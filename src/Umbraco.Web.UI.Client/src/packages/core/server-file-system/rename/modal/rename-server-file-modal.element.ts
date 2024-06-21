@@ -87,7 +87,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${'Rename'}>
 				<uui-box>

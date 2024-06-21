@@ -52,7 +52,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 				@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Content Template">
 				${this.#renderBlueprintName()}

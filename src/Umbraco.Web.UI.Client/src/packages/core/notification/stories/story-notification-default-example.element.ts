@@ -29,7 +29,7 @@ export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {
 		this._notificationContext?.peek(color, options);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<uui-button @click="${() => this._handleNotification('default')}" label="Default"></uui-button>
 			<uui-button

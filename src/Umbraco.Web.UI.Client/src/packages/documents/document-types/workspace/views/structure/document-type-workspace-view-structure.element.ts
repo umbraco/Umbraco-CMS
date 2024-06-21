@@ -62,7 +62,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('contentTypeEditor_structure')}>
 				<umb-property-layout alias="Root" label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}>

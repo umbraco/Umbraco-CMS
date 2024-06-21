@@ -28,7 +28,7 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 		});
 	}
 
-	render() {
+	override render() {
 		if (!this.data) {
 			return html`<uui-loader-bar></uui-loader-bar>`;
 		}

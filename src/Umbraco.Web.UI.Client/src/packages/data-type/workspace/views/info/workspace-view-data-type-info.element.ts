@@ -44,7 +44,7 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div class="container">
 				<umb-data-type-workspace-view-info-reference

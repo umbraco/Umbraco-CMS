@@ -187,7 +187,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
-	render() {
+	override render() {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
 			<uui-input

@@ -32,7 +32,7 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		if (!this.list) return nothing;
 
 		return html`

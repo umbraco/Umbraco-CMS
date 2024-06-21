@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-settings-welcome-dashboard')
 export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<section id="settings-dashboard" class="uui-text">
 				<uui-box>
@@ -64,7 +64,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 
 					<p>
 						<umb-localize key="settingsDashboard_supportDescription">
-						Extend your team with a highly skilled and passionate bunch of Umbraco know-it-alls
+							Extend your team with a highly skilled and passionate bunch of Umbraco know-it-alls
 						</umb-localize>
 					</p>
 					<uui-button

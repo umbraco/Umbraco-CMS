@@ -75,7 +75,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		this.value = { ...this.value, constrain };
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Embed">
 				<uui-box>

@@ -59,7 +59,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.#workspaceContext.load(this.#contentUdi);
 	}
 
-	render() {
+	override render() {
 		return html` <uui-box>
 			<button
 				slot="header"

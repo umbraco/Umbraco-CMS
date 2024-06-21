@@ -43,7 +43,7 @@ export default class UmbStylesheetRuleSettingsModalElement extends UmbModalBaseE
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Edit style">
 				<div id="main">

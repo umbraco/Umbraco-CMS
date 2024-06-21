@@ -59,7 +59,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('user_selectUserGroup', false)}>
 				<uui-box>

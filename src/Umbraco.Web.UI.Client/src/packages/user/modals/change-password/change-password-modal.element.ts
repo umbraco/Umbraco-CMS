@@ -77,7 +77,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${this._headline}>
 				<uui-form>

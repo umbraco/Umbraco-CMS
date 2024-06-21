@@ -160,7 +160,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		this.#groupStructureHelper.addContainer(this.#containerId, sortOrder);
 	};
 
-	render() {
+	override render() {
 		return html`
 			${
 				this.#containerId

@@ -58,7 +58,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	public invalid?: boolean;
 
-	render() {
+	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">

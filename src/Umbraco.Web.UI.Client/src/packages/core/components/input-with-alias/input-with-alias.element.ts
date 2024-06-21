@@ -68,7 +68,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		this._aliasLocked = !this._aliasLocked;
 	}
 
-	render() {
+	override render() {
 		const nameLabel = this.label ?? this.localize.term('placeholders_entername');
 		const aliasLabel = this.localize.term('placeholders_enterAlias');
 

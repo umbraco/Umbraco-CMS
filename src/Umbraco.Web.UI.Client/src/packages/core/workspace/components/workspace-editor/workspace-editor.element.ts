@@ -82,7 +82,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout main-no-padding .headline=${this.headline}>
 				${this.#renderBackButton()}

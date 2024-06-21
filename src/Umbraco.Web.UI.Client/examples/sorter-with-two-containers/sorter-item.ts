@@ -12,7 +12,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 	@property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
 	umbDragPlaceholder = false;
 
-	render() {
+	override render() {
 		return html`
 			<div>
 				${this.name}

@@ -48,7 +48,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MemberGroup" back-path="/section/member-management/view/member-groups">
 				${this.#renderActions()}

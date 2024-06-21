@@ -48,7 +48,7 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMemberGroup')}>
 			<uui-box>
 				${repeat(

@@ -82,7 +82,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('propertyEditorPicker_openPropertyEditorPicker')}>
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>

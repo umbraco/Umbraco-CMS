@@ -62,7 +62,7 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('dynamicRoot_pickDynamicRootOriginTitle')}>
 				<div id="main">

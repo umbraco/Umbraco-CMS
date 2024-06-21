@@ -136,7 +136,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		this.updateValue({ destination });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Restore">
 				<uui-box>

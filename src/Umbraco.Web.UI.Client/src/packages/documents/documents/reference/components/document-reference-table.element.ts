@@ -49,7 +49,7 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		this._hasMoreReferences = data.total > this.#pageSize ? data.total - this.#pageSize : 0;
 	}
 
-	render() {
+	override render() {
 		return html` ${this.#renderErrorMessage()} ${this.#renderTable()} `;
 	}
 

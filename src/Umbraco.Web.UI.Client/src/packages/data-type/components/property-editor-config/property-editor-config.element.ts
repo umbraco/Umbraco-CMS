@@ -39,7 +39,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._properties?.length > 0
 			? repeat(
 					this._properties,

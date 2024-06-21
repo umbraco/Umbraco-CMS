@@ -89,7 +89,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		await this._firstActionApi?.execute();
 	}
 
-	render() {
+	override render() {
 		if (this._numberOfActions === 0) return nothing;
 		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
 	}

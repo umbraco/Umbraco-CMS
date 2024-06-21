@@ -32,7 +32,7 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`${this._sectionsNames.join(', ')}`;
 	}
 }

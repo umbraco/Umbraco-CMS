@@ -163,7 +163,7 @@ export class UmbModalElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`${this.element}`;
 	}
 

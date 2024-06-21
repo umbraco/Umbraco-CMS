@@ -53,7 +53,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('examineManagement_indexers')} class="overview">
 				<p>

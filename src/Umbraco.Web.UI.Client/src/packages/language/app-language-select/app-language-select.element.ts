@@ -77,7 +77,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		this._popoverElement?.hidePopover();
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderTrigger()} ${this.#renderContent()}`;
 	}
 

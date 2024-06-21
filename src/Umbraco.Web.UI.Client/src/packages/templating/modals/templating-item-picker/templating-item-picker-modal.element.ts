@@ -79,7 +79,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box> ${this.#renderItems()} </uui-box>

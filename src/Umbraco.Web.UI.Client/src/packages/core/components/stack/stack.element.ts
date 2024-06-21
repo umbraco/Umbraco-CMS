@@ -24,7 +24,7 @@ export class UmbStackElement extends UmbLitElement {
 	@property({ type: Boolean })
 	divide: boolean = false;
 
-	render() {
+	override render() {
 		return html`
 			<div class=${classMap({ divide: this.divide, compact: this.look === 'compact' })}>
 				<slot></slot>

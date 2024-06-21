@@ -46,7 +46,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		if (!this._user) return html`User not found`;
 
 		return html`

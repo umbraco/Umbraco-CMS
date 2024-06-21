@@ -3,7 +3,7 @@ import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/ex
 
 @customElement('umb-section-main')
 export class UmbSectionMainElement extends LitElement {
-	render() {
+	override render() {
 		return html`
 			<main>
 				<slot></slot>

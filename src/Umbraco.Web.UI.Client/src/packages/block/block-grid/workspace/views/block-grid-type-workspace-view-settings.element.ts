@@ -76,7 +76,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 		this.#datasetContext?.setPropertyValue('rowMaxSpan', (e.target as UmbInputNumberRangeElement).maxValue);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('general_general')}>
 				<umb-property

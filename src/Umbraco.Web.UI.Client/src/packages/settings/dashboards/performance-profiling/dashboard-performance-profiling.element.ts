@@ -64,7 +64,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 			: html` ${unsafeHTML(this.localize.term('profiling_profilerEnabledDescription'))} `;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('profiling_performanceProfiling')}>
 				${typeof this._profilingStatus === 'undefined' ? html`<uui-loader></uui-loader>` : this.renderProfilingStatus()}

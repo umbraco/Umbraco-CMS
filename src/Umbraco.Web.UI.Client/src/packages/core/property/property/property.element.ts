@@ -293,7 +293,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-property-layout
 				id="layout"

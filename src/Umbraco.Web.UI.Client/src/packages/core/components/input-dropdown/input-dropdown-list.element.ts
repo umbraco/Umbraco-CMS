@@ -29,7 +29,7 @@ export class UmbInputDropdownListElement extends UUIFormControlMixin(UmbLitEleme
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-select
 			label=${this.localize.term('formProviderFieldTypes_dropdownName')}
 			.placeholder=${this.placeholder ?? ''}

@@ -177,7 +177,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return this._permitted.length > 0
 			? repeat(
 					this._permitted,

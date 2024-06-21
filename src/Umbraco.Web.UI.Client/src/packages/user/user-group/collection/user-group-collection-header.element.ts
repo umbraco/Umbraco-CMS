@@ -26,7 +26,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 
 	#debouncedSearch = debounce((query: any) => this.#collectionContext?.setFilter({ query }), 500);
 
-	render() {
+	override render() {
 		return html`<umb-collection-action-bundle></umb-collection-action-bundle>
 			<uui-input
 				@input=${this.#onSearch}

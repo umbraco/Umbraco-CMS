@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-relation-type-root-workspace')
 export class UmbRelationTypeRootWorkspaceElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout main-no-padding headline=${this.localize.term('relationType_relations')}>
 				<umb-collection alias=${UMB_RELATION_TYPE_COLLECTION_ALIAS}></umb-collection>;

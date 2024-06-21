@@ -185,7 +185,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">

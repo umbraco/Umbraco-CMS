@@ -81,7 +81,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		this._qrCodeSetupImageUrl = data.qrCodeSetupImageUrl;
 	}
 
-	render() {
+	override render() {
 		if (this._loading) {
 			return html`<uui-loader-bar></uui-loader-bar>`;
 		}

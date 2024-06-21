@@ -43,7 +43,7 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		return input.substring(9, frontChars) + separator + input.substring(input.length - backChars);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('user_yourHistory')}>
 				<uui-ref-list>${map(this._history, (item) => html` ${this.#renderItem(item)} `)}</uui-ref-list>

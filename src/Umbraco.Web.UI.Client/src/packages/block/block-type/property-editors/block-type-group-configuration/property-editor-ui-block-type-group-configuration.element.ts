@@ -18,7 +18,7 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	render() {
+	override render() {
 		return html`<div>umb-property-editor-ui-block-type-group-configuration</div>`;
 	}
 

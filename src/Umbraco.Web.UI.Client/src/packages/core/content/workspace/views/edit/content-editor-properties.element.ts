@@ -66,7 +66,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		);
 	}
 
-	render() {
+	override render() {
 		return this._propertyStructure && this._dataPaths
 			? repeat(
 					this._propertyStructure,

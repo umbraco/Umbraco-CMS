@@ -33,7 +33,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._variants
 			? html`<div id="splitViews">
 						${repeat(

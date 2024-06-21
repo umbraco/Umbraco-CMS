@@ -46,7 +46,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectUsers')}>
 				<uui-box>

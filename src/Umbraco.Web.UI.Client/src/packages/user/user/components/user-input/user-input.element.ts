@@ -125,7 +125,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 

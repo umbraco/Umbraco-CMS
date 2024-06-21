@@ -33,7 +33,7 @@ export class UmbInputEyeDropperElement extends UUIFormControlMixin(UmbLitElement
 	// To do this, we must omit the `.swatches` attribute, otherwise the default swatches can't be used.
 	// So, we've use a `when()` render both configurations. [LK]
 
-	render() {
+	override render() {
 		const swatches = this.showPalette ? this.swatches : undefined;
 		return when(
 			this.showPalette && !swatches,

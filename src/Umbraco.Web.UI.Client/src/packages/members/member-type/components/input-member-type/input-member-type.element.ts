@@ -103,7 +103,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		});
 	}
 
-	render() {
+	override render() {
 		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 

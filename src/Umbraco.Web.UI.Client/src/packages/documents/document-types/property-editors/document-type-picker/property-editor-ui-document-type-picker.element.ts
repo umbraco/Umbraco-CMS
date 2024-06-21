@@ -39,7 +39,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-document-type
 				.min=${this.min}

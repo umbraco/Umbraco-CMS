@@ -44,7 +44,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<a href="${ensureSlash(path()) + this.manifest?.meta.label}">
 			<uui-box class="group-box"> ${this.manifest?.meta.label} ${this._renderStatus()} </uui-box>
 		</a>`;
@@ -66,25 +66,25 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 			? html`<uui-tag look="secondary" color="positive">
 					<uui-icon name="icon-check"></uui-icon>
 					${resultObject.success}
-			  </uui-tag> `
+				</uui-tag> `
 			: nothing}
 		${resultObject.warning > 0
 			? html`<uui-tag look="secondary" color="warning">
 					<uui-icon name="icon-alert"></uui-icon>
 					${resultObject.warning}
-			  </uui-tag>`
+				</uui-tag>`
 			: nothing}
 		${resultObject.error > 0
 			? html`<uui-tag look="secondary" color="danger">
 					<uui-icon name="icon-wrong"></uui-icon>
 					${resultObject.error}
-			  </uui-tag>`
+				</uui-tag>`
 			: nothing}
 		${resultObject.info > 0
 			? html`<uui-tag look="secondary">
 					<uui-icon name="icon-info"></uui-icon>
 					${resultObject.info}
-			  </uui-tag>`
+				</uui-tag>`
 			: nothing} `;
 	}
 

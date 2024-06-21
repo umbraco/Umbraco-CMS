@@ -99,7 +99,7 @@ export class UmbInputSectionElement extends UUIFormControlMixin(UmbLitElement, '
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
 			<uui-button

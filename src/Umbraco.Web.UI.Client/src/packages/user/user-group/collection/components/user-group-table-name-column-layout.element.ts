@@ -10,7 +10,7 @@ export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {
 	@property({ attribute: false })
 	value!: any;
 
-	render() {
+	override render() {
 		const href = `section/user-management/view/user-groups/user-group/edit/${this.item.id}`;
 		return html`<a href=${href}>${this.value.name}</a>`;
 	}

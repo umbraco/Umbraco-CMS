@@ -27,7 +27,7 @@ export class UmbPackagesMarketplaceSectionViewElement extends UmbLitElement impl
 		);
 	}
 
-	render() {
+	override render() {
 		if (!this._marketplaceUrl) return html`<div id="loader"><uui-loader></uui-loader></div>`;
 		return html`
 			<div id="container">

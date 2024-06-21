@@ -121,7 +121,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this._temporaryFileId = '';
 	}
 
-	render() {
+	override render() {
 		return html` <umb-body-layout headline=${this.localize.term('general_import')}>
 			<uui-box>
 				${when(

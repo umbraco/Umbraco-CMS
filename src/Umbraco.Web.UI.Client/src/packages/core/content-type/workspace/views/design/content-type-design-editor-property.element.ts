@@ -195,7 +195,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
 		return this._inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
 	}

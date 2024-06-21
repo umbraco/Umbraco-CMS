@@ -62,7 +62,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('buttons_publishDescendants')}>
 			<p id="subtitle">
 				${this._options.length === 1

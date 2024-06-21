@@ -10,7 +10,7 @@ export class UmbPreviewOpenWebsiteElement extends UmbLitElement {
 		previewContext.openWebsite();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button look="primary" @click=${this.#onClick}>
 				<div>

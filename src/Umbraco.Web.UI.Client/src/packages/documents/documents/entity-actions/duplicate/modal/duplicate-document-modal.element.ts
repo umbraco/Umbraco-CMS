@@ -40,7 +40,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		this.updateValue({ includeDescendants: target.checked });
 	}
 
-	render() {
+	override render() {
 		if (!this.data) return nothing;
 
 		return html`

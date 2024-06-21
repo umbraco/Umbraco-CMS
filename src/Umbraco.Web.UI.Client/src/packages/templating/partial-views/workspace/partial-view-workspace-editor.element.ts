@@ -88,7 +88,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
-	render() {
+	override render() {
 		return this._isNew !== undefined
 			? html`<umb-workspace-editor alias="Umb.Workspace.PartialView">
 					<div id="workspace-header" slot="header">

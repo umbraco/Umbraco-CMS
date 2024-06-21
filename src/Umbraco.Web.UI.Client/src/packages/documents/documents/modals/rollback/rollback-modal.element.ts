@@ -295,7 +295,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">

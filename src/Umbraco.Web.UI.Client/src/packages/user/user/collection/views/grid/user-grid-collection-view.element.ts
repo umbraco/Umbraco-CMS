@@ -64,7 +64,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		this.#collectionContext?.selection.deselect(user.unique ?? '');
 	}
 
-	render() {
+	override render() {
 		if (this._loading) nothing;
 		return html`
 			<div id="user-grid">

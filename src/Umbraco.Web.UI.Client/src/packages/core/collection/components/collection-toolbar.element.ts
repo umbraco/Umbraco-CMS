@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-toolbar')
 export class UmbCollectionToolbarElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
 			<umb-collection-view-bundle></umb-collection-view-bundle>

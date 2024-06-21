@@ -28,7 +28,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 		},
 	];
 
-	render() {
+	override render() {
 		return html`
 			<div id="info-links" class="uui-text">
 				<uui-box id="our-umbraco">

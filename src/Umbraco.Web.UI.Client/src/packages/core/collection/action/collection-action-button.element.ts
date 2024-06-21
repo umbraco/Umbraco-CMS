@@ -64,7 +64,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				id="action-button"

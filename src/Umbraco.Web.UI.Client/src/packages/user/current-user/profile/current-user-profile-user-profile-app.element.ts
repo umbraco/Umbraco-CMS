@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-current-user-profile-user-profile-app')
 export class UmbCurrentUserProfileUserProfileAppElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<uui-box .headline=${this.localize.term('user_yourProfile')}>
 				<umb-extension-with-api-slot id="actions" type="currentUserAction"></umb-extension-with-api-slot>

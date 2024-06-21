@@ -30,7 +30,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		this.value = { altText: data.variants[0].name, caption: undefined, url: data.urls[0]?.url ?? '' };
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout .headline=${this.localize.term('defaultdialogs_editSelectedMedia')}>
 				<div id="wrapper">

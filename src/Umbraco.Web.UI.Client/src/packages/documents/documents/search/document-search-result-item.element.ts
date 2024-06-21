@@ -61,7 +61,7 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
-	render() {
+	override render() {
 		if (!this.item) return nothing;
 
 		return html`

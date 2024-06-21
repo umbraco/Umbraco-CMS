@@ -52,7 +52,7 @@ export class UmbDropdownElement extends UmbLitElement {
 		this.open = event.newState === 'open';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				id="dropdown-button"

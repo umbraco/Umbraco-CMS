@@ -60,7 +60,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select a configuration">
 				<uui-box> ${this._renderDataTypes()} ${this._renderCreate()}</uui-box>

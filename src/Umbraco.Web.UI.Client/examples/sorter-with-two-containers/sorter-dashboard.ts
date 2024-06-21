@@ -36,7 +36,7 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 		},
 	];
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<div class="outer-wrapper">

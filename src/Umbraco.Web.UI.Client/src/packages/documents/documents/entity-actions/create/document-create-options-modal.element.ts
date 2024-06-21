@@ -115,7 +115,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_create')}>
 				${when(

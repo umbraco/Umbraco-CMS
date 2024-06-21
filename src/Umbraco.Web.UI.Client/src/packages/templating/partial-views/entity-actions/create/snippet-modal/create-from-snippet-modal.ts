@@ -42,7 +42,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Partial View from snippet">
 				<uui-box>

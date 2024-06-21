@@ -24,7 +24,7 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 		return this.localize.term('login_signInWith', labelLocalized);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				type="button"

@@ -87,7 +87,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="container" class="uui-text" data-test="installer-telemetry">
 				<h1>Consent for telemetry data</h1>

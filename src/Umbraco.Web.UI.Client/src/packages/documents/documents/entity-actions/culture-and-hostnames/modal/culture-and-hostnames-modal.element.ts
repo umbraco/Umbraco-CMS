@@ -108,7 +108,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	// Renders
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
 				${this.#renderCultureSection()} ${this.#renderDomainSection()}

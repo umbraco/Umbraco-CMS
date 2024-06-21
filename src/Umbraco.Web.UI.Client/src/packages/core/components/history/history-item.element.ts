@@ -10,7 +10,7 @@ export class UmbHistoryItemElement extends UmbLitElement {
 	@property({ type: String })
 	detail?: string;
 
-	render() {
+	override render() {
 		return html`
 			<div class="user-info">
 				<slot name="avatar"></slot>

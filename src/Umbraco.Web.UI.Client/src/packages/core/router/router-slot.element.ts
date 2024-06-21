@@ -128,7 +128,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		}
 	};
 
-	render() {
+	override render() {
 		return html`${this.#router}${this.#modalRouter}`;
 	}
 

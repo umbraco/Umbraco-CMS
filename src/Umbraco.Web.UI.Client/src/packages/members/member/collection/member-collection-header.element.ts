@@ -64,7 +64,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 		this.#collectionContext?.setMemberTypeFilter(contentTypeUnique);
 	}
 
-	render() {
+	override render() {
 		return html`<umb-collection-action-bundle></umb-collection-action-bundle>
 			<uui-input
 				@input=${this.#onSearch}

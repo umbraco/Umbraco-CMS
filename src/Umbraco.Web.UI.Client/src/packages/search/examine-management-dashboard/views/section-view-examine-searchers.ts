@@ -117,7 +117,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		await modalContext.onSubmit().catch(() => undefined);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('general_search')}>
 				<p>

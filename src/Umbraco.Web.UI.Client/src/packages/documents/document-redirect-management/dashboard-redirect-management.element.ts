@@ -136,7 +136,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	// Renders
-	render() {
+	override render() {
 		return html` <div id="redirect-actions">
 				${this._trackerEnabled
 					? html`<div id="search-wrapper">

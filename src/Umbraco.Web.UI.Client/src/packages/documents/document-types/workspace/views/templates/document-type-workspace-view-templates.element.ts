@@ -73,7 +73,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		this.#workspaceContext?.setDefaultTemplate({ id: input.defaultUnique });
 	}
 
-	render() {
+	override render() {
 		return this._isElementType ? this.#renderUnsupported() : this.#renderTemplates();
 	}
 

@@ -79,7 +79,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 		this.#dataTypeModal?.open({}, `edit/${this.value}`);
 	}
 
-	render() {
+	override render() {
 		return !this.value ? this.#renderCreate() : this.#renderConfigured();
 	}
 

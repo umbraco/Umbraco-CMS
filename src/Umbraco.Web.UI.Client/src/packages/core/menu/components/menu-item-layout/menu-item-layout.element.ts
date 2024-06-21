@@ -57,7 +57,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 		this._isActive = location.includes(this.href);
 	}
 
-	render() {
+	override render() {
 		return html`<uui-menu-item
 			href="${ifDefined(this.href)}"
 			label=${this.label}

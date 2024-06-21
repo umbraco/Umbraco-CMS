@@ -3,7 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeaderElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<div id="appHeader">
 				<umb-backoffice-header-logo></umb-backoffice-header-logo>

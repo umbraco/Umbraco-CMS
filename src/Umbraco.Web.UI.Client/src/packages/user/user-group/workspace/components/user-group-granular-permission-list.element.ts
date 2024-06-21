@@ -82,7 +82,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		this.#workspaceContext?.setPermissions(newCombinedValue);
 	};
 
-	render() {
+	override render() {
 		return html`${this._extensionElements.map((element) => this.#renderProperty(element))}`;
 	}
 

@@ -130,7 +130,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		return 'x' + simpleHashCode('' + layout.collectionView + layout.name + layout.icon).toString(16);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="layout-wrapper">${this.#renderLayouts()}</div>
 			${this.#renderInput()}

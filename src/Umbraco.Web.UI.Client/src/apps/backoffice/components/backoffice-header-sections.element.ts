@@ -52,7 +52,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-tab-group id="tabs">
 				${repeat(

@@ -53,7 +53,7 @@ export class UmbInstallerElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<umb-installer-layout data-test="installer">${this._renderSection()}</umb-installer-layout> `;
 	}
 }

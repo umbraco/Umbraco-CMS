@@ -47,7 +47,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 		this._filtered = this.data.items;
 	}
 
-	render() {
+	override render() {
 		if (!this.data) return nothing;
 		const items = this._filtered;
 		return html`

@@ -82,7 +82,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		this._routes = routes?.length > 0 ? [...routes, { path: '', redirectTo: routes?.[0]?.path }] : [];
 	}
 
-	render() {
+	override render() {
 		return this._routes.length > 0
 			? html`
 					<umb-body-layout main-no-padding>

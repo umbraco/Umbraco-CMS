@@ -1,9 +1,9 @@
-import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-installer-layout')
 export class UmbInstallerLayoutElement extends LitElement {
-	render() {
+	override render() {
 		return html`
 			<!-- <div id="background" aria-hidden="true"></div> -->
 

@@ -51,7 +51,7 @@ export class UmbDataTypeWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		this._loading = false;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('references_tabName')}>
 				${when(

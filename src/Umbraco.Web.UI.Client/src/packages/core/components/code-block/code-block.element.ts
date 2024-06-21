@@ -30,7 +30,7 @@ export class UmbCodeBlockElement extends LitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderHeader()}
 			<pre><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>

@@ -54,7 +54,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 		});
 	}
 
-	render() {
+	override render() {
 		if (!this._installedPackages.length) return this.#renderNoPackages();
 		return html`${this.#renderCustomMigrations()} ${this.#renderInstalled()} `;
 	}

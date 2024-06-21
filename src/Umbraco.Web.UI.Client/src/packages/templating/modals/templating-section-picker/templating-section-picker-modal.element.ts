@@ -50,7 +50,7 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box>
@@ -120,7 +120,7 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 								shown.
 							</umb-localize>
 						</small>
-				  </div>`
+					</div>`
 				: ''}
 		</uui-button>`;
 	}
@@ -146,7 +146,7 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 							<umb-localize key="template_sectionName">Section Name</umb-localize>
 						</uui-label>
 						<uui-input id="define-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
-				  </div>`
+					</div>`
 				: ''}
 		</uui-button>`;
 	}

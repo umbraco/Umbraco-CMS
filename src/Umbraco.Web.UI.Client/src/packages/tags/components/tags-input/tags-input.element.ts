@@ -180,7 +180,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	/** Render */
 
-	render() {
+	override render() {
 		return html`
 			<div id="wrapper">
 				${this.#enteredTags()}

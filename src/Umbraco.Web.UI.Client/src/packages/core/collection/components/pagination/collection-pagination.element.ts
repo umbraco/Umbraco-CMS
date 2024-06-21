@@ -48,7 +48,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		this._collectionContext?.pagination.setCurrentPageNumber(event.target.current);
 	}
 
-	render() {
+	override render() {
 		if (this._totalPages <= 1) {
 			return nothing;
 		}

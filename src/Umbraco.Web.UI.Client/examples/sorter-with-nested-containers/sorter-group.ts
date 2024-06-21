@@ -50,7 +50,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		this.value = this.value.filter((r) => r.name !== item.name);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<div class="sorter-container">
 				${repeat(

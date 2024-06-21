@@ -110,7 +110,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		this._cacheCollect();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline="Published Cache Status">
 				<p>${this._publishedStatusText}</p>

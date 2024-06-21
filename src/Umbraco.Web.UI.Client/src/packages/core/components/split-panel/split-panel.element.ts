@@ -222,7 +222,7 @@ export class UmbSplitPanelElement extends LitElement {
 		this.#connect();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="main">
 				<slot

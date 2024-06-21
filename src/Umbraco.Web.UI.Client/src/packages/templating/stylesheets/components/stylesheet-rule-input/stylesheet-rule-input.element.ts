@@ -72,7 +72,7 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 		this.#sorter.setModel(this.rules);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-ref-list>
 				${repeat(

@@ -44,7 +44,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<umb-workspace-editor
 			alias="Umb.Workspace.Language"
 			back-path="section/settings/workspace/language-root">

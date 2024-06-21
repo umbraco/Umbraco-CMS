@@ -148,7 +148,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		return sorting;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${'Sort Children'}>
 				<uui-box>${this.#renderChildren()}</uui-box>

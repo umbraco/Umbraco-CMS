@@ -279,7 +279,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="top">
 				${this.#renderSearchIcon()}

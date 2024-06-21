@@ -50,7 +50,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		this.#userGroupWorkspaceContext?.setFallbackPermissions(verbs);
 	}
 
-	render() {
+	override render() {
 		return html` ${this._entityTypes.map((entityType) => this.#renderPermissionsByEntityType(entityType))} `;
 	}
 

@@ -75,7 +75,7 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + this.data?.user.unique); //TODO: URL Should be dynamic
 	};
 
-	render() {
+	override render() {
 		return html`<uui-dialog-layout headline="${this._userItem?.name} has been created">
 			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
 			<uui-form-layout-item>

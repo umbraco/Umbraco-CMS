@@ -48,7 +48,7 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		this._currentLabel = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : '';
 	}
 
-	render() {
+	override render() {
 		return html`<uui-toggle
 			.checked=${this.#checked}
 			.label=${this._currentLabel}

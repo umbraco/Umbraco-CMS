@@ -55,7 +55,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<slot></slot>
 			<umb-backoffice-modal-container></umb-backoffice-modal-container>
 			<umb-backoffice-notification-container></umb-backoffice-notification-container>`;

@@ -55,7 +55,7 @@ export abstract class UmbFolderModalElementBase<
 		this.onFormSubmit({ name });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term(this._isNew ? 'actions_folderCreate' : 'actions_folderRename')}>
 				<uui-box>

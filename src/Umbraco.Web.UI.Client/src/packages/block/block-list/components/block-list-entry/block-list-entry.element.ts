@@ -136,7 +136,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		`;
 	}
 
-	render() {
+	override render() {
 		return this.#renderBlock();
 	}
 

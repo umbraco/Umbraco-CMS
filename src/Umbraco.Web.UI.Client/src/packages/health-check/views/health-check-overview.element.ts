@@ -26,7 +26,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 		this._healthCheckDashboardContext?.checkAll();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<div id="header" slot="header">

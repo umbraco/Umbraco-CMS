@@ -95,7 +95,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-input-dropdown-list
 				@change="${this.#onContentTypeChange}"
 				.options=${this._options}></umb-input-dropdown-list>

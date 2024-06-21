@@ -104,7 +104,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._allowedDocumentTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
 	}
 

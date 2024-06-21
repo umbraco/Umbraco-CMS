@@ -48,7 +48,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline="Select languages">
 			<uui-box>
 				${this.#filteredLanguages.length > 0

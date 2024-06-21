@@ -83,7 +83,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.#setCleanup();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline="Data variations">
 				<umb-property-layout

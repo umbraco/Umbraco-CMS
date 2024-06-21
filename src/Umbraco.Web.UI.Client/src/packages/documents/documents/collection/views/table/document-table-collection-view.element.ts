@@ -194,7 +194,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return this._tableItems.length === 0 ? this.#renderEmpty() : this.#renderItems();
 	}
 

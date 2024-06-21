@@ -140,7 +140,7 @@ export class UmbInputBlockTypeElement<
 		this.deleteItem(item.contentElementTypeKey);
 	}
 
-	render() {
+	override render() {
 		return html`<div id="blocks">
 			${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
 		</div>`;

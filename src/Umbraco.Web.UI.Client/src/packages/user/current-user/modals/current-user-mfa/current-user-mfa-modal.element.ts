@@ -65,7 +65,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('member_2fa')}">
 				<div id="main">

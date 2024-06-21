@@ -147,7 +147,7 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 		this.value = this._customFields.find((field) => field.alias === alias) as FieldPickerValue;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-combobox id="preview">
 				<uui-combobox-list @change=${this.#onChange}>

@@ -15,7 +15,7 @@ export class UmbExamineFieldsViewerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		if (!this.data) return nothing;
 
 		return html`

@@ -73,7 +73,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		this._collectionContext?.selection.clearSelection();
 	}
 
-	render() {
+	override render() {
 		if (this._selectionLength === 0) return nothing;
 
 		return html`

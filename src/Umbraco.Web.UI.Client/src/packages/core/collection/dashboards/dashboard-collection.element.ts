@@ -7,7 +7,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 	public manifest!: ManifestDashboardCollection;
 
 	// TODO: figure out what collection to render
-	render() {
+	override render() {
 		return html`<umb-collection></umb-collection>`;
 	}
 

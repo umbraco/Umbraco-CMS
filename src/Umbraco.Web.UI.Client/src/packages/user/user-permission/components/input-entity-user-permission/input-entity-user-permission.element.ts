@@ -68,7 +68,7 @@ export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(Umb
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderGroupedPermissions(this._manifests)} `;
 	}
 

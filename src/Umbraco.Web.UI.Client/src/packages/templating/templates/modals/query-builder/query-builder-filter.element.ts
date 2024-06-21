@@ -109,7 +109,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		const properties = localizePropertyType(this.settings?.properties);
 		return html`
 			<span>${this.unremovable ? this.localize.term('template_where') : this.localize.term('template_and')}</span>

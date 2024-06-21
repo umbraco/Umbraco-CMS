@@ -48,7 +48,7 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Stylesheet">
 				<uui-box>

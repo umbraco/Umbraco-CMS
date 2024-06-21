@@ -417,7 +417,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderToolbar()}
 			<umb-code-editor

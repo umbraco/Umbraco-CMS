@@ -69,7 +69,7 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 		}
 	}
 
-	render() {
+	override render() {
 		return html` <uui-combobox value="${this.value}" @change=${this.#onChange}>
 			<uui-combobox-list>
 				${this._options.map(

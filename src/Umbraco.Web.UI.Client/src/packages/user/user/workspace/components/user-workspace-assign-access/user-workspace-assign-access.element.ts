@@ -113,7 +113,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', selection);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>

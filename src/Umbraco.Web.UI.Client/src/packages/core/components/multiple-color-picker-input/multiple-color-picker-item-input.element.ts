@@ -131,7 +131,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		this._colorPicker.click();
 	}
 
-	render() {
+	override render() {
 		//TODO: Using native input=color element instead of uui-color-picker due to its huge size and bad adaptability as a pop up
 		return html`
 			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>

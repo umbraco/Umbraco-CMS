@@ -68,7 +68,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('general_scheduledPublishing')}>
 			<p id="subtitle">
 				${when(

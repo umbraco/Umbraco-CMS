@@ -103,7 +103,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-input
 				type="number"

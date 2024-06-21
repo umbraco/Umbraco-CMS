@@ -51,7 +51,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
 				<uui-box headline="Create a folder under Content Templates">

@@ -99,7 +99,7 @@ The controller is already initialised if you use the `UmbElementMixin` in your e
 
 ```ts
 export class MyElement extends UmbElementMixin(LitElement) {
-	render() {
+	override render() {
 		return html` <uui-button .label=${this.localize.term('general_close')}></uui-button> `;
 	}
 }
@@ -116,7 +116,7 @@ export class MyElement extends LitElement {
 	// Create a new instance of the controller and attach it to the element
 	private localize = new UmbLocalizeController(this);
 
-	render() {
+	override render() {
 		return html` <uui-button .label=${this.localize.localize('general_close')}></uui-button> `;
 	}
 }

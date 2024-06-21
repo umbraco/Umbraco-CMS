@@ -106,7 +106,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<umb-property-layout label="Language">

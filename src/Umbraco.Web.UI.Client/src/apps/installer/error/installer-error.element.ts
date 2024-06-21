@@ -55,7 +55,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html` <div id="container" class="uui-text" data-test="installer-error">
 			<uui-form>
 				<form id="installer-form" @submit="${this._handleSubmit}">

@@ -190,7 +190,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
 			${this.#renderAddButton()}`;
 	}

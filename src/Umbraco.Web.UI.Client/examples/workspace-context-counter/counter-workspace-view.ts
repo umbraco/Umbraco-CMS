@@ -25,7 +25,7 @@ export class ExampleCounterWorkspaceView extends UmbElementMixin(LitElement) {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<h1 class="uui-h2" style="margin-top: var(--uui-size-layout-1);">Counter Example</h1>

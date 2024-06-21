@@ -79,7 +79,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		target.style.display = hasChildren ? 'flex' : 'none';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div
 				id="header"

@@ -117,7 +117,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		this.hasPendingMigrations = false;
 	}
 
-	render() {
+	override render() {
 		return this.name
 			? html`
 					<uui-ref-node-package

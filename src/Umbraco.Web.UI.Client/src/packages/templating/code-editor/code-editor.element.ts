@@ -148,7 +148,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		return this.#editor?.find(text, searchOptions);
 	}
 
-	render() {
+	override render() {
 		return html` <div id="editor-container" ${ref(this.containerRef)}></div> `;
 	}
 

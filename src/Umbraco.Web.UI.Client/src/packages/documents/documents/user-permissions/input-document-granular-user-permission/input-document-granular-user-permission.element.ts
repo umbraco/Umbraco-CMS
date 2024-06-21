@@ -146,7 +146,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 

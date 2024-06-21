@@ -165,7 +165,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		this.#requestRelations();
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderRelations()}${this.#renderDetails()}`;
 	}
 

@@ -22,7 +22,7 @@ class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
 		this.amountOfUpdates++;
 	}
 
-	render() {
+	override render() {
 		return html`${this.localize.term('logout')}`;
 	}
 }

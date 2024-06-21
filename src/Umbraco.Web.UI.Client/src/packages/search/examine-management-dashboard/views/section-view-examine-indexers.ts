@@ -102,7 +102,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		if (!this._indexData || this._loading) return html` <uui-loader-bar></uui-loader-bar>`;
 
 		return html`

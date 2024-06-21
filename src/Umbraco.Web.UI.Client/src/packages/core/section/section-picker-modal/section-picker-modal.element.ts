@@ -41,7 +41,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select sections">
 				<uui-box>

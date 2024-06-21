@@ -30,7 +30,7 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 		}).passContextAliasMatches();
 	}
 
-	render() {
+	override render() {
 		return this._areaConfigConfigurationObject
 			? html`
 					<uui-box headline="Areas">

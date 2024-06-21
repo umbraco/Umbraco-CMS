@@ -115,7 +115,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		return this._userAvatarUrls.length > 0;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<form id="AvatarUploadForm" novalidate>

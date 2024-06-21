@@ -365,7 +365,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">

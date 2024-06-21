@@ -63,7 +63,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Partial View">
 				<uui-box>

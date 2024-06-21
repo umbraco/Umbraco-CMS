@@ -38,7 +38,7 @@ export class ExampleManifestPickerDashboard extends UmbLitElement {
 		this._selectedManifest = selectedManifest?.value ?? '';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<umb-property-layout label="Select a extension type...">

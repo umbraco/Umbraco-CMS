@@ -97,7 +97,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout
 				headline="${this.localize.term('create_createUnder')} ${this.localize.term('treeHeaders_documentTypes')}">

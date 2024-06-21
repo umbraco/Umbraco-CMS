@@ -55,7 +55,7 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Script">
 				<uui-box>

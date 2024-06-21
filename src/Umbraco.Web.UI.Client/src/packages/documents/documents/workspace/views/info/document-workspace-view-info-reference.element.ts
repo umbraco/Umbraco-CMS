@@ -112,7 +112,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		return '';
 	}
 
-	render() {
+	override render() {
 		if (this._items && this._items.length > 0) {
 			return html` <uui-box
 					headline=${this.localize.term('references_labelUsedByItems')}

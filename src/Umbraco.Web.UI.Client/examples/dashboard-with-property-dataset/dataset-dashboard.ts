@@ -18,7 +18,7 @@ export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {
 		this.requestUpdate('data', oldValue);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<h1 class="uui-h2" style="margin-top: var(--uui-size-layout-1);">Dataset Example</h1>

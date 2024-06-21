@@ -55,7 +55,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_readyToPublish')}>
 			<p id="subtitle">
 				<umb-localize key="content_variantsToPublish">Which variants would you like to publish?</umb-localize>

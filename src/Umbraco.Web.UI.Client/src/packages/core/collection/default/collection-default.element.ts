@@ -49,7 +49,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-transparent>
 				${this.renderToolbar()}

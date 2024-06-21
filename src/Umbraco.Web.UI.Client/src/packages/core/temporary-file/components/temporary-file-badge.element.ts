@@ -19,7 +19,7 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 		return this._progress;
 	}
 
-	render() {
+	override render() {
 		return html`<uui-badge>
 			<div id="wrapper">
 				<uui-loader-circle progress=${this.progress}></uui-loader-circle>

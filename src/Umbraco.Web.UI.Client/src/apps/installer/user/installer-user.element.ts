@@ -52,7 +52,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 		this._installerContext?.nextStep();
 	};
 
-	render() {
+	override render() {
 		return html` <div id="container" class="uui-text" data-test="installer-user">
 			<h1>Install Umbraco</h1>
 			<uui-form>

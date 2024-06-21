@@ -22,7 +22,7 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 		this._displayValue = data || [];
 	}
 
-	render() {
+	override render() {
 		if (this.uniques.length < 1) {
 			return html`
 				<uui-ref-node

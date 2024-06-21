@@ -29,7 +29,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 		this.updateValue({ allowedVerbs: target.allowedVerbs });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this._headline}>
 				<uui-box>

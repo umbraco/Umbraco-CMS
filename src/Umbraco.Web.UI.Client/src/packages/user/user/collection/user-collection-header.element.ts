@@ -139,7 +139,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 					.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
 			${this.#renderSearch()}

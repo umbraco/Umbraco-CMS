@@ -120,7 +120,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('insert', { bubbles: false, cancelable: true, composed: false }));
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button-group>
 				<uui-button

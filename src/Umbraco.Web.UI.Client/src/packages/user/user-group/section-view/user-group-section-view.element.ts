@@ -32,7 +32,7 @@ export class UmbUserGroupSectionViewElement extends UmbLitElement {
 		},
 	];
 
-	render() {
+	override render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>`;
 	}
 

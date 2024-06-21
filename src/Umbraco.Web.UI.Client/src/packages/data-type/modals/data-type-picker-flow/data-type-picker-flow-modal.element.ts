@@ -228,7 +228,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select editor" class="uui-text">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>

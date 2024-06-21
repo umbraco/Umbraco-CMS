@@ -98,7 +98,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<h1 class="uui-h2">

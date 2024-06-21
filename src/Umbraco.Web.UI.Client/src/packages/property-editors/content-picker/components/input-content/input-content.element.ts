@@ -91,7 +91,7 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		switch (this._type) {
 			case 'content':
 				return this.#renderDocumentPicker();

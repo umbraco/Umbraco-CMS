@@ -208,7 +208,7 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 	// TODO: This would conceptually be a Property Type Workspace, should be changed at one point in the future. [NL]
 	// For now this is hacky made available by giving the element an fixed alias. [NL]
 	// This would allow for workspace views and workspace actions. [NL]
-	render() {
+	override render() {
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">

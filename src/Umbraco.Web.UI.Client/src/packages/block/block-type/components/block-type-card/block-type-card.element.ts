@@ -62,7 +62,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	}
 
 	// TODO: Support image files instead of icons.
-	render() {
+	override render() {
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(this.href)}

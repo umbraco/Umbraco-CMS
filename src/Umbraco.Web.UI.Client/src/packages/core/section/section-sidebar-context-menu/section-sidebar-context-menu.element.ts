@@ -79,7 +79,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderBackdrop()}
 			<div id="relative-wrapper">

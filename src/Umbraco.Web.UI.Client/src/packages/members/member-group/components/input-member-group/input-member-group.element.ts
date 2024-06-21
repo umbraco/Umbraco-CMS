@@ -148,7 +148,7 @@ export class UmbInputMemberGroupElement extends UUIFormControlMixin(UmbLitElemen
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 

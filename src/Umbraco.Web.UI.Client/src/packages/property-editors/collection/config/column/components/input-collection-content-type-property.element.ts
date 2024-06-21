@@ -328,7 +328,7 @@ export class UmbInputCollectionContentTypePropertyElement extends UUIFormControl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-button
 			label=${this.localize.term('general_choose')}
 			look="placeholder"

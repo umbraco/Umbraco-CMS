@@ -41,7 +41,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Data Type">
 				<uui-box>

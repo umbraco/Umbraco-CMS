@@ -41,7 +41,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		previewContext.updateIFrame({ culture: culture.unique });
 	}
 
-	render() {
+	override render() {
 		if (this._cultures.length <= 1) return nothing;
 		return html`
 			<uui-button look="primary" popovertarget="cultures-popover">

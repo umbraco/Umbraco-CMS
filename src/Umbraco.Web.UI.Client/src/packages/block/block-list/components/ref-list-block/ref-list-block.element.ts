@@ -29,7 +29,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<uui-ref-node
 			standalone
 			.name=${this.label ?? ''}

@@ -34,7 +34,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="layout">
 				<img

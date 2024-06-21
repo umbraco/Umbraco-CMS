@@ -291,7 +291,7 @@ export class UmbAppElement extends UmbLitElement {
 		this.requestUpdate();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 

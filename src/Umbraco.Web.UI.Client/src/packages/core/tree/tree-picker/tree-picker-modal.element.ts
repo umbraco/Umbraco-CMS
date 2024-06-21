@@ -88,7 +88,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select">
 				<uui-box>

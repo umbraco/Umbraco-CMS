@@ -166,7 +166,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('mediaStartNode', selected ? { unique: selected } : null);
 	}
 
-	render() {
+	override render() {
 		if (!this._unique) return nothing;
 
 		return html`

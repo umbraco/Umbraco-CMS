@@ -64,7 +64,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-toggle
 				?checked=${this.value.allowBulkPublish}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkPublish')}

@@ -112,7 +112,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		this.#collectionContext?.setLastSelectedView(this._entityUnique, view.alias);
 	}
 
-	render() {
+	override render() {
 		if (!this._currentView) return nothing;
 		if (this._views.length <= 1) return nothing;
 

@@ -98,7 +98,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-ref-list>
 				${repeat(

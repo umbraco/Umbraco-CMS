@@ -169,7 +169,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 

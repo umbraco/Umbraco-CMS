@@ -9,7 +9,7 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
 	item?: UmbSearchResultItemModel;
 
-	render() {
+	override render() {
 		if (!this.item) return nothing;
 
 		return html`

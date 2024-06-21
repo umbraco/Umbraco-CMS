@@ -122,7 +122,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.setValue({ selection: this._selection });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('contentTypeEditor_compositions')}">
 				${this._references.length ? this.#renderHasReference() : this.#renderAvailableCompositions()}

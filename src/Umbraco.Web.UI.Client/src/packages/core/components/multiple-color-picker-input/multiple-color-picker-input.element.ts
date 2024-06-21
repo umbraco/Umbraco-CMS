@@ -175,7 +175,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 

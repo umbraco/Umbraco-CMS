@@ -55,7 +55,7 @@ export class UmbPreviewElement extends UmbLitElement {
 		this.#context.checkSession();
 	}
 
-	render() {
+	override render() {
 		if (!this._previewUrl) return nothing;
 		return html`
 			${when(!this._iframeReady, () => html`<div id="loading"><uui-loader-circle></uui-loader-circle></div>`)}

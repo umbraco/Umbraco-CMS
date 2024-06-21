@@ -68,7 +68,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<umb-property-layout label="Property Editor" description=${this.localize.term('propertyEditorPicker_title')}>

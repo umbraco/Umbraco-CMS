@@ -72,7 +72,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return this._propertyEditorUiAlias && this._property?.alias
 			? html`<umb-property
 					.dataPath=${this.dataPath}

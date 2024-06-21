@@ -75,7 +75,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation" class="handle"></uui-icon>`}
 

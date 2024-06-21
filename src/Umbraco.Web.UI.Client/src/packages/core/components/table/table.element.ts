@@ -160,7 +160,7 @@ export class UmbTableElement extends LitElement {
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-table class="uui-text">
 			<uui-table-column
 				.style=${when(

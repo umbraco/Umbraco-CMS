@@ -36,7 +36,7 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-stylesheet-input @change=${this.#onChange} .selection=${this.#value}></umb-stylesheet-input>`;
 	}
 }

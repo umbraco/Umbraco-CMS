@@ -65,7 +65,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
-	render() {
+	override render() {
 		return this._isNew !== undefined
 			? html`<umb-workspace-editor alias="Umb.Workspace.Script">
 					<div id="workspace-header" slot="header">
