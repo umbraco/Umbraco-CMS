@@ -17,7 +17,7 @@ public static class UmbracoBuilderAuthExtensions
 {
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
-        if (builder.Services.Any(x=>x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
+        if (builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
         {
             ConfigureOpenIddict(builder);
         }
