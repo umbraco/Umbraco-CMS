@@ -24,8 +24,7 @@
                   focusLockService.removeInertAttribute();
                 }
             }
-
-            focusLockService.addInertAttribute();
+          /* focusLockService.addInertAttribute();*/
         }
 
         var directive = {
