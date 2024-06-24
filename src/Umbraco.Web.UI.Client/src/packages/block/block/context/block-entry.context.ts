@@ -309,7 +309,7 @@ export abstract class UmbBlockEntryContext<
 		);
 		/*
 
-			This two way binding does not work well, might need to further investigate what the exact problem is.
+		This two way binding does not work well, might need to further investigate what the exact problem is.
 		this.observe(
 			this.content,
 			(content) => {
