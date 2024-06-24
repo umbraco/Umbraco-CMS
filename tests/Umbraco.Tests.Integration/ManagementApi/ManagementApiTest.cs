@@ -111,7 +111,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         var codeVerifier = "12345"; // Just a dummy value we use in tests
         var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
-            .TrimEnd("=");
+            .TrimEndOfString("=");
 
         var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) +
                   $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}";

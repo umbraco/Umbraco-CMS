@@ -37,7 +37,7 @@ public class AllIndexerController : IndexerControllerBase
     {
         IndexResponseModel[] indexes = _examineManager.Indexes
             .Select(_indexPresentationFactory.Create)
-            .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
+            .OrderBy(indexModel => indexModel.Name.TrimEndOfString("Indexer")).ToArray();
 
         var viewModel = new PagedViewModel<IndexResponseModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
         return Task.FromResult(viewModel);

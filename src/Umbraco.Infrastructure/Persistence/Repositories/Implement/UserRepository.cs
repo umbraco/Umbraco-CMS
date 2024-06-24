@@ -1179,7 +1179,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var args = filterSql.Arguments;
         var sqlFilter = hasWhereClause
             ? filterSql.SQL
-            : " WHERE " + filterSql.SQL.TrimStart("AND ");
+            : " WHERE " + filterSql.SQL.TrimStartOfString("AND ");
 
         sql.Append(SqlContext.Sql(sqlFilter, args));
 

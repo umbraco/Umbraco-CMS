@@ -64,7 +64,7 @@ public class LuceneIndexDiagnostics : IIndexDiagnostics
             {
                 var rootDir = _hostingEnvironment.ApplicationPhysicalPath;
                 d["LuceneIndexFolder"] = fsDir.Directory.ToString().ToLowerInvariant()
-                    .TrimStart(rootDir.ToLowerInvariant()).Replace("\\", " /").EnsureStartsWith('/');
+                    .TrimStartOfString(rootDir.ToLowerInvariant()).Replace("\\", " /").EnsureStartsWith('/');
             }
 
             if (_indexOptions != null)

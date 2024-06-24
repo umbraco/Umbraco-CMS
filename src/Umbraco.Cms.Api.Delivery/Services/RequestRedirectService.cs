@@ -66,7 +66,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         }
 
         // important: redirect URLs are always tracked without trailing slashes
-        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath.TrimEnd("/"), culture);
+        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath.TrimEndOfString("/"), culture);
         IPublishedContent? content = redirectUrl != null
             ? _apiPublishedContentCache.GetById(redirectUrl.ContentKey)
             : null;
