@@ -18,14 +18,14 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 			e.preventDefault();
 		});
 	}
-	render() {
+	override render() {
 		return html`
 			<button aria-label="TODO: Some introduction to keyboard scaling" id="handler"></button>
 			<slot id="label"></slot>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: absolute;

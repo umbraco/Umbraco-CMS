@@ -35,7 +35,7 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-markdown
 				value=${this.value}

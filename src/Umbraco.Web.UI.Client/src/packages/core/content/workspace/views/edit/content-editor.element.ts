@@ -117,7 +117,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		this._routes = routes;
 	}
 
-	render() {
+	override render() {
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
@@ -159,7 +159,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

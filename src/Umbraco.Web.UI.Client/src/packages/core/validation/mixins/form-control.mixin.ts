@@ -183,7 +183,7 @@ export function UmbFormControlMixin<
 			}
 		}
 
-		disconnectedCallback(): void {
+		override disconnectedCallback(): void {
 			super.disconnectedCallback();
 			this.#removeFormListeners();
 		}
@@ -337,7 +337,7 @@ export function UmbFormControlMixin<
 			}
 		}
 
-		updated(changedProperties: Map<string | number | symbol, unknown>) {
+		override updated(changedProperties: Map<string | number | symbol, unknown>) {
 			super.updated(changedProperties);
 			this._runValidators();
 		}

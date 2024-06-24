@@ -18,7 +18,7 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 	 * Executes the action.
 	 * @memberof UmbTrashEntityAction
 	 */
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(

@@ -32,7 +32,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 > {
 	#initPromise!: Promise<unknown>;
 
-	public set data(value: UmbDataTypePickerFlowModalData) {
+	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
@@ -228,7 +228,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select editor" class="uui-text">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
@@ -354,7 +354,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		</ul>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#filter {

@@ -31,7 +31,7 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 		]);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		await this.#init;
 

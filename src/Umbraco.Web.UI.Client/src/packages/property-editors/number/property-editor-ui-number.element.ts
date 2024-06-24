@@ -9,6 +9,15 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	@property({ type: Number })
 	value?: number;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _max?: number;
 
@@ -39,7 +48,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-input
 				type="number"
@@ -48,12 +57,13 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 				step=${ifDefined(this._step)}
 				placeholder=${ifDefined(this._placeholder)}
 				.value=${this.value ?? (this._placeholder ? undefined : 0)}
-				@input=${this.#onInput}>
+				@input=${this.#onInput}
+				?readonly=${this.readonly}>
 			</uui-input>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				width: 100%;

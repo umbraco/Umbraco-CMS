@@ -138,7 +138,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-tiny-mce .configuration=${this._config} .value=${this._markup} @change=${this.#onChange}>
 			</umb-input-tiny-mce>

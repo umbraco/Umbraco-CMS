@@ -85,7 +85,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
 
-	render() {
+	override render() {
 		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
 	}
 
@@ -138,7 +138,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

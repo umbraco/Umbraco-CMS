@@ -25,6 +25,15 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 		return this._value;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _group?: string;
 
@@ -57,12 +66,13 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-tags-input
 			group=${ifDefined(this._group)}
 			.culture=${this._culture}
 			.items=${this.value}
-			@change=${this.#onChange}></umb-tags-input>`;
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></umb-tags-input>`;
 	}
 }
 

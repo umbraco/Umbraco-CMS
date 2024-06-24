@@ -28,7 +28,7 @@ export class UmbTagStore extends UmbStoreBase {
 	 * @param {TagResponseModel} TAG
 	 * @memberof UmbTagStore
 	 */
-	append(tag: TagResponseModel) {
+	override append(tag: TagResponseModel) {
 		this._data.append([tag]);
 	}
 

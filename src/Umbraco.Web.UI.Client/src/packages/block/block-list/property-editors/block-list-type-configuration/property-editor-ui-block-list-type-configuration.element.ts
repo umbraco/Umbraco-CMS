@@ -61,7 +61,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-input-block-type
 			.value=${this.value}
 			.workspacePath=${this._workspacePath}

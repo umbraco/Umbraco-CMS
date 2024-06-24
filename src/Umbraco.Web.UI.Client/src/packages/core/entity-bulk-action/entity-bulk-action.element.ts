@@ -21,7 +21,7 @@ export class UmbEntityBulkActionElement<
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-button
 			@click=${this.#onClick}
 			label=${ifDefined(this.manifest?.meta.label)}

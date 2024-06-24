@@ -69,7 +69,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 	@property({ attribute: false, type: Object })
 	device = this.#devices[0];
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#changeDevice(this.device);
 	}
@@ -88,7 +88,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button look="primary" popovertarget="devices-popover">
 				<div>
@@ -115,9 +115,9 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
-		:host {
+			:host {
 				display: flex;
 				border-left: 1px solid var(--uui-color-header-contrast);
 				--uui-button-font-weight: 400;

@@ -14,7 +14,7 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement 
 	@state()
 	private _sectionsNames: Array<string> = [];
 
-	updated(changedProperties: Map<string, any>) {
+	override updated(changedProperties: Map<string, any>) {
 		if (changedProperties.has('value')) {
 			this.observeSectionNames();
 		}
@@ -32,7 +32,7 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`${this._sectionsNames.join(', ')}`;
 	}
 }

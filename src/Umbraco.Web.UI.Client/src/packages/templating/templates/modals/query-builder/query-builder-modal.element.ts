@@ -183,7 +183,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		this.#updateFilters();
 	};
 
-	render() {
+	override render() {
 		const properties = localizePropertyType(this._queryBuilderSettings?.properties);
 		const sort = localizeSort(this._queryRequest.sort);
 		return html`
@@ -273,7 +273,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

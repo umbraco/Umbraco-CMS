@@ -35,7 +35,7 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._variants
 			? html`<div id="splitViews">
 						${repeat(
@@ -57,7 +57,7 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

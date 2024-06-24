@@ -39,13 +39,15 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	 * TODO: Write proper JSDocs here.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return await this.#entryContext.propertyValueByAlias<ReturnType>(propertyAlias);
+		// TODO: Investigate how I do that with the workspaces..
+		return await this.#entryContext.contentPropertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
 	 * TODO: Write proper JSDocs here.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
-		return this.#entryContext.setPropertyValue(propertyAlias, value);
+		// TODO: Investigate how I do that with the workspaces..
+		return this.#entryContext.setContentPropertyValue(propertyAlias, value);
 	}
 }

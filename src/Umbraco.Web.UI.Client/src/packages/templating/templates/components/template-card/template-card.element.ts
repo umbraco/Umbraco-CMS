@@ -13,18 +13,18 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-template-card')
 export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String })
-	name = '';
+	override name = '';
 
 	@property({ type: Boolean, reflect: true })
 	default = false;
 
 	_id = '';
 	@property({ type: String })
-	public set id(newId: string) {
+	public override set id(newId: string) {
 		this._id = newId;
 		super.value = newId;
 	}
-	public get id() {
+	public override get id() {
 		return this._id;
 	}
 
@@ -44,7 +44,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 		this.dispatchEvent(new CustomEvent('open', { bubbles: false, composed: true }));
 	}
 
-	render() {
+	override render() {
 		return html`<div id="card">
 			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
 				<uui-icon class="logo" name="icon-layout"></uui-icon>
@@ -61,7 +61,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				box-sizing: border-box;

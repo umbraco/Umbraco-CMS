@@ -25,7 +25,7 @@ umbExtensionsRegistry.register(manifest);
 export class UmbHeaderAppButtonElement extends UmbLitElement {
 	public manifest?: ManifestHeaderAppButtonKind;
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				look="primary"
@@ -37,7 +37,7 @@ export class UmbHeaderAppButtonElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			uui-button {

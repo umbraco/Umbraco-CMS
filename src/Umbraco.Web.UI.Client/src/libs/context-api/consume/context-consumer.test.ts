@@ -39,7 +39,7 @@ describe('UmbContextConsumer', () => {
 
 		describe('events', () => {
 			it('dispatches context request event when constructed', async () => {
-				const listener = oneEvent(window, UMB_CONTENT_REQUEST_EVENT_TYPE);
+				const listener = oneEvent(window, UMB_CONTENT_REQUEST_EVENT_TYPE, false);
 
 				consumer.hostConnected();
 

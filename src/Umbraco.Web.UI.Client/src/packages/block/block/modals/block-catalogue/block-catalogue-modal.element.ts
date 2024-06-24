@@ -49,7 +49,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
 
@@ -84,7 +84,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.#updateFiltered();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
 				${this.#renderViews()} ${this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()}
@@ -158,7 +158,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#search {
 				width: 100%;

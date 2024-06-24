@@ -14,7 +14,7 @@ export class UmbWebhookTableContentTypeColumnLayoutElement extends UmbLitElement
 
 	#repository?: UmbDocumentTypeItemRepository | UmbMediaTypeItemRepository;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.#getContentTypes();
@@ -36,13 +36,13 @@ export class UmbWebhookTableContentTypeColumnLayoutElement extends UmbLitElement
 		}
 	}
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
 
 		return html`${this._contentTypes}`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

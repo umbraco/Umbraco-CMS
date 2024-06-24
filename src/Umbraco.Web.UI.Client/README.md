@@ -126,7 +126,7 @@ export default class MyElement extends UmbElementMixin(LitElement) {
 		this._notificationContext?.peek('positive', { data: { message: '#h5yr' } });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline="Welcome">
 				<p>A TypeScript Lit Dashboard</p>

@@ -123,7 +123,6 @@ export class UmbDocumentWorkspaceContext
 	);
 	#varies?: boolean;
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -216,7 +215,7 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
@@ -754,14 +753,14 @@ export class UmbDocumentWorkspaceContext
 		return await this.#performSaveOrCreate(saveData);
 	}
 
-	public requestSubmit() {
+	public override requestSubmit() {
 		return this.#handleSave();
 	}
 
 	public submit() {
 		return this.#handleSave();
 	}
-	public invalidSubmit() {
+	public override invalidSubmit() {
 		return this.#handleSave();
 	}
 
@@ -861,7 +860,7 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.structure.destroy();

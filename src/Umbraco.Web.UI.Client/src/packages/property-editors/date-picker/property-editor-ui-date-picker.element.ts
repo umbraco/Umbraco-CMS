@@ -104,7 +104,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-date
 				value="${ifDefined(this.value)}"

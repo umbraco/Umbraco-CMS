@@ -128,7 +128,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		localStorage.setItem('umb-split-panel-position', position.toString());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-split-panel
 				lock="start"
@@ -157,7 +157,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
