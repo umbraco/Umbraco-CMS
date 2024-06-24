@@ -62,7 +62,7 @@ export class UmbDebugElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		if (!this.visible) return nothing;
 		return this.dialog ? this.#renderDialog() : this.#renderPanel();
 	}
@@ -148,7 +148,7 @@ export class UmbDebugElement extends UmbLitElement {
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				float: right;

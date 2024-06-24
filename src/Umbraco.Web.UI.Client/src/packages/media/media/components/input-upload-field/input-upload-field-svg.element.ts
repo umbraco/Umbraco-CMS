@@ -6,13 +6,13 @@ export class UmbInputUploadFieldSvgElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
-	render() {
+	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
 		return html`<img src=${this.path} alt="svg" />`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

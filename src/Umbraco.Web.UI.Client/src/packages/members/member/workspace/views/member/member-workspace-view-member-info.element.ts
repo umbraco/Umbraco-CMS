@@ -64,7 +64,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		return this.localize.date(date, TimeFormatOptions);
 	}
 
-	render() {
+	override render() {
 		return this.#renderGeneralSection();
 	}
 
@@ -94,7 +94,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.general-item {

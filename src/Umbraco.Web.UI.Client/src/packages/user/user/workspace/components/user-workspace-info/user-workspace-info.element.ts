@@ -67,7 +67,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		];
 	};
 
-	render() {
+	override render() {
 		if (this._userInfo.length === 0) return nothing;
 		return html`<uui-box id="user-info">${this.#renderState()} ${this.#renderInfoList()} </uui-box>`;
 	}
@@ -101,7 +101,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-tag {

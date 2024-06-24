@@ -73,7 +73,6 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly defaultTemplate;
 	readonly cleanup;
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	createTemplateMode: boolean = false;
@@ -139,7 +138,7 @@ export class UmbDocumentTypeWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 	}
@@ -322,7 +321,7 @@ export class UmbDocumentTypeWorkspaceContext
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
 		this.repository.destroy();

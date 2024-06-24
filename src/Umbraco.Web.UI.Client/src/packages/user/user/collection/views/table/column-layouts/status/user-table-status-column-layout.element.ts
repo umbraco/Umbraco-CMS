@@ -6,14 +6,14 @@ export class UmbUserTableStatusColumnLayoutElement extends LitElement {
 	@property({ attribute: false })
 	value: any;
 
-	render() {
+	override render() {
 		return html`${this.value.status && this.value.status !== 'enabled'
 			? html`<uui-tag
 					size="s"
 					look="${getDisplayStateFromUserStatus(this.value.status).look}"
 					color="${getDisplayStateFromUserStatus(this.value.status).color}">
 					${this.value.status}
-			  </uui-tag>`
+				</uui-tag>`
 			: nothing}`;
 	}
 }

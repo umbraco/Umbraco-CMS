@@ -86,18 +86,17 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 
 	/**
 	 * Render the element.
-	 * @protected
 	 * @return {*}
 	 * @memberof UmbExtensionElementAndApiSlotElementBase
 	 */
-	protected render() {
+	override render() {
 		return this._element;
 	}
 
 	/**
 	 * Disable the Shadow DOM for this element. This is needed because this is a wrapper element and should not stop the event propagation.
 	 */
-	protected createRenderRoot() {
+	protected override createRenderRoot() {
 		return this;
 	}
 }

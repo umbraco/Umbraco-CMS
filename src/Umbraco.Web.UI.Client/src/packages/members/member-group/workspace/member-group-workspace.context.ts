@@ -25,8 +25,6 @@ export class UmbMemberGroupWorkspaceContext
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS);
 
@@ -59,7 +57,7 @@ export class UmbMemberGroupWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -139,7 +137,7 @@ export class UmbMemberGroupWorkspaceContext
 		this.#data.update({ name });
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

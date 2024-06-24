@@ -14,7 +14,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('The document unique identifier is missing');
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);

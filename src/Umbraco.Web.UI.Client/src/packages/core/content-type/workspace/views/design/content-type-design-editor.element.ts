@@ -365,7 +365,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
@@ -533,7 +533,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		</uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -109,7 +109,7 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 		}
 	};
 
-	render() {
+	override render() {
 		return html`<slot></slot>`;
 	}
 }

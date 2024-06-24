@@ -12,7 +12,7 @@ export class UmbMfaUserEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const { unique } = this.args;
 		if (!unique) throw new Error('Unique is not available');
 

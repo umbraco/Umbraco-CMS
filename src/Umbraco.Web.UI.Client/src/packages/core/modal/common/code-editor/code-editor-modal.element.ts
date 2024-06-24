@@ -1,6 +1,6 @@
 import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { loadCodeEditor, type UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import type { UmbCodeEditorModalData, UmbCodeEditorModalValue} from '@umbraco-cms/backoffice/modal';
+import type { UmbCodeEditorModalData, UmbCodeEditorModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -47,7 +47,7 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 		</div>`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout .headline=${this.data?.headline ?? 'Code Editor'}>
 				<div id="editor-box">${this.isCodeEditorReady ? this.#renderCodeEditor() : this.#renderLoading()}</div>
@@ -64,7 +64,7 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#editor-box {
 				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));

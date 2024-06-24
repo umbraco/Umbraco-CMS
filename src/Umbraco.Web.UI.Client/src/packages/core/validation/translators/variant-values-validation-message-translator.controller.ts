@@ -42,7 +42,7 @@ export class UmbVariantValuesValidationMessageTranslator
 		return '$.values[' + UmbDataPathPropertyValueFilter(specificValue) + path.substring(path.indexOf(']'));
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		super.destroy();
 		this.#context.removeTranslator(this);
 	}

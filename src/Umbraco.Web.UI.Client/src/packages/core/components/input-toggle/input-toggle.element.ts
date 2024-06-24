@@ -33,7 +33,7 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		return undefined;
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#updateLabel();
 	}
@@ -48,14 +48,14 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		this._currentLabel = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : '';
 	}
 
-	render() {
+	override render() {
 		return html`<uui-toggle
 			.checked=${this.#checked}
 			.label=${this._currentLabel}
 			@change=${this.#onChange}></uui-toggle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-toggle {
 				width: 100%;

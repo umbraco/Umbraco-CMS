@@ -40,7 +40,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 */
-	setValue(data: T): void {
+	override setValue(data: T): void {
 		if (!this._subject) return;
 		const frozenData = deepFreeze(data);
 		this.#value = frozenData;
@@ -50,7 +50,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 		}
 	}
 
-	getValue(): T {
+	override getValue(): T {
 		return this.#value;
 	}
 

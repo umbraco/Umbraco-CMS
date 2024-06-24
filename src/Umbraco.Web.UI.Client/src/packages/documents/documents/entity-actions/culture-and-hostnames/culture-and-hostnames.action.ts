@@ -9,7 +9,7 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_CULTURE_AND_HOSTNAMES_MODAL, {
 			data: { unique: this.args.unique },

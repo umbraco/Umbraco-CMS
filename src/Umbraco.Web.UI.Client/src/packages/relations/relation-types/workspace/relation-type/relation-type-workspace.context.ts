@@ -59,7 +59,7 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase<UmbRelationT
 		return 'relation-type';
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

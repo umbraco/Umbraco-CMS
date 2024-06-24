@@ -75,7 +75,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		window.addEventListener('storage', this.#onStorageEvent.bind(this));
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		super.destroy();
 		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
 	}

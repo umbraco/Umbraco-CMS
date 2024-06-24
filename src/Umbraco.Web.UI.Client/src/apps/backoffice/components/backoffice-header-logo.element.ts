@@ -23,7 +23,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button id="logo" look="primary" label="Umbraco" compact popovertarget="logo-popover">
 				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
@@ -40,7 +40,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#logo {

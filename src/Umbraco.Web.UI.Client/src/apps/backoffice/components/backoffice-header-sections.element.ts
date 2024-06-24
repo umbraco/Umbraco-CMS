@@ -52,7 +52,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-tab-group id="tabs">
 				${repeat(
@@ -73,7 +73,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host {
 				display: contents;

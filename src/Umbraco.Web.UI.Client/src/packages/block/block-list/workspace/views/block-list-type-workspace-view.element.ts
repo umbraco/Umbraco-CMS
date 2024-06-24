@@ -5,7 +5,7 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 
 @customElement('umb-block-list-type-workspace-view-settings')
 export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	render() {
+	override render() {
 		return html`
 			<uui-box headline="Editor Appearance">
 				<umb-property
@@ -80,7 +80,7 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

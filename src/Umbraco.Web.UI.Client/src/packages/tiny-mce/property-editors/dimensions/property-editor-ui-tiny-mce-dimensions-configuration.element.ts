@@ -21,7 +21,7 @@ export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends Um
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-input
 				type="number"
 				label=${this.localize.term('general_width')}
@@ -38,7 +38,7 @@ export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends Um
 			pixels`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITinyMceDimensionsConfigurationElement;

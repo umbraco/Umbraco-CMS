@@ -33,7 +33,7 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`${this._loggers.length > 0
 			? this._loggers.find((logger) => logger.name === this.loggerName)?.level
 			: nothing}`;

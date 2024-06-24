@@ -30,7 +30,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<uui-box>
 			<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
 			${this.#renderEmailProperty()} ${this.#renderUILanguageProperty()}
@@ -65,7 +65,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

@@ -42,7 +42,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 	#propertyEditorUiAlias = '';
 
-	render() {
+	override render() {
 		if (!this._actions?.length) return nothing;
 		return html`
 			<uui-button id="popover-trigger" popovertarget="property-action-popover" label="Open actions menu" compact>
@@ -60,7 +60,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

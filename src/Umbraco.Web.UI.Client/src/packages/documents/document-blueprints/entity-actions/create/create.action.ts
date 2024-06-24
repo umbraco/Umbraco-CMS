@@ -10,7 +10,7 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL, {
 			data: {

@@ -54,7 +54,7 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 		this.#context?.setContent(newContent);
 	}
 
-	render() {
+	override render() {
 		return html`<uui-box headline="Rich text editor styles">
 			<umb-property-layout
 				description="Define the styles that should be available in the rich text editor for this stylesheet.">
@@ -65,7 +65,7 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

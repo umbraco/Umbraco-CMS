@@ -113,13 +113,13 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 			style="color:var(--uui-color-danger-standalone);display:inline-block"></uui-icon>`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

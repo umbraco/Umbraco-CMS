@@ -29,7 +29,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 		this._setup();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-installer-layout data-test="upgrader">
 			<umb-upgrader-view
 				.fetching=${this.fetching}

@@ -10,7 +10,7 @@ export class UmbSearchHeaderAppElement extends UmbHeaderAppButtonElement {
 		context.open(this, UMB_SEARCH_MODAL);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button @click=${this.#onSearchClick} look="primary" label="search" compact>
 				<uui-icon name="icon-search"></uui-icon>
@@ -18,7 +18,7 @@ export class UmbSearchHeaderAppElement extends UmbHeaderAppButtonElement {
 		`;
 	}
 
-	static styles = UmbHeaderAppButtonElement.styles;
+	static override styles = UmbHeaderAppButtonElement.styles;
 }
 
 export default UmbSearchHeaderAppElement;

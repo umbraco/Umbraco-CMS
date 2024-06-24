@@ -126,7 +126,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		this.#oldInputValue = value;
 	}
 
-	render() {
+	override render() {
 		if (!this.value) this.value = [];
 
 		return html`
@@ -188,7 +188,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

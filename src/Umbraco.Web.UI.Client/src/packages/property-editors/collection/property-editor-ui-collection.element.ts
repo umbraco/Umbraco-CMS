@@ -64,7 +64,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 		};
 	}
 
-	render() {
+	override render() {
 		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
 		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
 	}

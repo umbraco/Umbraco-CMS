@@ -4,11 +4,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-history-list')
 export class UmbHistoryListElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`<slot></slot> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

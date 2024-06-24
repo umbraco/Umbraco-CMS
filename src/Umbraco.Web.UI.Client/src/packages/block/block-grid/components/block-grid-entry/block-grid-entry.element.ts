@@ -148,7 +148,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
 		this.observe(
@@ -183,7 +183,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.#callUpdateInlineCreateButtons();
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('_blockViewProps') || _changedProperties.has('_columnSpan')) {
 			this.#callUpdateInlineCreateButtons();
@@ -286,11 +286,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			: nothing;
 	}
 
-	render() {
+	override render() {
 		return this.#renderBlock();
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

@@ -5,7 +5,7 @@ const elementName = 'umb-relation-type-collection';
 @customElement(elementName)
 export class UmbRelationTypeCollectionElement extends UmbCollectionDefaultElement {
 	// NOTE: Returns empty toolbar, so to remove the header padding.
-	protected renderToolbar() {
+	protected override renderToolbar() {
 		return html``;
 	}
 }

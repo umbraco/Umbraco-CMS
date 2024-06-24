@@ -184,11 +184,40 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.removeOne(settingsUdi);
 	}
 
+	setOneContentProperty(udi: string, propertyAlias: string, value: unknown) {
+		this.#contents.updateOne(udi, { [propertyAlias]: value });
+	}
+	setOneSettingsProperty(udi: string, propertyAlias: string, value: unknown) {
+		this.#settings.updateOne(udi, { [propertyAlias]: value });
+	}
+
+	contentProperty(udi: string, propertyAlias: string) {
+		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+	}
+	settingsProperty(udi: string, propertyAlias: string) {
+		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+	}
+
 	abstract create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
 		modalData?: UmbBlockWorkspaceData,
 	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
+
+	public createBlockSettingsData(contentElementTypeKey: string) {
+		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
+		if (!blockType) {
+			throw new Error(`Cannot create block settings, missing block type for ${contentElementTypeKey}`);
+		}
+		if (!blockType.settingsElementTypeKey) {
+			throw new Error(`Cannot create block settings, missing settings element type for ${contentElementTypeKey}`);
+		}
+
+		return {
+			udi: buildUdi('element', UmbId.new()),
+			contentTypeKey: blockType.settingsElementTypeKey,
+		};
+	}
 
 	protected createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
 		// Find block type.

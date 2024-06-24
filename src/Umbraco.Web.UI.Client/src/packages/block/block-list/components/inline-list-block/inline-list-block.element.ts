@@ -59,7 +59,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.#workspaceContext.load(this.#contentUdi);
 	}
 
-	render() {
+	override render() {
 		return html` <uui-box>
 			<button
 				slot="header"
@@ -77,7 +77,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#accordion-button {

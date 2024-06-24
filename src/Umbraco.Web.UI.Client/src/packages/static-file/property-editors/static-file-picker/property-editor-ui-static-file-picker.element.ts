@@ -38,7 +38,7 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	}
 
 	// TODO: Implement mandatory?
-	render() {
+	override render() {
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}

@@ -9,7 +9,7 @@ export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Debug: Contexts">
 				<div id="main">${this.data?.content}</div>
@@ -20,7 +20,7 @@ export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			summary {

@@ -12,7 +12,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 	UmbExamineFieldsSettingsModalData,
 	UmbExamineFieldsSettingsModalValue
 > {
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('examineManagement_fields')}>
 			<uui-scroll-container id="field-settings"> ${this.#renderFields()} </uui-scroll-container>
 			<div slot="actions">
@@ -50,7 +50,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 		</span>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

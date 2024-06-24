@@ -40,8 +40,6 @@ export class UmbPartialViewWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.PartialView');
 		this.#loadCodeEditor();
@@ -87,7 +85,7 @@ export class UmbPartialViewWorkspaceContext
 		);
 	};
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -197,7 +195,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

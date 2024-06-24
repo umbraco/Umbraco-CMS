@@ -31,8 +31,6 @@ export class UmbUserWorkspaceContext
 	readonly mediaStartNodeUniques = this.#currentData.asObservablePart((data) => data?.mediaStartNodeUniques || []);
 	readonly hasMediaRootAccess = this.#currentData.asObservablePart((data) => data?.hasMediaRootAccess || false);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
 
@@ -122,7 +120,7 @@ export class UmbUserWorkspaceContext
 		return this.avatarRepository.deleteAvatar(unique);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.detailRepository.destroy();

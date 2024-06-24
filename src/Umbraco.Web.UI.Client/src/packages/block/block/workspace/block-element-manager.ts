@@ -95,7 +95,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		return new UmbBlockElementPropertyDatasetContext(host, this);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		this.structure.destroy();
 		super.destroy();

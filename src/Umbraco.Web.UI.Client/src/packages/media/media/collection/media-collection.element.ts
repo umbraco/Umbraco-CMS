@@ -48,7 +48,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		this._progress = event.progress;
 	}
 
-	protected renderToolbar() {
+	protected override renderToolbar() {
 		return html`
 			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
