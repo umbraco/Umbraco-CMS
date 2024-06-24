@@ -1,11 +1,10 @@
 import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import {
-	type UmbInvariantDatasetWorkspaceContext,
-	type UmbRoutableWorkspaceContext,
-	type UmbWorkspaceContext,
-	UmbWorkspaceRouteManager,
+import type {
+	UmbInvariantDatasetWorkspaceContext,
+	UmbRoutableWorkspaceContext,
+	UmbWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
