@@ -307,6 +307,9 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeContent',
 		);
+		/*
+
+			This two way binding does not work well, might need to further investigate what the exact problem is.
 		this.observe(
 			this.content,
 			(content) => {
@@ -316,6 +319,7 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeInternalContent',
 		);
+		*/
 
 		// observe settings:
 		const settingsUdi = this._layout.value?.settingsUdi;
