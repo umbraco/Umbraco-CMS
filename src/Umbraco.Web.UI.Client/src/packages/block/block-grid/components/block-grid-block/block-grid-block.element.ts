@@ -16,13 +16,13 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	urls?: UmbBlockViewUrlsPropType;
 
-	render() {
+	override render() {
 		return html`<umb-ref-grid-block standalone .name=${this.label ?? ''} href=${this.urls?.editContent ?? ''}>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			umb-block-grid-areas-container {
 				margin-top: calc(var(--uui-size-2) + 1px);

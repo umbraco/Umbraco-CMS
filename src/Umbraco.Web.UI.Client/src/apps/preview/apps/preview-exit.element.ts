@@ -10,7 +10,7 @@ export class UmbPreviewExitElement extends UmbLitElement {
 		previewContext.exitPreview(0);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button look="primary" @click=${this.#onClick}>
 				<div>
@@ -21,7 +21,7 @@ export class UmbPreviewExitElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

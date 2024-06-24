@@ -56,7 +56,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		};
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this._parentUnique = this.data?.unique ?? null;
 		this._selectionConfiguration.selection = this._parentUnique ? [this._parentUnique] : [];
@@ -121,7 +121,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this._temporaryFileId = '';
 	}
 
-	render() {
+	override render() {
 		return html` <umb-body-layout headline=${this.localize.term('general_import')}>
 			<uui-box>
 				${when(
@@ -190,7 +190,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 			</uui-form>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

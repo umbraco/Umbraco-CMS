@@ -63,7 +63,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	#repository = new UmbTagRepository(this);
 
-	public focus() {
+	public override focus() {
 		this._tagInput.focus();
 	}
 
@@ -107,7 +107,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		}
 	}
 
-	protected updated(): void {
+	protected override updated(): void {
 		this._mainTag.style.width = `${this._widthTracker.offsetWidth - 4}px`;
 	}
 
@@ -189,7 +189,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	/** Render */
 
-	render() {
+	override render() {
 		return html`
 			<div id="wrapper">
 				${this.#enteredTags()}
@@ -264,7 +264,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		return html` <uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon> `;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#wrapper {
 				box-sizing: border-box;

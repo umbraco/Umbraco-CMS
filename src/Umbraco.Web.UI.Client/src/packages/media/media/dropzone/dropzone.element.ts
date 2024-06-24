@@ -39,7 +39,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 		document.addEventListener('drop', this.#handleDrop.bind(this));
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
@@ -93,7 +93,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<uui-file-dropzone
 			id="dropzone"
 			.accept=${this.accept?.join(',')}
@@ -102,7 +102,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 			label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"></uui-file-dropzone>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host([dragging]) #dropzone {
 				opacity: 1;

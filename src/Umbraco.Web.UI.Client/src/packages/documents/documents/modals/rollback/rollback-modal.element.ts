@@ -295,7 +295,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">
@@ -320,7 +320,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -9,7 +9,6 @@ const ctrlSymbol = Symbol();
 const observeSymbol = Symbol();
 
 export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
-	readonly controllerAlias: UmbControllerAlias;
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
@@ -106,7 +105,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 		this.#control.focusFirstInvalidElement();
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#context = undefined;
 		// Reset control setup.
 		this.#demolish();

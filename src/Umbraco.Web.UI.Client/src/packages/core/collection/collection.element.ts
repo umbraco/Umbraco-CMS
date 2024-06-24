@@ -25,7 +25,7 @@ export class UmbCollectionElement extends UmbExtensionElementAndApiSlotElementBa
 	}
 	#config?: UmbCollectionConfiguration;
 
-	protected apiChanged(api: UmbApi | undefined): void {
+	protected override apiChanged(api: UmbApi | undefined): void {
 		super.apiChanged(api);
 		this.#setConfig();
 	}

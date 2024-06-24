@@ -237,7 +237,7 @@ export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement,
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -285,7 +285,7 @@ export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

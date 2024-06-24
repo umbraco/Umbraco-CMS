@@ -318,7 +318,7 @@ export class UmbBlockGridEntriesContext
 	}
 
 	// create Block?
-	async delete(contentUdi: string) {
+	override async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
 	}

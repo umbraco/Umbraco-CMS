@@ -195,7 +195,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
 		return this._inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
 	}
@@ -337,7 +337,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host(:not([sort-mode-active])) {

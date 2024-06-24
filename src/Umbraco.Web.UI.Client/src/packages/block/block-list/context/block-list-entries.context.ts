@@ -100,7 +100,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
-	async setLayouts(layouts: Array<UmbBlockListLayoutModel>) {
+	override async setLayouts(layouts: Array<UmbBlockListLayoutModel>) {
 		await this._retrieveManager;
 		this._manager?.setLayouts(layouts);
 	}
@@ -127,7 +127,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	// create Block?
-	async delete(contentUdi: string) {
+	override async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
 	}

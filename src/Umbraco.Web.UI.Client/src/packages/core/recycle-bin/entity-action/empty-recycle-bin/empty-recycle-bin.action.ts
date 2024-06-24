@@ -19,7 +19,7 @@ export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEnti
 	 * Executes the action.
 	 * @memberof UmbEmptyRecycleBinEntityAction
 	 */
-	async execute() {
+	override async execute() {
 		await umbConfirmModal(this._host, {
 			headline: `Empty Recycle Bin`,
 			content: `When items are deleted from the recycle bin, they will be gone forever.`,

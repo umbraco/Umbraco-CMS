@@ -52,7 +52,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	render() {
+	override render() {
 		return this._unique !== undefined && this._entityType
 			? html`
 					<uui-button
@@ -80,7 +80,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -33,7 +33,7 @@ export class UmbSectionSidebarMenuElement<
 		return html`<h3>${this.manifest?.meta?.label}</h3>`;
 	}
 
-	render() {
+	override render() {
 		return html`${this.renderHeader()}
 			<umb-extension-slot
 				type="menu"
@@ -41,7 +41,7 @@ export class UmbSectionSidebarMenuElement<
 				default-element="umb-menu"></umb-extension-slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			h3 {

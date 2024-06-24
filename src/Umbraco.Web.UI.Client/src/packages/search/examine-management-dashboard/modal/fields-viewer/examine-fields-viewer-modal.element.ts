@@ -15,7 +15,7 @@ export class UmbExamineFieldsViewerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		if (!this.data) return nothing;
 
 		return html`
@@ -46,7 +46,7 @@ export class UmbExamineFieldsViewerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

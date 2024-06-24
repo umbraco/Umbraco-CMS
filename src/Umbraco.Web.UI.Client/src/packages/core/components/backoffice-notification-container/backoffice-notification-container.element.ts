@@ -42,7 +42,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-toast-notification-container bottom-up id="notifications" popover="manual">
 				${this._notifications
@@ -50,13 +50,13 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 							this._notifications,
 							(notification: UmbNotificationHandler) => notification.key,
 							(notification) => html`${notification.element}`,
-					  )
+						)
 					: ''}
 			</uui-toast-notification-container>
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			#notifications {

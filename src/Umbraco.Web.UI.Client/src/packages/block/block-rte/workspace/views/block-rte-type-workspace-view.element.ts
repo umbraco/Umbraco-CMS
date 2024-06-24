@@ -5,7 +5,7 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 
 @customElement('umb-block-rte-type-workspace-view-settings')
 export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	render() {
+	override render() {
 		return html`
 			<uui-box headline="Editor Appearance">
 				<umb-property
@@ -70,7 +70,7 @@ export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

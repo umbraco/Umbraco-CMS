@@ -78,7 +78,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 		return this._userAvatarUrls.length > 0;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				@click=${this.#handleUserClick}
@@ -94,7 +94,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbHeaderAppButtonElement.styles,
 		css`
 			uui-button {

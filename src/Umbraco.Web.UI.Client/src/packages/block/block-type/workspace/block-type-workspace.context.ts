@@ -34,8 +34,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
 		super(host, args.manifest.alias);
 		const manifest = args.manifest;
@@ -73,7 +71,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		]);
 	}
 
-	protected resetState() {
+	protected override resetState() {
 		super.resetState();
 		this.#data.setValue(undefined);
 		this.#properties.setValue([]);
@@ -160,7 +158,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		this.setIsNew(false);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		this.#properties.destroy();
 		super.destroy();

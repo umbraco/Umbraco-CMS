@@ -6,7 +6,7 @@ export class UmbPermissionsEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		throw new Error('Method not implemented.');
 	}
 }

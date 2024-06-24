@@ -13,7 +13,7 @@ class UmbServerExtensionsHostElement extends UmbLitElement {
 		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
 	}
 
-	render() {
+	override render() {
 		return html`<slot></slot>`;
 	}
 }

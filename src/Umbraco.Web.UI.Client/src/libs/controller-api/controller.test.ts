@@ -28,16 +28,16 @@ class UmbTestControllerImplementation extends UmbControllerHostMixin(class {}) {
 		return this._host?.getHostElement();
 	}
 
-	hostConnected(): void {
+	override hostConnected(): void {
 		super.hostConnected();
 		this.testIsConnected = true;
 	}
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		super.hostDisconnected();
 		this.testIsConnected = false;
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		if (this._host) {
 			this._host.removeUmbController(this);
 			this._host = undefined as any;

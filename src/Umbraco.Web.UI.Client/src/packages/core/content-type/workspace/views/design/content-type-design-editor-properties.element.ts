@@ -190,7 +190,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			});
 	}
 
-	render() {
+	override render() {
 		return this._ownerContentType
 			? html`
 					<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
@@ -225,7 +225,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#btn-add {

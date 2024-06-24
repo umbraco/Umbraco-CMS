@@ -46,7 +46,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 			});
 	}
 
-	protected firstUpdated(): void {
+	protected override firstUpdated(): void {
 		this.#getReferences();
 	}
 
@@ -112,7 +112,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		return '';
 	}
 
-	render() {
+	override render() {
 		if (this._items && this._items.length > 0) {
 			return html` <uui-box
 					headline=${this.localize.term('references_labelUsedByItems')}
@@ -172,7 +172,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-table-cell:not(.link-cell) {

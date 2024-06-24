@@ -61,12 +61,12 @@ export class UmbSplitPanelElement extends LitElement {
 
 	#hasInitialized = false;
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#disconnect();
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (!this.#hasInitialized) return;
@@ -247,7 +247,7 @@ export class UmbSplitPanelElement extends LitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="main">
 				<slot
@@ -261,7 +261,7 @@ export class UmbSplitPanelElement extends LitElement {
 			</div>
 		`;
 	}
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: contents;
 			--umb-split-panel-initial-position: 50%;

@@ -236,7 +236,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		`;
 	}
 
-	render() {
+	override render() {
 		if (!this._workspaceContext) {
 			return html`<div>Not found</div>`;
 		}
@@ -246,7 +246,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		</umb-body-layout>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

@@ -22,7 +22,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 		this.addEventListener(UUIRefEvent.OPEN, () => this.dispatchEvent(new Event('click')));
 	}
 
-	public render() {
+	override render() {
 		return html`
 			<button
 				type="button"
@@ -42,7 +42,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefElement.styles,
 		...UUIRefNodeElement.styles,
 		UmbTextStyles,

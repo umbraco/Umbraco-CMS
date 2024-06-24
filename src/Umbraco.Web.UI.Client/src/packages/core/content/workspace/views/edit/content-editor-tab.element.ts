@@ -48,7 +48,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this._hasProperties
 				? html`
@@ -72,7 +72,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

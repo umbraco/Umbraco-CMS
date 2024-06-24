@@ -5,7 +5,7 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export class UmbUnregisterExtensionEntityAction extends UmbEntityActionBase<unknown> {
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot delete an item without a unique identifier.');
 
 		const extension = umbExtensionsRegistry.getByAlias(this.args.unique);

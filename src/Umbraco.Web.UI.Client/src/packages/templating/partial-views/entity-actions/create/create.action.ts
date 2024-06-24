@@ -9,7 +9,7 @@ export class UmbPartialViewCreateOptionsEntityAction extends UmbEntityActionBase
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_PARTIAL_VIEW_CREATE_OPTIONS_MODAL, {
 			data: {

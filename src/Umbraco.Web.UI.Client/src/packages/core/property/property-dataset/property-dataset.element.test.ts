@@ -57,7 +57,7 @@ export class UmbTestPropertyEditorElement extends UmbElementMixin(LitElement) {
 // Adapter property editor, which tests what happens if a editor sets values of other editors.
 @customElement('test-adapter-property-editor')
 export class UmbTestAdapterPropertyEditorElement extends UmbTestPropertyEditorElement {
-	protected async _observeProperty() {
+	protected override async _observeProperty() {
 		super._observeProperty();
 		if (!this._datasetContext || !this._alias) return;
 		this.observe(

@@ -6,7 +6,7 @@ import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 const elementName = 'umb-media-tree-item';
 @customElement(elementName)
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel> {
-	renderIconContainer() {
+	override renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon">
 				${this.item?.mediaType.icon
@@ -16,11 +16,11 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 		`;
 	}
 
-	renderLabel() {
+	override renderLabel() {
 		return html`<span id="label" slot="label">${this._item?.variants[0].name}</span> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#icon-container {

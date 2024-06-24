@@ -8,7 +8,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionDeleteKind> {
 	// TODO: make base type for item and detail models
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot delete an item without a unique identifier.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(

@@ -71,7 +71,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement implements 
 		};
 	}
 
-	render() {
+	override render() {
 		if (this._loading) return nothing;
 		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
 	}

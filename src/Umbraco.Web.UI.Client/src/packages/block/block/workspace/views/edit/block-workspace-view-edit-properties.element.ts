@@ -53,7 +53,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
@@ -61,7 +61,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			umb-property-type-based-property {

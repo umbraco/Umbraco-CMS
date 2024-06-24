@@ -66,7 +66,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-tags-input
 			group=${ifDefined(this._group)}
 			.culture=${this._culture}

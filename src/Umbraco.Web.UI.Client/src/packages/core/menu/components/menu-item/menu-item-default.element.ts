@@ -40,7 +40,7 @@ export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuI
 		this._href = `section/${this.#pathname}/workspace/${this.manifest.meta.entityType}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-menu-item-layout
 				.href=${this._href}

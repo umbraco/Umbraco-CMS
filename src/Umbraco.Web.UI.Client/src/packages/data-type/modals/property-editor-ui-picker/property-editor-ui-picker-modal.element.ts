@@ -27,7 +27,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _submitLabel = 'Select';
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		// TODO: We never parse on a submit label, so this seem weird as we don't enable this of other places.
@@ -82,7 +82,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('propertyEditorPicker_openPropertyEditorPicker')}>
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
@@ -134,7 +134,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		</ul>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#filter {

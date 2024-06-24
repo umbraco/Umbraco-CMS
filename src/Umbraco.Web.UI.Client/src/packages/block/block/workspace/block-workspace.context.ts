@@ -3,11 +3,10 @@ import { UmbBlockElementManager } from './block-element-manager.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -37,9 +36,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#entityType: string;
 
-	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
-	readonly isNew = this.#isNew.asObservable();
-
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
@@ -58,8 +54,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	// TODO: Get the name of the contentElementType..
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
@@ -259,13 +253,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		});
 	}
 
-	getIsNew() {
-		return this.#isNew.value;
-	}
-	setIsNew(value: boolean): void {
-		this.#isNew.setValue(value);
-	}
-
 	getData() {
 		return this.#layout.getValue();
 	}
@@ -364,7 +351,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 	};
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#layout.destroy();
 		this.#label.destroy();

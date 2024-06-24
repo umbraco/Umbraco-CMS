@@ -54,7 +54,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this._placeholder = config?.getValueByAlias('placeholder');
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
@@ -66,7 +66,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-input
 			.value=${this.value ?? ''}
 			.type=${this._type}

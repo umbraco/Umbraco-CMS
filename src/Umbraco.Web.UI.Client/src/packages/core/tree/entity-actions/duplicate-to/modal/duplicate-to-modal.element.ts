@@ -22,7 +22,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 		}
 	}
 
-	render() {
+	override render() {
 		if (!this.data) return nothing;
 
 		return html`
@@ -54,7 +54,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export { UmbDuplicateToModalElement as element };
