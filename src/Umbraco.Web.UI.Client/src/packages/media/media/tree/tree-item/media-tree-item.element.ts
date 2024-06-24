@@ -30,6 +30,12 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 			#icon {
 				vertical-align: middle;
 			}
+
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
 		`,
 	];
 }
