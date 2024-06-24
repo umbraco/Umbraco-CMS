@@ -18,3 +18,5 @@ export class UmbMoveDocumentBlueprintRepository extends UmbRepositoryBase implem
 		return { error };
 	}
 }
+
+export { UmbMoveDocumentBlueprintRepository as api };

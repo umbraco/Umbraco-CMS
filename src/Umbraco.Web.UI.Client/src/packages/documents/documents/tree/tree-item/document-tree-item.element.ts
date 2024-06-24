@@ -130,6 +130,12 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				line-height: 14px;
 			}
 
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
 			:hover #icon-lock {
 				background: var(--uui-color-surface-emphasis);
 			}

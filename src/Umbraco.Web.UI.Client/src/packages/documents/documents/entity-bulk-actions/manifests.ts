@@ -19,7 +19,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.Document.Publish',
 		name: 'Publish Document Entity Bulk Action',
 		weight: 50,
-		api: UmbDocumentPublishEntityBulkAction,
+		api: () => import('./publish/publish.action.js'),
 		meta: {
 			label: 'Publish',
 		},
@@ -41,7 +41,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.Document.Unpublish',
 		name: 'Unpublish Document Entity Bulk Action',
 		weight: 40,
-		api: UmbDocumentUnpublishEntityBulkAction,
+		api: () => import('./unpublish/unpublish.action.js'),
 		meta: {
 			label: 'Unpublish',
 		},
