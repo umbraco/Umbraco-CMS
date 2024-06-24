@@ -6,4 +6,5 @@ export type UmbDocumentTypeItemModel = {
 	name: string;
 	isElement: boolean;
 	icon?: string | null;
+	description?: string | null;
 };
