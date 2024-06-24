@@ -69,7 +69,6 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			if (value) {
 				const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
 				if (blockTypeData) {
-					console.log(blockTypeData);
 					this.#data.setValue(blockTypeData);
 					return;
 				}
