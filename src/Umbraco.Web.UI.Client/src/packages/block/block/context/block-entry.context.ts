@@ -43,14 +43,22 @@ export abstract class UmbBlockEntryContext<
 	getUnique() {
 		return this.getContentUdi();
 	}
-	propertyValueByAlias<ReturnType>(propertyAlias: string) {
+
+	setContentPropertyValue(propertyAlias: string, value: unknown) {
+		if (!this.#contentUdi) throw new Error('No content UDI set.');
+		this._manager?.setOneContentProperty(this.#contentUdi, propertyAlias, value);
+	}
+	setSettingsPropertyValue(propertyAlias: string, value: unknown) {
+		const settingsUdi = this._layout.getValue()?.settingsUdi;
+		if (!settingsUdi) throw new Error('Settings UDI was not available.');
+		this._manager?.setOneSettingsProperty(settingsUdi, propertyAlias, value);
+	}
+
+	contentPropertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#content.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
 	}
-	setPropertyValue(propertyAlias: string, value: unknown) {
-		this.#content.setValue({
-			...this.#content.getValue()!,
-			[propertyAlias]: value,
-		});
+	settingsPropertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+		return this.#settings.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
 	}
 
 	#index = new UmbNumberState(undefined);
@@ -76,7 +84,9 @@ export abstract class UmbBlockEntryContext<
 	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this._blockType.asObservable();
 	public readonly contentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
-	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) => x?.settingsElementTypeKey);
+	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
+		x ? x.settingsElementTypeKey ?? undefined : null,
+	);
 
 	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
@@ -84,6 +94,7 @@ export abstract class UmbBlockEntryContext<
 	 * @obsolete Use `unique` instead. Cause we will most likely rename this in the future.
 	 */
 	public readonly contentUdi = this._layout.asObservablePart((x) => x?.contentUdi);
+	public readonly settingsUdi = this._layout.asObservablePart((x) => x?.settingsUdi);
 	public readonly unique = this._layout.asObservablePart((x) => x?.contentUdi);
 
 	#label = new UmbStringState('');
@@ -114,8 +125,12 @@ export abstract class UmbBlockEntryContext<
 
 	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
+	private readonly settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
+		x ? x.contentTypeKey ?? undefined : null,
+	);
 
 	abstract readonly showContentEdit: Observable<boolean>;
+
 	/**
 	 * Set the contentUdi of this entry.
 	 * @method setContentUdi
@@ -176,8 +191,39 @@ export abstract class UmbBlockEntryContext<
 			this.#observeBlockTypeLabel();
 		});
 
-		this.observe(this.index, () => {
-			this.#updateCreatePaths();
+		// Correct settings data, accordingly to configuration of the BlockType: [NL]
+		this.observe(
+			observeMultiple([this.settingsElementTypeKey, this.settingsDataContentTypeKey]),
+			([settingsElementTypeKey, settingsDataContentTypeKey]) => {
+				// Notice the values are only undefined while we are missing the source of these observables. [NL]
+				if (settingsElementTypeKey === undefined || settingsDataContentTypeKey === undefined) return;
+				// Is there a difference between configuration and actual data udi:
+				if (settingsElementTypeKey !== settingsDataContentTypeKey) {
+					// We need to update our udi for the settings data [NL]
+					if (settingsElementTypeKey != null) {
+						// Update the settings model with latest elementTypeKey, so data is up to date with configuration: [NL]
+						const currentSettings = this.#settings.getValue();
+						if (currentSettings) {
+							this._manager?.setOneSettings({ ...currentSettings, contentTypeKey: settingsElementTypeKey });
+						}
+					}
+					// We do not need to remove the settings if configuration is gone, cause another observation handles this. [NL]
+				}
+			},
+		);
+
+		this.observe(observeMultiple([this.layout, this.blockType]), ([layout, blockType]) => {
+			if (!this.#contentUdi || !layout || !blockType) return;
+			if (layout.settingsUdi == null && blockType.settingsElementTypeKey) {
+				// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
+				const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
+				this._manager?.setOneSettings(settingsData);
+				this._layout.update({ settingsUdi: settingsData.udi } as Partial<BlockLayoutType>);
+			} else if (layout.settingsUdi && blockType.settingsElementTypeKey === undefined) {
+				// We no longer have settings ElementType in config. So we remove the settingsData and settings UDI from the layout. [NL]
+				this._manager?.removeOneSettings(layout.settingsUdi);
+				this._layout.update({ settingsUdi: undefined } as Partial<BlockLayoutType>);
+			}
 		});
 	}
 
@@ -275,21 +321,25 @@ export abstract class UmbBlockEntryContext<
 		const settingsUdi = this._layout.value?.settingsUdi;
 		if (settingsUdi) {
 			this.observe(
-				this._manager.contentOf(settingsUdi),
-				(content) => {
-					this.#settings.setValue(content);
+				this._manager.settingsOf(settingsUdi),
+				(settings) => {
+					this.#settings.setValue(settings);
 				},
 				'observeSettings',
 			);
+			/*
+
+			This two way binding does not work well, might need to further investigate what the exact problem is.
 			this.observe(
 				this.settings,
 				(settings) => {
 					if (settings) {
+						console.log('settings to be set', this.#contentUdi, settings);
 						this._manager?.setOneSettings(settings);
 					}
 				},
 				'observeInternalSettings',
-			);
+			);*/
 		}
 	}
 

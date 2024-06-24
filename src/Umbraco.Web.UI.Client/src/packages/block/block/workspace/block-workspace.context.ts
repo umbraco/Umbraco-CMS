@@ -137,24 +137,26 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 				// Content:
 				const contentUdi = layoutData?.contentUdi;
-				if (contentUdi) {
+				if (!contentUdi) {
+					return;
+				}
+
+				this.observe(
+					this.#blockManager!.contentOf(contentUdi),
+					(contentData) => {
+						this.content.setData(contentData);
+					},
+					'observeContent',
+				);
+				if (!this.#initialContent) {
 					this.observe(
 						this.#blockManager!.contentOf(contentUdi),
 						(contentData) => {
-							this.content.setData(contentData);
+							this.#initialContent ??= contentData;
+							this.removeUmbControllerByAlias('observeContentInitially');
 						},
-						'observeContent',
+						'observeContentInitially',
 					);
-					if (!this.#initialContent) {
-						this.observe(
-							this.#blockManager!.contentOf(contentUdi),
-							(contentData) => {
-								this.#initialContent ??= contentData;
-								this.removeUmbControllerByAlias('observeContentInitially');
-							},
-							'observeContentInitially',
-						);
-					}
 				}
 
 				// Settings:
@@ -169,7 +171,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					);
 					if (!this.#initialSettings) {
 						this.observe(
-							this.#blockManager!.contentOf(settingsUdi),
+							this.#blockManager!.settingsOf(settingsUdi),
 							(settingsData) => {
 								this.#initialSettings ??= settingsData;
 								this.removeUmbControllerByAlias('observeSettingsInitially');

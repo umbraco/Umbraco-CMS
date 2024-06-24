@@ -1,6 +1,6 @@
 export interface UmbBlockLayoutBaseModel {
 	contentUdi: string;
-	settingsUdi?: string;
+	settingsUdi?: string | null;
 }
 
 export interface UmbBlockDataType {
