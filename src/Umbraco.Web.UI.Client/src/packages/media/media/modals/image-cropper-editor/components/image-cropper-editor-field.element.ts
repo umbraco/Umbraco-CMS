@@ -1,14 +1,15 @@
-import type { UmbImageCropperElement } from '../../../components/input-image-cropper/image-cropper.element.js';
 import type {
 	UmbImageCropperCrop,
 	UmbImageCropperCrops,
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
-} from './types.js';
+} from '../../../components/index.js';
+import type { UmbImageCropperElement } from '../../../components/input-image-cropper/image-cropper.element.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+/** TODO Do we want to combine this with the original image-cropper-field element? Element is very similar, but with a few UI changes... */
 @customElement('umb-image-cropper-editor-field')
 export class UmbImageCropperEditorFieldElement extends UmbLitElement {
 	@property({ attribute: false })
@@ -170,14 +171,15 @@ export class UmbImageCropperEditorFieldElement extends UmbLitElement {
 		return html` <uui-menu-item
 				id="reset-current-crop"
 				@click=${this.#resetCurrentCrop}
-				?current=${!this.currentCrop}
-				label="Media"></uui-menu-item>
+				?active=${!this.currentCrop}
+				label=${this.localize.term('general_media')}></uui-menu-item>
+
 			${repeat(
 				this.crops,
 				(crop) => crop.alias + JSON.stringify(crop.coordinates),
 				(crop) =>
 					html` <umb-image-cropper-preview
-						?current=${this.currentCrop?.alias === crop.alias}
+						?active=${this.currentCrop?.alias === crop.alias}
 						@click=${() => this.#onCropClick(crop)}
 						.crop=${crop}
 						.focalPoint=${this.focalPoint}
@@ -215,6 +217,8 @@ export class UmbImageCropperEditorFieldElement extends UmbLitElement {
 
 		#reset-current-crop {
 			--uui-menu-item-flat-structure: 1;
+			--uui-menu-item-border-radius: var(--uui-border-radius);
+			border-radius: var(--uui-border-radius);
 			width: 100%;
 			background-color: var(--uui-color-surface);
 		}
@@ -224,9 +228,9 @@ export class UmbImageCropperEditorFieldElement extends UmbLitElement {
 			flex: 1;
 		}
 
-		[current],
-		#reset-current-crop[current] {
-			background-color: var(--uui-color-surface-alt);
+		#reset-current-crop[active],
+		[active] {
+			background-color: var(--uui-color-current);
 		}
 
 		umb-image-cropper-focus-setter {
