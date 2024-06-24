@@ -355,8 +355,6 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentTypeOf(contentTypeKey),
 			(contentType) => {
-				//this.#contentElementTypeAlias.setValue(contentType?.alias);
-				//this.#contentElementTypeName.setValue(contentType?.name);
 				this.#contentElementType.setValue(contentType);
 				this._gotContentType(contentType);
 			},
