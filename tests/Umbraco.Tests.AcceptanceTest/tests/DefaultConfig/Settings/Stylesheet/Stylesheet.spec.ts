@@ -169,7 +169,7 @@ test('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
 test('cannot create a stylesheet with an empty name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
-  
+
   // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
   await umbracoUi.stylesheet.clickCreateButton();
