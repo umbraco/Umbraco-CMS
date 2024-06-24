@@ -2,9 +2,9 @@
  * Splits a string into an array using a specified delimiter,
  * trims whitespace from each element, and removes empty elements.
  *
- * @param {string} string - The input string to be split and processed.
+ * @param {string | undefined} string - The input string to be split and processed.
  * @param {string} [split=','] - The delimiter used for splitting the string (default is comma).
- * @returns {string[]} An array of non-empty, trimmed strings.
+ * @returns {Array<string>} An array of non-empty, trimmed strings.
  *
  * @example
  * const result = splitStringToArray('one, two, three, ,five');
@@ -14,7 +14,7 @@
  * const customDelimiterResult = splitStringToArray('apple | orange | banana', ' | ');
  * // customDelimiterResult: ['apple', 'orange', 'banana']
  */
-export function splitStringToArray(string: string, split: string = ','): string[] {
+export function splitStringToArray(string: string | undefined, split: string = ','): string[] {
 	if (!string) return [];
 	return (
 		string
