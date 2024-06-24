@@ -34,6 +34,15 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		return this._items;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _matches: Array<TagResponseModel> = [];
 
@@ -188,18 +197,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 					<uui-tag id="input-width-tracker" aria-hidden="true" style="visibility:hidden;opacity:0;position:absolute;">
 						${this._currentInput}
 					</uui-tag>
-					<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
-						<input
-							id="tag-input"
-							aria-label="tag input"
-							placeholder="Enter tag"
-							.value="${this._currentInput ?? undefined}"
-							@keydown="${this.#onKeydown}"
-							@input="${this.#onInput}"
-							@blur="${this.#onBlur}" />
-						<uui-icon id="icon-add" name="icon-add"></uui-icon>
-						${this.#renderTagOptions()}
-					</uui-tag>
+					${this.#renderAddButton()}
 				</span>
 			</div>
 		`;
@@ -210,7 +208,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			return html`
 				<uui-tag class="tag">
 					<span>${tag}</span>
-					<uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon>
+					${this.#renderRemoveButton(tag)}
 				</uui-tag>
 			`;
 		})}`;
@@ -233,12 +231,37 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 								name="${tag.group ?? ''}"
 								@click="${() => this.#optionClick(index)}"
 								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, index)}"
-								value="${tag.text ?? ''}" />
+								value="${tag.text ?? ''}"
+								?readonly=${this.readonly} />
 							<label for="tag-${tag.id}"> ${tag.text} </label>`;
 					},
 				)}
 			</div>
 		`;
+	}
+
+	#renderAddButton() {
+		if (this.readonly) return nothing;
+
+		return html`
+			<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
+				<input
+					id="tag-input"
+					aria-label="tag input"
+					placeholder="Enter tag"
+					.value="${this._currentInput ?? undefined}"
+					@keydown="${this.#onKeydown}"
+					@input="${this.#onInput}"
+					@blur="${this.#onBlur}" />
+				<uui-icon id="icon-add" name="icon-add"></uui-icon>
+				${this.#renderTagOptions()}
+			</uui-tag>
+		`;
+	}
+
+	#renderRemoveButton(tag: string) {
+		if (this.readonly) return nothing;
+		return html` <uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon> `;
 	}
 
 	static override styles = [
@@ -253,6 +276,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				border: 1px solid var(--uui-color-border);
 				background-color: var(--uui-input-background-color, var(--uui-color-surface));
 				flex: 1;
+				min-height: 40px;
 			}
 
 			#main-tag-wrapper {
