@@ -217,7 +217,6 @@ export class UmbBlockGridEntryContext
 				if (newColumnSpan !== columnSpan) {
 					const layoutValue = this._layout.getValue();
 					if (!layoutValue) return;
-					console.log("newColumnSpan", newColumnSpan)
 					this._layout.setValue({
 						...layoutValue,
 						columnSpan: newColumnSpan,
