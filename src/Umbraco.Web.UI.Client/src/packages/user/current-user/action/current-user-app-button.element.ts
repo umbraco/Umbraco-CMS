@@ -41,7 +41,7 @@ export class UmbCurrentUserAppButtonElement<
 		return this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				@click=${this.#onClick}
@@ -54,7 +54,7 @@ export class UmbCurrentUserAppButtonElement<
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbCurrentUserAppButtonElement;

@@ -17,7 +17,7 @@ export class UmbMediaTypeSearchProvider
 		return this.#repository.search(args);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#repository.destroy();
 	}
 }

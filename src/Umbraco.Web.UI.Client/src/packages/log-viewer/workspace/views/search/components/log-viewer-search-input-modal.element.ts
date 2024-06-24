@@ -36,7 +36,7 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 		this._hasValue = (target.value as string).length > 0;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-dialog-layout headline="Save Search">
 				<span>Enter a friendly name for your search query</span>
@@ -63,7 +63,7 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				width: 100%;

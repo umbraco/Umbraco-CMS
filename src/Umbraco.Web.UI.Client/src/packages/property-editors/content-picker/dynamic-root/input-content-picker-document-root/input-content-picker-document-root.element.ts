@@ -1,5 +1,8 @@
 import type { UmbContentPickerDynamicRoot, UmbContentPickerDynamicRootQueryStep } from '../../types.js';
-import { UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL, UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL } from '../modals/index.js';
+import {
+	UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL,
+	UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL,
+} from '../modals/index.js';
 import { html, css, customElement, property, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -58,7 +61,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		);
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.#updateDynamicRootOrigin(this.data);
@@ -168,7 +171,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderAddOriginButton()}
 			<uui-ref-list>${this.#renderOrigin()}</uui-ref-list>
@@ -245,7 +248,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 			look="placeholder"></uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			.add-button {
 				width: 100%;

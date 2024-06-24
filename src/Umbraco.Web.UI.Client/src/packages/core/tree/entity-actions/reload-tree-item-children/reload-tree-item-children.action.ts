@@ -9,7 +9,7 @@ export class UmbReloadTreeItemChildrenEntityAction extends UmbEntityActionBase<M
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 
 		eventContext.dispatchEvent(

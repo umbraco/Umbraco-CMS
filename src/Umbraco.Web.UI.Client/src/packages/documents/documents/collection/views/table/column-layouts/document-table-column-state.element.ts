@@ -12,12 +12,14 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 	@property({ attribute: false })
 	value!: UmbEditableDocumentCollectionItemModel;
 
-	render() {
+	override render() {
 		switch (this.value.item.state) {
 			case 'Published':
 				return html`<uui-tag color="positive" look="secondary">${this.localize.term('content_published')}</uui-tag>`;
 			case 'PublishedPendingChanges':
-				return html`<uui-tag color="warning" look="secondary">${this.localize.term('content_publishedPendingChanges')}</uui-tag>`;
+				return html`<uui-tag color="warning" look="secondary"
+					>${this.localize.term('content_publishedPendingChanges')}</uui-tag
+				>`;
 			case 'Draft':
 				return html`<uui-tag color="default" look="secondary">${this.localize.term('content_unpublished')}</uui-tag>`;
 			case 'NotCreated':

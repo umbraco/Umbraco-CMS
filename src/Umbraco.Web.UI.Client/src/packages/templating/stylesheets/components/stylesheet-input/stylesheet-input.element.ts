@@ -62,11 +62,11 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 	}
 
 	@property()
-	public set value(idsString: string) {
+	public override set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(idsString);
 	}
-	public get value() {
+	public override get value() {
 		return this.#pickerContext.getSelection().join(',');
 	}
 
@@ -98,7 +98,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-ref-list>
 				${repeat(
@@ -128,7 +128,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

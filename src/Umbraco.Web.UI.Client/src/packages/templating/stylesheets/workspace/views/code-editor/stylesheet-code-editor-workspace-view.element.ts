@@ -45,7 +45,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
-	render() {
+	override render() {
 		return html` <uui-box>
 			<div slot="header" id="code-editor-menu-container"></div>
 			${this._ready
@@ -56,7 +56,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

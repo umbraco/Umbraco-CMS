@@ -16,7 +16,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 	@state()
 	private _cultures: Array<UmbLanguageDetailModel> = [];
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#getCultures();
 	}
@@ -41,7 +41,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		previewContext.updateIFrame({ culture: culture.unique });
 	}
 
-	render() {
+	override render() {
 		if (this._cultures.length <= 1) return nothing;
 		return html`
 			<uui-button look="primary" popovertarget="cultures-popover">
@@ -69,7 +69,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

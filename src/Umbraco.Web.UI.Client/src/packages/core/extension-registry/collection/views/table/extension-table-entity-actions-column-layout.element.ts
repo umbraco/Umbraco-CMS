@@ -15,7 +15,7 @@ export class UmbExtensionTableEntityActionsColumnLayoutElement extends UmbLitEle
 		this._isOpen = false;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-dropdown .open=${this._isOpen} compact hide-expand>
 				<uui-symbol-more slot="label"></uui-symbol-more>

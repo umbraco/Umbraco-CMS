@@ -128,7 +128,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	}
 
 	// TODO: Needs localizations:
-	render() {
+	override render() {
 		return this._areaGridColumns
 			? html`${this._styleElement}
 					<div

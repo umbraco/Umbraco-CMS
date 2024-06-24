@@ -60,7 +60,7 @@ export class UmbPropertyEditorUIBlockRteBlockConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return UmbInputBlockTypeElement
 			? html`<umb-input-block-type
 					.value=${this.value}

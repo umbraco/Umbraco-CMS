@@ -54,7 +54,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	@property()
-	public set value(valueString: string | undefined) {
+	public override set value(valueString: string | undefined) {
 		if (valueString !== this.value) {
 			if (valueString === undefined) {
 				this.minValue = this.maxValue = undefined;
@@ -65,7 +65,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 			this.maxValue = getNumberOrUndefined(splittedValue[1]);
 		}
 	}
-	public get value(): string | undefined {
+	public override get value(): string | undefined {
 		return this.minValue || this.maxValue ? (this.minValue || '') + ',' + (this.maxValue || '') : undefined;
 	}
 
@@ -83,11 +83,11 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		);
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
 	}
 
-	focus() {
+	override focus() {
 		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
@@ -103,7 +103,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-input
 				type="number"
@@ -125,7 +125,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host(:invalid:not([pristine])) {
 			color: var(--uui-color-danger);
 		}

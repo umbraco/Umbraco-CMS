@@ -64,7 +64,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#getPackageCreated();
 	}
@@ -122,7 +122,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		this.#notificationContext?.peek('positive', { data: { message: 'Package updated' } });
 	}
 
-	render() {
+	override render() {
 		if (!this.workspaceAlias) return nothing;
 		return html`
 			<umb-workspace-editor alias=${this.workspaceAlias} back-path="section/packages/view/created">
@@ -425,7 +425,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

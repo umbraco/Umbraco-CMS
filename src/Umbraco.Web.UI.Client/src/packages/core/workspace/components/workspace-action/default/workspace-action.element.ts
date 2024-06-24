@@ -108,7 +108,7 @@ export class UmbWorkspaceActionElement<
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button-group>
 				<uui-button

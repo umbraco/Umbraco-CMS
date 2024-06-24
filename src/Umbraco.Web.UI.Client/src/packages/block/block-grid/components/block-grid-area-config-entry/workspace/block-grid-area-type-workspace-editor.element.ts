@@ -27,7 +27,7 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	// TODO: Localization, make it so that the headline is about area configuration?
-	render() {
+	override render() {
 		return this.workspaceAlias
 			? html`
 					<umb-workspace-editor
@@ -38,7 +38,7 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

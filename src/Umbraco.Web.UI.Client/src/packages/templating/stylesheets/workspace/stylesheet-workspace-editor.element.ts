@@ -34,7 +34,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.setName(value);
 	}
 
-	render() {
+	override render() {
 		return this._isNew !== undefined
 			? html`
 					<umb-workspace-editor alias="Umb.Workspace.StyleSheet">
@@ -54,7 +54,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -77,7 +77,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		this._popoverElement?.hidePopover();
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderTrigger()} ${this.#renderContent()}`;
 	}
 
@@ -105,7 +105,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		</uui-popover-container>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

@@ -34,7 +34,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="layout">
 				<img
@@ -112,7 +112,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		}
 	};
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

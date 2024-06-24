@@ -13,7 +13,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 
 	#documentTypePickerContext = new UmbDocumentTypePickerContext(this);
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		if (this.data) {
@@ -49,7 +49,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('dynamicRoot_pickDynamicRootQueryStepTitle')}>
 				<div id="main">

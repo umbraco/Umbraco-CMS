@@ -87,7 +87,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="container" class="uui-text" data-test="installer-telemetry">
 				<h1>Consent for telemetry data</h1>
@@ -100,7 +100,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host,
 			#container {

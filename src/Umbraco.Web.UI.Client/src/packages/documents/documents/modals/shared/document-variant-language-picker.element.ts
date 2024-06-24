@@ -29,7 +29,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	@state()
 	_selection: Array<string> = [];
 
-	render() {
+	override render() {
 		return this.variantLanguageOptions.length
 			? repeat(
 					this.variantLanguageOptions,
@@ -80,7 +80,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#subtitle {

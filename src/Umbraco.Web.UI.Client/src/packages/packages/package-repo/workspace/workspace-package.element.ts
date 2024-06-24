@@ -10,7 +10,7 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 	@state()
 	_package?: any;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (this.entityId) this._getPackageData();
 	}
@@ -37,11 +37,11 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 		</div>`;
 	}
 
-	render() {
+	override render() {
 		return html`<umb-workspace-editor alias="Umb.Workspace.Package"> ${this._renderHeader()} </umb-workspace-editor> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.header {

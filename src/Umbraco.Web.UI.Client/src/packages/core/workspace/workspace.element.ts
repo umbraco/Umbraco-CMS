@@ -12,7 +12,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
 	entityType = '';
 
-	render() {
+	override render() {
 		if (!this.entityType) return nothing;
 		return html`<umb-extension-with-api-slot
 			type="workspace"

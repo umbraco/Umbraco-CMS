@@ -87,7 +87,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	render() {
+	override render() {
 		return this._items && this._items.length > 0
 			? html`
 					<uui-button
@@ -120,7 +120,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {

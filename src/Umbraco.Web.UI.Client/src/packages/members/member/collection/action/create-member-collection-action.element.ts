@@ -60,7 +60,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				label=${this.localize.term('general_create')}
@@ -73,7 +73,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#popover-content {

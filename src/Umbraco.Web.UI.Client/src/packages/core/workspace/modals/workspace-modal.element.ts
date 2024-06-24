@@ -13,11 +13,11 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 	 * TODO: Consider if this binding and events integration is the right for communicating back the modal handler. Or if we should go with some Context API. like a Modal Context API.
 	 *
 	 */
-	render() {
+	override render() {
 		return this.data ? html`<umb-workspace .entityType=${this.data.entityType}></umb-workspace>` : '';
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -64,7 +64,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		this.requestUpdate();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				look="primary"
@@ -126,7 +126,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

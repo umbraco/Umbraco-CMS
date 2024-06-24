@@ -19,7 +19,7 @@ export class UmbConfirmModalElement extends UmbLitElement {
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-dialog-layout class="uui-text" .headline=${this.data?.headline || null}>
 				${this.data?.content}
@@ -41,7 +41,7 @@ export class UmbConfirmModalElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbConfirmModalElement;

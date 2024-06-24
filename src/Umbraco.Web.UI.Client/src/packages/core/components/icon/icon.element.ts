@@ -47,11 +47,11 @@ export class UmbIconElement extends UmbLitElement {
 		return this._icon;
 	}
 
-	render() {
+	override render() {
 		return html`<uui-icon name=${ifDefined(this._icon)} style=${ifDefined(this._color)}></uui-icon>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

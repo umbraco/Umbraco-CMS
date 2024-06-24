@@ -146,7 +146,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		this.groupStructureHelper.removeContainer(this._group.id);
 	}
 
-	render() {
+	override render() {
 		if (this._inherited === undefined || !this._groupId) return nothing;
 		return html`
 			<uui-box>
@@ -221,7 +221,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host([drag-placeholder]) {

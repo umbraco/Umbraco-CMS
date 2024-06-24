@@ -110,7 +110,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			: `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-breadcrumbs>
 				${this._structure.map(
@@ -124,7 +124,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

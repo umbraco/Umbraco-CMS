@@ -9,7 +9,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 		super(host, UmbUserServerDataSource, UMB_USER_DETAIL_STORE_CONTEXT);
 	}
 
-	async create(model: UmbUserDetailModel) {
+	override async create(model: UmbUserDetailModel) {
 		return super.create(model, null);
 	}
 }

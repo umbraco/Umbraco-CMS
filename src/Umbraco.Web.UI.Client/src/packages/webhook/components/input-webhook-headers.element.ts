@@ -20,7 +20,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		return this._headerNames.filter((name) => !this._headers.find((header) => header.name === name));
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
 		if (!this.headers) return;
@@ -28,7 +28,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		this._headers = Object.entries(this.headers).map(([name, value]) => ({ name, value }));
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('_headers')) {
@@ -116,14 +116,14 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderGrid()}
 			<uui-button id="add" look="placeholder" @click=${this.#addHeader}>Add</uui-button>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#grid {

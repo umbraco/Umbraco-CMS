@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	private _layoutColumns?: number;
 
 	@property({ attribute: false })
-	public set value(value: UmbBlockGridValueModel | undefined) {
+	public override set value(value: UmbBlockGridValueModel | undefined) {
 		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
@@ -63,7 +63,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		this.#context.setContents(this._value.contentData);
 		this.#context.setSettings(this._value.settingsData);
 	}
-	public get value(): UmbBlockGridValueModel {
+	public override get value(): UmbBlockGridValueModel {
 		return this._value;
 	}
 
@@ -88,7 +88,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		});
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
 		this.observe(this.#context.gridColumns, (gridColumns) => {
@@ -99,13 +99,13 @@ export class UmbPropertyEditorUIBlockGridElement
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <umb-block-grid-entries
 			.areaKey=${null}
 			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

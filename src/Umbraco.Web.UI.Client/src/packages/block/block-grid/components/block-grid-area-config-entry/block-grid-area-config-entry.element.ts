@@ -46,7 +46,7 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
 		this.observe(
@@ -85,16 +85,16 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 					<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
 						${this._columnSpan}x${this._rowSpan}
 					</umb-block-scale-handler>
-			  `
+				`
 			: '';
 	}
 
-	render() {
+	override render() {
 		return this.#renderBlock();
 	}
 
 	// TODO: Update UUI, as it is missing proper colors to be used for this case:
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

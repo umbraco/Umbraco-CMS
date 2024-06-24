@@ -39,7 +39,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._properties?.length > 0
 			? repeat(
 					this._properties,
@@ -56,7 +56,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 			: html`<div>No configuration</div>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorConfigElement;

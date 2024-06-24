@@ -160,7 +160,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		this.#groupStructureHelper.addContainer(this.#containerId, sortOrder);
 	};
 
-	render() {
+	override render() {
 		return html`
 			${
 				this.#containerId
@@ -204,7 +204,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			[drag-placeholder] {
 				opacity: 0.5;

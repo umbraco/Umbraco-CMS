@@ -2,7 +2,7 @@ import type { UserConfig } from 'vite';
 
 interface UmbViteDefaultConfigArgs {
 	dist: string;
-	entry?: string[];
+	entry?: string[] | Record<string, string>;
 }
 
 export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => {

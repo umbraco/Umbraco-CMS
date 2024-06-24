@@ -72,7 +72,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		if (this._documentTypeUnique) {
 			this.#retrieveAllowedDocumentTypesOf(this._documentTypeUnique);
 		}
@@ -104,7 +104,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._allowedDocumentTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
 	}
 
@@ -149,7 +149,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-scroll-container {
 				max-height: 500px;

@@ -29,7 +29,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	_hasUnpublishPermission = true;
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 		this.#getReferences();
 	}
@@ -91,7 +91,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_unpublish')}>
 			<p id="subtitle">
 				<umb-localize key="content_languagesToUnpublish">
@@ -137,7 +137,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
