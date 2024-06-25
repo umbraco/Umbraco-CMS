@@ -14,7 +14,7 @@ public class Twitter : OEmbedProviderBase
 
     public override string ApiEndpoint => "http://publish.twitter.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"(twitter|x).com/.*/status/.*" };
+    public override string[] UrlSchemeRegex => new[] { @"(?:https?:\/\/)(?:www\.)?(twitter|x)\.com\/.*\/status\/.*" };
 
     public override Dictionary<string, string> RequestParams => new();
 
