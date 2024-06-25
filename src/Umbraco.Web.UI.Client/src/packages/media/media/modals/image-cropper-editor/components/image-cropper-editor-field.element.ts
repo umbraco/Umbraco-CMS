@@ -1,171 +1,31 @@
-import type {
-	UmbImageCropperCrop,
-	UmbImageCropperCrops,
-	UmbImageCropperFocalPoint,
-	UmbImageCropperPropertyEditorValue,
-} from '../../../components/index.js';
-import type { UmbImageCropperElement } from '../../../components/input-image-cropper/image-cropper.element.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbInputImageCropperFieldElement } from '../../../components/input-image-cropper/image-cropper-field.element.js';
+import { css, customElement, html, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 
-/** TODO Do we want to combine this with the original image-cropper-field element? Element is very similar, but with a few UI changes... */
 @customElement('umb-image-cropper-editor-field')
-export class UmbImageCropperEditorFieldElement extends UmbLitElement {
-	@property({ attribute: false })
-	get value() {
-		return this.#value;
-	}
-	set value(value) {
-		if (!value) {
-			this.crops = [];
-			this.focalPoint = { left: 0.5, top: 0.5 };
-			this.src = '';
-			this.#value = undefined;
-		} else {
-			this.crops = [...value.crops];
-			// TODO: This is a temporary solution to make sure we have a focal point
-			this.focalPoint = value.focalPoint || { left: 0.5, top: 0.5 };
-			this.src = value.src;
-			this.#value = value;
-		}
-
-		this.requestUpdate();
-	}
-	#value?: UmbImageCropperPropertyEditorValue;
-
-	@state()
-	crops: UmbImageCropperCrops = [];
-
-	@state()
-	currentCrop?: UmbImageCropperCrop;
-
-	@property({ attribute: false })
-	file?: File;
-
-	@property()
-	fileDataUrl?: string;
-
-	@state()
-	focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
-
-	@property({ type: Boolean })
-	hideFocalPoint = false;
-
-	@state()
-	src = '';
-
-	get source() {
-		if (this.fileDataUrl) return this.fileDataUrl;
-		if (this.src) return this.src;
-		return '';
-	}
-
-	updated(changedProperties: Map<string | number | symbol, unknown>) {
-		super.updated(changedProperties);
-
-		if (changedProperties.has('file')) {
-			if (this.file) {
-				const reader = new FileReader();
-				reader.onload = (event) => {
-					this.fileDataUrl = event.target?.result as string;
-				};
-				reader.readAsDataURL(this.file);
-			} else {
-				this.fileDataUrl = undefined;
-			}
-		}
-	}
-
-	#onCropClick(crop: any) {
-		const index = this.crops.findIndex((c) => c.alias === crop.alias);
-
-		if (index === -1) return;
-
-		this.currentCrop = { ...this.crops[index] };
-	}
-
-	#onCropChange = (event: CustomEvent) => {
-		const target = event.target as UmbImageCropperElement;
-		const value = target.value;
-
-		if (!value) return;
-
-		const index = this.crops.findIndex((crop) => crop.alias === value.alias);
-
-		if (index === undefined) return;
-
-		this.crops[index] = value;
+export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperFieldElement {
+	#resetCurrentCrop() {
 		this.currentCrop = undefined;
-		this.#updateValue();
-	};
-
-	#onFocalPointChange = (event: CustomEvent) => {
-		this.focalPoint = event.detail;
-		this.#updateValue();
-	};
-
-	#updateValue() {
-		this.#value = {
-			crops: [...this.crops],
-			focalPoint: this.focalPoint,
-			src: this.src,
-		};
-
-		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onResetFocalPoint = () => {
-		this.focalPoint = { left: 0.5, top: 0.5 };
-		this.#updateValue();
-	};
-
-	render() {
+	renderActions() {
 		return html`
-			<div id="main">${this.#renderMain()}</div>
-			<div id="side">${this.#renderSide()}</div>
+			<slot name="actions"></slot>
+			${when(
+				!this.hideFocalPoint,
+				() =>
+					html`<uui-button
+						compact
+						id="reset-focal-point"
+						label=${this.localize.term('content_resetFocalPoint')}
+						@click=${this.onResetFocalPoint}>
+						<uui-icon name="icon-axis-rotation"></uui-icon>
+						${this.localize.term('content_resetFocalPoint')}
+					</uui-button>`,
+			)}
 		`;
 	}
 
-	#renderMain() {
-		if (this.currentCrop) {
-			return html`
-				<umb-image-cropper
-					.focalPoint=${this.focalPoint}
-					.src=${this.source}
-					.value=${this.currentCrop}
-					?hideFocalPoint=${this.hideFocalPoint}
-					@change=${this.#onCropChange}>
-				</umb-image-cropper>
-			`;
-		}
-
-		return html`
-			<umb-image-cropper-focus-setter
-				.focalPoint=${this.focalPoint}
-				.src=${this.source}
-				?hideFocalPoint=${this.hideFocalPoint}
-				@change=${this.#onFocalPointChange}>
-			</umb-image-cropper-focus-setter>
-			<div id="actions">
-				<slot name="actions"></slot>
-				${when(
-					!this.hideFocalPoint,
-					() =>
-						html`<uui-button
-							compact
-							id="reset-focal-point"
-							label=${this.localize.term('content_resetFocalPoint')}
-							@click=${this.#onResetFocalPoint}>
-							<uui-icon name="icon-axis-rotation"></uui-icon>
-							${this.localize.term('content_resetFocalPoint')}
-						</uui-button>`,
-				)}
-			</div>
-		`;
-	}
-
-	#renderSide() {
+	renderSide() {
 		if (!this.value || !this.crops) return;
 
 		return html` <uui-menu-item
@@ -180,15 +40,11 @@ export class UmbImageCropperEditorFieldElement extends UmbLitElement {
 				(crop) =>
 					html` <umb-image-cropper-preview
 						?active=${this.currentCrop?.alias === crop.alias}
-						@click=${() => this.#onCropClick(crop)}
+						@click=${() => this.onCropClick(crop)}
 						.crop=${crop}
 						.focalPoint=${this.focalPoint}
 						.src=${this.source}></umb-image-cropper-preview>`,
 			)}`;
-	}
-
-	#resetCurrentCrop() {
-		this.currentCrop = undefined;
 	}
 
 	static styles = css`
