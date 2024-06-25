@@ -334,7 +334,6 @@ export abstract class UmbBlockEntryContext<
 				this.settings,
 				(settings) => {
 					if (settings) {
-						console.log('settings to be set', this.#contentUdi, settings);
 						this._manager?.setOneSettings(settings);
 					}
 				},
