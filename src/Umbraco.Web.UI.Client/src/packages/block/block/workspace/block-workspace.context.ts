@@ -1,6 +1,3 @@
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
-import { UmbBlockElementManager } from './block-element-manager.js';
-import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -9,13 +6,16 @@ import {
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
+import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
+import { UmbBlockElementManager } from './block-element-manager.js';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>

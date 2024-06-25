@@ -307,6 +307,9 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeContent',
 		);
+		/*
+
+		This two way binding does not work well, might need to further investigate what the exact problem is.
 		this.observe(
 			this.content,
 			(content) => {
@@ -316,6 +319,7 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeInternalContent',
 		);
+		*/
 
 		// observe settings:
 		const settingsUdi = this._layout.value?.settingsUdi;
@@ -334,7 +338,6 @@ export abstract class UmbBlockEntryContext<
 				this.settings,
 				(settings) => {
 					if (settings) {
-						console.log('settings to be set', this.#contentUdi, settings);
 						this._manager?.setOneSettings(settings);
 					}
 				},
@@ -352,8 +355,6 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentTypeOf(contentTypeKey),
 			(contentType) => {
-				//this.#contentElementTypeAlias.setValue(contentType?.alias);
-				//this.#contentElementTypeName.setValue(contentType?.name);
 				this.#contentElementType.setValue(contentType);
 				this._gotContentType(contentType);
 			},
