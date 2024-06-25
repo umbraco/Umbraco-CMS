@@ -112,14 +112,14 @@ stages:
               projects: $(solution)
           - task: DotNetCoreCLI@2
             name: build
-            displayName: Run dotnet build and generate NuGet packages
+            displayName: Run dotnet build
             inputs:
               command: build
               projects: $(solution)
               arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true'
           - task: DotNetCoreCLI@2
             name: pack
-            displayName: Generate NuGet packages
+            displayName: Run dotnet pack
             inputs:
               command: pack
               projects: $(solution)
