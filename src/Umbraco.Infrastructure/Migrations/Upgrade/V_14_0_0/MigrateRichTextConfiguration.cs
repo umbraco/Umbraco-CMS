@@ -1,39 +1,32 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+﻿using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
 public class MigrateRichTextConfiguration : MigrationBase
 {
-    private readonly IDataTypeService _dataTypeService;
 
-    public MigrateRichTextConfiguration(IMigrationContext context, IDataTypeService dataTypeService) : base(context) => _dataTypeService = dataTypeService;
+    public MigrateRichTextConfiguration(IMigrationContext context) : base(context)
+    {
+    }
 
     protected override void Migrate()
     {
-        IEnumerable<IDataType> richTextEditors = _dataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText).GetAwaiter().GetResult();
-        foreach (IDataType richTextEditor in richTextEditors)
+        Sql<ISqlContext> sql = Sql()
+            .Select<DataTypeDto>()
+            .From<DataTypeDto>()
+            .Where<DataTypeDto>(x => x.EditorAlias.Equals(Constants.PropertyEditors.Aliases.RichText));
+
+        List<DataTypeDto> dataTypeDtos = Database.Fetch<DataTypeDto>(sql);
+
+        foreach (DataTypeDto dataTypeDto in dataTypeDtos)
         {
-            if (!richTextEditor.ConfigurationData.TryGetValue("toolbar", out var configurationValue))
-            {
-                continue;
-            }
-
-            if (configurationValue is not List<string> toolbar)
-            {
-                continue;
-            }
-
-            if (toolbar.Contains("ace"))
-            {
-                toolbar.Remove("ace");
-                toolbar.Add("sourcecode");
-            }
-
-            richTextEditor.ConfigurationData.Remove("toolbar");
-            richTextEditor.ConfigurationData.Add("toolbar", toolbar);
-            _dataTypeService.UpdateAsync(richTextEditor, Constants.Security.SuperUserKey);
+            // Update the configuration
+            dataTypeDto.Configuration = dataTypeDto.Configuration?.Replace("\"ace", "\"sourcecode");
+            Database.Update(dataTypeDto);
         }
     }
 }
