@@ -96,7 +96,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
@@ -171,7 +171,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

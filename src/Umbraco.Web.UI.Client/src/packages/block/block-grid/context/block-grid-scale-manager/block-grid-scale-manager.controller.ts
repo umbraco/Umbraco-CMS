@@ -25,7 +25,7 @@ export class UmbBlockGridScaleManager extends UmbControllerBase {
 	#runtimeGridRows: Array<number> = [];
 	#lockedGridRows = 0;
 	//
-	_host: UmbBlockGridScalableContext;
+	override _host: UmbBlockGridScalableContext;
 	_entries?: UmbBlockGridScalableContainerContext;
 
 	constructor(host: UmbBlockGridScalableContext) {

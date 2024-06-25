@@ -48,7 +48,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		this._collectionContext?.pagination.setCurrentPageNumber(event.target.current);
 	}
 
-	render() {
+	override render() {
 		if (this._totalPages <= 1) {
 			return nothing;
 		}
@@ -59,7 +59,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			@change=${this.#onChange}></uui-pagination>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

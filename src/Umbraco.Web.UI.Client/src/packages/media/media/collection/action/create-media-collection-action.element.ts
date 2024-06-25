@@ -69,7 +69,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		this.#retrieveAllowedMediaTypesOf(this._mediaTypeUnique ?? '');
 	}
 
@@ -98,7 +98,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._allowedMediaTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
 	}
 

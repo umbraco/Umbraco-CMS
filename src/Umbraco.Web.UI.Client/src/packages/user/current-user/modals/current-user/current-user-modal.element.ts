@@ -58,7 +58,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		this._logOutButtonState = 'success';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this._currentUser?.name || ''}">
 				<div id="main">
@@ -81,7 +81,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			#main {

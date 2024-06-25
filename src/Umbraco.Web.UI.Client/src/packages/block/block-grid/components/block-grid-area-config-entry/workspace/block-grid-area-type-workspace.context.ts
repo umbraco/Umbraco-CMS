@@ -23,8 +23,6 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	// Just for context token safety:
 	public readonly IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = true;
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	#entityType: string;
 	#data = new UmbObjectState<UmbBlockGridTypeAreaType | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -55,7 +53,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -142,7 +140,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

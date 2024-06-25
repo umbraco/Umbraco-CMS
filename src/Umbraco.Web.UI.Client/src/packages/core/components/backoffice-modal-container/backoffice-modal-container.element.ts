@@ -89,7 +89,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		return modalElement.render();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-modal-container id="container">
 				${this._modals.length > 0
@@ -103,7 +103,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {

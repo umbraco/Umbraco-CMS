@@ -24,14 +24,14 @@ export class UmbPreviewElement extends UmbLitElement {
 		this.observe(this.#context.previewUrl, (previewUrl) => (this._previewUrl = previewUrl));
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.addEventListener('visibilitychange', this.#onVisibilityChange);
 		window.addEventListener('beforeunload', () => this.#context.exitSession());
 		this.#context.startSession();
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.removeEventListener('visibilitychange', this.#onVisibilityChange);
 		// NOTE: Unsure how we remove an anonymous function from 'beforeunload' event listener.
@@ -55,7 +55,7 @@ export class UmbPreviewElement extends UmbLitElement {
 		this.#context.checkSession();
 	}
 
-	render() {
+	override render() {
 		if (!this._previewUrl) return nothing;
 		return html`
 			${when(!this._iframeReady, () => html`<div id="loading"><uui-loader-circle></uui-loader-circle></div>`)}
@@ -77,7 +77,7 @@ export class UmbPreviewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

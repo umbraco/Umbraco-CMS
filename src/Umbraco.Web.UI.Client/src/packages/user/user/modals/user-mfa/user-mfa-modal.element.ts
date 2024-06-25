@@ -24,7 +24,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	#unique = '';
 	#userRepository = new UmbUserRepository(this);
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#unique = this.modalContext?.data.unique ?? '';
 		this.#loadProviders();
 	}
@@ -65,7 +65,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('member_2fa')}">
 				<div id="main">
@@ -149,7 +149,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 		this.#loadProviders();
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

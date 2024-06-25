@@ -71,7 +71,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-backoffice-header></umb-backoffice-header>
 			<umb-backoffice-main></umb-backoffice-main>
@@ -79,7 +79,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

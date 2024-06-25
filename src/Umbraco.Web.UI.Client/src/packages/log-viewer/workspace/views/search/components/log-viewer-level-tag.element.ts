@@ -28,7 +28,7 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 		},
 	};
 
-	render() {
+	override render() {
 		return html`<uui-tag
 			look=${ifDefined(this.level ? this.levelMap[this.level]?.look : undefined)}
 			color=${ifDefined(this.level ? this.levelMap[this.level]?.color : undefined)}

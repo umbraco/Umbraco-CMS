@@ -39,7 +39,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	// Init
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#getDocumentName();
 	}
@@ -162,7 +162,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	// Renders
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_protect')}>
 				<uui-box>${this._startPage ? this.renderSelectGroup() : this.renderEditPage()}</uui-box> ${this.renderActions()}
@@ -274,7 +274,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			>${remove}${confirm}`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box,

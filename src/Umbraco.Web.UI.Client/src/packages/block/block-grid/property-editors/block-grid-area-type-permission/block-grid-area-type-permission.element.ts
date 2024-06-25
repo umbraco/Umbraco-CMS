@@ -97,7 +97,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<div id="permissions">
 				${repeat(
 					this._value,
@@ -180,7 +180,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#permissions {

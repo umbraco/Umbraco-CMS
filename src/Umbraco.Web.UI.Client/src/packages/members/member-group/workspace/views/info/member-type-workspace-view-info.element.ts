@@ -21,7 +21,7 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <div id="left-column">
 				<uui-box headline=${this.localize.term('content_membergroup')}>
 					<div id="no-properties">
@@ -42,7 +42,7 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 			</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#no-properties {

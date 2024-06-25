@@ -34,7 +34,7 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}
 }

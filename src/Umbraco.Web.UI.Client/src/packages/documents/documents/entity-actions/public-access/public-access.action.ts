@@ -14,7 +14,7 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<nev
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modal = modalManager.open(this, UMB_PUBLIC_ACCESS_MODAL, { data: { unique: this.args.unique } });
@@ -39,3 +39,5 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<nev
 		actionEventContext.dispatchEvent(entityChildrenEvent);
 	}
 }
+
+export { UmbDocumentPublicAccessEntityAction as api };

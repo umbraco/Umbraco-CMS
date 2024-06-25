@@ -24,7 +24,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	_createLabel?: string;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		// TODO: We should make a nicer way to observe the value..  [NL]
@@ -88,7 +88,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select">
 				<uui-box>

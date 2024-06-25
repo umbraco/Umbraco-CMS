@@ -66,10 +66,10 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	}
 
 	@property({ type: String })
-	public set value(selectionString: string | undefined) {
+	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string | undefined {
+	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
@@ -100,11 +100,11 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		if (!this._items) return nothing;
 		return html`
 			<uui-ref-list>
@@ -151,7 +151,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

@@ -60,7 +60,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this._key = this.data?.key ?? '';
@@ -112,7 +112,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this.value = { key: this._key, unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
 				${this.#renderBody()}
@@ -149,7 +149,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#layout {
 				height: 100%;

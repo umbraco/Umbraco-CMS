@@ -69,7 +69,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		return structureItem.isFolder ? undefined : `${workspaceBasePath}/${structureItem.unique}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-breadcrumbs>
 				${map(
@@ -84,7 +84,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

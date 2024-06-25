@@ -126,11 +126,17 @@
 		"url": "https://umbraco.com"
 	},
 	"workspaces": [
+		"./src/packages/block",
 		"./src/packages/data-type",
 		"./src/packages/dictionary",
+		"./src/packages/documents",
+		"./src/packages/health-check",
 		"./src/packages/language",
+		"./src/packages/tags",
 		"./src/packages/umbraco-news",
-		"./src/packages/webhook"
+		"./src/packages/webhook",
+		"./src/packages/health-check",
+		"./src/packages/tags"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
@@ -154,6 +160,7 @@
 		"generate:server-api-dev": "openapi-ts --input http://localhost:11000/umbraco/swagger/management/swagger.json --output src/external/backend-api/src --debug true --enums typescript --lint true --schemas false",
 		"generate:server-api": "openapi-ts --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --debug true --enums typescript --lint true --schemas false",
 		"generate:icons": "node ./devops/icons/index.js",
+		"generate:overrides": "node ./devops/tsc/index.js",
 		"generate:jsonschema:dist": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/umbraco-package.ts\" --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"generate:jsonschema": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/*.ts\"",
 		"lint:errors": "npm run lint -- --quiet",
@@ -251,7 +258,7 @@
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.8",
 		"typedoc": "^0.25.13",
-		"typescript": "^5.4.5",
+		"typescript": "^5.5.2",
 		"typescript-json-schema": "^0.63.0",
 		"vite": "^5.2.9",
 		"vite-plugin-static-copy": "^1.0.5",

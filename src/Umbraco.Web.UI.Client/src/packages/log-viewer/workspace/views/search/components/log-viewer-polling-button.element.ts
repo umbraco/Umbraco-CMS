@@ -53,7 +53,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		this.#togglePolling();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button-group>
 				<uui-button label="Start pooling" @click=${this.#togglePolling}
@@ -75,7 +75,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#polling-enabled-icon {
 				margin-right: var(--uui-size-space-3);

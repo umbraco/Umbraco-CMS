@@ -35,7 +35,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	// Init
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#requestLanguages();
 		this.#readDomains();
@@ -108,7 +108,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	// Renders
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
 				${this.#renderCultureSection()} ${this.#renderDomainSection()}
@@ -225,7 +225,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-button-group {

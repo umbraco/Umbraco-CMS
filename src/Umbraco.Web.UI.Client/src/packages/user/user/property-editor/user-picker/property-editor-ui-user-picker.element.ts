@@ -21,7 +21,7 @@ export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implemen
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-user-input min="0" max="1" .value=${this.value ?? ''} @change=${this.#onChange}></umb-user-input>
 		`;

@@ -41,7 +41,7 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
-	protected renderToolbar() {
+	protected override renderToolbar() {
 		return html`
 			<div id="toolbar" slot="header">
 				<uui-input @input=${this.#onSearch} label="Search" placeholder="Search..." id="input-search"></uui-input>
@@ -54,7 +54,7 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#toolbar {
 				display: flex;

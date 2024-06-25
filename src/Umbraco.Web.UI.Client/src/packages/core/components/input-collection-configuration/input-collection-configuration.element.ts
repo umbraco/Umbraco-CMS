@@ -10,10 +10,8 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-collection-configuration')
-export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<string, typeof UmbLitElement>(
-	UmbLitElement,
-) {
-	protected getFormElement() {
+export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<string, typeof UmbLitElement>(UmbLitElement) {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -81,7 +79,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<
 		this.#dataTypeModal?.open({}, `edit/${this.value}`);
 	}
 
-	render() {
+	override render() {
 		return !this.value ? this.#renderCreate() : this.#renderConfigured();
 	}
 
@@ -113,7 +111,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#create-button {
 				width: 100%;

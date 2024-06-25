@@ -122,13 +122,13 @@ export class UmbServerModelValidationContext
 
 	focusFirstInvalidElement(): void {}
 
-	hostConnected(): void {
+	override hostConnected(): void {
 		super.hostConnected();
 		if (this.#context) {
 			this.#context.addValidator(this);
 		}
 	}
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		super.hostDisconnected();
 		if (this.#context) {
 			this.#context.removeValidator(this);
@@ -136,7 +136,7 @@ export class UmbServerModelValidationContext
 		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		// TODO: make sure we destroy things properly:
 		this.#translators = [];
 		super.destroy();

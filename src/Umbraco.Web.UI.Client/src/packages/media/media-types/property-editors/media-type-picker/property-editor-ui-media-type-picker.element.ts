@@ -30,7 +30,7 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-media-type .min=${this._min} .max=${this._max} .value=${this.value} @change=${this.#onChange}>
 			</umb-input-media-type>

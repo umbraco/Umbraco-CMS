@@ -93,7 +93,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return this.#renderType();
 	}
 

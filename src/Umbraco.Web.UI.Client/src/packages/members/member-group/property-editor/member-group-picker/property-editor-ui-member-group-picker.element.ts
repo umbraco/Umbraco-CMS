@@ -33,7 +33,7 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-member-group
 				.min=${this._min}

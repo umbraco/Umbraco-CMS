@@ -45,7 +45,7 @@ export class UmbPropertyActionElement<
 		event.stopPropagation();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-menu-item
 				label=${ifDefined(this.manifest?.meta.label)}

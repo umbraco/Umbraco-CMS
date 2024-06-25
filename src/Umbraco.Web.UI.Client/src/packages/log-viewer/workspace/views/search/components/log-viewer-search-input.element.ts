@@ -144,7 +144,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-input
 				id="search-input"
@@ -193,7 +193,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

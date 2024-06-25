@@ -38,7 +38,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<umb-ref-grid-block standalone .name=${this.label ?? ''} href=${this.urls?.editContent ?? ''}>
 			<umb-property-type-based-property
 				.property=${this._inlineProperty}
@@ -47,7 +47,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		</umb-ref-grid-block>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			umb-block-grid-areas-container {
 				margin-top: calc(var(--uui-size-2) + 1px);

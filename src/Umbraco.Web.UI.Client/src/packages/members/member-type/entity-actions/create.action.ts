@@ -7,7 +7,7 @@ export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<never> 
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		// TODO: Generate the href or retrieve it from something?
 		history.pushState(
 			null,

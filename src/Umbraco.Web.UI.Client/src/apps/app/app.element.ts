@@ -154,7 +154,7 @@ export class UmbAppElement extends UmbLitElement {
 		new UmbContextDebugController(this);
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#setup();
 	}
@@ -291,11 +291,11 @@ export class UmbAppElement extends UmbLitElement {
 		this.requestUpdate();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			overflow: hidden;
 		}

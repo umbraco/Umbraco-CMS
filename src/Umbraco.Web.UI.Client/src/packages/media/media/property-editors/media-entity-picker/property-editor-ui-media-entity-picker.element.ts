@@ -30,7 +30,7 @@ export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement i
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-media
 				.min=${this._min}

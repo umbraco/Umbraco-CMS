@@ -212,7 +212,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		);
 	}
 
-	render() {
+	override render() {
 		return html`<div id="groups">
 			${this._notGroupedBlockTypes
 				? html`<umb-input-block-type
@@ -256,7 +256,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input:not(:hover, :focus) {

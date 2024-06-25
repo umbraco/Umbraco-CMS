@@ -7,7 +7,7 @@ export class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<never> 
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		history.pushState(
 			{},
 			'',

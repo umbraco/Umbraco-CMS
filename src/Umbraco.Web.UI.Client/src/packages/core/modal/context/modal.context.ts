@@ -146,7 +146,7 @@ export class UmbModalContext<
 		this.#value.update(partialValue);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.dispatchEvent(new CustomEvent('umb:destroy'));
 		this.#value.destroy();
 		(this as any).router = null;

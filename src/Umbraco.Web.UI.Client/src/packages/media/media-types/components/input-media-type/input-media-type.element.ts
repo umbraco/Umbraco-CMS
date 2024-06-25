@@ -85,10 +85,10 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 	}
 
 	@property({ type: String })
-	public set value(selectionString: string | undefined) {
+	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string | undefined {
+	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
@@ -142,7 +142,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -189,7 +189,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

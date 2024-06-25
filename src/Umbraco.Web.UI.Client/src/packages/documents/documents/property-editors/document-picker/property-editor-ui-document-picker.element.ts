@@ -45,7 +45,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		const startNode: UmbTreeStartNode | undefined = this._startNodeId
 			? { unique: this._startNodeId, entityType: UMB_DOCUMENT_ENTITY_TYPE }
 			: undefined;

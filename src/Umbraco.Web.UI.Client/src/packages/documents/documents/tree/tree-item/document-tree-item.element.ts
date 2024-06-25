@@ -68,7 +68,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return this._variant?.state === 'Draft';
 	}
 
-	renderIconContainer() {
+	override renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
 				${this.item?.documentType.icon
@@ -85,7 +85,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		`;
 	}
 
-	renderLabel() {
+	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
 			>${this.#getLabel()}</span
 		> `;
@@ -95,7 +95,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return html`<umb-icon id="icon-lock" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#icon-container {
@@ -128,6 +128,12 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				height: 14px;
 				border-radius: 100%;
 				line-height: 14px;
+			}
+
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 
 			:hover #icon-lock {

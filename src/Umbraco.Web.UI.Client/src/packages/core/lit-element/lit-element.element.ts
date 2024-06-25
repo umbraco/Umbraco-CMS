@@ -1,8 +1,6 @@
 import { LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 
-// TODO: Currently we don't check if the `lang` is registered in the backoffice. We should do that. We can do that by checking if the `lang` is in the `languages` array of the `language` resource and potentially make sure that UmbLocalizationRegistry only loads the localizations and some other mechanism reloads to another language (currently it does both)
-
 /**
  * The base class for all Umbraco LitElement elements.
  *
@@ -19,7 +17,7 @@ export class UmbLitElement extends UmbElementMixin(LitElement) {
 	 * @example 'ltr'
 	 * @example 'rtl'
 	 */
-	@property() dir: 'rtl' | 'ltr' | '' = '';
+	@property() override dir: 'rtl' | 'ltr' | '' = '';
 
 	/**
 	 * The language of the element.
@@ -29,5 +27,5 @@ export class UmbLitElement extends UmbElementMixin(LitElement) {
 	 * @example 'en-us'
 	 * @example 'en'
 	 */
-	@property() lang = '';
+	@property() override lang = '';
 }

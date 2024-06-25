@@ -117,11 +117,11 @@ export class UmbDonutChartElement extends LitElement {
 
 	#containerBounds: DOMRect | undefined;
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#containerBounds = this._container.getBoundingClientRect();
 	}
 
-	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('radius') || _changedProperties.has('borderSize') || _changedProperties.has('svgSize')) {
 			if (this.borderSize > this.radius) {
 				throw new Error('Border size cannot be bigger than radius');
@@ -264,7 +264,7 @@ export class UmbDonutChartElement extends LitElement {
         `;
 	}
 
-	render() {
+	override render() {
 		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
 				<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">${this.#renderCircles()}</svg>
 				<div
@@ -277,7 +277,7 @@ export class UmbDonutChartElement extends LitElement {
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			path {

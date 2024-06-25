@@ -63,10 +63,10 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 	}
 
 	@property({ type: String })
-	public set value(selectionString: string | undefined) {
+	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string | undefined {
+	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
@@ -98,7 +98,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
 			<uui-button
@@ -120,7 +120,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 		</umb-ref-section>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

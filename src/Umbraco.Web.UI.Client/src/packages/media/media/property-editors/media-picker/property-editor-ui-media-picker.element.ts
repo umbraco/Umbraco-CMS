@@ -75,7 +75,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-rich-media
 				.alias=${this._alias}

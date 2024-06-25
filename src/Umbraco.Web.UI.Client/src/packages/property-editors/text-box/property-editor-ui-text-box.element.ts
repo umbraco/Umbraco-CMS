@@ -6,6 +6,7 @@ import {
 	state,
 	ifDefined,
 	type PropertyValueMap,
+	property,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -23,6 +24,15 @@ export class UmbPropertyEditorUITextBoxElement
 	extends UmbFormControlMixin<string>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	#defaultType: UuiInputTypeType = 'text';
 
 	@state()
@@ -44,7 +54,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this._placeholder = config?.getValueByAlias('placeholder');
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
@@ -56,14 +66,15 @@ export class UmbPropertyEditorUITextBoxElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-input
 			.value=${this.value ?? ''}
 			.type=${this._type}
 			placeholder=${ifDefined(this._placeholder)}
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
-			@input=${this.onChange}></uui-input>`;
+			@input=${this.onChange}
+			?readonly=${this.readonly}></uui-input>`;
 	}
 
 	static styles = [

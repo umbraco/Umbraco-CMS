@@ -89,3 +89,5 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 		return { error };
 	}
 }
+
+export { UmbDocumentPublishingRepository as api };

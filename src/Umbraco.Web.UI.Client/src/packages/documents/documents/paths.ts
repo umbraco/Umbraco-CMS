@@ -1,4 +1,4 @@
-import { UMB_DOCUMENTS_SECTION_PATHNAME } from '../paths.js';
+import { UMB_DOCUMENTS_SECTION_PATHNAME } from '../section/paths.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, type UmbDocumentEntityTypeUnion } from './entity.js';
 import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';

@@ -28,6 +28,7 @@ const tsConfigBase = {
 		baseUrl: '.',
 		incremental: true,
 		skipLibCheck: true,
+		noImplicitOverride: true,
 		/* Bundler mode */
 		moduleResolution: 'bundler',
 		allowImportingTsExtensions: true,

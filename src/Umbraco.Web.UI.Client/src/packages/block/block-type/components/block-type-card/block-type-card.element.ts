@@ -47,6 +47,9 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	_name?: string;
 
 	@state()
+	_description?: string;
+
+	@state()
 	_fallbackIcon?: string | null;
 
 	constructor() {
@@ -57,16 +60,18 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 			if (item) {
 				this._fallbackIcon = item.icon;
 				this._name = item.name;
+				this._description = item.description ?? undefined;
 			}
 		});
 	}
 
 	// TODO: Support image files instead of icons.
-	render() {
+	override render() {
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(this.href)}
 				.name=${this._name ?? 'Unknown'}
+				.description=${this._description}
 				.background=${this.backgroundColor}>
 				${this.iconFile
 					? html`<img src=${this.iconFile} alt="" />`

@@ -18,3 +18,5 @@ export class UmbMoveDocumentRepository extends UmbRepositoryBase implements UmbM
 		return { error };
 	}
 }
+
+export { UmbMoveDocumentRepository as api };

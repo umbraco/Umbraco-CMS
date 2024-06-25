@@ -11,7 +11,7 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 > {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
@@ -48,7 +48,7 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Stylesheet">
 				<uui-box>

@@ -735,7 +735,7 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.setValue([]);
 		this.#containers.setValue([]);
 	}
-	public destroy() {
+	public override destroy() {
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
 		super.destroy();

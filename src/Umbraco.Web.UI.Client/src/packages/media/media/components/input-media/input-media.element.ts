@@ -108,10 +108,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	startNode = '';
 
 	@property({ type: String })
-	public set value(selectionString: string | undefined) {
+	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string | undefined {
+	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
@@ -196,7 +196,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
 	}
 
@@ -256,7 +256,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

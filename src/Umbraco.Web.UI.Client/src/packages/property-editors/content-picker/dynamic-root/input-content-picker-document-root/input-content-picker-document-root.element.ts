@@ -64,7 +64,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		);
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.#updateDynamicRootOrigin(this.data);
@@ -174,7 +174,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderAddOriginButton()}
 			<uui-ref-list>${this.#renderOrigin()}</uui-ref-list>
@@ -251,7 +251,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			look="placeholder"></uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			.add-button {
 				width: 100%;

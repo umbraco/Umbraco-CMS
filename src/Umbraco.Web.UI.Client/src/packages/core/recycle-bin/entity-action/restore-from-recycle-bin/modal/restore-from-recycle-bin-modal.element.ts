@@ -28,7 +28,9 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 	#recycleBinRepository?: UmbRecycleBinRepository;
 
-	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+	protected override async firstUpdated(
+		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
+	): Promise<void> {
 		super.firstUpdated(_changedProperties);
 		if (!this.data?.unique) throw new Error('Cannot restore an item without a unique identifier.');
 
@@ -134,7 +136,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		this.updateValue({ destination });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Restore">
 				<uui-box>
@@ -173,7 +175,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#placeholder {

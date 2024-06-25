@@ -90,10 +90,10 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: String })
-	public set value(selectionString: string | undefined) {
+	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string | undefined {
+	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
@@ -158,7 +158,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -207,7 +207,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

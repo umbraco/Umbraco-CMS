@@ -20,7 +20,7 @@ export class UmbControllerHostProviderElement
 		this.shadowRoot?.appendChild(slot);
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		if (this.create) {
 			this.create(this);
