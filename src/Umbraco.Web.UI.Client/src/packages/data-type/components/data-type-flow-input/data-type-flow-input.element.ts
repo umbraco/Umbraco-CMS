@@ -16,7 +16,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  */
 @customElement('umb-data-type-flow-input')
 export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

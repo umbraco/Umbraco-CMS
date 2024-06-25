@@ -123,7 +123,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		this._input?.focus();
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
