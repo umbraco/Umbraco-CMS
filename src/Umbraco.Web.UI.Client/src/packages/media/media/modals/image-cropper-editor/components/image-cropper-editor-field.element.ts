@@ -29,11 +29,10 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 	override renderSide() {
 		if (!this.value || !this.crops) return;
 
-		return html` <uui-menu-item
-				id="reset-current-crop"
+		return html` <umb-image-cropper-preview
 				@click=${this.#resetCurrentCrop}
 				?active=${!this.currentCrop}
-				label=${this.localize.term('general_media')}></uui-menu-item>
+				.label=${this.localize.term('general_media')}></umb-image-cropper-preview>
 
 			${repeat(
 				this.crops,
@@ -73,14 +72,6 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 
 		#reset-focal-point uui-icon {
 			padding-right: var(--uui-size-3);
-		}
-
-		#reset-current-crop {
-			--uui-menu-item-flat-structure: 1;
-			--uui-menu-item-border-radius: var(--uui-border-radius);
-			border-radius: var(--uui-border-radius);
-			width: 100%;
-			background-color: var(--uui-color-surface);
 		}
 
 		slot[name='actions'] {

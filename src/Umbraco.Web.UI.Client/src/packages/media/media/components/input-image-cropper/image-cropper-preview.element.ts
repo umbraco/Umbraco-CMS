@@ -13,6 +13,9 @@ export class UmbImageCropperPreviewElement extends LitElement {
 	@property({ type: String, attribute: false })
 	src: string = '';
 
+	@property({ type: String })
+	label?: string;
+
 	@property({ attribute: false })
 	get focalPoint() {
 		return this.#focalPoint;
@@ -140,14 +143,14 @@ export class UmbImageCropperPreviewElement extends LitElement {
 
 	render() {
 		if (!this.crop) {
-			return nothing;
+			return html`<span id="label">${this.label}</span>`;
 		}
 
 		return html`
 			<div id="container">
 				<img id="image" src=${this.src} alt="" />
 			</div>
-			<span id="alias">${this.crop.alias}</span>
+			<span id="alias">${this.label ?? this.crop.alias}</span>
 			<span id="dimensions">${this.crop.width} x ${this.crop.height}</span>
 			${this.crop.coordinates
 				? html`<span id="user-defined"><umb-localize key="imagecropper_customCrop">User defined</umb-localize></span>`
@@ -177,6 +180,9 @@ export class UmbImageCropperPreviewElement extends LitElement {
 			max-width: 100%;
 			max-height: 200px;
 			user-select: none;
+		}
+		#label {
+			font-weight: bold;
 		}
 		#alias {
 			font-weight: bold;
