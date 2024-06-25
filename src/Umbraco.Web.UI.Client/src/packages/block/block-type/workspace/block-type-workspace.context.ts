@@ -10,7 +10,6 @@ import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -99,11 +98,21 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	async create(contentElementTypeId: string, groupKey?: string | null) {
 		this.resetState();
-		//Only set groupKey property if it exists
-		const data: BlockTypeData = {
-			contentElementTypeKey: contentElementTypeId,
-			...(groupKey && { groupKey: groupKey }),
+
+
+		let data: BlockTypeData = {
+			contentElementTypeKey: contentElementTypeId
 		} as BlockTypeData;
+
+		// If we have a modal context, we blend in the modal preset data: [NL]
+		if (this.modalContext) {
+			data = { ...data, ...this.modalContext.data.preset };
+		}
+
+		// Only set groupKey property if it has been parsed to this method
+		if (groupKey) {
+			data.groupKey = groupKey;
+		}
 
 		this.setIsNew(true);
 		this.#data.setValue(data);
