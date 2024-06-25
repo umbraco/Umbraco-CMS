@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -9,11 +10,11 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly IContentTypeService _contentTypeService;
+    private readonly IBlockEditorElementTypeCache _elementTypeCache;
 
-    protected BlockEditorValidatorBase(IPropertyValidationService propertyValidationService, IContentTypeService contentTypeService)
+    protected BlockEditorValidatorBase(IPropertyValidationService propertyValidationService, IBlockEditorElementTypeCache elementTypeCache)
         : base(propertyValidationService)
-        => _contentTypeService = contentTypeService;
+        => _elementTypeCache = elementTypeCache;
 
     protected IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData<TValue, TLayout> blockEditorData)
     {
@@ -29,7 +30,7 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
 
         foreach (var group in itemDataGroups)
         {
-            var allElementTypes = _contentTypeService.GetAll(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
+            var allElementTypes = _elementTypeCache.GetAll(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
 
             for (var i = 0; i < group.Items.Count; i++)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Routing;
@@ -71,8 +73,10 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             }
         }
 
-        // If there's only one candidate, we don't need to do anything.
-        if (candidates.Count < 2)
+        // If there's only one candidate, or the request has the ufprt-token, we don't need to do anything .
+        // The ufprt-token is handled by the the <see cref="UmbracoRouteValueTransformer"/> and should not be discarded.
+        var candidateCount = candidates.Count;
+        if (candidateCount < 2 || string.IsNullOrEmpty(httpContext.Request.GetUfprt()) is false)
         {
             return;
         }
@@ -85,12 +89,32 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         RouteEndpoint? dynamicEndpoint = null;
         for (var i = 0; i < candidates.Count; i++)
         {
+            if (candidates.IsValidCandidate(i) is false)
+            {
+                // If the candidate is not valid we reduce the candidate count so we can later ensure that there is always
+                // at least 1 candidate.
+                candidateCount -= 1;
+                continue;
+            }
+
             CandidateState candidate = candidates[i];
 
             // If it's not a RouteEndpoint there's not much we can do to count it in the order.
             if (candidate.Endpoint is not RouteEndpoint routeEndpoint)
             {
                 continue;
+            }
+
+            // We have to ensure that none of the candidates is a render controller or surface controller
+            // Normally these shouldn't be statically routed, however some people do it.
+            // So we should probably be friendly and check for it.
+            // Do not add this to V14.
+            ControllerActionDescriptor? controllerDescriptor = routeEndpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+            TypeInfo? controllerTypeInfo = controllerDescriptor?.ControllerTypeInfo;
+            if (controllerTypeInfo is not null &&
+                (controllerTypeInfo.IsType<RenderController>() || controllerTypeInfo.IsType<SurfaceController>()))
+            {
+                return;
             }
 
             if (routeEndpoint.Order < lowestOrder)
@@ -123,7 +147,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         // Invalidate the dynamic route if another route has a lower order.
         // This means that if you register your static route after the dynamic route, the dynamic route will take precedence
         // This more closely resembles the existing behaviour.
-        if (dynamicEndpoint is not null && dynamicId is not null && dynamicEndpoint.Order > lowestOrder)
+        if (dynamicEndpoint is not null && dynamicId is not null && dynamicEndpoint.Order > lowestOrder && candidateCount > 1)
         {
             candidates.SetValidity(dynamicId.Value, false);
         }
