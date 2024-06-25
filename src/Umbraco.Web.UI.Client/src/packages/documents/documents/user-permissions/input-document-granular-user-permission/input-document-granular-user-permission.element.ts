@@ -37,7 +37,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => (this.#modalManagerContext = instance));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

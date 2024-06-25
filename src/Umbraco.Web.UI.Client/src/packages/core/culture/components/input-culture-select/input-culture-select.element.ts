@@ -36,7 +36,7 @@ export class UmbInputCultureSelectElement extends UUIFormControlMixin(UmbLitElem
 
 	#cultureRepository = new UmbCultureRepository(this);
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

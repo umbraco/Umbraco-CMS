@@ -24,7 +24,7 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	@property({ type: Boolean, attribute: 'enable-range' })
 	enableRange = false;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
