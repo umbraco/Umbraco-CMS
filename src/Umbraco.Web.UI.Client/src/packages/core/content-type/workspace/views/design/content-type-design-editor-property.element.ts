@@ -484,11 +484,13 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: absolute;
 				top: var(--uui-size-space-2);
 				right: var(--uui-size-space-2);
-				display: none;
+				opacity: 0;
 			}
+
 			#editor:hover uui-action-bar,
-			#editor:focus uui-action-bar {
-				display: block;
+			#editor:focus uui-action-bar,
+			#editor:focus-within uui-action-bar {
+				opacity: 1;
 			}
 
 			a {
