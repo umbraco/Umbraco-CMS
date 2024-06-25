@@ -1,22 +1,21 @@
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
-import { UmbBlockElementManager } from './block-element-manager.js';
-import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
+import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
+import { UmbBlockElementManager } from './block-element-manager.js';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -37,9 +36,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#entityType: string;
 
-	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
-	readonly isNew = this.#isNew.asObservable();
-
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
@@ -58,8 +54,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	// TODO: Get the name of the contentElementType..
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
@@ -143,24 +137,26 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 				// Content:
 				const contentUdi = layoutData?.contentUdi;
-				if (contentUdi) {
+				if (!contentUdi) {
+					return;
+				}
+
+				this.observe(
+					this.#blockManager!.contentOf(contentUdi),
+					(contentData) => {
+						this.content.setData(contentData);
+					},
+					'observeContent',
+				);
+				if (!this.#initialContent) {
 					this.observe(
 						this.#blockManager!.contentOf(contentUdi),
 						(contentData) => {
-							this.content.setData(contentData);
+							this.#initialContent ??= contentData;
+							this.removeUmbControllerByAlias('observeContentInitially');
 						},
-						'observeContent',
+						'observeContentInitially',
 					);
-					if (!this.#initialContent) {
-						this.observe(
-							this.#blockManager!.contentOf(contentUdi),
-							(contentData) => {
-								this.#initialContent ??= contentData;
-								this.removeUmbControllerByAlias('observeContentInitially');
-							},
-							'observeContentInitially',
-						);
-					}
 				}
 
 				// Settings:
@@ -175,7 +171,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					);
 					if (!this.#initialSettings) {
 						this.observe(
-							this.#blockManager!.contentOf(settingsUdi),
+							this.#blockManager!.settingsOf(settingsUdi),
 							(settingsData) => {
 								this.#initialSettings ??= settingsData;
 								this.removeUmbControllerByAlias('observeSettingsInitially');
@@ -255,13 +251,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.#blockManager?.setOneSettings(settingsData);
 			}
 		});
-	}
-
-	getIsNew() {
-		return this.#isNew.value;
-	}
-	setIsNew(value: boolean): void {
-		this.#isNew.setValue(value);
 	}
 
 	getData() {
@@ -362,7 +351,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 	};
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#layout.destroy();
 		this.#label.destroy();

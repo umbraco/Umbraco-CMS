@@ -9,3 +9,5 @@ export class UmbDocumentTypeItemRepository extends UmbItemRepositoryBase<UmbDocu
 		super(host, UmbDocumentTypeItemServerDataSource, UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT);
 	}
 }
+
+export { UmbDocumentTypeItemRepository as api };

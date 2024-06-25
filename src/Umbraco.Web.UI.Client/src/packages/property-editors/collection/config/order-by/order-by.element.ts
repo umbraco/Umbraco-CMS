@@ -45,7 +45,7 @@ export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement i
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		if (!this._options.length) return html`<p><em>Add a column (above) to order by.</em></p>`;
 		return html`<uui-select label="select" .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}

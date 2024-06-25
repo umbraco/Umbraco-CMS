@@ -8,21 +8,27 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
 	uniques: Array<string> = [];
 
+	@property({ type: Boolean })
+	readonly = false;
+
 	@state()
 	_displayValue: Array<UmbMediaItemModel> = [];
 
 	#itemRepository = new UmbMediaItemRepository(this);
 
-	protected async firstUpdated(): Promise<void> {
+	protected override async firstUpdated(): Promise<void> {
 		if (this.uniques.length === 0) return;
 		const { data } = await this.#itemRepository.requestItems(this.uniques);
 		this._displayValue = data || [];
 	}
 
-	render() {
+	override render() {
 		if (this.uniques.length < 1) {
 			return html`
-				<uui-ref-node name="Media Root">
+				<uui-ref-node
+					name="Media Root"
+					?disabled=${this.readonly}
+					style="--uui-color-disabled-contrast: var(--uui-color-text)">
 					<uui-icon slot="icon" name="folder"></uui-icon>
 				</uui-ref-node>
 			`;
@@ -34,7 +40,10 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 			(item) => {
 				return html`
 					<!-- TODO: get correct variant name -->
-					<uui-ref-node name=${ifDefined(item.variants[0]?.name)}>
+					<uui-ref-node
+						name=${ifDefined(item.variants[0]?.name)}
+						?disabled=${this.readonly}
+						style="--uui-color-disabled-contrast: var(--uui-color-text)">
 						<uui-icon slot="icon" name="folder"></uui-icon>
 					</uui-ref-node>
 				`;

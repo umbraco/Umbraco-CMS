@@ -191,7 +191,7 @@ export class UmbExtensionElementAndApiInitializer<
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#constructorArguments = undefined;
 		this.#elProps = undefined;

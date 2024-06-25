@@ -212,7 +212,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return this._tableItems.length === 0 ? this.#renderEmpty() : this.#renderItems();
 	}
 
@@ -244,7 +244,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

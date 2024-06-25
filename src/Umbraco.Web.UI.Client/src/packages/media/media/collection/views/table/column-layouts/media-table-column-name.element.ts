@@ -18,7 +18,7 @@ export class UmbMediaTableColumnNameElement extends UmbLitElement implements Umb
 		window.history.pushState(null, '', event.target.href);
 	}
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
 		return html`
 			<uui-button
@@ -29,7 +29,7 @@ export class UmbMediaTableColumnNameElement extends UmbLitElement implements Umb
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-button {
 				text-align: left;

@@ -32,7 +32,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 > {
 	#initPromise!: Promise<unknown>;
 
-	public set data(value: UmbDataTypePickerFlowModalData) {
+	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
@@ -71,7 +71,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _createDataType(propertyEditorUiAlias: string) {
 		// TODO: Could be nice with a more pretty way to prepend to the URL:
 		// Open create modal:
-		console.log('_createDataType', propertyEditorUiAlias);
 		this._createDataTypeModal.open(
 			{ uiAlias: propertyEditorUiAlias },
 			`create/parent/${UMB_DATA_TYPE_ENTITY_TYPE}/null`,
@@ -228,7 +227,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select editor" class="uui-text">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
@@ -354,7 +353,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		</ul>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#filter {

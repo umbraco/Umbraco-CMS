@@ -61,7 +61,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return this._editorElement?.querySelector('iframe') ?? undefined;
 	}
 
-	set value(newValue: FormDataEntryValue | FormData) {
+	override set value(newValue: FormDataEntryValue | FormData) {
 		super.value = newValue;
 		const newContent = newValue?.toString() ?? '';
 
@@ -70,7 +70,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		}
 	}
 
-	get value(): FormDataEntryValue | FormData {
+	override get value(): FormDataEntryValue | FormData {
 		return super.value;
 	}
 
@@ -103,7 +103,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		});
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 
 		this.#editorRef?.destroy();
@@ -243,6 +243,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			paste_data_images: false,
 			language: this.#getLanguage(),
 			promotion: false,
+			convert_unsafe_embeds: true, // [JOV] Workaround for CVE-2024-29881
 
 			// Extend with configuration options
 			...configurationOptions,
@@ -355,11 +356,11 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * Nothing rendered by default - TinyMCE initialization creates
 	 * a target div and binds the RTE to that element
 	 */
-	render() {
+	override render() {
 		return html`<div class="editor"></div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			.tox-tinymce {
 				position: relative;

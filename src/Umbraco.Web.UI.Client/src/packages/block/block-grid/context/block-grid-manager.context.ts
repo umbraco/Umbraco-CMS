@@ -130,7 +130,7 @@ export class UmbBlockGridManagerContext<
 		return true;
 	}
 
-	setOneLayout(layoutEntry: BlockLayoutType, modalData?: UmbBlockGridWorkspaceData) {
+	override setOneLayout(layoutEntry: BlockLayoutType, modalData?: UmbBlockGridWorkspaceData) {
 		const index = modalData?.originData.index ?? -1;
 
 		if (modalData?.originData.parentUnique && modalData?.originData.areaKey) {

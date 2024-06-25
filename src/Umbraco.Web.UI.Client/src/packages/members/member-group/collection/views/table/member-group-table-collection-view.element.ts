@@ -16,7 +16,7 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Name',
+			name: this.localize.term('general_name'),
 			alias: 'memberGroupName',
 		},
 	];
@@ -57,13 +57,13 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

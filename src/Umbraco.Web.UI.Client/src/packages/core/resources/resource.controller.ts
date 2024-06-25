@@ -28,11 +28,11 @@ export class UmbResourceController extends UmbControllerBase {
 		});
 	}
 
-	hostConnected(): void {
+	override hostConnected(): void {
 		// Do nothing
 	}
 
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		this.cancel();
 	}
 
@@ -163,7 +163,7 @@ export class UmbResourceController extends UmbControllerBase {
 		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		super.destroy();
 		this.cancel();
 	}

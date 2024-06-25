@@ -270,7 +270,7 @@ export class UmbDefaultCollectionContext<
 		}
 	};
 
-	destroy(): void {
+	override destroy(): void {
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadStructureForEntityEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,

@@ -417,7 +417,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderToolbar()}
 			<umb-code-editor
@@ -550,7 +550,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		return html`<uui-scroll-container id="preview">${unsafeHTML(sanitizedHtml)}</uui-scroll-container>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -561,11 +561,9 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 			#toolbar {
 				background-color: var(--uui-color-background-alt);
 				display: flex;
+				flex-wrap: wrap;
 				gap: var(--uui-size-2);
-			}
-
-			#toolbar uui-button-group:last-child {
-				margin-left: auto;
+				margin-bottom: var(--uui-size-2);
 			}
 
 			umb-code-editor {

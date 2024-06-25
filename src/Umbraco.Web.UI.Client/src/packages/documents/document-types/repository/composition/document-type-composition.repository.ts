@@ -32,3 +32,5 @@ export class UmbDocumentTypeCompositionRepository
 		return this.#compositionSource.availableCompositions(args);
 	}
 }
+
+export { UmbDocumentTypeCompositionRepository as api };

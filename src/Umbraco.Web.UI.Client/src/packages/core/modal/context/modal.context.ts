@@ -26,7 +26,7 @@ export type UmbModalContextClassArgs<
 
 // TODO: consider splitting this into two separate handlers
 export class UmbModalContext<
-	ModalPreset extends { [key: string]: any } = { [key: string]: any },
+	ModalData extends { [key: string]: any } = { [key: string]: any },
 	ModalValue = any,
 > extends UmbControllerBase {
 	//
@@ -35,19 +35,19 @@ export class UmbModalContext<
 	#submitRejecter?: (reason?: UmbModalRejectReason) => void;
 
 	public readonly key: string;
-	public readonly data: ModalPreset;
+	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
-	public readonly alias: string | UmbModalToken<ModalPreset, ModalValue>;
+	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
 
 	#value;
 	public readonly value;
 
 	constructor(
 		host: UmbControllerHost,
-		modalAlias: string | UmbModalToken<ModalPreset, ModalValue>,
+		modalAlias: string | UmbModalToken<ModalData, ModalValue>,
 		args: UmbModalContextClassArgs<UmbModalToken>,
 	) {
 		super(host);
@@ -69,9 +69,9 @@ export class UmbModalContext<
 		this.data = Object.freeze(
 			// If we have both data and defaultData perform a deep merge
 			args.data && defaultData
-				? (umbDeepMerge(args.data as UmbDeepPartialObject<ModalPreset>, defaultData) as ModalPreset)
+				? (umbDeepMerge(args.data as UmbDeepPartialObject<ModalData>, defaultData) as ModalData)
 				: // otherwise pick one of them:
-					(args.data as ModalPreset) ?? defaultData,
+					(args.data as ModalData) ?? defaultData,
 		);
 
 		const initValue =
@@ -146,7 +146,7 @@ export class UmbModalContext<
 		this.#value.update(partialValue);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.dispatchEvent(new CustomEvent('umb:destroy'));
 		this.#value.destroy();
 		(this as any).router = null;

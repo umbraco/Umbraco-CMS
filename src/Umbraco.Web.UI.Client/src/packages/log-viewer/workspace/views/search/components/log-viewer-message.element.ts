@@ -37,13 +37,13 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	@property()
 	exception = '';
 
-	willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
+	override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
 		if (changedProperties.has('timestamp')) {
 			this.date = new Date(this.timestamp);
 		}
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('open')) {
 			this.open ? this.details.setAttribute('open', 'true') : this.details.removeAttribute('open');
 		}
@@ -131,7 +131,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		this.open = (event.target as HTMLDetailsElement).open;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<details @open=${this.#setOpen}>
 				<summary>
@@ -193,7 +193,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host > details {

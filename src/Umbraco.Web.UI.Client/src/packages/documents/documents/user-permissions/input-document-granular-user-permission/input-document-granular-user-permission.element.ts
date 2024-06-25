@@ -146,7 +146,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -232,7 +232,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 			.join(', ');
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

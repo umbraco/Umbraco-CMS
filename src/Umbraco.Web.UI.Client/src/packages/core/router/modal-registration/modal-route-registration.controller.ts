@@ -215,13 +215,13 @@ export class UmbModalRouteRegistrationController<
 		}
 	}
 
-	hostConnected() {
+	override hostConnected() {
 		super.hostConnected();
 		if (!this.#modalRegistrationContext) {
 			this.#registerModal();
 		}
 	}
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		super.hostDisconnected();
 		if (this.#modalRegistrationContext) {
 			this.#modalRegistrationContext.unregisterModal(this);
@@ -327,7 +327,7 @@ export class UmbModalRouteRegistrationController<
 		return;
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#contextConsumer.destroy();
 		this.#modalRegistrationContext = undefined;

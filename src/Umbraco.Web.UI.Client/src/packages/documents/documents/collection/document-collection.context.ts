@@ -11,3 +11,5 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 		super(host, UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS);
 	}
 }
+
+export { UmbDocumentCollectionContext as api };

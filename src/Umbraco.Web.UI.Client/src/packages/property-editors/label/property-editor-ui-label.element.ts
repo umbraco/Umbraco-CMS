@@ -18,11 +18,11 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	render() {
+	override render() {
 		return html`${this.value ?? ''}`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUILabelElement;

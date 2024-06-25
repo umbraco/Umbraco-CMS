@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-select
 			label="Select a value type"
 			.options="${this._options}"

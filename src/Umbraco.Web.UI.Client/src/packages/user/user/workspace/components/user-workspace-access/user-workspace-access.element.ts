@@ -23,7 +23,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <uui-box id="access" headline=${this.localize.term('user_access')}>
 			<div slot="header" class="faded-text">
 				<umb-localize key="user_accessHelp"
@@ -40,6 +40,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	#renderDocumentStartNodes() {
 		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
 			<umb-user-document-start-node
+				readonly
 				.uniques=${this._user?.documentStartNodeUniques.map((reference) => reference.unique) ||
 				[]}></umb-user-document-start-node>`;
 	}
@@ -47,11 +48,12 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	#renderMediaStartNodes() {
 		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
 			<umb-user-media-start-node
+				readonly
 				.uniques=${this._user?.mediaStartNodeUniques.map((reference) => reference.unique) ||
 				[]}></umb-user-media-start-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#access {

@@ -101,11 +101,11 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		});
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#editor = new UmbCodeEditorController(this);
 	}
 
-	protected updated(_changedProperties: PropertyValues<this>): void {
+	protected override updated(_changedProperties: PropertyValues<this>): void {
 		if (_changedProperties.has('theme') || _changedProperties.has('language')) {
 			this.#editor?.updateOptions({
 				theme: this.theme,
@@ -148,11 +148,11 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		return this.#editor?.find(text, searchOptions);
 	}
 
-	render() {
+	override render() {
 		return html` <div id="editor-container" ${ref(this.containerRef)}></div> `;
 	}
 
-	static styles = [
+	static override styles = [
 		monacoEditorStyles,
 		monacoJumpingCursorHack,
 		css`

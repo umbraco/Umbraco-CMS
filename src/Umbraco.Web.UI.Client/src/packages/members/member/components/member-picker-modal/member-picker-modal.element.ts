@@ -16,14 +16,14 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
 		this._members = data?.items ?? [];
 	}
@@ -45,8 +45,8 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
-		return html`<umb-body-layout headline="Select members">
+	override render() {
+		return html`<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
 			<uui-box>
 				${repeat(
 					this.#filteredMembers,
@@ -64,8 +64,12 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				)}
 			</uui-box>
 			<div slot="actions">
-				<uui-button label="Close" @click=${this.#close}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+				<uui-button label=${this.localize.term('general_cancel')} @click=${this.#close}></uui-button>
+				<uui-button
+					label=${this.localize.term('general_submit')}
+					look="primary"
+					color="positive"
+					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
 	}

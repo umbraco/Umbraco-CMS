@@ -63,7 +63,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return this._multiple ? this.#renderDropdownMultiple() : this.#renderDropdownSingle();
 	}
 
@@ -84,7 +84,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UUISelectElement.styles,
 		css`
 			#native {

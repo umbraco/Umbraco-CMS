@@ -26,7 +26,7 @@ export class UmbPropertyTypeContext extends UmbContextBase<UmbPropertyTypeContex
 		return this.#label.getValue();
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#alias.destroy();
 		this.#label.destroy();

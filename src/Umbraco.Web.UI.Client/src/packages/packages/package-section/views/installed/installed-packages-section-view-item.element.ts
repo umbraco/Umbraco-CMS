@@ -117,7 +117,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		this.hasPendingMigrations = false;
 	}
 
-	render() {
+	override render() {
 		return this.name
 			? html`
 					<uui-ref-node-package
@@ -143,7 +143,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: flex;
 			min-height: 47px;

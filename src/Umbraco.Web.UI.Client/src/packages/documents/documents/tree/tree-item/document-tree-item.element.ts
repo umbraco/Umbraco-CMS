@@ -68,12 +68,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return this._variant?.state === 'Draft';
 	}
 
-	renderIconContainer() {
+	override renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
 				${this.item?.documentType.icon
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
+							${this.item.isProtected ? this.#renderIsProtectedIcon() : nothing}
 							<!--
 							// TODO: implement correct status symbol
 							<span id="status-symbol"></span>
@@ -84,13 +85,17 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		`;
 	}
 
-	renderLabel() {
+	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
 			>${this.#getLabel()}</span
 		> `;
 	}
 
-	static styles = [
+	#renderIsProtectedIcon() {
+		return html`<umb-icon id="icon-lock" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#icon-container {
@@ -111,6 +116,51 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				bottom: 0;
 				right: 0;
 				border-radius: 100%;
+			}
+
+			#icon-lock {
+				position: absolute;
+				bottom: -5px;
+				right: -5px;
+				font-size: 10px;
+				background: var(--uui-color-surface);
+				width: 14px;
+				height: 14px;
+				border-radius: 100%;
+				line-height: 14px;
+			}
+
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			:hover #icon-lock {
+				background: var(--uui-color-surface-emphasis);
+			}
+
+			/** Active */
+			[active] #icon-lock {
+				background: var(--uui-color-current);
+			}
+
+			[active]:hover #icon-lock {
+				background: var(--uui-color-current-emphasis);
+			}
+
+			/** Selected */
+			[selected] #icon-lock {
+				background-color: var(--uui-color-selected);
+			}
+
+			[selected]:hover #icon-lock {
+				background-color: var(--uui-color-selected-emphasis);
+			}
+
+			/** Disabled */
+			[disabled] #icon-lock {
+				background-color: var(--uui-color-disabled);
 			}
 
 			.draft {

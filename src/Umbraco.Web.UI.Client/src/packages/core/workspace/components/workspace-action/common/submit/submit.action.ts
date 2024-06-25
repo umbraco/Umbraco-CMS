@@ -32,7 +32,7 @@ export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmitta
 		);
 	}
 
-	async execute() {
+	override async execute() {
 		const workspaceContext = await this.getContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT);
 		return await workspaceContext.requestSubmit();
 	}

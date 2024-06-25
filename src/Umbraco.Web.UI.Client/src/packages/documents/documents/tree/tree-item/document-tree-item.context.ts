@@ -20,3 +20,5 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		});
 	}
 }
+
+export { UmbDocumentTreeItemContext as api };

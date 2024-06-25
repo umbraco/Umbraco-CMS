@@ -1,9 +1,6 @@
+import type { UmbIconDefinition, UmbIconModule } from './types.js';
+import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { type UUIIconHost, UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
-
-interface UmbIconDescriptor {
-	name: string;
-	path: string;
-}
 
 /**
  * @export
@@ -17,10 +14,10 @@ export class UmbIconRegistry extends UUIIconRegistry {
 		this.#initResolve = resolve;
 	});
 
-	#icons: UmbIconDescriptor[] = [];
+	#icons: UmbIconDefinition[] = [];
 	#unhandledProviders: Map<string, UUIIconHost> = new Map();
 
-	setIcons(icons: UmbIconDescriptor[]) {
+	setIcons(icons: UmbIconDefinition[]) {
 		const oldIcons = this.#icons;
 		this.#icons = icons;
 		if (this.#initResolve) {
@@ -39,7 +36,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 			}
 		});
 	}
-	appendIcons(icons: UmbIconDescriptor[]) {
+	appendIcons(icons: UmbIconDefinition[]) {
 		this.#icons = [...this.#icons, ...icons];
 	}
 	/**
@@ -47,7 +44,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 	 * @return {*}  {boolean}
 	 * @memberof UmbIconStore
 	 */
-	acceptIcon(iconName: string): boolean {
+	override acceptIcon(iconName: string): boolean {
 		const iconProvider = this.provideIcon(iconName);
 		this.#loadIcon(iconName, iconProvider);
 
@@ -56,22 +53,22 @@ export class UmbIconRegistry extends UUIIconRegistry {
 
 	async #loadIcon(iconName: string, iconProvider: UUIIconHost): Promise<boolean> {
 		await this.#init;
-		const iconManifest = this.#icons.find((i: UmbIconDescriptor) => i.name === iconName);
+		const iconManifest = this.#icons.find((i: UmbIconDefinition) => i.name === iconName);
 		// Icon not found, so lets add it to a list of unhandled requests.
 		if (!iconManifest) {
 			this.#unhandledProviders.set(iconName, iconProvider);
 			return false;
 		}
 
-		const iconPath = iconManifest.path;
+		try {
+			const iconModule = await loadManifestPlainJs<UmbIconModule>(iconManifest.path);
+			if (!iconModule) throw new Error(`Failed to load icon ${iconName}`);
+			if (!iconModule.default) throw new Error(`Icon ${iconName} is missing a default export`);
+			iconProvider.svg = iconModule.default;
+		} catch (error: any) {
+			console.error(`Failed to load icon ${iconName}`, error.message);
+		}
 
-		import(/* @vite-ignore */ iconPath)
-			.then((iconModule) => {
-				iconProvider.svg = iconModule.default;
-			})
-			.catch((err) => {
-				console.error(`Failed to load icon ${iconName} on path ${iconPath}`, err.message);
-			});
 		return true;
 	}
 }

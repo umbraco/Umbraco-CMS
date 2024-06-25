@@ -36,7 +36,6 @@ export class UmbDictionaryWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly dictionary = this.#data.asObservablePart((data) => data);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Dictionary');
@@ -68,7 +67,7 @@ export class UmbDictionaryWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -168,7 +167,7 @@ export class UmbDictionaryWorkspaceContext
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

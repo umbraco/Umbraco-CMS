@@ -1,10 +1,10 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
-import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -53,7 +53,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
@@ -61,7 +61,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			umb-property-type-based-property {

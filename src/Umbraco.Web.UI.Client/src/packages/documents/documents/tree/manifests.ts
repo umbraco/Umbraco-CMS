@@ -43,7 +43,7 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.Document',
 	name: 'Document Tree Item',
 	element: () => import('./tree-item/document-tree-item.element.js'),
-	api: UmbDocumentTreeItemContext,
+	api: () => import('./tree-item/document-tree-item.context.js'),
 	forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 };
 

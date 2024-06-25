@@ -2,7 +2,7 @@ import { expect, oneEvent } from '@open-wc/testing';
 import { UmbContextProvider } from '../provide/context-provider.js';
 import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextConsumer } from './context-consumer.js';
-import type { UmbContextRequestEventImplementation} from './context-request.event.js';
+import type { UmbContextRequestEventImplementation } from './context-request.event.js';
 import { UMB_CONTENT_REQUEST_EVENT_TYPE } from './context-request.event.js';
 
 const testContextAlias = 'my-test-context';

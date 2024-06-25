@@ -18,7 +18,7 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
@@ -55,7 +55,7 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 		}`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Script">
 				<uui-box>

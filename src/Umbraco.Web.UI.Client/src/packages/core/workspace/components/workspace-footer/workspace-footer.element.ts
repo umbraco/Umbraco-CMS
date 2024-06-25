@@ -50,7 +50,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	};
 
 	// TODO: Some event/callback from umb-extension-slot that can be utilized to hide the footer, if empty.
-	render() {
+	override render() {
 		return html`
 			<umb-footer-layout>
 				<umb-extension-slot type="workspaceFooterApp"></umb-extension-slot>
@@ -72,7 +72,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

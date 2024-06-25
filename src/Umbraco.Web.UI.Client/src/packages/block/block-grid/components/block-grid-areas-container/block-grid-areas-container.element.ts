@@ -53,7 +53,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return this._areas && this._areas.length > 0
 			? html` ${this.#styleElement}
 					<div
@@ -73,7 +73,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

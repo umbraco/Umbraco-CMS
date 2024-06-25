@@ -61,7 +61,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-multiple-text-string
 				max=${this._max}

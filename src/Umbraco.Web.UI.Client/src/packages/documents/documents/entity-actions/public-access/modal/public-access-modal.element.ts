@@ -1,12 +1,12 @@
 import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
-import { UmbDocumentDetailRepository } from '../../../repository/index.js';
+import { UmbDocumentItemRepository } from '../../../repository/index.js';
 import type { UmbInputDocumentElement } from '../../../components/index.js';
 import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './public-access-modal.token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
-import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
+import { UmbMemberDetailRepository, type UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import { UmbMemberGroupItemRepository, type UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -32,56 +32,52 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	private _selection: Array<string> = [];
 
 	@state()
-	private _loginPageId?: string;
+	private _loginDocumentId?: string;
 
 	@state()
-	private _errorPageId?: string;
+	private _errorDocumentId?: string;
 
 	// Init
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#getDocumentName();
-		this.#getPublicAccessModel();
 	}
 
 	async #getDocumentName() {
 		if (!this.#unique) return;
 		// Should this be done here or in the action file?
-		const { data } = await new UmbDocumentDetailRepository(this).requestByUnique(this.#unique);
+		const { data } = await new UmbDocumentItemRepository(this).requestItems([this.#unique]);
 		if (!data) return;
+		const item = data[0];
 		//TODO How do we ensure we get the correct variant?
-		this._documentName = data.variants[0]?.name;
+		this._documentName = item.variants[0]?.name;
+
+		if (item.isProtected) {
+			this.#getPublicAccessModel();
+		}
 	}
 
 	async #getPublicAccessModel() {
 		if (!this.#unique) return;
-		//const { data } = (await this.#publicAccessRepository.read(this.#unique));
-		// TODO Currently returning "void". Remove mock data when API is ready. Will it be Response or Request model?
-		const data: any = undefined;
-		/*const data: PublicAccessResponseModel = {
-			members: [{ name: 'Agent', id: '007' }],
-			groups: [],
-			loginPageId: '123',
-			errorPageId: '456',
-		};*/
+		const { data } = await this.#publicAccessRepository.read(this.#unique);
 
 		if (!data) return;
 		this.#isNew = false;
 		this._startPage = false;
 
 		// Specific or Groups
-		this._specific = data.members.length > 0 ? true : false;
+		this._specific = data.members.length > 0;
 
 		//selection
 		if (data.members.length > 0) {
-			this._selection = data.members.map((m: any) => m.id);
+			this._selection = data.members.map((m) => m.id);
 		} else if (data.groups.length > 0) {
-			this._selection = data.groups.map((g: any) => g.id);
+			this._selection = data.groups.map((g) => g.id);
 		}
 
-		this._loginPageId = data.loginPageId;
-		this._errorPageId = data.errorPageId;
+		this._loginDocumentId = data.loginDocument.id;
+		this._errorDocumentId = data.errorDocument.id;
 	}
 
 	// Modal events
@@ -91,30 +87,54 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	}
 
 	async #handleSave() {
-		if (!this._loginPageId || !this._errorPageId || !this.#unique) return;
+		if (!this._loginDocumentId || !this._errorDocumentId || !this.#unique) return;
 
-		const groups = this._specific ? [] : this._selection;
-		const members = this._specific ? this._selection : [];
-
+		// TODO: [v15] Currently the Management API doesn't support passing the member/group ids, only the userNames/names.
+		// This is a temporary solution where we have to look them up until the API is updated to support this.
 		const requestBody: PublicAccessRequestModel = {
-			memberGroupNames: groups,
-			memberUserNames: members,
-			loginDocument: { id: this._loginPageId },
-			errorDocument: { id: this._errorPageId },
+			memberGroupNames: [],
+			memberUserNames: [],
+			loginDocument: { id: this._loginDocumentId },
+			errorDocument: { id: this._errorDocumentId },
 		};
 
-		if (this.#isNew) {
-			this.#publicAccessRepository.create(this.#unique, requestBody);
+		if (this._specific) {
+			// Members
+			// user name is not part of the item model, so we need to look it up from the member detail repository
+			// be aware that the detail repository requires access to the member section.
+			const repo = new UmbMemberDetailRepository(this);
+			const promises = this._selection.map((memberId) => repo.requestByUnique(memberId));
+			const responses = await Promise.all(promises);
+			const memberUserNames = responses
+				.filter((response) => response.data)
+				.map((response) => response.data?.username) as string[];
+
+			requestBody.memberUserNames = memberUserNames;
 		} else {
-			this.#publicAccessRepository.update(this.#unique, requestBody);
+			// Groups
+			const repo = new UmbMemberGroupItemRepository(this);
+			const { data } = await repo.requestItems(this._selection);
+			if (!data) throw new Error('No Member groups returned');
+
+			const groupNames = data
+				.filter((groupItem) => this._selection.includes(groupItem.unique))
+				.map((groupItem) => groupItem.name);
+
+			requestBody.memberGroupNames = groupNames;
+		}
+
+		if (this.#isNew) {
+			await this.#publicAccessRepository.create(this.#unique, requestBody);
+		} else {
+			await this.#publicAccessRepository.update(this.#unique, requestBody);
 		}
 
 		this.modalContext?.submit();
 	}
 
-	#handleDelete() {
+	async #handleDelete() {
 		if (!this.#unique) return;
-		this.#publicAccessRepository.delete(this.#unique);
+		await this.#publicAccessRepository.delete(this.#unique);
 		this.modalContext?.submit();
 	}
 
@@ -125,11 +145,11 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	// Change Events
 
 	#onChangeLoginPage(e: CustomEvent) {
-		this._loginPageId = (e.target as UmbInputDocumentElement).selection[0];
+		this._loginDocumentId = (e.target as UmbInputDocumentElement).selection[0];
 	}
 
 	#onChangeErrorPage(e: CustomEvent) {
-		this._errorPageId = (e.target as UmbInputDocumentElement).selection[0];
+		this._errorDocumentId = (e.target as UmbInputDocumentElement).selection[0];
 	}
 
 	#onChangeGroup(e: CustomEvent) {
@@ -142,7 +162,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	// Renders
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_protect')}>
 				<uui-box>${this._startPage ? this.renderSelectGroup() : this.renderEditPage()}</uui-box> ${this.renderActions()}
@@ -182,7 +202,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 				<small>
 					<umb-localize key="publicAccess_paLoginPageHelp"> Choose the page that contains the login form </umb-localize>
 				</small>
-				<umb-input-document max="1" @change=${this.#onChangeLoginPage}></umb-input-document>
+				<umb-input-document
+					.value=${this._loginDocumentId ? this._loginDocumentId : ''}
+					max="1"
+					@change=${this.#onChangeLoginPage}></umb-input-document>
 			</div>
 			<br />
 			<div class="select-item">
@@ -192,7 +215,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 						Used when people are logged on, but do not have access
 					</umb-localize>
 				</small>
-				<umb-input-document max="1" @change=${this.#onChangeErrorPage}></umb-input-document>
+				<umb-input-document
+					.value=${this._errorDocumentId ? this._errorDocumentId : ''}
+					max="1"
+					@change=${this.#onChangeErrorPage}></umb-input-document>
 			</div>`;
 	}
 
@@ -220,7 +246,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					look="primary"
 					color="positive"
 					label=${this.localize.term('buttons_save')}
-					?disabled=${!this._loginPageId || !this._errorPageId || this._selection.length === 0}
+					?disabled=${!this._loginDocumentId || !this._errorDocumentId || this._selection.length === 0}
 					@click="${this.#handleSave}"></uui-button>`
 			: html`<uui-button
 					slot="actions"
@@ -248,7 +274,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			>${remove}${confirm}`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box,

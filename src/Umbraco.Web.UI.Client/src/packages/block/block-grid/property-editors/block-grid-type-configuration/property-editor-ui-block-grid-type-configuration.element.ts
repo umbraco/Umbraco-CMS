@@ -17,14 +17,13 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
+import { UMB_BLOCK_GRID_TYPE, UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_PROPERTY_CONTEXT,
 	UMB_PROPERTY_DATASET_CONTEXT,
 	type UmbPropertyDatasetContext,
 } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -61,8 +60,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#datasetContext?: UmbPropertyDatasetContext;
 	#blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
-		typeof UMB_WORKSPACE_MODAL.DATA,
-		typeof UMB_WORKSPACE_MODAL.VALUE
+		typeof UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL.VALUE
 	>;
 
 	#value: Array<UmbBlockTypeWithGroupKey> = [];
@@ -105,11 +104,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this.#observeBlockGroups();
 		});
 
-		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(UMB_BLOCK_GRID_TYPE)
-			.onSetup(() => {
-				return { data: { entityType: UMB_BLOCK_GRID_TYPE, preset: {} }, modal: { size: 'large' } };
-			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newpath = routeBuilder({});
 				this._workspacePath = newpath;
@@ -212,7 +208,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		);
 	}
 
-	render() {
+	override render() {
 		return html`<div id="groups">
 			${this._notGroupedBlockTypes
 				? html`<umb-input-block-type
@@ -256,7 +252,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input:not(:hover, :focus) {

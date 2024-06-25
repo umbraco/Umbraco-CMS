@@ -186,11 +186,11 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	getFormElement() {
+	override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
 			${this.#renderAddButton()}`;
 	}
@@ -230,7 +230,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#action {
 				display: block;

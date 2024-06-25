@@ -116,7 +116,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	multiple = false;
 
 	@property()
-	public get value() {
+	public override get value() {
 		return this.items?.map((item) => item.mediaKey).join(',');
 	}
 
@@ -324,7 +324,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		this.#addItems(uploaded);
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderDropzone()}
 			<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>
@@ -391,7 +391,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	static styles = UmbInputMediaElement.styles;
+	static override styles = UmbInputMediaElement.styles;
 }
 
 export default UmbInputRichMediaElement;

@@ -88,10 +88,10 @@ export class UmbInputMemberGroupElement extends UUIFormControlMixin(UmbLitElemen
 	allowedContentTypeIds?: string[] | undefined;
 
 	@property()
-	public set value(idsString: string) {
+	public override set value(idsString: string) {
 		this.selection = splitStringToArray(idsString);
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.selection.join(',');
 	}
 
@@ -148,7 +148,7 @@ export class UmbInputMemberGroupElement extends UUIFormControlMixin(UmbLitElemen
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -182,6 +182,7 @@ export class UmbInputMemberGroupElement extends UUIFormControlMixin(UmbLitElemen
 					${this.#renderOpenButton(item)}
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
+				<umb-icon slot="icon" name="icon-users"></umb-icon>
 			</uui-ref-node>
 		`;
 	}
@@ -197,7 +198,7 @@ export class UmbInputMemberGroupElement extends UUIFormControlMixin(UmbLitElemen
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

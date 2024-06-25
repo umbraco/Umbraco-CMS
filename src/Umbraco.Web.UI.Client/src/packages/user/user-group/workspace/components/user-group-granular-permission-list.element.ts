@@ -82,7 +82,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		this.#workspaceContext?.setPermissions(newCombinedValue);
 	};
 
-	render() {
+	override render() {
 		return html`${this._extensionElements.map((element) => this.#renderProperty(element))}`;
 	}
 
@@ -100,7 +100,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		`;
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		this._extensionElements.forEach((element) => element.removeEventListener(UmbChangeEvent.TYPE, this.#onValueChange));
 		super.disconnectedCallback();
 	}

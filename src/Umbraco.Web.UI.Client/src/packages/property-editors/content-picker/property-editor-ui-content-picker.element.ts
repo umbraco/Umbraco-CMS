@@ -71,7 +71,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 		this._showOpenButton = config.getValueByAlias('showOpenButton');
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#setPickerRootUnique();
 	}
@@ -100,7 +100,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		const startNode: UmbTreeStartNode | undefined =
 			this._rootUnique && this._rootEntityType
 				? { unique: this._rootUnique, entityType: this._rootEntityType }

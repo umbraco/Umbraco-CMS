@@ -164,7 +164,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		console.log(`fetch users, order column: ${orderingColumn}, desc: ${orderingDesc}`);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
@@ -177,7 +177,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

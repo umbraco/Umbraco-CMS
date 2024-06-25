@@ -1,5 +1,6 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
+import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -19,10 +20,12 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 	@state()
 	private _editMemberTypePath = '';
+
 	@state()
-	private _createDate = 'Unknown';
+	private _createDate = this.localize.term('general_unknown');
+
 	@state()
-	private _updateDate = 'Unknown';
+	private _updateDate = this.localize.term('general_unknown');
 
 	@state()
 	private _unique = '';
@@ -45,8 +48,8 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, async (context) => {
 			this.#workspaceContext = context;
 			this.observe(this.#workspaceContext.contentTypeUnique, (unique) => (this._memberTypeUnique = unique || ''));
-			this.observe(this.#workspaceContext.createDate, (date) => (this._createDate = date || 'Unknown'));
-			this.observe(this.#workspaceContext.updateDate, (date) => (this._updateDate = date || 'Unknown'));
+			this.observe(this.#workspaceContext.createDate, (date) => (this._createDate = this.#setDateFormat(date)));
+			this.observe(this.#workspaceContext.updateDate, (date) => (this._updateDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique || ''));
 
 			const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
@@ -56,56 +59,44 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		});
 	}
 
-	render() {
+	#setDateFormat(date: string | undefined | null): string {
+		if (!date) return this.localize.term('general_unknown');
+		return this.localize.date(date, TimeFormatOptions);
+	}
+
+	override render() {
 		return this.#renderGeneralSection();
 	}
 
 	#renderGeneralSection() {
 		return html`
 			<div class="general-item">
-				<umb-localize class="headline" key="content_createDate"></umb-localize>
-				<span>
-					<umb-localize-date .date=${this._createDate}></umb-localize-date>
-				</span>
+				<umb-localize class="headline" key="content_createDate">Created</umb-localize>
+				<span> ${this._createDate} </span>
 			</div>
 			<div class="general-item">
-				<umb-localize class="headline" key="content_updateDate"></umb-localize>
-				<span>
-					<umb-localize-date .date=${this._updateDate}></umb-localize-date>
-				</span>
+				<umb-localize class="headline" key="content_updateDate">Last edited</umb-localize>
+				<span> ${this._updateDate} </span>
 			</div>
 			<div class="general-item">
-				<span class="headline">Member Type</span>
-				<div class="member-type-edit">
-					<uui-icon .name=${this._memberTypeIcon}></uui-icon>
-					<span>${this._memberTypeName}</span>
-					<uui-button
-						look="secondary"
-						href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}
-						label=${this.localize.term('general_edit')}></uui-button>
-				</div>
+				<umb-localize class="headline" key="content_membertype">Member Type</umb-localize>
+				<uui-ref-node
+					standalone
+					.name=${this._memberTypeName}
+					.href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}>
+					<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
+				</uui-ref-node>
 			</div>
 			<div class="general-item">
-				<umb-localize class="headline" key="template_id"></umb-localize>
+				<umb-localize class="headline" key="template_id">Id</umb-localize>
 				<span>${this._unique}</span>
 			</div>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
-			.member-type-edit {
-				display: flex;
-				align-items: center;
-			}
-			.member-type-edit uui-icon {
-				margin-right: var(--uui-size-space-1);
-			}
-			.member-type-edit uui-button {
-				margin-left: auto;
-			}
-
 			.general-item {
 				display: flex;
 				flex-direction: column;
