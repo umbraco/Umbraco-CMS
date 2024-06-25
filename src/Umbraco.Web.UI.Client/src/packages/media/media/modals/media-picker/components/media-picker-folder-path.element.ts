@@ -38,7 +38,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	@state()
 	private _typingNewFolder = false;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#loadPath();
 	}
@@ -120,7 +120,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<div id="path">
 			${repeat(
 				this._paths,
@@ -143,7 +143,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#path {
 				display: flex;

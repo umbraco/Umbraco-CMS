@@ -67,7 +67,7 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-slider
 				.valueLow=${this.value?.from ?? this._initVal1}

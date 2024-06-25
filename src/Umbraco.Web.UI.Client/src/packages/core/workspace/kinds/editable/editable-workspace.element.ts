@@ -16,11 +16,11 @@ export class UmbEditableWorkspaceElement extends UmbLitElement {
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [api]);
 	}
 
-	render() {
+	override render() {
 		return html` <umb-router-slot .routes="${this._routes}"></umb-router-slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			form {
 				display: contents;

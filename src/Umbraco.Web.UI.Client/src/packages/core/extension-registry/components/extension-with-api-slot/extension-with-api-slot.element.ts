@@ -142,12 +142,12 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		index: number,
 	) => TemplateResult | HTMLElement | null | undefined;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#attached = true;
 		this.#observeExtensions();
 	}
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		this.#attached = false;
 		this.#extensionsController?.destroy();
 		this.#extensionsController = undefined;
@@ -177,7 +177,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return this._permitted.length > 0
 			? repeat(
 					this._permitted,
@@ -187,7 +187,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 			: html`<slot></slot>`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: contents;
 		}

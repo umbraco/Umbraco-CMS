@@ -38,7 +38,7 @@ const requestor = new FetchRequestor();
  * This class is needed to prevent the hash from being parsed as part of the query string.
  */
 class UmbNoHashQueryStringUtils extends BasicQueryStringUtils {
-	parse(input: LocationLike) {
+	override parse(input: LocationLike) {
 		return super.parse(input, false);
 	}
 }

@@ -36,7 +36,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	@query('uui-pagination')
 	private _pagination?: UUIPaginationElement;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#getTrackerStatus();
 		this.#getRedirectData();
@@ -136,7 +136,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	// Renders
-	render() {
+	override render() {
 		return html` <div id="redirect-actions">
 				${this._trackerEnabled
 					? html`<div id="search-wrapper">
@@ -249,7 +249,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

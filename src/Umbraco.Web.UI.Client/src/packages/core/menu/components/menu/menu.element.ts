@@ -14,7 +14,7 @@ export class UmbMenuElement extends UmbLitElement {
 		//this.provideContext(UMB_MENU_CONTEXT, new UmbMenuContext());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-extension-slot
 				type="menuItem"

@@ -86,7 +86,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-dropdown label="Select log levels">
 				<span slot="label">
@@ -100,7 +100,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#log-level-selector {
 				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));

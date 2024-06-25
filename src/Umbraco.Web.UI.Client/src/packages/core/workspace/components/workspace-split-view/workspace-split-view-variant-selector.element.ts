@@ -208,7 +208,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		this._popoverElement.style.width = `${host.width}px`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-input
 				id="name-input"
@@ -290,7 +290,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#name-input {

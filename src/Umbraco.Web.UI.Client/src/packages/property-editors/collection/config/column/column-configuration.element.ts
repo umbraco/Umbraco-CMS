@@ -93,7 +93,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="layout-wrapper">${this.#renderColumns()}</div>
 			${this.#renderInput()}
@@ -150,7 +150,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#layout-wrapper {

@@ -16,7 +16,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 > {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
@@ -51,7 +51,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
 				<uui-box headline="Create a folder under Content Templates">
@@ -76,7 +76,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box:first-child {

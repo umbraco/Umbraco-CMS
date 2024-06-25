@@ -35,5 +35,6 @@ const mapper = (item: DocumentTypeItemResponseModel): UmbDocumentTypeItemModel =
 		icon: item.icon,
 		unique: item.id,
 		name: item.name,
+		description: item.description,
 	};
 };

@@ -1,15 +1,14 @@
-import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
-import { UmbWebhookDetailRepository } from '../../repository/index.js';
-import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
+import { UmbWebhookDetailRepository } from '../../repository/index.js';
+import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 
 export class UmbWebhookWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbWebhookDetailModel>
@@ -21,8 +20,6 @@ export class UmbWebhookWorkspaceContext
 	readonly data = this.#data.asObservable();
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Webhook');
@@ -52,7 +49,7 @@ export class UmbWebhookWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -127,7 +124,7 @@ export class UmbWebhookWorkspaceContext
 		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

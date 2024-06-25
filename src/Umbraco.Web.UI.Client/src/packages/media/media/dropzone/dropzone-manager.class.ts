@@ -263,7 +263,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		//
 	}
 
-	public destroy() {
+	public override destroy() {
 		this.#tempFileManager.destroy();
 		this.#completed.destroy();
 		super.destroy();

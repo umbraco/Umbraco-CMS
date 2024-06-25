@@ -37,7 +37,7 @@ export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbB
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 */
-	setValue(data: T): void {
+	override setValue(data: T): void {
 		if (!this._subject) return;
 		const oldValue = this._subject.getValue();
 

@@ -31,7 +31,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('action-executed'));
 	}
 
-	render() {
+	override render() {
 		return html` <div class="action uui-text">
 			<p>${this.action.description || html`<span class="no-description">This action has no description</span>`}</p>
 			<uui-form>
@@ -95,7 +95,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		return nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -14,7 +14,7 @@ export class UmbMemberSearchProvider extends UmbControllerBase implements UmbSea
 		return this.#repository.search(args);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#repository.destroy();
 	}
 }

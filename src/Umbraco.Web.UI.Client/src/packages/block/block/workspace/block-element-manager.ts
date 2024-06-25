@@ -1,11 +1,11 @@
-import type { UmbBlockDataType } from '../types.js';
-import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import type { UmbBlockDataType } from '../types.js';
+import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 
 export class UmbBlockElementManager extends UmbControllerBase {
 	//
@@ -95,7 +95,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		return new UmbBlockElementPropertyDatasetContext(host, this);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		this.structure.destroy();
 		super.destroy();

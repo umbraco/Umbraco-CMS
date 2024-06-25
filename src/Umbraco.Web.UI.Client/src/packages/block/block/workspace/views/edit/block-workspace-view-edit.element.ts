@@ -1,6 +1,3 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
-import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
-import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
@@ -9,6 +6,9 @@ import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from 
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
+import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 
 @customElement('umb-block-workspace-view-edit')
 export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -121,7 +121,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		this._routes = routes;
 	}
 
-	render() {
+	override render() {
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
@@ -163,7 +163,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -6,13 +6,13 @@ export class UmbInputUploadFieldAudioElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
-	render() {
+	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
 		return html`<audio controls src=${this.path}></audio>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

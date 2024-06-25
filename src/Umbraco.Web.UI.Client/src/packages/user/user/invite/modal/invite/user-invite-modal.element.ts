@@ -45,7 +45,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<uui-dialog-layout headline="Invite User">
 			${this.#renderForm()}
 			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
@@ -87,7 +87,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 			</uui-form>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -111,13 +111,13 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		this.#repository = new UmbLogViewerRepository(host);
 	}
 
-	hostConnected() {
+	override hostConnected() {
 		super.hostConnected();
 		window.addEventListener('changestate', this.onChangeState);
 		this.onChangeState();
 	}
 
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		super.hostDisconnected();
 		window.removeEventListener('changestate', this.onChangeState);
 	}

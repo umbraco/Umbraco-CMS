@@ -31,13 +31,13 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this._workspaceEditPath ?? '#'}
 			><uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon
 		></uui-ref-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);

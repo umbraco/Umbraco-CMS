@@ -46,7 +46,7 @@ export class UmbUpgraderViewElement extends LitElement {
 										target="_blank"
 										label="View Report"></uui-button>
 								</p>
-						  `
+							`
 						: ''
 				}
 
@@ -76,7 +76,7 @@ export class UmbUpgraderViewElement extends LitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html` ${this.fetching ? html`<div class="center"><uui-loader></uui-loader></div>` : this._renderLayout()} `;
 	}
 
@@ -85,7 +85,7 @@ export class UmbUpgraderViewElement extends LitElement {
 		this.dispatchEvent(new CustomEvent('onAuthorizeUpgrade', { detail: e, bubbles: true }));
 	};
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			.center {
 				display: grid;

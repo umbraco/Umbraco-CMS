@@ -40,7 +40,7 @@ export class UmbInputCultureSelectElement extends UUIFormControlMixin(UmbLitElem
 		return undefined;
 	}
 
-	protected async firstUpdated() {
+	protected override async firstUpdated() {
 		const { data } = await this.#cultureRepository.requestCultures();
 		if (data) {
 			this._cultures = data.items;
@@ -74,7 +74,7 @@ export class UmbInputCultureSelectElement extends UUIFormControlMixin(UmbLitElem
 		return this._cultures.find((culture) => culture.name.toLowerCase() === (this.value as string)?.toLowerCase());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<!-- TODO: comboxbox doesn't support disabled or readonly mode yet. This is a temp solution -->
 			${this.disabled || this.readonly

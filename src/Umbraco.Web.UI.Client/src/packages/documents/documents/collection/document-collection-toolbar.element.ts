@@ -25,7 +25,7 @@ export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
 			<uui-input @input=${this.#updateSearch} label="Search" placeholder="Search..." id="input-search"></uui-input>
@@ -33,7 +33,7 @@ export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

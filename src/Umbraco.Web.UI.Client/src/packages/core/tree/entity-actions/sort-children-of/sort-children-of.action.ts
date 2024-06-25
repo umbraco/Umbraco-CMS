@@ -5,7 +5,7 @@ import type { MetaEntityActionSortChildrenOfKind } from '@umbraco-cms/backoffice
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntityActionSortChildrenOfKind> {
-	async execute() {
+	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modal = modalManager.open(this._host, UMB_SORT_CHILDREN_OF_MODAL, {
 			data: {

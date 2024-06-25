@@ -80,7 +80,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('defaultdialogs_externalLoginProviders')}">
 				<div id="main">
@@ -213,7 +213,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

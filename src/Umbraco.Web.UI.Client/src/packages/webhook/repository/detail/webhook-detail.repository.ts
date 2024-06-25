@@ -10,7 +10,7 @@ export class UmbWebhookDetailRepository extends UmbDetailRepositoryBase<UmbWebho
 		super(host, UmbWebhookDetailServerDataSource, UMB_WEBHOOK_DETAIL_STORE_CONTEXT);
 	}
 
-	async create(model: UmbWebhookDetailModel) {
+	override async create(model: UmbWebhookDetailModel) {
 		return super.create(model, null);
 	}
 

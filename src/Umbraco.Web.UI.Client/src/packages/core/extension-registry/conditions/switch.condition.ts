@@ -31,7 +31,7 @@ export class UmbSwitchCondition extends UmbConditionBase<SwitchConditionConfig> 
 		}, parseInt(this.config.frequency));
 	}
 
-	destroy() {
+	override destroy() {
 		clearTimeout(this.#timer);
 		super.destroy();
 	}

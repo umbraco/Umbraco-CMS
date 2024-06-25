@@ -70,7 +70,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 		return { error };
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 	}
 }

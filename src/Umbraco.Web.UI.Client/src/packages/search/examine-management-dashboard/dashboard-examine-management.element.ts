@@ -37,7 +37,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	@state()
 	private _activePath = '';
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-transparent>
 				${this.#renderHeader()}
@@ -65,7 +65,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#header {
 				display: flex;

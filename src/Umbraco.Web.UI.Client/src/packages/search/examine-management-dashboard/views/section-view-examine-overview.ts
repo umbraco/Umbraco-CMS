@@ -20,7 +20,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 	@state()
 	private _loadingSearchers = false;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this._getIndexers();
 		this._getSearchers();
@@ -53,7 +53,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('examineManagement_indexers')} class="overview">
 				<p>
@@ -118,7 +118,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

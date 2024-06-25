@@ -6,7 +6,7 @@ import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-c
 class UmbFocusDirective extends AsyncDirective {
 	private _el?: HTMLElement;
 
-	render() {
+	override render() {
 		return nothing;
 	}
 

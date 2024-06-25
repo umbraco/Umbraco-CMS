@@ -365,7 +365,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
@@ -475,7 +475,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		if (this._sortModeActive) {
-			return html`<div class="not-active">
+			return html`<div class="tab">
 				${ownedTab
 					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
@@ -533,7 +533,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		</uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

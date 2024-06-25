@@ -142,7 +142,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	/**
 	 * Query the parent router slot when the router slot is connected.
 	 */
-	connectedCallback() {
+	override connectedCallback() {
 		// Do not query a parent if the parent has been set from the outside.
 		if (!this._lockParent) {
 			const captureParentEvent = new CustomEvent('router-slot:capture-parent', {
@@ -167,7 +167,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	/**
 	 * Tears down the element.
 	 */
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		this.detachListeners();
 	}
 

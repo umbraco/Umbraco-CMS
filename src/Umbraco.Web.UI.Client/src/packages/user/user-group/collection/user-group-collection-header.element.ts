@@ -26,7 +26,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 
 	#debouncedSearch = debounce((query: any) => this.#collectionContext?.setFilter({ query }), 500);
 
-	render() {
+	override render() {
 		return html`<umb-collection-action-bundle></umb-collection-action-bundle>
 			<uui-input
 				@input=${this.#onSearch}
@@ -36,7 +36,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 			<umb-collection-view-bundle></umb-collection-view-bundle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

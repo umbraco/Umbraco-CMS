@@ -372,7 +372,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		</p>
 	`;
 
-	render() {
+	override render() {
 		return html` <div id="container" class="uui-text" data-test="installer-database">
 			<h1 class="uui-h3">Database Configuration</h1>
 			<uui-form>
@@ -391,7 +391,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host,
 			#container {

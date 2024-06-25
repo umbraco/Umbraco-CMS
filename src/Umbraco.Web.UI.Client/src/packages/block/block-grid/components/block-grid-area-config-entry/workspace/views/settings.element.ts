@@ -10,7 +10,7 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 	// TODO: Add create button label field:
 	// TODO: Turn minAllowed and maxAllowed into one range property/input...
 	// TODO: Add validation permission field:
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${'Identification'}>
 				<umb-property
@@ -41,7 +41,7 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -55,7 +55,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		},
 	];
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
@@ -97,7 +97,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout
 				headline="${this.localize.term('create_createUnder')} ${this.localize.term('treeHeaders_documentTypes')}">

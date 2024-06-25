@@ -100,6 +100,8 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		const locale = new Intl.Locale(lang);
 		const language = locale?.language.toLowerCase();
 		const region = locale?.region?.toLowerCase() ?? '';
+		// TODO: Its a bit of a tight coupling here, as this code relies on localizations begin a map. We should abstract that away. [NL]
+		// TODO: Currently we don't check if the `lang` is available. We should do that. We could maybe checking if the `lang` is in the `languages` map. [NL]?
 		const primary = umbLocalizationManager.localizations.get(`${language}-${region}`) as LocalizationSetType;
 		const secondary = umbLocalizationManager.localizations.get(language) as LocalizationSetType;
 

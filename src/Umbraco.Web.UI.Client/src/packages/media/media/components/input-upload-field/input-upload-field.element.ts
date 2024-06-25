@@ -91,7 +91,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this._dropzone.browse();
 	}
 
-	render() {
+	override render() {
 		return html`${this._src ? this.#renderFile(this._src, this.temporaryFile?.file) : this.#renderDropzone()}`;
 	}
 
@@ -171,7 +171,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

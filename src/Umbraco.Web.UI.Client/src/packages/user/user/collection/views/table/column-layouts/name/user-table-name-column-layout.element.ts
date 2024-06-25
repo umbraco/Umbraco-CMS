@@ -12,7 +12,7 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 	@property({ attribute: false })
 	value!: any;
 
-	render() {
+	override render() {
 		const avatarUrls = [
 			{
 				scale: '1x',
