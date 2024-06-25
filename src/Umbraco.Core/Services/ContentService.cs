@@ -1188,14 +1188,6 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
-            // Change state to publishing
-            content.PublishedState = PublishedState.Publishing;
-            var publishingNotification = new ContentPublishingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(publishingNotification))
-            {
-                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-            }
-
             // this will create the correct culture impact even if culture is * or null
             IEnumerable<CultureImpact?> impacts =
                 cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
@@ -1205,6 +1197,14 @@ public class ContentService : RepositoryService, IContentService
             foreach (CultureImpact? impact in impacts)
             {
                 content.PublishCulture(impact);
+            }
+
+            // Change state to publishing
+            content.PublishedState = PublishedState.Publishing;
+            var publishingNotification = new ContentPublishingNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(publishingNotification))
+            {
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
 
             PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, publishingNotification.State, userId);
