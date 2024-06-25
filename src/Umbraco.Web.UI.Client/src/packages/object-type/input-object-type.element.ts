@@ -34,7 +34,7 @@ export class UmbInputObjectTypeElement extends UUIFormControlMixin(UmbLitElement
 		});
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

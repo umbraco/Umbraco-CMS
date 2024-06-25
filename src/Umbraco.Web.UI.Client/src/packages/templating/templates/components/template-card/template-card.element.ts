@@ -28,7 +28,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 		return this._id;
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

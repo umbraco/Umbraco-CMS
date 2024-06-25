@@ -198,7 +198,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<umb-property-layout label="Content" description="Select the starting root content">
 				<div slot="editor">
-					<umb-input-document max="1" .value=${this._package.contentNodeId ?? ''} @change=${this.#onContentChange}>
+					<umb-input-document
+						max="1"
+						.value=${this._package.contentNodeId ?? undefined}
+						@change=${this.#onContentChange}>
 					</umb-input-document>
 					<uui-checkbox
 						label="Include child nodes"

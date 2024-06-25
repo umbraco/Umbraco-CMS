@@ -9,27 +9,34 @@ export class UmbInstallerUserElement extends UmbLitElement {
 	@state()
 	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 
-	private _installerContext?: UmbInstallerContext;
+	@state()
+	private _minimumPasswordLength = 10;
+
+	#installerContext?: UmbInstallerContext;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
-			this._installerContext = installerContext;
+			this.#installerContext = installerContext;
 			this._observeInstallerData();
 		});
 	}
 
 	private _observeInstallerData() {
-		if (!this._installerContext) return;
+		if (!this.#installerContext) return;
 
-		this.observe(this._installerContext.data, ({ user }) => {
+		this.observe(this.#installerContext.data, ({ user }) => {
 			this._userFormData = {
 				name: user.name,
 				password: user.password,
 				email: user.email,
 				subscribeToNewsletter: user.subscribeToNewsletter ?? false,
 			};
+		});
+
+		this.observe(this.#installerContext.settings, (settings) => {
+			this._minimumPasswordLength = settings?.user.minCharLength ?? this._minimumPasswordLength;
 		});
 	}
 
@@ -48,8 +55,8 @@ export class UmbInstallerUserElement extends UmbLitElement {
 		const email = formData.get('email') as string;
 		const subscribeToNewsletter = formData.has('subscribeToNewsletter');
 
-		this._installerContext?.appendData({ user: { name, password, email, subscribeToNewsletter } });
-		this._installerContext?.nextStep();
+		this.#installerContext?.appendData({ user: { name, password, email, subscribeToNewsletter } });
+		this.#installerContext?.nextStep();
 	};
 
 	override render() {
@@ -87,6 +94,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 							id="password"
 							name="password"
 							label="password"
+							minlength=${this._minimumPasswordLength}
 							.value=${this._userFormData?.password}
 							required
 							required-message="Password is required"></uui-input-password>

@@ -10,7 +10,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-collection-configuration')
-export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(UmbLitElement) {
+export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<string, typeof UmbLitElement>(UmbLitElement) {
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -25,7 +25,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 	@property({ attribute: 'default-value' })
 	defaultValue?: string;
 
-	#setValue(value: string) {
+	#setValue(value: string | undefined) {
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -65,7 +65,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 	}
 
 	#clearDataType() {
-		this.#setValue('');
+		this.#setValue(undefined);
 	}
 
 	#createDataType() {
@@ -99,7 +99,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 		if (!this.value || !this._dataTypePickerModalPath) return nothing;
 		return html`
 			<uui-ref-list>
-				<umb-ref-data-type standalone data-type-id=${this.value as string} @open=${this.#editDataType}>
+				<umb-ref-data-type standalone data-type-id=${this.value} @open=${this.#editDataType}>
 					<uui-action-bar slot="actions">
 						<uui-button
 							label=${this.localize.term('general_choose')}
