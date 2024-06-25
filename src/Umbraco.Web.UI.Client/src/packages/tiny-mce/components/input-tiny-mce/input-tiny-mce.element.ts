@@ -57,7 +57,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
 	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
 	}
 

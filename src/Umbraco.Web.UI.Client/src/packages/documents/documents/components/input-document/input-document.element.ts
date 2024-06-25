@@ -137,7 +137,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

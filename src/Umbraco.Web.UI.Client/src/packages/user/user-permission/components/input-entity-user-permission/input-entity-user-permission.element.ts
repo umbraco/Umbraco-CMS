@@ -28,7 +28,7 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

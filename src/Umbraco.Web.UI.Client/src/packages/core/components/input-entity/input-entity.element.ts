@@ -28,7 +28,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		},
 	});
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

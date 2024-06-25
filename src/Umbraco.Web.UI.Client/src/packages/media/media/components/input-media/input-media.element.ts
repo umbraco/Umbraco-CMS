@@ -173,7 +173,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		);
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

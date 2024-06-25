@@ -15,7 +15,7 @@ const elementName = 'umb-input-content';
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -65,10 +65,10 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 
 	@property({ type: String })
-	public set value(selectionString: string | undefined) {
+	public override set value(selectionString: string | undefined) {
 		this.#selection = splitStringToArray(selectionString);
 	}
-	public get value(): string | undefined {
+	public override get value(): string | undefined {
 		return this.#selection.length > 0 ? this.#selection.join(',') : undefined;
 	}
 

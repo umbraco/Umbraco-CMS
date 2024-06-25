@@ -23,7 +23,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 	string | undefined,
 	typeof UmbLitElement
 >(UmbLitElement) {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
