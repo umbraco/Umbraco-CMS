@@ -1,4 +1,4 @@
-import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
@@ -50,28 +50,15 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 		return html`
 			<uui-box headline="Theme">
 				<uui-tag slot="headline" look="placeholder">Experimental</uui-tag>
-				<select label="Select theme" @change=${this.#onThemeChange}>
-					${repeat(
-						this._themes,
-						(theme) => theme.value,
-						(theme) => html`<option value=${theme.value} ?selected=${theme.selected}>${theme.name}</option>`,
-					)}
-				</select>
+				<uui-select label="Select theme" .options=${this._themes} @change=${this.#onThemeChange}></uui-select>
 			</uui-box>
 		`;
 	}
 
 	static override styles = [
 		css`
-			select {
+			uui-select {
 				width: 100%;
-				font: inherit;
-				color: var(--uui-color-text);
-				background-color: var(--uui-color-surface);
-				padding: var(--uui-size-1) var(--uui-size-space-3);
-				border: 1px solid var(--uui-color-border);
-				height: var(--uui-size-11);
-				box-sizing: border-box;
 			}
 		`,
 	];
