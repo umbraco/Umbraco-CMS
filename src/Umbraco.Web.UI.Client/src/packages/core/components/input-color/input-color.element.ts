@@ -11,7 +11,7 @@ import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui
  */
 @customElement('umb-input-color')
 export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '') {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

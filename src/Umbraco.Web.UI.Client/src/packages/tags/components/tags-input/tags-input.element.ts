@@ -67,7 +67,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this._tagInput.focus();
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

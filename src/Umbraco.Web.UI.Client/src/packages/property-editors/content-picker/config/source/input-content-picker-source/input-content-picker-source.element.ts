@@ -10,7 +10,7 @@ import '../../../dynamic-root/input-content-picker-document-root/input-content-p
 
 @customElement('umb-input-content-picker-source')
 export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

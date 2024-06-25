@@ -21,7 +21,7 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 	@property({ type: Array })
 	public list: Array<UmbRadioButtonItem> = [];
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

@@ -7,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbStaticFilePickerContext extends UmbPickerInputContext<
 	UmbStaticFileItemModel,
-	any,
+	UmbStaticFileItemModel,
 	UmbStaticFilePickerModalData,
 	UmbStaticFilePickerModalValue
 > {

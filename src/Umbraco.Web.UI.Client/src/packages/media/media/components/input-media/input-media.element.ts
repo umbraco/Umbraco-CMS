@@ -9,12 +9,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-media';
 
 @customElement(elementName)
-export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('detail');
@@ -107,12 +107,12 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	@property({ type: String })
 	startNode = '';
 
-	@property()
-	public override set value(idsString: string) {
-		this.selection = splitStringToArray(idsString);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public override get value() {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@state()
@@ -141,7 +141,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 		this.observe(this.#pickerContext.selectedItems, async (selectedItems) => {
 			const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
-			if (!missingCards.length) return;
+			if (selectedItems?.length && !missingCards.length) return;
 
 			if (!selectedItems?.length) {
 				this._cards = [];
@@ -173,7 +173,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		);
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

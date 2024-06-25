@@ -29,7 +29,7 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 	@state()
 	_currentLabel?: string;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

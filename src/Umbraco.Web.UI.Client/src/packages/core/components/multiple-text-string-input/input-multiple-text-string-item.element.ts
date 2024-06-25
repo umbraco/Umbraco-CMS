@@ -71,7 +71,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		this._input?.focus();
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
