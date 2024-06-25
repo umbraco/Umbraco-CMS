@@ -73,13 +73,13 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
 			// TODO: This is problematic, cause if a workspaceView appears later, then this takes over. And it is also a problem if it does not use redirect, but just a view defined with and empty path.
-			/*const firstRoute = newRoutes[0];
+			const firstRoute = newRoutes[0];
 			if (firstRoute) {
 				newRoutes.push({
 					path: ``,
 					redirectTo: firstRoute.path,
 				});
-			}*/
+			}
 		}
 
 		this._routes = newRoutes;
