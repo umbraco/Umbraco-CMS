@@ -12,15 +12,16 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 			<slot name="actions"></slot>
 			${when(
 				!this.hideFocalPoint,
-				() =>
-					html`<uui-button
+				() => html`
+					<uui-button
 						compact
 						id="reset-focal-point"
 						label=${this.localize.term('content_resetFocalPoint')}
 						@click=${this.onResetFocalPoint}>
 						<uui-icon name="icon-axis-rotation"></uui-icon>
 						${this.localize.term('content_resetFocalPoint')}
-					</uui-button>`,
+					</uui-button>
+				`,
 			)}
 		`;
 	}
@@ -37,13 +38,14 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 			${repeat(
 				this.crops,
 				(crop) => crop.alias + JSON.stringify(crop.coordinates),
-				(crop) =>
-					html` <umb-image-cropper-preview
+				(crop) => html`
+					<umb-image-cropper-preview
 						?active=${this.currentCrop?.alias === crop.alias}
 						@click=${() => this.onCropClick(crop)}
 						.crop=${crop}
 						.focalPoint=${this.focalPoint}
-						.src=${this.source}></umb-image-cropper-preview>`,
+						.src=${this.source}></umb-image-cropper-preview>
+				`,
 			)}`;
 	}
 
@@ -55,6 +57,7 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 			gap: var(--uui-size-space-3);
 			height: 400px;
 		}
+
 		#main {
 			width: 100%;
 			height: 100%;
@@ -62,6 +65,7 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 			gap: var(--uui-size-space-1);
 			flex-direction: column;
 		}
+
 		#actions {
 			display: flex;
 			justify-content: space-between;
@@ -92,6 +96,7 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 		umb-image-cropper-focus-setter {
 			height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
 		}
+
 		#side {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
