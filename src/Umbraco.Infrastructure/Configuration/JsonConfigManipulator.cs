@@ -19,6 +19,7 @@ internal class JsonConfigManipulator : IConfigManipulator
     private const string GlobalIdPath = $"{CmsObjectPath}:Global:Id";
     private const string DisableRedirectUrlTrackingPath = $"{CmsObjectPath}:WebRouting:DisableRedirectUrlTracking";
 
+    private readonly JsonDocumentOptions _jsonDocumentOptions = new() { CommentHandling = JsonCommentHandling.Skip };
     private readonly IConfiguration _configuration;
     private readonly ILogger<JsonConfigManipulator> _logger;
     private readonly SemaphoreSlim _lock = new(1, 1);
@@ -238,7 +239,7 @@ internal class JsonConfigManipulator : IConfigManipulator
         try
         {
             using var streamReader = new StreamReader(jsonFilePath);
-            return await JsonNode.ParseAsync(streamReader.BaseStream);
+            return await JsonNode.ParseAsync(streamReader.BaseStream, documentOptions: _jsonDocumentOptions);
         }
         catch (IOException exception)
         {

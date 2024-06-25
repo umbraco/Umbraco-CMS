@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Cms.Core.Manifest;
+namespace Umbraco.Cms.Core.Manifest;
 
 public class PackageManifest
 {
     public required string Name { get; set; }
+
+    public string? Id { get; set; }
 
     public string? Version { get; set; }
 

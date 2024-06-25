@@ -6,6 +6,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Helpers;
 
+/// <remark>
+/// This class seems unused, but is used by implementors to configure the error flow for external login providers
+/// so that they properly route towards our default error handling page with the correct parameters.
+/// </remark>
 public class OAuthOptionsHelper
 {
     // https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
@@ -48,7 +52,7 @@ public class OAuthOptionsHelper
     public T SetUmbracoRedirectWithFilteredParams<T>(T context, string providerFriendlyName, string eventName)
         where T : HandleRequestContext<RemoteAuthenticationOptions>
     {
-        var callbackPath = _securitySettings.Value.AuthorizeCallbackErrorPathName;
+        var callbackPath =_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName;
 
         callbackPath = callbackPath.AppendQueryStringToUrl("flow=external-login")
         .AppendQueryStringToUrl($"provider={providerFriendlyName}")

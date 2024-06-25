@@ -1,18 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Notifications;
@@ -2339,7 +2343,18 @@ internal class UserService : RepositoryService, IUserService
         }
 
         // We don't know what the entity type may be, so we have to get the entire entity :(
-        var idKeyMap = keys.ToDictionary(key => _entityService.Get(key)!.Id);
+        Dictionary<int, Guid> idKeyMap = new();
+        foreach (Guid key in keys)
+        {
+            IEntitySlim? entity = _entityService.Get(key);
+
+            if (entity is null)
+            {
+                return Attempt.FailWithStatus(UserOperationStatus.NodeNotFound, Enumerable.Empty<NodePermissions>());
+            }
+
+            idKeyMap[entity.Id] = key;
+        }
 
         EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
 
@@ -2434,6 +2449,7 @@ internal class UserService : RepositoryService, IUserService
         EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+
     }
 
     /// <summary>

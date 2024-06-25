@@ -39,7 +39,7 @@ public class EnableUserController : UserControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            UserPermissionResource.WithKeys(model.UserIds),
+            UserPermissionResource.WithKeys(model.UserIds.Select(x => x.Id)),
             AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -47,7 +47,7 @@ public class EnableUserController : UserControllerBase
             return Forbidden();
         }
 
-        UserOperationStatus result = await _userService.EnableAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds);
+        UserOperationStatus result = await _userService.EnableAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds.Select(x => x.Id).ToHashSet());
 
         return result is UserOperationStatus.Success
             ? Ok()

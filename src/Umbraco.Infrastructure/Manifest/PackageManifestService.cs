@@ -10,16 +10,18 @@ internal sealed class PackageManifestService : IPackageManifestService
 {
     private readonly IEnumerable<IPackageManifestReader> _packageManifestReaders;
     private readonly IAppPolicyCache _cache;
-    private readonly PackageManifestSettings _packageManifestSettings;
+    private RuntimeSettings _runtimeSettings;
+
 
     public PackageManifestService(
         IEnumerable<IPackageManifestReader> packageManifestReaders,
         AppCaches appCaches,
-        IOptions<PackageManifestSettings> packageManifestSettings)
+        IOptionsMonitor<RuntimeSettings> runtimeSettingsOptionsMonitor)
     {
         _packageManifestReaders = packageManifestReaders;
-        _packageManifestSettings = packageManifestSettings.Value;
         _cache = appCaches.RuntimeCache;
+        _runtimeSettings = runtimeSettingsOptionsMonitor.CurrentValue;
+        runtimeSettingsOptionsMonitor.OnChange(runtimeSettings => _runtimeSettings = runtimeSettings);
     }
 
     public async Task<IEnumerable<PackageManifest>> GetAllPackageManifestsAsync()
@@ -34,7 +36,9 @@ internal sealed class PackageManifestService : IPackageManifestService
 
                    return tasks.SelectMany(x => x.Result);
                },
-               _packageManifestSettings.CacheTimeout)
+               _runtimeSettings.Mode == RuntimeMode.Production
+                   ? TimeSpan.FromDays(30)
+                   : TimeSpan.FromSeconds(10))
            ?? Array.Empty<PackageManifest>();
 
     public async Task<IEnumerable<PackageManifest>> GetPublicPackageManifestsAsync()

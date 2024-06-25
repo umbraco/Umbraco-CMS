@@ -34,7 +34,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -223,7 +223,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -281,7 +281,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -421,7 +421,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -663,7 +663,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -750,7 +750,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -835,7 +835,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -887,7 +887,7 @@
         "operationId": "GetDataTypeConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1079,7 +1079,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1137,7 +1137,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -1277,7 +1277,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -1419,7 +1419,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1468,7 +1468,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1486,9 +1486,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -1533,7 +1530,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1548,9 +1545,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -1578,7 +1572,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1652,7 +1646,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1715,7 +1709,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1777,7 +1771,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1993,7 +1987,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2051,7 +2045,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -2191,7 +2185,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -2310,7 +2304,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2402,7 +2396,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -2662,7 +2656,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2680,9 +2674,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -2710,7 +2701,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2776,7 +2767,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2831,7 +2822,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -3023,7 +3014,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -3081,7 +3072,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -3221,7 +3212,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -3363,7 +3354,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -3594,7 +3585,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -3652,7 +3643,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -3792,7 +3783,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -4026,7 +4017,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4044,9 +4035,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -4074,7 +4062,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4148,7 +4136,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4211,7 +4199,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4403,7 +4391,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4461,7 +4449,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -4575,7 +4563,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -4704,7 +4692,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4782,7 +4770,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4842,7 +4830,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5057,6 +5045,209 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-type/{id}/export": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeByIdExport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/{id}/import": {
+      "put": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "PutDocumentTypeByIdImport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document-type/{id}/move": {
       "put": {
         "tags": [
@@ -5107,7 +5298,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -5227,7 +5418,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5293,7 +5484,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -5355,7 +5546,7 @@
         "operationId": "GetDocumentTypeConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5547,7 +5738,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5605,7 +5796,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -5745,7 +5936,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -5837,6 +6028,152 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-type/import": {
+      "post": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "PostDocumentTypeImport",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              },
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/document-type": {
       "get": {
         "tags": [
@@ -5859,7 +6196,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5877,9 +6214,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -5924,7 +6258,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5939,9 +6273,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -5969,7 +6300,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6043,7 +6374,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6106,7 +6437,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6177,7 +6508,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6251,7 +6582,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6332,7 +6663,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -6450,7 +6781,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -6616,7 +6947,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6836,7 +7167,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6894,7 +7225,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -7034,7 +7365,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -7178,7 +7509,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -7355,7 +7686,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -7444,7 +7775,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -7612,7 +7943,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -7697,7 +8028,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -7808,7 +8139,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -7900,7 +8231,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -8114,7 +8445,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -8197,7 +8528,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -8286,7 +8617,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -8402,7 +8733,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -8544,7 +8875,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -8673,7 +9004,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -8737,7 +9068,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -8814,7 +9145,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -8956,7 +9287,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -9088,7 +9419,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -9123,7 +9454,7 @@
         "operationId": "GetDocumentConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -9189,7 +9520,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -9303,7 +9634,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -9372,7 +9703,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -9486,7 +9817,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -9504,9 +9835,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -9551,7 +9879,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -9566,9 +9894,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -9586,7 +9911,7 @@
         "operationId": "DeleteRecycleBinDocument",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -9671,7 +9996,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -9782,7 +10107,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -9887,7 +10212,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -10015,7 +10340,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10070,7 +10395,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10115,7 +10440,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10189,7 +10514,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10252,7 +10577,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10318,7 +10643,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -10377,7 +10702,7 @@
         "operationId": "GetDynamicRootSteps",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10431,7 +10756,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10490,7 +10815,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10561,7 +10886,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -10677,7 +11002,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -10792,13 +11117,160 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedHelpPageResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/imaging/resize/urls": {
+      "get": {
+        "tags": [
+          "Imaging"
+        ],
+        "operationId": "GetImagingResizeUrls",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 200
+            }
+          },
+          {
+            "name": "width",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 200
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ImageCropModeModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaUrlInfoResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/import/analyze": {
+      "get": {
+        "tags": [
+          "Import"
+        ],
+        "operationId": "GetImportAnalyze",
+        "parameters": [
+          {
+            "name": "temporaryFileId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/EntityImportAnalysisResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
                     }
                   ]
                 }
@@ -10844,7 +11316,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -10900,7 +11372,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -11020,7 +11492,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11053,7 +11525,7 @@
         "operationId": "GetInstallSettings",
         "responses": {
           "428": {
-            "description": "Client Error",
+            "description": "Precondition Required",
             "content": {
               "application/json": {
                 "schema": {
@@ -11067,7 +11539,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -11122,7 +11594,7 @@
         },
         "responses": {
           "428": {
-            "description": "Client Error",
+            "description": "Precondition Required",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11148,7 +11620,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11230,7 +11702,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11268,7 +11740,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -11286,9 +11758,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -11306,7 +11775,7 @@
         "operationId": "GetItemLanguageDefault",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -11321,9 +11790,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -11361,7 +11827,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -11561,7 +12027,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -11653,7 +12119,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11792,7 +12258,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11860,7 +12326,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -11927,7 +12393,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12022,7 +12488,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12107,7 +12573,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12162,7 +12628,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12339,7 +12805,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12408,7 +12874,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -12488,7 +12954,7 @@
             }
           },
           "200": {
-            "description": "Success"
+            "description": "OK"
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
@@ -12512,7 +12978,7 @@
         "operationId": "GetManifestManifest",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12550,7 +13016,7 @@
         "operationId": "GetManifestManifestPrivate",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12588,7 +13054,7 @@
         "operationId": "GetManifestManifestPublic",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12629,7 +13095,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12647,9 +13113,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -12694,7 +13157,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12709,9 +13172,58 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/media-type/folders": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetItemMediaTypeFolders",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
           },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedModelMediaTypeItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
@@ -12756,7 +13268,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -12771,9 +13283,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -12948,7 +13457,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -13006,7 +13515,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -13120,7 +13629,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -13249,7 +13758,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -13309,7 +13818,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -13524,6 +14033,209 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media-type/{id}/export": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeByIdExport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media-type/{id}/import": {
+      "put": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "PutMediaTypeByIdImport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media-type/{id}/move": {
       "put": {
         "tags": [
@@ -13574,7 +14286,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -13694,7 +14406,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -13760,7 +14472,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -13979,7 +14691,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14037,7 +14749,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -14177,7 +14889,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -14269,6 +14981,152 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media-type/import": {
+      "post": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "PostMediaTypeImport",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              },
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/media-type/ancestors": {
       "get": {
         "tags": [
@@ -14287,7 +15145,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14361,7 +15219,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14424,7 +15282,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14517,7 +15375,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14594,7 +15452,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14612,9 +15470,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -14659,7 +15514,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14674,9 +15529,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -14851,7 +15703,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -14909,7 +15761,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15049,7 +15901,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15193,7 +16045,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -15270,7 +16122,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15355,7 +16207,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15484,7 +16336,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -15548,7 +16400,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -15625,7 +16477,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15757,7 +16609,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -15792,7 +16644,7 @@
         "operationId": "GetMediaConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -15858,7 +16710,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15972,7 +16824,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16041,7 +16893,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16141,7 +16993,7 @@
         "operationId": "DeleteRecycleBinMedia",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16226,7 +17078,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16337,7 +17189,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16442,7 +17294,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16570,7 +17422,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16625,7 +17477,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16670,7 +17522,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16744,7 +17596,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16807,7 +17659,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16856,7 +17708,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -16874,9 +17726,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -16914,7 +17763,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -17078,7 +17927,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -17177,7 +18026,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -17265,7 +18114,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -17385,7 +18234,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -17434,7 +18283,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -17452,9 +18301,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -17499,7 +18345,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -17514,9 +18360,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -17691,7 +18534,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -17749,7 +18592,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -17863,7 +18706,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -17974,7 +18817,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -18197,7 +19040,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -18279,7 +19122,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -18385,7 +19228,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -18448,7 +19291,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -18466,9 +19309,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -18513,7 +19353,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -18528,9 +19368,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -18705,7 +19542,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -18763,7 +19600,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -18903,7 +19740,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -19045,7 +19882,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -19145,7 +19982,7 @@
         "operationId": "GetMemberConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -19211,7 +20048,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -19311,7 +20148,7 @@
         "operationId": "PostModelsBuilderBuild",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -19326,7 +20163,7 @@
             }
           },
           "428": {
-            "description": "Client Error",
+            "description": "Precondition Required",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -19385,7 +20222,7 @@
         "operationId": "GetModelsBuilderDashboard",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -19420,7 +20257,7 @@
         "operationId": "GetModelsBuilderStatus",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -19475,7 +20312,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -19533,7 +20370,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -19630,7 +20467,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -19678,7 +20515,7 @@
         "operationId": "GetPackageConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -19733,7 +20570,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -19937,7 +20774,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -20007,7 +20844,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -20121,7 +20958,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -20194,7 +21031,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -20250,7 +21087,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -20298,7 +21135,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -20316,9 +21153,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -20492,7 +21326,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -20549,7 +21383,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -20688,7 +21522,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21100,7 +21934,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21157,7 +21991,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21277,7 +22111,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21322,7 +22156,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21380,7 +22214,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21445,7 +22279,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21500,7 +22334,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21535,7 +22369,7 @@
         "operationId": "DeletePreview",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21548,16 +22382,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -21566,7 +22392,7 @@
         "operationId": "PostPreview",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21599,7 +22425,7 @@
         "operationId": "GetProfilingStatus",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21663,7 +22489,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21742,7 +22568,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21773,7 +22599,7 @@
         "operationId": "PostPublishedCacheCollect",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21806,7 +22632,7 @@
         "operationId": "PostPublishedCacheRebuild",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21839,7 +22665,7 @@
         "operationId": "PostPublishedCacheReload",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -21872,7 +22698,7 @@
         "operationId": "GetPublishedCacheStatus",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -21941,7 +22767,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22005,7 +22831,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22049,7 +22875,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -22097,7 +22923,7 @@
         "operationId": "GetRedirectManagementStatus",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22139,7 +22965,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -22201,7 +23027,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22219,9 +23045,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -22259,7 +23082,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22305,7 +23128,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22383,7 +23206,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22445,7 +23268,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22463,9 +23286,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -22639,7 +23459,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -22696,7 +23516,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -22835,7 +23655,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -23247,7 +24067,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -23304,7 +24124,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -23413,7 +24233,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -23478,7 +24298,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -23533,7 +24353,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -23588,7 +24408,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -23655,7 +24475,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -23701,7 +24521,7 @@
         "operationId": "GetSecurityConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -23767,7 +24587,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -24003,7 +24823,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -24111,7 +24931,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24160,7 +24980,7 @@
         "operationId": "GetServerConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24192,7 +25012,7 @@
         "operationId": "GetServerInformation",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24238,7 +25058,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24262,7 +25082,7 @@
         "operationId": "GetServerTroubleshooting",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24307,7 +25127,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24351,7 +25171,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24413,7 +25233,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24465,7 +25285,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24510,7 +25330,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24528,9 +25348,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -24704,7 +25521,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -24761,7 +25578,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -24900,7 +25717,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -25312,7 +26129,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25369,7 +26186,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -25478,7 +26295,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25543,7 +26360,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25598,7 +26415,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25674,7 +26491,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25726,7 +26543,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25761,7 +26578,7 @@
         "operationId": "GetTelemetryLevel",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25851,7 +26668,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -25913,7 +26730,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25931,9 +26748,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -25978,7 +26792,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -25993,9 +26807,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -26170,7 +26981,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -26228,7 +27039,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -26368,7 +27179,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -26468,7 +27279,7 @@
         "operationId": "GetTemplateConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -26534,7 +27345,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -26593,7 +27404,7 @@
         "operationId": "GetTemplateQuerySettings",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -26638,7 +27449,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -26704,7 +27515,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -26759,7 +27570,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -26796,6 +27607,10 @@
           "content": {
             "multipart/form-data": {
               "schema": {
+                "required": [
+                  "File",
+                  "Id"
+                ],
                 "type": "object",
                 "properties": {
                   "Id": {
@@ -26934,7 +27749,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -27027,7 +27842,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -27060,7 +27875,7 @@
         "operationId": "GetTemporaryFileConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -27092,7 +27907,7 @@
         "operationId": "PostUpgradeAuthorize",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -27107,7 +27922,7 @@
             }
           },
           "428": {
-            "description": "Client Error",
+            "description": "Precondition Required",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -27133,7 +27948,7 @@
             }
           },
           "500": {
-            "description": "Server Error",
+            "description": "Internal Server Error",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -27192,7 +28007,7 @@
         "operationId": "GetUpgradeSettings",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -27206,7 +28021,7 @@
             }
           },
           "428": {
-            "description": "Client Error",
+            "description": "Precondition Required",
             "content": {
               "application/json": {
                 "schema": {
@@ -27402,7 +28217,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -27463,7 +28278,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -27551,7 +28366,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -27614,7 +28429,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -27691,7 +28506,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -27709,9 +28524,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -27760,7 +28572,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -27970,7 +28782,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -28016,7 +28828,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -28074,7 +28886,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -28188,7 +29000,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -28277,8 +29089,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28286,8 +29101,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28295,8 +29113,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -28304,7 +29125,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -28391,8 +29212,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28400,8 +29224,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28409,8 +29236,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -28418,7 +29248,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -28557,7 +29387,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -28634,7 +29464,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -28652,9 +29482,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -28847,7 +29674,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -28939,7 +29766,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -28999,7 +29826,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -29057,7 +29884,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -29197,7 +30024,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -29308,7 +30135,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -29379,7 +30206,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -29471,6 +30298,66 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/user/{id}/calculate-start-nodes": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserByIdCalculateStartNodes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CalculatedUserStartNodesResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/user/{id}/change-password": {
       "post": {
         "tags": [
@@ -29521,7 +30408,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -29632,7 +30519,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -29754,7 +30641,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -29894,7 +30781,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -29994,7 +30881,7 @@
         "operationId": "GetUserConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30029,7 +30916,7 @@
         "operationId": "GetUserCurrent",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30061,7 +30948,7 @@
         "operationId": "GetUserCurrent2fa",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30113,7 +31000,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -30237,7 +31124,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -30341,7 +31228,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30432,7 +31319,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -30522,7 +31409,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -30581,7 +31468,7 @@
         "operationId": "GetUserCurrentConfiguration",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30608,23 +31495,26 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/user/current/logins": {
+    "/umbraco/management/api/v1/user/current/login-providers": {
       "get": {
         "tags": [
           "User"
         ],
-        "operationId": "GetUserCurrentLogins",
+        "operationId": "GetUserCurrentLoginProviders",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/LinkedLoginsRequestModel"
-                    }
-                  ]
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserExternalLoginProviderModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -30662,7 +31552,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30722,7 +31612,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30785,7 +31675,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -30862,7 +31752,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -30993,7 +31883,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -31270,7 +32160,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -31393,7 +32283,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -31524,7 +32414,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -31658,7 +32548,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -31737,7 +32627,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -31825,7 +32715,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -31843,9 +32733,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -31883,7 +32770,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -32070,7 +32957,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -32177,7 +33064,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -32317,7 +33204,7 @@
             }
           },
           "200": {
-            "description": "Success",
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -32385,7 +33272,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -32615,6 +33502,51 @@
             }
           },
           "isCompatible": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CalculatedUserStartNodesResponseModel": {
+        "required": [
+          "documentStartNodeIds",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
+          "id",
+          "mediaStartNodeIds"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "documentStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "hasDocumentRootAccess": {
+            "type": "boolean"
+          },
+          "mediaStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "hasMediaRootAccess": {
             "type": "boolean"
           }
         },
@@ -32908,6 +33840,7 @@
       "CreateDocumentRequestModel": {
         "required": [
           "documentType",
+          "template",
           "values",
           "variants"
         ],
@@ -34241,8 +35174,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -34370,6 +35306,7 @@
           "hasMediaRootAccess",
           "id",
           "isAdmin",
+          "languageIsoCode",
           "languages",
           "mediaStartNodeIds",
           "name",
@@ -34399,8 +35336,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -34410,8 +35350,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -34477,6 +35420,34 @@
         ],
         "type": "string"
       },
+      "DataTypeContentTypeReferenceModel": {
+        "required": [
+          "icon",
+          "id",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DataTypeItemResponseModel": {
         "required": [
           "id",
@@ -34535,18 +35506,17 @@
       },
       "DataTypeReferenceResponseModel": {
         "required": [
-          "id",
-          "properties",
-          "type"
+          "contentType",
+          "properties"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string"
+          "contentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DataTypeContentTypeReferenceModel"
+              }
+            ]
           },
           "properties": {
             "type": "array",
@@ -34809,8 +35779,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -34826,8 +35799,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -34946,8 +35922,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -35609,6 +36588,10 @@
           "icon": {
             "type": "string",
             "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -35936,6 +36919,7 @@
       },
       "DocumentUrlInfoModel": {
         "required": [
+          "culture",
           "url"
         ],
         "type": "object",
@@ -36391,9 +37375,33 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EntityImportAnalysisResponseModel": {
+        "required": [
+          "entityType"
+        ],
+        "type": "object",
+        "properties": {
+          "entityType": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -36528,6 +37536,11 @@
           },
           "providedValueValidationRegex": {
             "type": "string",
+            "nullable": true
+          },
+          "actionParameters": {
+            "type": "object",
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -36709,6 +37722,17 @@
         },
         "additionalProperties": false
       },
+      "ImageCropModeModel": {
+        "enum": [
+          "Crop",
+          "Max",
+          "Stretch",
+          "Pad",
+          "BoxPad",
+          "Min"
+        ],
+        "type": "string"
+      },
       "ImportDictionaryRequestModel": {
         "required": [
           "temporaryFile"
@@ -36729,6 +37753,38 @@
               }
             ],
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImportDocumentTypeRequestModel": {
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImportMediaTypeRequestModel": {
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -36854,8 +37910,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -36945,41 +38004,6 @@
           "isoCode": {
             "minLength": 1,
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LinkedLoginModel": {
-        "required": [
-          "providerKey",
-          "providerName"
-        ],
-        "type": "object",
-        "properties": {
-          "providerName": {
-            "type": "string"
-          },
-          "providerKey": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LinkedLoginsRequestModel": {
-        "required": [
-          "linkedLogins"
-        ],
-        "type": "object",
-        "properties": {
-          "linkedLogins": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/LinkedLoginModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -37127,6 +38151,10 @@
           "name": {
             "minLength": 1,
             "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
           },
           "version": {
             "type": "string",
@@ -37676,12 +38704,14 @@
       "MediaTypeResponseModel": {
         "required": [
           "alias",
+          "aliasCanBeChanged",
           "allowedAsRoot",
           "allowedMediaTypes",
           "compositions",
           "containers",
           "icon",
           "id",
+          "isDeletable",
           "isElement",
           "name",
           "properties",
@@ -37769,6 +38799,12 @@
                 }
               ]
             }
+          },
+          "isDeletable": {
+            "type": "boolean"
+          },
+          "aliasCanBeChanged": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -37799,6 +38835,7 @@
           "hasChildren",
           "icon",
           "id",
+          "isDeletable",
           "isFolder",
           "name"
         ],
@@ -37827,12 +38864,16 @@
           },
           "icon": {
             "type": "string"
+          },
+          "isDeletable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
       },
       "MediaUrlInfoModel": {
         "required": [
+          "culture",
           "url"
         ],
         "type": "object",
@@ -41986,8 +43027,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -43228,16 +44272,22 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "userGroupIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -43270,8 +44320,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "languageIsoCode": {
@@ -43281,8 +44334,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -43292,8 +44348,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -43444,6 +44503,30 @@
           "key": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserExternalLoginProviderModel": {
+        "required": [
+          "hasManualLinkingEnabled",
+          "isLinkedOnUser",
+          "providerSchemeName"
+        ],
+        "type": "object",
+        "properties": {
+          "providerSchemeName": {
+            "type": "string"
+          },
+          "providerKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLinkedOnUser": {
+            "type": "boolean"
+          },
+          "hasManualLinkingEnabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -43713,8 +44796,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -43729,8 +44815,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -43740,8 +44829,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {

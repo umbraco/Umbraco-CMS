@@ -62,6 +62,7 @@ public static partial class Constants
             public const string ControllerToken = "controller";
             public const string ActionToken = "action";
             public const string AreaToken = "area";
+            public const string DynamicRoutePattern = "/{**umbracoSlug}";
         }
 
         public static class RoutePath

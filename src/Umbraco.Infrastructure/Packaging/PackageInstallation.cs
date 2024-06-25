@@ -2,19 +2,20 @@ using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging;
 
 public class PackageInstallation : IPackageInstallation
 {
-    private readonly PackageDataInstallation _packageDataInstallation;
+    private readonly IPackageDataInstallation _packageDataInstallation;
     private readonly CompiledPackageXmlParser _parser;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PackageInstallation" /> class.
     /// </summary>
-    public PackageInstallation(PackageDataInstallation packageDataInstallation, CompiledPackageXmlParser parser)
+    public PackageInstallation(IPackageDataInstallation packageDataInstallation, CompiledPackageXmlParser parser)
     {
         _packageDataInstallation =
             packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));

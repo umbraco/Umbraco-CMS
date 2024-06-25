@@ -1,14 +1,17 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class AvailableCompositionDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeEditingService _contentTypeEditingService;

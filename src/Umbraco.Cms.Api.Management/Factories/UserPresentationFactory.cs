@@ -1,6 +1,7 @@
 using Umbraco.Cms.Api.Management.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core;
@@ -69,7 +70,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             CreateDate = user.CreateDate,
             UpdateDate = user.UpdateDate,
             State = user.UserState,
-            UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
+            UserGroupIds = new HashSet<ReferenceByIdModel>(user.Groups.Select(x => new ReferenceByIdModel(x.Key))),
             DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             HasDocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
@@ -101,7 +102,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroupKeys = requestModel.UserGroupIds,
+            UserGroupKeys = requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
         };
 
         return await Task.FromResult(createModel);
@@ -114,7 +115,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroupKeys = requestModel.UserGroupIds,
+            UserGroupKeys = requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
             Message = requestModel.Message,
         };
 
@@ -161,13 +162,13 @@ public class UserPresentationFactory : IUserPresentationFactory
             Name = updateModel.Name,
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
-            ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
+            ContentStartNodeKeys = updateModel.DocumentStartNodeIds.Select(x => x.Id).ToHashSet(),
             HasContentRootAccess = updateModel.HasDocumentRootAccess,
-            MediaStartNodeKeys = updateModel.MediaStartNodeIds,
-            HasMediaRootAccess = updateModel.HasMediaRootAccess
+            MediaStartNodeKeys = updateModel.MediaStartNodeIds.Select(x => x.Id).ToHashSet(),
+            HasMediaRootAccess = updateModel.HasMediaRootAccess,
         };
 
-        model.UserGroupKeys = updateModel.UserGroupIds;
+        model.UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet();
 
         return await Task.FromResult(model);
     }
@@ -211,16 +212,34 @@ public class UserPresentationFactory : IUserPresentationFactory
         });
     }
 
-    private ISet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
+    public async Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user)
     {
-        IEnumerable<Guid>? keys = ids?
+        var mediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
+        var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
+
+        return await Task.FromResult(new CalculatedUserStartNodesResponseModel()
+        {
+            Id = user.Key,
+            MediaStartNodeIds = mediaStartNodeKeys,
+            HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
+            DocumentStartNodeIds = documentStartNodeKeys,
+            HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
+        });
+    }
+
+    private ISet<ReferenceByIdModel> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
+    {
+        IEnumerable<ReferenceByIdModel>? models = ids?
             .Select(x => _entityService.GetKey(x, type))
             .Where(x => x.Success)
-            .Select(x => x.Result);
+            .Select(x => x.Result)
+            .Select(x => new ReferenceByIdModel(x));
 
-        return keys is null
-            ? new HashSet<Guid>()
-            : new HashSet<Guid>(keys);
+        return models is null
+            ? new HashSet<ReferenceByIdModel>()
+            : new HashSet<ReferenceByIdModel>(models);
     }
 
     private bool HasRootAccess(IEnumerable<int>? startNodeIds)

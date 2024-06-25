@@ -65,6 +65,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Icon = source.Icon;
         target.IsElement = source.IsElement;
+        target.Description = source.Description;
     }
 
     // Umbraco.Code.MapAll

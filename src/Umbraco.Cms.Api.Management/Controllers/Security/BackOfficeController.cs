@@ -13,12 +13,14 @@ using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -39,7 +41,11 @@ public class BackOfficeController : SecurityControllerBase
     private readonly ILogger<BackOfficeController> _logger;
     private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
     private readonly IUserTwoFactorLoginService _userTwoFactorLoginService;
-    private readonly IBackOfficeExternalLoginProviders _backOfficeExternalLoginProviders;
+    private readonly IBackOfficeExternalLoginService _externalLoginService;
+
+    private const string RedirectFlowParameter = "flow";
+    private const string RedirectStatusParameter = "status";
+    private const string RedirectErrorCodeParameter = "errorCode";
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
@@ -49,7 +55,7 @@ public class BackOfficeController : SecurityControllerBase
         ILogger<BackOfficeController> logger,
         IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
         IUserTwoFactorLoginService userTwoFactorLoginService,
-        IBackOfficeExternalLoginProviders backOfficeExternalLoginProviders)
+        IBackOfficeExternalLoginService externalLoginService)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
@@ -58,7 +64,7 @@ public class BackOfficeController : SecurityControllerBase
         _logger = logger;
         _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
         _userTwoFactorLoginService = userTwoFactorLoginService;
-        _backOfficeExternalLoginProviders = backOfficeExternalLoginProviders;
+        _externalLoginService = externalLoginService;
     }
 
     [HttpPost("login")]
@@ -76,6 +82,7 @@ public class BackOfficeController : SecurityControllerBase
                 .WithDetail("The operation is not allowed on the user")
                 .Build());
         }
+
         if (result.IsLockedOut)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
@@ -83,6 +90,7 @@ public class BackOfficeController : SecurityControllerBase
                 .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
                 .Build());
         }
+
         if(result.RequiresTwoFactor)
         {
             string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
@@ -94,7 +102,15 @@ public class BackOfficeController : SecurityControllerBase
                 EnabledTwoFactorProviderNames = enabledProviders
             });
         }
-        return Ok();
+
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+        return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
+            .WithTitle("Invalid credentials")
+            .WithDetail("The provided credentials are invalid. User has not been signed in.")
+            .Build());
     }
 
     [AllowAnonymous]
@@ -181,28 +197,70 @@ public class BackOfficeController : SecurityControllerBase
         return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
+    // Creates and retains a short lived secret to use in the link-login
+    // endpoint because we can not protect that method with a bearer token for reasons explained there
+    [HttpGet("link-login-key")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> LinkLoginKey(string provider)
+    {
+        Attempt<Guid?, ExternalLoginOperationStatus> generateSecretAttempt = await _externalLoginService.GenerateLoginProviderSecretAsync(User, provider);
+        return generateSecretAttempt.Success
+            ? Ok(generateSecretAttempt.Result)
+            : generateSecretAttempt.Status is ExternalLoginOperationStatus.AuthenticationSchemeNotFound
+                ? StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+                .WithTitle("Invalid provider")
+                .WithDetail($"No provider with scheme name '{provider}' is configured")
+                .Build())
+                : Unauthorized();
+    }
+
     /// <summary>
     ///     Called when a user links an external login provider in the back office
     /// </summary>
     /// <param name="provider"></param>
     /// <returns></returns>
+    // This method is marked as AllowAnonymous and protected with a secret (linkKey) inside the model for the following reasons
+    // - when a js client uses the fetch api (or old ajax requests) they can send a bearer token
+    //   but since this method returns a redirect (after middleware intervenes) to another domain
+    //   and the redirect can not be intercepted, a cors error is thrown on the client
+    // - if we switch this method to a form post or a plain get, cors is not an issue, but the client
+    //   can't set a bearer token header.
+    // we are forcing form usage here for the whole model so the secret does not end up in url logs.
     [HttpPost("link-login")]
+    [AllowAnonymous]
     [MapToApiVersion("1.0")]
-    public IActionResult LinkLogin(string provider)
+    public async Task<IActionResult> LinkLogin([FromForm] LinkLoginRequestModel requestModel)
     {
+        Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> claimsPrincipleAttempt = await _externalLoginService.ClaimsPrincipleFromLoginProviderLinkKeyAsync(requestModel.Provider, requestModel.LinkKey);
+
+        if (claimsPrincipleAttempt.Success == false)
+        {
+            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+                $"{RedirectFlowParameter}=link-login",
+                $"{RedirectStatusParameter}=unauthorized"));
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(claimsPrincipleAttempt.Result!);
+        if (user == null)
+        {
+            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+                $"{RedirectFlowParameter}=link-login",
+                $"{RedirectStatusParameter}=user-not-found"));
+        }
+
         // Request a redirect to the external login provider to link a login for the current user
         var redirectUrl = Url.Action(nameof(ExternalLinkLoginCallback), this.GetControllerName());
 
         // Configures the redirect URL and user identifier for the specified external login including xsrf data
         AuthenticationProperties properties =
-            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _backOfficeUserManager.GetUserId(User));
+            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(requestModel.Provider, redirectUrl, user.Id);
 
-        return Challenge(properties, provider);
+        return Challenge(properties, requestModel.Provider);
     }
 
     /// <summary>
     ///     Callback path when the user initiates a link login request from the back office to the external provider from the
-    ///     <see cref="LinkLogin(string)" /> action
+    ///     <see cref="LinkLogin(LinkLoginRequestModel)" /> action
     /// </summary>
     /// <remarks>
     ///     An example of this is here
@@ -214,110 +272,66 @@ public class BackOfficeController : SecurityControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> ExternalLinkLoginCallback()
     {
-        var cookieAuthenticatedUserAttempt =
-            await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        Attempt<IEnumerable<IdentityError>, ExternalLoginOperationStatus> handleResult = await _externalLoginService.HandleLoginCallbackAsync(HttpContext);
 
-        if (cookieAuthenticatedUserAttempt.Succeeded == false)
+        if (handleResult.Success)
         {
-            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=external-login-callback",
-                "status=unauthorized"));
+            return Redirect(_securitySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority) ?? Constants.System.DefaultUmbracoPath);
         }
 
-        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
-        if (user == null)
+        return handleResult.Status switch
         {
-            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=external-login-callback",
-                "status=user-not-found"));
-        }
+            ExternalLoginOperationStatus.Unauthorized => RedirectWithStatus("unauthorized"),
+            ExternalLoginOperationStatus.UserNotFound => RedirectWithStatus("user-not-found"),
+            ExternalLoginOperationStatus.ExternalInfoNotFound => RedirectWithStatus("external-info-not-found"),
+            ExternalLoginOperationStatus.IdentityFailure => RedirectWithStatus("failed"),
+            _ => RedirectWithStatus("unknown-failure")
+        };
 
-        ExternalLoginInfo? info =
-            await _backOfficeSignInManager.GetExternalLoginInfoAsync();
-
-        if (info == null)
-        {
-            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=external-login-callback",
-                "status=external-info-not-found"));
-        }
-
-        IdentityResult addLoginResult = await _backOfficeUserManager.AddLoginAsync(user, info);
-        if (addLoginResult.Succeeded)
-        {
-            // Update any authentication tokens if succeeded
-            await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(info);
-            return Redirect("/umbraco"); // todo shouldn't this come from configuration
-        }
-
-        // Add errors and redirect for it to be displayed
-        // TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
-        // return RedirectToLogin(new { flow = "external-login", status = "failed", logout = "true" });
-        // todo
-        return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-            "flow=external-login-callback",
-            "status=failed"));
+        RedirectResult RedirectWithStatus(string status)
+            => CallbackErrorRedirectWithStatus("external-login-callback", status, handleResult.Result);
     }
 
-    // todo cleanup unhappy responses
     [HttpPost("unlink-login")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginRequestModel unlinkLoginRequestModel)
     {
-        var userId = User.Identity?.GetUserId();
-        if (userId is null)
-        {
-            throw new InvalidOperationException("Could not find userId");
-        }
-
-        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId);
-        if (user == null)
-        {
-            throw new InvalidOperationException("Could not find user");
-        }
-
-        AuthenticationScheme? authType = (await _backOfficeSignInManager.GetExternalAuthenticationSchemesAsync())
-            .FirstOrDefault(x => x.Name == unlinkLoginRequestModel.LoginProvider);
-
-        if (authType == null)
-        {
-            _logger.LogWarning("Could not find the supplied external authentication provider");
-        }
-        else
-        {
-            BackOfficeExternaLoginProviderScheme? opt = await _backOfficeExternalLoginProviders.GetAsync(authType.Name);
-            if (opt == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
-                    .WithTitle("Missing Authentication options")
-                    .WithDetail($"Could not find external authentication options registered for provider {authType.Name}")
-                    .Build());
-            }
-
-            if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
-            {
-                // If AllowManualLinking is disabled for this provider we cannot unlink
-                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
-                    .WithTitle("Unlinking disabled")
-                    .WithDetail($"Manual linking is disabled for provider {authType.Name}")
-                    .Build());
-            }
-        }
-
-        IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(
-            user,
+        Attempt<ExternalLoginOperationStatus> unlinkResult = await _externalLoginService.UnLinkLoginAsync(
+            User,
             unlinkLoginRequestModel.LoginProvider,
             unlinkLoginRequestModel.ProviderKey);
 
-        if (result.Succeeded)
+        if (unlinkResult.Success)
         {
-            await _backOfficeSignInManager.SignInAsync(user, true);
             return Ok();
         }
 
-        return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
-            .WithTitle("Unlinking failed")
-            .Build());
+        return OperationStatusResult(unlinkResult.Result, problemDetailsBuilder => unlinkResult.Result switch
+        {
+            ExternalLoginOperationStatus.UserNotFound => Unauthorized(problemDetailsBuilder
+                .WithTitle("User not found")
+                .Build()),
+            ExternalLoginOperationStatus.IdentityNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Missing identity")
+                .Build()),
+            ExternalLoginOperationStatus.AuthenticationSchemeNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Authentication scheme not found")
+                .WithDetail("Could not find the authentication scheme for the supplied provider")
+                .Build()),
+            ExternalLoginOperationStatus.AuthenticationOptionsNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Missing Authentication options")
+                .WithDetail("Could not find external authentication options for the supplied provider")
+                .Build()),
+            ExternalLoginOperationStatus.UnlinkingDisabled => BadRequest(problemDetailsBuilder
+                .WithTitle("Unlinking disabled")
+                .WithDetail("Manual linking is disabled for the supplied provider")
+                .Build()),
+            ExternalLoginOperationStatus.InvalidProviderKey => BadRequest(problemDetailsBuilder
+                .WithTitle("Unlinking failed")
+                .WithDetail("Could not match ProviderKey to the supplied provider")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown external login operation status."),
+        });
     }
 
     /// <summary>
@@ -408,4 +422,18 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
+
+    private RedirectResult CallbackErrorRedirectWithStatus( string flowType, string status, IEnumerable<IdentityError> identityErrors)
+    {
+        var redirectUrl = _securitySettings.Value.BackOfficeHost + "/" +
+                          _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+                              $"{RedirectFlowParameter}={flowType}",
+                              $"{RedirectStatusParameter}={status}");
+        foreach (IdentityError identityError in identityErrors)
+        {
+            redirectUrl.AppendQueryStringToUrl($"{RedirectErrorCodeParameter}={identityError.Code}");
+        }
+
+        return Redirect(redirectUrl);
+    }
 }

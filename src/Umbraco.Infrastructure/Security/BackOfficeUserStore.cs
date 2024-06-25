@@ -157,8 +157,9 @@ public class BackOfficeUserStore :
             throw new DataException("Could not create the user, check logs for details");
         }
 
-        // re-assign id
+        // re-assign id and key
         user.Id = UserIdToString(userEntity.Id);
+        user.Key = userEntity.Key;
 
         if (isLoginsPropertyDirty)
         {

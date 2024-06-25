@@ -620,6 +620,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.NotFound;
         }
 
+        if (CanDelete(item) is false)
+        {
+            return ContentTypeOperationStatus.NotAllowed;
+        }
+
         Delete(item, performingUserId);
 
         scope.Complete();
@@ -628,6 +633,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
     {
+        if (CanDelete(item) is false)
+        {
+            throw new InvalidOperationException("The item was not allowed to be deleted");
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -695,6 +705,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     public void Delete(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
     {
         TItem[] itemsA = items.ToArray();
+        if (itemsA.All(CanDelete) is false)
+        {
+            throw new InvalidOperationException("One or more items were not allowed to be deleted");
+        }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -749,6 +763,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     protected abstract void DeleteItemsOfTypes(IEnumerable<int> typeIds);
+
+    protected virtual bool CanDelete(TItem item) => true;
 
     #endregion
 
