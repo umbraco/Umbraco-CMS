@@ -74,7 +74,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.setDescription(event.target.value.toString() ?? '');
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MemberType">
 				<div id="header" slot="header">
@@ -105,7 +105,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

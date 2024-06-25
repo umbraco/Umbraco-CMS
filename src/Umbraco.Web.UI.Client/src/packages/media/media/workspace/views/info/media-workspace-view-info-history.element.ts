@@ -82,7 +82,7 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<uui-box>
 			<div id="rollback" slot="header">
 				<h2><umb-localize key="general_history">History</umb-localize></h2>
@@ -140,7 +140,7 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-loader-circle {

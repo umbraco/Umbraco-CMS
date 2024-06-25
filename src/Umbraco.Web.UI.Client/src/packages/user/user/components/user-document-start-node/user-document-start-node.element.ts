@@ -34,7 +34,7 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		if (this.uniques.length < 1) {
 			return html`
 				<uui-ref-node

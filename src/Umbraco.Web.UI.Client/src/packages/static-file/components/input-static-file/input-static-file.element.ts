@@ -65,11 +65,11 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 
 	@property()
 	// get value is handled by super class.
-	public set value(pathsString: string) {
+	public override set value(pathsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(pathsString);
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.selection.join(',');
 	}
 
@@ -104,7 +104,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		if (!this._items) return nothing;
 		return html`
 			<uui-ref-list>
@@ -151,7 +151,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

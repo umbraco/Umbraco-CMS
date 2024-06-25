@@ -98,7 +98,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<h1 class="uui-h2">
@@ -119,7 +119,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

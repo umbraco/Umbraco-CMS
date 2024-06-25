@@ -5,7 +5,7 @@ import type { MetaEntityActionFolderKind } from '@umbraco-cms/backoffice/extensi
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateFolderEntityAction extends UmbEntityActionBase<MetaEntityActionFolderKind> {
-	async execute() {
+	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_FOLDER_CREATE_MODAL, {
 			data: {

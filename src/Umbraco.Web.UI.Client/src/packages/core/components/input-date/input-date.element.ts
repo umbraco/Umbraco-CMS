@@ -42,7 +42,7 @@ export class UmbInputDateElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-input
 			id="datetime"
 			.label=${this.localize.term('placeholders_enterdate')}

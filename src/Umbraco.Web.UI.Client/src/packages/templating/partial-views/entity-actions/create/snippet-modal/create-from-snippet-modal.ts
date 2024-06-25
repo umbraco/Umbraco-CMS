@@ -24,7 +24,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 		}/snippet/${snippet.id}`;
 	}
 
-	protected async firstUpdated() {
+	protected override async firstUpdated() {
 		const { data } = await tryExecuteAndNotify(this, PartialViewService.getPartialViewSnippet({ take: 10000 }));
 
 		if (data) {
@@ -42,7 +42,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Partial View from snippet">
 				<uui-box>

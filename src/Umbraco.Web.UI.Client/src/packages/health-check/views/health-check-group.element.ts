@@ -58,7 +58,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		this._buttonState = 'success';
 	}
 
-	render() {
+	override render() {
 		return html` <a href="/section/settings/dashboard/health-check"> &larr; Back to overview </a>
 			${this._group ? this.#renderGroup() : nothing}`;
 	}
@@ -116,7 +116,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 									href="${result.readMoreLink}">
 									Read more
 									<uui-icon name="icon-out"></uui-icon>
-							  </uui-button>`
+								</uui-button>`
 							: nothing}
 					</div>`;
 				})}
@@ -152,7 +152,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		else return nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

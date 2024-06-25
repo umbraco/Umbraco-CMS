@@ -27,7 +27,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <uui-box id="access" headline=${this.localize.term('user_access')}>
 			<div slot="header" class="faded-text">
 				<umb-localize key="user_accessHelp"
@@ -57,7 +57,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 				[]}></umb-user-media-start-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#access {

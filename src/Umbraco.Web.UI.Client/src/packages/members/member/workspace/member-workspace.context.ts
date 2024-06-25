@@ -60,7 +60,6 @@ export class UmbMemberWorkspaceContext
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -128,7 +127,7 @@ export class UmbMemberWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
@@ -378,7 +377,7 @@ export class UmbMemberWorkspaceContext
 		return new UmbMemberPropertyDatasetContext(host, this, variantId);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#currentData.destroy();
 		super.destroy();
 		this.#persistedData.destroy();

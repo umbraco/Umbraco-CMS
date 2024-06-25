@@ -20,7 +20,7 @@ export class UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-input
 				type="number"

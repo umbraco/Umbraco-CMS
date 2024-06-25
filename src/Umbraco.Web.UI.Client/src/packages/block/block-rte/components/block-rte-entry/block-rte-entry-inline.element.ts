@@ -7,7 +7,7 @@ import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
  */
 @customElement('umb-rte-block-inline')
 export class UmbBlockRteEntryInlineElement extends UmbBlockRteEntryElement {
-	static styles = [
+	static override styles = [
 		...UmbBlockRteEntryElement.styles,
 		css`
 			:host {

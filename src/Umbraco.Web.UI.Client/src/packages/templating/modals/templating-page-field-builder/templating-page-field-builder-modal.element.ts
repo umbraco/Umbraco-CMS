@@ -45,7 +45,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 		this._field = (e.target as UmbTemplateFieldDropdownListElement).value?.alias;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box>
@@ -98,7 +98,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box > div {

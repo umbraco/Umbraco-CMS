@@ -89,13 +89,13 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return this._routes.length > 0
 			? html`<umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

@@ -12,14 +12,14 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  */
 @customElement('umb-footer-layout')
 export class UmbFooterLayoutElement extends LitElement {
-	render() {
+	override render() {
 		return html`
 			<slot></slot>
 			<slot id="actions" name="actions"></slot>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

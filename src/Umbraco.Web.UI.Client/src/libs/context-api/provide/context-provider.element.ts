@@ -46,7 +46,7 @@ export class UmbContextProviderElement extends UmbControllerHostElementMixin(HTM
 		this.shadowRoot?.appendChild(slot);
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		if (!this.key) {
 			throw new Error('The key property is required.');

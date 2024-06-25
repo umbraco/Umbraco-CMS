@@ -82,7 +82,6 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
@@ -115,7 +114,7 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
@@ -381,7 +380,7 @@ export class UmbDataTypeWorkspaceContext
 		await this.repository.delete(unique);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.#properties.destroy();

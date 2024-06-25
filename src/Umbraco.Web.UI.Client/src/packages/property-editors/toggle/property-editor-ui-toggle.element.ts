@@ -35,7 +35,7 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-toggle
 				.labelOn=${this._labelOn}

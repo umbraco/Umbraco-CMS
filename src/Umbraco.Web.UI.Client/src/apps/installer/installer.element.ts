@@ -21,7 +21,7 @@ export class UmbInstallerElement extends UmbLitElement {
 		this.provideContext(UMB_INSTALLER_CONTEXT, this._umbInstallerContext);
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this._observeCurrentStep();
 	}
@@ -53,7 +53,7 @@ export class UmbInstallerElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<umb-installer-layout data-test="installer">${this._renderSection()}</umb-installer-layout> `;
 	}
 }

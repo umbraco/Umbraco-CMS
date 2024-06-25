@@ -164,7 +164,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
@@ -176,7 +176,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbUserGroupCollectionTableViewElement;

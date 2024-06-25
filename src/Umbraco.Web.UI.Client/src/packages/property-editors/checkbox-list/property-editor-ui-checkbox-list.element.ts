@@ -47,7 +47,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-checkbox-list
 				.list=${this._list}

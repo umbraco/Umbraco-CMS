@@ -36,7 +36,7 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		const template = repeat(
 			this._columnsArray,
 			(index) => index,
@@ -60,7 +60,7 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 		return html`<div id="wrapper">${template}</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#wrapper {

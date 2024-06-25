@@ -156,7 +156,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	};
 
-	render() {
+	override render() {
 		let createPath: string | undefined;
 		if (this._blocks?.length === 1) {
 			const elementKey = this._blocks[0].contentElementTypeKey;
@@ -190,7 +190,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			</uui-button-group>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 
 		css`

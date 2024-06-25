@@ -16,7 +16,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	 * @return {*}
 	 * @memberof UmbUserDetailRepository
 	 */
-	async create(model: UmbUserDetailModel) {
+	override async create(model: UmbUserDetailModel) {
 		return super.create(model, null);
 	}
 

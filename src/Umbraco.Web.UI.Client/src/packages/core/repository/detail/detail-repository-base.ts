@@ -153,7 +153,7 @@ export abstract class UmbDetailRepositoryBase<
 		return this.#detailStore!.byUnique(unique);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#detailStore = undefined;
 		(this.detailDataSource as any) = undefined;
 		super.destroy();

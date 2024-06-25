@@ -21,7 +21,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
 
@@ -62,7 +62,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('buttons_publishDescendants')}>
 			<p id="subtitle">
 				${this._options.length === 1
@@ -103,7 +103,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		</umb-body-layout> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

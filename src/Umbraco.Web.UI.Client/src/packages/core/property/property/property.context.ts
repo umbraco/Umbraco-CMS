@@ -163,7 +163,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property. (Get it via the dataset) [NL]
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#alias.destroy();
 		this.#label.destroy();

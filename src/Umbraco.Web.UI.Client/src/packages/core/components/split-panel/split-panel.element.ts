@@ -61,12 +61,12 @@ export class UmbSplitPanelElement extends LitElement {
 
 	#hasInitialized = false;
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#disconnect();
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (!this.#hasInitialized) return;
@@ -222,7 +222,32 @@ export class UmbSplitPanelElement extends LitElement {
 		this.#connect();
 	}
 
-	render() {
+	#onKeydown(event: KeyboardEvent) {
+		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+			const { width } = this.mainElement.getBoundingClientRect();
+			const divider = this.dividerElement.getBoundingClientRect();
+
+			const dividerPos = divider.left - this.mainElement.getBoundingClientRect().left;
+			const percentageFromWidth = (dividerPos / width) * 100;
+
+			const multiplier = event.shiftKey ? 10 : 1;
+			const step = 1 * multiplier * (event.key === 'ArrowLeft' ? -1 : 1);
+
+			const newPercent = percentageFromWidth + step;
+			const toPixels = (newPercent / 100) * this.mainElement.getBoundingClientRect().width;
+
+			this.#setPosition(toPixels);
+		}
+
+		if (event.key === 'Home' || event.key === 'End') {
+			event.preventDefault();
+			const { width } = this.mainElement.getBoundingClientRect();
+			const newPos = event.key === 'Home' ? 0 : width;
+			this.#setPosition(newPos);
+		}
+	}
+
+	override render() {
 		return html`
 			<div id="main">
 				<slot
@@ -230,13 +255,13 @@ export class UmbSplitPanelElement extends LitElement {
 					@slotchange=${this.#onSlotChanged}
 					style="width: ${this._hasStartPanel ? '100%' : '0'}"></slot>
 				<div id="divider">
-					<div id="divider-touch-area" tabindex="0"></div>
+					<div id="divider-touch-area" tabindex="0" @keydown=${this.#onKeydown}></div>
 				</div>
 				<slot name="end" @slotchange=${this.#onSlotChanged} style="width: ${this._hasEndPanel ? '100%' : '0'}"></slot>
 			</div>
 		`;
 	}
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: contents;
 			--umb-split-panel-initial-position: 50%;

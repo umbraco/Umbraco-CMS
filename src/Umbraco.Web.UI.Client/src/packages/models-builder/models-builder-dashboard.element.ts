@@ -54,7 +54,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 		this._buttonStateReload = status ? 'success' : 'failed';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<div class="headline">
@@ -130,7 +130,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

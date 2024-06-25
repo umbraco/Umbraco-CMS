@@ -79,7 +79,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box> ${this.#renderItems()} </uui-box>
@@ -135,7 +135,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#main uui-button:not(:last-of-type) {

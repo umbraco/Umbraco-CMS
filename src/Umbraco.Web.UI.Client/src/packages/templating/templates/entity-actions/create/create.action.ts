@@ -7,7 +7,7 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const url = `section/settings/workspace/template/create/parent/${this.args.entityType}/${
 			this.args.unique || 'null'
 		}`;

@@ -85,7 +85,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		this._activeTabId = tabId;
 	}
 
-	render() {
+	override render() {
 		if (!this._tabs) return;
 		return html`
 			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
@@ -128,7 +128,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

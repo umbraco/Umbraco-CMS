@@ -38,7 +38,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 	}
 
 	// TODO: Implement mandatory?
-	render() {
+	override render() {
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}
@@ -51,7 +51,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridLayoutStylesheetElement;

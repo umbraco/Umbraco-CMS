@@ -20,12 +20,12 @@ import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registr
 import { UmbLitElement } from '../src/packages/core/lit-element';
 import { umbLocalizationRegistry } from '../src/packages/core/localization';
 import customElementManifests from '../dist-cms/custom-elements.json';
-import icons from '../src/packages/core/icon-registry/icons/icons';
+import icons from '../src/packages/core/icon-registry/icons';
 
 import '../src/libs/context-api/provide/context-provider.element';
 import '../src/packages/core/components';
 
-import { manifests as documentManifests } from '../src/packages/documents';
+import { manifests as documentManifests } from '../src/packages/documents/manifests';
 import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
 import { UmbNotificationContext } from '../src/packages/core/notification';
 

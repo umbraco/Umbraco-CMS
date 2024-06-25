@@ -44,7 +44,7 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return this.workspaceAlias
 			? html`
 					<umb-workspace-editor
@@ -55,7 +55,7 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

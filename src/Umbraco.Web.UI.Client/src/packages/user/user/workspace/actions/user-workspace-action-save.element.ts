@@ -33,7 +33,7 @@ export class UmbUserWorkspaceActionSaveElement extends UmbLitElement {
 			});
 	}
 
-	render() {
+	override render() {
 		return html`<uui-button
 			@click=${this._handleSave}
 			look="primary"

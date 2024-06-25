@@ -410,7 +410,7 @@ export abstract class UmbTreeItemContextBase<
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,

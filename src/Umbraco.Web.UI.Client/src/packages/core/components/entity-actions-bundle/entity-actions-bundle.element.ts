@@ -42,7 +42,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		});
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
 			this.#entityContext.setEntityType(this.entityType);
 			this.#entityContext.setUnique(this.unique);
@@ -89,7 +89,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		await this._firstActionApi?.execute();
 	}
 
-	render() {
+	override render() {
 		if (this._numberOfActions === 0) return nothing;
 		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
 	}

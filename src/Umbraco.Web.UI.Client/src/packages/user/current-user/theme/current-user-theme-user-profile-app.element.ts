@@ -45,7 +45,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 		this.#themeContext.setThemeByAlias(theme);
 	}
 
-	render() {
+	override render() {
 		if (!this._themes.length) return nothing;
 		return html`
 			<uui-box headline="Theme">
@@ -55,7 +55,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-select {
 				width: 100%;

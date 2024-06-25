@@ -39,7 +39,7 @@ export class UmbContentTypeMoveRootGroupsIntoFirstTabHelper<T extends UmbContent
 		);
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 		this.#structure = undefined;
 		this.#tabContainers = undefined;

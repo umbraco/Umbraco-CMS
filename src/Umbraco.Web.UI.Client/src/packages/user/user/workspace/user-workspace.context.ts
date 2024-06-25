@@ -34,8 +34,6 @@ export class UmbUserWorkspaceContext
 	#calculatedStartNodes = new UmbObjectState<UmbUserStartNodesModel | undefined>(undefined);
 	readonly calculatedStartNodes = this.#calculatedStartNodes.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
 
@@ -130,7 +128,7 @@ export class UmbUserWorkspaceContext
 		return this.avatarRepository.deleteAvatar(unique);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.detailRepository.destroy();

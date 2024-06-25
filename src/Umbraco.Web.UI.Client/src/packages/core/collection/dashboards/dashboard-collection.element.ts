@@ -7,11 +7,11 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 	public manifest!: ManifestDashboardCollection;
 
 	// TODO: figure out what collection to render
-	render() {
+	override render() {
 		return html`<umb-collection></umb-collection>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

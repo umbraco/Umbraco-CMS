@@ -6,7 +6,7 @@ import './user-group-collection-header.element.js';
 const elementName = 'umb-user-group-collection';
 @customElement(elementName)
 export class UmbUserGroupCollectionElement extends UmbCollectionDefaultElement {
-	protected renderToolbar() {
+	protected override renderToolbar() {
 		return html`<umb-user-group-collection-header slot="header"></umb-user-group-collection-header> `;
 	}
 }

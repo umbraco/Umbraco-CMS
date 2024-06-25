@@ -51,7 +51,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		});
 	}
 
-	protected async firstUpdated() {
+	protected override async firstUpdated() {
 		await this.#load();
 		this._loading = false;
 	}
@@ -81,7 +81,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		this._qrCodeSetupImageUrl = data.qrCodeSetupImageUrl;
 	}
 
-	render() {
+	override render() {
 		if (this._loading) {
 			return html`<uui-loader-bar></uui-loader-bar>`;
 		}
@@ -199,7 +199,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#authForm {
