@@ -1,6 +1,6 @@
-import type { UmbDataTypeDetailModel } from '../types.js';
 import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbDataTypeDetailModel } from '../types.js';
 
 export const UMB_DATATYPE_WORKSPACE_MODAL = new UmbModalToken<
 	UmbWorkspaceModalData<UmbDataTypeDetailModel>,

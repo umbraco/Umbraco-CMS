@@ -1,6 +1,6 @@
-import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
 
 export const manifests: Array<ManifestTypes> = [
 	{
@@ -73,8 +73,6 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
-		],
-		TODO_conditions: [
 			{
 				alias: 'Umb.Condition.BlockWorkspaceHasSettings',
 			},
