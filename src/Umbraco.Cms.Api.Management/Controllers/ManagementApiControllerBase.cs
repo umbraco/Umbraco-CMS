@@ -41,7 +41,9 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 
         Type controllerType = typeof(T);
         var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
-        var apiVersion = controllerType.GetMethod(actionName)?.GetMapToApiVersionAttributeValue();
+        var apiVersion = controllerType.GetMethod(actionName)?.GetMapToApiVersionAttributeValue()
+                         ?? HttpContext.ApiVersioningFeature().RequestedApiVersion?.ToString();
+
         return apiVersion?.Split(".").FirstOrDefault();
     }
 
