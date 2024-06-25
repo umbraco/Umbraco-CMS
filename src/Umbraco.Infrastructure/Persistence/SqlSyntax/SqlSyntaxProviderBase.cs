@@ -303,7 +303,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             sb.Append(Format(column) + ",\n");
         }
 
-        return sb.ToString().TrimEndOfString(",\n");
+        return sb.ToString().TrimEndExact(",\n");
     }
 
     public virtual string Format(ColumnDefinition column) =>

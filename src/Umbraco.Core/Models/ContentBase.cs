@@ -578,19 +578,19 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         // Special check here since we want to check if the request is for changed cultures
         if (propertyName.StartsWith(ChangeTrackingPrefix.AddedCulture))
         {
-            var culture = propertyName.TrimStartOfString(ChangeTrackingPrefix.AddedCulture);
+            var culture = propertyName.TrimStartExact(ChangeTrackingPrefix.AddedCulture);
             return _currentCultureChanges.addedCultures?.Contains(culture) ?? false;
         }
 
         if (propertyName.StartsWith(ChangeTrackingPrefix.RemovedCulture))
         {
-            var culture = propertyName.TrimStartOfString(ChangeTrackingPrefix.RemovedCulture);
+            var culture = propertyName.TrimStartExact(ChangeTrackingPrefix.RemovedCulture);
             return _currentCultureChanges.removedCultures?.Contains(culture) ?? false;
         }
 
         if (propertyName.StartsWith(ChangeTrackingPrefix.UpdatedCulture))
         {
-            var culture = propertyName.TrimStartOfString(ChangeTrackingPrefix.UpdatedCulture);
+            var culture = propertyName.TrimStartExact(ChangeTrackingPrefix.UpdatedCulture);
             return _currentCultureChanges.updatedCultures?.Contains(culture) ?? false;
         }
 
@@ -609,19 +609,19 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         // Special check here since we want to check if the request is for changed cultures
         if (propertyName.StartsWith(ChangeTrackingPrefix.AddedCulture))
         {
-            var culture = propertyName.TrimStartOfString(ChangeTrackingPrefix.AddedCulture);
+            var culture = propertyName.TrimStartExact(ChangeTrackingPrefix.AddedCulture);
             return _previousCultureChanges.addedCultures?.Contains(culture) ?? false;
         }
 
         if (propertyName.StartsWith(ChangeTrackingPrefix.RemovedCulture))
         {
-            var culture = propertyName.TrimStartOfString(ChangeTrackingPrefix.RemovedCulture);
+            var culture = propertyName.TrimStartExact(ChangeTrackingPrefix.RemovedCulture);
             return _previousCultureChanges.removedCultures?.Contains(culture) ?? false;
         }
 
         if (propertyName.StartsWith(ChangeTrackingPrefix.UpdatedCulture))
         {
-            var culture = propertyName.TrimStartOfString(ChangeTrackingPrefix.UpdatedCulture);
+            var culture = propertyName.TrimStartExact(ChangeTrackingPrefix.UpdatedCulture);
             return _previousCultureChanges.updatedCultures?.Contains(culture) ?? false;
         }
 

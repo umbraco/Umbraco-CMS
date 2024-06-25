@@ -97,7 +97,7 @@ public class FilePermissionHelper : IFilePermissionHelper
                 temp = new List<string>();
             }
 
-            temp.Add(dir.TrimStartOfString(_basePath));
+            temp.Add(dir.TrimStartExact(_basePath));
             success = false;
         }
 
@@ -122,7 +122,7 @@ public class FilePermissionHelper : IFilePermissionHelper
                 temp = new List<string>();
             }
 
-            temp.Add(file.TrimStartOfString(_basePath));
+            temp.Add(file.TrimStartExact(_basePath));
             success = false;
         }
 
