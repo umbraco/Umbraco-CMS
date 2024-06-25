@@ -7,7 +7,7 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 		this.currentCrop = undefined;
 	}
 
-	renderActions() {
+	override renderActions() {
 		return html`
 			<slot name="actions"></slot>
 			${when(
@@ -25,7 +25,7 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 		`;
 	}
 
-	renderSide() {
+	override renderSide() {
 		if (!this.value || !this.crops) return;
 
 		return html` <uui-menu-item
@@ -47,7 +47,7 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 			)}`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: flex;
 			width: 100%;
