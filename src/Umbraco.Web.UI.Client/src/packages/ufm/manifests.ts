@@ -7,7 +7,7 @@ export const manifests: Array<ManifestUfmComponent> = [
 		name: 'Label Value Markdown Component',
 		api: () => import('./ufm-components/label-value.component.js'),
 		meta: {
-			marker: '=?',
+			marker: '=',
 		},
 	},
 	{
