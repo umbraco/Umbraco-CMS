@@ -60,7 +60,6 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	public invalid?: boolean;
 
 	override render() {
-		const ufmValue = { alias: this.alias, label: this.label, description: this.description };
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
@@ -69,9 +68,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
 				</uui-label>
 				<slot name="action-menu"></slot>
-				<uui-scroll-container id="description">
-					<umb-ufm-render .markdown=${this.description} .value=${ufmValue}></umb-ufm-render>
-				</uui-scroll-container>
+				${this.#renderDescription()}
 				<slot name="description"></slot>
 			</div>
 			<div id="editorColumn">
@@ -80,6 +77,12 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				</uui-form-validation-message>
 			</div>
 		`;
+	}
+
+	#renderDescription() {
+		if (!this.description) return;
+		const ufmValue = { alias: this.alias, label: this.label, description: this.description };
+		return html`<umb-ufm-render .markdown=${this.description} .value=${ufmValue}></umb-ufm-render>`;
 	}
 
 	static override styles = [
