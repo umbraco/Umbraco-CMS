@@ -105,7 +105,6 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -164,7 +163,6 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-              includePreviewVersions: true
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
@@ -282,7 +280,6 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -324,7 +321,6 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-              includePreviewVersions: true
 
           # Test
           - task: DotNetCoreCLI@2
@@ -373,7 +369,6 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-              includePreviewVersions: true
 
           # Start SQL Server
           - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
@@ -467,7 +462,6 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-              includePreviewVersions: true
 
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
@@ -603,7 +597,6 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-              includePreviewVersions: true
 
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
