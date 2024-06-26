@@ -8567,6 +8567,29 @@ providerName
 	}
 
 	/**
+	 * @returns unknown OK
+	 * @throws ApiError
+	 */
+	public static getUserByIdCalculateStartNodes(data: UserData['payloads']['GetUserByIdCalculateStartNodes']): CancelablePromise<UserData['responses']['GetUserByIdCalculateStartNodes']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/user/{id}/calculate-start-nodes',
+			path: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
 	 * @returns string OK
 	 * @throws ApiError
 	 */
