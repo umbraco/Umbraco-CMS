@@ -1,14 +1,15 @@
+import type { UmbUfmRenderElement } from '../../../ufm/components/ufm-render/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
-	html,
-	LitElement,
-	ifDefined,
-	when,
 	customElement,
+	html,
+	ifDefined,
 	property,
-	state,
 	repeat,
+	state,
+	when,
+	LitElement,
 } from '@umbraco-cms/backoffice/external/lit';
 
 // TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
@@ -31,6 +32,7 @@ export interface UmbTableColumn {
 	width?: string;
 	allowSorting?: boolean;
 	align?: 'left' | 'center' | 'right';
+	labelTemplate?: string;
 }
 
 export interface UmbTableColumnLayoutElement extends HTMLElement {
@@ -259,6 +261,15 @@ export class UmbTableElement extends LitElement {
 			const element = document.createElement(column.elementName) as UmbTableColumnLayoutElement;
 			element.column = column;
 			element.item = item;
+			element.value = value;
+			return element;
+		}
+
+		if (column.labelTemplate) {
+			import('@umbraco-cms/backoffice/ufm');
+			const element = document.createElement('umb-ufm-render') as UmbUfmRenderElement;
+			element.inline = true;
+			element.markdown = column.labelTemplate;
 			element.value = value;
 			return element;
 		}
