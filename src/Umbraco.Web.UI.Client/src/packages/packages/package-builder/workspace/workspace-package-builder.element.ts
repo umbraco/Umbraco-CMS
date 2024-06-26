@@ -2,7 +2,7 @@ import { UmbDictionaryPickerContext } from '../../../dictionary/components/input
 import { UmbPackageRepository } from '../../package/repository/index.js';
 import { UmbPartialViewPickerContext } from '../../../templating/partial-views/components/input-partial-view/input-partial-view.context.js';
 import { UmbScriptPickerContext } from '../../../templating/scripts/components/input-script/input-script.context.js';
-import { UmbStylesheetPickerContext } from '../../../templating/stylesheets/components/stylesheet-input/stylesheet-input.context.js';
+import { UmbStylesheetPickerContext } from '../../../templating/stylesheets/global-components/stylesheet-input/stylesheet-input.context.js';
 import { UmbTemplatePickerContext } from '../../../templating/templates/global-components/input-template/input-template.context.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
 import type { UmbDataTypeInputElement } from '../../../data-type/components/data-type-input/data-type-input.element.js';

@@ -1,5 +1,5 @@
 import type { UmbStylesheetRule } from '../../../types.js';
-import type { UmbStylesheetRuleInputElement } from '../../../components/index.js';
+import type { UmbStylesheetRuleInputElement } from '../../../global-components/index.js';
 import { UmbStylesheetRuleManager } from '../../../utils/index.js';
 import { UMB_STYLESHEET_WORKSPACE_CONTEXT } from '../../stylesheet-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
