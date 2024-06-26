@@ -197,8 +197,16 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 		this._routes.push(...routes);
 
 		if (navigate === undefined) {
-			// If navigate is not determined, then we will check if we have a route match. If not then we will re-render.
+			// If navigate is not determined, then we will check if we have a route match. If not then we will re-render. [NL]
 			navigate = this._routeMatch === null;
+			if (navigate === false) {
+				const newMatch = this.getRouteMatch();
+				console.log("new match...", newMatch)
+				// Check if match is still present? [NL]
+				// Check if there is a better/different match? [NL]
+				// Maybe both are handled in this approach? [NL]
+				navigate = this._routeMatch !== newMatch;
+			}
 		}
 
 		// Navigate fallback:
@@ -206,6 +214,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 		// Register that the path has changed so the correct route can be loaded.
 		if (navigate) {
+			console.log("navigate...")
 			this.render();
 		}
 	}
@@ -232,11 +241,19 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 		// Either choose the parent fragment or the current path if no parent exists.
 		// The root router slot will always use the entire path.
-		const pathFragment =
-			this.parent != null && this.parent.fragments != null ? this.parent.fragments.rest : pathWithoutBasePath();
+		const pathFragment = this.getPathFragment();
 
 		// Route to the path
 		await this.renderPath(pathFragment);
+	}
+
+	protected getPathFragment() {
+		return this.parent != null && this.parent.fragments != null ? this.parent.fragments.rest : pathWithoutBasePath();
+	}
+
+	protected getRouteMatch() {
+		// Find the corresponding route.
+		return matchRoutes(this._routes, this.getPathFragment());
 	}
 
 	/**
@@ -296,6 +313,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	 * Returns true if a navigation was made to a new page.
 	 */
 	protected async renderPath(path: string | PathFragment): Promise<boolean> {
+
+		// Notice: Since this is never called from any other place than one higher in this file(when writing this...), we could just retrieve the path and find a match by using this.getRouteMatch() [NL]
 		// Find the corresponding route.
 		const match = matchRoutes(this._routes, path);
 

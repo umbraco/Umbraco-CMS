@@ -28,7 +28,8 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		value ??= [];
 		const oldValue = this.#router.routes;
 		if (
-			value.filter((route) => (oldValue ? oldValue.findIndex((r) => r.path === route.path) === -1 : true)).length > 0
+			value.length !== oldValue?.length ||
+			value.filter((route) => (oldValue?.findIndex((r) => r.path === route.path) === -1)).length > 0
 		) {
 			this.#router.routes = value;
 		}
