@@ -148,7 +148,7 @@ stages:
             inputs:
               command: pack
               projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore --no-build --output $(Build.ArtifactStagingDirectory)/nupkg'
+              arguments: '--configuration $(buildConfiguration) --no-restore --no-build -p:BuildProjectReferences=false --output $(Build.ArtifactStagingDirectory)/nupkg'
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
