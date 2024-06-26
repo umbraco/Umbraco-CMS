@@ -134,13 +134,8 @@ stages:
                     echo $a.symbols.UmbracoVersion.defaultValue
                   }
                 }
-          - task: DotNetCoreCLI@2
-            name: pack
-            displayName: Run dotnet pack
-            inputs:
-              command: pack
-              projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore --no-build -p:BuildProjectReferences=false --output $(Build.ArtifactStagingDirectory)/nupkg'
+
+                dotnet pack $(solution) --configuration $(buildConfiguration) -p:BuildProjectReferences=false --output $(Build.ArtifactStagingDirectory)/nupkg
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
