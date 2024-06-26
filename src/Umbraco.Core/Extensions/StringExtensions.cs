@@ -287,7 +287,7 @@ public static class StringExtensions
     /// <param name="value">The value.</param>
     /// <param name="forRemoving">For removing.</param>
     /// <returns></returns>
-    public static string Trim(this string value, string forRemoving)
+    public static string TrimExact(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
