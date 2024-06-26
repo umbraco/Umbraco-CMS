@@ -23,7 +23,7 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-markdown')
 export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, '') {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this._codeEditor;
 	}
 

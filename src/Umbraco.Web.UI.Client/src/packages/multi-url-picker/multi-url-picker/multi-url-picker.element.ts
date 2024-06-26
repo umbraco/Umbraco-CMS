@@ -37,7 +37,7 @@ export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement,
 		},
 	});
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

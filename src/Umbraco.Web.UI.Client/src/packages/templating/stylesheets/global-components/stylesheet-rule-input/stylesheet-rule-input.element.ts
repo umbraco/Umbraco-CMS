@@ -24,7 +24,7 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 	@property({ type: Array, attribute: false })
 	rules: UmbStylesheetRule[] = [];
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

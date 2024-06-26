@@ -108,7 +108,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 			});
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

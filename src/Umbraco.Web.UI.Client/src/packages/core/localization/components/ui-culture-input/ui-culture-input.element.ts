@@ -55,7 +55,7 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 			}));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this._selectElement;
 	}
 

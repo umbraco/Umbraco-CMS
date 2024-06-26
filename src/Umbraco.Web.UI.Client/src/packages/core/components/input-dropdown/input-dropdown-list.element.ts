@@ -19,7 +19,7 @@ export class UmbInputDropdownListElement extends UUIFormControlMixin(UmbLitEleme
 	@query('uui-select')
 	private selectEle!: HTMLInputElement;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this.selectEle;
 	}
 

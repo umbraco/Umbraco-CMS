@@ -3,11 +3,13 @@ import { UmbStaticFilePickerContext } from './input-static-file.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-static-file')
-export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputStaticFileElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	#serializer = new UmbServerFilePathUniqueSerializer();
 
 	/**
@@ -63,14 +65,12 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
-	// get value is handled by super class.
-	public override set value(pathsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selection = splitStringToArray(pathsString);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public override get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@property()
@@ -100,7 +100,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

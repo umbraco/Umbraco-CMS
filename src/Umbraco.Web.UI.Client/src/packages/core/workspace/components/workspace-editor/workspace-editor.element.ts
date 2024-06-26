@@ -56,10 +56,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		this._routes = [];
+		let newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			this._routes = this._workspaceViews.map((manifest) => {
+			newRoutes = this._workspaceViews.map((manifest) => {
 				return {
 					path: `view/${manifest.meta.pathname}`,
 					component: () => createExtensionElement(manifest),
@@ -72,14 +72,17 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			});
 
 			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
-			const firstView = this._workspaceViews[0];
-			if (firstView) {
-				this._routes.push({
+			// TODO: This is problematic, cause if a workspaceView appears later, then this takes over. And it is also a problem if it does not use redirect, but just a view defined with and empty path.
+			const firstRoute = newRoutes[0];
+			if (firstRoute) {
+				newRoutes.push({
 					path: ``,
-					redirectTo: `view/${firstView.meta.pathname}`,
+					redirectTo: firstRoute.path,
 				});
 			}
 		}
+
+		this._routes = newRoutes;
 	}
 
 	override render() {

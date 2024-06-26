@@ -6,7 +6,7 @@ import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external
 
 @customElement('umb-input-eye-dropper')
 export class UmbInputEyeDropperElement extends UUIFormControlMixin(UmbLitElement, '') {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

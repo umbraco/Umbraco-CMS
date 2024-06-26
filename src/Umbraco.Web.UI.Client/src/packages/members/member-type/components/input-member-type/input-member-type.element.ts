@@ -1,12 +1,14 @@
 import { UmbMemberTypePickerContext } from './input-member-type.context.js';
 import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-member-type')
-export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -60,13 +62,12 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
-	public override set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection. [NL]
-		this.selection = splitStringToArray(idsString);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public override get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@state()
@@ -93,7 +94,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
