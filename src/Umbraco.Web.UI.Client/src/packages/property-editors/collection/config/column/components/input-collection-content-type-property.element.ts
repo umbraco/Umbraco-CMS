@@ -196,7 +196,7 @@ export class UmbInputCollectionContentTypePropertyElement extends UUIFormControl
 
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

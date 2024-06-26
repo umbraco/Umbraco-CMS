@@ -171,7 +171,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

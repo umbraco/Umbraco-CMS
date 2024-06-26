@@ -20,7 +20,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	private _allowedContentTypeIDs?: Array<string>;
 
 	@state()
-	private _collection?: string | null;
+	private _collection?: string;
 
 	constructor() {
 		super();
@@ -82,10 +82,8 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-media-type
 							.selection=${this._allowedContentTypeIDs ?? []}
-							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
-									e.target as UmbInputMediaTypeElement
-								).selection.map((id, index) => ({
+							@change="${(e: CustomEvent & { target: UmbInputMediaTypeElement }) => {
+								const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map((id, index) => ({
 									contentType: { unique: id },
 									sortOrder: index,
 								}));
@@ -101,7 +99,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 					<div slot="editor">
 						<umb-input-collection-configuration
 							default-value="3a0156c4-3b8c-4803-bdc1-6871faa83fff"
-							.value=${this._collection ?? ''}
+							.value=${this._collection}
 							@change=${(e: CustomEvent) => {
 								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });

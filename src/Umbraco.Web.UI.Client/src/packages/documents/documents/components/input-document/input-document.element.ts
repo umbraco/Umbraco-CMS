@@ -6,12 +6,14 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-document')
-export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -91,12 +93,12 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
-	@property()
-	public override set value(idsString: string) {
-		this.selection = splitStringToArray(idsString);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public override get value() {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@state()
@@ -135,7 +137,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

@@ -100,7 +100,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 		);
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this;
 	}
 

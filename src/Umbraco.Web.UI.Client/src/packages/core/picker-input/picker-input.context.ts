@@ -8,7 +8,7 @@ import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@um
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
-	PickedItemType extends PickerItemBaseType,
+	PickedItemType extends PickerItemBaseType = PickerItemBaseType,
 	PickerItemType extends PickerItemBaseType = PickedItemType,
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,

@@ -94,7 +94,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 

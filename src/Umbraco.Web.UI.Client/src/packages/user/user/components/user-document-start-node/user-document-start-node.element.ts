@@ -5,8 +5,18 @@ import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-user-document-start-node')
 export class UmbUserDocumentStartNodeElement extends UmbLitElement {
+	#uniques: Array<string> = [];
 	@property({ type: Array, attribute: false })
-	uniques: Array<string> = [];
+	public get uniques(): Array<string> {
+		return this.#uniques;
+	}
+	public set uniques(value: Array<string>) {
+		this.#uniques = value;
+
+		if (this.#uniques.length > 0) {
+			this.#observeItems();
+		}
+	}
 
 	@property({ type: Boolean })
 	readonly = false;
@@ -16,10 +26,12 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 
 	#itemRepository = new UmbDocumentItemRepository(this);
 
-	protected override async firstUpdated(): Promise<void> {
-		if (this.uniques.length === 0) return;
-		const { data } = await this.#itemRepository.requestItems(this.uniques);
-		this._displayValue = data || [];
+	async #observeItems() {
+		const { asObservable } = await this.#itemRepository.requestItems(this.#uniques);
+
+		this.observe(asObservable(), (data) => {
+			this._displayValue = data || [];
+		});
 	}
 
 	override render() {
