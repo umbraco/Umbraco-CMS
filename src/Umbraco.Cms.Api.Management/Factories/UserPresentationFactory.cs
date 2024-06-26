@@ -212,6 +212,23 @@ public class UserPresentationFactory : IUserPresentationFactory
         });
     }
 
+    public async Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user)
+    {
+        var mediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
+        var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
+
+        return await Task.FromResult(new CalculatedUserStartNodesResponseModel()
+        {
+            Id = user.Key,
+            MediaStartNodeIds = mediaStartNodeKeys,
+            HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
+            DocumentStartNodeIds = documentStartNodeKeys,
+            HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
+        });
+    }
+
     private ISet<ReferenceByIdModel> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {
         IEnumerable<ReferenceByIdModel>? models = ids?
