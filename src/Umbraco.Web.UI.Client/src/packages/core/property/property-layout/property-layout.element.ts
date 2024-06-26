@@ -82,7 +82,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	#renderDescription() {
 		if (!this.description) return;
 		const ufmValue = { alias: this.alias, label: this.label, description: this.description };
-		return html`<umb-ufm-render .markdown=${this.description} .value=${ufmValue}></umb-ufm-render>`;
+		return html`<umb-ufm-render id="description" .markdown=${this.description} .value=${ufmValue}></umb-ufm-render>`;
 	}
 
 	static override styles = [
@@ -129,6 +129,10 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			}
 			uui-badge {
 				right: -30px;
+			}
+
+			#description {
+				color: var(--uui-color-text-alt);
 			}
 
 			#editorColumn {

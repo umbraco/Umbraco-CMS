@@ -94,10 +94,6 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host {
-				color: var(--uui-color-text-alt);
-			}
-
 			* {
 				max-width: 100%;
 			}
