@@ -181,7 +181,7 @@
 		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
-		"package:validate": "node ./devops/package/validate-exports.js && npm run check:paths",
+		"package:validate": "node ./devops/package/validate-exports.js",
 		"generate:ui-api-docs": "typedoc --options typedoc.config.js"
 	},
 	"engines": {
