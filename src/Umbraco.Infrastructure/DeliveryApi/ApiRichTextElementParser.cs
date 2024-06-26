@@ -132,9 +132,15 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             return;
         }
 
+        if (attributes["type"] is not string type)
+        {
+            type = "unknown";
+        }
+
         ReplaceLocalLinks(
             publishedSnapshot,
             href,
+            type,
             route =>
             {
                 attributes["route"] = route;
