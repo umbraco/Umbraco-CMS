@@ -1,10 +1,10 @@
-import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../index.js';
-import { UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '../../modals/index.js';
+import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
 
 // Note: Does only support picking a single data type. But this could be developed later into this same component. To follow other picker input components.
 /**
