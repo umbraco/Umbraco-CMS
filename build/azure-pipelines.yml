@@ -130,18 +130,18 @@ stages:
           - task: PowerShell@2
             displayName: Prepare nupkg
             inputs:
-            targetType: inline
-            script: |
-              $umbracoVersion = "$(Build.BuildNumber)" -replace "\+",".g"
-              $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
+              targetType: inline
+              script: |
+                $umbracoVersion = "$(Build.BuildNumber)" -replace "\+",".g"
+                $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
 
-              foreach ($templatePath in $templatePaths) {
-                $a = Get-Content $templatePath -Raw | ConvertFrom-Json
-                if ($a.symbols -and $a.symbols.UmbracoVersion) {
-                  $a.symbols.UmbracoVersion.defaultValue = $umbracoVersion
-                  $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
+                foreach ($templatePath in $templatePaths) {
+                  $a = Get-Content $templatePath -Raw | ConvertFrom-Json
+                  if ($a.symbols -and $a.symbols.UmbracoVersion) {
+                    $a.symbols.UmbracoVersion.defaultValue = $umbracoVersion
+                    $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
+                  }
                 }
-              }
           - task: DotNetCoreCLI@2
             name: pack
             displayName: Run dotnet pack
