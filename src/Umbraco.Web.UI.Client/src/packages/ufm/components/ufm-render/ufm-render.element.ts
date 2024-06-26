@@ -82,7 +82,6 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	}
 
 	override render() {
-		console.log("re-render?", this)
 		return until(this.#renderMarkdown());
 	}
 
