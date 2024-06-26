@@ -51,7 +51,6 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	@property()
 	markdown?: string;
 
-	@property({ attribute: false })
 	public set value(value: string | unknown | undefined) {
 		this.#context.setValue(value);
 	}
@@ -83,6 +82,7 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	}
 
 	override render() {
+		console.log("re-render?", this)
 		return until(this.#renderMarkdown());
 	}
 
