@@ -51,6 +51,7 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	@property()
 	markdown?: string;
 
+	// No reactive property declaration cause its causing a re-render that is not needed. This just works as a shortcut to set the values on the context. [NL]
 	public set value(value: string | unknown | undefined) {
 		this.#context.setValue(value);
 	}
