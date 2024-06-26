@@ -1,11 +1,11 @@
-import type { UmbStylesheetRule } from '../../types.js';
-import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-modal.token.js';
 import { css, html, customElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbStylesheetRule } from '../../types.js';
+import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-modal.token.js';
 
 @customElement('umb-stylesheet-rule-input')
 export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitElement, '') {
