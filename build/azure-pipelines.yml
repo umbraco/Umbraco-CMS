@@ -135,7 +135,7 @@ stages:
                   }
                 }
 
-                dotnet pack $(solution) --configuration $(buildConfiguration) -p:BuildProjectReferences=false --output $(Build.ArtifactStagingDirectory)/nupkg
+                dotnet pack $(solution) --configuration $(buildConfiguration) -p:BuildProjectReferences=false --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
