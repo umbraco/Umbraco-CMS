@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Twitter the popular online service for microblogging and social networking.
 /// </summary>
+[Obsolete("Please use the X instead, scheduled for removal in v16")]
 public class Twitter : OEmbedProviderBase
 {
     public Twitter(IJsonSerializer jsonSerializer)
@@ -14,7 +15,7 @@ public class Twitter : OEmbedProviderBase
 
     public override string ApiEndpoint => "http://publish.twitter.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"(?:https?:\/\/)(?:www\.)?(twitter|x)\.com\/.*\/status\/.*" };
+    public override string[] UrlSchemeRegex => new[] { @"twitter.com/.*/status/.*" };
 
     public override Dictionary<string, string> RequestParams => new();
 
