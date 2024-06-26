@@ -149,7 +149,7 @@
 		"build:workspaces": "npm run build -ws --if-present",
 		"build": "tsc --project ./src/tsconfig.build.json && rollup -c ./src/rollup.config.js",
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
-		"check:paths": "node ./devops/build/check-path-length.js dist-cms 140",
+		"check:paths": "node ./devops/build/check-path-length.js dist-cms 120",
 		"compile": "tsc",
 		"dev": "vite",
 		"dev:server": "VITE_UMBRACO_USE_MSW=off vite",
