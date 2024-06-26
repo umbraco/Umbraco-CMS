@@ -1,5 +1,5 @@
 import { UMB_TEMPLATING_SECTION_PICKER_MODAL } from '../../modals/templating-section-picker/templating-section-picker-modal.token.js';
-import type { UmbTemplatingInsertMenuElement } from '../../components/templating-item-menu/templating-item-menu.element.js';
+import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/insert-menu.element.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.js';
 import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context-token.js';
