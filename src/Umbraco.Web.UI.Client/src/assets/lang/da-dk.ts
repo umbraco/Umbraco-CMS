@@ -1587,7 +1587,7 @@ export default {
 		requiredLabel: 'Påkrævet label',
 		enableListViewHeading: 'Aktivér listevisning',
 		enableListViewDescription:
-			'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste;\n      undersider vil ikke blive vist i træet\n    ',
+			'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste.',
 		allowedTemplatesHeading: 'Tilladte skabeloner',
 		allowedTemplatesDescription: 'Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.',
 		allowAtRootHeading: 'Tillad på rodniveau',
@@ -1682,7 +1682,7 @@ export default {
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Samlinger',
 		collectionsDescription:
-			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer, underordnede elementer vil ikke blive vist i træet.',
+			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer.',
 		structure: 'Struktur',
 		presentation: 'Præsentation',
 	},
