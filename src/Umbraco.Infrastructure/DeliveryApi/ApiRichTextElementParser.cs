@@ -132,7 +132,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             return;
         }
 
-        if (attributes["type"] is not string type)
+        if (attributes.ContainsKey("type") is false || attributes["type"] is not string type)
         {
             type = "unknown";
         }
