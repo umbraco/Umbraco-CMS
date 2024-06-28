@@ -46,6 +46,11 @@ ensureAnchorHistory();
  */
 export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouterSlot<D, P> {
 	/**
+	 * Method to cancel navigation if changed.
+	 */
+	private _cancelNavigation ?:() => void;
+
+	/**
 	 * Listeners on the router.
 	 */
 	private listeners: EventListenerSubscription[] = [];
@@ -200,9 +205,13 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 			// If navigate is not determined, then we will check if we have a route match. If not then we will re-render. [NL]
 			navigate = this._routeMatch === null;
 			if (navigate === false) {
-				const newMatch = this.getRouteMatch();
-				// Check if this match matches the current match (aka. If the path has changed), if so we should navigate. [NL]
-				navigate = this._routeMatch?.route.path !== newMatch?.route.path;
+				if (this.isConnected) {
+					const newMatch = this.getRouteMatch();
+					// Check if this match matches the current match (aka. If the path has changed), if so we should navigate. [NL]
+					if(newMatch) {
+						navigate = shouldNavigate(this.match, newMatch);
+					}
+				}
 			}
 		}
 
@@ -327,10 +336,17 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 			// Only change route if its a new route.
 			const navigate = shouldNavigate(this.match, match);
 			if (navigate) {
+
+				// If another navigation is still begin resolved in this very moment, then we need to cancel that so it does not end up overriding this new navigation.[NL]
+				this._cancelNavigation?.();
 				// Listen for another push state event. If another push state event happens
 				// while we are about to navigate we have to cancel.
 				let navigationInvalidated = false;
-				const cancelNavigation = () => (navigationInvalidated = true);
+				const cancelNavigation = () => {
+					navigationInvalidated = true;
+					this._cancelNavigation = undefined;
+				};
+				this._cancelNavigation = cancelNavigation;
 				const removeChangeListener: EventListenerSubscription = addListener<Event, GlobalRouterEvent>(
 					GLOBAL_ROUTER_EVENTS_TARGET,
 					'changestate',

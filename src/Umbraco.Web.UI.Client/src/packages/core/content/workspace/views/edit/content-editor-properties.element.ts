@@ -41,7 +41,6 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			);
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
-			console.log(this, datasetContext)
 			this.#variantId = datasetContext.getVariantId();
 			this.#generatePropertyDataPath();
 		});

@@ -35,8 +35,6 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 
 	override render() {
 
-		console.log("workspace split view render")
-
 		return html`
 			<umb-workspace-editor
 				alias=${this.alias}

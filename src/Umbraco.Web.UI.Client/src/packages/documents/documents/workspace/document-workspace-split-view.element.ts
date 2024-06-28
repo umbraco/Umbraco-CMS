@@ -1,8 +1,8 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
@@ -28,25 +28,9 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			this._workspaceContext.splitView.activeVariantsInfo,
 			(variants) => {
 				this._variants = variants;
-				console.log("______variants: ", variants[0])
 			},
 			'_observeActiveVariantsInfo',
 		);
-	}
-
-	override connectedCallback(): void {
-		super.connectedCallback();
-		console.log("connected callback------")
-	}
-
-	override disconnectedCallback(): void {
-		super.disconnectedCallback();
-		console.log("DISconnected callback------")
-	}
-
-	override destroy(): void {
-		super.destroy();
-		console.log("split view ot destroyed")
 	}
 
 	override render() {
