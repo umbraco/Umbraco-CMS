@@ -4,15 +4,15 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//
 	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
+	//private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
 
 	#appLanguage?: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -67,7 +67,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: UmbDocumentWorkspaceSplitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
 						const variantSplit = info.match.fragments.consumed.split('_&_');
@@ -84,7 +84,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: UmbDocumentWorkspaceSplitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
@@ -115,16 +115,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 		});
 
-		const oldValue = this._routes;
-
-		// is there any differences in the amount ot the paths? [NL]
-		if (oldValue && oldValue.length === routes.length) {
-			// is there any differences in the paths? [NL]
-			const hasDifferences = oldValue.some((route, index) => route.path !== routes[index].path);
-			if (!hasDifferences) return;
-		}
 		this._routes = routes;
-		this.requestUpdate('_routes', oldValue);
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {

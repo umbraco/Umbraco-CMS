@@ -1601,7 +1601,7 @@ export default {
 		requiredLabel: 'Required label',
 		enableListViewHeading: 'Enable list view',
 		enableListViewDescription:
-			'Configures the content item to show a sortable and searchable list of its\n      children, the children will not be shown in the tree\n    ',
+			'Configures the content item to show a sortable and searchable list of its children.',
 		allowedTemplatesHeading: 'Allowed Templates',
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
@@ -1694,7 +1694,7 @@ export default {
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Collections',
 		collectionsDescription:
-			'Configures the content item to show list of its children, the children will not be shown in the tree.',
+			'Configures the content item to show list of its children.',
 		structure: 'Structure',
 		presentation: 'Presentation',
 	},

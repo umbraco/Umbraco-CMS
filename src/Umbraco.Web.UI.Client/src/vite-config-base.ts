@@ -1,8 +1,9 @@
-import type { UserConfig } from 'vite';
+import type { BuildOptions, UserConfig, LibraryOptions } from 'vite';
 
 interface UmbViteDefaultConfigArgs {
-	dist: string;
-	entry?: string[] | Record<string, string>;
+	dist: BuildOptions['outDir'];
+	entry?: LibraryOptions['entry'];
+	plugins?: UserConfig['plugins'];
 }
 
 export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => {
@@ -19,5 +20,6 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 				external: [/^@umbraco/],
 			},
 		},
+		plugins: args.plugins,
 	};
 };

@@ -1,6 +1,6 @@
+import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // import local components
@@ -34,6 +34,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
 	override render() {
+
+		console.log("workspace split view render")
+
 		return html`
 			<umb-workspace-editor
 				alias=${this.alias}

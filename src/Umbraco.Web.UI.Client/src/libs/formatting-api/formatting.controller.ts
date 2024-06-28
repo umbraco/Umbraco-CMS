@@ -16,12 +16,14 @@ UmbDomPurify.addHook('afterSanitizeAttributes', function (node) {
 
 /**
  * @description - Controller for formatting text.
+ * @deprecated - Use the `<umb-ufm-render>` component instead. This method will be removed in Umbraco 15.
  */
 export class UmbFormattingController extends UmbControllerBase {
 	#localize = new UmbLocalizationController(this._host);
 
 	/**
 	 * A method to localize the string input then transform any markdown to santized HTML.
+	 * @deprecated - Use the `<umb-ufm-render>` component instead. This method will be removed in Umbraco 15.
 	 */
 	public transform(input?: string): string {
 		if (!input) return '';

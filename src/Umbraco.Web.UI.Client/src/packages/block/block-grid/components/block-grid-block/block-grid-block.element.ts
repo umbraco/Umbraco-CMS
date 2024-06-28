@@ -1,8 +1,11 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
+import type { UmbBlockDataType, UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
+
+import '@umbraco-cms/backoffice/ufm';
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
-import type { UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-block-grid-block
@@ -16,8 +19,26 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	urls?: UmbBlockViewUrlsPropType;
 
+	@state()
+	_content?: UmbBlockDataType;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
+			this.observe(
+				context.content,
+				(content) => {
+					this._content = content;
+				},
+				'observeContent',
+			);
+		});
+	}
+
 	override render() {
-		return html`<umb-ref-grid-block standalone .name=${this.label ?? ''} href=${this.urls?.editContent ?? ''}>
+		return html`<umb-ref-grid-block standalone href=${this.urls?.editContent ?? ''}>
+			<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
 	}

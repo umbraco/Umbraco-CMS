@@ -1,7 +1,8 @@
-import { localizeAndTransform } from '@umbraco-cms/backoffice/formatting-api';
-import { css, customElement, html, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+
+import '@umbraco-cms/backoffice/ufm';
 
 /**
  *  @element umb-property-layout
@@ -67,9 +68,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
 				</uui-label>
 				<slot name="action-menu"></slot>
-				<uui-scroll-container id="description">
-					${unsafeHTML(localizeAndTransform(this, this.description))}
-				</uui-scroll-container>
+				${this.#renderDescription()}
 				<slot name="description"></slot>
 			</div>
 			<div id="editorColumn">
@@ -78,6 +77,12 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				</uui-form-validation-message>
 			</div>
 		`;
+	}
+
+	#renderDescription() {
+		if (!this.description) return;
+		const ufmValue = { alias: this.alias, label: this.label, description: this.description };
+		return html`<umb-ufm-render id="description" .markdown=${this.description} .value=${ufmValue}></umb-ufm-render>`;
 	}
 
 	static override styles = [
@@ -128,14 +133,6 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 
 			#description {
 				color: var(--uui-color-text-alt);
-			}
-
-			#description * {
-				max-width: 100%;
-			}
-
-			#description pre {
-				overflow: auto;
 			}
 
 			#editorColumn {
