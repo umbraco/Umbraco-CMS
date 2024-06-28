@@ -83,6 +83,11 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
+
 		const oldValue = this._routes;
 
 		// is there any differences in the amount ot the paths? [NL]

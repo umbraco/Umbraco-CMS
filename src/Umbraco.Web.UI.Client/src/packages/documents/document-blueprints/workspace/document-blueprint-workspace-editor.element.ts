@@ -1,10 +1,10 @@
-import type { UmbDocumentBlueprintVariantOptionModel } from '../types.js';
-import { UmbDocumentBlueprintWorkspaceSplitViewElement } from './document-blueprint-workspace-split-view.element.js';
-import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from './document-blueprint-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbDocumentBlueprintVariantOptionModel } from '../types.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from './document-blueprint-workspace.context-token.js';
+import { UmbDocumentBlueprintWorkspaceSplitViewElement } from './document-blueprint-workspace-split-view.element.js';
 
 @customElement('umb-document-blueprint-workspace-editor')
 export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
@@ -83,6 +83,11 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
+
 		const oldValue = this._routes;
 
 		// is there any differences in the amount ot the paths? [NL]
@@ -101,7 +106,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes && this._routes.length > 0
+		return this._routes
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
 			: '';
 	}

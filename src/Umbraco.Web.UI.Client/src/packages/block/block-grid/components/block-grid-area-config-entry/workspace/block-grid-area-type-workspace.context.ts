@@ -1,4 +1,3 @@
-import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
@@ -14,6 +13,7 @@ import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbBlockGridTypeAreaType>
