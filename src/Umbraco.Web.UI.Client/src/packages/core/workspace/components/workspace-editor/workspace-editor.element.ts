@@ -70,12 +70,14 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					},
 				} as UmbRoute;
 			});
+
+			newRoutes.push({
+				path: '',
+				redirectTo: newRoutes[0]?.path,
+			});
+
 		}
 
-		newRoutes.push({
-			path: '',
-			redirectTo: newRoutes[0]?.path,
-		});
 		newRoutes.push({
 			path: `**`,
 			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,

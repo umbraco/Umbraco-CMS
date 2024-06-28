@@ -63,6 +63,12 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				}
 			});
 
+		if(newRoutes.length > 0 ) {
+			newRoutes.push({
+				path: ``,
+				redirectTo: newRoutes[0].path
+			});
+		}
 
 		newRoutes.push({
 			path: `**`,
