@@ -49,6 +49,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		console.log("workspace editor created.")
+
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'workspaceView', null, (workspaceViews) => {
 			this._workspaceViews = workspaceViews.map((view) => view.manifest);
 			this._createRoutes();
