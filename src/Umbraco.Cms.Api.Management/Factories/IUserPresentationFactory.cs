@@ -25,4 +25,6 @@ public interface IUserPresentationFactory
     Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync();
 
     UserItemResponseModel CreateItemResponseModel(IUser user);
+
+    Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user);
 }
