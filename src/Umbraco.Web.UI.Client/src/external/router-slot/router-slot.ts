@@ -409,16 +409,23 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 						return cancel();
 					}
 
-					// Remove the old page by clearing the slot
-					this.clearChildren();
+					// We have some routes that share the same component instance, those should not be removed and re-appended [NL]
+					const isTheSameComponent = this.firstChild === page;
+
+					if(!isTheSameComponent) {
+						// Remove the old page by clearing the slot
+						this.clearChildren();
+					}
 
 					// Store the new route match before we append the new page to the DOM.
 					// We do this to ensure that we can find the match in the connectedCallback of the page.
 					this._routeMatch = match;
 
-					if (page) {
-						// Append the new page
-						this.appendChild(page);
+					if(!isTheSameComponent) {
+						if (page) {
+							// Append the new page
+							this.appendChild(page);
+						}
 					}
 				}
 
