@@ -98,6 +98,11 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 			});
 		}
 
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
+
 		this.#routes.setValue(routes);
 	}
 }
