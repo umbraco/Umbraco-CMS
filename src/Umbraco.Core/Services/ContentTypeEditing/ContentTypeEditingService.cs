@@ -15,8 +15,7 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
 {
     private readonly ITemplateService _templateService;
-    private readonly IDataTypeService _dataTypeService;
-    private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IElementSwitchValidationService _elementSwitchValidationService;
     private readonly IContentTypeService _contentTypeService;
 
     public ContentTypeEditingService(
@@ -25,13 +24,12 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        PropertyEditorCollection propertyEditorCollection)
+        IElementSwitchValidationService elementSwitchValidationService)
         : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
-        _dataTypeService = dataTypeService;
-        _propertyEditorCollection = propertyEditorCollection;
+        _elementSwitchValidationService = elementSwitchValidationService;
     }
 
     [Obsolete("Use the constructor that is not marked obsolete, will be removed in v16")]
@@ -45,8 +43,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
-        _dataTypeService = dataTypeService;
-        _propertyEditorCollection = StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>();
+        _elementSwitchValidationService = StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidationService>();
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
@@ -100,6 +97,13 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         bool isElement) =>
         await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases, isElement);
 
+    protected override async Task<ContentTypeOperationStatus> AdditionalCreateValidationAsync(
+        ContentTypeEditingModelBase<ContentTypePropertyTypeModel, ContentTypePropertyContainerModel> model)
+    {
+        // validate if the parent documentType (if set) has the same element status as the documentType being created
+        return await ValidateCreateParentElementStatusAsync(model);
+    }
+
     // update content type history clean-up
     private void UpdateHistoryCleanup(IContentType contentType, ContentTypeModelBase model)
     {
@@ -136,34 +140,34 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         // => check whether the element was used in a block structure prior to updating
         if (model.IsElement is false)
         {
-            return await ValidateElementToDocumentNotUsedInBlockStructuresAsync(contentType);
+            return await _elementSwitchValidationService.ElementToDocumentNotUsedInBlockStructuresAsync(contentType)
+                ? ContentTypeOperationStatus.Success
+                : ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration;
         }
 
-        return ValidateDocumentToElementHasNoContent(contentType);
+        return await _elementSwitchValidationService.DocumentToElementHasNoContentAsync(contentType)
+            ? ContentTypeOperationStatus.Success
+            : ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent;
     }
 
-    private async Task<ContentTypeOperationStatus> ValidateElementToDocumentNotUsedInBlockStructuresAsync(IContentTypeBase contentType)
+    /// <summary>
+    /// Should be called after it has been established that the composition list is in a valid state and the (composition) parent exists
+    /// </summary>
+    private async Task<ContentTypeOperationStatus> ValidateCreateParentElementStatusAsync(
+        ContentTypeEditingModelBase<ContentTypePropertyTypeModel, ContentTypePropertyContainerModel> model)
     {
-        // get all propertyEditors that support block usage
-        var editors = _propertyEditorCollection.Where(pe => pe.SupportsConfigurableElements).ToArray();
-        var blockEditorAliases = editors.Select(pe => pe.Alias).ToArray();
+        Guid? parentId = model.Compositions
+            .SingleOrDefault(composition => composition.CompositionType == CompositionType.Inheritance)?.Key;
+        if (parentId is null)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
 
-        // get all dataTypes that are based on those propertyEditors
-        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorAliasAsync(blockEditorAliases);
-
-        // check whether any of the configurations on those dataTypes have this element selected as a possible block
-        return dataTypes.Any(dataType =>
-            editors.First(editor => editor.Alias == dataType.EditorAlias)
-                .GetValueEditor(dataType.ConfigurationObject)
-                .ConfiguredElementTypeKeys().Contains(contentType.Key))
-            ? ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration
-            : ContentTypeOperationStatus.Success;
+        IContentType? parent = await _contentTypeService.GetAsync(parentId.Value);
+        return parent!.IsElement == model.IsElement
+            ? ContentTypeOperationStatus.Success
+            : ContentTypeOperationStatus.InvalidElementFlagComparedToParent;
     }
-
-    private ContentTypeOperationStatus ValidateDocumentToElementHasNoContent(IContentTypeBase contentType) =>
-        _contentTypeService.HasContentNodes(contentType.Id)
-            ? ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent
-            : ContentTypeOperationStatus.Success;
 
     private async Task SaveAsync(IContentType contentType, Guid userKey)
         => await _contentTypeService.SaveAsync(contentType, userKey);

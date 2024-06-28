@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Core.Handlers;
 
@@ -15,13 +16,16 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IContentTypeService _contentTypeService;
+    private readonly IElementSwitchValidationService _elementSwitchValidationService;
 
     public WarnDocumentTypeElementSwitchNotificationHandler(
         IEventMessagesFactory eventMessagesFactory,
-        IContentTypeService contentTypeService)
+        IContentTypeService contentTypeService,
+        IElementSwitchValidationService elementSwitchValidationService)
     {
         _eventMessagesFactory = eventMessagesFactory;
         _contentTypeService = contentTypeService;
+        _elementSwitchValidationService = elementSwitchValidationService;
     }
 
     // To figure out whether a warning should be generated, we need both the state before and after saving
@@ -64,25 +68,14 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
                 continue;
             }
 
-            WarnIfAncestorsAreMisaligned(savedDocumentType, eventMessages);
-            WarnIfDescendantsAreMisaligned(savedDocumentType, eventMessages);
+            await WarnIfAncestorsAreMisaligned(savedDocumentType, eventMessages);
+            await WarnIfDescendantsAreMisaligned(savedDocumentType, eventMessages);
         }
     }
 
-    private void WarnIfAncestorsAreMisaligned(IContentType contentType, EventMessages eventMessages)
+    private async Task WarnIfAncestorsAreMisaligned(IContentType contentType, EventMessages eventMessages)
     {
-        var ancestorIds = contentType.AncestorIds();
-        if (ancestorIds.Length == 0)
-        {
-            return;
-        }
-
-        var ancestors = _contentTypeService
-            .GetAll(ancestorIds).ToArray();
-        var misMatchingAncestors = ancestors
-            .Where(ancestor => ancestor.IsElement != contentType.IsElement).ToArray();
-
-        if (misMatchingAncestors.Any())
+        if (await _elementSwitchValidationService.AncestorsAreNotMisalignedAsync(contentType) == false)
         {
             // todo update this message when the format has been agreed upon on with the client
             eventMessages.Add(new EventMessage(
@@ -92,11 +85,9 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
         }
     }
 
-    private void WarnIfDescendantsAreMisaligned(IContentType contentType, EventMessages eventMessages)
+    private async Task WarnIfDescendantsAreMisaligned(IContentType contentType, EventMessages eventMessages)
     {
-        IEnumerable<IContentType> descendants = _contentTypeService.GetDescendants(contentType.Id, false);
-
-        if (descendants.Any(descendant => descendant.IsElement != contentType.IsElement))
+        if (await _elementSwitchValidationService.DescendantsAreNotMisalignedAsync(contentType) == false)
         {
             // todo update this message when the format has been agreed upon on with the client
             eventMessages.Add(new EventMessage(
