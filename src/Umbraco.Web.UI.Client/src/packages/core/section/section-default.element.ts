@@ -101,14 +101,11 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 					}),
 				);
 
-				//this.#debouncedCreateRoutes(routes);
 				this.#createRoutes(routes);
 			},
 			'umbRouteExtensionApisInitializer',
 		);
 	}
-
-	//#debouncedCreateRoutes = debounce(this.#createRoutes, 50);
 
 	#createRoutes(routes: Array<IRoute>) {
 		this._routes = [
