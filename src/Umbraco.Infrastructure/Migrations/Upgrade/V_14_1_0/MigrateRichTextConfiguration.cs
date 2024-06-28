@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_1_0;
 
 public class MigrateRichTextConfiguration : MigrationBase
 {
