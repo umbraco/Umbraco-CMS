@@ -1,12 +1,18 @@
 ﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-internal class ContentCache : IPublishedHybridCache
+internal sealed class ContentCache : IPublishedHybridCache
 {
-    public ContentCache(Microsoft.Extensions.Caching.Hybrid.HybridCache cache)
+    private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _cache;
+    private readonly IDocumentRepository _documentRepository;
+
+    public ContentCache(Microsoft.Extensions.Caching.Hybrid.HybridCache cache, IDocumentRepository documentRepository)
     {
+        _cache = cache;
+        _documentRepository = documentRepository;
     }
 
     public IPublishedContent? GetById(bool preview, int contentId) => throw new NotImplementedException();
@@ -15,7 +21,17 @@ internal class ContentCache : IPublishedHybridCache
 
     public IPublishedContent? GetById(int contentId) => throw new NotImplementedException();
 
-    public IPublishedContent? GetById(Guid contentId) => throw new NotImplementedException();
+    public IPublishedContent? GetById(Guid contentId)
+    {
+        return null;
+        // var getContent = _cache.GetOrCreateAsync(
+        //     $"{contentId}", // Unique key to the cache entry
+        //     async cancel =>
+        //     {
+        //         IContent? content = _documentRepository.Get(contentId);
+        //         return null;
+        //     }).GetAwaiter().GetResult();
+    }
 
     public bool HasById(bool preview, int contentId) => throw new NotImplementedException();
 

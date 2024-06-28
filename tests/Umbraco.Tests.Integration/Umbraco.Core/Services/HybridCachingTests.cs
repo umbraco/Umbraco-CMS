@@ -8,8 +8,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
-[UmbracoTest(
-    Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class HybridCachingTests : UmbracoIntegrationTestWithContent
 {
 
@@ -17,7 +16,7 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
     {
         services.AddHybridCache();
         services.AddSingleton<IPublishedHybridCache, ContentCache>();
-    } 
+    }
 
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
 
@@ -25,7 +24,7 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
     public void Can_Get_Content()
     {
         var textPage = PublishedHybridCache.GetById(Textpage.Key);
-        
+
         Assert.IsNotNull(textPage);
     }
 }
