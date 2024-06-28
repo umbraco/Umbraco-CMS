@@ -1,9 +1,8 @@
-import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
+import type { ManifestBlockEditorCustomView, UmbBlockEditorCustomViewProperties, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
@@ -39,6 +38,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#context = new UmbBlockGridEntryContext(this);
 	#renderTimeout: number | undefined;
+
+	@state()
+	_contentTypeAlias?:string;
 
 	@state()
 	_columnSpan?: number;
@@ -84,9 +86,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
-	_blockViewProps: UmbBlockViewPropsType<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
 
-	#updateBlockViewProps(incoming: Partial<UmbBlockViewPropsType<UmbBlockGridLayoutModel>>) {
+	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
 		this.requestUpdate('_blockViewProps');
 	}
@@ -176,6 +178,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 		this.observe(this.#context.contentElementTypeAlias, (contentElementTypeAlias) => {
 			if (contentElementTypeAlias) {
+				this._contentTypeAlias = contentElementTypeAlias;
 				this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
 			}
 		});
@@ -235,8 +238,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-block-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-block-grid-block>`;
 	}
 
+	#extensionSlotFilterMethod = (manifest:ManifestBlockEditorCustomView) => {
+		if(manifest.forContentTypeAlias?.indexOf(this._contentTypeAlias!) === -1) {
+			return false;
+		}
+		return true;
+	}
+
 	#renderBlock() {
-		return this.contentUdi
+		return this.contentUdi && this._contentTypeAlias
 			? html`
 					${this._createBeforePath && this._showInlineCreateBefore
 						? html`<uui-button-inline-create
@@ -251,6 +261,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							type="blockEditorCustomView"
 							default-element="umb-block-grid-block"
 							.props=${this._blockViewProps}
+							.filter=${this.#extensionSlotFilterMethod}
 							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
 						<uui-action-bar>
