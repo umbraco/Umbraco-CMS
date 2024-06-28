@@ -10,28 +10,26 @@ internal sealed class PublishedContent : PublishedContentBase
     private readonly IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
     private readonly IVariationContextAccessor? _variationContextAccessor;
     private readonly IPublishedModelFactory? _publishedModelFactory;
-    private readonly IPublishedContentType _contentType;
     private readonly ContentData _contentData;
+    private readonly ContentNode _contentNode;
     private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
     private readonly string? _urlSegment;
 
     public PublishedContent(
+        ContentNode contentNode,
         ContentData contentData,
         IPublishedSnapshotAccessor? publishedSnapshotAccessor,
         IVariationContextAccessor? variationContextAccessor,
-        IPublishedModelFactory? publishedModelFactory,
-        IPublishedContentType contentType,
-        string path)
+        IPublishedModelFactory? publishedModelFactory)
         : base(variationContextAccessor)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _variationContextAccessor = variationContextAccessor;
         _publishedModelFactory = publishedModelFactory;
+        _contentNode = contentNode;
 
         _contentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
         _urlSegment = _contentData.UrlSegment;
-        _contentType = contentType;
-        Path = path;
 
         // // TODO: Implement properties
         // var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
@@ -47,7 +45,7 @@ internal sealed class PublishedContent : PublishedContentBase
         // Properties = properties;
     }
 
-    public override IPublishedContentType ContentType => _contentType;
+    public override IPublishedContentType ContentType => _contentNode.ContentType;
 
     public override Guid Key { get; }
 
@@ -61,7 +59,7 @@ internal sealed class PublishedContent : PublishedContentBase
 
     public override int Level { get; }
 
-    public override string Path { get; }
+    public override string Path => _contentNode.Path;
 
     public override int? TemplateId { get; }
 
