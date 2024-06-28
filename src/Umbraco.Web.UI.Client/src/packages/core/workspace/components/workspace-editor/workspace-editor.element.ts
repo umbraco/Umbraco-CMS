@@ -74,7 +74,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 		newRoutes.push({
 			path: `**`,
-			component: () => import('../workspace-views/workspace-fallback-view.element.js'),
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 		});
 
 		this._routes = newRoutes;

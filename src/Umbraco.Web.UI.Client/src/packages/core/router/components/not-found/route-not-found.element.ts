@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * A fallback view to be used in Workspace Views, maybe this can be upgraded at a later point.
  */
 // TODO: Rename and move this file to a more generic place.
-@customElement('umb-workspace-fallback-view')
-export class UmbWorkspaceFallbackViewElement extends UmbLitElement {
+@customElement('umb-route-not-found')
+export class UmbRouteNotFoundElement extends UmbLitElement {
 
 	override render() {
 		return html`
@@ -47,10 +47,10 @@ export class UmbWorkspaceFallbackViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbWorkspaceFallbackViewElement;
+export default UmbRouteNotFoundElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-fallback-view': UmbWorkspaceFallbackViewElement;
+		'umb-route-not-found': UmbRouteNotFoundElement;
 	}
 }
