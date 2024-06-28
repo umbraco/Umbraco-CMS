@@ -30298,6 +30298,66 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/user/{id}/calculate-start-nodes": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserByIdCalculateStartNodes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CalculatedUserStartNodesResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/user/{id}/change-password": {
       "post": {
         "tags": [
@@ -33442,6 +33502,51 @@
             }
           },
           "isCompatible": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CalculatedUserStartNodesResponseModel": {
+        "required": [
+          "documentStartNodeIds",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
+          "id",
+          "mediaStartNodeIds"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "documentStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "hasDocumentRootAccess": {
+            "type": "boolean"
+          },
+          "mediaStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
+            }
+          },
+          "hasMediaRootAccess": {
             "type": "boolean"
           }
         },
@@ -37431,6 +37536,11 @@
           },
           "providedValueValidationRegex": {
             "type": "string",
+            "nullable": true
+          },
+          "actionParameters": {
+            "type": "object",
+            "additionalProperties": { },
             "nullable": true
           }
         },

@@ -420,6 +420,20 @@
     <!-- The following key get these tokens passed in:
   0: Comma delimitted list of headers found
 -->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Mae'r peniad neu meta-tag <strong>X-Frame-Options</strong> sy'n cael ei ddefnyddio i reoli os mae safle'n gallu cael ei osod o fewn IFRAME gan safle arall wedi'i ganfod.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Frame-Options</strong> sy'n cael ei ddefnyddio i reoli os mae safle'n gallu cael ei osod o fewn IFRAME gan safle arall wedi'i ganfod.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[Mae'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[Mae'r peniad <strong>Strict-Transport-Security</strong>, hefyd wedi'i adnabod fel HSTS-header, wedi'i ganfod.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Strict-Transport-Security</strong> wedi'i ganfod.]]></key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost">
+      <![CDATA[Darganfuwyd y pennyn <strong>Strict-Transport-Security</strong>, a elwir hefyd yn HSTS-header. <strong>Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.</strong>]]>
+    </key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
+      <![CDATA[Ni ddaethpwyd o hyd i'r pennyn <strong>Strict-Transport-Security</strong>. Ni ddylai'r pennyn hwn fod yn bresennol ar localhost.]]>
+    </key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Mae'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Mae'r peniadau canlynol sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Dim peniadau sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Gosodiadau SMTP wedi ffurfweddu'n gywir ac mae'r gwasanaeth yn gweithio fel y disgwylir.</key>
