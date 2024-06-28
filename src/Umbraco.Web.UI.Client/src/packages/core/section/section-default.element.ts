@@ -86,13 +86,11 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 						const api = await createExtensionApi(this, extensionController.manifest);
 
 						return {
-							path:
+							path: (
 								api?.getPath?.() ||
 								extensionController.manifest.meta?.path ||
-								aliasToPath(extensionController.manifest.alias),
-							// be aware that this is kind of a hack to pass the manifest element to the router. But as the two resolve components
-							// in a similar way. I currently find it more safe to let the router do the component resolving instead
-							// of replicating it as a custom resolver here.
+								aliasToPath(extensionController.manifest.alias)
+							),
 							component: () => createExtensionElement(extensionController.manifest),
 							setup: (element: PageComponent, info: IRoutingInfo) => {
 								api?.setup?.(element, info);

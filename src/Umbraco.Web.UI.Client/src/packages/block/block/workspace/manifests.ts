@@ -75,10 +75,6 @@ export const manifests: Array<ManifestTypes> = [
 			},
 			{
 				alias: 'Umb.Condition.BlockWorkspaceHasSettings',
-			},
-			{
-				alias: 'Umb.Condition.Switch',
-				frequency: '2000'
 			}
 		],
 	} as any,
