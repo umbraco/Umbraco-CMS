@@ -87,17 +87,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 		});
 
-		const oldValue = this._routes;
-
-		// is there any differences in the amount ot the paths? [NL]
-		// TODO: if we make a memorization function as the observer, we can avoid this check and avoid the whole build of routes. [NL]
-		if (oldValue && oldValue.length === routes.length) {
-			// is there any differences in the paths? [NL]
-			const hasDifferences = oldValue.some((route, index) => route.path !== routes[index].path);
-			if (!hasDifferences) return;
-		}
 		this._routes = routes;
-		this.requestUpdate('_routes', oldValue);
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {

@@ -101,7 +101,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					const route = routes.find((route) => route.path === this.#appCulture);
 
 					if (!route) {
-						history.pushState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 2].path}`);
+						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
+						history.pushState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 3].path}`);
 						return;
 					}
 
