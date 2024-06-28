@@ -7,6 +7,9 @@ import { customElement, state, css, html } from '@umbraco-cms/backoffice/externa
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 @customElement('umb-media-workspace-editor')
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
+	//
+	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
+	private splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	@state()
 	_routes?: Array<UmbRoute>;
@@ -46,7 +49,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: UmbMediaWorkspaceSplitViewElement,
+					component: this.splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
 						const variantSplit = info.match.fragments.consumed.split('_&_');
@@ -63,7 +66,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 				path: variant.unique,
-				component: UmbMediaWorkspaceSplitViewElement,
+				component: this.splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
