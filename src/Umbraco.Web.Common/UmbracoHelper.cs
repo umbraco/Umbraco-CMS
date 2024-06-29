@@ -104,15 +104,15 @@ public class UmbracoHelper
     /// <summary>
     ///     Returns the dictionary value for the key specified
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
+    /// <param name="key">Key of dictionary item.</param>
+    /// <returns>The dictionary value, should one exist.</returns>
     public string? GetDictionaryValue(string key) => GetDictionaryValue(key, Thread.CurrentThread.CurrentUICulture);
 
 
     /// <summary>
     ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
     /// </summary>
-    /// <param name="key">key of dictionary item.</param>
+    /// <param name="key">Key of dictionary item.</param>
     /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
     /// <returns>The dictionary value, should one exist.</returns>
     public string? GetDictionaryValue(string key, CultureInfo specificCulture)
@@ -133,24 +133,6 @@ public class UmbracoHelper
         if (string.IsNullOrWhiteSpace(dictionaryValue))
         {
             dictionaryValue = defaultValue;
-        }
-
-        return dictionaryValue;
-    }
-
-    /// <summary>
-    ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
-    /// </summary>
-    /// <param name="key">key of dictionary item</param>
-    /// <param name="altText">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
-    /// <returns>Returns the dictionary value, or a default value if none exists.</returns>
-    [Obsolete("Use GetDictionaryValueOrDefault instead, scheduled for removal in v14.")]
-    public string GetDictionaryValue(string key, string altText)
-    {
-        var dictionaryValue = GetDictionaryValue(key);
-        if (string.IsNullOrWhiteSpace(dictionaryValue))
-        {
-            dictionaryValue = altText;
         }
 
         return dictionaryValue;
