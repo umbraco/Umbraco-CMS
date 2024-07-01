@@ -26,7 +26,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
 
 	@state()
-	private _permitted: Array<UmbExtensionElementAndApiInitializer> = [];
+	private _permitted?: Array<UmbExtensionElementAndApiInitializer>;
 
 	/**
 	 * The type or types of extensions to render.
@@ -178,13 +178,13 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._permitted.length > 0
+		return this._permitted ? this._permitted.length > 0
 			? repeat(
 					this._permitted,
 					(ext) => ext.alias,
 					(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
 				)
-			: html`<slot></slot>`;
+			: html`<slot></slot>` : '';
 	}
 
 	static override styles = css`
