@@ -134,21 +134,26 @@ stages:
               arguments: install --tool-path . nbgv
             displayName: Install NBGV tool
           - script: nbgv cloud
-            displayName: Set Version
+            name: version
+            displayName: Calculate Version
           - bash: |
               echo "##[command]Running npm version"
               echo "##[debug]Version: $PACKAGE_VERSION"
+              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
+            displayName: Set Version
+            workingDirectory: src/Umbraco.Web.UI.Client
+            env:
+              PACKAGE_VERSION: $(version.NBGV_NpmPackageVersion)
+          - script: npm run build:for:npm
+            displayName: Run build:for:npm
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - bash: |
               echo "##[command]Running npm pack"
               echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
-              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
               mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
-            displayName: Prepare Bellissima npm package
-            env:
-              PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
-          - script: npm run build:for:npm
-            displayName: Run build (Bellissima)
+            displayName: Run npm pack
             workingDirectory: src/Umbraco.Web.UI.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Bellissima npm artifact
