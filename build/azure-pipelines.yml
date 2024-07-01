@@ -117,7 +117,7 @@ stages:
               artifactName: build_output
 
       - job: B
-        displayName: Bellissima Package
+        displayName: Build Bellissima Package
         pool:
           vmImage: 'ubuntu-latest'
         steps:
