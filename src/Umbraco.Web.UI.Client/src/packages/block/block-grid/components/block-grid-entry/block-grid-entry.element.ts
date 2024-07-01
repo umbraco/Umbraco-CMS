@@ -86,7 +86,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_inlineCreateAboveWidth?: string;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = { contentUdi: undefined!, config: { showContentEdit: false, showSettingsEdit: false} }; // Set to undefined cause it will be set before we render.
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
@@ -97,15 +97,21 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		super();
 
 		// Misc:
-		this.observe(this.#context.showContentEdit, (show) => {
-			this._showContentEdit = show;
+		this.observe(this.#context.showContentEdit, (showContentEdit) => {
+			this._showContentEdit = showContentEdit;
+			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
 		}, null);
 		this.observe(this.#context.settingsElementTypeKey, (key) => {
 			this._hasSettings = !!key;
+			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
 		}, null);
 		this.observe(this.#context.canScale, (canScale) => {
 			this._canScale = canScale;
 		}, null);
+		this.observe(this.#context.blockType, (blockType) => {
+			this.#updateBlockViewProps({ blockType });
+		}, null);
+		// TODO: Implement index.
 		this.observe(this.#context.label, (label) => {
 			this.#updateBlockViewProps({ label });
 			this._label = label;
@@ -142,11 +148,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}, null);
 		this.observe(this.#context.workspaceEditContentPath, (path) => {
 			this._workspaceEditContentPath = path;
-			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editContent: path } });
+			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
 		}, null);
 		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
 			this._workspaceEditSettingsPath = path;
-			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editSettings: path } });
+			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
 		}, null);
 	}
 

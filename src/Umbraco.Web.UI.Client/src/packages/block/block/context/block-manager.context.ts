@@ -1,16 +1,16 @@
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import type { UmbBlockWorkspaceData } from '../workspace/index.js';
-import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbBlockWorkspaceData } from '../workspace/index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 
 function buildUdi(entityType: string, guid: string) {
 	return `umb://${entityType}/${guid.replace(/-/g, '')}`;

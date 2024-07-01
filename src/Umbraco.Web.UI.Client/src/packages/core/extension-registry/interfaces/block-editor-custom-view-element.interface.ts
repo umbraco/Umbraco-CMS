@@ -1,4 +1,17 @@
+
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { ManifestBlockEditorCustomView } from "../index.js";
+// Shared with the Property Editor
+export interface UmbBlockTypeBaseModel {
+	contentElementTypeKey: string;
+	settingsElementTypeKey?: string;
+	label?: string;
+	thumbnail?: string;
+	iconColor?: string;
+	backgroundColor?: string;
+	editorSize?: UUIModalSidebarSize;
+	forceHideContentEditorInOverlay: boolean;
+}
 
 // Shared with the Property Editor
 export interface UmbBlockLayoutBaseModel {
@@ -14,9 +27,10 @@ export interface UmbBlockDataType {
 }
 
 export interface UmbBlockEditorCustomViewConfiguration {
-	editContentPath: string;
-	editSettingsPath: string;
-	showEditBlock: boolean;
+	editContentPath?: string;
+	editSettingsPath?: string;
+	showContentEdit: boolean;
+	showSettingsEdit: boolean;
 }
 
 export interface UmbBlockViewUrlsPropType {
@@ -25,10 +39,10 @@ export interface UmbBlockViewUrlsPropType {
 }
 
 
-export interface UmbBlockEditorCustomViewProperties<LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel> {
+export interface UmbBlockEditorCustomViewProperties<LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel, BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel> {
 	manifest?: ManifestBlockEditorCustomView;
-	config?: UmbBlockEditorCustomViewConfiguration;
-	urls?: UmbBlockViewUrlsPropType;
+	config?: Partial<UmbBlockEditorCustomViewConfiguration>;
+	blockType?: BlockType;
 	contentUdi?: string;
 	label?: string;
 	icon?: string;
@@ -38,6 +52,6 @@ export interface UmbBlockEditorCustomViewProperties<LayoutType extends UmbBlockL
 	settings?: UmbBlockDataType;
 }
 
-export interface UmbBlockEditorCustomViewElement<LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel> extends UmbBlockEditorCustomViewProperties<LayoutType>, HTMLElement {
+export interface UmbBlockEditorCustomViewElement<LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel, BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel> extends UmbBlockEditorCustomViewProperties<LayoutType, BlockType>, HTMLElement {
 
 }

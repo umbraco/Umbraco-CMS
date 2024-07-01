@@ -1,8 +1,8 @@
-import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '../context/block-rte-entries.context-token.js';
-import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/block-rte-manager.context-token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/block-rte-manager.context-token.js';
+import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '../context/block-rte-entries.context-token.js';
 
 export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase {
 	#localize = new UmbLocalizationController(this._host);

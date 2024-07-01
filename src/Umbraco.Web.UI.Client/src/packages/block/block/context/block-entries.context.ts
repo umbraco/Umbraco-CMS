@@ -1,13 +1,13 @@
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
-import type { UmbBlockWorkspaceData } from '../workspace/block-workspace.modal-token.js';
-import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
-import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import type { UmbBlockWorkspaceData } from '../workspace/block-workspace.modal-token.js';
+import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
+import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 
 export abstract class UmbBlockEntriesContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,

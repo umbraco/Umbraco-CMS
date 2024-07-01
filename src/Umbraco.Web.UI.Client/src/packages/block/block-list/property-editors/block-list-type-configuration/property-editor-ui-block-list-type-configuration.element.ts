@@ -1,7 +1,5 @@
-import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
-import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockTypeBaseModel, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
@@ -10,6 +8,8 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import type { UmbInputBlockTypeElement } from '../../../block-type/index.js';
+import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
 
 /**
  * @element umb-property-editor-ui-block-list-type-configuration
