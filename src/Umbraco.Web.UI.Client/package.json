@@ -119,7 +119,7 @@
 		"type": "git"
 	},
 	"bugs": {
-		"url": "https://github.com/umbraco/Umbraco.CMS.Backoffice/issues"
+		"url": "https://github.com/umbraco/Umbraco-CMS/issues"
 	},
 	"author": {
 		"name": "Umbraco A/S",
