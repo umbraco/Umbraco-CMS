@@ -8,7 +8,7 @@ import { manifests as blockTypeManifests } from './block-type/manifests.js';
 //import { manifest } from './custom-view/manifest.js';
 
 export const manifests: Array<ManifestTypes> = [
-//	manifest,
+	//manifest,
 	...blockManifests,
 	...blockTypeManifests,
 	...blockListManifests,

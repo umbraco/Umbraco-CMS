@@ -367,10 +367,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				border-color: var(--uui-color-interactive);
 			}
 
-			uui-action-bar {
-				background-color: var(--uui-color-surface);
-			}
-
 			.umb-block-grid__block {
 				height: 100%;
 			}
