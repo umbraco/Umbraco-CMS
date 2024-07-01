@@ -227,7 +227,7 @@
 		"@types/chai": "^4.3.5",
 		"@types/mocha": "^10.0.1",
 		"@typescript-eslint/eslint-plugin": "^7.1.0",
-		"@typescript-eslint/parser": "^7.1.0",
+		"@typescript-eslint/parser": "^7.15.0",
 		"@web/dev-server-esbuild": "^1.0.2",
 		"@web/dev-server-import-maps": "^0.2.0",
 		"@web/dev-server-rollup": "^0.6.3",
