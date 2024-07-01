@@ -79,6 +79,10 @@ stages:
         steps:
           - checkout: self
             submodules: true
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
           - template: templates/backoffice-install.yml
           - script: npm run build:for:cms
             displayName: Run build (Bellissima)
@@ -89,10 +93,6 @@ stages:
           - script: npm run build
             displayName: Run npm build (Login)
             workingDirectory: src/Umbraco.Web.UI.Login
-          - task: UseDotNet@2
-            displayName: Use .NET SDK from global.json
-            inputs:
-              useGlobalJson: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -115,6 +115,7 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
+
       - job: B
         displayName: Bellissima Package
         pool:
@@ -123,24 +124,6 @@ stages:
           - checkout: self
             submodules: true
           - template: templates/backoffice-install.yml
-          - task: UseDotNet@2
-            displayName: Use .NET SDK from global.json
-            inputs:
-              useGlobalJson: true
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: custom
-              custom: tool
-              arguments: install --tool-path . nbgv
-            displayName: Install NBGV tool
-          - bash: |
-              echo "##[command]Running nbgv get-version"
-              PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
-              echo "##[command]Running npm version"
-              echo "##[debug]Version: $PACKAGE_VERSION"
-              cd src/Umbraco.Web.UI.Client
-              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
-            displayName: Set Version
           - script: npm run build:for:npm
             displayName: Run build:for:npm
             workingDirectory: src/Umbraco.Web.UI.Client
