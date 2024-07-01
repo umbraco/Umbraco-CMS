@@ -118,6 +118,12 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				vertical-align: middle;
 			}
 
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
 			#state-icon {
 				position: absolute;
 				bottom: -5px;
@@ -128,12 +134,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				height: 14px;
 				border-radius: 100%;
 				line-height: 14px;
-			}
-
-			#label {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
 			}
 
 			:hover #state-icon {
