@@ -33,11 +33,6 @@ export interface UmbBlockEditorCustomViewConfiguration {
 	showSettingsEdit: boolean;
 }
 
-export interface UmbBlockViewUrlsPropType {
-	editContent?: string;
-	editSettings?: string;
-}
-
 
 export interface UmbBlockEditorCustomViewProperties<LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel, BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel> {
 	manifest?: ManifestBlockEditorCustomView;

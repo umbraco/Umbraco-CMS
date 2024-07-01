@@ -1,7 +1,8 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
-import type { UmbBlockDataType, UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 import '@umbraco-cms/backoffice/ufm';
 import '../block-grid-areas-container/index.js';
@@ -17,7 +18,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	label?: string;
 
 	@property({ attribute: false })
-	urls?: UmbBlockViewUrlsPropType;
+	config?: UmbBlockEditorCustomViewConfiguration;
 
 	@state()
 	_content?: UmbBlockDataType;
@@ -37,7 +38,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-ref-grid-block standalone href=${this.urls?.editContent ?? ''}>
+		return html`<umb-ref-grid-block standalone href=${this.config?.editContentPath ?? ''}>
 			<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
