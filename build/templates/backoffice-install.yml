@@ -6,6 +6,17 @@ steps:
       versionSource: 'fromFile'
       versionFilePath: src/Umbraco.Web.UI.Client/.nvmrc
 
+  - bash: |
+      echo "##[command]Install nbgv"
+      dotnet tool install --tool-path . nbgv
+      echo "##[command]Running nbgv get-version"
+      PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
+      echo "##[command]Running npm version"
+      echo "##[debug]Version: $PACKAGE_VERSION"
+      cd src/Umbraco.Web.UI.Client
+      npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
+    displayName: Set NPM Version
+
   - task: Cache@2
     displayName: Cache node_modules
     inputs:
@@ -18,14 +29,3 @@ steps:
   - script: npm ci --no-fund --no-audit --prefer-offline
     displayName: Run npm ci (Bellissima)
     workingDirectory: src/Umbraco.Web.UI.Client
-
-  - bash: |
-      echo "##[command]Install nbgv"
-      dotnet tool install --tool-path . nbgv
-      echo "##[command]Running nbgv get-version"
-      PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
-      echo "##[command]Running npm version"
-      echo "##[debug]Version: $PACKAGE_VERSION"
-      cd src/Umbraco.Web.UI.Client
-      npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
-    displayName: Set NPM Version
