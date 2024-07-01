@@ -5,6 +5,6 @@ export const manifest:ManifestBlockEditorCustomView = {
 	alias: 'Umb.blockEditorCustomView.TestView',
 	name: 'Block Editor Custom View Test',
 	element: () => import('./custom-view.element.js'),
-	//forContentTypeAlias: []
-	//forBlockType?: Array<string>;
+	forContentTypeAlias: 'elementTypeHeadline',
+	forBlockEditor: 'block-grid'
 }

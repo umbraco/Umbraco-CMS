@@ -2,12 +2,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestBlockEditorCustomView, UmbBlockEditorCustomViewProperties, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
+import { UMB_BLOCK_GRID, type UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
+
 import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
 import '../block-scale-handler/index.js';
-
 /**
  * @element umb-block-grid-entry
  */
@@ -84,7 +85,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_inlineCreateAboveWidth?: string;
 
-	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
 
@@ -99,55 +99,55 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		// Misc:
 		this.observe(this.#context.showContentEdit, (show) => {
 			this._showContentEdit = show;
-		});
+		}, null);
 		this.observe(this.#context.settingsElementTypeKey, (key) => {
 			this._hasSettings = !!key;
-		});
+		}, null);
 		this.observe(this.#context.canScale, (canScale) => {
 			this._canScale = canScale;
-		});
+		}, null);
 		this.observe(this.#context.label, (label) => {
 			this.#updateBlockViewProps({ label });
 			this._label = label;
-		});
+		}, null);
 		this.observe(this.#context.contentElementTypeIcon, (icon) => {
 			this.#updateBlockViewProps({ icon });
 			this._icon = icon;
-		});
+		}, null);
 		this.observe(this.#context.inlineEditingMode, (mode) => {
 			this._inlineEditingMode = mode;
-		});
+		}, null);
 
 		// Data:
 		this.observe(this.#context.layout, (layout) => {
 			this.#updateBlockViewProps({ layout });
-		});
+		}, null);
 		this.observe(this.#context.content, (content) => {
 			this.#updateBlockViewProps({ content });
-		});
+		}, null);
 		this.observe(this.#context.settings, (settings) => {
 			this.#updateBlockViewProps({ settings });
-		});
+		}, null);
 
 		// Paths:
 		this.observe(this.#context.createBeforePath, (createPath) => {
 			//const oldValue = this._createBeforePath;
 			this._createBeforePath = createPath;
 			//this.requestUpdate('_createPath', oldValue);
-		});
+		}, null);
 		this.observe(this.#context.createAfterPath, (createPath) => {
 			//const oldValue = this._createAfterPath;
 			this._createAfterPath = createPath;
 			//this.requestUpdate('_createPath', oldValue);
-		});
+		}, null);
 		this.observe(this.#context.workspaceEditContentPath, (path) => {
 			this._workspaceEditContentPath = path;
 			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editContent: path } });
-		});
+		}, null);
 		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
 			this._workspaceEditSettingsPath = path;
 			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editSettings: path } });
-		});
+		}, null);
 	}
 
 	override connectedCallback(): void {
@@ -175,13 +175,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			if (contentElementTypeKey) {
 				this.setAttribute('data-content-element-type-key', contentElementTypeKey);
 			}
-		});
+		}, 'contentElementTypeKey');
 		this.observe(this.#context.contentElementTypeAlias, (contentElementTypeAlias) => {
 			if (contentElementTypeAlias) {
 				this._contentTypeAlias = contentElementTypeAlias;
 				this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
 			}
-		});
+		}, 'contentElementTypeAlias');
 
 		this.#callUpdateInlineCreateButtons();
 	}
@@ -228,6 +228,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	};
 
+	#extensionSlotFilterMethod = (manifest:ManifestBlockEditorCustomView) => {
+		if(manifest.forContentTypeAlias && !stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)) {
+			return false;
+		}
+		if(manifest.forBlockEditor && !stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_GRID)) {
+			return false;
+		}
+		return true;
+	}
+
 	#renderInlineEditBlock() {
 		return html`<umb-block-grid-block-inline
 			.contentUdi=${this.contentUdi}
@@ -236,13 +246,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderRefBlock() {
 		return html`<umb-block-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-block-grid-block>`;
-	}
-
-	#extensionSlotFilterMethod = (manifest:ManifestBlockEditorCustomView) => {
-		if(manifest.forContentTypeAlias?.indexOf(this._contentTypeAlias!) === -1) {
-			return false;
-		}
-		return true;
 	}
 
 	#renderBlock() {

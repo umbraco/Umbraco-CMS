@@ -19,5 +19,6 @@ export * from './string/from-camel-case.function.js';
 export * from './string/generate-umbraco-alias.function.js';
 export * from './string/increment-string.function.js';
 export * from './string/split-string-to-array.js';
+export * from './string/string-or-string-array-contains.function.js';
 export * from './string/to-camel-case/to-camel-case.function.js';
 export type * from './type/index.js';
