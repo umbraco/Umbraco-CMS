@@ -18,14 +18,9 @@ steps:
     displayName: Run npm ci (Bellissima)
     workingDirectory: src/Umbraco.Web.UI.Client
 
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: custom
-      custom: tool
-      arguments: install --tool-path . nbgv
-    displayName: Install NBGV tool
-
   - bash: |
+      echo "##[command]Install nbgv"
+      dotnet tool install --tool-path . nbgv
       echo "##[command]Running nbgv get-version"
       PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
       echo "##[command]Running npm version"
