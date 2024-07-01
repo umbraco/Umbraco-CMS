@@ -79,7 +79,7 @@ stages:
         steps:
           - checkout: self
             submodules: true
-          - template: build/azure-backoffice-install.yml
+          - template: templates/backoffice-install.yml
           - script: npm run build:for:cms
             displayName: Run build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.Client
@@ -122,7 +122,7 @@ stages:
         steps:
           - checkout: self
             submodules: true
-          - template: build/azure-backoffice-install.yml
+          - template: templates/backoffice-install.yml
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -222,7 +222,7 @@ stages:
         steps:
           - checkout: self
             submodules: true
-          - template: build/azure-backoffice-install.yml
+          - template: templates/backoffice-install.yml
           - script: npm run storybook:build
             displayName: Build Storybook
             env:
