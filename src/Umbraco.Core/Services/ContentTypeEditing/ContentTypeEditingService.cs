@@ -63,9 +63,11 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         UpdateHistoryCleanup(contentType, model);
         UpdateTemplates(contentType, model);
 
-        await _contentTypeService.UpdateAsync(contentType, userKey);
+        Attempt<ContentTypeOperationStatus> attempt = await _contentTypeService.UpdateAsync(contentType, userKey);
 
-        return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+        return attempt.Success
+            ? Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType)
+            : Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(attempt.Result, null);
     }
 
     public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(

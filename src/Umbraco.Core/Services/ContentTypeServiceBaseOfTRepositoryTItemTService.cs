@@ -664,7 +664,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Attempt.Fail(ContentTypeOperationStatus.NameCannotBeEmpty);
         }
 
-        if (item.Name != null && item.Name.Length > 255)
+        if (item.Name.Length > 255)
         {
             return Attempt.Fail(ContentTypeOperationStatus.NameTooLong);
         }
