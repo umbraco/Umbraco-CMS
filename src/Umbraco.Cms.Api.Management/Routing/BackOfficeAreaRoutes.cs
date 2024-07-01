@@ -52,8 +52,8 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             case RuntimeLevel.Install:
             case RuntimeLevel.Upgrade:
             case RuntimeLevel.Run:
-                endpoints.MapHub<BackofficeHub>(_umbracoPathSegment + Constants.Web.BackofficeSignalRHub);
                 MapMinimalBackOffice(endpoints);
+                endpoints.MapHub<BackofficeHub>(_umbracoPathSegment + Constants.Web.BackofficeSignalRHub);
                 break;
             case RuntimeLevel.BootFailed:
             case RuntimeLevel.Unknown:
