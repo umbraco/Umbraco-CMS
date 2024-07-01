@@ -7,8 +7,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
@@ -54,7 +52,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             case RuntimeLevel.Install:
             case RuntimeLevel.Upgrade:
             case RuntimeLevel.Run:
-
+                endpoints.MapHub<BackofficeHub>(_umbracoPathSegment + Constants.Web.BackofficeSignalRHub);
                 MapMinimalBackOffice(endpoints);
                 break;
             case RuntimeLevel.BootFailed:
