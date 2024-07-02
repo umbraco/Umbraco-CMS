@@ -53,6 +53,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#onSearchInput(event: UUIInputEvent) {
 		const value = event.target.value as string;
 		this._searchQuery = value;
+
+		if (!this._searchQuery) {
+			this._searchResult = [];
+			this._searching = false;
+			return;
+		}
+
 		this._searching = true;
 		this.#debouncedSearch();
 	}
@@ -60,12 +67,6 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#debouncedSearch = debounce(this.#search, 300);
 
 	async #search() {
-		if (!this._searchQuery) {
-			this._searchResult = [];
-			this._searching = false;
-			return;
-		}
-
 		const { data } = await this.#searchProvider.search({ query: this._searchQuery });
 		this._searchResult = data?.items ?? [];
 		this._searching = false;
@@ -78,6 +79,11 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 	#close() {
 		this.modalContext?.reject();
+	}
+
+	#onSearchClear() {
+		this._searchQuery = '';
+		this._searchResult = [];
 	}
 
 	override render() {
@@ -108,11 +114,17 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 	#renderSearch() {
 		return html`
-			<uui-input id="search-input" placeholder="Search..." @input=${this.#onSearchInput}>
+			<uui-input .value=${this._searchQuery} id="search-input" placeholder="Search..." @input=${this.#onSearchInput}>
 				<div slot="prepend">
 					${this._searching
 						? html`<uui-loader-circle id="search-indicator"></uui-loader-circle>`
 						: html`<uui-icon name="search"></uui-icon>`}
+				</div>
+
+				<div slot="append">
+					<uui-button type="button" @click=${this.#onSearchClear} compact>
+						<uui-icon name="icon-delete"></uui-icon>
+					</uui-button>
 				</div>
 			</uui-input>
 			<div id="search-divider"></div>
