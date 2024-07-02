@@ -1,6 +1,6 @@
+import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // import local components
