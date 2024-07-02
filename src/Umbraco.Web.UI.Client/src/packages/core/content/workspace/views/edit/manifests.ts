@@ -1,6 +1,7 @@
+import { manifests as conditionsManifests } from './conditions/manifests.js';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const contentEditorManifest: UmbBackofficeManifestKind = {
+const contentEditorManifest: UmbBackofficeManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.WorkspaceView.ContentEditor',
 	matchKind: 'contentEditor',
@@ -17,3 +18,5 @@ export const contentEditorManifest: UmbBackofficeManifestKind = {
 		},
 	},
 };
+
+export const manifests = [contentEditorManifest, ...conditionsManifests];
