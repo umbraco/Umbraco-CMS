@@ -218,7 +218,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			);
 		});
 
-		this.#controlValidator = new UmbFormControlValidator(this, this /*, this.#dataPath*/);
+		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
 	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
