@@ -23,6 +23,9 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _searchResult: Array<UmbMemberItemModel> = [];
 
+	@state()
+	private _searching = false;
+
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 	#searchProvider = new UmbMemberSearchProvider(this);
@@ -50,6 +53,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#onSearchInput(event: UUIInputEvent) {
 		const value = event.target.value as string;
 		this._searchQuery = value;
+		this._searching = true;
 		this.#debouncedSearch();
 	}
 
@@ -58,11 +62,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	async #search() {
 		if (!this._searchQuery) {
 			this._searchResult = [];
+			this._searching = false;
 			return;
 		}
 
 		const { data } = await this.#searchProvider.search({ query: this._searchQuery });
 		this._searchResult = data?.items ?? [];
+		this._searching = false;
 	}
 
 	#submit() {
@@ -104,7 +110,9 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-input id="search-input" placeholder="Search..." @input=${this.#onSearchInput}>
 				<div slot="prepend">
-					<uui-icon name="search"></uui-icon>
+					${this._searching
+						? html`<uui-loader-circle id="search-indicator"></uui-loader-circle>`
+						: html`<uui-icon name="search"></uui-icon>`}
 				</div>
 			</uui-input>
 			<div id="search-divider"></div>
@@ -148,6 +156,11 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				background-color: var(--uui-color-divider);
 				margin-top: var(--uui-size-space-5);
 				margin-bottom: var(--uui-size-space-3);
+			}
+
+			#search-indicator {
+				margin-left: 7px;
+				margin-top: 4px;
 			}
 		`,
 	];
