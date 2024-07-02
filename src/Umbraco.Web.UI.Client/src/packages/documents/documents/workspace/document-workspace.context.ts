@@ -588,7 +588,6 @@ export class UmbDocumentWorkspaceContext
 			this.#persistedData.setValue(data);
 			this.#currentData.setValue(data);
 
-			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
@@ -717,6 +716,14 @@ export class UmbDocumentWorkspaceContext
 			unique,
 			variantIds.map((variantId) => ({ variantId })),
 		);
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.getUnique()!,
+			entityType: this.getEntityType(),
+		});
+
+		eventContext.dispatchEvent(event);
 	}
 
 	async #handleSave() {
