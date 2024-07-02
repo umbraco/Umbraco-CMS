@@ -132,7 +132,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
-	#controlValidator: UmbFormControlValidator;
 
 	@property({ attribute: false })
 	public set areaKey(value: string | null | undefined) {
