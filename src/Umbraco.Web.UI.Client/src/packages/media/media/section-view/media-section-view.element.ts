@@ -55,7 +55,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 					{
 						path: `**`,
 						component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-					}
+					},
 				];
 			},
 			'_observeConfigDataType',

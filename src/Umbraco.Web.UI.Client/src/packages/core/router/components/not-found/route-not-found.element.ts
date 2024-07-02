@@ -8,14 +8,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 // TODO: Rename and move this file to a more generic place.
 @customElement('umb-route-not-found')
 export class UmbRouteNotFoundElement extends UmbLitElement {
-
 	override render() {
 		return html`
 			<div class="uui-text">
 				<h4><umb-localize key="routing_routeNotFoundTitle"></umb-localize></h4>
 				<umb-localize key="routing_routeNotFoundDescription"></umb-localize>
 			</div>
-			`;
+		`;
 	}
 
 	static override styles = [
@@ -35,7 +34,7 @@ export class UmbRouteNotFoundElement extends UmbLitElement {
 				align-items: center;
 				height: 100%;
 				opacity: 0;
-				animation: fadeIn 4s .2s forwards;
+				animation: fadeIn 4s 0.2s forwards;
 			}
 
 			@keyframes fadeIn {

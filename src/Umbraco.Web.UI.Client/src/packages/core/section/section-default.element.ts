@@ -86,11 +86,10 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 						const api = await createExtensionApi(this, extensionController.manifest);
 
 						return {
-							path: (
+							path:
 								api?.getPath?.() ||
 								extensionController.manifest.meta?.path ||
-								aliasToPath(extensionController.manifest.alias)
-							),
+								aliasToPath(extensionController.manifest.alias),
 							component: () => createExtensionElement(extensionController.manifest),
 							setup: (element: PageComponent, info: IRoutingInfo) => {
 								api?.setup?.(element, info);

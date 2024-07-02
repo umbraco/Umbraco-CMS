@@ -75,7 +75,7 @@ export const manifests: Array<ManifestTypes> = [
 			},
 			{
 				alias: 'Umb.Condition.BlockWorkspaceHasSettings',
-			}
+			},
 		],
 	} as any,
 ];

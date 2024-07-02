@@ -2524,6 +2524,6 @@ export default {
 	},
 	routing: {
 		routeNotFoundTitle: 'Not found',
-		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.'
-	}
+		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
+	},
 } as UmbLocalizationDictionary;

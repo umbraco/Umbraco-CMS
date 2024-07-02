@@ -211,7 +211,6 @@ export abstract class UmbBaseExtensionInitializer<
 		// Check if we already have a controller for this config:
 		const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
 		if (!existing) {
-
 			// TODO: Be aware that we might not have a host element any longer at this moment, but I did not want to make a fix for it jet, as its a good indication to if something else is terrible wrong [NL]
 			const conditionController = await createExtensionApi(this, conditionManifest, [
 				{

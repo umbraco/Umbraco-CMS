@@ -1,5 +1,10 @@
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { closestColumnSpanOption } from '../utils/index.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
+import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from './block-grid-entries.context-token.js';
+import {
+	type UmbBlockGridScalableContext,
+	UmbBlockGridScaleManager,
+} from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import {
 	UmbArrayState,
 	UmbBooleanState,
@@ -8,13 +13,8 @@ import {
 	appendToFrozenArray,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { closestColumnSpanOption } from '../utils/index.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
-import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from './block-grid-entries.context-token.js';
-import {
-	type UmbBlockGridScalableContext,
-	UmbBlockGridScaleManager,
-} from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 

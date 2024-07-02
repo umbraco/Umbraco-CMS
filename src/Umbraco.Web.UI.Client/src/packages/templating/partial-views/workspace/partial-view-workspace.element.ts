@@ -47,7 +47,7 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 		{
 			path: `**`,
 			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		}
+		},
 	];
 
 	constructor() {

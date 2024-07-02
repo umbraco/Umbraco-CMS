@@ -1,3 +1,4 @@
+import type { UmbUfmRenderElement } from '../../../ufm/components/ufm-render/index.js';
 import {
 	css,
 	customElement,
@@ -9,7 +10,6 @@ import {
 	when,
 	LitElement,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbUfmRenderElement } from '../../../ufm/components/ufm-render/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
