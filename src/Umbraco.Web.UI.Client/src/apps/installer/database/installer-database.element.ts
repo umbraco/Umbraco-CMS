@@ -79,7 +79,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 					.filter((x) => !!x.id)
 					.map((x, i) => ({
 						name: x.displayName ?? 'Unknown database',
-						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
 						value: x.id!,
 						selected: i === 0,
 					}));

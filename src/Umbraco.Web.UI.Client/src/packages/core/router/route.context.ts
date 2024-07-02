@@ -12,7 +12,6 @@ const EmptyDiv = document.createElement('div');
 type UmbRoutePlusModalKey = UmbRoute & { __modalKey: string };
 
 export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
-	#mainRouter: IRouterSlot;
 	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
 	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
@@ -23,7 +22,6 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 
 	constructor(host: UmbControllerHost, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
 		super(host, UMB_ROUTE_CONTEXT);
-		this.#mainRouter = mainRouter;
 		this.#modalRouter = modalRouter;
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this.#modalContext = context;

@@ -1,7 +1,7 @@
-import { expect } from '@open-wc/testing';
 import type { ManifestCollectionView } from '../extension-registry/models/index.js';
 import { umbExtensionsRegistry } from '../extension-registry/index.js';
 import { UmbCollectionViewManager } from './collection-view.manager.js';
+import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
