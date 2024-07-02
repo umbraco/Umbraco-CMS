@@ -1,16 +1,16 @@
-import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
-import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
-import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
-import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
-import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
-import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
+import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
+import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
+import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -407,6 +407,7 @@ export abstract class UmbTreeItemContextBase<
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
+		// TODO: Encode uniques [NL]
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 

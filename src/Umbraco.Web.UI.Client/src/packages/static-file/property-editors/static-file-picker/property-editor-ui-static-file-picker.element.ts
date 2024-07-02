@@ -8,40 +8,55 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import '../../components/input-static-file/index.js';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 
 @customElement('umb-property-editor-ui-static-file-picker')
 export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _singleItemMode = false;
+	#singleItemMode = false;
+	// TODO: get rid of UmbServerFilePathUniqueSerializer in v.15 [NL]
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	@state()
 	private _value?: string | Array<string>;
 
 	@property({ attribute: false })
 	public set value(value: string | Array<string> | undefined) {
-		this._value = value;
+		if (Array.isArray(value)) {
+			this._value = value.map((unique) => this.#serverFilePathUniqueSerializer.toUnique(unique));
+		} else if (value) {
+			this._value = this.#serverFilePathUniqueSerializer.toUnique(value);
+		} else {
+			this._value = undefined;
+		}
 	}
-	public get value() {
-		return this._value;
+	public get value(): string | Array<string> | undefined {
+		if (Array.isArray(this._value)) {
+			return this._value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique) ?? '');
+		} else if (this._value) {
+			return this.#serverFilePathUniqueSerializer.toServerPath(this._value) ?? '';
+		} else {
+			return undefined;
+		}
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._singleItemMode = config?.getValueByAlias<boolean>('singleItemMode') ?? false;
+		this.#singleItemMode = config?.getValueByAlias<boolean>('singleItemMode') ?? false;
 		const validationLimit = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 
-		this._limitMin = validationLimit?.min;
-		this._limitMax = validationLimit?.max;
+		this._limitMin = validationLimit?.min ?? 0;
+		this._limitMax = this.#singleItemMode ? 1 : validationLimit?.max ?? Infinity;
 	}
 
 	@state()
-	private _limitMin?: number;
+	private _limitMin: number = 0;
 	@state()
-	private _limitMax?: number;
+	private _limitMax: number = Infinity;
 
 	private _onChange(event: CustomEvent) {
-		if (this._singleItemMode) {
-			this.value = (event.target as UmbInputStaticFileElement).selection[0];
+		if (this.#singleItemMode) {
+			this._value = (event.target as UmbInputStaticFileElement).selection[0];
 		} else {
-			this.value = (event.target as UmbInputStaticFileElement).selection;
+			this._value = (event.target as UmbInputStaticFileElement).selection;
 		}
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}

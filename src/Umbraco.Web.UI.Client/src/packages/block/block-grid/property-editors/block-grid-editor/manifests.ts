@@ -1,5 +1,5 @@
-import { manifest as blockGridSchemaManifest } from './Umbraco.BlockGrid.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as blockGridSchemaManifest } from './Umbraco.BlockGrid.js';
 
 export const UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockGrid';
 
@@ -55,6 +55,12 @@ export const manifests: Array<ManifestTypes> = [
 						label: 'Layout Stylesheet',
 						description: 'Override default stylesheet for backoffice layout.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridLayoutStylesheet',
+						config: [
+							{
+								alias: 'singleItemMode',
+								value: true,
+							},
+						],
 					},
 				],
 			},
