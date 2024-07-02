@@ -294,7 +294,7 @@ export class UmbSplitPanelElement extends LitElement {
 		#divider-touch-area {
 			position: absolute;
 			top: 0;
-			left: 0;
+			left: 5px;
 			height: 100%;
 			width: var(--umb-split-panel-divider-touch-area-width);
 			transform: translateX(-50%);
