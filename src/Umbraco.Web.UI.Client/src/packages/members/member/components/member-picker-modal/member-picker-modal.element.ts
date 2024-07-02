@@ -102,7 +102,11 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 	#renderSearch() {
 		return html`
-			<uui-input id="search-input" placeholder="Search..." @input=${this.#onSearchInput}></uui-input>
+			<uui-input id="search-input" placeholder="Search..." @input=${this.#onSearchInput}>
+				<div slot="prepend">
+					<uui-icon name="search"></uui-icon>
+				</div>
+			</uui-input>
 			<div id="search-divider"></div>
 			${this.#renderSearchResult()}
 		`;
