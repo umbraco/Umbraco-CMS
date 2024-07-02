@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 
@@ -21,6 +22,32 @@ public class HtmlLocalLinkParserTests
 {
     [Test]
     public void Returns_Udis_From_LocalLinks()
+    {
+        var input = @"<p>
+    <div>
+        <img src='/media/12312.jpg' data-udi='umb://media/D4B18427A1544721B09AC7692F35C264' />
+        <a type=""document"" href=""/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}"" title=""other page"">other page</a>
+    </div>
+</p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" />
+<a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
+</p>";
+
+        var umbracoContextAccessor = new TestUmbracoContextAccessor();
+        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+
+        var result = parser.FindUdisFromLocalLinks(input).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result.Count);
+            Assert.Contains(UdiParser.Parse("umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"), result);
+            Assert.Contains(UdiParser.Parse("umb://media/7e21a725-b905-4c5f-86dc-8c41ec116e39"), result);
+        });
+    }
+
+    // todo remove at some point and the implementation.
+    [Test]
+    public void Returns_Udis_From_Legacy_LocalLinks()
     {
         var input = @"<p>
     <div>
@@ -36,12 +63,59 @@ public class HtmlLocalLinkParserTests
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
 
-        Assert.AreEqual(2, result.Count);
-        Assert.AreEqual(UdiParser.Parse("umb://document/C093961595094900AAF9170DDE6AD442"), result[0]);
-        Assert.AreEqual(UdiParser.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2"), result[1]);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result.Count);
+            Assert.Contains(UdiParser.Parse("umb://document/C093961595094900AAF9170DDE6AD442"), result);
+            Assert.Contains(UdiParser.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2"), result);
+        });
+    }
+
+    // todo remove at some point and the implementation.
+    [Test]
+    public void Returns_Udis_From_Legacy_And_Current_LocalLinks()
+    {
+        var input = @"<p>
+    <div>
+        <img src='/media/12312.jpg' data-udi='umb://media/D4B18427A1544721B09AC7692F35C264' />
+        <a href=""{locallink:umb://document/C093961595094900AAF9170DDE6AD442}"">hello</a>
+    </div>
+</p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" />
+<a href=""{locallink:umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2}"">hello</a>
+</p>
+<p>
+    <div>
+        <img src='/media/12312.jpg' data-udi='umb://media/D4B18427A1544721B09AC7692F35C264' />
+        <a type=""document"" href=""/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}"" title=""other page"">other page</a>
+    </div>
+</p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" />
+<a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
+</p>";
+
+        var umbracoContextAccessor = new TestUmbracoContextAccessor();
+        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+
+        var result = parser.FindUdisFromLocalLinks(input).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(4, result.Count);
+            Assert.Contains(UdiParser.Parse("umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"), result);
+            Assert.Contains(UdiParser.Parse("umb://media/7e21a725-b905-4c5f-86dc-8c41ec116e39"), result);
+            Assert.Contains(UdiParser.Parse("umb://document/C093961595094900AAF9170DDE6AD442"), result);
+            Assert.Contains(UdiParser.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2"), result);
+        });
     }
 
     [TestCase("", "")]
+    // current
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a type=\"document\" href=\"/my-test-url\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a type=\"media\" href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",
         "hello href=\"/my-test-url\" world ")]
