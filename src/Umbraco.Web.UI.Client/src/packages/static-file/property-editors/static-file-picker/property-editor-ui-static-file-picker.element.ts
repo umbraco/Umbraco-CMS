@@ -11,17 +11,21 @@ import '../../components/input-static-file/index.js';
 
 @customElement('umb-property-editor-ui-static-file-picker')
 export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value: Array<string> = [];
+	private _singleItemMode = false;
 
-	@property({ type: Array })
-	public set value(value: Array<string>) {
-		this._value = value || [];
+	@state()
+	private _value?: string | Array<string>;
+
+	@property({ attribute: false })
+	public set value(value: string | Array<string> | undefined) {
+		this._value = value;
 	}
-	public get value(): Array<string> {
+	public get value() {
 		return this._value;
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this._singleItemMode = config?.getValueByAlias<boolean>('singleItemMode') ?? false;
 		const validationLimit = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 
 		this._limitMin = validationLimit?.min;
@@ -34,7 +38,11 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputStaticFileElement).selection;
+		if (this._singleItemMode) {
+			this.value = (event.target as UmbInputStaticFileElement).selection[0];
+		} else {
+			this.value = (event.target as UmbInputStaticFileElement).selection;
+		}
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -42,10 +50,10 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	override render() {
 		return html`
 			<umb-input-static-file
-				@change=${this._onChange}
-				.selection=${this._value}
+				.selection=${this._value ? (Array.isArray(this._value) ? this._value : [this._value]) : []}
 				.min=${this._limitMin ?? 0}
-				.max=${this._limitMax ?? Infinity}></umb-input-static-file>
+				.max=${this._limitMax ?? Infinity}
+				@change=${this._onChange}></umb-input-static-file>
 		`;
 	}
 }
