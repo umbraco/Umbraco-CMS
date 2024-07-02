@@ -1,11 +1,11 @@
-import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import type { UmbDocumentVariantOptionModel } from '../types.js';
+import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
@@ -101,7 +101,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					const route = routes.find((route) => route.path === this.#appCulture);
 
 					if (!route) {
-						history.pushState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 2].path}`);
+						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
+						history.pushState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 3].path}`);
 						return;
 					}
 
@@ -110,16 +111,12 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
-		const oldValue = this._routes;
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
-		// is there any differences in the amount ot the paths? [NL]
-		if (oldValue && oldValue.length === routes.length) {
-			// is there any differences in the paths? [NL]
-			const hasDifferences = oldValue.some((route, index) => route.path !== routes[index].path);
-			if (!hasDifferences) return;
-		}
 		this._routes = routes;
-		this.requestUpdate('_routes', oldValue);
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
@@ -128,7 +125,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes && this._routes.length > 0
+		return this._routes
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
 			: '';
 	}

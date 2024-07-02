@@ -108,11 +108,10 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			});
 		}
 
-		// Find the routes who are removed:
-		//const removedRoutes = this._routes.filter((route) => !routes.find((r) => r.path === route.path));
-
-		// Find the routes who are new:
-		//const newRoutes = routes.filter((route) => !this._routes.find((r) => r.path === route.path));
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this._routes = routes;
 	}

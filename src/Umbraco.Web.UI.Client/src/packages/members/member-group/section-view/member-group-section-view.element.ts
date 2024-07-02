@@ -28,6 +28,10 @@ export class UmbMemberGroupSectionViewElement extends UmbLitElement {
 			path: '',
 			redirectTo: 'collection',
 		},
+		{
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		}
 	];
 
 	override render() {

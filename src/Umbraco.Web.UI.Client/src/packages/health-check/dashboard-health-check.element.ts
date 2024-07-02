@@ -24,7 +24,10 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		{
 			path: ``,
 			component: () => import('./views/health-check-overview.element.js'),
-		},
+		},{
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		}
 	];
 
 	private _healthCheckDashboardContext = new UmbHealthCheckDashboardContext(this);

@@ -1,14 +1,3 @@
-import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
-import type { UmbDocumentTypeDetailModel } from '../types.js';
-import {
-	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
-	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
-	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
-	UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
-	type UmbCreateDocumentTypeWorkspacePresetType,
-} from '../paths.js';
-import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -18,7 +7,6 @@ import {
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -31,6 +19,17 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
+import {
+	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
+	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
+	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
+	UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
+	type UmbCreateDocumentTypeWorkspacePresetType,
+} from '../paths.js';
+import type { UmbDocumentTypeDetailModel } from '../types.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
+import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext

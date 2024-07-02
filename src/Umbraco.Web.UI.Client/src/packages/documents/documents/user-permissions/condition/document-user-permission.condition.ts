@@ -1,4 +1,3 @@
-import { isDocumentUserPermission } from '../utils.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -10,6 +9,7 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { isDocumentUserPermission } from '../utils.js';
 
 export class UmbDocumentUserPermissionCondition
 	extends UmbConditionBase<UmbDocumentUserPermissionConditionConfig>

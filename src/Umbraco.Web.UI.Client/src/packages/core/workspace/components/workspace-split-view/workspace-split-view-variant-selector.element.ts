@@ -1,17 +1,17 @@
-import type { ActiveVariant } from '../../controllers/index.js';
-import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	type UUIInputElement,
 	UUIInputEvent,
 	type UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import type { ActiveVariant } from '../../controllers/index.js';
+import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 type UmbDocumentVariantOption = {
 	culture: string | null;

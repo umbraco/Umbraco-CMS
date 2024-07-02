@@ -71,16 +71,17 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				} as UmbRoute;
 			});
 
-			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
-			// TODO: This is problematic, cause if a workspaceView appears later, then this takes over. And it is also a problem if it does not use redirect, but just a view defined with and empty path.
-			const firstRoute = newRoutes[0];
-			if (firstRoute) {
-				newRoutes.push({
-					path: ``,
-					redirectTo: firstRoute.path,
-				});
-			}
+			newRoutes.push({
+				path: '',
+				redirectTo: newRoutes[0]?.path,
+			});
+
 		}
+
+		newRoutes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this._routes = newRoutes;
 	}

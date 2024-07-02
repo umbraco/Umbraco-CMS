@@ -1,5 +1,5 @@
-import { UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS } from '../index.js';
 import type { ManifestTypes, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS } from '../index.js';
 
 export const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
@@ -53,7 +53,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
-			},
+			}
 		],
 	},
 ];

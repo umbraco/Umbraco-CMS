@@ -1,5 +1,3 @@
-import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
-import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
@@ -14,6 +12,8 @@ import {
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
+import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
@@ -27,7 +27,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	//readonly data = this.#data.asObservable();
 
 	// TODO: Get the name of the contentElementType..
-	readonly name = this.#data.asObservablePart((data) => 'block');
+	readonly name = this.#data.asObservablePart(() => 'block');
 	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
 
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);

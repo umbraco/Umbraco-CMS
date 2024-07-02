@@ -1,5 +1,3 @@
-import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
@@ -11,6 +9,8 @@ import {
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
