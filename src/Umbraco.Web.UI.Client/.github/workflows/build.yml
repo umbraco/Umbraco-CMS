@@ -36,5 +36,5 @@ jobs:
           cache-dependency-path: ./package-lock.json
       - run: npm ci --no-audit --no-fund --prefer-offline
       - run: npm run lint:errors
-      - run: npm run build:for:npm
+      - run: npm run build:for:cms
       - run: npm run generate:jsonschema:dist
