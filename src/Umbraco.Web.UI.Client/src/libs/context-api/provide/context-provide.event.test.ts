@@ -1,6 +1,6 @@
-import { expect } from '@open-wc/testing';
 import type { UmbContextProvideEvent } from './context-provide.event.js';
 import { UmbContextProvideEventImplementation } from './context-provide.event.js';
+import { expect } from '@open-wc/testing';
 
 describe('UmbContextProvideEvent', () => {
 	const event: UmbContextProvideEvent = new UmbContextProvideEventImplementation('my-test-context-alias');

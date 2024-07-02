@@ -1,14 +1,14 @@
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_BLOCK_GRID_AREA_TYPE_ENTRIES_CONTEXT } from '../../property-editors/block-grid-areas-config/block-grid-area-type-entries.context-token.js';
 import {
 	UmbBlockGridScaleManager,
 	type UmbBlockGridScalableContext,
 } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import { UMB_BLOCK_GRID_AREA_CONFIG_ENTRY_CONTEXT } from './block-grid-area-config-entry.context-token.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block-grid';
 export class UmbBlockGridAreaConfigEntryContext
 	extends UmbContextBase<UmbBlockGridAreaConfigEntryContext>

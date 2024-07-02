@@ -1,7 +1,7 @@
 import './story-notification-default-example.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
 import { UmbNotificationContext } from '../notification.context.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {

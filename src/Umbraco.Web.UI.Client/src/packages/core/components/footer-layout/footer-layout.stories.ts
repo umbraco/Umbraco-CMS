@@ -1,7 +1,7 @@
 import './footer-layout.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbFooterLayoutElement } from './footer-layout.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {

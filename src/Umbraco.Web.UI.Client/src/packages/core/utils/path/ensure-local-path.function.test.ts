@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { ensureLocalPath } from './ensure-local-path.function.js';
+import { expect } from '@open-wc/testing';
 
 describe('ensureLocalPath', () => {
 	it('should return the same URL if it is a local URL', () => {

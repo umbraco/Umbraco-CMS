@@ -49,14 +49,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		}
 	}
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-		});
-	}
-
 	private _searchMenuData: Array<{ label: string; href: () => string; icon: string; title: string }> = [
 		{
 			label: 'Search in Google',
