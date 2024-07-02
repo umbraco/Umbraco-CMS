@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.LiveEnvironment;
 [HealthCheck(
     "8E31E5C9-7A1D-4ACB-A3A8-6495F3EDB932",
     "Runtime Mode",
-    Description = "Health check for the recommended production configuration for runtime mode.",
+    Description = "The Production Runtime Mode disables development features and checks that settings are configured optimally for production.
     Group = "Live Environment")]
 public class RuntimeModeCheck : AbstractSettingsCheck
 {
