@@ -15,6 +15,7 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     [Test]
     public async Task RebuildAllUrlsAsync()
     {
+
         await DocumentUrlService.RebuildAllUrlsAsync();
     }
 }
