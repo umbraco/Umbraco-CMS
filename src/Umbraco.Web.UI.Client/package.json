@@ -260,7 +260,7 @@
 		"storybook": "^7.6.17",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.8",
-		"typedoc": "^0.25.13",
+		"typedoc": "^0.26.3",
 		"typescript": "^5.5.2",
 		"typescript-json-schema": "^0.63.0",
 		"vite": "^5.2.9",
