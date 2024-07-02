@@ -217,13 +217,13 @@ stages:
             displayName: Replace BASE_PATH on assets
             workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
           - task: ArchiveFiles@2
-            displayName: Archive js Docs
+            displayName: Archive Storybook
             inputs:
               rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
               includeRootFolder: false
               archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
-            displayName: Publish js Docs
+            displayName: Publish Storybook
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
               artifact: ui-docs
@@ -846,7 +846,7 @@ stages:
               BlobPrefix: v$(umbracoMajorVersion)/csharp
               CleanTargetBeforeCopy: true
       - job:
-        displayName: Upload js Docs
+        displayName: Upload Storybook
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -859,7 +859,7 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-docs
           - task: AzureFileCopy@4
-            displayName: 'Copy UI Docs to blob storage'
+            displayName: 'Copy Storybook to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/ui-docs/*'
               azureSubscription: umbraco-storage
