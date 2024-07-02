@@ -35,7 +35,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 */
 	sortBy(sortMethod?: (a: T, b: T) => number) {
 		this.#sortMethod = sortMethod;
-		super.setValue(this.getValue().sort(this.#sortMethod));
+		const value = this.getValue();
+		if(value) {
+			super.setValue([...value].sort(this.#sortMethod));
+		}
 		return this;
 	}
 
@@ -51,7 +54,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 */
 	override setValue(value: T[]) {
 		if (this.#sortMethod) {
-			super.setValue(value.sort(this.#sortMethod));
+			super.setValue([...value].sort(this.#sortMethod));
 		} else {
 			super.setValue(value);
 		}
