@@ -1,12 +1,12 @@
 import './document-unpublish-modal.element.js';
 
-import type { Meta, StoryObj } from '@storybook/web-components';
 import { UmbDocumentVariantState } from '../../types.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
 } from './document-unpublish-modal.token.js';
 import type { UmbDocumentUnpublishModalElement } from './document-unpublish-modal.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentUnpublishModalData = {

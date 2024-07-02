@@ -1,6 +1,6 @@
+import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 
 export const UMB_BLOCK_WORKSPACE_CONTEXT = new UmbContextToken<UmbWorkspaceContext, UmbBlockWorkspaceContext>(
 	'UmbWorkspaceContext',

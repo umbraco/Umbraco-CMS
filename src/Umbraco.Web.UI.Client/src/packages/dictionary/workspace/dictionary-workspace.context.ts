@@ -35,7 +35,6 @@ export class UmbDictionaryWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly dictionary = this.#data.asObservablePart((data) => data);
 
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Dictionary');
 
