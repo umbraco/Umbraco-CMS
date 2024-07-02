@@ -71,11 +71,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				} as UmbRoute;
 			});
 
-			newRoutes.push({
-				path: '',
-				redirectTo: newRoutes[0]?.path,
-			});
-
+			newRoutes.push({ ...newRoutes[0], path: '' });
 		}
 
 		newRoutes.push({
@@ -116,11 +112,12 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,
-								(view) => html`
+								(view, index) => html`
 									<uui-tab
 										href="${this._routerPath}/view/${view.meta.pathname}"
 										.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
-										?active=${'view/' + view.meta.pathname === this._activePath}>
+										?active=${'view/' + view.meta.pathname === this._activePath ||
+										(index === 0 && this._activePath === '')}>
 										<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
 										${view.meta.label ? this.localize.string(view.meta.label) : view.name}
 									</uui-tab>
