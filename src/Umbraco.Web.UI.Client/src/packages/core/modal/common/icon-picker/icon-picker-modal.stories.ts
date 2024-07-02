@@ -1,8 +1,8 @@
 import '../../../components/body-layout/body-layout.element.js';
 import './icon-picker-modal.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';

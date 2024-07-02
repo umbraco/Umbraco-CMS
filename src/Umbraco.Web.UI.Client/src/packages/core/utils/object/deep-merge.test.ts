@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { umbDeepMerge } from './deep-merge.function.js';
+import { expect } from '@open-wc/testing';
 
 describe('UmbDeepMerge', () => {
 	beforeEach(() => {});

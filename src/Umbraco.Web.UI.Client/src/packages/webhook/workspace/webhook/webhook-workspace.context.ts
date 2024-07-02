@@ -1,3 +1,6 @@
+import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
+import { UmbWebhookDetailRepository } from '../../repository/index.js';
+import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
@@ -6,9 +9,6 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
-import { UmbWebhookDetailRepository } from '../../repository/index.js';
-import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 
 export class UmbWebhookWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbWebhookDetailModel>

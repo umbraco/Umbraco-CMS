@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { splitStringToArray } from './string/split-string-to-array.js';
+import { expect } from '@open-wc/testing';
 
 describe('splitStringToArray', () => {
 	it('splits and cleans a comma-separated string', () => {

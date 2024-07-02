@@ -1,5 +1,5 @@
-import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
+import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUICheckboxListElement', () => {

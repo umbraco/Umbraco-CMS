@@ -1,5 +1,5 @@
-import { expect, oneEvent } from '@open-wc/testing';
 import { UmbPaginationManager } from './pagination.manager.js';
+import { expect, oneEvent } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 

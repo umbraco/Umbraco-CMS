@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-content-picker.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-content-picker.element.js';

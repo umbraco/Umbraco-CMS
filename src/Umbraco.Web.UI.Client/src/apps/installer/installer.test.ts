@@ -1,6 +1,6 @@
+import { UmbInstallerElement } from './installer.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { UmbInstallerElement } from './installer.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 // TODO: Write tests

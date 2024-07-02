@@ -1,5 +1,5 @@
-import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIUserPickerElement } from './property-editor-ui-user-picker.element.js';
+import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIUserPickerElement', () => {

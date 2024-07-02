@@ -1,6 +1,6 @@
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
 import type { UmbBlockDataType, UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
 
 import '@umbraco-cms/backoffice/ufm';

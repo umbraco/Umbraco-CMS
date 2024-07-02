@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIImageCropperElement } from './property-editor-ui-image-cropper.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-image-cropper.element.js';

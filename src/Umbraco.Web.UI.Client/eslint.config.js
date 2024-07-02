@@ -50,7 +50,7 @@ export default [
 			"no-unused-vars": "warn",
 			"no-var": "error",
 			"import/no-unresolved": "off",
-			"import/order": "warn",
+			"import/order": ["warn", { "groups": ["builtin", "parent", "sibling", "index", "external"] }],
 			"import/no-self-import": "error",
 			"import/no-cycle": ["error", { "maxDepth": 6, "allowUnsafeDynamicCyclicDependency": true }],
 			"local-rules/bad-type-import": "error",
