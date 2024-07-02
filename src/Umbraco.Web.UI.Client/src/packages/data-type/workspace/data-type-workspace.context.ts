@@ -82,7 +82,6 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
 		this.#observePropertyEditorUIAlias();
