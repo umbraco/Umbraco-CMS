@@ -1,10 +1,11 @@
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UMB_AUTH_CONTEXT } from '../auth/index.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbResourceController extends UmbControllerBase {
@@ -34,6 +35,17 @@ export class UmbResourceController extends UmbControllerBase {
 
 	override hostDisconnected(): void {
 		this.cancel();
+	}
+
+	#buildApiErrorMessage(error: any) {
+		const entries: Array<Record<string, any>> = [];
+
+		Object.entries(error).forEach(([category, message]) => {
+			entries.push({ category, messages: message as string[] });
+		});
+		const template = html` ${entries.map((e) => e.messages.map((msg: string) => html`<div>${msg}</div>`))}`;
+
+		return template;
 	}
 
 	/**
@@ -129,10 +141,11 @@ export class UmbResourceController extends UmbControllerBase {
 					default:
 						// Other errors
 						if (this.#notificationContext) {
+							const message = error.body?.errors ? this.#buildApiErrorMessage(error.body.errors) : undefined;
 							this.#notificationContext.peek('danger', {
 								data: {
 									headline: error.body?.title ?? error.name ?? 'Server Error',
-									message: error.body?.detail ?? error.message ?? 'Something went wrong',
+									message: message ?? error.body?.detail ?? error.message ?? 'Something went wrong',
 								},
 								...options,
 							});
