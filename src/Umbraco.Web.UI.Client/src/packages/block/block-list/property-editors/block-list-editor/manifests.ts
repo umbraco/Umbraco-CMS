@@ -1,5 +1,5 @@
-import { manifest as blockListSchemaManifest } from './Umbraco.BlockList.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as blockListSchemaManifest } from './Umbraco.BlockList.js';
 
 export const UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockList';
 

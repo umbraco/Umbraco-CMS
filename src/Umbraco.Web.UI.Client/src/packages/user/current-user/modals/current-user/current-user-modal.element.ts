@@ -84,6 +84,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
+			:host {
+				color: var(--uui-color-text);
+			}
 			#main {
 				display: flex;
 				flex-direction: column;
