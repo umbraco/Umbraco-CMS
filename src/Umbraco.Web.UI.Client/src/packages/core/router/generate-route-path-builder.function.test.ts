@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { umbGenerateRoutePathBuilder } from './generate-route-path-builder.function.js';
+import { expect } from '@open-wc/testing';
 
 describe('createRoutePathBuilder', () => {
 	it('should return a function that builds a route path without parameters', () => {

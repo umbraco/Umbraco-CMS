@@ -38,7 +38,6 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	private _treeElement?: UmbTreeElement;
 
 	#fileReader;
-	#fileNodes!: NodeListOf<ChildNode>;
 	#fileContent: Array<UmbDictionaryItemPreview> = [];
 	#dictionaryImportRepository = new UmbDictionaryImportRepository(this);
 	#temporaryFileRepository = new UmbTemporaryFileRepository(this);
@@ -73,7 +72,6 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(htmlString, 'text/xml');
 		const elements = doc.childNodes;
-		this.#fileNodes = elements;
 
 		this.#fileContent = this.#dictionaryPreviewItemBuilder(elements);
 		this.requestUpdate();

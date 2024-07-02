@@ -1,6 +1,6 @@
-import { expect } from '@open-wc/testing';
 import type { ManifestElementWithElementName, ManifestKind, ManifestBase } from '../types/index.js';
 import { UmbExtensionRegistry } from './extension.registry.js';
+import { expect } from '@open-wc/testing';
 
 interface TestManifestWithMeta extends ManifestBase {
 	meta: unknown;

@@ -1,7 +1,7 @@
-import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestApi, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbExtensionApiInitializer } from './index.js';
+import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbControllerHostElement, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
