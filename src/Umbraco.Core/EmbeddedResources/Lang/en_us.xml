@@ -420,7 +420,7 @@
       disable this setting before go live.
     </key>
     <key alias="runtimeModeCheckSuccessMessage">Runtime mode is set to production.</key>
-    <key alias="runtimeModeCheckErrorMessage">Runtime mode is not set to production. It is recommended to change this setting to Production before go live.</key>
+    <key alias="runtimeModeCheckErrorMessage">Runtime mode is not set to Production. It is recommended to set the Runtime Mode to Production for live/production environments.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
