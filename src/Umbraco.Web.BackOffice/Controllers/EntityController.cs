@@ -1,16 +1,11 @@
-using System.Collections.Concurrent;
 using System.Dynamic;
 using System.Globalization;
-using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Security.Cryptography;
-using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -21,7 +16,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
@@ -718,15 +712,15 @@ public class EntityController : UmbracoAuthorizedJsonController
         {
             //TODO: Need to check for Object types that support hierarchy here, some might not.
 
-            var startNodes = GetStartNodes(type);
+            var startNodeIds = GetStartNodeIds(type);
 
             var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
 
             // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
-            if (id == Constants.System.Root && startNodes.Length > 0 &&
-                startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
+            if (id == Constants.System.Root && startNodeIds.Length > 0 &&
+                startNodeIds.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
             {
-                IEntitySlim[] nodes = _entityService.GetAll(objectType.Value, startNodes).ToArray();
+                IEntitySlim[] nodes = _entityService.GetAll(objectType.Value, startNodeIds).ToArray();
                 if (nodes.Length == 0)
                 {
                     return Enumerable.Empty<EntityBasic>();
@@ -858,13 +852,14 @@ public class EntityController : UmbracoAuthorizedJsonController
         {
             IEnumerable<IEntitySlim> entities;
 
-            var startNodes = GetStartNodes(type);
+            var startNodeIds = GetStartNodeIds(type);
+            var startNodePaths = GetStartNodePaths(type);
 
             var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
 
             // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
-            if (id == Constants.System.Root && startNodes.Length > 0 &&
-                startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
+            if (id == Constants.System.Root && startNodeIds.Length > 0 &&
+                startNodeIds.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
             {
                 return new PagedResult<EntityBasic>(0, 0, 0);
             }
@@ -896,22 +891,28 @@ public class EntityController : UmbracoAuthorizedJsonController
             var culture = ClientCulture();
             var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {
-                Items = entities.Select(source =>
-                {
-                    EntityBasic? target = _umbracoMapper.Map<IEntitySlim, EntityBasic>(source, context =>
+                Items = entities
+                    // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
+                    // This has been the case with this functionality in Umbraco for a long time.
+                    .Where(entity => ignoreUserStartNodes ||
+                                     (ContentPermissions.IsInBranchOfStartNode(entity.Path, startNodeIds, startNodePaths, out var hasPathAccess) &&
+                                     hasPathAccess))
+                    .Select(source =>
                     {
-                        context.SetCulture(culture);
-                        context.SetCulture(culture);
-                    });
+                        EntityBasic? target = _umbracoMapper.Map<IEntitySlim, EntityBasic>(source, context =>
+                        {
+                            context.SetCulture(culture);
+                            context.SetCulture(culture);
+                        });
 
-                    if (target is not null)
-                    {
-                        //TODO: Why is this here and not in the mapping?
-                        target.AdditionalData["hasChildren"] = source.HasChildren;
-                    }
+                        if (target is not null)
+                        {
+                            //TODO: Why is this here and not in the mapping?
+                            target.AdditionalData["hasChildren"] = source.HasChildren;
+                        }
 
-                    return target;
-                }).WhereNotNull()
+                        return target;
+                    }).WhereNotNull()
             };
 
             return pagedResult;
@@ -931,7 +932,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         }
     }
 
-    private int[] GetStartNodes(UmbracoEntityTypes type)
+    private int[] GetStartNodeIds(UmbracoEntityTypes type)
     {
         switch (type)
         {
@@ -943,6 +944,21 @@ public class EntityController : UmbracoAuthorizedJsonController
                     _entityService, _appCaches) ?? Array.Empty<int>();
             default:
                 return Array.Empty<int>();
+        }
+    }
+
+    private string[] GetStartNodePaths(UmbracoEntityTypes type)
+    {
+        switch (type)
+        {
+            case UmbracoEntityTypes.Document:
+                return _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetContentStartNodePaths(
+                    _entityService, _appCaches) ?? Array.Empty<string>();
+            case UmbracoEntityTypes.Media:
+                return _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetMediaStartNodePaths(
+                    _entityService, _appCaches) ?? Array.Empty<string>();
+            default:
+                return Array.Empty<string>();
         }
     }
 
@@ -979,7 +995,7 @@ public class EntityController : UmbracoAuthorizedJsonController
             {
                 // root is special: we reduce it to start nodes
 
-                var aids = GetStartNodes(type);
+                var aids = GetStartNodeIds(type);
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
                 entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
