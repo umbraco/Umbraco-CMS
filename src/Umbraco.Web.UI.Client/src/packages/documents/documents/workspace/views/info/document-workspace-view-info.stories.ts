@@ -1,7 +1,7 @@
 import './document-workspace-view-info.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbDocumentWorkspaceViewInfoElement } from './document-workspace-view-info.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 // import { data } from '../../../../../../core/mocks/data/document.data.js';
