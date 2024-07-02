@@ -48,7 +48,9 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		const newRoutes = this._sections
 			.filter((x) => x.manifest)
 			.map((section) => {
-				const existingRoute = this._routes.find((r) => r.path === UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: section.manifest!.meta.pathname }));
+				const existingRoute = this._routes.find(
+					(r) => r.path === UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: section.manifest!.meta.pathname }),
+				);
 				if (existingRoute) {
 					return existingRoute;
 				} else {
@@ -63,17 +65,17 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				}
 			});
 
-		if(newRoutes.length > 0 ) {
+		if (newRoutes.length > 0) {
 			newRoutes.push({
 				path: ``,
-				redirectTo: newRoutes[0].path
+				redirectTo: newRoutes[0].path,
+			});
+
+			newRoutes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 			});
 		}
-
-		newRoutes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		});
 
 		this._routes = newRoutes;
 	}

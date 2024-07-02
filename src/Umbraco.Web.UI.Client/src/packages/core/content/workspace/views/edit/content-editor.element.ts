@@ -106,12 +106,12 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				path: '',
 				redirectTo: routes[0]?.path,
 			});
-		}
 
-		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		});
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
+		}
 
 		this._routes = routes;
 	}

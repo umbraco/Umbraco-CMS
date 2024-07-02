@@ -79,7 +79,15 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		});
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
-		this._routes = routes?.length > 0 ? [...routes, { path: '', redirectTo: routes?.[0]?.path }] : [];
+		if (routes.length > 0) {
+			routes.push({ path: '', redirectTo: routes?.[0]?.path });
+
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
+		}
+		this._routes = routes;
 	}
 
 	override render() {
