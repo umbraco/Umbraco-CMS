@@ -17,7 +17,14 @@ export default [
 
 	// Global ignores
 	{
-		ignores: ["**/rollup.config.js", "**/vite.config.ts", "src/external/router-slot", "src/packages/core/icon-registry/icons", "src/packages/core/icon-registry/icons.ts"],
+		ignores: [
+			"**/rollup.config.js",
+			"**/vite.config.ts",
+			"src/external/backend-api",
+			"src/external/router-slot",
+			"src/packages/core/icon-registry/icons",
+			"src/packages/core/icon-registry/icons.ts"
+		],
 	},
 
 	// Global config
