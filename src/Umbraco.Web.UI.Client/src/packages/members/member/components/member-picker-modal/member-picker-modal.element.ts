@@ -3,7 +3,7 @@ import type { UmbMemberDetailModel } from '../../types.js';
 import { UmbMemberSearchProvider } from '../../search/member.search-provider.js';
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
-import { html, customElement, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -56,6 +56,11 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#debouncedSearch = debounce(this.#search, 300);
 
 	async #search() {
+		if (!this._searchQuery) {
+			this._searchResult = [];
+			return;
+		}
+
 		const { data } = await this.#searchProvider.search({ query: this._searchQuery });
 		this._searchResult = data?.items ?? [];
 	}
@@ -71,14 +76,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
-			<uui-box>
-				${this.#renderSearch()}
-				${repeat(
-					this.#filteredMembers,
-					(item) => item.unique,
-					(item) => this.#renderMemberItem(item),
-				)}
-			</uui-box>
+			<uui-box> ${this.#renderSearch()} ${this.#renderItems()} </uui-box>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_cancel')} @click=${this.#close}></uui-button>
@@ -91,12 +89,22 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
+	#renderItems() {
+		if (this._searchQuery) return nothing;
+		return html`
+			${repeat(
+				this.#filteredMembers,
+				(item) => item.unique,
+				(item) => this.#renderMemberItem(item),
+			)}
+		`;
+	}
+
 	#renderSearch() {
 		return html`
-			<div id="search">
-				<uui-input id="search-input" placeholder="Search..." @input=${this.#onSearchInput}></uui-input>
-				${this.#renderSearchResult()}
-			</div>
+			<uui-input id="search-input" placeholder="Search..." @input=${this.#onSearchInput}></uui-input>
+			<div id="search-divider"></div>
+			${this.#renderSearchResult()}
 		`;
 	}
 
@@ -126,13 +134,16 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	static override styles = [
 		UmbTextStyles,
 		css`
-			#search {
-				padding-bottom: var(--uui-size-space-5);
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-
 			#search-input {
 				width: 100%;
+			}
+
+			#search-divider {
+				width: 100%;
+				height: 1px;
+				background-color: var(--uui-color-divider);
+				margin-top: var(--uui-size-space-5);
+				margin-bottom: var(--uui-size-space-3);
 			}
 		`,
 	];
