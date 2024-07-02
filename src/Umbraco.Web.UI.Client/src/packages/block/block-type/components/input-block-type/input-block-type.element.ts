@@ -145,8 +145,6 @@ export class UmbInputBlockTypeElement<
 	#renderItem = (block: BlockType) => {
 		return html`
 			<umb-block-type-card
-				.data-umb-content-element-key=${block.contentElementTypeKey}
-				.name=${block.label}
 				.iconFile=${block.thumbnail}
 				.iconColor=${block.iconColor}
 				.backgroundColor=${block.backgroundColor}
