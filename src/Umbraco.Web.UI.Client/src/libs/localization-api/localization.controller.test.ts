@@ -1,7 +1,7 @@
-import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import type { UmbLocalizationSet, UmbLocalizationSetBase } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
 import { UmbLocalizationController } from './localization.controller.js';
+import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

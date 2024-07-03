@@ -17,7 +17,11 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_GRID_TYPE, UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
+import {
+	UMB_BLOCK_GRID_TYPE,
+	UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
+	type UmbBlockGridTypeGroupType,
+} from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_PROPERTY_CONTEXT,
@@ -104,7 +108,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this.#observeBlockGroups();
 		});
 
-		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL)
+		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(
+			this,
+			UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
+		)
 			.addAdditionalPath(UMB_BLOCK_GRID_TYPE)
 			.observeRouteBuilder((routeBuilder) => {
 				const newpath = routeBuilder({});

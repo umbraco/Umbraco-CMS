@@ -1,6 +1,6 @@
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
+import { UMB_TEMPLATE_TREE_STORE_CONTEXT } from './template-tree.store.context-token.js';
 
 /**
  * @export
@@ -20,5 +20,3 @@ export class UmbTemplateTreeStore extends UmbUniqueTreeStore {
 }
 
 export default UmbTemplateTreeStore;
-
-export const UMB_TEMPLATE_TREE_STORE_CONTEXT = new UmbContextToken<UmbTemplateTreeStore>('UmbTemplateTreeStore');

@@ -132,7 +132,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
-	#controlValidator: UmbFormControlValidator;
 
 	@property({ attribute: false })
 	public set areaKey(value: string | null | undefined) {
@@ -220,7 +219,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			);
 		});
 
-		this.#controlValidator = new UmbFormControlValidator(this, this /*, this.#dataPath*/);
+		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
 	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
