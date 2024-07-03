@@ -61,6 +61,10 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 			path: '',
 			redirectTo: 'overview',
 		});
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 		this._routes = routes;
 	}
 
