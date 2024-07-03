@@ -10,4 +10,6 @@ export class UmbMediaUrlRepository extends UmbItemRepositoryBase<UmbMediaUrlMode
 	}
 }
 
+export { UmbMediaUrlRepository as api };
+
 export default UmbMediaUrlRepository;

@@ -19,6 +19,8 @@ export class UmbMediaRecycleBinTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
+export { UmbMediaRecycleBinTreeStore as api };
+
 export const UMB_MEDIA_RECYCLE_BIN_TREE_STORE_CONTEXT = new UmbContextToken<UmbMediaRecycleBinTreeStore>(
 	'UmbMediaRecycleBinTreeStore',
 );

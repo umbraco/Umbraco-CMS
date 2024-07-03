@@ -10,7 +10,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Media.Create',
 		name: 'Create Media Entity Action',
 		weight: 1200,
-		api: UmbCreateMediaEntityAction,
+		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',

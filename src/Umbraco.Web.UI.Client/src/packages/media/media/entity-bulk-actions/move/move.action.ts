@@ -21,3 +21,5 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<object
 		}
 	}
 }
+
+export { UmbMediaMoveEntityBulkAction as api };
