@@ -30,7 +30,7 @@ jobs:
         with:
           directory-to-scan: src
           should-scan-archives: false
-          ignore-globs: '**/.git/**,*.md,*.mdx,*.stories.ts,*.js'
+          ignore-globs: '**/.git/**,src/mocks/**/*,*.md,*.mdx,*.stories.ts,*.js'
 
       - name: Upload DevSkim scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
