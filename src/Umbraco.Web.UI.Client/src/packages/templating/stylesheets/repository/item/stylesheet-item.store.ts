@@ -1,7 +1,7 @@
-import type { UmbStylesheetItemModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
+import type { UmbStylesheetItemModel } from '../../types.js';
+import { UMB_STYLESHEET_ITEM_STORE_CONTEXT } from './stylesheet-item.store.context-token.js';
 
 /**
  * @export
@@ -22,5 +22,3 @@ export class UmbStylesheetItemStore extends UmbItemStoreBase<UmbStylesheetItemMo
 }
 
 export default UmbStylesheetItemStore;
-
-export const UMB_STYLESHEET_ITEM_STORE_CONTEXT = new UmbContextToken<UmbStylesheetItemStore>('UmbStylesheetItemStore');

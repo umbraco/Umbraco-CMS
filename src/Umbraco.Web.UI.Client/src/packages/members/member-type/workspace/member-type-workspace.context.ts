@@ -5,7 +5,6 @@ import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-edi
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
