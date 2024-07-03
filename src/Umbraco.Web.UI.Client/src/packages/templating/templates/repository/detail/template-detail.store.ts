@@ -1,7 +1,7 @@
-import type { UmbTemplateDetailModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbTemplateDetailModel } from '../../types.js';
+import { UMB_TEMPLATE_DETAIL_STORE_CONTEXT } from './template-detail.store.context-token.js';
 
 /**
  * @export
@@ -21,5 +21,3 @@ export class UmbTemplateDetailStore extends UmbDetailStoreBase<UmbTemplateDetail
 }
 
 export default UmbTemplateDetailStore;
-
-export const UMB_TEMPLATE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbTemplateDetailStore>('UmbTemplateDetailStore');

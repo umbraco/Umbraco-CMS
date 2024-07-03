@@ -1,6 +1,5 @@
-import { UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UmbScriptCreateOptionsEntityAction } from './create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../../entity.js';
 
 export const manifests: Array<ManifestTypes> = [
 	{
@@ -9,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Script.CreateOptions',
 		name: 'Script Create Options Entity Action',
 		weight: 1200,
-		api: UmbScriptCreateOptionsEntityAction,
+		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
