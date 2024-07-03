@@ -1,6 +1,6 @@
-import { UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL } from '../current-user-mfa-enable-provider/current-user-mfa-enable-provider-modal.token.js';
+import { UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL } from '../current-user-mfa-enable/current-user-mfa-enable-modal.token.js';
 import { UmbCurrentUserRepository } from '../../repository/index.js';
-import { UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL } from '../current-user-mfa-disable-provider/current-user-mfa-disable-provider-modal.token.js';
+import { UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL } from '../current-user-mfa-disable/current-user-mfa-disable-modal.token.js';
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

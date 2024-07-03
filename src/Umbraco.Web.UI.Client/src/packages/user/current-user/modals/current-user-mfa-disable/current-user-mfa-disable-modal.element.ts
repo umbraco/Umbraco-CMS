@@ -1,5 +1,5 @@
 import { UmbCurrentUserRepository } from '../../repository/index.js';
-import type { UmbCurrentUserMfaDisableProviderModalConfig } from './current-user-mfa-disable-provider-modal.token.js';
+import type { UmbCurrentUserMfaDisableModalConfig } from './current-user-mfa-disable-modal.token.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import { css, customElement, html, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -7,9 +7,9 @@ import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { isApiError } from '@umbraco-cms/backoffice/resources';
 
-@customElement('umb-current-user-mfa-disable-provider-modal')
-export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseElement<
-	UmbCurrentUserMfaDisableProviderModalConfig,
+@customElement('umb-current-user-mfa-disable-modal')
+export class UmbCurrentUserMfaDisableModalElement extends UmbModalBaseElement<
+	UmbCurrentUserMfaDisableModalConfig,
 	never
 > {
 	#currentUserRepository = new UmbCurrentUserRepository(this);
@@ -156,10 +156,10 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 	];
 }
 
-export default UmbCurrentUserMfaDisableProviderModalElement;
+export default UmbCurrentUserMfaDisableModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-mfa-disable-provider-modal': UmbCurrentUserMfaDisableProviderModalElement;
+		'umb-current-user-mfa-disable-modal': UmbCurrentUserMfaDisableModalElement;
 	}
 }
