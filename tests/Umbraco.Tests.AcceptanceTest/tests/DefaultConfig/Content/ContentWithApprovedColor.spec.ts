@@ -4,20 +4,15 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Approved Color';
-let dataTypeDefaultData = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
-  dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName); 
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName); 
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  } 
 });
 
 test('can create content with the approved color data type', async ({umbracoApi, umbracoUi}) => {
@@ -64,23 +59,11 @@ test('can publish content with the approved color data type', async ({umbracoApi
 
 test('can create content with the custom approved color data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const colorValue = 'ffffff';
+  const customDataTypeName = 'CustomApprovedColor';
+  const colorValue = 'd73737';
   const colorLabel = '';
-  const customDataTypeValues = [
-    {
-      "alias": "items",
-      "value": [
-        {
-          "value": colorValue,
-          "label": colorLabel
-        }
-      ]
-    }
-  ];
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  dataTypeData.values = customDataTypeValues;
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const customDataTypeData = await umbracoApi.dataType.createApprovedColorDataTypeWithColor(customDataTypeName, colorValue, colorLabel);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeData.id);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
