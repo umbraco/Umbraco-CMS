@@ -11,11 +11,11 @@ export default defineConfig({
 	...getDefaultConfig({
 		dist,
 		entry: {
-			//'entry-point': 'entry-point.ts',
-			//'imaging/index': 'imaging/index.ts',
-			//'media-type/index': 'media-type/index.ts',
-			//'media/index': 'media/index.ts',
-			//'umbraco-package': 'umbraco-package.ts',
+			'entry-point': 'entry-point.ts',
+			'imaging/index': 'imaging/index.ts',
+			'media-types/index': 'media-types/index.ts',
+			'media/index': 'media/index.ts',
+			'umbraco-package': 'umbraco-package.ts',
 			manifests: 'manifests.ts',
 		},
 	}),
