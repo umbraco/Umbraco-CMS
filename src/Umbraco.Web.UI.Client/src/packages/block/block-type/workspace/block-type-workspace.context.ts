@@ -27,7 +27,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	//readonly data = this.#data.asObservable();
 
 	// TODO: Get the name of the contentElementType..
-	readonly name = this.#data.asObservablePart((data) => 'block');
+	readonly name = this.#data.asObservablePart(() => 'block');
 	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
 
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
