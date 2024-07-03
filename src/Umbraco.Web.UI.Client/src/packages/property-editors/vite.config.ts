@@ -11,9 +11,9 @@ export default defineConfig({
 	...getDefaultConfig({
 		dist,
 		entry: {
-			'entry-point/index': 'entry-point/index.ts',
-			manifests: 'manifests.ts',
+			'entry-point': 'entry-point.ts',
 			'umbraco-package': 'umbraco-package.ts',
+			manifests: 'manifests.ts',
 		},
 	}),
 });
