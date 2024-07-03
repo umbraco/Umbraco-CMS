@@ -8,7 +8,6 @@ import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

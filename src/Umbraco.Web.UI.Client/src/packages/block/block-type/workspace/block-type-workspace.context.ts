@@ -27,7 +27,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	//readonly data = this.#data.asObservable();
 
 	// TODO: Get the name of the contentElementType..
-	readonly name = this.#data.asObservablePart((data) => 'block');
+	readonly name = this.#data.asObservablePart(() => 'block');
 	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
 
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
@@ -99,9 +99,8 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	async create(contentElementTypeId: string, groupKey?: string | null) {
 		this.resetState();
 
-
 		let data: BlockTypeData = {
-			contentElementTypeKey: contentElementTypeId
+			contentElementTypeKey: contentElementTypeId,
 		} as BlockTypeData;
 
 		// If we have a modal context, we blend in the modal preset data: [NL]

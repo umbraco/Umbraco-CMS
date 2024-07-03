@@ -1,3 +1,5 @@
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
+import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -10,8 +12,6 @@ import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
-import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
 
 import '../block-type-card/index.js';
 

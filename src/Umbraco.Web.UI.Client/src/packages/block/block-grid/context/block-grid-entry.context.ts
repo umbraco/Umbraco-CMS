@@ -5,10 +5,6 @@ import {
 	type UmbBlockGridScalableContext,
 	UmbBlockGridScaleManager,
 } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
 	UmbBooleanState,
@@ -17,6 +13,10 @@ import {
 	appendToFrozenArray,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -30,8 +30,8 @@ export class UmbBlockGridEntryContext
 	implements UmbBlockGridScalableContext
 {
 	//
-	readonly columnSpan = this._layout.asObservablePart((x) => x ? x.columnSpan ?? null : undefined);
-	readonly rowSpan = this._layout.asObservablePart((x) => x ? x.rowSpan ?? null : undefined);
+	readonly columnSpan = this._layout.asObservablePart((x) => (x ? x.columnSpan ?? null : undefined));
+	readonly rowSpan = this._layout.asObservablePart((x) => (x ? x.rowSpan ?? null : undefined));
 	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);

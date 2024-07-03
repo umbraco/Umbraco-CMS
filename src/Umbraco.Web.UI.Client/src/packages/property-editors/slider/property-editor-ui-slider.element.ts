@@ -36,17 +36,23 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._enableRange = Boolean(config.getValueByAlias('enableRange')) ?? false;
+		this._enableRange = Boolean(config.getValueByAlias('enableRange'));
 
 		// Make sure that step is higher than 0 (decimals ok).
 		const step = (config.getValueByAlias('step') ?? 1) as number;
 		this._step = step > 0 ? step : 1;
 
-		this._initVal1 = Number(config.getValueByAlias('initVal1')) ?? 0;
-		this._initVal2 = Number(config.getValueByAlias('initVal2')) ?? this._initVal1 + this._step;
+		const initVal1 = Number(config.getValueByAlias('initVal1'));
+		this._initVal1 = isNaN(initVal1) ? 0 : initVal1;
 
-		this._min = Number(config.getValueByAlias('minVal')) ?? 0;
-		this._max = Number(config.getValueByAlias('maxVal')) ?? 100;
+		const initVal2 = Number(config.getValueByAlias('initVal2'));
+		this._initVal2 = isNaN(initVal2) ? this._initVal1 + this._step : initVal2;
+
+		const minVal = Number(config.getValueByAlias('minVal'));
+		this._min = isNaN(minVal) ? 0 : minVal;
+
+		const maxVal = Number(config.getValueByAlias('maxVal'));
+		this._max = isNaN(maxVal) ? 100 : maxVal;
 
 		if (this._min === this._max) {
 			this._max = this._min + 100;

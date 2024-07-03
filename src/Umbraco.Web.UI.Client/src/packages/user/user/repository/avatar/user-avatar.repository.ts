@@ -7,7 +7,6 @@ import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-fi
 export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	#temporaryFileRepository: UmbTemporaryFileRepository;
 	#avatarSource: UmbUserAvatarServerDataSource;
-	#avatarFile: File | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);

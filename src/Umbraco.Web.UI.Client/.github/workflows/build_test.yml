@@ -25,22 +25,30 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [20]
-
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: ./package-lock.json
       - run: npm ci --no-audit --no-fund --prefer-offline
       - run: npm run lint:errors
-      - run: npm run build
+      - run: npm run build:for:cms
       - run: npm run generate:jsonschema:dist
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: ./package-lock.json
+      - run: npm ci --no-audit --no-fund --prefer-offline
       - run: npx playwright install --with-deps
       - run: npm test
       - name: Upload Code Coverage reports
@@ -50,13 +58,3 @@ jobs:
           name: code-coverage
           path: coverage/
           retention-days: 30
-    # Commented out since it is outdated and is quite spammy
-    # - name: Report code coverage
-    #   uses: zgosalvez/github-actions-report-lcov@v2
-    #   if: always()
-    #   continue-on-error: true
-    #   with:
-    #     coverage-files: coverage/lcov.info
-    #     artifact-name: code-coverage-report
-    #     github-token: ${{ secrets.GITHUB_TOKEN }}
-    #     working-directory: ./

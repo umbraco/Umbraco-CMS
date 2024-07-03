@@ -52,8 +52,6 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 	/** Indicates if the currently edited property is a new property or an existing */
 	#isNew = false;
 
-	#context = new UmbPropertyTypeWorkspaceContext(this);
-
 	@state()
 	private _contentTypeVariesByCulture?: boolean;
 

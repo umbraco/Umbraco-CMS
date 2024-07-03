@@ -1,5 +1,4 @@
 import type { UmbUfmRenderElement } from '../../../ufm/components/ufm-render/index.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	customElement,
@@ -11,6 +10,7 @@ import {
 	when,
 	LitElement,
 } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
 export interface UmbTableItem {
@@ -163,17 +163,19 @@ export class UmbTableElement extends LitElement {
 	}
 
 	override render() {
-		return html`<uui-table class="uui-text">
-			<uui-table-column
-				.style=${when(
-					!(this.config.allowSelection === false && this.config.hideIcon === true),
-					() => 'width: 60px',
-				)}></uui-table-column>
-			<uui-table-head>
-				${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
-			</uui-table-head>
-			${repeat(this.items, (item) => item.id, this._renderRow)}
-		</uui-table>`;
+		return html`
+			<uui-table class="uui-text">
+				<uui-table-column
+					.style=${when(
+						!(this.config.allowSelection === false && this.config.hideIcon === true),
+						() => 'width: 60px',
+					)}></uui-table-column>
+				<uui-table-head>
+					${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
+				</uui-table-head>
+				${repeat(this.items, (item) => item.id, this._renderRow)}
+			</uui-table>
+		`;
 	}
 
 	private _renderHeaderCell(column: UmbTableColumn) {
@@ -201,48 +203,54 @@ export class UmbTableElement extends LitElement {
 	private _renderHeaderCheckboxCell() {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
-		return html` <uui-table-head-cell style="--uui-table-cell-padding: 0">
-			${when(
-				this.config.allowSelection,
-				() =>
-					html` <uui-checkbox
-						label="Select All"
-						style="padding: var(--uui-size-4) var(--uui-size-5);"
-						@change="${this._handleAllRowsCheckboxChange}"
-						?checked="${this.selection.length === this.items.length}">
-					</uui-checkbox>`,
-			)}
-		</uui-table-head-cell>`;
+		return html`
+			<uui-table-head-cell style="--uui-table-cell-padding: 0">
+				${when(
+					this.config.allowSelection,
+					() =>
+						html` <uui-checkbox
+							label="Select All"
+							style="padding: var(--uui-size-4) var(--uui-size-5);"
+							@change="${this._handleAllRowsCheckboxChange}"
+							?checked="${this.selection.length === this.items.length}">
+						</uui-checkbox>`,
+				)}
+			</uui-table-head-cell>
+		`;
 	}
 
 	private _renderRow = (item: UmbTableItem) => {
-		return html`<uui-table-row
-			?selectable="${this.config.allowSelection}"
-			?select-only=${this._selectionMode}
-			?selected=${this._isSelected(item.id)}
-			@selected=${() => this._selectRow(item.id)}
-			@deselected=${() => this._deselectRow(item.id)}>
-			${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
-		</uui-table-row>`;
+		return html`
+			<uui-table-row
+				?selectable="${this.config.allowSelection}"
+				?select-only=${this._selectionMode}
+				?selected=${this._isSelected(item.id)}
+				@selected=${() => this._selectRow(item.id)}
+				@deselected=${() => this._deselectRow(item.id)}>
+				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
+			</uui-table-row>
+		`;
 	};
 
 	private _renderRowCheckboxCell(item: UmbTableItem) {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
-		return html`<uui-table-cell>
-			${when(!this.config.hideIcon, () => html`<umb-icon name="${ifDefined(item.icon ?? undefined)}"></umb-icon>`)}
-			${when(
-				this.config.allowSelection,
-				() => html`
-					<uui-checkbox
-						label="Select Row"
-						@click=${(e: PointerEvent) => e.stopPropagation()}
-						@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
-						?checked="${this._isSelected(item.id)}">
-					</uui-checkbox>
-				`,
-			)}
-		</uui-table-cell>`;
+		return html`
+			<uui-table-cell>
+				${when(!this.config.hideIcon, () => html`<umb-icon name="${ifDefined(item.icon ?? undefined)}"></umb-icon>`)}
+				${when(
+					this.config.allowSelection,
+					() => html`
+						<uui-checkbox
+							label="Select Row"
+							@click=${(e: PointerEvent) => e.stopPropagation()}
+							@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
+							?checked="${this._isSelected(item.id)}">
+						</uui-checkbox>
+					`,
+				)}
+			</uui-table-cell>
+		`;
 	}
 
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
@@ -251,7 +259,8 @@ export class UmbTableElement extends LitElement {
 				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};">
 					${this._renderCellContent(column, item)}
 			</uui-table-cell>
-		</uui-table-cell>`;
+		</uui-table-cell>
+		`;
 	}
 
 	private _renderCellContent(column: UmbTableColumn, item: UmbTableItem) {
@@ -292,6 +301,7 @@ export class UmbTableElement extends LitElement {
 				position: sticky;
 				top: 0;
 				z-index: 1;
+				background-color: var(--uui-color-surface, #fff);
 			}
 
 			uui-table-row uui-checkbox {
@@ -331,6 +341,7 @@ export class UmbTableElement extends LitElement {
 				justify-content: space-between;
 				width: 100%;
 			}
+
 			uui-table-head-cell button > span {
 				flex: 1 0 auto;
 			}

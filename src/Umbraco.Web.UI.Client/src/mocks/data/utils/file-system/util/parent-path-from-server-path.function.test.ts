@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { getParentPathFromServerPath } from './parent-path-from-server-path.function.js';
+import { expect } from '@open-wc/testing';
 
 describe('parent-path-from-server-path', () => {
 	it('it returns the parent path of a nested server path', () => {

@@ -1,3 +1,4 @@
+/** @type {import('eslint').Rule.RuleModule}*/
 module.exports = {
 	meta: {
 		type: 'problem',
@@ -5,12 +6,26 @@ module.exports = {
 			description:
 				'Ensure all exported string constants should be in uppercase with words separated by underscores and prefixed with UMB_',
 		},
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					excludedFileNames: {
+						type: 'array',
+						items: {
+							type: 'string',
+						},
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 	},
 	create: function (context) {
 		const excludedFileNames = context.options[0]?.excludedFileNames || [];
 		return {
 			ExportNamedDeclaration(node) {
-				const fileName = context.getFilename();
+				const fileName = context.filename;
 
 				if (excludedFileNames.some((excludedFileName) => fileName.includes(excludedFileName))) {
 					// Skip the rule check for files in the excluded list

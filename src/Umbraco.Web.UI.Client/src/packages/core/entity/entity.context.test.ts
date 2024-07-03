@@ -1,6 +1,6 @@
-import { expect } from '@open-wc/testing';
 import { UmbEntityContext } from './entity.context.js';
 import { UMB_ENTITY_CONTEXT } from './entity.context-token.js';
+import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';

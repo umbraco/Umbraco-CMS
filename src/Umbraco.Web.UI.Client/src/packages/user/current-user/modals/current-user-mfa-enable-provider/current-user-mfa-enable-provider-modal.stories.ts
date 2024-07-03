@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbCurrentUserMfaEnableProviderModalElement } from './current-user-mfa-enable-provider-modal.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
