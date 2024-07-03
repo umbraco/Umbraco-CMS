@@ -74,11 +74,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				${this.item?.documentType.icon
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
-							${this.item.isProtected ? this.#renderIsProtectedIcon() : nothing}
-							<!--
-							// TODO: implement correct status symbol
-							<span id="status-symbol"></span>
-							-->
+							${this.#renderStateIcon()}
 						`
 					: nothing}
 			</span>
@@ -91,8 +87,24 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		> `;
 	}
 
+	#renderStateIcon() {
+		if (this.item?.isProtected) {
+			return this.#renderIsProtectedIcon();
+		}
+
+		if (this.item?.documentType.collection) {
+			return this.#renderIsCollectionIcon();
+		}
+
+		return nothing;
+	}
+
+	#renderIsCollectionIcon() {
+		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
+	}
+
 	#renderIsProtectedIcon() {
-		return html`<umb-icon id="icon-lock" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
+		return html`<umb-icon id="state-icon" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
 	}
 
 	static override styles = [
@@ -106,19 +118,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				vertical-align: middle;
 			}
 
-			#status-symbol {
-				width: 5px;
-				height: 5px;
-				border: 1px solid white;
-				background-color: blue;
-				display: block;
-				position: absolute;
-				bottom: 0;
-				right: 0;
-				border-radius: 100%;
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 
-			#icon-lock {
+			#state-icon {
 				position: absolute;
 				bottom: -5px;
 				right: -5px;
@@ -130,36 +136,30 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				line-height: 14px;
 			}
 
-			#label {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-
-			:hover #icon-lock {
+			:hover #state-icon {
 				background: var(--uui-color-surface-emphasis);
 			}
 
 			/** Active */
-			[active] #icon-lock {
+			[active] #state-icon {
 				background: var(--uui-color-current);
 			}
 
-			[active]:hover #icon-lock {
+			[active]:hover #state-icon {
 				background: var(--uui-color-current-emphasis);
 			}
 
 			/** Selected */
-			[selected] #icon-lock {
+			[selected] #state-icon {
 				background-color: var(--uui-color-selected);
 			}
 
-			[selected]:hover #icon-lock {
+			[selected]:hover #state-icon {
 				background-color: var(--uui-color-selected-emphasis);
 			}
 
 			/** Disabled */
-			[disabled] #icon-lock {
+			[disabled] #state-icon {
 				background-color: var(--uui-color-disabled);
 			}
 

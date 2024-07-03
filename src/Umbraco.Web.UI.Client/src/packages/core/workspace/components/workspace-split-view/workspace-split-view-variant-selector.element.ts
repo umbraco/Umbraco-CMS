@@ -1,3 +1,5 @@
+import type { ActiveVariant } from '../../controllers/index.js';
+import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
 import {
 	type UUIInputElement,
 	UUIInputEvent,
@@ -6,8 +8,6 @@ import {
 import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import type { ActiveVariant } from '../../controllers/index.js';
-import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';

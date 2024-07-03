@@ -33,7 +33,7 @@ export class UmbUserGroupSectionViewElement extends UmbLitElement {
 		{
 			path: `**`,
 			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		}
+		},
 	];
 
 	override render() {

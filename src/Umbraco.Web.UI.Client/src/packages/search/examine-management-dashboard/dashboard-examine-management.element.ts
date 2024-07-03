@@ -28,10 +28,11 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		{
 			path: ``,
 			component: () => import('./views/section-view-examine-overview.js'),
-		},{
+		},
+		{
 			path: `**`,
 			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		}
+		},
 	];
 
 	@state()

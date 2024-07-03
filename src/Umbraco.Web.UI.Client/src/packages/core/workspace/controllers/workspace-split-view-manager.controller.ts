@@ -13,7 +13,9 @@ export type ActiveVariant = {
  * @description - Class managing the split view state for a workspace context.
  */
 export class UmbWorkspaceSplitViewManager {
-	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index).sortBy((a, b) => (a.index || 0) - (b.index || 0));
+	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index).sortBy(
+		(a, b) => (a.index || 0) - (b.index || 0),
+	);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();
 
 	private _routeBase?: string;
@@ -39,7 +41,7 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	public activeVariantByIndex(index: number) {
-		return this.#activeVariantsInfo.asObservablePart((data) => data.find(x => x.index === index) || undefined);
+		return this.#activeVariantsInfo.asObservablePart((data) => data.find((x) => x.index === index) || undefined);
 	}
 
 	public switchVariant(index: number, variantId: UmbVariantId) {

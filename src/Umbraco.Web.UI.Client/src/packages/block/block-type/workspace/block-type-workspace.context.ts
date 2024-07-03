@@ -1,3 +1,5 @@
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
+import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
@@ -12,8 +14,6 @@ import {
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
-import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
@@ -99,9 +99,8 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	async create(contentElementTypeId: string, groupKey?: string | null) {
 		this.resetState();
 
-
 		let data: BlockTypeData = {
-			contentElementTypeKey: contentElementTypeId
+			contentElementTypeKey: contentElementTypeId,
 		} as BlockTypeData;
 
 		// If we have a modal context, we blend in the modal preset data: [NL]

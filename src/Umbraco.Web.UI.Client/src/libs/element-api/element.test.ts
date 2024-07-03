@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { UmbElementMixin } from './element.mixin.js';
+import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { type UmbObserverController, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 

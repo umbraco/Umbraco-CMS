@@ -22,7 +22,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	UmbMediaPickerModalValue
 > {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
-	#mediaUrlRepository = new UmbMediaUrlRepository(this); // used to get urls
 	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
 	#imagingRepository = new UmbImagingRepository(this); // used to get image renditions
 

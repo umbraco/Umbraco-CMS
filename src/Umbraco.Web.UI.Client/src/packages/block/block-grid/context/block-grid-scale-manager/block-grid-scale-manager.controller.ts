@@ -1,7 +1,7 @@
+import { closestColumnSpanOption } from '../../utils/index.js';
 import { getAccumulatedValueOfIndex, getInterpolatedIndexOfPositionInWeightMap } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { closestColumnSpanOption } from '../../utils/index.js';
 
 // This might be more generic than Block Grid, but this is where it belongs currently:
 export interface UmbBlockGridScalableContext extends UmbControllerHost {

@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { UmbDeepState } from './deep-state.js';
+import { expect } from '@open-wc/testing';
 
 describe('UmbDeepState', () => {
 	type ObjectType = { key: string; another: string };

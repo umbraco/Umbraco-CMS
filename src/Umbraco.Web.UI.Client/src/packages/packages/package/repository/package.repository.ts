@@ -166,7 +166,6 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 		const { unique, ...model } = pkg;
 		const { error } = await this.#packageSource.updateCreatedPackage(unique, model);
 		return !error;
-
 	}
 
 	async configuration() {

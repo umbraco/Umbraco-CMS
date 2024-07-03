@@ -1,3 +1,6 @@
+import type { UmbDictionaryDetailModel } from '../types.js';
+import { UmbDictionaryDetailRepository } from '../repository/index.js';
+import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
@@ -11,9 +14,6 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbDictionaryDetailModel } from '../types.js';
-import { UmbDictionaryDetailRepository } from '../repository/index.js';
-import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbDictionaryDetailModel>
@@ -34,7 +34,6 @@ export class UmbDictionaryWorkspaceContext
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly dictionary = this.#data.asObservablePart((data) => data);
-
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Dictionary');

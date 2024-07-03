@@ -55,7 +55,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 					{
 						path: `**`,
 						component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-					}
+					},
 				];
 			},
 			'_observeConfigDataType',
@@ -64,6 +64,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 
 	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
+		const pageSize = Number(config.getValueByAlias('pageSize'));
 		return {
 			unique: '',
 			dataTypeId: '',
@@ -71,7 +72,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
-			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
+			pageSize: isNaN(pageSize) ? 50 : pageSize,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}

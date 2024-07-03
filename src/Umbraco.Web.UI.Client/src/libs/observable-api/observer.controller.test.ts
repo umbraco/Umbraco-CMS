@@ -1,7 +1,7 @@
-import { expect } from '@open-wc/testing';
 import { UmbObjectState } from './states/object-state.js';
 import { UmbObserverController } from './observer.controller.js';
 import { simpleHashCode } from './utils/simple-hash-code.function.js';
+import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 

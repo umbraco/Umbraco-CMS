@@ -1,3 +1,6 @@
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
+import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
+import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
@@ -25,9 +28,6 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
-import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
-import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
@@ -79,7 +79,6 @@ export class UmbDataTypeWorkspaceContext
 
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
-
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
