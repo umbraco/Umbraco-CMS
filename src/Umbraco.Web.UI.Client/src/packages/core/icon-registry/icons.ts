@@ -2099,10 +2099,6 @@ name: "icon-database",
 
 path: () => import("./icons/icon-database.js"),
 },{
-name: "icon-azure",
-
-path: () => import("./icons/icon-azure.js"),
-},{
 name: "icon-facebook",
 
 path: () => import("./icons/icon-facebook.js"),
@@ -2131,10 +2127,6 @@ name: "icon-mastodon",
 
 path: () => import("./icons/icon-mastodon.js"),
 },{
-name: "icon-microsoft",
-
-path: () => import("./icons/icon-microsoft.js"),
-},{
 name: "icon-twitter-x",
 
 path: () => import("./icons/icon-twitter-x.js"),
@@ -2142,6 +2134,14 @@ path: () => import("./icons/icon-twitter-x.js"),
 name: "icon-umbraco",
 
 path: () => import("./icons/icon-umbraco.js"),
+},{
+name: "icon-microsoft",
+
+path: () => import("./icons/icon-microsoft.js"),
+},{
+name: "icon-azure",
+
+path: () => import("./icons/icon-azure.js"),
 },{
 name: "icon-art-easel",
 legacy: true,
@@ -2350,6 +2350,10 @@ path: () => import("./icons/icon-male-and-female.js"),
 name: "icon-male-symbol",
 legacy: true,
 path: () => import("./icons/icon-male-symbol.js"),
+},{
+name: "icon-microsoftazure",
+legacy: true,
+path: () => import("./icons/icon-microsoftazure.js"),
 },{
 name: "icon-molecular-network",
 legacy: true,
