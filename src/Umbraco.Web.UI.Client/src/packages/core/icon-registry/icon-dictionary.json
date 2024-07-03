@@ -2452,10 +2452,6 @@
 	],
 	"simpleIcons": [
 		{
-			"name": "icon-azure",
-			"file": "microsoftazure.svg"
-		},
-		{
 			"name": "icon-facebook",
 			"file": "facebook.svg"
 		},
@@ -2482,10 +2478,6 @@
 		{
 			"name": "icon-mastodon",
 			"file": "mastodon.svg"
-		},
-		{
-			"name": "icon-microsoft",
-			"file": "microsoft.svg"
 		},
 		{
 			"name": "icon-twitter-x",
