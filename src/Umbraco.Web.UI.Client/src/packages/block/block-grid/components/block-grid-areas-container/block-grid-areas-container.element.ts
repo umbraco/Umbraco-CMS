@@ -46,10 +46,10 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 				manager.layoutStylesheet,
 				(stylesheet) => {
 					// Do not re-render stylesheet if its the same href.
-					if (!stylesheet || this._styleElement?.getAttribute('href') === stylesheet) return;
+					if (!stylesheet || this._styleElement?.href === stylesheet) return;
 					this._styleElement = document.createElement('link');
-					this._styleElement.setAttribute('rel', 'stylesheet');
-					this._styleElement.setAttribute('href', stylesheet);
+					this._styleElement.rel = 'stylesheet';
+					this._styleElement.href = stylesheet;
 				},
 				'observeStylesheet',
 			);
