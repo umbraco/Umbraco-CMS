@@ -1,5 +1,5 @@
-import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIImageCropsConfigurationElement } from './property-editor-ui-image-crops-configuration.element.js';
+import { expect, fixture, html } from '@open-wc/testing';
 import type { UmbTestRunnerWindow } from '@umbraco-cms/internal/test-utils';
 //import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 

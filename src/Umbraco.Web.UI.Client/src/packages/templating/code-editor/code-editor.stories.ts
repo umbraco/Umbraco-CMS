@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbCodeEditorElement } from './code-editor.element.js';
 import type { CodeEditorLanguage } from './code-editor.model.js';
 import { CodeEditorTheme } from './code-editor.model.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './code-editor.element.js';

@@ -1,8 +1,8 @@
+import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { UUIIconRequestEvent, UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 
 /**
  *  @element umb-ref-data-type

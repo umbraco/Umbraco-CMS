@@ -71,15 +71,13 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				} as UmbRoute;
 			});
 
-			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
-			// TODO: This is problematic, cause if a workspaceView appears later, then this takes over. And it is also a problem if it does not use redirect, but just a view defined with and empty path.
-			const firstRoute = newRoutes[0];
-			if (firstRoute) {
-				newRoutes.push({
-					path: ``,
-					redirectTo: firstRoute.path,
-				});
-			}
+			// Duplicate first workspace and use it for the empty path scenario. [NL]
+			newRoutes.push({ ...newRoutes[0], path: '' });
+
+			newRoutes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
 		}
 
 		this._routes = newRoutes;
@@ -115,15 +113,18 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,
-								(view) => html`
-									<uui-tab
-										href="${this._routerPath}/view/${view.meta.pathname}"
-										.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
-										?active=${'view/' + view.meta.pathname === this._activePath}>
-										<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
-										${view.meta.label ? this.localize.string(view.meta.label) : view.name}
-									</uui-tab>
-								`,
+								(view, index) =>
+									// Notice how we use index 0 to determine which workspace that is active with empty path. [NL]
+									html`
+										<uui-tab
+											href="${this._routerPath}/view/${view.meta.pathname}"
+											.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
+											?active=${'view/' + view.meta.pathname === this._activePath ||
+											(index === 0 && this._activePath === '')}>
+											<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
+											${view.meta.label ? this.localize.string(view.meta.label) : view.name}
+										</uui-tab>
+									`,
 							)}
 						</uui-tab-group>
 					`

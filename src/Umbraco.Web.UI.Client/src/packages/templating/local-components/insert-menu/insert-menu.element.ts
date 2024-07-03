@@ -1,17 +1,17 @@
-import { UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL } from '../../modals/templating-page-field-builder/templating-page-field-builder-modal.token.js';
-import { CodeSnippetType } from '../../types.js';
-import {
-	UMB_TEMPLATING_ITEM_PICKER_MODAL,
-	type UmbTemplatingItemPickerModalValue,
-} from '../../modals/templating-item-picker/templating-item-picker-modal.token.js';
-import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
-import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '@umbraco-cms/backoffice/partial-view';
 import { UmbDictionaryDetailRepository, UMB_DICTIONARY_PICKER_MODAL } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
+import {
+	UMB_TEMPLATING_ITEM_PICKER_MODAL,
+	type UmbTemplatingItemPickerModalValue,
+} from '../../modals/templating-item-picker/templating-item-picker-modal.token.js';
+import { CodeSnippetType } from '../../types.js';
+import { UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL } from '../../modals/templating-page-field-builder/templating-page-field-builder-modal.token.js';
+import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '@umbraco-cms/backoffice/partial-view';
 
 @customElement('umb-templating-insert-menu')
 export class UmbTemplatingInsertMenuElement extends UmbLitElement {

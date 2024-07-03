@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { retrieveStoredPath, setStoredPath } from './stored-path.function.js';
+import { expect } from '@open-wc/testing';
 import { UMB_STORAGE_REDIRECT_URL } from '@umbraco-cms/backoffice/auth';
 
 describe('retrieveStoredPath', () => {

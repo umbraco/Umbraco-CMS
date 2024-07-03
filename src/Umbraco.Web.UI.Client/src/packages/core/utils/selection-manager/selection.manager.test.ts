@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { UmbSelectionManager } from './selection.manager.js';
+import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';

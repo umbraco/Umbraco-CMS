@@ -14,7 +14,7 @@ class UmbTemplateMockDB extends UmbEntityMockDbBase<UmbMockTemplateModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockTemplateModel>(this, treeItemMapper);
 	item = new UmbMockEntityItemManager<UmbMockTemplateModel>(this, itemMapper);
 	detail = new UmbMockTemplateDetailManager(this);
-	query = new UmbMockTemplateQueryManager(this);
+	query = new UmbMockTemplateQueryManager();
 
 	constructor(data: Array<UmbMockTemplateModel>) {
 		super(data);

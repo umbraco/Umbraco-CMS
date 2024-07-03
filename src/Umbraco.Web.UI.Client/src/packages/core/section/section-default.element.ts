@@ -13,12 +13,12 @@ import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import {
-	UmbExtensionsApiInitializer,
 	UmbExtensionsElementInitializer,
 	UmbExtensionsManifestInitializer,
 	createExtensionApi,
+	createExtensionElement,
 } from '@umbraco-cms/backoffice/extension-api';
-import { aliasToPath, debounce } from '@umbraco-cms/backoffice/utils';
+import { aliasToPath } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @export
@@ -90,11 +90,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 								api?.getPath?.() ||
 								extensionController.manifest.meta?.path ||
 								aliasToPath(extensionController.manifest.alias),
-							// TODO: look into removing the "as PageComponent" type hack
-							// be aware that this is kind of a hack to pass the manifest element to the router. But as the two resolve components
-							// in a similar way. I currently find it more safe to let the router do the component resolving instead
-							// of replicating it as a custom resolver here.
-							component: extensionController.manifest.element as PageComponent | PromiseLike<PageComponent>,
+							component: () => createExtensionElement(extensionController.manifest),
 							setup: (element: PageComponent, info: IRoutingInfo) => {
 								api?.setup?.(element, info);
 							},
@@ -102,13 +98,11 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 					}),
 				);
 
-				this.#debouncedCreateRoutes(routes);
+				this.#createRoutes(routes);
 			},
 			'umbRouteExtensionApisInitializer',
 		);
 	}
-
-	#debouncedCreateRoutes = debounce(this.#createRoutes, 50);
 
 	#createRoutes(routes: Array<IRoute>) {
 		this._routes = [

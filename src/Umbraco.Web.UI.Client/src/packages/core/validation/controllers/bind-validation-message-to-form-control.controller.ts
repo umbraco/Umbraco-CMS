@@ -9,7 +9,6 @@ const ctrlSymbol = Symbol();
 const observeSymbol = Symbol();
 
 export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
-
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
 	#control: UmbFormControlMixinInterface<unknown>;
