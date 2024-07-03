@@ -86,6 +86,18 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Operation not permitted")
                     .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
                     .Build()),
+                ContentTypeOperationStatus.CancelledByNotification => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Cancelled by notification")
+                    .WithDetail("The attempted operation was cancelled by a notification.")
+                    .Build()),
+                ContentTypeOperationStatus.NameCannotBeEmpty => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Name cannot be empty")
+                    .WithDetail("The name of the content type cannot be empty")
+                    .Build()),
+                ContentTypeOperationStatus.NameTooLong => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Name was too long")
+                    .WithDetail("Name cannot be more than 255 characters in length.")
+                    .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 
