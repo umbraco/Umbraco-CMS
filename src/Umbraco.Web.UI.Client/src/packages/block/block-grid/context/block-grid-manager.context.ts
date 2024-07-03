@@ -1,10 +1,10 @@
+import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
+import type { UmbBlockGridWorkspaceData } from '../index.js';
 import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
 import { removeInitialSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import type { UmbBlockGridWorkspaceData } from '../index.js';
 import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 

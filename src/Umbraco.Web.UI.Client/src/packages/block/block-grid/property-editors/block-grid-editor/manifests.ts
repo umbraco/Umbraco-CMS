@@ -1,5 +1,5 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { manifest as blockGridSchemaManifest } from './Umbraco.BlockGrid.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockGrid';
 
