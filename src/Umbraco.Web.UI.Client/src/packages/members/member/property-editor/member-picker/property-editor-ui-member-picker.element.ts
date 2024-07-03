@@ -21,7 +21,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-override render() {
+	override render() {
 		return html` <umb-input-member min="0" max="1" .value=${this.value} @change=${this.#onChange}></umb-input-member> `;
 	}
 }

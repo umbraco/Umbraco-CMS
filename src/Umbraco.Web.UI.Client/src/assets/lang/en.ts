@@ -1623,8 +1623,7 @@ export default {
 		editProperty: 'Edit property',
 		requiredLabel: 'Required label',
 		enableListViewHeading: 'Enable list view',
-		enableListViewDescription:
-			'Configures the content item to show a sortable and searchable list of its children.',
+		enableListViewDescription: 'Configures the content item to show a sortable and searchable list of its children.',
 		allowedTemplatesHeading: 'Allowed Templates',
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
@@ -1717,8 +1716,7 @@ export default {
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Collections',
-		collectionsDescription:
-			'Configures the content item to show list of its children.',
+		collectionsDescription: 'Configures the content item to show list of its children.',
 		structure: 'Structure',
 		presentation: 'Presentation',
 	},
@@ -2592,5 +2590,9 @@ export default {
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
 			'We will send:\n<ul>\n    <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n    <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n    <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n    <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n</ul>\n<em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n<br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>',
+	},
+	routing: {
+		routeNotFoundTitle: 'Not found',
+		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
 	},
 } as UmbLocalizationDictionary;

@@ -27,8 +27,6 @@ interface MediaPickerResultData {
 }
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
-	#currentUser?: UmbCurrentUserModel;
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#temporaryFileRepository;
 

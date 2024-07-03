@@ -46,6 +46,11 @@ ensureAnchorHistory();
  */
 export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouterSlot<D, P> {
 	/**
+	 * Method to cancel navigation if changed.
+	 */
+	private _cancelNavigation ?:() => void;
+
+	/**
 	 * Listeners on the router.
 	 */
 	private listeners: EventListenerSubscription[] = [];
@@ -197,8 +202,17 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 		this._routes.push(...routes);
 
 		if (navigate === undefined) {
-			// If navigate is not determined, then we will check if we have a route match. If not then we will re-render.
+			// If navigate is not determined, then we will check if we have a route match. If not then we will re-render. [NL]
 			navigate = this._routeMatch === null;
+			if (navigate === false) {
+				if (this.isConnected) {
+					const newMatch = this.getRouteMatch();
+					// Check if this match matches the current match (aka. If the path has changed), if so we should navigate. [NL]
+					if(newMatch) {
+						navigate = shouldNavigate(this.match, newMatch);
+					}
+				}
+			}
 		}
 
 		// Navigate fallback:
@@ -232,11 +246,19 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 		// Either choose the parent fragment or the current path if no parent exists.
 		// The root router slot will always use the entire path.
-		const pathFragment =
-			this.parent != null && this.parent.fragments != null ? this.parent.fragments.rest : pathWithoutBasePath();
+		const pathFragment = this.getPathFragment();
 
 		// Route to the path
 		await this.renderPath(pathFragment);
+	}
+
+	protected getPathFragment() {
+		return this.parent != null && this.parent.fragments != null ? this.parent.fragments.rest : pathWithoutBasePath();
+	}
+
+	protected getRouteMatch() {
+		// Find the corresponding route.
+		return matchRoutes(this._routes, this.getPathFragment());
 	}
 
 	/**
@@ -296,6 +318,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	 * Returns true if a navigation was made to a new page.
 	 */
 	protected async renderPath(path: string | PathFragment): Promise<boolean> {
+
+		// Notice: Since this is never called from any other place than one higher in this file(when writing this...), we could just retrieve the path and find a match by using this.getRouteMatch() [NL]
 		// Find the corresponding route.
 		const match = matchRoutes(this._routes, path);
 
@@ -312,10 +336,17 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 			// Only change route if its a new route.
 			const navigate = shouldNavigate(this.match, match);
 			if (navigate) {
+
+				// If another navigation is still begin resolved in this very moment, then we need to cancel that so it does not end up overriding this new navigation.[NL]
+				this._cancelNavigation?.();
 				// Listen for another push state event. If another push state event happens
 				// while we are about to navigate we have to cancel.
 				let navigationInvalidated = false;
-				const cancelNavigation = () => (navigationInvalidated = true);
+				const cancelNavigation = () => {
+					navigationInvalidated = true;
+					this._cancelNavigation = undefined;
+				};
+				this._cancelNavigation = cancelNavigation;
 				const removeChangeListener: EventListenerSubscription = addListener<Event, GlobalRouterEvent>(
 					GLOBAL_ROUTER_EVENTS_TARGET,
 					'changestate',
@@ -378,16 +409,23 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 						return cancel();
 					}
 
-					// Remove the old page by clearing the slot
-					this.clearChildren();
+					// We have some routes that share the same component instance, those should not be removed and re-appended [NL]
+					const isTheSameComponent = this.firstChild === page;
+
+					if(!isTheSameComponent) {
+						// Remove the old page by clearing the slot
+						this.clearChildren();
+					}
 
 					// Store the new route match before we append the new page to the DOM.
 					// We do this to ensure that we can find the match in the connectedCallback of the page.
 					this._routeMatch = match;
 
-					if (page) {
-						// Append the new page
-						this.appendChild(page);
+					if(!isTheSameComponent) {
+						if (page) {
+							// Append the new page
+							this.appendChild(page);
+						}
 					}
 				}
 
