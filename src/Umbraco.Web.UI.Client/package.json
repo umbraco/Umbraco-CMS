@@ -139,7 +139,8 @@
 		"./src/packages/webhook",
 		"./src/packages/health-check",
 		"./src/packages/tags",
-		"./src/packages/templating"
+		"./src/packages/templating",
+		"./src/packages/property-editors"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
