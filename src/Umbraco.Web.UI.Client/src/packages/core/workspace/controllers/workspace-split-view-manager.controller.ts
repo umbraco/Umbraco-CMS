@@ -1,5 +1,5 @@
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type ActiveVariant = {
 	index: number;
@@ -13,7 +13,9 @@ export type ActiveVariant = {
  * @description - Class managing the split view state for a workspace context.
  */
 export class UmbWorkspaceSplitViewManager {
-	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index);
+	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index).sortBy(
+		(a, b) => (a.index || 0) - (b.index || 0),
+	);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();
 
 	private _routeBase?: string;
@@ -25,7 +27,7 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	setActiveVariant(index: number, culture: string | null, segment: string | null) {
-		this.#activeVariantsInfo.appendOne({ index, culture: culture || null, segment: segment || null });
+		this.#activeVariantsInfo.appendOneAt({ index, culture: culture ?? null, segment: segment ?? null }, index);
 	}
 
 	getActiveVariants() {
@@ -39,7 +41,7 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	public activeVariantByIndex(index: number) {
-		return this.#activeVariantsInfo.asObservablePart((data) => data[index] || undefined);
+		return this.#activeVariantsInfo.asObservablePart((data) => data.find((x) => x.index === index) || undefined);
 	}
 
 	public switchVariant(index: number, variantId: UmbVariantId) {

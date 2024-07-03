@@ -1,10 +1,9 @@
-import { UmbDictionaryDetailRepository } from '../repository/index.js';
 import type { UmbDictionaryDetailModel } from '../types.js';
+import { UmbDictionaryDetailRepository } from '../repository/index.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';

@@ -1,6 +1,6 @@
 import type { UmbDocumentBlueprintVariantOptionModel } from '../types.js';
-import { UmbDocumentBlueprintWorkspaceSplitViewElement } from './document-blueprint-workspace-split-view.element.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from './document-blueprint-workspace.context-token.js';
+import { UmbDocumentBlueprintWorkspaceSplitViewElement } from './document-blueprint-workspace-split-view.element.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -83,17 +83,12 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
-		const oldValue = this._routes;
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
-		// is there any differences in the amount ot the paths? [NL]
-		// TODO: if we make a memorization function as the observer, we can avoid this check and avoid the whole build of routes. [NL]
-		if (oldValue && oldValue.length === routes.length) {
-			// is there any differences in the paths? [NL]
-			const hasDifferences = oldValue.some((route, index) => route.path !== routes[index].path);
-			if (!hasDifferences) return;
-		}
 		this._routes = routes;
-		this.requestUpdate('_routes', oldValue);
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
@@ -101,7 +96,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes && this._routes.length > 0
+		return this._routes
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
 			: '';
 	}
