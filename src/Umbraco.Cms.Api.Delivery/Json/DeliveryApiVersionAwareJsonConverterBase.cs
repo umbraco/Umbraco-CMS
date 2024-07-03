@@ -61,21 +61,21 @@ public abstract class DeliveryApiVersionAwareJsonConverterBase<T> : JsonConverte
         return attribute?.Order ?? 0;
     }
 
-    private bool ShouldIncludeProperty(PropertyInfo prop, int version)
+    /// <summary>
+    ///     Determines whether a property should be included based on version bounds.
+    /// </summary>
+    /// <param name="propertyInfo">The property info.</param>
+    /// <param name="version">An integer representing an API version.</param>
+    /// <returns><c>true</c> if the property should be included; otherwise, <c>false</c>.</returns>
+    private bool ShouldIncludeProperty(PropertyInfo propertyInfo, int version)
     {
-        var attribute = prop
+        var attribute = propertyInfo
             .GetCustomAttributes(typeof(IncludeInApiVersionAttribute), false)
             .FirstOrDefault();
 
         if (attribute is not IncludeInApiVersionAttribute apiVersionAttribute)
         {
             return true; // No attribute means include the property
-        }
-
-        // Check if the version is in the specified versions
-        if (apiVersionAttribute.Versions.Length > 0)
-        {
-            return apiVersionAttribute.Versions.Contains(version);
         }
 
         // Check if the version is within the specified bounds

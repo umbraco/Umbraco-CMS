@@ -3,23 +3,9 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 [AttributeUsage(AttributeTargets.Property)]
 public class IncludeInApiVersionAttribute : Attribute
 {
-    public int[] Versions { get; }
-
     public int? MinVersion { get; }
 
     public int? MaxVersion { get; }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="IncludeInApiVersionAttribute"/> class.
-    ///     Specifies that the property should be included in the API response for the specified versions.
-    /// </summary>
-    /// <param name="versions">The API versions for which the property should be included.</param>
-    public IncludeInApiVersionAttribute(params int[] versions)
-    {
-        Versions = versions;
-        MinVersion = null;
-        MaxVersion = null;
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="IncludeInApiVersionAttribute"/> class.
@@ -27,10 +13,9 @@ public class IncludeInApiVersionAttribute : Attribute
     /// </summary>
     /// <param name="minVersion">The minimum API version (inclusive) for which the property should be included.</param>
     /// <param name="maxVersion">The maximum API version (inclusive) for which the property should be included.</param>
-    public IncludeInApiVersionAttribute(int? minVersion = null, int? maxVersion = null)
+    public IncludeInApiVersionAttribute(int minVersion = -1, int maxVersion = -1)
     {
-        Versions = [];
-        MinVersion = minVersion;
-        MaxVersion = maxVersion;
+        MinVersion = minVersion >= 0 ? minVersion : null;
+        MaxVersion = maxVersion >= 0 ? maxVersion : null;
     }
 }
