@@ -13,13 +13,10 @@ export type UmbCrop = {
 };
 
 /**
- * @element umb-property-editor-ui-image-crops-configuration
+ * @element umb-property-editor-ui-image-crops
  */
-@customElement('umb-property-editor-ui-image-crops-configuration')
-export class UmbPropertyEditorUIImageCropsConfigurationElement
-	extends UmbLitElement
-	implements UmbPropertyEditorUiElement
-{
+@customElement('umb-property-editor-ui-image-crops')
+export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@query('#label')
 	private _labelInput!: HTMLInputElement;
 
@@ -244,10 +241,10 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	];
 }
 
-export default UmbPropertyEditorUIImageCropsConfigurationElement;
+export default UmbPropertyEditorUIImageCropsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-image-crops-configuration': UmbPropertyEditorUIImageCropsConfigurationElement;
+		'umb-property-editor-ui-image-crops': UmbPropertyEditorUIImageCropsElement;
 	}
 }
