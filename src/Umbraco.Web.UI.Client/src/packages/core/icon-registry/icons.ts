@@ -2135,14 +2135,6 @@ name: "icon-umbraco",
 
 path: () => import("./icons/icon-umbraco.js"),
 },{
-name: "icon-microsoft",
-
-path: () => import("./icons/icon-microsoft.js"),
-},{
-name: "icon-azure",
-
-path: () => import("./icons/icon-azure.js"),
-},{
 name: "icon-art-easel",
 legacy: true,
 path: () => import("./icons/icon-art-easel.js"),
@@ -2154,6 +2146,10 @@ path: () => import("./icons/icon-article.js"),
 name: "icon-auction-hammer",
 legacy: true,
 path: () => import("./icons/icon-auction-hammer.js"),
+},{
+name: "icon-azure",
+legacy: true,
+path: () => import("./icons/icon-azure.js"),
 },{
 name: "icon-baby-stroller",
 legacy: true,
@@ -2351,9 +2347,9 @@ name: "icon-male-symbol",
 legacy: true,
 path: () => import("./icons/icon-male-symbol.js"),
 },{
-name: "icon-microsoftazure",
+name: "icon-microsoft",
 legacy: true,
-path: () => import("./icons/icon-microsoftazure.js"),
+path: () => import("./icons/icon-microsoft.js"),
 },{
 name: "icon-molecular-network",
 legacy: true,

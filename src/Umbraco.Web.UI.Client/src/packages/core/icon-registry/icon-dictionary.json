@@ -2488,14 +2488,6 @@
 		{
 			"name": "icon-umbraco",
 			"file": "icon-umbraco.svg"
-		},
-		{
-			"name": "icon-microsoft",
-			"file": "icon-microsoft.svg"
-		},
-		{
-			"name": "icon-azure",
-			"file": "icon-microsoftazure.svg"
 		}
 	]
 }
