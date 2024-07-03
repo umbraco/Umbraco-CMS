@@ -12,7 +12,8 @@ import '../block-grid-entries/index.js';
 @customElement('umb-block-grid-areas-container')
 export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 	//
-	#styleElement?: HTMLLinkElement;
+	@state()
+	_styleElement?: HTMLLinkElement;
 
 	@state()
 	_areas?: Array<UmbBlockGridTypeAreaType> = [];
@@ -44,9 +45,11 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 			this.observe(
 				manager.layoutStylesheet,
 				(stylesheet) => {
-					this.#styleElement = document.createElement('link');
-					this.#styleElement.setAttribute('rel', 'stylesheet');
-					this.#styleElement.setAttribute('href', stylesheet);
+					// Do not re-render stylesheet if its the same href.
+					if (!stylesheet || this._styleElement?.getAttribute('href') === stylesheet) return;
+					this._styleElement = document.createElement('link');
+					this._styleElement.setAttribute('rel', 'stylesheet');
+					this._styleElement.setAttribute('href', stylesheet);
 				},
 				'observeStylesheet',
 			);
@@ -55,7 +58,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 
 	override render() {
 		return this._areas && this._areas.length > 0
-			? html` ${this.#styleElement}
+			? html` ${this._styleElement}
 					<div
 						class="umb-block-grid__area-container"
 						style="--umb-block-grid--area-grid-columns: ${this._areaGridColumns}">

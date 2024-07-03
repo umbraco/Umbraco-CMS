@@ -210,7 +210,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				manager.layoutStylesheet,
 				(stylesheet) => {
 					if (!stylesheet) return;
-					if (this._styleElement && this._styleElement.href === stylesheet) return;
+					if (this._styleElement?.href === stylesheet) return;
 					this._styleElement = document.createElement('link');
 					this._styleElement.setAttribute('rel', 'stylesheet');
 					this._styleElement.setAttribute('href', stylesheet);
