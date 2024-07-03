@@ -1,4 +1,4 @@
-import { readFileSync, writeFile, mkdir } from 'fs';
+import { readFileSync, writeFile, mkdir, rmSync } from 'fs';
 import * as globModule from 'tiny-glob';
 import * as pathModule from 'path';
 
@@ -15,6 +15,9 @@ const lucideSvgDirectory = 'node_modules/lucide-static/icons';
 const simpleIconsSvgDirectory = 'node_modules/simple-icons/icons';
 
 const run = async () => {
+	// Empty output directory:
+	rmSync(iconsOutputDirectory, { recursive: true });
+
 	var icons = await collectDictionaryIcons();
 	icons = await collectDiskIcons(icons);
 	writeIconsToDisk(icons);
