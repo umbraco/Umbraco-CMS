@@ -1,24 +1,30 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Json;
 
 public abstract class DeliveryApiVersionAwareJsonConverterBase<T> : JsonConverter<T>
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly JsonConverter<T> _defaultConverter = (JsonConverter<T>)JsonSerializerOptions.Default.GetConverter(typeof(T));
 
-    private const int ApiVersion = 4; // TODO: remove
+    public DeliveryApiVersionAwareJsonConverterBase(IHttpContextAccessor httpContextAccessor)
+        => _httpContextAccessor = httpContextAccessor;
 
     /// <inheritdoc />
     public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => _defaultConverter.Read(ref reader, typeToConvert, options);
 
+    /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
         Type type = typeof(T);
         PropertyInfo[] properties = type.GetProperties();
+        var apiVersion = GetApiVersion();
 
         writer.WriteStartObject();
 
@@ -26,7 +32,7 @@ public abstract class DeliveryApiVersionAwareJsonConverterBase<T> : JsonConverte
         foreach (PropertyInfo property in properties.OrderBy(GetPropertyOrder))
         {
             // Filter out properties based on the API version
-            var include = ShouldIncludeProperty(property, ApiVersion);
+            var include = apiVersion is null || ShouldIncludeProperty(property, apiVersion.Value);
 
             if (include is false)
             {
@@ -39,6 +45,14 @@ public abstract class DeliveryApiVersionAwareJsonConverterBase<T> : JsonConverte
         }
 
         writer.WriteEndObject();
+    }
+
+    private int? GetApiVersion()
+    {
+        HttpContext? httpContext = _httpContextAccessor.HttpContext;
+        ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
+
+        return apiVersion?.MajorVersion;
     }
 
     private int GetPropertyOrder(PropertyInfo prop)
