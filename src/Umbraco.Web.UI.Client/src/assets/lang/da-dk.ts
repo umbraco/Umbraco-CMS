@@ -1586,8 +1586,7 @@ export default {
 		addProperty: 'Tilføj egenskab',
 		requiredLabel: 'Påkrævet label',
 		enableListViewHeading: 'Aktivér listevisning',
-		enableListViewDescription:
-			'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste;\n      undersider vil ikke blive vist i træet\n    ',
+		enableListViewDescription: 'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste.',
 		allowedTemplatesHeading: 'Tilladte skabeloner',
 		allowedTemplatesDescription: 'Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.',
 		allowAtRootHeading: 'Tillad på rodniveau',
@@ -1681,8 +1680,7 @@ export default {
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Samlinger',
-		collectionsDescription:
-			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer, underordnede elementer vil ikke blive vist i træet.',
+		collectionsDescription: 'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer.',
 		structure: 'Struktur',
 		presentation: 'Præsentation',
 	},
@@ -2522,5 +2520,9 @@ export default {
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
 			'\n          We will send:\n          <ul>\n            <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n            <li>Number of: Root nodes, Content nodes, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n          </ul>\n          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>\n       ',
+	},
+	routing: {
+		routeNotFoundTitle: 'Ikke fundet',
+		routeNotFoundDescription: 'Den side du leder efter kunne ikke findes. Kontroller adressen og prøv igen.',
 	},
 } as UmbLocalizationDictionary;

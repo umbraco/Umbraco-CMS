@@ -1,7 +1,7 @@
-import type { UmbScriptItemModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
+import type { UmbScriptItemModel } from '../../types.js';
+import { UMB_SCRIPT_ITEM_STORE_CONTEXT } from './script-item.store.context-token.js';
 
 /**
  * @export
@@ -22,5 +22,3 @@ export class UmbScriptItemStore extends UmbItemStoreBase<UmbScriptItemModel> {
 }
 
 export default UmbScriptItemStore;
-
-export const UMB_SCRIPT_ITEM_STORE_CONTEXT = new UmbContextToken<UmbScriptItemStore>('UmbScriptItemStore');

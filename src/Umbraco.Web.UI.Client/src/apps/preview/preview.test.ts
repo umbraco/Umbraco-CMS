@@ -1,5 +1,5 @@
-import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPreviewElement } from './preview.element.js';
+import { expect, fixture, html } from '@open-wc/testing';
 
 describe('UmbPreview', () => {
 	let element: UmbPreviewElement;

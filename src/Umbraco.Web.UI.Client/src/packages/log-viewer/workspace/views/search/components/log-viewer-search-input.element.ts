@@ -81,14 +81,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		});
 	}
 
-	#toggleSavedSearchesPopover() {
-		this._searchDropdownElement.open = !this._searchDropdownElement.open;
-	}
-
-	#openSavedSearchesPopover() {
-		this.#toggleSavedSearchesPopover();
-	}
-
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
 		this.inputQuery$.next(target.value as string);

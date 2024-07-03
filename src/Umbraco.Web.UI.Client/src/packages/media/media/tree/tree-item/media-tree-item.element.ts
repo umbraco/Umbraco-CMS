@@ -10,7 +10,10 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 		return html`
 			<span id="icon-container" slot="icon">
 				${this.item?.mediaType.icon
-					? html` <umb-icon id="icon" slot="icon" name="${this.item.mediaType.icon}"></umb-icon> `
+					? html`
+							<umb-icon id="icon" slot="icon" name="${this.item.mediaType.icon}"></umb-icon>
+							${this.#renderStateIcon()}
+						`
 					: nothing}
 			</span>
 		`;
@@ -18,6 +21,18 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 
 	override renderLabel() {
 		return html`<span id="label" slot="label">${this._item?.variants[0].name}</span> `;
+	}
+
+	#renderStateIcon() {
+		if (this.item?.mediaType.collection) {
+			return this.#renderIsCollectionIcon();
+		}
+
+		return nothing;
+	}
+
+	#renderIsCollectionIcon() {
+		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
 	}
 
 	static override styles = [
@@ -35,6 +50,45 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
+			}
+
+			#state-icon {
+				position: absolute;
+				bottom: -5px;
+				right: -5px;
+				font-size: 10px;
+				background: var(--uui-color-surface);
+				width: 14px;
+				height: 14px;
+				border-radius: 100%;
+				line-height: 14px;
+			}
+
+			:hover #state-icon {
+				background: var(--uui-color-surface-emphasis);
+			}
+
+			/** Active */
+			[active] #state-icon {
+				background: var(--uui-color-current);
+			}
+
+			[active]:hover #state-icon {
+				background: var(--uui-color-current-emphasis);
+			}
+
+			/** Selected */
+			[selected] #state-icon {
+				background-color: var(--uui-color-selected);
+			}
+
+			[selected]:hover #state-icon {
+				background-color: var(--uui-color-selected-emphasis);
+			}
+
+			/** Disabled */
+			[disabled] #state-icon {
+				background-color: var(--uui-color-disabled);
 			}
 		`,
 	];

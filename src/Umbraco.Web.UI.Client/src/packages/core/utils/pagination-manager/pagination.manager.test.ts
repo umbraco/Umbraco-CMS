@@ -1,5 +1,5 @@
-import { expect, oneEvent } from '@open-wc/testing';
 import { UmbPaginationManager } from './pagination.manager.js';
+import { expect, oneEvent } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -141,7 +141,7 @@ describe('UmbPaginationManager', () => {
 		});
 
 		it('dispatches a change event', async () => {
-			const listener = oneEvent(manager, UmbChangeEvent.TYPE, false);
+			const listener = oneEvent(manager, UmbChangeEvent.TYPE);
 			manager.setCurrentPageNumber(2);
 			const event = (await listener) as unknown as UmbChangeEvent;
 			const target = event.target as UmbPaginationManager;

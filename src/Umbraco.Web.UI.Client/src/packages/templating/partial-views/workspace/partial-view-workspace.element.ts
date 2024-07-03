@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
-import '../../components/templating-item-menu/templating-item-menu.element.js';
+import '../../local-components/insert-menu/insert-menu.element.js';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -43,6 +43,10 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 				const unique = info.match.params.unique;
 				this.#workspaceContext.load(unique);
 			},
+		},
+		{
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 		},
 	];
 

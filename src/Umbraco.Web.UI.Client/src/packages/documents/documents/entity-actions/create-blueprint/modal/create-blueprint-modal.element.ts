@@ -14,7 +14,6 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 	#documentRepository = new UmbDocumentDetailRepository(this);
 
 	#documentUnique = '';
-	#document?: UmbDocumentDetailModel;
 
 	@state()
 	private _documentName = '';
@@ -31,7 +30,6 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 		const { data } = await this.#documentRepository.requestByUnique(this.#documentUnique);
 		if (!data) return;
 
-		this.#document = data;
 		this._documentName = data.variants[0].name;
 		this._blueprintName = data.variants[0].name;
 	}

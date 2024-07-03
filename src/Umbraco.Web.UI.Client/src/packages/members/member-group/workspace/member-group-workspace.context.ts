@@ -5,7 +5,6 @@ import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-e
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';

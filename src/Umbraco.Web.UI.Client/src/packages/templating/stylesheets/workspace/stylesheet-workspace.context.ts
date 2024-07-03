@@ -6,7 +6,6 @@ import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-edit
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';

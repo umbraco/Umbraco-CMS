@@ -1,5 +1,5 @@
-import type { Meta } from '@storybook/web-components';
 import { umbDataTypeMockDb } from '../../../../mocks/data/data-type/data-type.db.js';
+import type { Meta } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-tiny-mce-maximagesize-configuration.element.js';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';

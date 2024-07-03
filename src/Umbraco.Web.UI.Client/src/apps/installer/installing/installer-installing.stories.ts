@@ -1,7 +1,6 @@
-import type { Meta, Story } from '@storybook/web-components';
-
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import type { UmbInstallerInstallingElement } from './installer-installing.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import './installer-installing.element.js';
 

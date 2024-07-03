@@ -1,7 +1,7 @@
-import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT } from './document-detail.store.context-token.js';
+import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export

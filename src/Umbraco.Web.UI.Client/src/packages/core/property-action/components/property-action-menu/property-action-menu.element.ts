@@ -17,8 +17,6 @@ function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyA
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-	#actionsInitializer?: UmbExtensionsElementAndApiInitializer<ManifestTypes, 'propertyAction'>;
-
 	@state()
 	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestPropertyAction, never>> = [];
 
@@ -27,7 +25,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		this.#propertyEditorUiAlias = alias;
 
 		// TODO: Stop using string for 'propertyAction', we need to start using Const. [NL]
-		this.#actionsInitializer = new UmbExtensionsElementAndApiInitializer(
+		new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			'propertyAction',

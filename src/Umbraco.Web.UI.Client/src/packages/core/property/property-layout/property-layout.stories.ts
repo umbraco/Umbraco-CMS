@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbPropertyLayoutElement } from './property-layout.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-layout.element.js';
