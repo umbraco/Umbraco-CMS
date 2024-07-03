@@ -1,4 +1,3 @@
-import { expect, fixture } from '@open-wc/testing';
 import type {
 	ManifestCondition,
 	ManifestKind,
@@ -10,6 +9,7 @@ import type { UmbExtensionCondition } from '../condition/extension-condition.int
 import type { UmbControllerHostElement } from '../../controller-api/controller-host-element.interface.js';
 import { UmbControllerHostElementMixin } from '../../controller-api/controller-host-element.mixin.js';
 import { UmbBaseExtensionInitializer } from './index.js';
+import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';

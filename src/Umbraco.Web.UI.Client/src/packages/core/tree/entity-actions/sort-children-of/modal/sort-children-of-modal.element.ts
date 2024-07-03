@@ -51,7 +51,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	}
 
 	async #requestChildren() {
-		if (!this.data?.unique === undefined) throw new Error('unique is required');
+		if (this.data?.unique === undefined) throw new Error('unique is required');
 		if (!this.data?.treeRepositoryAlias) throw new Error('treeRepositoryAlias is required');
 
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel>>(

@@ -92,7 +92,6 @@ export class UmbDocumentWorkspaceContext
 	public readonly languages = this.#languages.asObservable();
 
 	#serverValidation = new UmbServerModelValidationContext(this);
-	#serverValidationValuesTranslator = new UmbVariantValuesValidationMessageTranslator(this, this.#serverValidation);
 	#validationRepository?: UmbDocumentValidationRepository;
 
 	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);

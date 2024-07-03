@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
 import { hasOwnOpener } from './has-own-opener.function.js';
+import { expect } from '@open-wc/testing';
 
 describe('hasOwnOpener', () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

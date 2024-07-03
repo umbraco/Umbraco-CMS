@@ -99,9 +99,8 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	async create(contentElementTypeId: string, groupKey?: string | null) {
 		this.resetState();
 
-
 		let data: BlockTypeData = {
-			contentElementTypeKey: contentElementTypeId
+			contentElementTypeKey: contentElementTypeId,
 		} as BlockTypeData;
 
 		// If we have a modal context, we blend in the modal preset data: [NL]
