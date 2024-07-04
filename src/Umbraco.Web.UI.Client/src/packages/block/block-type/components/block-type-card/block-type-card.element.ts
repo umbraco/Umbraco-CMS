@@ -24,16 +24,20 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	href?: string;
 
 	@property({ type: String, attribute: false })
-	public set iconFile(value: string | undefined) {
+	public set iconFile(value: string) {
 		value = transformServerPathToClientPath(value);
 		if (value) {
 			this.#init.then(() => {
-				this._iconFile = this.#appUrl! + removeInitialSlashFromPath(value);
+				this._iconFile = this.#appUrl + removeInitialSlashFromPath(value);
 			});
 		} else {
 			this._iconFile = undefined;
 		}
 	}
+	public get iconFile(): string | undefined {
+		return this._iconFile;
+	}
+
 	@state()
 	private _iconFile?: string | undefined;
 
