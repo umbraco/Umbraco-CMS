@@ -3,8 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.HybridCache;
+using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
@@ -39,6 +41,8 @@ public static class UmbracoBuilderExtensions
                     throw new IndexOutOfRangeException();
             }
         });
+
+        builder.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
 
         return builder;
     }

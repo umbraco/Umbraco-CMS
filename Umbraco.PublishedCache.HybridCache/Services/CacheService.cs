@@ -41,4 +41,12 @@ internal sealed class CacheService : ICacheService
         scope.Complete();
         return await Task.FromResult(preview ? contentNodeKit.Node.DraftModel! : contentNodeKit.Node.PublishedModel!);
     }
+
+    public Task RefreshContent(IContent content)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _nuCacheContentRepository.RefreshContent(content);
+        scope.Complete();
+        return Task.CompletedTask;
+    }
 }
