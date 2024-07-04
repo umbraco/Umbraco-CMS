@@ -7,7 +7,7 @@ describe('UmbPropertyEditorUIImageCropsElement', () => {
 	let element: UmbPropertyEditorUIImageCropsElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-property-editor-ui-image-crops-></umb-property-editor-ui-image-crops-> `);
+		element = await fixture(html` <umb-property-editor-ui-image-crops></umb-property-editor-ui-image-crops> `);
 	});
 
 	it('is defined with its own instance', () => {
