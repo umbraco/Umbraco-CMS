@@ -57,12 +57,12 @@ class UmbTestConditionAlwaysInvalid extends UmbControllerBase implements UmbExte
 
 describe('UmbBaseExtensionController', () => {
 	describe('Manifest without conditions', () => {
-		let hostElement: UmbControllerHostElement;
+		//let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			//hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -94,12 +94,12 @@ describe('UmbBaseExtensionController', () => {
 	});
 
 	describe('Manifest with empty conditions', () => {
-		let hostElement: UmbControllerHostElement;
+		//let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			//hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
