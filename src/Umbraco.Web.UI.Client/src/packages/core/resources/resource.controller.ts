@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { UMB_AUTH_CONTEXT } from '../auth/index.js';
+import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { UMB_AUTH_CONTEXT } from '../auth/index.js';
-import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+
+export type ErrorMessageText = { category: string; messages: string[] };
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -37,12 +39,15 @@ export class UmbResourceController extends UmbControllerBase {
 		this.cancel();
 	}
 
-	#buildApiErrorMessage(error: any) {
-		const entries: Array<Record<string, any>> = [];
+	#buildApiErrorMessage(error: ErrorMessageText) {
+		if (!error) return undefined;
+		if (typeof error !== 'object') return undefined;
 
-		Object.entries(error).forEach(([category, message]) => {
-			entries.push({ category, messages: message as string[] });
+		const entries: Array<Record<string, any>> = [];
+		Object.entries(error).forEach(([property, message]) => {
+			entries.push({ property, messages: Array.isArray(message) ? message : [message] });
 		});
+
 		const template = html` ${entries.map((e) => e.messages.map((msg: string) => html`<div>${msg}</div>`))}`;
 
 		return template;
@@ -141,7 +146,7 @@ export class UmbResourceController extends UmbControllerBase {
 					default:
 						// Other errors
 						if (this.#notificationContext) {
-							const message = error.body?.errors ? this.#buildApiErrorMessage(error.body.errors) : undefined;
+							const message = this.#buildApiErrorMessage(error?.body?.errors);
 							this.#notificationContext.peek('danger', {
 								data: {
 									headline: error.body?.title ?? error.name ?? 'Server Error',
