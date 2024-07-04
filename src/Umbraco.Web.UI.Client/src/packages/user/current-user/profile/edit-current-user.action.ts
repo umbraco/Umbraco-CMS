@@ -36,3 +36,5 @@ export class UmbEditCurrentUserAction<ArgsMetaType = never>
 		return;
 	}
 }
+
+export { UmbEditCurrentUserAction as api };

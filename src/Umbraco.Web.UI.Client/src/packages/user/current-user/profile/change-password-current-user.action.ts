@@ -41,3 +41,5 @@ export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 		});
 	}
 }
+
+export { UmbChangePasswordCurrentUserAction as api };
