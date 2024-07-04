@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
+using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 
 namespace Umbraco.Extensions;
@@ -24,6 +25,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddHybridCache();
         builder.Services.AddSingleton<IPublishedHybridCache, ContentCache>();
         builder.Services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
+        builder.Services.AddSingleton<ICacheService, CacheService>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
             IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();

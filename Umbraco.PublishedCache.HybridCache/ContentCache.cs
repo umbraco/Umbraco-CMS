@@ -15,22 +15,18 @@ internal sealed class ContentCache : IPublishedHybridCache
         _cacheService = cacheService;
     }
 
-    public IPublishedContent? GetById(bool preview, int contentId) => throw new NotImplementedException();
-
-    public IPublishedContent? GetById(bool preview, Guid contentId) => throw new NotImplementedException();
-
-    public IPublishedContent? GetById(int contentId) =>
-        _cache.GetOrCreateAsync(
+    public async Task<IPublishedContent?> GetById(int contentId, bool preview = false) =>
+        await _cache.GetOrCreateAsync(
             $"{contentId}", // Unique key to the cache entry
-            async cancel => _cacheService.GetById(contentId)).GetAwaiter().GetResult().GetAwaiter().GetResult();
+            async cancel => await _cacheService.GetById(contentId, preview));
 
-    public IPublishedContent? GetById(Guid contentId) => throw new NotImplementedException();
+    public Task<IPublishedContent?> GetById(Guid contentId, bool preview = false) => throw new NotImplementedException();
 
-    public bool HasById(bool preview, int contentId) => throw new NotImplementedException();
+    public Task<bool> HasById(bool preview, int contentId) => throw new NotImplementedException();
 
-    public bool HasById(int contentId) => throw new NotImplementedException();
+    public Task<bool> HasById(int contentId) => throw new NotImplementedException();
 
-    public bool HasContent(bool preview) => throw new NotImplementedException();
+    public Task<bool> HasContent(bool preview) => throw new NotImplementedException();
 
-    public bool HasContent() => throw new NotImplementedException();
+    public Task<bool> HasContent() => throw new NotImplementedException();
 }

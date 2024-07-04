@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Exceptions;
+﻿using System.Text.Json.Serialization;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -15,6 +16,7 @@ internal sealed class PublishedContent : PublishedContentBase
     private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
     private readonly string? _urlSegment;
 
+    // [JsonConstructor]
     public PublishedContent(
         ContentNode contentNode,
         ContentData contentData,
