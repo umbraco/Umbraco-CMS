@@ -119,7 +119,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	private _propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
-	private _ownerContentType?: UmbContentTypeModel;
+	private _ownerContentTypeUnique?: string;
 
 	@state()
 	private _newPropertyPath?: string;
@@ -153,14 +153,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
 
-			this.observe(
-				workspaceContext.structure.ownerContentType,
-				(contentType) => {
-					this._ownerContentType = contentType;
-					this.createPropertyTypeWorkspaceRoutes();
-				},
-				'observeOwnerContentType',
-			);
+			this._ownerContentTypeUnique = workspaceContext.structure.getOwnerContentTypeUnique();
+			this.createPropertyTypeWorkspaceRoutes();
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
@@ -169,7 +163,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	}
 
 	createPropertyTypeWorkspaceRoutes() {
-		if (!this._ownerContentType || this._containerId === undefined) return;
+		if (!this._ownerContentTypeUnique || this._containerId === undefined) return;
+
 		// Note: Route for adding a new property
 		this.#addPropertyModal?.destroy();
 		this.#addPropertyModal = new UmbModalRouteRegistrationController(
@@ -181,7 +176,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
 				// TODO: Make a onInit promise, that can be awaited here.
-				if (!this._ownerContentType || this._containerId === undefined) return false;
+				if (!this._ownerContentTypeUnique || this._containerId === undefined) return false;
 
 				const preset: Partial<UmbPropertyTypeModel> = {};
 				if (params.sortOrder !== undefined) {
@@ -192,7 +187,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					}
 					preset.sortOrder = sortOrderInt;
 				}
-				return { data: { contentTypeUnique: this._ownerContentType.unique, preset: undefined } };
+				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: undefined } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._newPropertyPath =
@@ -217,8 +212,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			.addUniquePaths(['container-id'])
 			.addAdditionalPath('edit-property')
 			.onSetup(async () => {
-				if (!this._ownerContentType || this._containerId === undefined) return false;
-				return { data: { contentTypeUnique: this._ownerContentType.unique, preset: undefined } };
+				if (!this._ownerContentTypeUnique || this._containerId === undefined) return false;
+				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: undefined } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPropertyTypePath = routeBuilder(null);
@@ -232,7 +227,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._ownerContentType
+		return this._ownerContentTypeUnique
 			? html`
 					<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 						${repeat(
