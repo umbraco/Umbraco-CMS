@@ -56,6 +56,7 @@ public static partial class Constants
         ///     The "base" path to the Management API
         /// </summary>
         public const string ManagementApiPath = "/management/api/";
+        public const string BackofficeSignalRHub = "/backofficeHub";
 
         public static class Routing
         {
