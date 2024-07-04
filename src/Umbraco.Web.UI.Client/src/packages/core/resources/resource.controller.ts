@@ -8,7 +8,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export type ErrorMessageText = { category: string; messages: string[] };
+export type ErrorMessageText = { property: string; messages: string[] };
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -43,7 +43,7 @@ export class UmbResourceController extends UmbControllerBase {
 		if (!error) return undefined;
 		if (typeof error !== 'object') return undefined;
 
-		const entries: Array<Record<string, any>> = [];
+		const entries: Array<ErrorMessageText> = [];
 		Object.entries(error).forEach(([property, message]) => {
 			entries.push({ property, messages: Array.isArray(message) ? message : [message] });
 		});
