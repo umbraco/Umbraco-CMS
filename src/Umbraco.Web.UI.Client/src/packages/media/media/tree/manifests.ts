@@ -1,4 +1,5 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_TREE_ALIAS, UMB_MEDIA_TREE_REPOSITORY_ALIAS, UMB_MEDIA_TREE_STORE_ALIAS } from './constants.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
@@ -7,10 +8,6 @@ import type {
 	ManifestTreeStore,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_MEDIA_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Media.Tree';
-export const UMB_MEDIA_TREE_STORE_ALIAS = 'Umb.Store.Media.Tree';
-export const UMB_MEDIA_TREE_ALIAS = 'Umb.Tree.Media';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',

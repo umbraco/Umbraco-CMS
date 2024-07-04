@@ -12,7 +12,7 @@ if (!['dev', 'prod'].includes(mode)) {
 	throw new Error(`MODE must be "dev" or "prod", was "${mode}"`);
 }
 
-const silencedLogs = ['Lit is in dev mode.', 'Multiple versions of Lit loaded.'];
+const silencedLogs = ['Lit is in dev mode.', 'Multiple versions of Lit loaded.', '-- Extension of alias "', 'Error: Failed to create extension api from alias'];
 
 /** @type {import('@web/dev-server').DevServerConfig} */
 export default {
@@ -20,9 +20,11 @@ export default {
 	files: ['./src/**/*.test.ts'],
 	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: false },
 	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
+	/* TODO: fix coverage report
 	coverageConfig: {
 		reporters: ['lcovonly', 'text-summary'],
 	},
+	*/
 	plugins: [
 		importMapsPlugin({
 			inject: {

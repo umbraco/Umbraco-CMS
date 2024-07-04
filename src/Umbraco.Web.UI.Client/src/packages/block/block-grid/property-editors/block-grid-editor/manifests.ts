@@ -55,6 +55,12 @@ export const manifests: Array<ManifestTypes> = [
 						label: 'Layout Stylesheet',
 						description: 'Override default stylesheet for backoffice layout.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridLayoutStylesheet',
+						config: [
+							{
+								alias: 'singleItemMode',
+								value: true,
+							},
+						],
 					},
 				],
 			},
