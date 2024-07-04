@@ -1,7 +1,6 @@
 import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
-import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
 import { UmbDisableUserEntityBulkAction } from './disable/disable.action.js';
 import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';

@@ -5,7 +5,6 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
-import { UMB_CONTENT_REQUEST_EVENT_TYPE } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {

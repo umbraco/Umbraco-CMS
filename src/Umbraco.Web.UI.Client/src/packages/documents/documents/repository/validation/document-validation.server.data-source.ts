@@ -4,7 +4,6 @@ import {
 	DocumentService,
 	type UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -21,7 +20,7 @@ export class UmbDocumentValidationServerDataSource {
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
-	constructor(host: UmbControllerHost) {
+	constructor() {
 		//this.#host = host;
 	}
 
