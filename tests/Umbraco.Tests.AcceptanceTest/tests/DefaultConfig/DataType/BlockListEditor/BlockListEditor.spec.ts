@@ -87,7 +87,7 @@ test('can add a block to a block list editor', async ({umbracoApi, umbracoUi}) =
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -111,7 +111,7 @@ test('can add multiple blocks to a block list editor', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId, secondElementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId, secondElementTypeId])).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -132,7 +132,7 @@ test('can remove a block from a block list editor', async ({umbracoApi, umbracoU
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeFalsy();
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeFalsy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName)
@@ -184,7 +184,7 @@ test('can enable single block mode', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.isSingleBlockModeEnabled(blockListEditorName, true)).toBeTruthy();
+  expect(await umbracoApi.dataType.isSingleBlockModeEnabledForBlockList(blockListEditorName, true)).toBeTruthy();
 });
 
 test('can disable single block mode', async ({umbracoApi, umbracoUi}) => {
@@ -198,7 +198,7 @@ test('can disable single block mode', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.isSingleBlockModeEnabled(blockListEditorName, false)).toBeTruthy();
+  expect(await umbracoApi.dataType.isSingleBlockModeEnabledForBlockList(blockListEditorName, false)).toBeTruthy();
 });
 
 test('can enable live editing mode', async ({umbracoApi, umbracoUi}) => {
@@ -212,7 +212,7 @@ test('can enable live editing mode', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.isLiveEditingModeEnabled(blockListEditorName, true)).toBeTruthy();
+  expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockListEditorName, true)).toBeTruthy();
 });
 
 test('can disable live editing mode', async ({umbracoApi, umbracoUi}) => {
@@ -226,7 +226,7 @@ test('can disable live editing mode', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.isLiveEditingModeEnabled(blockListEditorName, false)).toBeTruthy();
+  expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockListEditorName, false)).toBeTruthy();
 });
 
 test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
@@ -240,7 +240,7 @@ test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.isInlineEditingModeEnabled(blockListEditorName, true)).toBeTruthy();
+  expect(await umbracoApi.dataType.isInlineEditingModeEnabledForBlockList(blockListEditorName, true)).toBeTruthy();
 });
 
 test('can disable inline editing mode', async ({umbracoApi, umbracoUi}) => {
@@ -254,7 +254,7 @@ test('can disable inline editing mode', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.isInlineEditingModeEnabled(blockListEditorName, false)).toBeTruthy();
+  expect(await umbracoApi.dataType.isInlineEditingModeEnabledForBlockList(blockListEditorName, false)).toBeTruthy();
 });
 
 test('can add a property editor width', async ({umbracoApi, umbracoUi}) => {
@@ -269,7 +269,7 @@ test('can add a property editor width', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesMaxPropertyContainWidth(blockListEditorName, propertyWidth)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, propertyWidth)).toBeTruthy();
 });
 
 test('can update a property editor width', async ({umbracoApi, umbracoUi}) => {
@@ -277,7 +277,7 @@ test('can update a property editor width', async ({umbracoApi, umbracoUi}) => {
   const oldPropertyWidth = '50%';
   const newPropertyWidth = '100%';
   await umbracoApi.dataType.createBlockListDataTypeWithPropertyEditorWidth(blockListEditorName, oldPropertyWidth);
-  expect(await umbracoApi.dataType.doesMaxPropertyContainWidth(blockListEditorName, oldPropertyWidth)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, oldPropertyWidth)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -286,14 +286,14 @@ test('can update a property editor width', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesMaxPropertyContainWidth(blockListEditorName, newPropertyWidth)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, newPropertyWidth)).toBeTruthy();
 });
 
 test('can remove a property editor width', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyWidth = '50%';
   await umbracoApi.dataType.createBlockListDataTypeWithPropertyEditorWidth(blockListEditorName, propertyWidth);
-  expect(await umbracoApi.dataType.doesMaxPropertyContainWidth(blockListEditorName, propertyWidth)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, propertyWidth)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -302,5 +302,7 @@ test('can remove a property editor width', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesMaxPropertyContainWidth(blockListEditorName, "")).toBeTruthy();
+  expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, "")).toBeTruthy();
 });
+
+// Image media picker tests
