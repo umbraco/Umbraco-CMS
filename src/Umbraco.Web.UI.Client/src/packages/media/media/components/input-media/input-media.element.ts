@@ -188,8 +188,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		});
 	}
 
-	#onRemove(item: UmbMediaCardItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	async #onRemove(item: UmbMediaCardItemModel) {
+		await this.#pickerContext.requestRemoveItem(item.unique);
+		this._cards = this._cards.filter((x) => x.unique !== item.unique);
 	}
 
 	override render() {
