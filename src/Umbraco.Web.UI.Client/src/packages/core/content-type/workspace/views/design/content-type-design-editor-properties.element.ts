@@ -19,8 +19,11 @@ import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffi
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 import './content-type-design-editor-property.element.js';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
-import { UMB_PROPERTY_TYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/property-type';
+import {
+	UMB_CREATE_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN,
+	UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN,
+	UMB_PROPERTY_TYPE_WORKSPACE_MODAL,
+} from '@umbraco-cms/backoffice/property-type';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -99,12 +102,13 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		const oldValue = this._containerId;
 		if (value === oldValue) return;
 		this._containerId = value;
+		this.createAddPropertyRoute();
 		this.#propertyStructureHelper.setContainerId(value);
-		this.#addPropertyModal.setUniquePathValue('container-id', value === null ? 'root' : value);
+		this.#addPropertyModal?.setUniquePathValue('container-id', value === null ? 'root' : value);
 		this.requestUpdate('containerId', oldValue);
 	}
 
-	#addPropertyModal: UmbModalRouteRegistrationController;
+	#addPropertyModal?: UmbModalRouteRegistrationController;
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
@@ -118,7 +122,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	private _ownerContentType?: UmbContentTypeModel;
 
 	@state()
-	private _modalRouteBuilderNewProperty?: UmbModalRouteBuilder;
+	private _newPropertyPath?: string;
 
 	@state()
 	private _sortModeActive?: boolean;
@@ -158,11 +162,14 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			this._propertyStructure = propertyStructure;
 			this.#sorter.setModel(this._propertyStructure);
 		});
+	}
 
+	createAddPropertyRoute() {
 		// Note: Route for adding a new property
+		this.#addPropertyModal?.destroy();
 		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_WORKSPACE_MODAL)
 			.addUniquePaths(['container-id'])
-			.addAdditionalPath('add-property/:sortOrder')
+			.addAdditionalPath('add-property')
 			.onSetup(async (params) => {
 				// TODO: Make a onInit promise, that can be awaited here.
 				if (!this._ownerContentType || this._containerId === undefined) return false;
@@ -179,7 +186,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 				return { data: { contentTypeUnique: this._ownerContentType.unique, preset } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._modalRouteBuilderNewProperty = routeBuilder;
+				this._newPropertyPath =
+					routeBuilder({}) +
+					UMB_CREATE_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ containerUnique: this._containerId! });
 			});
 	}
 
@@ -209,7 +218,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 						() => html`
 							<uui-button
 								id="btn-add"
-								href=${ifDefined(this._modalRouteBuilderNewProperty?.({ sortOrder: -1 }))}
+								href=${ifDefined(this._newPropertyPath)}
 								label=${this.localize.term('contentTypeEditor_addProperty')}
 								look="placeholder"></uui-button>
 						`,

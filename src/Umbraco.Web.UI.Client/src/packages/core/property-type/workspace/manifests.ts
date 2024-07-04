@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_TYPE_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_PROPERTY_TYPE_ENTITY_TYPE, UMB_PROPERTY_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -10,7 +10,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 		api: () => import('./property-type-workspace.context.js'),
 		meta: {
-			entityType: 'property-type',
+			entityType: UMB_PROPERTY_TYPE_ENTITY_TYPE,
 		},
 	},
 	{

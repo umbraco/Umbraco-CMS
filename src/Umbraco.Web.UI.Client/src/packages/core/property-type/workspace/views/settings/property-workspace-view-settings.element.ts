@@ -170,7 +170,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	override render() {
 		return this._data
 			? html`
-					<uui-box>
+					<uui-box class="uui-text">
 						<div class="container">
 							<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
 							<uui-input
@@ -331,9 +331,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		UmbTextStyles,
 		css`
 			:host {
-				color: var(--uui-color-text);
-			}
-			#content {
+				display: block;
 				padding: var(--uui-size-layout-1);
 			}
 			#alias-input,

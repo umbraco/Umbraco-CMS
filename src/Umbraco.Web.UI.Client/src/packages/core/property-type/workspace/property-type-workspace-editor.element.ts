@@ -2,19 +2,9 @@ import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from './property-type-workspace.c
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
-import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
-
 @customElement('umb-property-type-workspace-editor')
 export class UmbPropertyTypeWorkspaceEditorElement extends UmbLitElement {
 	//
-	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
-		this,
-		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
-	);
-
 	#workspaceContext?: typeof UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -26,8 +16,11 @@ export class UmbPropertyTypeWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			this.observe(context.name, (name) => {
+				this._name = name;
+			});
 			this.#workspaceContext?.createPropertyDatasetContext(this);
 		});
 	}
