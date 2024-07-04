@@ -42,7 +42,9 @@ export const getQueryString = (params: Record<string, unknown>): string => {
 			return;
 		}
 
-		if (Array.isArray(value)) {
+		if (value instanceof Date) {
+			append(key, value.toISOString());
+		} else if (Array.isArray(value)) {
 			value.forEach(v => encodePair(key, v));
 		} else if (typeof value === 'object') {
 			Object.entries(value).forEach(([k, v]) => encodePair(`${key}[${k}]`, v));
@@ -99,20 +101,24 @@ export const getFormData = (options: ApiRequestOptions): FormData | undefined =>
 	return undefined;
 };
 
-type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
+type Resolver<T> = (options: ApiRequestOptions<T>) => Promise<T>;
 
-export const resolve = async <T>(options: ApiRequestOptions, resolver?: T | Resolver<T>): Promise<T | undefined> => {
+export const resolve = async <T>(options: ApiRequestOptions<T>, resolver?: T | Resolver<T>): Promise<T | undefined> => {
 	if (typeof resolver === 'function') {
 		return (resolver as Resolver<T>)(options);
 	}
 	return resolver;
 };
 
-export const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions): Promise<Headers> => {
+export const getHeaders = async <T>(config: OpenAPIConfig, options: ApiRequestOptions<T>): Promise<Headers> => {
 	const [token, username, password, additionalHeaders] = await Promise.all([
+		// @ts-ignore
 		resolve(options, config.TOKEN),
+		// @ts-ignore
 		resolve(options, config.USERNAME),
+		// @ts-ignore
 		resolve(options, config.PASSWORD),
+		// @ts-ignore
 		resolve(options, config.HEADERS),
 	]);
 
@@ -154,7 +160,7 @@ export const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptio
 export const getRequestBody = (options: ApiRequestOptions): unknown => {
 	if (options.body !== undefined) {
 		if (options.mediaType?.includes('application/json') || options.mediaType?.includes('+json')) {
-			return JSON.stringify(options.body)
+			return JSON.stringify(options.body);
 		} else if (isString(options.body) || isBlob(options.body) || isFormData(options.body)) {
 			return options.body;
 		} else {
@@ -187,7 +193,7 @@ export const sendRequest = async (
 	}
 
 	for (const fn of config.interceptors.request._fns) {
-		request = await fn(request)
+		request = await fn(request);
 	}
 
 	onCancel(() => controller.abort());
@@ -302,7 +308,7 @@ export const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): 
  * @returns CancelablePromise<T>
  * @throws ApiError
  */
-export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> => {
+export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions<T>): CancelablePromise<T> => {
 	return new CancelablePromise(async (resolve, reject, onCancel) => {
 		try {
 			const url = getUrl(config, options);
@@ -314,18 +320,23 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
 				let response = await sendRequest(config, options, url, body, formData, headers, onCancel);
 
 				for (const fn of config.interceptors.response._fns) {
-					response = await fn(response)
+					response = await fn(response);
 				}
 
 				const responseBody = await getResponseBody(response);
 				const responseHeader = getResponseHeader(response, options.responseHeader);
+
+				let transformedBody = responseBody;
+				if (options.responseTransformer && response.ok) {
+					transformedBody = await options.responseTransformer(responseBody)
+				}
 
 				const result: ApiResult = {
 					url,
 					ok: response.ok,
 					status: response.status,
 					statusText: response.statusText,
-					body: responseHeader ?? responseBody,
+					body: responseHeader ?? transformedBody,
 				};
 
 				catchErrorCodes(options, result);

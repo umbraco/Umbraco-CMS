@@ -37,7 +37,10 @@ export class UmbRelationCollectionServerDataSource implements UmbCollectionDataS
 			id: filter.relationType.unique,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, RelationService.getRelationTypeById(requestBody));
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			RelationService.getRelationByRelationTypeId(requestBody),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => {
