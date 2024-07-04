@@ -1,4 +1,4 @@
-import { UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_MENU_ALIAS } from './media/index.js';
+import { UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_MENU_ALIAS } from '../media/index.js';
 import type {
 	ManifestSection,
 	ManifestSectionSidebarApp,

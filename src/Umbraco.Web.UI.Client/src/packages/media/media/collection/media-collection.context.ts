@@ -36,3 +36,5 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 		});
 	}
 }
+
+export { UmbMediaCollectionContext as api };

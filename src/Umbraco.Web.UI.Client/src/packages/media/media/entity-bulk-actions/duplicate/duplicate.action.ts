@@ -5,3 +5,5 @@ export class UmbDuplicateMediaEntityBulkAction extends UmbEntityBulkActionBase<o
 		console.log('execute bulk duplicate');
 	}
 }
+
+export { UmbDuplicateMediaEntityBulkAction as api };

@@ -40,3 +40,5 @@ export class UmbImagingRepository extends UmbControllerBase implements UmbApi {
 		return await this.requestResizedItems(uniques, imagingModel);
 	}
 }
+
+export { UmbImagingRepository as api };
