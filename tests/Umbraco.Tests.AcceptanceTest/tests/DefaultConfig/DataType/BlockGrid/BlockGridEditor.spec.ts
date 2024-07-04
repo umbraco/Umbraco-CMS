@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
-test('can create a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can create a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   //Arrange
   const blockGridLocatorName = 'Block Grid';
   const blockGridEditorAlias = 'Umbraco.BlockGrid';
@@ -24,6 +24,7 @@ test('can create a block grid editor', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
+  await page.pause();
   await umbracoUi.dataType.clickCreateButton();
   await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
   await umbracoUi.dataType.enterDataTypeName(blockGridEditorName);
@@ -42,7 +43,7 @@ test('can create a block grid editor', async ({umbracoApi, umbracoUi}) => {
 test('can rename a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongName = 'BlockListEditorTest';
-  await umbracoApi.dataType.createEmptyBlockGridDataType(wrongName);
+  await umbracoApi.dataType.createEmptyBlockGrid(wrongName);
 
   // Act
   await umbracoUi.dataType.goToDataType(wrongName);
@@ -57,7 +58,7 @@ test('can rename a block grid editor', async ({umbracoApi, umbracoUi}) => {
 
 test('can delete a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const blockGridId = await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  const blockGridId = await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
@@ -75,7 +76,7 @@ test('can add a block to a block grid editor', async ({page ,umbracoApi, umbraco
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -99,7 +100,7 @@ test('can add multiple blocks to a block grid editor', async ({page, umbracoApi,
   const secondElementName = 'SecondBlockGridElement';
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   const secondElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridDataTypeWithABlock(blockGridEditorName, elementTypeId);
+  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, elementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -122,7 +123,7 @@ test('can remove a block from a block grid editor', async ({umbracoApi, umbracoU
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridDataTypeWithABlock(blockGridEditorName, elementTypeId);
+  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, elementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -142,7 +143,7 @@ test('can add a block to a group in a block grid editor', async ({page,umbracoAp
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -168,7 +169,7 @@ test('can add multiple blocks to a group in a block grid editor', async ({page,u
   const secondElementName = 'SecondBlockGridElement';
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   const secondElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridDataTypeWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
+  await umbracoApi.dataType.createBlockGridWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -191,7 +192,7 @@ test('can delete a block in a group from a block grid editor', async ({umbracoAp
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridDataTypeWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
+  await umbracoApi.dataType.createBlockGridWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
 
   // Act
@@ -212,7 +213,7 @@ test('can move a block from a group to another group in a block grid editor', as
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'MoveToHereGroup';
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridDataTypeWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
+  await umbracoApi.dataType.createBlockGridWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
 
   // Act
@@ -237,7 +238,7 @@ test.skip('can delete a group in a block grid editor', async ({page, umbracoApi,
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridDataTypeWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
+  await umbracoApi.dataType.createBlockGridWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
 
 
@@ -248,7 +249,7 @@ test.skip('can delete a group in a block grid editor', async ({page, umbracoApi,
 
 test('can add a min and max amount to a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -265,7 +266,7 @@ test('can add a min and max amount to a block grid editor', async ({page, umbrac
 
 test('max can not be less than min in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createBlockGridDataTypeWithMinAndMaxAmount(blockGridEditorName, 2, 2);
+  await umbracoApi.dataType.createBlockGridWithMinAndMaxAmount(blockGridEditorName, 2, 2);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -274,8 +275,8 @@ test('max can not be less than min in a block grid editor', async ({page, umbrac
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible(false);
+  await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value');
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
-  expect(await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value'));
   expect(dataTypeData.values[0].value.min).toBe(2);
   // The max value should not be updated
   expect(dataTypeData.values[0].value.max).toBe(2);
@@ -283,7 +284,7 @@ test('max can not be less than min in a block grid editor', async ({page, umbrac
 
 test('can enable live editing mode in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -292,12 +293,12 @@ test('can enable live editing mode in a block grid editor', async ({page, umbrac
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, true);
+  expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, true)).toBeTruthy();
 });
 
 test('can disable live editing mode in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createBlockGridDataTypeWithLiveEditingMode(blockGridEditorName, true);
+  await umbracoApi.dataType.createBlockGridWithLiveEditingMode(blockGridEditorName, true);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -306,13 +307,13 @@ test('can disable live editing mode in a block grid editor', async ({page, umbra
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, false);
+  expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, false)).toBeTruthy();
 });
 
 test('can add editor width in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyEditorWidth = '100%'
-  await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -327,7 +328,7 @@ test('can add editor width in a block grid editor', async ({page, umbracoApi, um
 test('can remove editor width in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyEditorWidth = '100%'
-  await umbracoApi.dataType.createBlockGridDataTypeWithPropertyEditorWidth(blockGridEditorName, propertyEditorWidth);
+  await umbracoApi.dataType.createBlockGridWithPropertyEditorWidth(blockGridEditorName, propertyEditorWidth);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -343,7 +344,7 @@ test('can remove editor width in a block grid editor', async ({page, umbracoApi,
 test('can add a create button label in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const createButtonLabel = 'Create Block'
-  await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -352,14 +353,14 @@ test('can add a create button label in a block grid editor', async ({page, umbra
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockGridDataTypeContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeTruthy();
 });
 
 test('can remove a create button label in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const createButtonLabel = 'Create Block'
-  await umbracoApi.dataType.createBlockGridDataTypeWithCreateButtonLabel(blockGridEditorName, createButtonLabel);
-  expect(await umbracoApi.dataType.doesBlockGridDataTypeContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeTruthy();
+  await umbracoApi.dataType.createBlockGridWithCreateButtonLabel(blockGridEditorName, createButtonLabel);
+  expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -368,14 +369,14 @@ test('can remove a create button label in a block grid editor', async ({page, um
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockGridDataTypeContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeFalsy();
-  expect(await umbracoApi.dataType.doesBlockGridDataTypeContainCreateButtonLabel(blockGridEditorName, '')).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeFalsy();
+  expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, '')).toBeTruthy();
 });
 
 test('can update grid columns in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const gridColumns = 3;
-  await umbracoApi.dataType.createEmptyBlockGridDataType(blockGridEditorName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -387,10 +388,11 @@ test('can update grid columns in a block grid editor', async ({page, umbracoApi,
   expect(await umbracoApi.dataType.doesBlockGridDataTypeContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
 });
 
-test('can add a layout stylesheet a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+// TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
+test.skip('can add a stylesheet a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
 });
 
-test('can delete a layout stylesheet in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can delete a stylesheet in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
 });
 
 
