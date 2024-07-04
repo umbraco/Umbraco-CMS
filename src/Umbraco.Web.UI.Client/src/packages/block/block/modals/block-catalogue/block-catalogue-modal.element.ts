@@ -124,6 +124,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 							(block) => block.contentElementTypeKey,
 							(block) => html`
 								<umb-block-type-card
+									.iconFile=${block.thumbnail}
 									.iconColor=${block.iconColor}
 									.backgroundColor=${block.backgroundColor}
 									.contentElementTypeKey=${block.contentElementTypeKey}
