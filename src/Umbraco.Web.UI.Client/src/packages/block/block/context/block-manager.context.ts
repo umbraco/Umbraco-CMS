@@ -166,8 +166,9 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentUdi: string) {
 		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
-
-	setOneLayout(layoutData: BlockLayoutType) {
+	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	setOneLayout(layoutData: BlockLayoutType, modalData?: UmbBlockWorkspaceData) {
 		this._layouts.appendOne(layoutData);
 	}
 	setOneContent(contentData: UmbBlockDataType) {
