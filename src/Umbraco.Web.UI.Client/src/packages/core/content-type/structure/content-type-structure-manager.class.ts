@@ -449,30 +449,6 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties });
 	}
 
-	createPropertyScaffold(containerId: string | null = null) {
-		const property: UmbPropertyTypeScaffoldModel = {
-			id: UmbId.new(),
-			container: containerId ? { id: containerId } : null,
-			alias: '',
-			name: '',
-			description: '',
-			variesByCulture: false,
-			variesBySegment: false,
-			validation: {
-				mandatory: false,
-				mandatoryMessage: null,
-				regEx: null,
-				regExMessage: null,
-			},
-			appearance: {
-				labelOnTop: false,
-			},
-			sortOrder: 0,
-		};
-
-		return property;
-	}
-
 	async createProperty(contentTypeUnique: string | null, containerId: string | null = null, sortOrder?: number) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;

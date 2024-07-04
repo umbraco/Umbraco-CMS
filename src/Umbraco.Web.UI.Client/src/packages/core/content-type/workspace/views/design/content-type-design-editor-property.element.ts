@@ -15,6 +15,7 @@ import {
 	type UmbPropertyTypeModel,
 	type UmbPropertyTypeScaffoldModel,
 } from '@umbraco-cms/backoffice/content-type';
+import { UMB_PROPERTY_TYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/property-type';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -91,17 +92,14 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		super();
 
 		// TODO: consider if this can be registered more globally/contextually. [NL]
-		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
+		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_WORKSPACE_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
 				const id = this._inheritedContentTypeId;
 				if (id === undefined) return false;
 				const propertyData = this.property;
 				if (propertyData === undefined) return false;
-				return { data: { contentTypeId: id }, value: propertyData };
-			})
-			.onSubmit((result) => {
-				this.#partialUpdate(result as UmbPropertyTypeModel);
+				return { data: { contentTypeUnique: id, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);

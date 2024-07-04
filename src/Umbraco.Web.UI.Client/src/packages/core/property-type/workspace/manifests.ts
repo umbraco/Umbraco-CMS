@@ -30,11 +30,6 @@ export const manifests: Array<ManifestTypes> = [
 				match: UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 			},
 		],
-		TODO_conditions: [
-			{
-				alias: 'Umb.Condition.BlockEntryShowContentEdit',
-			},
-		],
 	},
 	{
 		type: 'workspaceAction',

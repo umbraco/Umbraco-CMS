@@ -22,6 +22,8 @@ import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffi
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 import './content-type-design-editor-property.element.js';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_PROPERTY_TYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/property-type';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -161,29 +163,23 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		});
 
 		// Note: Route for adding a new property
-		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
+		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_WORKSPACE_MODAL)
 			.addUniquePaths(['container-id'])
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
 				// TODO: Make a onInit promise, that can be awaited here.
 				if (!this._ownerContentType || this._containerId === undefined) return false;
-				const propertyData = await this.#propertyStructureHelper.createPropertyScaffold(this._containerId);
-				if (propertyData === undefined) return false;
+
+				const preset: Partial<UmbPropertyTypeModel> = {};
 				if (params.sortOrder !== undefined) {
 					let sortOrderInt = parseInt(params.sortOrder, 10);
 					if (sortOrderInt === -1) {
 						// Find the highest sortOrder and add 1 to it:
 						sortOrderInt = Math.max(...this._propertyStructure.map((x) => x.sortOrder), -1);
 					}
-					propertyData.sortOrder = sortOrderInt + 1;
+					preset.sortOrder = sortOrderInt + 1;
 				}
-				return { data: { contentTypeId: this._ownerContentType.unique }, value: propertyData };
-			})
-			.onSubmit(async (value) => {
-				if (!this._ownerContentType) return false;
-				// TODO: The model requires a data-type to be set, we cheat currently. But this should be re-though when we implement validation(As we most likely will have to com up with partial models for the runtime model.) [NL]
-				this.#propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
-				return true;
+				return { data: { contentTypeUnique: this._ownerContentType.unique, preset } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteBuilderNewProperty = routeBuilder;

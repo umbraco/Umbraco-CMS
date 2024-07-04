@@ -300,13 +300,13 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							@change=${this.#onValidationRegExChange}
 							placeholder=${this.localize.term('validation_validationRegExp')}
 							label=${this.localize.term('validation_validationRegExp')}
-							.value=${this._data.validation?.regEx ?? ''}></uui-input>
+							.value=${this._data?.validation?.regEx ?? ''}></uui-input>
 						<uui-textarea
 							name="pattern-message"
 							@change=${this.#onValidationMessageChange}
 							placeholder=${this.localize.term('validation_validationRegExpMessage')}
 							label=${this.localize.term('validation_validationRegExpMessage')}
-							.value=${this._data.validation?.regExMessage ?? ''}></uui-textarea>
+							.value=${this._data?.validation?.regExMessage ?? ''}></uui-textarea>
 					`
 				: nothing} `;
 	}
