@@ -75,7 +75,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -126,28 +126,24 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.selection.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.selection.length > this.max,
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
-	protected override getFormElement() {
-		return undefined;
-	}
-
 	#isDraft(item: UmbDocumentItemModel) {
 		return item.variants[0]?.state === 'Draft';
 	}
 
-	#pickableFilter: (item: UmbDocumentItemModel) => boolean = (item) => {
+	#pickableFilter = (item: UmbDocumentItemModel): boolean => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
 			return this.allowedContentTypeIds.includes(item.documentType.unique);
 		}
@@ -162,7 +158,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		});
 	}
 
-	#removeItem(item: UmbDocumentItemModel) {
+	#onRemove(item: UmbDocumentItemModel) {
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
@@ -171,7 +167,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.selection.length >= this.max) return;
+		if (this.selection.length >= this.max) return;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -201,7 +197,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
+					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -231,7 +227,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	static override styles = [
 		css`
 			#btn-add {
-				width: 100%;
+				display: block;
 			}
 
 			uui-ref-node[drag-placeholder] {

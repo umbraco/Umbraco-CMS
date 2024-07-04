@@ -87,7 +87,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -164,20 +164,16 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.selection.length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.selection.length > this.max,
 		);
 	}
 
-	protected override getFormElement() {
-		return undefined;
-	}
-
-	#pickableFilter: (item: UmbMediaItemModel) => boolean = (item) => {
+	#pickableFilter = (item: UmbMediaItemModel): boolean => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
 			return this.allowedContentTypeIds.includes(item.mediaType.unique);
 		}
