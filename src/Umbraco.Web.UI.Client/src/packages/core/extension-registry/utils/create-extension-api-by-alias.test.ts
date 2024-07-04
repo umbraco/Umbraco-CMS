@@ -1,6 +1,5 @@
-import type { ManifestApi } from '../../../../libs/extension-api/types/index.js';
-import type { UmbApi } from '../../../../libs/extension-api/models/api.interface.js';
 import { createExtensionApiByAlias } from './create-extension-api-by-alias.function.js';
+import type { ManifestApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { expect, fixture } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -54,15 +53,16 @@ describe('Create Extension Api By Alias Method', () => {
 		};
 		umbExtensionsRegistry.register(manifest);
 
-		createExtensionApiByAlias<UmbExtensionApiBoolTestClass>(hostElement, manifest.alias, []).then(() => {
-			umbExtensionsRegistry.unregister(manifest.alias);
-			done(new Error('Should not resolve'));
-		});
-
-		setTimeout(() => {
-			umbExtensionsRegistry.unregister(manifest.alias);
-			done();
-		}, 10);
+		createExtensionApiByAlias<UmbExtensionApiBoolTestClass>(hostElement, manifest.alias, []).then(
+			() => {
+				umbExtensionsRegistry.unregister(manifest.alias);
+				done(new Error('Should not resolve'));
+			},
+			() => {
+				umbExtensionsRegistry.unregister(manifest.alias);
+				done();
+			},
+		);
 	});
 
 	it('Handles when `api` property contains a class constructor', async () => {
