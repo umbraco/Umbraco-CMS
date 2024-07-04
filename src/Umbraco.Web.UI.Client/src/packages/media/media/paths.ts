@@ -1,4 +1,4 @@
-import { UMB_MEDIA_SECTION_PATHNAME } from '../paths.js';
+import { UMB_MEDIA_SECTION_PATHNAME } from '../media-section/paths.js';
 import { UMB_MEDIA_ENTITY_TYPE, type UmbMediaEntityTypeUnion } from './entity.js';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 import { UmbPathPattern } from '@umbraco-cms/backoffice/router';

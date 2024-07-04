@@ -1,4 +1,3 @@
-/*
 import { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 
@@ -21,4 +20,3 @@ describe('UmbDashboardRedirectManagement', () => {
 		});
 	}
 });
-*/
