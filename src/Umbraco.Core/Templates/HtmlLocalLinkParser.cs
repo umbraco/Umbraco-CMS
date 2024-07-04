@@ -10,6 +10,13 @@ namespace Umbraco.Cms.Core.Templates;
 /// </summary>
 public sealed class HtmlLocalLinkParser
 {
+    // needs to support media and document links, order of attributes should not matter nor should other attributes mess with things
+    // <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
+    // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
+    internal static readonly Regex LocalLinkTagPattern = new(
+        @"<a\s+(?:(?:(?:type=['""](?<type>document|media)['""].*?(?<locallink>href=[""']/{localLink:(?<guid>[a-fA-F0-9-]+)})[""'])|((?<locallink>href=[""']/{localLink:(?<guid>[a-fA-F0-9-]+)})[""'].*?type=(['""])(?<type>document|media)(?:['""])))|(?:(?:type=['""](?<type>document|media)['""])|(?:(?<locallink>href=[""']/{localLink:[a-fA-F0-9-]+})[""'])))[^>]*>",
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
     internal static readonly Regex LocalLinkPattern = new(
         @"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
@@ -105,6 +112,32 @@ public sealed class HtmlLocalLinkParser
     }
 
     private IEnumerable<(int? intId, GuidUdi? udi, string tagValue)> FindLocalLinkIds(string text)
+    {
+        MatchCollection localLinkTagMatches = LocalLinkTagPattern.Matches(text);
+        foreach (Match linkTag in localLinkTagMatches)
+        {
+            if (linkTag.Groups.Count < 1)
+            {
+                continue;
+            }
+
+            if (Guid.TryParse(linkTag.Groups["guid"].Value, out Guid guid) is false)
+            {
+                continue;
+            }
+
+            yield return (null, new GuidUdi(linkTag.Groups["type"].Value, guid), linkTag.Groups["locallink"].Value);
+        }
+
+        // also return legacy results for values that have not been migrated
+        foreach ((int? intId, GuidUdi? udi, string tagValue) legacyResult in FindLegacyLocalLinkIds(text))
+        {
+            yield return legacyResult;
+        }
+    }
+
+    // todo remove at some point?
+    private IEnumerable<(int? intId, GuidUdi? udi, string tagValue)> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
         MatchCollection tags = LocalLinkPattern.Matches(text);

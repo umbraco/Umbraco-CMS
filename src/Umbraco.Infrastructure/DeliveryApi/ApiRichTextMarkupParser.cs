@@ -52,8 +52,9 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         foreach (HtmlNode link in links)
         {
             ReplaceLocalLinks(
-                publishedSnapshot,
+                    publishedSnapshot,
                 link.GetAttributeValue("href", string.Empty),
+                link.GetAttributeValue("type", "unknown"),
                 route =>
                 {
                     link.SetAttributeValue("href", route.Path);
