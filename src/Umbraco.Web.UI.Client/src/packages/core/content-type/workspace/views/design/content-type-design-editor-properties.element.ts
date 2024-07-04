@@ -13,10 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbContentTypePropertyStructureHelper,
-	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
-} from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';

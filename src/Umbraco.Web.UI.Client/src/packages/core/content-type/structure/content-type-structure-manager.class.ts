@@ -449,37 +449,6 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties });
 	}
 
-	async createProperty(contentTypeUnique: string | null, containerId: string | null = null, sortOrder?: number) {
-		await this.#init;
-		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
-
-		// If we have a container, we need to ensure it exists, and then update the container with the new parent id. [NL]
-		if (containerId) {
-			const container = await this.ensureContainerOf(containerId, contentTypeUnique);
-			if (!container) {
-				throw new Error('Container for inserting property could not be found or created');
-			}
-			// Correct containerId to the local one: [NL]
-			containerId = container.id;
-		}
-
-		const property = this.createPropertyScaffold(containerId);
-		property.sortOrder = sortOrder ?? 0;
-
-		const properties: Array<UmbPropertyTypeScaffoldModel | UmbPropertyTypeModel> = [
-			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? []),
-		];
-
-		properties.push(property);
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { properties });
-
-		return property;
-	}
-
 	async insertProperty(contentTypeUnique: string | null, property: UmbPropertyTypeModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;

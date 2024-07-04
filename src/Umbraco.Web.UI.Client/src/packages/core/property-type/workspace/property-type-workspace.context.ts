@@ -12,13 +12,9 @@ import {
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UMB_CONTENT_TYPE_WORKSPACE_CONTEXT,
-	UmbPropertyTypeModel,
-	UmbPropertyTypeSettingsModalData,
-} from '@umbraco-cms/backoffice/content-type';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbPropertyTypeData } from '../types.js';
+import { UmbPropertyTypeWorkspaceData } from './property-type-workspace.modal-token.js';
 
 export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropertyTypeModel = UmbPropertyTypeModel>
 	extends UmbSubmittableWorkspaceContextBase<PropertyTypeData>
@@ -144,7 +140,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 		return this.#data.getValue()?.name;
 	}
 	setName(name: string | undefined) {
-		this.#data.update({ name: name });
+		this.updateData({ name: name } as any);
 	}
 
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
@@ -166,7 +162,7 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 		if (!this.modalContext) {
 			throw new Error('Needs to be in a modal to submit.');
 		}
-		const contentTypeUnique = (this.modalContext.data as unknown as UmbPropertyTypeSettingsModalData).contentTypeUnique;
+		const contentTypeUnique = (this.modalContext.data as UmbPropertyTypeWorkspaceData).contentTypeUnique;
 
 		const data = this.#data.getValue();
 		if (!data) {
