@@ -78,11 +78,16 @@ export class UmbPropertyEditorUIContentPickerElement
 			this.#dynamicRoot = startNode.dynamicRoot;
 		}
 
-		this._min = Number(config.getValueByAlias('minNumber')) || 0;
-		this._max = Number(config.getValueByAlias('maxNumber')) || Infinity;
+		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
+		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
 		this._showOpenButton = config.getValueByAlias('showOpenButton');
+	}
+
+	#parseInt(value: unknown, fallback: number): number {
+		const num = Number(value);
+		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
 	override firstUpdated() {
