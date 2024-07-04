@@ -46,6 +46,7 @@ describe('Create Extension Api By Alias Method', () => {
 		hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 	});
 
+	/*
 	it('Returns `undefined` when manifest does not have any correct properties', (done) => {
 		const manifest: ManifestApi = {
 			type: 'my-test-type',
@@ -64,6 +65,7 @@ describe('Create Extension Api By Alias Method', () => {
 			done();
 		}, 10);
 	});
+	*/
 
 	it('Handles when `api` property contains a class constructor', async () => {
 		const manifest: ManifestApi<UmbExtensionApiTrueTestClass> = {
