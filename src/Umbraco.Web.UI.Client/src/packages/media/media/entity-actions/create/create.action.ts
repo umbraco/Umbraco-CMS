@@ -33,3 +33,5 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbCreateMediaEntityAction as api };

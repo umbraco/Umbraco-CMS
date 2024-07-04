@@ -140,7 +140,8 @@
 		"./src/packages/health-check",
 		"./src/packages/tags",
 		"./src/packages/templating",
-		"./src/packages/property-editors"
+		"./src/packages/property-editors",
+		"./src/packages/media"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
