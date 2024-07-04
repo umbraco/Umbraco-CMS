@@ -44,7 +44,13 @@ export class UmbPropertyEditorUIContentPickerElement
 	_min = 0;
 
 	@state()
+	_minMessage = '';
+
+	@state()
 	_max = Infinity;
+
+	@state()
+	_maxMessage = '';
 
 	@state()
 	_allowedContentTypeUniques?: string | null;
@@ -83,6 +89,14 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
 		this._showOpenButton = config.getValueByAlias('showOpenButton');
+
+		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
+		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
+
+		// NOTE: Run validation immediately, to notify if the value is outside of min/max range. [LK]
+		if (this._min > 0 || this._max < Infinity) {
+			this.checkValidity();
+		}
 	}
 
 	#parseInt(value: unknown, fallback: number): number {
