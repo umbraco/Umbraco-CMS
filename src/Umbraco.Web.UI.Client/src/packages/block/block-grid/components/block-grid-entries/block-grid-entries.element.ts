@@ -1,12 +1,9 @@
-import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
-import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { html, customElement, state, repeat, css, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
@@ -17,6 +14,9 @@ import {
 	type UmbFormControlValidatorConfig,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
+import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
