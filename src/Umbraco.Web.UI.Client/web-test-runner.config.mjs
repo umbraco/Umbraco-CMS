@@ -20,9 +20,11 @@ export default {
 	files: ['./src/**/*.test.ts'],
 	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: false },
 	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
+	/* TODO: fix coverage report
 	coverageConfig: {
-		reporters: ['text-summary'],
+		reporters: ['lcovonly', 'text-summary'],
 	},
+	*/
 	plugins: [
 		importMapsPlugin({
 			inject: {
