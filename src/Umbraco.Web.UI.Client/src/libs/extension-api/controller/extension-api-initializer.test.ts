@@ -9,6 +9,8 @@ import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
+// Element is used in tests
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestApiController extends UmbControllerBase {

@@ -16,6 +16,8 @@ import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('umb-test-controller-host')
+// Element is used in tests
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestExtensionController extends UmbBaseExtensionInitializer {
