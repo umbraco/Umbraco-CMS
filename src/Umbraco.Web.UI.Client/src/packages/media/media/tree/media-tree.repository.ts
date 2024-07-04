@@ -6,7 +6,7 @@ import type {
 	UmbMediaTreeRootItemsRequestArgs,
 	UmbMediaTreeRootModel,
 } from './types.js';
-import { UMB_MEDIA_TREE_STORE_CONTEXT } from './media-tree.store.js';
+import { UMB_MEDIA_TREE_STORE_CONTEXT } from './media-tree.store.context-token.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
