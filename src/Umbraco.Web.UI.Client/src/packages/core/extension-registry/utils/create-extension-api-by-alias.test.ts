@@ -54,15 +54,16 @@ describe('Create Extension Api By Alias Method', () => {
 		};
 		umbExtensionsRegistry.register(manifest);
 
-		createExtensionApiByAlias<UmbExtensionApiBoolTestClass>(hostElement, manifest.alias, []).then(() => {
-			umbExtensionsRegistry.unregister(manifest.alias);
-			done(new Error('Should not resolve'));
-		});
-
-		setTimeout(() => {
-			umbExtensionsRegistry.unregister(manifest.alias);
-			done();
-		}, 10);
+		createExtensionApiByAlias<UmbExtensionApiBoolTestClass>(hostElement, manifest.alias, []).then(
+			() => {
+				umbExtensionsRegistry.unregister(manifest.alias);
+				done(new Error('Should not resolve'));
+			},
+			() => {
+				umbExtensionsRegistry.unregister(manifest.alias);
+				done();
+			},
+		);
 	});
 
 	it('Handles when `api` property contains a class constructor', async () => {
