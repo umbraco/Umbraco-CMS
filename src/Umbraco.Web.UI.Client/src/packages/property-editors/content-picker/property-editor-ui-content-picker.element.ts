@@ -3,6 +3,7 @@ import type { UmbInputContentElement } from './components/input-content/index.js
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -15,15 +16,26 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 // import of local component
 import './components/input-content/index.js';
 
+type UmbContentPickerValueType = UmbInputContentElement['selection'];
+
 const elementName = 'umb-property-editor-ui-content-picker';
 
 /**
  * @element umb-property-editor-ui-content-picker
  */
 @customElement(elementName)
-export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIContentPickerElement
+	extends UmbFormControlMixin<UmbContentPickerValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
+	implements UmbPropertyEditorUiElement
+{
 	@property({ type: Array })
-	value: UmbInputContentElement['items'] = [];
+	public override set value(value: UmbContentPickerValueType | undefined) {
+		this.#value = value;
+	}
+	public override get value(): UmbContentPickerValueType | undefined {
+		return this.#value;
+	}
+	#value?: UmbContentPickerValueType = [];
 
 	@state()
 	_type: UmbContentPickerSource['type'] = 'content';
@@ -73,8 +85,8 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 		this._showOpenButton = config.getValueByAlias('showOpenButton');
 	}
 
-	override connectedCallback() {
-		super.connectedCallback();
+	override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
 	}
 
@@ -98,7 +110,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
-		this.value = event.target.items;
+		this.value = event.target.selection;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -108,15 +120,19 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 				? { unique: this._rootUnique, entityType: this._rootEntityType }
 				: undefined;
 
-		return html`<umb-input-content
-			.items=${this.value}
-			.type=${this._type}
-			.min=${this._min}
-			.max=${this._max}
-			.startNode=${startNode}
-			.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
-			?showOpenButton=${this._showOpenButton}
-			@change=${this.#onChange}></umb-input-content>`;
+		return html`
+			<umb-input-content
+				.selection=${this.value ?? []}
+				.type=${this._type}
+				.min=${this._min}
+				.minMessage=${this._minMessage}
+				.max=${this._max}
+				.maxMessage=${this._maxMessage}
+				.startNode=${startNode}
+				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
+				?showOpenButton=${this._showOpenButton}
+				@change=${this.#onChange}></umb-input-content>
+		`;
 	}
 }
 
