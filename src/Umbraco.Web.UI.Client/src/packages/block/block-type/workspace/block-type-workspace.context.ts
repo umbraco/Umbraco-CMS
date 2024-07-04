@@ -11,7 +11,11 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestWorkspace, PropertyEditorSettingsProperty, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestWorkspace,
+	PropertyEditorSettingsProperty,
+	UmbBlockTypeBaseModel,
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbBlockTypeWithGroupKey } from '../types.js';
 import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 

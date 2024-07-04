@@ -1,6 +1,9 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbBlockEditorCustomViewProperties, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbBlockEditorCustomViewProperties,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import '../ref-rte-block/index.js';
@@ -43,7 +46,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_workspaceEditSettingsPath?: string;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = { contentUdi: undefined!, config: { showContentEdit: false, showSettingsEdit: false} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
+		contentUdi: undefined!,
+		config: { showContentEdit: false, showSettingsEdit: false },
+	}; // Set to undefined cause it will be set before we render.
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
@@ -64,36 +70,68 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			this._hasSettings = !!key;
 			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
 		});
-		this.observe(this.#context.blockType, (blockType) => {
-			this.#updateBlockViewProps({ blockType });
-		}, null);
+		this.observe(
+			this.#context.blockType,
+			(blockType) => {
+				this.#updateBlockViewProps({ blockType });
+			},
+			null,
+		);
 		// TODO: Implement index.
-		this.observe(this.#context.label, (label) => {
-			this.#updateBlockViewProps({ label });
-			this._label = label;
-		}, null);
-		this.observe(this.#context.contentElementTypeIcon, (icon) => {
-			this.#updateBlockViewProps({ icon });
-			this._icon = icon;
-		}, null);
+		this.observe(
+			this.#context.label,
+			(label) => {
+				this.#updateBlockViewProps({ label });
+				this._label = label;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeIcon,
+			(icon) => {
+				this.#updateBlockViewProps({ icon });
+				this._icon = icon;
+			},
+			null,
+		);
 		// Data props:
-		this.observe(this.#context.layout, (layout) => {
-			this.#updateBlockViewProps({ layout });
-		}, null);
-		this.observe(this.#context.content, (content) => {
-			this.#updateBlockViewProps({ content });
-		}, null);
-		this.observe(this.#context.settings, (settings) => {
-			this.#updateBlockViewProps({ settings });
-		}, null);
-		this.observe(this.#context.workspaceEditContentPath, (path) => {
-			this._workspaceEditContentPath = path;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
-		}, null);
-		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
-			this._workspaceEditSettingsPath = path;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
-		}, null);
+		this.observe(
+			this.#context.layout,
+			(layout) => {
+				this.#updateBlockViewProps({ layout });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.content,
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settings,
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditContentPath,
+			(path) => {
+				this._workspaceEditContentPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditSettingsPath,
+			(path) => {
+				this._workspaceEditSettingsPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {

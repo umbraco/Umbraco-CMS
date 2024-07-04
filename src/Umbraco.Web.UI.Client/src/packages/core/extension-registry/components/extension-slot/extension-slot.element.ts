@@ -129,13 +129,15 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._permitted ? this._permitted.length > 0
-			? repeat(
-					this._permitted,
-					(ext) => ext.alias,
-					(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
-				)
-			: html`<slot></slot>` : '';
+		return this._permitted
+			? this._permitted.length > 0
+				? repeat(
+						this._permitted,
+						(ext) => ext.alias,
+						(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
+					)
+				: html`<slot></slot>`
+			: '';
 	}
 
 	static override styles = css`

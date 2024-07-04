@@ -1,6 +1,5 @@
-
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import type { ManifestBlockEditorCustomView } from "../index.js";
+import type { ManifestBlockEditorCustomView } from '../index.js';
 // Shared with the Property Editor
 export interface UmbBlockTypeBaseModel {
 	contentElementTypeKey: string;
@@ -33,8 +32,10 @@ export interface UmbBlockEditorCustomViewConfiguration {
 	showSettingsEdit: boolean;
 }
 
-
-export interface UmbBlockEditorCustomViewProperties<LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel, BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel> {
+export interface UmbBlockEditorCustomViewProperties<
+	LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
+> {
 	manifest?: ManifestBlockEditorCustomView;
 	config?: Partial<UmbBlockEditorCustomViewConfiguration>;
 	blockType?: BlockType;
@@ -47,6 +48,8 @@ export interface UmbBlockEditorCustomViewProperties<LayoutType extends UmbBlockL
 	settings?: UmbBlockDataType;
 }
 
-export interface UmbBlockEditorCustomViewElement<LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel, BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel> extends UmbBlockEditorCustomViewProperties<LayoutType, BlockType>, HTMLElement {
-
-}
+export interface UmbBlockEditorCustomViewElement<
+	LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
+> extends UmbBlockEditorCustomViewProperties<LayoutType, BlockType>,
+		HTMLElement {}

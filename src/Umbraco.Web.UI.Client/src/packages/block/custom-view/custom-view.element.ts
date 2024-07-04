@@ -1,17 +1,14 @@
-import type { UmbBlockDataType, UmbBlockEditorCustomViewElement } from "@umbraco-cms/backoffice/extension-registry";
-import { css, customElement, html, property } from "@umbraco-cms/backoffice/external/lit";
-import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
+import type { UmbBlockDataType, UmbBlockEditorCustomViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-custom-view-test')
 export class UmbCustomViewTestElement extends UmbLitElement implements UmbBlockEditorCustomViewElement {
-
-	@property({attribute: false})
+	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
 	protected override render() {
-		return html`
-			Hello ${this.content?.headline}
-		`
+		return html` Hello ${this.content?.headline} `;
 	}
 
 	static override styles = [
@@ -24,8 +21,8 @@ export class UmbCustomViewTestElement extends UmbLitElement implements UmbBlockE
 				border-radius: 9px;
 				padding: 12px;
 			}
-		`
-	]
+		`,
+	];
 }
 
-export {UmbCustomViewTestElement as element};
+export { UmbCustomViewTestElement as element };

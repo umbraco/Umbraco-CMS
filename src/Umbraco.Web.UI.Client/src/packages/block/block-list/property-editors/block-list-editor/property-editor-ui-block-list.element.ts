@@ -1,7 +1,7 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyEditorUiElement , UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,

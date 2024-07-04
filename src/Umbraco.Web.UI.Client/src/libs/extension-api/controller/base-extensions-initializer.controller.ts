@@ -91,7 +91,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		}
 
 		// If we get no manifests and we have not exposed any extensions yet, then we should notify to let the listener know that we have our first response. [NL]
-		if(manifests.length === 0 && this.#exposedPermittedExts === undefined) {
+		if (manifests.length === 0 && this.#exposedPermittedExts === undefined) {
 			this.#exposedPermittedExts = [];
 			this.#onChange?.(this.#exposedPermittedExts);
 		}

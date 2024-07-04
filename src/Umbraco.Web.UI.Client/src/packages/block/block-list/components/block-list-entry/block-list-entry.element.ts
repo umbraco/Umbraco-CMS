@@ -1,6 +1,10 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestBlockEditorCustomView, UmbBlockEditorCustomViewProperties, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
@@ -35,7 +39,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#context = new UmbBlockListEntryContext(this);
 
 	@state()
-	_contentTypeAlias?:string;
+	_contentTypeAlias?: string;
 
 	@state()
 	_showContentEdit = false;
@@ -58,7 +62,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_inlineEditingMode?: boolean;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = { contentUdi: undefined!, config: { showContentEdit: false, showSettingsEdit: false} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
+		contentUdi: undefined!,
+		config: { showContentEdit: false, showSettingsEdit: false },
+	}; // Set to undefined cause it will be set before we render.
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
@@ -68,75 +75,129 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 
-		this.observe(this.#context.showContentEdit, (showContentEdit) => {
-			this._showContentEdit = showContentEdit;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
-		}, null);
-		this.observe(this.#context.settingsElementTypeKey, (key) => {
-			this._hasSettings = !!key;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
-		}, null);
-		this.observe(this.#context.blockType, (blockType) => {
-			this.#updateBlockViewProps({ blockType });
-		}, null);
+		this.observe(
+			this.#context.showContentEdit,
+			(showContentEdit) => {
+				this._showContentEdit = showContentEdit;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settingsElementTypeKey,
+			(key) => {
+				this._hasSettings = !!key;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.blockType,
+			(blockType) => {
+				this.#updateBlockViewProps({ blockType });
+			},
+			null,
+		);
 		// TODO: Implement index.
-		this.observe(this.#context.label, (label) => {
-			this.#updateBlockViewProps({ label });
-			this._label = label;
-		}, null);
-		this.observe(this.#context.contentElementTypeIcon, (icon) => {
-			this.#updateBlockViewProps({ icon });
-			this._icon = icon;
-		}, null);
-		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
-			this._inlineEditingMode = inlineEditingMode;
-		}, null);
+		this.observe(
+			this.#context.label,
+			(label) => {
+				this.#updateBlockViewProps({ label });
+				this._label = label;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeIcon,
+			(icon) => {
+				this.#updateBlockViewProps({ icon });
+				this._icon = icon;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.inlineEditingMode,
+			(inlineEditingMode) => {
+				this._inlineEditingMode = inlineEditingMode;
+			},
+			null,
+		);
 		// Data props:
-		this.observe(this.#context.layout, (layout) => {
-			this.#updateBlockViewProps({ layout });
-		}, null);
-		this.observe(this.#context.content, (content) => {
-			this.#updateBlockViewProps({ content });
-		}, null);
-		this.observe(this.#context.settings, (settings) => {
-			this.#updateBlockViewProps({ settings });
-		}, null);
-		this.observe(this.#context.workspaceEditContentPath, (path) => {
-			this._workspaceEditContentPath = path;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
-		}, null);
-		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
-			this._workspaceEditSettingsPath = path;
-			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
-		}, null);
+		this.observe(
+			this.#context.layout,
+			(layout) => {
+				this.#updateBlockViewProps({ layout });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.content,
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settings,
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditContentPath,
+			(path) => {
+				this._workspaceEditContentPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditSettingsPath,
+			(path) => {
+				this._workspaceEditSettingsPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
 	}
-
 
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
-		this.observe(this.#context.contentElementTypeKey, (contentElementTypeKey) => {
-			if (contentElementTypeKey) {
-				this.setAttribute('data-content-element-type-key', contentElementTypeKey);
-			}
-		}, 'contentElementTypeKey');
-		this.observe(this.#context.contentElementTypeAlias, (contentElementTypeAlias) => {
-			if (contentElementTypeAlias) {
-				this._contentTypeAlias = contentElementTypeAlias;
-				this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
-			}
-		}, 'contentElementTypeAlias');
+		this.observe(
+			this.#context.contentElementTypeKey,
+			(contentElementTypeKey) => {
+				if (contentElementTypeKey) {
+					this.setAttribute('data-content-element-type-key', contentElementTypeKey);
+				}
+			},
+			'contentElementTypeKey',
+		);
+		this.observe(
+			this.#context.contentElementTypeAlias,
+			(contentElementTypeAlias) => {
+				if (contentElementTypeAlias) {
+					this._contentTypeAlias = contentElementTypeAlias;
+					this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
+				}
+			},
+			'contentElementTypeAlias',
+		);
 	}
 
-	#extensionSlotFilterMethod = (manifest:ManifestBlockEditorCustomView) => {
-		if(manifest.forContentTypeAlias && !stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)) {
+	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+		if (
+			manifest.forContentTypeAlias &&
+			!stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)
+		) {
 			return false;
 		}
-		if(manifest.forBlockEditor && !stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_LIST)) {
+		if (manifest.forBlockEditor && !stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_LIST)) {
 			return false;
 		}
 		return true;
-	}
+	};
 
 	#renderRefBlock() {
 		return html`<umb-ref-list-block .label=${this._label}></umb-ref-list-block>`;

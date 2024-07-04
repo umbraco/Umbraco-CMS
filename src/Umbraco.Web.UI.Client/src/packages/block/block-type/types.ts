@@ -1,4 +1,4 @@
-import type { UmbBlockTypeBaseModel } from "@umbraco-cms/backoffice/extension-registry";
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 
 export interface UmbBlockTypeGroup {
 	name?: string;
