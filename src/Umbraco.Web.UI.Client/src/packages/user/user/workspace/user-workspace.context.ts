@@ -2,7 +2,7 @@ import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } fro
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbSubmittableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
