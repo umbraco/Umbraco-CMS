@@ -11,6 +11,7 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-content';
+
 @customElement(elementName)
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
@@ -156,7 +157,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	];
 }
 
-export default UmbInputContentElement;
+export { UmbInputContentElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

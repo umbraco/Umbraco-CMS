@@ -2,15 +2,17 @@ import { UmbDocumentPickerContext } from './input-document.context.js';
 import { classMap, css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-@customElement('umb-input-document')
+const elementName = 'umb-input-document';
+
+@customElement(elementName)
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
@@ -243,8 +245,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	];
 }
 
+export { UmbInputDocumentElement as element };
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-document': UmbInputDocumentElement;
+		[elementName]: UmbInputDocumentElement;
 	}
 }

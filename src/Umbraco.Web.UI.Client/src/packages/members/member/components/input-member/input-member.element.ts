@@ -9,7 +9,9 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-@customElement('umb-input-member')
+const elementName = 'umb-input-member';
+
+@customElement(elementName)
 export class UmbInputMemberElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
@@ -220,10 +222,10 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	];
 }
 
-export default UmbInputMemberElement;
+export { UmbInputMemberElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-member': UmbInputMemberElement;
+		[elementName]: UmbInputMemberElement;
 	}
 }
