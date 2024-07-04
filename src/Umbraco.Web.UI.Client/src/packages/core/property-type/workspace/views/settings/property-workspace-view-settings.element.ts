@@ -52,7 +52,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
-			this.observe(instance.data, (data) => (this._data = data));
+			this.observe(instance.data, (data) => {
+				this._data = data;
+			});
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {

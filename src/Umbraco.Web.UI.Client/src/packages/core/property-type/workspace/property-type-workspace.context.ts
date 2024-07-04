@@ -23,7 +23,13 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	// Just for context token safety:
 	public readonly IS_PROPERTY_TYPE_WORKSPACE_CONTEXT = true;
 
+	#init: Promise<unknown>;
+	#contentTypeContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
+
 	#entityType: string;
+
+	// #persistedData
+	// #currentData
 	#data = new UmbObjectState<PropertyTypeData | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
@@ -34,6 +40,12 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 		super(host, args.manifest.alias);
 		const manifest = args.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		this.#init = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
+			this.#contentTypeContext = context;
+		})
+			.skipHost()
+			.asPromise();
 
 		this.routes.setRoutes([
 			{
@@ -70,6 +82,8 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 	protected override resetState() {
 		super.resetState();
 		this.#data.setValue(undefined);
+		this.removeUmbControllerByAlias('isNewRedirectController');
+		this.removeUmbControllerByAlias('observePropertyTypeData');
 	}
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
@@ -78,14 +92,23 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 
 	async load(unique: string) {
 		this.resetState();
-		const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
-		this.observe(await context.structure.propertyStructureById(unique), (property) => {
-			if (property) {
-				this.#data.setValue(property as PropertyTypeData);
-			}
-			// Fallback to undefined:
-			this.#data.setValue(undefined);
-		});
+		await this.#init;
+		this.observe(
+			await this.#contentTypeContext?.structure.propertyStructureById(unique),
+			(property) => {
+				if (property) {
+					this.#data.setValue(property as PropertyTypeData);
+					//this.#persistedData.setValue(property);
+					//this.#currentData.setValue(property);
+
+					this.setIsNew(false);
+				} else {
+					// Fallback to undefined:
+					this.#data.setValue(undefined);
+				}
+			},
+			'observePropertyTypeData',
+		);
 	}
 
 	async create(containerId?: string | null) {
@@ -116,9 +139,10 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 			data = { ...data, ...this.modalContext.data.preset };
 		}
 
-		this.setIsNew(true);
 		this.#data.setValue(data);
-		return { data };
+		//this.#persistedData.setValue(property);
+		//this.#currentData.setValue(property);
+		this.setIsNew(true);
 	}
 
 	getData() {
@@ -169,11 +193,14 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 			throw new Error('No data to submit.');
 		}
 
-		const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+		await this.#init;
+		if (this.#contentTypeContext) {
+			await this.#contentTypeContext.structure.insertProperty(contentTypeUnique, data);
 
-		context.structure.insertProperty(contentTypeUnique, data);
-
-		this.setIsNew(false);
+			this.setIsNew(false);
+		} else {
+			throw new Error('Failed to find content type context.');
+		}
 	}
 
 	public override destroy(): void {

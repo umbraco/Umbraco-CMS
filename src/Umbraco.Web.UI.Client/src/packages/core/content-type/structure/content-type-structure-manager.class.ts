@@ -463,6 +463,10 @@ export class UmbContentTypeStructureManager<
 			property = { ...property, container: { id: container.id } };
 		}
 
+		if (property.sortOrder === undefined) {
+			property.sortOrder = 0;
+		}
+
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
 
