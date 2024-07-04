@@ -1,9 +1,9 @@
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL } from './modal/index.js';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL } from './modal/index.js';
 
 export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
