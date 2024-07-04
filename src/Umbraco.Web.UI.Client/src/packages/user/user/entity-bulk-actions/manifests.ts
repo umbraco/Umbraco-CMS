@@ -1,4 +1,4 @@
-import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
+import { UMB_USER_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
