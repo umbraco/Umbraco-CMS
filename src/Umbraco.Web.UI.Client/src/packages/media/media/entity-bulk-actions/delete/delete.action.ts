@@ -31,3 +31,5 @@ export class UmbMediaDeleteEntityBulkAction extends UmbEntityBulkActionBase<obje
 		*/
 	}
 }
+
+export { UmbMediaDeleteEntityBulkAction as api };

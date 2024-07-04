@@ -1,7 +1,4 @@
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
-import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
-import { UmbDuplicateMediaEntityBulkAction } from './duplicate/duplicate.action.js';
-import { UmbMediaDeleteEntityBulkAction } from './delete/delete.action.js';
 import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -15,7 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityBulkAction.Media.Duplicate',
 		name: 'Duplicate Media Entity Bulk Action',
 		weight: 30,
-		api: UmbDuplicateMediaEntityBulkAction,
+		api: () => import('./duplicate/duplicate.action.js'),
 		meta: {
 			label: 'Duplicate',
 		},
@@ -35,7 +32,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityBulkAction.Media.MoveTo',
 		name: 'Move Media Entity Bulk Action',
 		weight: 20,
-		api: UmbMediaMoveEntityBulkAction,
+		api: () => import('./move/move.action.js'),
 		meta: {
 			label: 'Move',
 		},
@@ -55,7 +52,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityBulkAction.Media.Delete',
 		name: 'Delete Media Entity Bulk Action',
 		weight: 10,
-		api: UmbMediaDeleteEntityBulkAction,
+		api: () => import('./delete/delete.action.js'),
 		meta: {
 			label: 'Delete',
 		},
