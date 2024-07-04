@@ -1,5 +1,5 @@
+import { UMB_PROPERTY_TYPE_ENTITY_TYPE } from './constants.js';
 import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
-import { UMB_PROPERTY_TYPE_ENTITY_TYPE } from './constants';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
 

@@ -1,6 +1,6 @@
+import { UMB_PROPERTY_TYPE_ENTITY_TYPE } from './constants.js';
 import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UMB_PROPERTY_TYPE_ENTITY_TYPE } from './constants';
 
 export interface UmbPropertyTypeWorkspaceData extends UmbWorkspaceModalData {
 	contentTypeUnique: string;

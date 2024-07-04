@@ -1,11 +1,12 @@
+import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '../../../index.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
+import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '../../../index.js';
 
 @customElement('umb-property-type-workspace-view-settings')
 export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {

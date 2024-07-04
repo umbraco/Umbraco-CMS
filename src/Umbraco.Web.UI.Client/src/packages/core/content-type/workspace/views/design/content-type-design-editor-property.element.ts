@@ -7,11 +7,11 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	type UmbContentTypeModel,
-	type UmbContentTypePropertyStructureHelper,
-	type UmbPropertyTypeModel,
-	type UmbPropertyTypeScaffoldModel,
+import type {
+	UmbContentTypeModel,
+	UmbContentTypePropertyStructureHelper,
+	UmbPropertyTypeModel,
+	UmbPropertyTypeScaffoldModel,
 } from '@umbraco-cms/backoffice/content-type';
 import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
 
