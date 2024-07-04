@@ -9,14 +9,6 @@ export class UmbBlockGridTypeWorkspaceViewAdvancedElement extends UmbLitElement 
 		return html`
 			<uui-box headline="Advanced">
 				<umb-property
-					label="Custom view"
-					alias="view"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
-				<umb-property
-					label="Custom stylesheet"
-					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
-				<umb-property
 					label="Overlay size"
 					alias="editorSize"
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
@@ -41,7 +33,13 @@ export class UmbBlockGridTypeWorkspaceViewAdvancedElement extends UmbLitElement 
 				<umb-property
 					label="Thumbnail"
 					alias="thumbnail"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"
+					.config=${[
+						{
+							alias: 'singleItemMode',
+							value: true,
+						},
+					]}></umb-property>
 			</uui-box>
 		`;
 	}
