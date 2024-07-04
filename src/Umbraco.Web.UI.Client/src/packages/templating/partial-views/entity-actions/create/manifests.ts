@@ -1,5 +1,5 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../../entity.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	{

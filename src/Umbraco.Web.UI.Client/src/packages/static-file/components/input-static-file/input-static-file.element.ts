@@ -141,7 +141,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		if (!item.unique) return;
 		return html`
 			<uui-ref-node name=${item.name} .detail=${this.#serializer.toServerPath(item.unique) || ''}>
-				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
+				<!-- TODO: implement is trashed, if we cant retrieve the item on the server (but only ask the server if we need to anyway...). <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}

@@ -1,10 +1,10 @@
+import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
+import { getQuerySnippet } from '../../utils/index.js';
+import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
-import { getQuerySnippet } from '../../utils/index.js';
-import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 
