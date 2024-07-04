@@ -186,7 +186,8 @@
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
 		"package:validate": "node ./devops/package/validate-exports.js && npm run check:paths",
-		"generate:ui-api-docs": "typedoc --options typedoc.config.js"
+		"generate:ui-api-docs": "typedoc --options typedoc.config.js",
+		"circular": "npx madge --circular --warning --extensions ts ./src"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
