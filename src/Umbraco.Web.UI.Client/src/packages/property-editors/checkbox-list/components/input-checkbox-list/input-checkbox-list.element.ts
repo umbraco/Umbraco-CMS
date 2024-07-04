@@ -25,6 +25,9 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 	public override set value(value: string) {
 		this.selection = value.split(',');
 	}
+	public override get value(): string {
+		return this.selection.join(',');
+	}
 
 	protected override getFormElement() {
 		return undefined;
