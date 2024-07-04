@@ -4,14 +4,8 @@ import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidat
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import {
-	UMB_NOTIFICATION_CONTEXT,
-	type UmbNotificationDefaultData,
-	type UmbNotificationOptions,
-} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
-
-export type ErrorMessageText = { property: string; messages: string[] };
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
