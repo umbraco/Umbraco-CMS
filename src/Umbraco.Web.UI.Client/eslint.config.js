@@ -47,7 +47,7 @@ export default [
 		},
 		rules: {
 			semi: ['warn', 'always'],
-			'no-unused-vars': 'warn',
+			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'no-var': 'error',
 			'import/no-unresolved': 'off',
 			'import/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
