@@ -109,7 +109,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 		);
 	}
 
-	async update(args: UmbUpdateFolderModel): Promise<any> {
+	async update(): Promise<any> {
 		throw new Error('Updating is not supported');
 	}
 }

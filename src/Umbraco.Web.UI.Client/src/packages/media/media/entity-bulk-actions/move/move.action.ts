@@ -15,8 +15,8 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<object
 			},
 		});
 		if (modalContext) {
-			const { selection } = await modalContext.onSubmit();
-			const destination = selection[0];
+			//const { selection } = await modalContext.onSubmit();
+			//const destination = selection[0];
 			//await this.repository?.move(this.selection, destination);
 		}
 	}

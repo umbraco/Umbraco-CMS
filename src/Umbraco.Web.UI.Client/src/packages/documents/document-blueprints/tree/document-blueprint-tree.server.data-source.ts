@@ -59,7 +59,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	}
 };
 
-const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
+const getAncestorsOf = () => {
 	throw new Error('Not implemented');
 	/** TODO: Implement when endpoint becomes available... */
 };
