@@ -1,6 +1,6 @@
+import { UMB_STYLESHEET_CREATE_OPTIONS_MODAL } from './options-modal/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_STYLESHEET_CREATE_OPTIONS_MODAL } from './options-modal/index.js';
 
 export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {

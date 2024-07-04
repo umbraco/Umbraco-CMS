@@ -1,6 +1,10 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
 import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
+import { removeInitialSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 
@@ -13,22 +17,47 @@ export class UmbBlockGridManagerContext<
 	BlockLayoutType extends UmbBlockGridLayoutModel = UmbBlockGridLayoutModel,
 > extends UmbBlockManagerContext<UmbBlockGridTypeModel, UmbBlockGridLayoutModel> {
 	//
+	#initAppUrl: Promise<void>;
+	#appUrl?: string;
 	#blockGroups = new UmbArrayState(<Array<UmbBlockTypeGroup>>[], (x) => x.key);
 	public readonly blockGroups = this.#blockGroups.asObservable();
 
-	layoutStylesheet = this._editorConfiguration.asObservablePart(
-		(x) => (x?.getValueByAlias('layoutStylesheet') as string) ?? UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET,
-	);
+	layoutStylesheet = this._editorConfiguration.asObservablePart((x) => {
+		if (!x) return undefined;
+		const layoutStylesheet = x.getValueByAlias<string>('layoutStylesheet');
+		if (!layoutStylesheet) return UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET;
+
+		if (layoutStylesheet) {
+			// Cause we await initAppUrl in setting the _editorConfiguration, we can trust the appUrl begin here.
+			return this.#appUrl! + removeInitialSlashFromPath(transformServerPathToClientPath(layoutStylesheet));
+		}
+		return undefined;
+	});
 	gridColumns = this._editorConfiguration.asObservablePart((x) => {
 		const value = x?.getValueByAlias('gridColumns') as string | undefined;
 		return parseInt(value && value !== '' ? value : '12');
 	});
+
+	override setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
+		this.#initAppUrl.then(() => {
+			// we await initAppUrl, So the appUrl begin here is available when retrieving the layoutStylesheet.
+			this._editorConfiguration.setValue(configs);
+		});
+	}
 
 	setBlockGroups(blockGroups: Array<UmbBlockTypeGroup>) {
 		this.#blockGroups.setValue(blockGroups);
 	}
 	getBlockGroups() {
 		return this.#blockGroups.value;
+	}
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.#initAppUrl = this.getContext(UMB_APP_CONTEXT).then((appContext) => {
+			this.#appUrl = appContext.getServerUrl() + appContext.getBackofficePath();
+		});
 	}
 
 	create(
