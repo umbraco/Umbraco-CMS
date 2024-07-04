@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 ///     The content model stored in the content cache database table serialized as JSON
 /// </summary>
 [DataContract] // NOTE: Use DataContract annotations here to control how MessagePack serializes/deserializes the data to use INT keys
-internal sealed class ContentCacheDataModel
+public sealed class ContentCacheDataModel
 {
     // TODO: We don't want to allocate empty arrays
     // dont serialize empty properties

@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 [DataContract] // NOTE: Use DataContract annotations here to control how MessagePack serializes/deserializes the data to use INT keys
-internal sealed class PropertyData
+public sealed class PropertyData
 {
     private string? _culture;
     private string? _segment;
