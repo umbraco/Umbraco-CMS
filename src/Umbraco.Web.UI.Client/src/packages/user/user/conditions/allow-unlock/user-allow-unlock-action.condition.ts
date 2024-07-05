@@ -1,6 +1,5 @@
-import { UmbUserStateEnum } from '../types.js';
-import { UmbUserActionConditionBase } from './user-allow-action-base.condition.js';
-import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
+import { UmbUserStateEnum } from '../../types.js';
+import { UmbUserActionConditionBase } from '../user-allow-action-base.condition.js';
 
 export class UmbUserAllowUnlockActionCondition extends UmbUserActionConditionBase {
 	async _onUserDataChange() {
@@ -14,9 +13,4 @@ export class UmbUserAllowUnlockActionCondition extends UmbUserActionConditionBas
 	}
 }
 
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'User Allow Unlock Action Condition',
-	alias: 'Umb.Condition.User.AllowUnlockAction',
-	api: UmbUserAllowUnlockActionCondition,
-};
+export { UmbUserAllowUnlockActionCondition as api };

@@ -1,5 +1,4 @@
-import { UmbUserActionConditionBase } from './user-allow-action-base.condition.js';
-import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
+import { UmbUserActionConditionBase } from '../user-allow-action-base.condition.js';
 
 export class UmbUserAllowDeleteActionCondition extends UmbUserActionConditionBase {
 	async _onUserDataChange() {

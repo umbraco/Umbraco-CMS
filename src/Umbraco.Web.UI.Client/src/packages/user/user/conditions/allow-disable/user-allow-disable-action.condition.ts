@@ -1,5 +1,5 @@
-import { UmbUserStateEnum } from '../types.js';
-import { UmbUserActionConditionBase } from './user-allow-action-base.condition.js';
+import { UmbUserStateEnum } from '../../types.js';
+import { UmbUserActionConditionBase } from '../user-allow-action-base.condition.js';
 
 export class UmbUserAllowDisableActionCondition extends UmbUserActionConditionBase {
 	async _onUserDataChange() {
