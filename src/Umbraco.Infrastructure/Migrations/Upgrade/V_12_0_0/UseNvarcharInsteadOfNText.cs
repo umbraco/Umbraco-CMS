@@ -32,11 +32,28 @@ public class UseNvarcharInsteadOfNText : MigrationBase
         MigrateNtextColumn<PropertyDataDto>("textValue", Constants.DatabaseSchema.Tables.PropertyData, x => x.TextValue);
     }
 
+    private void RawMigrateNtextColumn(string columnName, string tableName)
+    {
+        var test = "sdfsf";
+        var updateTypeSql = @$"
+ALTER TABLE {tableName}
+ALTER COLUMN {columnName} nvarchar(max)";
+        Sql<ISqlContext> copyDataQuery = Database.SqlContext.Sql(updateTypeSql);
+        Database.Execute(copyDataQuery);
+    }
+
     private void MigrateNtextColumn<TDto>(string columnName, string tableName, Expression<Func<TDto, object?>> fieldSelector, bool nullable = true)
     {
         var columnType = ColumnType(tableName, columnName);
         if (columnType is null || columnType.Equals("ntext", StringComparison.InvariantCultureIgnoreCase) is false)
         {
+            return;
+        }
+
+        // since it's ntext to nvarchar(max) we should be able to just raw query this without having issues with fallback values on sql server
+        if (Database.DatabaseType != DatabaseType.SQLite && Database.DatabaseType != DatabaseType.SQLCe)
+        {
+            RawMigrateNtextColumn(columnName, tableName);
             return;
         }
 
