@@ -36,7 +36,7 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 		return html`${Object.entries(list).map(
 			([property, errors]) =>
 				html`<div class="structured-list">
-					<span>${property}:</span>
+					<p>${property}:</p>
 					<ul>
 						${this.#renderListItem(errors)}
 					</ul>
@@ -58,9 +58,8 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 			.structured-list ul {
 				margin: 0;
 			}
-			.structured-list span {
-				display: block;
-				padding: var(--uui-size-3) 0 var(--uui-size-1);
+			.structured-list p {
+				margin: var(--uui-size-3) 0 var(--uui-size-1);
 			}
 		`,
 	];
