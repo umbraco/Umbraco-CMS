@@ -42,4 +42,12 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
 
         Assert.IsNotNull(textPage);
     }
+
+    [Test]
+    public async Task Can_Get_Content_By_Key()
+    {
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        Assert.IsNotNull(textPage);
+    }
 }

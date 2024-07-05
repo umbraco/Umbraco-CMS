@@ -196,7 +196,7 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
-    public ContentNodeKit GetContentSource(int id)
+    public ContentCacheNode GetContentSource(int id)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -207,7 +207,7 @@ AND cmsContentNu.nodeId IS NULL
 
         if (dto == null)
         {
-            return ContentNodeKit.Empty;
+            return new ContentCacheNode();
         }
 
         IContentCacheDataSerializer serializer =
@@ -215,7 +215,7 @@ AND cmsContentNu.nodeId IS NULL
         return CreateContentNodeKit(dto, serializer);
     }
 
-    public IEnumerable<ContentNodeKit> GetAllContentSources()
+    public IEnumerable<ContentCacheNode> GetAllContentSources()
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -232,7 +232,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public IEnumerable<ContentNodeKit> GetBranchContentSources(int id)
+    public IEnumerable<ContentCacheNode> GetBranchContentSources(int id)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect(SqlContentSourcesSelectUmbracoNodeJoin)
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -250,7 +250,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int>? ids)
+    public IEnumerable<ContentCacheNode> GetTypeContentSources(IEnumerable<int>? ids)
     {
         if (!ids?.Any() ?? false)
         {
@@ -273,7 +273,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public ContentNodeKit GetMediaSource(int id)
+    public ContentCacheNode GetMediaSource(int id)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
@@ -284,7 +284,7 @@ AND cmsContentNu.nodeId IS NULL
 
         if (dto == null)
         {
-            return ContentNodeKit.Empty;
+            return new ContentCacheNode();
         }
 
         IContentCacheDataSerializer serializer =
@@ -292,7 +292,7 @@ AND cmsContentNu.nodeId IS NULL
         return CreateMediaNodeKit(dto, serializer);
     }
 
-    public IEnumerable<ContentNodeKit> GetAllMediaSources()
+    public IEnumerable<ContentCacheNode> GetAllMediaSources()
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
@@ -309,7 +309,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public IEnumerable<ContentNodeKit> GetBranchMediaSources(int id)
+    public IEnumerable<ContentCacheNode> GetBranchMediaSources(int id)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect(SqlContentSourcesSelectUmbracoNodeJoin)
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
@@ -327,7 +327,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids)
+    public IEnumerable<ContentCacheNode> GetTypeMediaSources(IEnumerable<int> ids)
     {
         if (!ids.Any())
         {
@@ -350,7 +350,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public ContentNodeKit GetMediaSource(IScope scope, int id)
+    public ContentCacheNode GetMediaSource(IScope scope, int id)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
@@ -361,7 +361,7 @@ AND cmsContentNu.nodeId IS NULL
 
         if (dto == null)
         {
-            return ContentNodeKit.Empty;
+            return new ContentCacheNode();
         }
 
         IContentCacheDataSerializer serializer =
@@ -883,10 +883,10 @@ WHERE cmsContentNu.nodeId IN (
         return sql;
     }
 
-    private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
+    private ContentCacheNode CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
     {
-        ContentData? d = null;
-        ContentData? p = null;
+        ContentData? draftContentData = null;
+        ContentData? publishedContentData = null;
 
         if (dto.Edited)
         {
@@ -904,17 +904,15 @@ WHERE cmsContentNu.nodeId IN (
             }
             else
             {
-                var published = false;
-                ContentCacheDataModel? deserializedContent =
-                    serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
-
-                d = new ContentData(
+                bool published = false;
+                ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
+                draftContentData = new ContentData(
                     dto.EditName,
-                    deserializedContent?.UrlSegment,
+                    null,
                     dto.VersionId,
                     dto.EditVersionDate,
-                    dto.EditWriterId,
-                    dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
+                    dto.CreatorId,
+                    -1,
                     published,
                     deserializedContent?.PropertyData,
                     deserializedContent?.CultureData);
@@ -938,56 +936,62 @@ WHERE cmsContentNu.nodeId IN (
             else
             {
                 var published = true;
-                ContentCacheDataModel? deserializedContent =
-                    serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, published);
-
-                p = new ContentData(
-                    dto.PubName,
-                    deserializedContent?.UrlSegment,
+                ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
+                publishedContentData = new ContentData(
+                    dto.EditName,
+                    null,
                     dto.VersionId,
-                    dto.PubVersionDate,
-                    dto.PubWriterId,
-                    dto.PubTemplateId == 0 ? null : dto.PubTemplateId,
+                    dto.EditVersionDate,
+                    dto.CreatorId,
+                    -1,
                     published,
                     deserializedContent?.PropertyData,
                     deserializedContent?.CultureData);
             }
         }
 
-        var n = new ContentNode(dto.Id, dto.Key, dto.Path, dto.SortOrder, dto.CreateDate, dto.CreatorId);
-
-        var s = new ContentNodeKit(n, dto.ContentTypeId, d, p);
-
-        return s;
+        return new ContentCacheNode(draftContentData, publishedContentData)
+        {
+            Id = dto.Id,
+            Key = dto.Key,
+            Path = dto.Path,
+            SortOrder = dto.SortOrder,
+            CreateDate = dto.CreateDate,
+            CreatorId = dto.CreatorId,
+            ContentTypeId = dto.ContentTypeId,
+        };
     }
 
-    private ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
+    private ContentCacheNode CreateMediaNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
     {
         if (dto.EditData == null && dto.EditDataRaw == null)
         {
             throw new InvalidOperationException("No data for media " + dto.Id);
         }
 
-        var published = true;
-        ContentCacheDataModel? deserializedMedia =
-            serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
+        ContentCacheDataModel? deserializedMedia = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, true);
 
-        var p = new ContentData(
+        var publishedContentData = new ContentData(
             dto.EditName,
             null,
             dto.VersionId,
             dto.EditVersionDate,
             dto.CreatorId,
             -1,
-            published,
+            true,
             deserializedMedia?.PropertyData,
             deserializedMedia?.CultureData);
 
-        var n = new ContentNode(dto.Id, dto.Key, dto.Path, dto.SortOrder, dto.CreateDate, dto.CreatorId);
-
-        var s = new ContentNodeKit(n, dto.ContentTypeId, null, p);
-
-        return s;
+        return new ContentCacheNode(null, publishedContentData)
+        {
+            Id = dto.Id,
+            Key = dto.Key,
+            Path = dto.Path,
+            SortOrder = dto.SortOrder,
+            CreateDate = dto.CreateDate,
+            CreatorId = dto.CreatorId,
+            ContentTypeId = dto.ContentTypeId,
+        };
     }
 
     private IEnumerable<ContentSourceDto> GetMediaNodeDtos(Sql<ISqlContext> sql)

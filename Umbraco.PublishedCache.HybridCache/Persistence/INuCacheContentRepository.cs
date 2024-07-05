@@ -6,21 +6,21 @@ internal interface INuCacheContentRepository
 {
     void DeleteContentItem(IContentBase item);
 
-    IEnumerable<ContentNodeKit> GetAllContentSources();
+    IEnumerable<ContentCacheNode> GetAllContentSources();
 
-    IEnumerable<ContentNodeKit> GetAllMediaSources();
+    IEnumerable<ContentCacheNode> GetAllMediaSources();
 
-    IEnumerable<ContentNodeKit> GetBranchContentSources(int id);
+    IEnumerable<ContentCacheNode> GetBranchContentSources(int id);
 
-    IEnumerable<ContentNodeKit> GetBranchMediaSources(int id);
+    IEnumerable<ContentCacheNode> GetBranchMediaSources(int id);
 
-    ContentNodeKit GetContentSource(int id);
+    ContentCacheNode GetContentSource(int id);
 
-    ContentNodeKit GetMediaSource(int id);
+    ContentCacheNode GetMediaSource(int id);
 
-    IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int>? ids);
+    IEnumerable<ContentCacheNode> GetTypeContentSources(IEnumerable<int>? ids);
 
-    IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids);
+    IEnumerable<ContentCacheNode> GetTypeMediaSources(IEnumerable<int> ids);
 
     /// <summary>
     ///     Refreshes the nucache database row for the <see cref="IContent" />
