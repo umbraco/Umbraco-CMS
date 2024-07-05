@@ -554,6 +554,12 @@ stages:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
 
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/junit.xml'
+              testRunTitle: 'Acceptance Tests - $(Agent.JobName) - $(vmImage)'
+
       - job:
         displayName: E2E Tests (SQL Server)
         # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}}) # Outcommented due to timeouts
@@ -705,6 +711,12 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/junit.xml'
+              testRunTitle: 'Acceptance Tests - $(Agent.JobName) - $(vmImage)'
 
   ###############################################
   ## Release
