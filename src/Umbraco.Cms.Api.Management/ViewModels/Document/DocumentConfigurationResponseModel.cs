@@ -10,6 +10,6 @@ public class DocumentConfigurationResponseModel
 
     public required bool AllowNonExistingSegmentsCreation { get; set; }
 
-    [Obsolete("Use DocumentTypeConfigurationResponseModel.ReservedFieldNames from the DocumentTypeConfiguration endpoint instead.")]
+    [Obsolete("Use DocumentTypeConfigurationResponseModel.ReservedFieldNames from the ConfigurationDocumentTypeController endpoint instead.")]
     public required ISet<string> ReservedFieldNames { get; set; }
 }

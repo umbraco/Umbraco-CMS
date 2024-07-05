@@ -2,6 +2,6 @@
 
 public class MemberConfigurationResponseModel
 {
-    [Obsolete("Use MemberTypeConfigurationResponseModel.ReservedFieldNames from the MemberTypeConfiguration endpoint instead.")]
+    [Obsolete("Use MemberTypeConfigurationResponseModel.ReservedFieldNames from the ConfigurationMemberTypeController endpoint instead.")]
     public required ISet<string> ReservedFieldNames { get; set; }
 }
