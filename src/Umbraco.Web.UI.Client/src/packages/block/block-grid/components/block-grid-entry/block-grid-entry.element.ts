@@ -319,13 +319,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#renderInlineEditBlock() {
-		return html`<umb-block-grid-block-inline
-			.contentUdi=${this.contentUdi}
-			.label=${this._label}></umb-block-grid-block-inline>`;
+		return html`<umb-block-grid-block-inline .label=${this._label}></umb-block-grid-block-inline>`;
 	}
 
 	#renderRefBlock() {
-		return html`<umb-block-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-block-grid-block>`;
+		return html`<umb-block-grid-block .label=${this._label}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {
