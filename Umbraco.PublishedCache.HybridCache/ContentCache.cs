@@ -68,11 +68,8 @@ internal sealed class ContentCache : IPublishedHybridCache
     private IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
         var n = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
-        var contentNodeKit = new ContentNodeKit(n, contentCacheNode.ContentTypeId, contentCacheNode.Draft, contentCacheNode.Published);
-
-        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentNodeKit.ContentTypeId);
-        contentNodeKit.Build(contentType, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory);
-
-        return preview ? contentNodeKit.Node.DraftModel : contentNodeKit.Node.PublishedModel;
+        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
+        n.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory);
+        return preview ? n.DraftModel : n.PublishedModel;
     }
 }

@@ -138,8 +138,6 @@ internal class ContentNode
 
     public bool HasPublishedCulture(string culture) => _publishedData != null && (_publishedData.CultureInfos?.ContainsKey(culture) ?? false);
 
-    public ContentNodeKit ToKit() => new(this, ContentType.Id, _draftData, _publishedData);
-
     private IPublishedContent? GetModel(ref IPublishedContent? model, ContentData? contentData)
     {
         if (model != null)
