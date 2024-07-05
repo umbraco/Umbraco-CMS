@@ -4,8 +4,6 @@ import {
 	UMB_MEDIA_RECYCLE_BIN_TREE_REPOSITORY_ALIAS,
 	UMB_MEDIA_RECYCLE_BIN_TREE_STORE_ALIAS,
 } from './constants.js';
-import { UmbMediaRecycleBinTreeRepository } from './media-recycle-bin-tree.repository.js';
-import { UmbMediaRecycleBinTreeStore } from './media-recycle-bin-tree.store.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
@@ -19,14 +17,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_MEDIA_RECYCLE_BIN_TREE_REPOSITORY_ALIAS,
 	name: 'Media Recycle Bin Tree Repository',
-	api: UmbMediaRecycleBinTreeRepository,
+	api: () => import('./media-recycle-bin-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_MEDIA_RECYCLE_BIN_TREE_STORE_ALIAS,
 	name: 'Media Recycle Bin Tree Store',
-	api: UmbMediaRecycleBinTreeStore,
+	api: () => import('./media-recycle-bin-tree.store.js'),
 };
 
 const tree: ManifestTree = {

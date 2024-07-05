@@ -18,3 +18,5 @@ export class UmbMoveMediaRepository extends UmbRepositoryBase implements UmbMove
 		return { error };
 	}
 }
+
+export { UmbMoveMediaRepository as api };

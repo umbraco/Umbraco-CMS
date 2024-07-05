@@ -140,7 +140,8 @@
 		"./src/packages/health-check",
 		"./src/packages/tags",
 		"./src/packages/templating",
-		"./src/packages/property-editors"
+		"./src/packages/property-editors",
+		"./src/packages/media"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
@@ -179,7 +180,7 @@
 		"test:dev": "web-test-runner --config ./web-test-runner.dev.config.mjs",
 		"test:dev-watch": "web-test-runner --watch --config ./web-test-runner.dev.config.mjs",
 		"test:watch": "web-test-runner --watch",
-		"test": "web-test-runner --coverage",
+		"test": "web-test-runner",
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
 		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
@@ -215,7 +216,7 @@
 		"@hey-api/openapi-ts": "^0.48.1",
 		"@mdx-js/react": "^3.0.0",
 		"@open-wc/testing": "^4.0.0",
-		"@playwright/test": "^1.41.1",
+		"@playwright/test": "^1.45.1",
 		"@rollup/plugin-commonjs": "^25.0.7",
 		"@rollup/plugin-json": "^6.1.0",
 		"@rollup/plugin-node-resolve": "^15.2.3",

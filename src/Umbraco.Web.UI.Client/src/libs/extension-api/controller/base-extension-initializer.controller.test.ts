@@ -16,6 +16,8 @@ import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('umb-test-controller-host')
+// Element is used in tests
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestExtensionController extends UmbBaseExtensionInitializer {
@@ -57,12 +59,12 @@ class UmbTestConditionAlwaysInvalid extends UmbControllerBase implements UmbExte
 
 describe('UmbBaseExtensionController', () => {
 	describe('Manifest without conditions', () => {
-		let hostElement: UmbControllerHostElement;
+		//let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			//hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',
@@ -94,12 +96,12 @@ describe('UmbBaseExtensionController', () => {
 	});
 
 	describe('Manifest with empty conditions', () => {
-		let hostElement: UmbControllerHostElement;
+		//let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 		let manifest: ManifestWithDynamicConditions;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			//hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',

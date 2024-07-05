@@ -63,6 +63,8 @@ export class UmbBlockGridManagerContext<
 	create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		// TODO: [v15] Ignore unused parameter to avoid breaking changes
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		modalData?: UmbBlockGridWorkspaceData,
 	) {
 		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);

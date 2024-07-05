@@ -43,7 +43,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 	}
 
 	async showDialog() {
-		const blockEl = this.editor.selection.getNode();
+		//const blockEl = this.editor.selection.getNode();
 
 		/*if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
 			const blockUdi = blockEl.getAttribute('data-content-udi') ?? undefined;

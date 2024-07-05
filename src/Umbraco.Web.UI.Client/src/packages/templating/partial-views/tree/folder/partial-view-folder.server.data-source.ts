@@ -1,5 +1,5 @@
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbCreateFolderModel, UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
 import type { CreatePartialViewFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -109,7 +109,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 		);
 	}
 
-	async update(args: UmbUpdateFolderModel): Promise<any> {
+	async update(): Promise<any> {
 		throw new Error('Updating is not supported');
 	}
 }
