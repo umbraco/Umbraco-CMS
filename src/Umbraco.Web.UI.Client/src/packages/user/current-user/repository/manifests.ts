@@ -1,6 +1,5 @@
+import { UMB_CURRENT_USER_REPOSITORY_ALIAS } from './constants.js';
 import type { ManifestRepository, ManifestStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_CURRENT_USER_REPOSITORY_ALIAS = 'Umb.Repository.CurrentUser';
 
 const repository: ManifestRepository = {
 	type: 'repository',

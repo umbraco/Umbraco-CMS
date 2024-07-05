@@ -6,3 +6,5 @@ export class UmbSetGroupUserEntityBulkAction extends UmbEntityBulkActionBase<obj
 		throw new Error('Bulk set group is not implemented yet');
 	}
 }
+
+export { UmbSetGroupUserEntityBulkAction as api };

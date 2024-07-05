@@ -1,5 +1,5 @@
 import type { UmbUserGroupItemModel } from './types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_USER_GROUP_ITEM_STORE_CONTEXT } from './user-group-item.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
@@ -22,5 +22,3 @@ export class UmbUserGroupItemStore extends UmbItemStoreBase<UmbUserGroupItemMode
 }
 
 export default UmbUserGroupItemStore;
-
-export const UMB_USER_GROUP_ITEM_STORE_CONTEXT = new UmbContextToken<UmbUserGroupItemStore>('UmbUserGroupItemStore');

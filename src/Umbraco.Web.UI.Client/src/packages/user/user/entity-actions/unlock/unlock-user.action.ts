@@ -32,3 +32,5 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
 		await unlockUserRepository?.unlock([this.args.unique]);
 	}
 }
+
+export { UmbUnlockUserEntityAction as api };
