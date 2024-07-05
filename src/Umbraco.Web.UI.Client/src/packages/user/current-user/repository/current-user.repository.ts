@@ -1,5 +1,5 @@
 import { UmbCurrentUserServerDataSource } from './current-user.server.data-source.js';
-import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.js';
+import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 

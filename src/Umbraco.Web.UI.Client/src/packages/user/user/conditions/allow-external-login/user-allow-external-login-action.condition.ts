@@ -1,5 +1,4 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbUserAllowExternalLoginActionCondition extends UmbConditionBase<never> {
@@ -16,9 +15,4 @@ export class UmbUserAllowExternalLoginActionCondition extends UmbConditionBase<n
 	}
 }
 
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'User Allow ExternalLogin Action Condition',
-	alias: 'Umb.Condition.User.AllowExternalLoginAction',
-	api: UmbUserAllowExternalLoginActionCondition,
-};
+export { UmbUserAllowExternalLoginActionCondition as api };

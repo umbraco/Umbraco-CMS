@@ -1,6 +1,5 @@
+import { UMB_USER_AVATAR_REPOSITORY_ALIAS } from './constants.js';
 import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_AVATAR_REPOSITORY_ALIAS = 'Umb.Repository.User.Avatar';
 
 const avatarRepository: ManifestRepository = {
 	type: 'repository',

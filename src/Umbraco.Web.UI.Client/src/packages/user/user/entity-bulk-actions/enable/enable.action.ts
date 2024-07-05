@@ -25,3 +25,5 @@ export class UmbEnableUserEntityBulkAction extends UmbEntityBulkActionBase<objec
 		eventContext.dispatchEvent(event);
 	}
 }
+
+export { UmbEnableUserEntityBulkAction as api };

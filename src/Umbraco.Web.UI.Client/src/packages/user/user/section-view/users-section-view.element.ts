@@ -1,4 +1,4 @@
-import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
+import { UMB_USER_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_USER_ENTITY_TYPE, UMB_USER_ROOT_ENTITY_TYPE } from '../entity.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
