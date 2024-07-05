@@ -19,6 +19,11 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
+import {
+	extractUmbNotificationColor,
+	isUmbNotifications,
+	UMB_NOTIFICATION_CONTEXT,
+} from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -146,6 +151,7 @@ export class UmbAppElement extends UmbLitElement {
 		super();
 
 		OpenAPI.BASE = window.location.origin;
+		this.#attachApiInterceptor();
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 
@@ -209,6 +215,32 @@ export class UmbAppElement extends UmbLitElement {
 			// Redirect to the error page
 			this.#errorPage(errorMsg, error);
 		}
+	}
+
+	#attachApiInterceptor() {
+		OpenAPI.interceptors.response.use(async (response) => {
+			const umbNotifications = response.headers.get('umb-notifications') as string | null;
+			if (!umbNotifications) return response;
+
+			const notifications = JSON.parse(umbNotifications);
+			if (!isUmbNotifications(notifications)) return response;
+
+			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			for (const notification of notifications) {
+				notificationContext.peek(extractUmbNotificationColor(notification.type), {
+					data: { headline: notification.category, message: notification.message },
+				});
+			}
+
+			const newHeader = new Headers();
+			for (const header of response.headers.entries()) {
+				const [key, value] = header;
+				if (key !== 'umb-notifications') newHeader.set(key, value);
+			}
+
+			const newResponse = { ...response, headers: newHeader };
+			return newResponse;
+		});
 	}
 
 	// TODO: move set initial auth state into auth context

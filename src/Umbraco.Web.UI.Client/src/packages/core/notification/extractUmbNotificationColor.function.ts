@@ -1,7 +1,7 @@
-import type { UmbNotificationColor } from '../notification/notification.context.js';
+import type { UmbNotificationColor } from './notification.context.js';
 import { EventMessageTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-export function extractUmbColorNotification(type: EventMessageTypeModel): UmbNotificationColor {
+export function extractUmbNotificationColor(type: EventMessageTypeModel): UmbNotificationColor {
 	switch (type) {
 		case EventMessageTypeModel.ERROR:
 			return 'danger';
