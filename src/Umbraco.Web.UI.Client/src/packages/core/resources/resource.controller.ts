@@ -1,11 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UMB_AUTH_CONTEXT } from '../auth/index.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
+import { extractUmbColorNotification } from './extractUmbColorNotification.function.js';
+import { isUmbNotifications } from './isUmbNotifications.function.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { EventMessageTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+export interface UmbNotificationsEventModel {
+	category: string;
+	message: string;
+	type: EventMessageTypeModel;
+}
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -128,7 +137,9 @@ export class UmbResourceController extends UmbControllerBase {
 						break;
 					default:
 						// Other errors
-						if (this.#notificationContext) {
+						if (error && error.body && Array.isArray(error.body) && isUmbNotifications(error.body)) {
+							this.#peekUmbNotifications(error.body);
+						} else if (this.#notificationContext) {
 							this.#notificationContext.peek('danger', {
 								data: {
 									headline: error.body?.title ?? error.name ?? 'Server Error',
@@ -144,7 +155,19 @@ export class UmbResourceController extends UmbControllerBase {
 			}
 		}
 
+		if (Array.isArray(data) && isUmbNotifications(data)) {
+			this.#peekUmbNotifications(data);
+		}
+
 		return { data, error };
+	}
+
+	#peekUmbNotifications(notifications: Array<UmbNotificationsEventModel>) {
+		notifications.forEach((notification) => {
+			this.#notificationContext?.peek(extractUmbColorNotification(notification.type), {
+				data: { headline: notification.category, message: notification.message },
+			});
+		});
 	}
 
 	/**
