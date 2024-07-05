@@ -555,10 +555,11 @@ stages:
               artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
 
           - task: PublishTestResults@2
+            displayName: Publish test results
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/junit.xml'
-              testRunTitle: 'Acceptance Tests - $(Agent.JobName) - $(vmImage)'
+              testRunTitle: 'Acceptance Tests - $(Agent.JobName)'
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -713,10 +714,11 @@ stages:
               artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
 
           - task: PublishTestResults@2
+            displayName: Publish test results
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/junit.xml'
-              testRunTitle: 'Acceptance Tests - $(Agent.JobName) - $(vmImage)'
+              testRunTitle: 'Acceptance Tests - $(Agent.JobName)'
 
   ###############################################
   ## Release
