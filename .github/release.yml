@@ -32,4 +32,7 @@ changelog:
         - category/accessibility
     - title: 🚀 New Features
       labels:
+        - type/feature
+    - title: Other Changes
+      labels:
         - '*'
