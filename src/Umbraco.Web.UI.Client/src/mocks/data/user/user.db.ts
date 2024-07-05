@@ -1,5 +1,5 @@
 import { umbUserGroupMockDb } from '../user-group/user-group.db.js';
-import { arrayFilter, stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
+import { stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';

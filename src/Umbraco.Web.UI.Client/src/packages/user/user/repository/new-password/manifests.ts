@@ -1,6 +1,5 @@
+import { UMB_NEW_USER_PASSWORD_REPOSITORY_ALIAS } from './constants.js';
 import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_NEW_USER_PASSWORD_REPOSITORY_ALIAS = 'Umb.Repository.User.NewPassword';
 
 const newPasswordRepository: ManifestRepository = {
 	type: 'repository',

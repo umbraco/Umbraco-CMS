@@ -1,4 +1,3 @@
-import { UmbConfigureMfaProvidersApi } from './configure-mfa-providers-action.js';
 import type { ManifestCurrentUserActionDefaultKind, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
@@ -8,7 +7,7 @@ export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 		alias: 'Umb.CurrentUser.App.MfaLoginProviders',
 		name: 'MFA Login Providers Current User App',
 		weight: 800,
-		api: UmbConfigureMfaProvidersApi,
+		api: () => import('./configure-mfa-providers-action.js'),
 		meta: {
 			label: '#user_configureTwoFactor',
 			icon: 'icon-rectangle-ellipsis',

@@ -1,7 +1,4 @@
-import {
-	UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
-	UmbPropertyTypeWorkspaceContext,
-} from './property-type-settings-modal.context.js';
+import { UMB_PROPERTY_TYPE_WORKSPACE_ALIAS } from './property-type-settings-modal.context.js';
 import type {
 	UmbPropertyTypeSettingsModalData,
 	UmbPropertyTypeSettingsModalValue,

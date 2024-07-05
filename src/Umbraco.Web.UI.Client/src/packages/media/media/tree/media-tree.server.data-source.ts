@@ -4,11 +4,7 @@ import type {
 	UmbMediaTreeItemModel,
 	UmbMediaTreeRootItemsRequestArgs,
 } from './types.js';
-import type {
-	UmbTreeAncestorsOfRequestArgs,
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeAncestorsOfRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { MediaService, type MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

@@ -27,7 +27,7 @@ export class UmbInputObjectTypeElement extends UUIFormControlMixin(UmbLitElement
 
 		this.#repository = new UmbObjectTypeRepository(this);
 
-		this.#repository.read().then(({ data, error }) => {
+		this.#repository.read().then(({ data }) => {
 			if (!data) return;
 
 			this._options = data.items.map((item) => ({ value: item.id, name: item.name ?? '' }));

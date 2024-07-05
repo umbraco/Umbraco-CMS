@@ -1,4 +1,3 @@
-import { UMB_WEBHOOK_ENTITY_TYPE } from '../entity.js';
 import type { ManifestMenuItem, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestMenuItem = {
