@@ -40,3 +40,5 @@ export class UmbMfaUserEntityAction extends UmbEntityActionBase<never> {
 			.catch(() => undefined);
 	}
 }
+
+export { UmbMfaUserEntityAction as api };

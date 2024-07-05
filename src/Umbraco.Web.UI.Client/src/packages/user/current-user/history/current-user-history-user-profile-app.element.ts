@@ -1,5 +1,5 @@
 import type { UmbCurrentUserHistoryItem, UmbCurrentUserHistoryStore } from './current-user-history.store.js';
-import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.js';
+import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
 import { html, customElement, state, map, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
