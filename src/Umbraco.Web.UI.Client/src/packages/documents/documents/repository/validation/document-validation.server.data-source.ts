@@ -21,6 +21,8 @@ export class UmbDocumentValidationServerDataSource {
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
+	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	constructor(host: UmbControllerHost) {
 		//this.#host = host;
 	}

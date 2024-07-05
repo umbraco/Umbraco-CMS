@@ -1,4 +1,4 @@
-import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
+import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';

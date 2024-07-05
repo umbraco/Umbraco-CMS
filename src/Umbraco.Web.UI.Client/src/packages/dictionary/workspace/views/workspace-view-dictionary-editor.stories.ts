@@ -10,7 +10,7 @@ export default {
 	component: 'umb-workspace-view-dictionary-editor',
 	id: 'umb-workspace-view-dictionary-editor',
 	decorators: [
-		(story) => {
+		() => {
 			return html`TODO: make use of mocked workspace context??`;
 			/*html` <umb-context-provider key="umbDataTypeContext" .value=${new UmbWorkspaceDictionaryContext(data[0])}>
 				${story()}

@@ -15,7 +15,7 @@ describe('UmbExtensionElementController', () => {
 		let manifest: ManifestSection;
 
 		beforeEach(async () => {
-			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+			hostElement = new UmbTestControllerHostElement();
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
 				type: 'section',

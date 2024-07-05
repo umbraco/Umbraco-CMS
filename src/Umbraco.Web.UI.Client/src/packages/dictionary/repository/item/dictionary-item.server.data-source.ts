@@ -1,10 +1,7 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDictionaryItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type {
-	DictionaryItemItemResponseModel,
-	DictionaryItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { DictionaryItemItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

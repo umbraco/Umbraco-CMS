@@ -1,3 +1,5 @@
+// TODO: clean up this file
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
 /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
