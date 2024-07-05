@@ -18,7 +18,11 @@ internal sealed class ContentCache : IPublishedHybridCache
     public async Task<IPublishedContent?> GetById(int contentId, bool preview = false) =>
         await _cache.GetOrCreateAsync(
             $"{contentId}", // Unique key to the cache entry
-            async cancel => await _cacheService.GetById(contentId, preview));
+            async cancel =>
+            {
+                IPublishedContent? content = await _cacheService.GetById(contentId, preview);
+                return content;
+            });
 
     public Task<IPublishedContent?> GetById(Guid contentId, bool preview = false) => throw new NotImplementedException();
 

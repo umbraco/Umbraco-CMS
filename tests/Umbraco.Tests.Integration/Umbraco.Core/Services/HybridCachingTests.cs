@@ -38,7 +38,7 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Can_Get_Content_By_Id()
     {
-        var textPage = await PublishedHybridCache.GetById(Textpage.Id);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
 
         Assert.IsNotNull(textPage);
     }

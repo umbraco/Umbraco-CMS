@@ -51,9 +51,9 @@ internal sealed class PublishedContent : PublishedContentBase
 
     public override Guid Key { get; }
 
-    public override IEnumerable<IPublishedProperty> Properties { get; } = null!;
+    public override IEnumerable<IPublishedProperty> Properties { get; } = Enumerable.Empty<IPublishedProperty>();
 
-    public override IPublishedProperty? GetProperty(string alias) => throw new NotImplementedException();
+    public override IPublishedProperty? GetProperty(string alias) => null;
 
     public override int Id { get; }
 
@@ -73,7 +73,7 @@ internal sealed class PublishedContent : PublishedContentBase
 
     public override DateTime UpdateDate { get; }
 
-    public bool IsPreviewing { get; }
+    public bool IsPreviewing { get; } = false;
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures

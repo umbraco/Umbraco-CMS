@@ -33,23 +33,23 @@ internal struct ContentNodeKit
         IPublishedContentType contentType,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IVariationContextAccessor variationContextAccessor,
-        IPublishedModelFactory publishedModelFactory,
-        bool canBePublished)
+        IPublishedModelFactory publishedModelFactory)
     {
-        ContentData? draftData = DraftData;
+        // TODO: This relevant anymore? We can't access parent anyways
+        // ContentData? draftData = DraftData;
+        //
+        // // no published data if it cannot be published (eg is masked)
+        // ContentData? publishedData = canBePublished ? PublishedData : null;
+        //
+        // // we *must* have either published or draft data
+        // // if it cannot be published, published data is going to be null
+        // // therefore, ensure that draft data is not
+        // if (draftData == null && !canBePublished)
+        // {
+        //     draftData = PublishedData;
+        // }
 
-        // no published data if it cannot be published (eg is masked)
-        ContentData? publishedData = canBePublished ? PublishedData : null;
-
-        // we *must* have either published or draft data
-        // if it cannot be published, published data is going to be null
-        // therefore, ensure that draft data is not
-        if (draftData == null && !canBePublished)
-        {
-            draftData = PublishedData;
-        }
-
-        Node?.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor,
+        Node?.SetContentTypeAndData(contentType, DraftData, PublishedData, publishedSnapshotAccessor,
             variationContextAccessor, publishedModelFactory);
     }
 
