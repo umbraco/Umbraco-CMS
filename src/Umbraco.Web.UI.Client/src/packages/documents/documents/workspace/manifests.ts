@@ -1,9 +1,3 @@
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import {
-	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
-	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
-} from '../user-permissions/index.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import type {
 	ManifestWorkspaces,
@@ -12,6 +6,13 @@ import type {
 	ManifestWorkspaceView,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+} from '../user-permissions/index.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
@@ -62,6 +63,9 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
+			},
+			{
+				alias: UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
 			},
 		],
 	},
