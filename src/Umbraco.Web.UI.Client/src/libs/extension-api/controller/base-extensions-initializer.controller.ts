@@ -1,5 +1,4 @@
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	ManifestBase,
 	UmbBaseExtensionInitializer,
@@ -7,7 +6,6 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;

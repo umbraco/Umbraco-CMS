@@ -4,7 +4,6 @@ import {
 	UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
 	UMB_DICTIONARY_TREE_STORE_ALIAS,
 } from './constants.js';
-import { UmbDictionaryTreeStore } from './dictionary-tree.store.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,

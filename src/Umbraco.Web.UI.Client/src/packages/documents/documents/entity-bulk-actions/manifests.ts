@@ -1,10 +1,5 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentDuplicateEntityBulkAction } from './duplicate/duplicate.action.js';
-import { UmbDocumentDeleteEntityBulkAction } from './delete/delete.action.js';
-import { UmbMoveDocumentEntityBulkAction } from './move/move.action.js';
-import { UmbDocumentPublishEntityBulkAction } from './publish/publish.action.js';
-import { UmbDocumentUnpublishEntityBulkAction } from './unpublish/unpublish.action.js';
 import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import {

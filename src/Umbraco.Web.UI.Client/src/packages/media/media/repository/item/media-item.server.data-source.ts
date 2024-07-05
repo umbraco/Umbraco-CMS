@@ -1,4 +1,4 @@
-import { UMB_MEDIA_ENTITY_TYPE, UmbMediaEntityType } from '../../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMediaItemModel } from './types.js';
 import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';

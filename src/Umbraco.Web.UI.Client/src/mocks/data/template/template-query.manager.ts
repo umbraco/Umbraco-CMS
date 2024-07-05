@@ -1,4 +1,4 @@
-import { templateQueryResult, templateQuerySettings, type UmbMockTemplateModel } from './template.data.js';
+import { templateQueryResult, templateQuerySettings } from './template.data.js';
 
 export class UmbMockTemplateQueryManager {
 	constructor() {}

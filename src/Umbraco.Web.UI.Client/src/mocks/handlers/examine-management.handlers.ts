@@ -57,7 +57,6 @@ export const handlers = [
 
 	rest.get(umbracoPath('/searcher/:searcherName/query'), (_req, res, ctx) => {
 		const query = _req.url.searchParams.get('term');
-		const take = _req.url.searchParams.get('take');
 
 		const searcherName = _req.params.searcherName as string;
 
