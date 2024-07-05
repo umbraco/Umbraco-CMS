@@ -130,6 +130,70 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			'observeLayoutInitially',
 		);
 
+		this.#observeBlockData(unique);
+
+		if (this.#liveEditingMode) {
+			this.#establishLiveSync();
+		}
+	}
+
+	async create(contentElementTypeId: string) {
+		await this.#retrieveBlockEntries;
+		await this.#retrieveModalContext;
+		if (!this.#blockEntries) {
+			throw new Error('Block Entries not found');
+			return;
+		}
+		if (!this.#modalContext) {
+			throw new Error('Modal Context not found');
+			return;
+		}
+
+		// TODO: Missing some way to append more layout data... this could be part of modal data, (or context api?)
+
+		this.setIsNew(true);
+
+		const blockCreated = await this.#blockEntries.create(
+			contentElementTypeId,
+			{},
+			this.#modalContext.data as UmbBlockWorkspaceData,
+		);
+		if (!blockCreated) {
+			throw new Error('Block Entries could not create block');
+		}
+
+		// TODO: We should investigate if it makes sense to gather
+
+		if (!this.#liveEditingMode) {
+			this.#layout.setValue(blockCreated.layout as LayoutDataType);
+			this.content.setData(blockCreated.content);
+			if (blockCreated.settings) {
+				this.settings.setData(blockCreated.settings);
+			}
+		} else {
+			// Insert already, cause we are in live editing mode:
+			const blockInserted = await this.#blockEntries.insert(
+				blockCreated.layout,
+				blockCreated.content,
+				blockCreated.settings,
+				this.#modalContext.data as UmbBlockWorkspaceData,
+			);
+			if (!blockInserted) {
+				throw new Error('Block Entries could not insert block');
+			}
+
+			const unique = blockCreated.layout.contentUdi;
+
+			this.#observeBlockData(unique);
+			this.#establishLiveSync();
+		}
+	}
+
+	#observeBlockData(unique: string) {
+		if (!this.#blockEntries) {
+			throw new Error('Block Entries not found');
+			return;
+		}
 		this.observe(
 			this.#blockEntries.layoutOf(unique),
 			(layoutData) => {
@@ -183,56 +247,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			},
 			'observeLayout',
 		);
-
-		if (this.#liveEditingMode) {
-			this.#establishLiveSync();
-		}
-	}
-
-	async create(contentElementTypeId: string) {
-		await this.#retrieveBlockEntries;
-		await this.#retrieveModalContext;
-		if (!this.#blockEntries) {
-			throw new Error('Block Entries not found');
-			return;
-		}
-		if (!this.#modalContext) {
-			throw new Error('Modal Context not found');
-			return;
-		}
-
-		// TODO: Missing some way to append more layout data... this could be part of modal data, (or context api?)
-
-		this.setIsNew(true);
-
-		const blockCreated = await this.#blockEntries.create(
-			contentElementTypeId,
-			{},
-			this.#modalContext.data as UmbBlockWorkspaceData,
-		);
-		if (!blockCreated) {
-			throw new Error('Block Entries could not create block');
-		}
-
-		this.#layout.setValue(blockCreated.layout as LayoutDataType);
-		this.content.setData(blockCreated.content);
-		if (blockCreated.settings) {
-			this.settings.setData(blockCreated.settings);
-		}
-
-		if (this.#liveEditingMode) {
-			// Insert already, cause we are in live editing mode:
-			const blockInserted = await this.#blockEntries.insert(
-				blockCreated.layout,
-				blockCreated.content,
-				blockCreated.settings,
-				this.#modalContext.data as UmbBlockWorkspaceData,
-			);
-			if (!blockInserted) {
-				throw new Error('Block Entries could not insert block');
-			}
-			this.#establishLiveSync();
-		}
 	}
 
 	#establishLiveSync() {
