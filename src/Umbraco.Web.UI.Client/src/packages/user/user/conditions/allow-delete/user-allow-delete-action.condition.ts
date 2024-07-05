@@ -10,3 +10,5 @@ export class UmbUserAllowDeleteActionCondition extends UmbUserActionConditionBas
 		}
 	}
 }
+
+export { UmbUserAllowDeleteActionCondition as api };

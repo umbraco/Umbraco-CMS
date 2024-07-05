@@ -12,3 +12,5 @@ export class UmbUserAllowDisableActionCondition extends UmbUserActionConditionBa
 		this.permitted = this.userState !== UmbUserStateEnum.DISABLED;
 	}
 }
+
+export { UmbUserAllowDisableActionCondition as api };
