@@ -13,15 +13,16 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbContentTypePropertyStructureHelper,
-	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
-} from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 import './content-type-design-editor-property.element.js';
+import {
+	UMB_CREATE_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN,
+	UMB_PROPERTY_TYPE_WORKSPACE_MODAL,
+} from '@umbraco-cms/backoffice/property-type';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -97,15 +98,16 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		return this._containerId;
 	}
 	public set containerId(value: string | null | undefined) {
-		const oldValue = this._containerId;
-		if (value === oldValue) return;
+		if (value === this._containerId) return;
 		this._containerId = value;
+		this.createPropertyTypeWorkspaceRoutes();
 		this.#propertyStructureHelper.setContainerId(value);
-		this.#addPropertyModal.setUniquePathValue('container-id', value === null ? 'root' : value);
-		this.requestUpdate('containerId', oldValue);
+		this.#addPropertyModal?.setUniquePathValue('container-id', value === null ? 'root' : value);
+		this.#editPropertyModal?.setUniquePathValue('container-id', value === null ? 'root' : value);
 	}
 
-	#addPropertyModal: UmbModalRouteRegistrationController;
+	#addPropertyModal?: UmbModalRouteRegistrationController;
+	#editPropertyModal?: UmbModalRouteRegistrationController;
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
@@ -116,10 +118,13 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	private _propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
-	private _ownerContentType?: UmbContentTypeModel;
+	private _ownerContentTypeUnique?: string;
 
 	@state()
-	private _modalRouteBuilderNewProperty?: UmbModalRouteBuilder;
+	private _newPropertyPath?: string;
+
+	@state()
+	private _editPropertyTypePath?: string;
 
 	@state()
 	private _sortModeActive?: boolean;
@@ -147,51 +152,81 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
 
-			this.observe(
-				workspaceContext.structure.ownerContentType,
-				(contentType) => {
-					this._ownerContentType = contentType;
-				},
-				'observeOwnerContentType',
-			);
+			this._ownerContentTypeUnique = workspaceContext.structure.getOwnerContentTypeUnique();
+			this.createPropertyTypeWorkspaceRoutes();
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
 			this.#sorter.setModel(this._propertyStructure);
 		});
+	}
+
+	createPropertyTypeWorkspaceRoutes() {
+		if (!this._ownerContentTypeUnique || this._containerId === undefined) return;
 
 		// Note: Route for adding a new property
-		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
+		this.#addPropertyModal?.destroy();
+		this.#addPropertyModal = new UmbModalRouteRegistrationController(
+			this,
+			UMB_PROPERTY_TYPE_WORKSPACE_MODAL,
+			'addPropertyModal',
+		)
 			.addUniquePaths(['container-id'])
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
 				// TODO: Make a onInit promise, that can be awaited here.
-				if (!this._ownerContentType || this._containerId === undefined) return false;
-				const propertyData = await this.#propertyStructureHelper.createPropertyScaffold(this._containerId);
-				if (propertyData === undefined) return false;
+				if (!this._ownerContentTypeUnique || this._containerId === undefined) return false;
+
+				const preset: Partial<UmbPropertyTypeModel> = {};
 				if (params.sortOrder !== undefined) {
-					let sortOrderInt = parseInt(params.sortOrder, 10);
+					let sortOrderInt = parseInt(params.sortOrder);
 					if (sortOrderInt === -1) {
 						// Find the highest sortOrder and add 1 to it:
-						sortOrderInt = Math.max(...this._propertyStructure.map((x) => x.sortOrder), -1);
+						sortOrderInt = Math.max(...this._propertyStructure.map((x) => x.sortOrder), -1) + 1;
 					}
-					propertyData.sortOrder = sortOrderInt + 1;
+					preset.sortOrder = sortOrderInt;
 				}
-				return { data: { contentTypeId: this._ownerContentType.unique }, value: propertyData };
-			})
-			.onSubmit(async (value) => {
-				if (!this._ownerContentType) return false;
-				// TODO: The model requires a data-type to be set, we cheat currently. But this should be re-though when we implement validation(As we most likely will have to com up with partial models for the runtime model.) [NL]
-				this.#propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
-				return true;
+				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: undefined } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._modalRouteBuilderNewProperty = routeBuilder;
+				this._newPropertyPath =
+					routeBuilder({ sortOrder: '-1' }) +
+					UMB_CREATE_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({
+						containerUnique: this._containerId!,
+					});
 			});
+		if (this._containerId !== undefined) {
+			this.#addPropertyModal?.setUniquePathValue(
+				'container-id',
+				this._containerId === null ? 'root' : this._containerId,
+			);
+		}
+
+		this.#editPropertyModal?.destroy();
+		this.#editPropertyModal = new UmbModalRouteRegistrationController(
+			this,
+			UMB_PROPERTY_TYPE_WORKSPACE_MODAL,
+			'editPropertyModal',
+		)
+			.addUniquePaths(['container-id'])
+			.addAdditionalPath('edit-property')
+			.onSetup(async () => {
+				if (!this._ownerContentTypeUnique || this._containerId === undefined) return false;
+				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: undefined } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editPropertyTypePath = routeBuilder(null);
+			});
+		if (this._containerId !== undefined) {
+			this.#editPropertyModal?.setUniquePathValue(
+				'container-id',
+				this._containerId === null ? 'root' : this._containerId,
+			);
+		}
 	}
 
 	override render() {
-		return this._ownerContentType
+		return this._ownerContentTypeUnique
 			? html`
 					<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 						${repeat(
@@ -202,6 +237,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 									<umb-content-type-design-editor-property
 										data-umb-property-id=${property.id}
 										.editContentTypePath=${this.editContentTypePath}
+										.editPropertyTypePath=${this._editPropertyTypePath}
 										?sort-mode-active=${this._sortModeActive}
 										.propertyStructureHelper=${this.#propertyStructureHelper}
 										.property=${property}>
@@ -216,7 +252,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 						() => html`
 							<uui-button
 								id="btn-add"
-								href=${ifDefined(this._modalRouteBuilderNewProperty?.({ sortOrder: -1 }))}
+								href=${ifDefined(this._newPropertyPath)}
 								label=${this.localize.term('contentTypeEditor_addProperty')}
 								look="placeholder"></uui-button>
 						`,

@@ -3,7 +3,6 @@ import type {
 	UmbPropertyContainerTypes,
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
-	UmbPropertyTypeScaffoldModel,
 } from '../types.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -43,6 +42,7 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
 		x.find((y) => y.unique === this.#ownerContentTypeUnique),
 	);
+
 	private readonly _contentTypeContainers = this.#contentTypes.asObservablePart((x) =>
 		x.flatMap((x) => x.containers ?? []),
 	);
@@ -449,61 +449,6 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties });
 	}
 
-	createPropertyScaffold(containerId: string | null = null) {
-		const property: UmbPropertyTypeScaffoldModel = {
-			id: UmbId.new(),
-			container: containerId ? { id: containerId } : null,
-			alias: '',
-			name: '',
-			description: '',
-			variesByCulture: false,
-			variesBySegment: false,
-			validation: {
-				mandatory: false,
-				mandatoryMessage: null,
-				regEx: null,
-				regExMessage: null,
-			},
-			appearance: {
-				labelOnTop: false,
-			},
-			sortOrder: 0,
-		};
-
-		return property;
-	}
-
-	async createProperty(contentTypeUnique: string | null, containerId: string | null = null, sortOrder?: number) {
-		await this.#init;
-		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
-
-		// If we have a container, we need to ensure it exists, and then update the container with the new parent id. [NL]
-		if (containerId) {
-			const container = await this.ensureContainerOf(containerId, contentTypeUnique);
-			if (!container) {
-				throw new Error('Container for inserting property could not be found or created');
-			}
-			// Correct containerId to the local one: [NL]
-			containerId = container.id;
-		}
-
-		const property = this.createPropertyScaffold(containerId);
-		property.sortOrder = sortOrder ?? 0;
-
-		const properties: Array<UmbPropertyTypeScaffoldModel | UmbPropertyTypeModel> = [
-			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? []),
-		];
-
-		properties.push(property);
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { properties });
-
-		return property;
-	}
-
 	async insertProperty(contentTypeUnique: string | null, property: UmbPropertyTypeModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
@@ -516,6 +461,10 @@ export class UmbContentTypeStructureManager<
 			}
 			// Unfreeze object, while settings container.id
 			property = { ...property, container: { id: container.id } };
+		}
+
+		if (property.sortOrder === undefined) {
+			property.sortOrder = 0;
 		}
 
 		const frozenProperties =
