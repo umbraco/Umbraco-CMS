@@ -130,6 +130,9 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	getName() {
 		return 'block name content element type here...';
 	}
+
+	// TODO: [v15] ignoring unused name parameter to avoid breaking changes
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setName(name: string | undefined) {
 		console.warn('You cannot set a name of a block type.');
 	}

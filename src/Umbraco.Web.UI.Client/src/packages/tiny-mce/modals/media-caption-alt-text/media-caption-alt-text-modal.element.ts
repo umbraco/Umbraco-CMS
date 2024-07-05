@@ -2,7 +2,7 @@ import type {
 	UmbMediaCaptionAltTextModalData,
 	UmbMediaCaptionAltTextModalValue,
 } from './media-caption-alt-text-modal.token.js';
-import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import '@umbraco-cms/backoffice/block-type';
 import { UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';

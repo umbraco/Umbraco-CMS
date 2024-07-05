@@ -12,7 +12,7 @@ export default {
 	component: 'umb-workspace-view-data-type-info',
 	id: 'umb-workspace-view-data-type-info',
 	decorators: [
-		(story) => {
+		() => {
 			return html`TODO: make use of mocked workspace context??`;
 			/*html` <umb-context-provider key="umbDataTypeContext" .value=${new UmbDataTypeWorkspaceContext(data[0])}>
 				${story()}

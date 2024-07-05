@@ -6,7 +6,6 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import {
-	UmbBlockRteEntriesContext,
 	type UmbBlockRteLayoutModel,
 	UmbBlockRteManagerContext,
 	type UmbBlockRteTypeModel,
@@ -100,7 +99,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onChange(event: InputEvent & { target: HTMLInputElement }) {
+	#onChange() {
 		const editor = this.#managerContext.getTinyMceEditor();
 		if (!editor) return;
 
