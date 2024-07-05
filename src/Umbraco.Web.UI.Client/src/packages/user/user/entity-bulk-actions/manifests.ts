@@ -1,9 +1,5 @@
 import { UMB_USER_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
-import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
-import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
-import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
-import { UmbDisableUserEntityBulkAction } from './disable/disable.action.js';
 import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
@@ -32,7 +28,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.User.Enable',
 		name: 'Enable User Entity Bulk Action',
 		weight: 300,
-		api: UmbEnableUserEntityBulkAction,
+		api: () => import('./enable/enable.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			label: 'Enable',
@@ -49,7 +45,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.User.Unlock',
 		name: 'Unlock User Entity Bulk Action',
 		weight: 200,
-		api: UmbUnlockUserEntityBulkAction,
+		api: () => import('./unlock/unlock.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			label: 'Unlock',
@@ -66,7 +62,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.User.Disable',
 		name: 'Disable User Entity Bulk Action',
 		weight: 100,
-		api: UmbDisableUserEntityBulkAction,
+		api: () => import('./disable/disable.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			label: 'Disable',

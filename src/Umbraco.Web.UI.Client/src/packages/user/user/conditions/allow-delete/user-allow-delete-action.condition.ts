@@ -11,10 +11,3 @@ export class UmbUserAllowDeleteActionCondition extends UmbUserActionConditionBas
 		}
 	}
 }
-
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'User Allow Delete Action Condition',
-	alias: 'Umb.Condition.User.AllowDeleteAction',
-	api: UmbUserAllowDeleteActionCondition,
-};
