@@ -32,3 +32,5 @@ export class UmbEnableUserEntityAction extends UmbEntityActionBase<never> {
 		await enableRepository.enable([this.args.unique]);
 	}
 }
+
+export { UmbEnableUserEntityAction as api };

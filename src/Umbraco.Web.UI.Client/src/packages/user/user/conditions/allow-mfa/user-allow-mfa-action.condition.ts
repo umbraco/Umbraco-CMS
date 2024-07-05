@@ -1,5 +1,4 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbUserAllowMfaActionCondition extends UmbConditionBase<never> {
@@ -16,9 +15,4 @@ export class UmbUserAllowMfaActionCondition extends UmbConditionBase<never> {
 	}
 }
 
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'User Allow Mfa Action Condition',
-	alias: 'Umb.Condition.User.AllowMfaAction',
-	api: UmbUserAllowMfaActionCondition,
-};
+export { UmbUserAllowMfaActionCondition as api };
