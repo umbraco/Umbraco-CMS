@@ -16,12 +16,11 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 import './content-type-design-editor-property.element.js';
 import {
 	UMB_CREATE_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN,
-	UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN,
 	UMB_PROPERTY_TYPE_WORKSPACE_MODAL,
 } from '@umbraco-cms/backoffice/property-type';
 
