@@ -2,19 +2,18 @@ import { UmbPropertyTypeContext } from './content-type-design-editor-property.co
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
-	type UmbContentTypeModel,
-	type UmbContentTypePropertyStructureHelper,
-	type UmbPropertyTypeModel,
-	type UmbPropertyTypeScaffoldModel,
+import type {
+	UmbContentTypeModel,
+	UmbContentTypePropertyStructureHelper,
+	UmbPropertyTypeModel,
+	UmbPropertyTypeScaffoldModel,
 } from '@umbraco-cms/backoffice/content-type';
+import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -25,7 +24,6 @@ import {
 export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	//
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-	#settingsModal;
 	#dataTypeUnique?: string;
 	#context = new UmbPropertyTypeContext(this);
 
@@ -57,7 +55,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
 		this.#checkInherited();
-		this.#settingsModal.setUniquePathValue('propertyId', value?.id);
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
@@ -78,35 +75,14 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@state()
 	public _inheritedContentTypeName?: string;
 
-	@state()
-	protected _modalRoute?: string;
+	@property({ type: String, reflect: false })
+	protected editPropertyTypePath?: string;
 
 	@state()
 	private _dataTypeName?: string;
 
 	@state()
 	private _aliasLocked = true;
-
-	constructor() {
-		super();
-
-		// TODO: consider if this can be registered more globally/contextually. [NL]
-		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
-			.addUniquePaths(['propertyId'])
-			.onSetup(() => {
-				const id = this._inheritedContentTypeId;
-				if (id === undefined) return false;
-				const propertyData = this.property;
-				if (propertyData === undefined) return false;
-				return { data: { contentTypeId: id }, value: propertyData };
-			})
-			.onSubmit((result) => {
-				this.#partialUpdate(result as UmbPropertyTypeModel);
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._modalRoute = routeBuilder(null);
-			});
-	}
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
@@ -231,7 +207,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 
 	renderEditableProperty() {
-		if (!this.property) return;
+		if (!this.property || !this.editPropertyTypePath) return;
 
 		if (this.sortModeActive) {
 			return this.renderSortableProperty();
@@ -263,7 +239,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					id="editor"
 					look="secondary"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
-					href=${ifDefined(this._modalRoute)}>
+					href=${this.editPropertyTypePath +
+					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.id })}>
 					${this.renderPropertyTags()}
 					<uui-action-bar>
 						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">

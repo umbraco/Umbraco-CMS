@@ -11,13 +11,9 @@ import {
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	ManifestWorkspace,
-	PropertyEditorSettingsProperty,
-	UmbBlockTypeBaseModel,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
@@ -33,9 +29,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	// TODO: Get the name of the contentElementType..
 	readonly name = this.#data.asObservablePart(() => 'block');
 	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
-
-	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
-	readonly properties = this.#properties.asObservable();
 
 	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
 		super(host, args.manifest.alias);
@@ -77,7 +70,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	protected override resetState() {
 		super.resetState();
 		this.#data.setValue(undefined);
-		this.#properties.setValue([]);
+		this.removeUmbControllerByAlias('isNewRedirectController');
 	}
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
@@ -175,7 +168,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	public override destroy(): void {
 		this.#data.destroy();
-		this.#properties.destroy();
 		super.destroy();
 	}
 }
