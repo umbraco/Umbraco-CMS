@@ -21,7 +21,7 @@ const entityActions: Array<ManifestTypes> = [
 			},
 		],
 	},
-	resendInviteManifests,
+	...resendInviteManifests,
 ];
 
 export const manifests: Array<ManifestTypes> = [...entityActions];
