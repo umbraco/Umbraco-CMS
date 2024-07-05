@@ -47,6 +47,7 @@ export default [
 		},
 		rules: {
 			semi: ['warn', 'always'],
+			"prettier/prettier": ["warn", {"endOfLine": "auto" }],
 			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'no-var': 'error',
 			'import/no-unresolved': 'off',
