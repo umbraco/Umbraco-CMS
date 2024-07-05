@@ -1,10 +1,10 @@
+import { umbExtensionsRegistry } from '../../registry.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '../../registry.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**

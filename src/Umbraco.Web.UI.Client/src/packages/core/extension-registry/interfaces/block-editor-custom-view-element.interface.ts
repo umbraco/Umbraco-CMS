@@ -1,5 +1,5 @@
-import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { ManifestBlockEditorCustomView } from '../index.js';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 // Shared with the Property Editor
 export interface UmbBlockTypeBaseModel {
 	contentElementTypeKey: string;

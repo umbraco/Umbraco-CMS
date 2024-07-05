@@ -1,3 +1,5 @@
+import type { UmbBlockTypeWithGroupKey } from '../types.js';
+import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
@@ -16,8 +18,6 @@ import type {
 	PropertyEditorSettingsProperty,
 	UmbBlockTypeBaseModel,
 } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBlockTypeWithGroupKey } from '../types.js';
-import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>

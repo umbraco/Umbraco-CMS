@@ -1,5 +1,5 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbBlockEditorCustomViewElement } from '../interfaces/index.js';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestBlockEditorCustomView extends ManifestElement<UmbBlockEditorCustomViewElement> {
 	type: 'blockEditorCustomView';

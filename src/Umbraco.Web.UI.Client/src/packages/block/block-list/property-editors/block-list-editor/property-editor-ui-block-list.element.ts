@@ -1,3 +1,8 @@
+import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
+import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
+import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
+import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -10,11 +15,6 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
-import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
-import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
-import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 
 import '../../components/block-list-entry/index.js';

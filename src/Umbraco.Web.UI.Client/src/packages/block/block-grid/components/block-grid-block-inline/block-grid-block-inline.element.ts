@@ -1,9 +1,9 @@
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
+import { UmbBlockGridInlinePropertyDatasetContext } from './block-grid-inline-property-dataset.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.context-token.js';
-import { UmbBlockGridInlinePropertyDatasetContext } from './block-grid-inline-property-dataset.context.js';
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
 

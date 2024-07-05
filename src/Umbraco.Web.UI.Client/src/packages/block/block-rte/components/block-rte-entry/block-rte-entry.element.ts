@@ -1,11 +1,11 @@
+import type { UmbBlockRteLayoutModel } from '../../types.js';
+import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbBlockEditorCustomViewProperties,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBlockRteLayoutModel } from '../../types.js';
-import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import '../ref-rte-block/index.js';
 
 /**

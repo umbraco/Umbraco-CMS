@@ -1,3 +1,6 @@
+import type { UmbBlockManagerContext } from '../index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -13,9 +16,6 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBlockManagerContext } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import type { UmbBlockEntriesContext } from './block-entries.context.js';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
