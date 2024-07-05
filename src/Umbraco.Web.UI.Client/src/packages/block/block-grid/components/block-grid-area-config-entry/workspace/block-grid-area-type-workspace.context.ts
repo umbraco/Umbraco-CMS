@@ -106,6 +106,9 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	getName() {
 		return this.#data.getValue()?.alias;
 	}
+
+	// TODO: [v15] ignoring unused name parameter to avoid breaking changes
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setName(name: string | undefined) {
 		throw new Error('You cannot set a name of a area-type.');
 	}

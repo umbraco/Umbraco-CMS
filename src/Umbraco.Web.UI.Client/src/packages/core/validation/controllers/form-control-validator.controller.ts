@@ -4,7 +4,7 @@ import type { UmbFormControlMixinInterface } from '../mixins/form-control.mixin.
 import { UmbValidationInvalidEvent } from '../events/validation-invalid.event.js';
 import { UmbValidationValidEvent } from '../events/validation-valid.event.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbFormControlValidator extends UmbControllerBase implements UmbValidator {
 	// The path to the data that this validator is validating.

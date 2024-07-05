@@ -1,4 +1,4 @@
-import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.js';
+import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -41,3 +41,5 @@ export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 		});
 	}
 }
+
+export { UmbChangePasswordCurrentUserAction as api };

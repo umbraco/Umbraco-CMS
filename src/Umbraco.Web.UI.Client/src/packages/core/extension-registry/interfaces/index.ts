@@ -1,3 +1,4 @@
+export * from './block-editor-custom-view-element.interface.js';
 export * from './dashboard-element.interface.js';
 export * from './external-login-provider-element.interface.js';
 export * from './menu-item-element.interface.js';

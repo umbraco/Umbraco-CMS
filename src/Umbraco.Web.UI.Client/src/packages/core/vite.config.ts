@@ -37,6 +37,7 @@ export default defineConfig({
 			'picker-input/index': './picker-input/index.ts',
 			'property-action/index': './property-action/index.ts',
 			'property-editor/index': './property-editor/index.ts',
+			'property-type/index': './property-type/index.ts',
 			'property/index': './property/index.ts',
 			'recycle-bin/index': './recycle-bin/index.ts',
 			'repository/index': './repository/index.ts',
