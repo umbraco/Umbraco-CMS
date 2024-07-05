@@ -1,6 +1,6 @@
 import type { UmbCurrentUserModel } from './types.js';
 import { UmbCurrentUserRepository } from './repository/index.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -116,5 +116,3 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 }
 
 export default UmbCurrentUserContext;
-
-export const UMB_CURRENT_USER_CONTEXT = new UmbContextToken<UmbCurrentUserContext>('UmbCurrentUserContext');

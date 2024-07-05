@@ -1,3 +1,4 @@
+import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -6,8 +7,6 @@ import type {
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-
-export const UMB_MEDIA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MediaType';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',

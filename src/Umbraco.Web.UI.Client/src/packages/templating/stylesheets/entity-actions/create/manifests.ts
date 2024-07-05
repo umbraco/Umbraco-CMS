@@ -1,5 +1,4 @@
 import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UmbStylesheetCreateOptionsEntityAction } from './create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -9,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Stylesheet.CreateOptions',
 		name: 'Stylesheet Create Options Entity Action',
 		weight: 1200,
-		api: UmbStylesheetCreateOptionsEntityAction,
+		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',

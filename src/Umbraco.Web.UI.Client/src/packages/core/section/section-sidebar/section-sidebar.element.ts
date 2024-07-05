@@ -1,9 +1,15 @@
+import { UmbSectionSidebarContext } from './section-sidebar.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
+	constructor() {
+		super();
+		new UmbSectionSidebarContext(this);
+	}
+
 	override render() {
 		return html`
 			<umb-section-sidebar-context-menu>

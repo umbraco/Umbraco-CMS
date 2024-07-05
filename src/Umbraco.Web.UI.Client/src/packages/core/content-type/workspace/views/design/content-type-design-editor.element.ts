@@ -207,7 +207,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				redirectTo: routes[0]?.path,
 				guards: [() => this._activeTabId === undefined],
 			});
-			// TODO: Look at this case.
+		}
+
+		if (routes.length !== 0) {
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+				guards: [() => this._activeTabId === undefined],
+			});
 		}
 
 		// If we have an active tab name, then we might have a active tab name re-name, then we will redirect to the new name if it has been changed: [NL]
@@ -225,6 +232,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				}
 			}
 		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this._routes = routes;
 	}

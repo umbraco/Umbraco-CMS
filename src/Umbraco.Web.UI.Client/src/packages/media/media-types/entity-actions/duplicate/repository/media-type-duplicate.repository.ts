@@ -18,3 +18,5 @@ export class UmbDuplicateMediaTypeRepository extends UmbRepositoryBase implement
 		return { error };
 	}
 }
+
+export { UmbDuplicateMediaTypeRepository as api };

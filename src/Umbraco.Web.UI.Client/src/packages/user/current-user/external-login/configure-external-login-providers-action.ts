@@ -16,3 +16,5 @@ export class UmbConfigureExternalLoginProvidersApi<ArgsMetaType = never>
 		await modalManagerContext.open(this, UMB_CURRENT_USER_EXTERNAL_LOGIN_MODAL).onSubmit();
 	}
 }
+
+export { UmbConfigureExternalLoginProvidersApi as api };

@@ -23,3 +23,5 @@ export class UmbPartialViewCreateOptionsEntityAction extends UmbEntityActionBase
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbPartialViewCreateOptionsEntityAction as api };

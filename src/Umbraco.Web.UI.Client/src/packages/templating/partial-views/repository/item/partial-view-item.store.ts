@@ -1,5 +1,5 @@
 import type { UmbPartialViewItemModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_PARTIAL_VIEW_ITEM_STORE_CONTEXT } from './partial-view-item.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
@@ -22,7 +22,3 @@ export class UmbPartialViewItemStore extends UmbItemStoreBase<UmbPartialViewItem
 }
 
 export default UmbPartialViewItemStore;
-
-export const UMB_PARTIAL_VIEW_ITEM_STORE_CONTEXT = new UmbContextToken<UmbPartialViewItemStore>(
-	'UmbPartialViewItemStore',
-);

@@ -16,10 +16,8 @@ import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_CONTENT_TYPE_WORKSPACE_CONTEXT,
-	UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT,
-} from '@umbraco-cms/backoffice/content-type';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
+import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 
 interface GroupedItems<T> {
@@ -129,7 +127,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 					this.#initPromise,
 				]);
 				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
-				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getLabel() ?? ''} - ${propertyEditorName}`;
+				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getName() ?? ''} - ${propertyEditorName}`;
 
 				return {
 					data: {

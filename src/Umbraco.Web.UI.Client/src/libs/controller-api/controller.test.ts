@@ -51,7 +51,7 @@ describe('UmbController', () => {
 	let hostElement: UmbControllerHostElement;
 
 	beforeEach(() => {
-		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostElement;
+		hostElement = new UmbTestControllerHostElement();
 	});
 
 	describe('Controller Host Public API', () => {
