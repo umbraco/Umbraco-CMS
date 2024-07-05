@@ -9,7 +9,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class ConfigurationMemberTypeController : MemberTypeControllerBase
 {
     private readonly IConfigurationPresentationFactory _configurationPresentationFactory;
