@@ -19,6 +19,11 @@ export class UmbUserConfigRepository extends UmbRepositoryBase implements UmbApi
 	}
 
 	async #init() {
+		// Check if the store already has data
+		if (this.#dataStore?.getState()) {
+			return;
+		}
+
 		const { data } = await this.#dataSource.getUserConfig();
 
 		if (data) {
