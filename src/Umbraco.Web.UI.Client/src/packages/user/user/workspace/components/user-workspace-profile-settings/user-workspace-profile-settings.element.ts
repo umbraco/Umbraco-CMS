@@ -1,6 +1,6 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
-import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -11,6 +11,9 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	@state()
 	private _user?: UmbUserDetailModel;
 
+	@state()
+	private _usernameIsEmail = true;
+
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -19,7 +22,32 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
 			this.observe(this.#userWorkspaceContext.data, (user) => (this._user = user), 'umbUserObserver');
+			this.observe(
+				this.#userWorkspaceContext.configRepository.part('usernameIsEmail'),
+				(usernameIsEmail) => (this._usernameIsEmail = usernameIsEmail),
+				'umbUsernameIsEmailObserver',
+			);
 		});
+	}
+
+	#onEmailChange(event: UmbChangeEvent) {
+		const target = event.target as HTMLInputElement;
+
+		if (typeof target?.value === 'string') {
+			this.#userWorkspaceContext?.updateProperty('email', target.value);
+
+			if (this._usernameIsEmail) {
+				this.#userWorkspaceContext?.updateProperty('userName', target.value);
+			}
+		}
+	}
+
+	#onUsernameChange(event: UmbChangeEvent) {
+		const target = event.target as HTMLInputElement;
+
+		if (typeof target?.value === 'string') {
+			this.#userWorkspaceContext?.updateProperty('userName', target.value);
+		}
 	}
 
 	#onLanguageChange(event: UmbChangeEvent) {
@@ -33,19 +61,44 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	override render() {
 		return html`<uui-box>
 			<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
-			${this.#renderEmailProperty()} ${this.#renderUILanguageProperty()}
+			${this.#renderEmailProperty()} ${this.#renderUsernameProperty()} ${this.#renderUILanguageProperty()}
 		</uui-box>`;
 	}
 
 	#renderEmailProperty() {
 		return html`
-			<umb-property-layout label="${this.localize.term('general_email')}">
+			<umb-property-layout
+				label="${this.localize.term('general_email')}"
+				.description=${this.localize.term('user_emailDescription', this._usernameIsEmail)}>
 				<uui-input
 					slot="editor"
 					name="email"
 					label="${this.localize.term('general_email')}"
-					readonly
+					@change="${this.#onEmailChange}"
+					required
+					required-message=${this.localize.term('user_emailRequired')}
 					value=${ifDefined(this._user?.email)}></uui-input>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderUsernameProperty() {
+		if (this._usernameIsEmail) {
+			return nothing;
+		}
+
+		return html`
+			<umb-property-layout
+				label="${this.localize.term('user_loginname')}"
+				description=${this.localize.term('user_loginnameDescription')}>
+				<uui-input
+					slot="editor"
+					name="username"
+					label="${this.localize.term('user_loginname')}"
+					@change="${this.#onUsernameChange}"
+					required
+					required-message=${this.localize.term('user_loginnameRequired')}
+					value=${ifDefined(this._user?.userName)}></uui-input>
 			</umb-property-layout>
 		`;
 	}
