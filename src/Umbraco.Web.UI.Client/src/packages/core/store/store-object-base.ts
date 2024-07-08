@@ -8,11 +8,11 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
  * The base class for a store that holds an object.
  */
 export class UmbStoreObjectBase<T> extends UmbContextBase<never> implements UmbApi {
-	protected _data: UmbObjectState<T | undefined>;
+	protected _data;
 
 	constructor(host: UmbControllerHost, storeAlias: string, initialData?: T) {
 		super(host, storeAlias);
-		this._data = new UmbObjectState(initialData);
+		this._data = new UmbObjectState<T | null>(initialData ?? null);
 	}
 
 	/**
@@ -29,7 +29,7 @@ export class UmbStoreObjectBase<T> extends UmbContextBase<never> implements UmbA
 	 * Returns the current state of the store
 	 * @memberof UmbStoreObjectBase
 	 */
-	getState(): T | undefined {
+	getState() {
 		return this._data.getValue();
 	}
 
