@@ -8,13 +8,19 @@ import {
 	UMB_NOTIFICATION_HEADER,
 } from '@umbraco-cms/backoffice/notification';
 
+/**
+ * Controller that adds interceptors to the OpenAPI client
+ */
 export class UmbApiInterceptorController extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#addApiInterceptor();
+		this.#addUmbNotificationsInterceptor();
 	}
 
-	#addApiInterceptor() {
+	/**
+	 * Interceptor which takes in the umb-notifications and displays the notifications, if any.
+	 */
+	#addUmbNotificationsInterceptor() {
 		OpenAPI.interceptors.response.use((response) => {
 			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
 			if (!umbNotifications) return response;
