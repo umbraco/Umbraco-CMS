@@ -1861,6 +1861,8 @@ export default {
 		lastLogin: 'Seneste login',
 		lastPasswordChangeDate: 'Kodeord sidst ændret',
 		loginname: 'Brugernavn',
+		loginnameRequired: 'Påkrævet - indtast et brugernavn for denne bruger',
+		loginnameDescription: 'Brugernavnet bruges til at logge ind og til at identificere brugeren',
 		mediastartnode: 'Startnode i mediearkivet',
 		mediastartnodehelp: 'Begræns mediebiblioteket til en bestemt startnode',
 		mediastartnodes: 'Medie startnoder',
@@ -1963,7 +1965,12 @@ export default {
 		'2faCodeInput': 'Indtast din verifikationskode',
 		'2faCodeInputHelp': 'Indtast din verifikationskode fra din autentificeringsapp',
 		'2faInvalidCode': 'Den indtastede kode er ugyldig',
-		emailRequired: 'Required - enter an email address for this user',
+		emailRequired: 'Påkrævet - indtast en emailadresse for denne bruger',
+		emailDescription: (usernameIsEmail: boolean) => {
+			return usernameIsEmail
+				? 'Emailadressen bruges som brugernavn og til notifikationer og adgangskode gendannelse'
+				: 'Emailadressen bruges til notifikationer og adgangskode gendannelse';
+		},
 		duplicateLogin: 'A user with this login already exists',
 		nameRequired: 'Required - enter a name for this user',
 		passwordRequiresDigit: "The password must have at least one digit ('0'-'9')",
