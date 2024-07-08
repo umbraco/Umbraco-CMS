@@ -1,5 +1,3 @@
-import { UmbChangePasswordCurrentUserAction } from './change-password-current-user.action.js';
-import { UmbEditCurrentUserAction } from './edit-current-user.action.js';
 import type {
 	ManifestCurrentUserActionDefaultKind,
 	ManifestTypes,
@@ -27,7 +25,7 @@ const currentUserActions: Array<ManifestCurrentUserActionDefaultKind> = [
 		alias: 'Umb.CurrentUser.Button.Edit',
 		name: 'Current User Edit Button',
 		weight: 1000,
-		api: UmbEditCurrentUserAction,
+		api: () => import('./edit-current-user.action.js'),
 		meta: {
 			label: '#general_edit',
 			icon: 'edit',
@@ -45,7 +43,7 @@ const currentUserActions: Array<ManifestCurrentUserActionDefaultKind> = [
 		alias: 'Umb.CurrentUser.Button.ChangePassword',
 		name: 'Current User Change Password Button',
 		weight: 900,
-		api: UmbChangePasswordCurrentUserAction,
+		api: () => import('./change-password-current-user.action.js'),
 		meta: {
 			label: '#general_changePassword',
 			icon: 'lock',

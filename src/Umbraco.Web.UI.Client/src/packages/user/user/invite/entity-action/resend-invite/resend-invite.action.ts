@@ -25,3 +25,5 @@ export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEn
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbResendInviteToUserEntityAction as api };

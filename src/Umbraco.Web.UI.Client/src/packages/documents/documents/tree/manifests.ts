@@ -1,6 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
-import { UmbDocumentTreeItemContext } from './tree-item/document-tree-item.context.js';
 import type {
 	ManifestRepository,
 	ManifestTree,

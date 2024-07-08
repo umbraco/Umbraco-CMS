@@ -152,6 +152,7 @@ describe('UmbElementMixin', () => {
 			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
 			const ctrl2 = hostElement.observe(myObservable, (value) => {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				const a = value + 'bla';
 			});
 
@@ -172,6 +173,7 @@ describe('UmbElementMixin', () => {
 			const ctrl2 = hostElement.observe(
 				undefined,
 				() => {
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
 					const a = 1;
 				},
 				'observer',

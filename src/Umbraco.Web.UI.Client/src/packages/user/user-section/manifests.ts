@@ -1,6 +1,5 @@
+import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from './constants.js';
 import type { ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_MANAGEMENT_SECTION_ALIAS = 'Umb.Section.Users';
 
 const section: ManifestSection = {
 	type: 'section',

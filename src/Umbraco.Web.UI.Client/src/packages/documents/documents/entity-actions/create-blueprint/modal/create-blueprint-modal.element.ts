@@ -3,7 +3,6 @@ import type { UmbCreateBlueprintModalData, UmbCreateBlueprintModalValue } from '
 import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbDocumentDetailModel } from '@umbraco-cms/backoffice/document';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-create-blueprint-modal')

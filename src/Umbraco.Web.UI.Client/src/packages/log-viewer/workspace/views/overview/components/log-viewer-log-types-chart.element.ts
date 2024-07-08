@@ -42,7 +42,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	setLogLevelCount() {
 		this.logLevelCount = this._logLevelCount
-			? Object.entries(this._logLevelCount).filter(([level, number]) => !this._logLevelCountFilter.includes(level))
+			? Object.entries(this._logLevelCount).filter(([level]) => !this._logLevelCountFilter.includes(level))
 			: [];
 	}
 

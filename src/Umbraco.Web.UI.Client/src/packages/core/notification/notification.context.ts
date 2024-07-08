@@ -12,6 +12,7 @@ import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 export interface UmbNotificationDefaultData {
 	message: string;
 	headline?: string;
+	structuredList?: Record<string, Array<unknown>>;
 }
 
 /**

@@ -16,3 +16,5 @@ export class UmbConfigureMfaProvidersApi<ArgsMetaType = never>
 		await modalManagerContext.open(this, UMB_CURRENT_USER_MFA_MODAL).onSubmit();
 	}
 }
+
+export { UmbConfigureMfaProvidersApi as api };

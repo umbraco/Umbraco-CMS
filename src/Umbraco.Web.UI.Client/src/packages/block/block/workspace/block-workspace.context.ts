@@ -112,13 +112,24 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		]);
 	}
 
+	protected override resetState() {
+		super.resetState();
+		this.#label.setValue(undefined);
+		this.#layout.setValue(undefined);
+		this.#initialLayout = undefined;
+		this.#initialContent = undefined;
+		this.#initialSettings = undefined;
+		this.content.reset();
+		this.settings.reset();
+		this.removeUmbControllerByAlias('isNewRedirectController');
+	}
+
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
 		await this.#editorConfigPromise;
 		if (!this.#blockManager || !this.#blockEntries) {
 			throw new Error('Block manager not found');
-			return;
 		}
 
 		this.observe(

@@ -6,6 +6,7 @@ import type {
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -54,6 +55,9 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
+			},
+			{
+				alias: UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
 			},
 		],
 	},
