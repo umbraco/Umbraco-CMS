@@ -14,27 +14,39 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbPropertyTypeAppearanceModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbPropertyTypeAppearanceModel,
+	UmbPropertyTypeValidationModel,
+} from '@umbraco-cms/backoffice/content-type';
 
 export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
+
 	#label = new UmbStringState(undefined);
 	public readonly label = this.#label.asObservable();
+
 	#description = new UmbStringState(undefined);
 	public readonly description = this.#description.asObservable();
+
 	#appearance = new UmbObjectState<UmbPropertyTypeAppearanceModel | undefined>(undefined);
 	public readonly appearance = this.#appearance.asObservable();
+
 	#value = new UmbDeepState<ValueType | undefined>(undefined);
 	public readonly value = this.#value.asObservable();
+
 	#configValues = new UmbArrayState<UmbPropertyEditorConfigProperty>([], (x) => x.alias);
 	public readonly configValues = this.#configValues.asObservable();
 
 	#config = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
 	public readonly config = this.#config.asObservable();
 
+	#validation = new UmbObjectState<UmbPropertyTypeValidationModel | undefined>(undefined);
+	public readonly validation = this.#validation.asObservable();
+
 	private _editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this._editor.asObservable();
+
 	setEditor(editor: UmbPropertyEditorUiElement | undefined) {
 		this._editor.setValue(editor ?? undefined);
 	}
@@ -108,24 +120,28 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	public getAlias(): string | undefined {
 		return this.#alias.getValue();
 	}
+
 	public setLabel(label: string | undefined): void {
 		this.#label.setValue(label);
 	}
 	public getLabel(): string | undefined {
 		return this.#label.getValue();
 	}
+
 	public setDescription(description: string | undefined): void {
 		this.#description.setValue(description);
 	}
 	public getDescription(): string | undefined {
 		return this.#description.getValue();
 	}
+
 	public setAppearance(appearance: UmbPropertyTypeAppearanceModel | undefined): void {
 		this.#appearance.setValue(appearance);
 	}
 	public getAppearance(): UmbPropertyTypeAppearanceModel | undefined {
 		return this.#appearance.getValue();
 	}
+
 	/**
 	 * Set the value of this property.
 	 * @param value {ValueType} the whole value to be set
@@ -143,17 +159,26 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	public getValue(): ValueType | undefined {
 		return this.#value.getValue();
 	}
+
 	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined): void {
 		this.#configValues.setValue(config ?? []);
 	}
 	public getConfig(): Array<UmbPropertyEditorConfigProperty> | undefined {
 		return this.#configValues.getValue();
 	}
+
 	public setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId.setValue(variantId);
 	}
 	public getVariantId(): UmbVariantId | undefined {
 		return this.#variantId.getValue();
+	}
+
+	public setValidation(validation: UmbPropertyTypeValidationModel | undefined): void {
+		this.#validation.setValue(validation);
+	}
+	public getValidation(): UmbPropertyTypeValidationModel | undefined {
+		return this.#validation.getValue();
 	}
 
 	public resetValue(): void {
