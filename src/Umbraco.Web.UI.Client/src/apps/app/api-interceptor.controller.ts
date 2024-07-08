@@ -18,7 +18,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which takes in the umb-notifications and displays the notifications, if any.
+	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
 	 */
 	#addUmbNotificationsInterceptor() {
 		OpenAPI.interceptors.response.use((response) => {
