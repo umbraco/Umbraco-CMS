@@ -68,6 +68,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	#renderEmailProperty() {
 		return html`
 			<umb-property-layout
+				mandatory
 				label="${this.localize.term('general_email')}"
 				.description=${this.localize.term('user_emailDescription', this._usernameIsEmail)}>
 				<uui-input
@@ -89,6 +90,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 
 		return html`
 			<umb-property-layout
+				mandatory
 				label="${this.localize.term('user_loginname')}"
 				description=${this.localize.term('user_loginnameDescription')}>
 				<uui-input
