@@ -115,16 +115,32 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     {
         base.OnTransformingIndexValues(e);
 
+        // Performs special value transformations to all deriving indexes of this base class
+        // but the DeliveryApiContentIndex (they are not needed in this case).
+        // The alternative is to move the call to ApplySpecialIndexValueTransformations into a new base class
+        // that all implementors but the DeliveryApiContentIndex would inherit from but that would be breaking
+        // for any custom indexes deriving from UmbracoExamineIndex.
+        if (e.Index.Name != Constants.UmbracoIndexes.DeliveryApiContentIndexName)
+        {
+            ApplySpecialIndexValueTransformations(e);
+        }
+    }
+
+    /// <summary>
+    ///     Updates the index ValueSet with a special __Path and __Icon fields.
+    /// </summary>
+    private void ApplySpecialIndexValueTransformations(IndexingItemEventArgs e)
+    {
         var updatedValues = e.ValueSet.Values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value);
 
-        //ensure special __Path field
+        // Ensure special __Path field
         var path = e.ValueSet.GetValue("path");
         if (path != null)
         {
             updatedValues[UmbracoExamineFieldNames.IndexPathFieldName] = path.Yield();
         }
 
-        //icon
+        // Ensure special __Icon field
         if (e.ValueSet.Values.TryGetValue("icon", out IReadOnlyList<object>? icon) &&
             e.ValueSet.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName) == false)
         {
