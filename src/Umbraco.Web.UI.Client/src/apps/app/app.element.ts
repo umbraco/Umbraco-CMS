@@ -218,19 +218,20 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#attachApiInterceptor() {
-		OpenAPI.interceptors.response.use(async (response) => {
-			const umbNotifications = response.headers.get('umb-notifications') as string | null;
+		OpenAPI.interceptors.response.use((response) => {
+			const umbNotifications = response.headers.get('umb-notifications');
 			if (!umbNotifications) return response;
 
 			const notifications = JSON.parse(umbNotifications);
 			if (!isUmbNotifications(notifications)) return response;
 
-			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-			for (const notification of notifications) {
-				notificationContext.peek(extractUmbNotificationColor(notification.type), {
-					data: { headline: notification.category, message: notification.message },
-				});
-			}
+			this.getContext(UMB_NOTIFICATION_CONTEXT).then((notificationContext) => {
+				for (const notification of notifications) {
+					notificationContext.peek(extractUmbNotificationColor(notification.type), {
+						data: { headline: notification.category, message: notification.message },
+					});
+				}
+			});
 
 			const newHeader = new Headers();
 			for (const header of response.headers.entries()) {
@@ -238,7 +239,12 @@ export class UmbAppElement extends UmbLitElement {
 				if (key !== 'umb-notifications') newHeader.set(key, value);
 			}
 
-			const newResponse = { ...response, headers: newHeader };
+			const newResponse = new Response(response.body, {
+				headers: newHeader,
+				status: response.status,
+				statusText: response.statusText,
+			});
+
 			return newResponse;
 		});
 	}
