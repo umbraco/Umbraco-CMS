@@ -3,6 +3,7 @@ import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
+import { UmbApiInterceptorController } from './api-interceptor.controller.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
@@ -19,12 +20,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
-import {
-	extractUmbNotificationColor,
-	isUmbNotifications,
-	UMB_NOTIFICATION_CONTEXT,
-	UMB_NOTIFICATION_HEADER,
-} from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -152,7 +147,8 @@ export class UmbAppElement extends UmbLitElement {
 		super();
 
 		OpenAPI.BASE = window.location.origin;
-		this.#attachApiInterceptor();
+
+		new UmbApiInterceptorController(this);
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 
@@ -218,6 +214,7 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
+	/*
 	#attachApiInterceptor() {
 		OpenAPI.interceptors.response.use((response) => {
 			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
@@ -249,6 +246,7 @@ export class UmbAppElement extends UmbLitElement {
 			return newResponse;
 		});
 	}
+		*/
 
 	// TODO: move set initial auth state into auth context
 	async #setAuthStatus() {
