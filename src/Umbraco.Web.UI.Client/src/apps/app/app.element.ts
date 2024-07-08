@@ -214,40 +214,6 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
-	/*
-	#attachApiInterceptor() {
-		OpenAPI.interceptors.response.use((response) => {
-			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
-			if (!umbNotifications) return response;
-
-			const notifications = JSON.parse(umbNotifications);
-			if (!isUmbNotifications(notifications)) return response;
-
-			this.getContext(UMB_NOTIFICATION_CONTEXT).then((notificationContext) => {
-				for (const notification of notifications) {
-					notificationContext.peek(extractUmbNotificationColor(notification.type), {
-						data: { headline: notification.category, message: notification.message },
-					});
-				}
-			});
-
-			const newHeader = new Headers();
-			for (const header of response.headers.entries()) {
-				const [key, value] = header;
-				if (key !== UMB_NOTIFICATION_HEADER) newHeader.set(key, value);
-			}
-
-			const newResponse = new Response(response.body, {
-				headers: newHeader,
-				status: response.status,
-				statusText: response.statusText,
-			});
-
-			return newResponse;
-		});
-	}
-		*/
-
 	// TODO: move set initial auth state into auth context
 	async #setAuthStatus() {
 		if (this.bypassAuth) return;
