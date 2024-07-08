@@ -22,3 +22,5 @@ export interface UmbNotificationsEventModel {
 export function isUmbNotifications(notifications: Array<unknown>): notifications is Array<UmbNotificationsEventModel> {
 	return notifications.every(objectIsUmbNotification);
 }
+
+export const UMB_NOTIFICATION_HEADER = 'umb-notifications';

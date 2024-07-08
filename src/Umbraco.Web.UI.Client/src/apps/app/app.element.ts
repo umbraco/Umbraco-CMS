@@ -23,6 +23,7 @@ import {
 	extractUmbNotificationColor,
 	isUmbNotifications,
 	UMB_NOTIFICATION_CONTEXT,
+	UMB_NOTIFICATION_HEADER,
 } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-app')
@@ -219,7 +220,7 @@ export class UmbAppElement extends UmbLitElement {
 
 	#attachApiInterceptor() {
 		OpenAPI.interceptors.response.use((response) => {
-			const umbNotifications = response.headers.get('umb-notifications');
+			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
 			if (!umbNotifications) return response;
 
 			const notifications = JSON.parse(umbNotifications);
@@ -236,7 +237,7 @@ export class UmbAppElement extends UmbLitElement {
 			const newHeader = new Headers();
 			for (const header of response.headers.entries()) {
 				const [key, value] = header;
-				if (key !== 'umb-notifications') newHeader.set(key, value);
+				if (key !== UMB_NOTIFICATION_HEADER) newHeader.set(key, value);
 			}
 
 			const newResponse = new Response(response.body, {
