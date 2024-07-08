@@ -35351,7 +35351,8 @@
             "type": "boolean"
           },
           "usernameIsEmail": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true
           },
           "passwordConfiguration": {
             "oneOf": [
@@ -44549,11 +44550,15 @@
       "UserConfigurationResponseModel": {
         "required": [
           "canInviteUsers",
-          "passwordConfiguration"
+          "passwordConfiguration",
+          "usernameIsEmail"
         ],
         "type": "object",
         "properties": {
           "canInviteUsers": {
+            "type": "boolean"
+          },
+          "usernameIsEmail": {
             "type": "boolean"
           },
           "passwordConfiguration": {
