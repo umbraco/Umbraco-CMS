@@ -1,5 +1,5 @@
 import type { UmbContentPickerSource } from '../../types.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
@@ -13,7 +13,7 @@ const elementName = 'umb-input-content';
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
-	@property({ type: Object, attribute: false })
+	@property()
 	public set type(newType: UmbContentPickerSource['type']) {
 		const oldType = this.#type;
 		if (newType?.toLowerCase() !== this.#type) {
