@@ -2268,8 +2268,8 @@ export default {
 		headlineAdvanced: 'Avanceret',
 		forceHideContentEditor: 'Skjul indholdseditoren',
 		forceHideContentEditorHelp: 'Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet',
-		girdInlineEditing: 'Direkte redigering',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Direkte redigering',
+		gridInlineEditingHelp:
 			'Tilføjer direkte redigering a det første felt. Yderligere felter optræder kun i redigerings vinduet.',
 		blockHasChanges: 'Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?',
 		confirmCancelBlockCreationHeadline: 'Annuller oprettelse?',

@@ -2403,8 +2403,8 @@ export default {
 		headlineAdvanced: 'Advanced',
 		forceHideContentEditor: 'Hide content editor',
 		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay',
-		girdInlineEditing: 'Inline editing',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Inline editing',
+		gridInlineEditingHelp:
 			'Enables inline editing for the first Property. Additional properties can be edited in the overlay.',
 		blockHasChanges: 'You have made changes to this content. Are you sure you want to discard them?',
 		confirmCancelBlockCreationHeadline: 'Discard creation?',

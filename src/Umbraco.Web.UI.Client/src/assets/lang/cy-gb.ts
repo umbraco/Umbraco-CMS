@@ -2469,8 +2469,8 @@ export default {
 		getSampleDescription:
 			"Bydd hyn yn ychwanegu Blociau sylfaenol ac yn eich helpu i ddechrau gyda'r Golygydd Grid Bloc. Fe gewch Blociau ar gyfer Pennawd, Testun Cyfoethog, Delwedd, yn ogystal â Chynllun Dwy Golofn.",
 		getSampleButton: 'Gosod',
-		girdInlineEditing: 'Golygu mewnol',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Golygu mewnol',
+		gridInlineEditingHelp:
 			'Yn galluogi golygu mewnol ar gyfer yr Eiddo cyntaf. Gellir golygu priodweddau ychwanegol yn y droshaen.',
 		areaAllowedBlocksEmpty:
 			'Yn ddiofyn, caniateir pob math bloc mewn Ardal, Defnyddiwch yr opsiwn hwn i ganiatáu mathau dethol yn unig.',
