@@ -83,10 +83,13 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	}
 
 	@property({ attribute: false })
-	public set pickerContext(ctor: new (host: UmbControllerHost) => UmbPickerInputContext<any, any, any, any>) {
+	public set pickerContext(ctor: (new (host: UmbControllerHost) => UmbPickerInputContext) | undefined) {
 		if (this.#pickerContext) return;
-		this.#pickerContext = new ctor(this);
+		this.#pickerContext = ctor ? new ctor(this) : undefined;
 		this.#observePickerContext();
+	}
+	public get pickerContext(): UmbPickerInputContext | undefined {
+		return this.#pickerContext;
 	}
 
 	@state()

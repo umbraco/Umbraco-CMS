@@ -1,5 +1,5 @@
 import type { UmbMediaDetailModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_MEDIA_DETAIL_STORE_CONTEXT } from './media-detail.store.context-token.js';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -21,5 +21,3 @@ export class UmbMediaDetailStore extends UmbDetailStoreBase<UmbMediaDetailModel>
 }
 
 export default UmbMediaDetailStore;
-
-export const UMB_MEDIA_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbMediaDetailStore>('UmbMediaDetailStore');

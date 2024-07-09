@@ -1,11 +1,11 @@
 import { umbExtensionsRegistry } from '../../registry.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-extension-slot
@@ -24,7 +24,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementInitializer;
 
 	@state()
-	private _permitted: Array<UmbExtensionElementInitializer> = [];
+	private _permitted?: Array<UmbExtensionElementInitializer>;
 
 	/**
 	 * The type or types of extensions to render.
@@ -129,13 +129,15 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._permitted.length > 0
-			? repeat(
-					this._permitted,
-					(ext) => ext.alias,
-					(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
-				)
-			: html`<slot></slot>`;
+		return this._permitted
+			? this._permitted.length > 0
+				? repeat(
+						this._permitted,
+						(ext) => ext.alias,
+						(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
+					)
+				: html`<slot></slot>`
+			: '';
 	}
 
 	static override styles = css`

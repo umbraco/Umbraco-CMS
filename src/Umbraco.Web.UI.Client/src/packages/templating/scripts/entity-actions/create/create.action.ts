@@ -23,3 +23,5 @@ export class UmbScriptCreateOptionsEntityAction extends UmbEntityActionBase<neve
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbScriptCreateOptionsEntityAction as api };

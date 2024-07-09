@@ -1,14 +1,5 @@
 import type { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	repeat,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

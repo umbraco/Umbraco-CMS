@@ -1,6 +1,6 @@
-import { expect, fixture, html } from '@open-wc/testing';
 import type { UmbInputDateElement } from '../../core/components/input-date/input-date.element.js';
 import { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element.js';
+import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 

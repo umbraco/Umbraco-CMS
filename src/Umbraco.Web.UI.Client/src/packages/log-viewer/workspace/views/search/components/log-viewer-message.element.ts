@@ -1,5 +1,3 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
@@ -47,14 +45,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		if (_changedProperties.has('open')) {
 			this.open ? this.details.setAttribute('open', 'true') : this.details.removeAttribute('open');
 		}
-	}
-
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-		});
 	}
 
 	private _searchMenuData: Array<{ label: string; href: () => string; icon: string; title: string }> = [

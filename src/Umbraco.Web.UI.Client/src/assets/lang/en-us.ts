@@ -1600,8 +1600,7 @@ export default {
 		editProperty: 'Edit property',
 		requiredLabel: 'Required label',
 		enableListViewHeading: 'Enable list view',
-		enableListViewDescription:
-			'Configures the content item to show a sortable and searchable list of its\n      children, the children will not be shown in the tree\n    ',
+		enableListViewDescription: 'Configures the content item to show a sortable and searchable list of its children.',
 		allowedTemplatesHeading: 'Allowed Templates',
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
@@ -1693,8 +1692,7 @@ export default {
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Collections',
-		collectionsDescription:
-			'Configures the content item to show list of its children, the children will not be shown in the tree.',
+		collectionsDescription: 'Configures the content item to show list of its children.',
 		structure: 'Structure',
 		presentation: 'Presentation',
 	},
@@ -1843,6 +1841,11 @@ export default {
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
 		emailRequired: 'Required - enter an email address for this user',
+		emailDescription: (usernameIsEmail: boolean) => {
+			return usernameIsEmail
+				? 'The email address is used for notifications, password recovery, and as the username for logging in'
+				: 'The email address is used for notifications and password recovery';
+		},
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
@@ -1874,6 +1877,8 @@ export default {
 		lastLogin: 'Last login',
 		lastPasswordChangeDate: 'Password last changed',
 		loginname: 'Username',
+		loginnameRequired: 'Required - enter a username for this user',
+		loginnameDescription: 'The username is used for logging in',
 		mediastartnode: 'Media start node',
 		mediastartnodehelp: 'Limit the media library to a specific start node',
 		mediastartnodes: 'Media start nodes',
@@ -2523,5 +2528,9 @@ export default {
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
 			'\n          We will send:\n          <ul>\n            <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n            <li>Number of: Root nodes, Content nodes, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n          </ul>\n          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>\n       ',
+	},
+	routing: {
+		routeNotFoundTitle: 'Not found',
+		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
 	},
 } as UmbLocalizationDictionary;

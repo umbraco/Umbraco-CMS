@@ -1,12 +1,12 @@
-import { UmbDictionaryPickerContext } from '../../../dictionary/components/input-dictionary/input-dictionary.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
-import { UmbPartialViewPickerContext } from '../../../templating/partial-views/components/input-partial-view/input-partial-view.context.js';
-import { UmbScriptPickerContext } from '../../../templating/scripts/components/input-script/input-script.context.js';
-import { UmbStylesheetPickerContext } from '../../../templating/stylesheets/components/stylesheet-input/stylesheet-input.context.js';
-import { UmbTemplatePickerContext } from '../../../templating/templates/components/input-template/input-template.context.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
-import type { UmbDataTypeInputElement } from '../../../data-type/components/data-type-input/data-type-input.element.js';
-import type { UmbInputLanguageElement } from '../../../language/components/input-language/input-language.element.js';
+import { UmbDictionaryPickerContext } from '@umbraco-cms/backoffice/dictionary';
+import { UmbPartialViewPickerContext } from '@umbraco-cms/backoffice/partial-view';
+import { UmbScriptPickerContext } from '@umbraco-cms/backoffice/script';
+import { UmbStylesheetPickerContext } from '@umbraco-cms/backoffice/stylesheet';
+import { UmbTemplatePickerContext } from '@umbraco-cms/backoffice/template';
+import type { UmbDataTypeInputElement } from '@umbraco-cms/backoffice/data-type';
+import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import {
 	css,
 	html,

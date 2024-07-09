@@ -2,10 +2,11 @@ import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } fro
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbUserConfigRepository } from '../repository/config/index.js';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbSubmittableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmittableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -17,6 +18,7 @@ export class UmbUserWorkspaceContext
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
+	public readonly configRepository = new UmbUserConfigRepository(this);
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);

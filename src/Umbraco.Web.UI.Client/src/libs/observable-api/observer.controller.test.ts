@@ -1,7 +1,7 @@
-import { expect } from '@open-wc/testing';
 import { UmbObjectState } from './states/object-state.js';
 import { UmbObserverController } from './observer.controller.js';
 import { simpleHashCode } from './utils/simple-hash-code.function.js';
+import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -20,7 +20,7 @@ describe('UmbObserverController', () => {
 			const state = new UmbObjectState(undefined);
 			const observable = state.asObservable();
 
-			const callbackMethod = (state: unknown) => {};
+			const callbackMethod = () => {};
 
 			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, 'my-test-alias');
 			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, 'my-test-alias');
@@ -33,7 +33,7 @@ describe('UmbObserverController', () => {
 			const state = new UmbObjectState(undefined);
 			const observable = state.asObservable();
 
-			const callbackMethod = (state: unknown) => {};
+			const callbackMethod = () => {};
 
 			const mySymbol = Symbol();
 			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, mySymbol);
@@ -47,7 +47,7 @@ describe('UmbObserverController', () => {
 			const state = new UmbObjectState(undefined);
 			const observable = state.asObservable();
 
-			const callbackMethod = (state: unknown) => {};
+			const callbackMethod = () => {};
 
 			// Imitates the behavior of the observe method in the UmbClassMixin
 			let controllerAlias1 = null;

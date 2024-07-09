@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbDataTypeDetailsWorkspaceViewEditElement } from './data-type-details-workspace-view.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data.js';
@@ -12,7 +12,7 @@ export default {
 	component: 'umb-data-type-workspace-view-edit',
 	id: 'umb-data-type-workspace-view-edit',
 	decorators: [
-		(story) => {
+		() => {
 			return html`TODO: make use of mocked workspace context??`;
 			/*html` <umb-context-provider key="umbDataTypeContext" .value=${new UmbDataTypeWorkspaceContext(data[0])}>
 				${story()}

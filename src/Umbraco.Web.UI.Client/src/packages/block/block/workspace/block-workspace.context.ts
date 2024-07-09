@@ -1,3 +1,6 @@
+import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
+import { UmbBlockElementManager } from './block-element-manager.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -8,9 +11,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
-import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
-import { UmbBlockElementManager } from './block-element-manager.js';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
@@ -112,13 +112,24 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		]);
 	}
 
+	protected override resetState() {
+		super.resetState();
+		this.#label.setValue(undefined);
+		this.#layout.setValue(undefined);
+		this.#initialLayout = undefined;
+		this.#initialContent = undefined;
+		this.#initialSettings = undefined;
+		this.content.reset();
+		this.settings.reset();
+		this.removeUmbControllerByAlias('isNewRedirectController');
+	}
+
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
 		await this.#editorConfigPromise;
 		if (!this.#blockManager || !this.#blockEntries) {
 			throw new Error('Block manager not found');
-			return;
 		}
 
 		this.observe(

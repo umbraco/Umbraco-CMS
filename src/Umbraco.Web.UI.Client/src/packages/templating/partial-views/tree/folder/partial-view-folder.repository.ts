@@ -7,3 +7,5 @@ export class UmbPartialViewFolderRepository extends UmbFolderRepositoryBase {
 		super(host, UmbPartialViewFolderServerDataSource);
 	}
 }
+
+export { UmbPartialViewFolderRepository as api };

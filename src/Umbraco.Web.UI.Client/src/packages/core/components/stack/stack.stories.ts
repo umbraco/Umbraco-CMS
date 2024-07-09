@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import './stack.element.js';
-import type { UmbStackElement} from './stack.element.js';
+import type { UmbStackElement } from './stack.element.js';
 
 const meta: Meta<UmbStackElement> = {
 	title: 'Components/Stack',
@@ -12,17 +12,17 @@ export default meta;
 type Story = StoryObj<UmbStackElement>;
 
 export const Default: Story = {
-	args: { },
+	args: {},
 };
 
 export const Divide: Story = {
 	args: {
-		divide: true
+		divide: true,
 	},
 };
 
 export const Compact: Story = {
 	args: {
-		look: 'compact'
+		look: 'compact',
 	},
 };

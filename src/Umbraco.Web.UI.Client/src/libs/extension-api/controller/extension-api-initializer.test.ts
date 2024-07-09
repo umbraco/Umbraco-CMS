@@ -1,7 +1,7 @@
-import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestApi, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbExtensionApiInitializer } from './index.js';
+import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbControllerHostElement, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -9,6 +9,8 @@ import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
+// Element is used in tests
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbTestApiController extends UmbControllerBase {

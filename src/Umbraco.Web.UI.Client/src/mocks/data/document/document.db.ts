@@ -33,11 +33,11 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	}
 
 	// permissions
-	getUserPermissionsForDocument(id: string): Array<any> {
+	getUserPermissionsForDocument(): Array<any> {
 		return [];
 	}
 
-	getDomainsForDocument(id: string): DomainsResponseModel {
+	getDomainsForDocument(): DomainsResponseModel {
 		return { defaultIsoCode: 'en-us', domains: [] };
 	}
 

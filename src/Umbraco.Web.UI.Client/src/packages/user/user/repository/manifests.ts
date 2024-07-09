@@ -1,5 +1,6 @@
 import { manifests as avatarManifests } from './avatar/manifests.js';
 import { manifests as changePasswordManifests } from './change-password/manifests.js';
+import { manifests as configManifests } from './config/manifests.js';
 import { manifests as detailManifests } from './detail/manifests.js';
 import { manifests as disableManifests } from './disable/manifests.js';
 import { manifests as enableManifests } from './enable/manifests.js';
@@ -12,6 +13,7 @@ export const manifests: Array<ManifestTypes> = [
 	...itemManifests,
 	...avatarManifests,
 	...changePasswordManifests,
+	...configManifests,
 	...disableManifests,
 	...enableManifests,
 	...unlockManifests,

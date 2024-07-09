@@ -136,6 +136,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					name: item.header,
 					alias: item.alias,
 					elementName: item.elementName,
+					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
 			});

@@ -3,7 +3,6 @@ import type { UmbCreateBlueprintModalData, UmbCreateBlueprintModalValue } from '
 import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbDocumentDetailModel } from '@umbraco-cms/backoffice/document';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-create-blueprint-modal')
@@ -14,7 +13,6 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 	#documentRepository = new UmbDocumentDetailRepository(this);
 
 	#documentUnique = '';
-	#document?: UmbDocumentDetailModel;
 
 	@state()
 	private _documentName = '';
@@ -31,7 +29,6 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 		const { data } = await this.#documentRepository.requestByUnique(this.#documentUnique);
 		if (!data) return;
 
-		this.#document = data;
 		this._documentName = data.variants[0].name;
 		this._blueprintName = data.variants[0].name;
 	}

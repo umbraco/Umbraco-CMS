@@ -17,3 +17,5 @@ export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbStylesheetCreateOptionsEntityAction as api };

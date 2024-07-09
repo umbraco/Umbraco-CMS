@@ -1,4 +1,4 @@
-import type { UmbBlockTypeBaseModel } from '../block-type/index.js';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
 export const UMB_BLOCK_RTE_TYPE = 'block-rte-type';

@@ -1,7 +1,7 @@
-import { expect } from '@open-wc/testing';
 import { UmbContextConsumer } from '../consume/context-consumer.js';
 import { UmbContextRequestEventImplementation } from '../consume/context-request.event.js';
 import { UmbContextProvider } from './context-provider.js';
+import { expect } from '@open-wc/testing';
 
 class UmbTestContextProviderClass {
 	prop = 'value from provider';

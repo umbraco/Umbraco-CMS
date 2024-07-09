@@ -1,6 +1,5 @@
+import { UMB_USER_DETAIL_REPOSITORY_ALIAS, UMB_USER_DETAIL_STORE_ALIAS } from './constants.js';
 import type { ManifestRepository, ManifestStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.User.Detail';
 
 const repository: ManifestRepository = {
 	type: 'repository',
@@ -8,8 +7,6 @@ const repository: ManifestRepository = {
 	name: 'User Detail Repository',
 	api: () => import('./user-detail.repository.js'),
 };
-
-export const UMB_USER_DETAIL_STORE_ALIAS = 'Umb.Store.User.Detail';
 
 const store: ManifestStore = {
 	type: 'store',

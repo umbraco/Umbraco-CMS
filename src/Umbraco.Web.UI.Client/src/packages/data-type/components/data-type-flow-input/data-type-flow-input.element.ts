@@ -1,5 +1,5 @@
-import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../index.js';
 import { UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '../../modals/index.js';
+import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

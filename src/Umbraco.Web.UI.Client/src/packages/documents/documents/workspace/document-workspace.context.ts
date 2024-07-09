@@ -34,7 +34,6 @@ import {
 	type UmbPublishableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -53,10 +52,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import {
-	UmbServerModelValidationContext,
-	UmbVariantValuesValidationMessageTranslator,
-} from '@umbraco-cms/backoffice/validation';
+import { UmbServerModelValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
@@ -92,7 +88,6 @@ export class UmbDocumentWorkspaceContext
 	public readonly languages = this.#languages.asObservable();
 
 	#serverValidation = new UmbServerModelValidationContext(this);
-	#serverValidationValuesTranslator = new UmbVariantValuesValidationMessageTranslator(this, this.#serverValidation);
 	#validationRepository?: UmbDocumentValidationRepository;
 
 	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
@@ -589,7 +584,6 @@ export class UmbDocumentWorkspaceContext
 			this.#persistedData.setValue(data);
 			this.#currentData.setValue(data);
 
-			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
@@ -718,6 +712,14 @@ export class UmbDocumentWorkspaceContext
 			unique,
 			variantIds.map((variantId) => ({ variantId })),
 		);
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.getUnique()!,
+			entityType: this.getEntityType(),
+		});
+
+		eventContext.dispatchEvent(event);
 	}
 
 	async #handleSave() {

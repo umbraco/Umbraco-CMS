@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UMB_AUTH_CONTEXT } from '../auth/index.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
-import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
@@ -57,8 +58,8 @@ export class UmbResourceController extends UmbControllerBase {
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
-		const { data, error: _error } = await UmbResourceController.tryExecute<T>(this.#promise);
-		const error: any = _error;
+		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
+
 		if (error) {
 			/**
 			 * Determine if we want to show a notification or just log the error to the console.
@@ -71,16 +72,31 @@ export class UmbResourceController extends UmbControllerBase {
 			} else {
 				console.group('ApiError caught in UmbResourceController');
 				console.error('Request failed', error.request);
-				console.error('ProblemDetails', error.body);
+				console.error('Request body', error.body);
 				console.error('Error', error);
+
+				let problemDetails: ProblemDetails | null = null;
 
 				// ApiError - body could hold a ProblemDetails from the server
 				if (typeof error.body !== 'undefined' && !!error.body) {
 					try {
-						(error as any).body = typeof error.body === 'string' ? JSON.parse(error.body) : error.body;
+						(error as any).body = problemDetails = typeof error.body === 'string' ? JSON.parse(error.body) : error.body;
 					} catch (e) {
 						console.error('Error parsing error body (expected JSON)', e);
 					}
+				}
+
+				/**
+				 * Check if the operation status ends with `ByNotification` and if so, don't show a notification
+				 * This is a special case where the operation was cancelled by the server and the client gets a notification header instead.
+				 */
+				let isCancelledByNotification = false;
+				if (
+					problemDetails?.operationStatus &&
+					typeof problemDetails.operationStatus === 'string' &&
+					problemDetails.operationStatus.endsWith('ByNotification')
+				) {
+					isCancelledByNotification = true;
 				}
 
 				// Go through the error status codes and act accordingly
@@ -103,14 +119,14 @@ export class UmbResourceController extends UmbControllerBase {
 					case 500:
 						// Server Error
 
-						if (this.#notificationContext) {
-							let headline = error.body?.title ?? error.name ?? 'Server Error';
+						if (!isCancelledByNotification && this.#notificationContext) {
+							let headline = problemDetails?.title ?? error.name ?? 'Server Error';
 							let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 
 							// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
 							if (
-								error.body?.detail?.includes('ObjectCacheAppCache') ||
-								error.body?.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
+								problemDetails?.detail?.includes('ObjectCacheAppCache') ||
+								problemDetails?.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
 							) {
 								headline = 'Please restart the server';
 								message =
@@ -128,11 +144,14 @@ export class UmbResourceController extends UmbControllerBase {
 						break;
 					default:
 						// Other errors
-						if (this.#notificationContext) {
+						if (!isCancelledByNotification && this.#notificationContext) {
 							this.#notificationContext.peek('danger', {
 								data: {
-									headline: error.body?.title ?? error.name ?? 'Server Error',
-									message: error.body?.detail ?? error.message ?? 'Something went wrong',
+									headline: problemDetails?.title ?? error.name ?? 'Server Error',
+									message: problemDetails?.detail ?? error.message ?? 'Something went wrong',
+									structuredList: problemDetails?.errors
+										? (problemDetails.errors as Record<string, Array<unknown>>)
+										: undefined,
 								},
 								...options,
 							});

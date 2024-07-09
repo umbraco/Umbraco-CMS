@@ -19,7 +19,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor')) ?? false;
+		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor'));
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
@@ -27,7 +27,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
-		return num > 0 ? num : fallback;
+		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
 	@state()

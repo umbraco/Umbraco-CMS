@@ -182,7 +182,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	#observeRootContainers() {
-		if (!this.#structure || !this.#childType || !this.#containerId === undefined) return;
+		if (!this.#structure || !this.#childType || this.#containerId === undefined) return;
 
 		this.observe(
 			this.#structure.rootContainers(this.#childType),

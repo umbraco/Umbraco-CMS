@@ -1,4 +1,4 @@
-import { UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
+import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
@@ -22,7 +22,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	UmbMediaPickerModalValue
 > {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
-	#mediaUrlRepository = new UmbMediaUrlRepository(this); // used to get urls
 	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
 	#imagingRepository = new UmbImagingRepository(this); // used to get image renditions
 

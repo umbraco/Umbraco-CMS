@@ -49,7 +49,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 			routes.push({
 				path: workspace.meta.entityType,
 				component: () => createExtensionElement(workspace),
-				setup: (component, info) => {
+				setup: (component) => {
 					if (component) {
 						(component as any).workspaceAlias = workspace.alias;
 					}
@@ -60,6 +60,10 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		routes.push({
 			path: '',
 			redirectTo: 'overview',
+		});
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 		});
 		this._routes = routes;
 	}

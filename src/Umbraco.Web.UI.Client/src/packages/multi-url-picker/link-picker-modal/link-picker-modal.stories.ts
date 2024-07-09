@@ -1,8 +1,8 @@
 import '../../core/components/body-layout/body-layout.element.js';
 import './link-picker-modal.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {

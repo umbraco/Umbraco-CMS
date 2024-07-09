@@ -10,6 +10,7 @@ import { manifests as iconRegistryManifests } from './icon-registry/manifests.js
 import { manifests as localizationManifests } from './localization/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
+import { manifests as propertyTypeManifests } from './property-type/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
@@ -33,6 +34,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...workspaceManifests,
 	...contentManifests,
 	...contentTypeManifests,
+	...propertyTypeManifests,
 	...settingsManifests,
 	...modalManifests,
 	...entityActionManifests,

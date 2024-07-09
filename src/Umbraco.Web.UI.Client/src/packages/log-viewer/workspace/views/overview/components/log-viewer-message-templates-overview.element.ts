@@ -3,10 +3,7 @@ import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type {
-	LogTemplateResponseModel,
-	SavedLogSearchResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { LogTemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-log-viewer-message-templates-overview')
@@ -47,21 +44,6 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 		this.#currentPage = event.target.current;
 		this.#getMessageTemplates();
 	}
-
-	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
-		return html` <li>
-			<uui-button
-				label="${searchListItem.name ?? ''}"
-				title="${searchListItem.name ?? ''}"
-				href=${`section/settings/workspace/logviewer/view/search/?lq=${searchListItem.query}`}>
-				<uui-icon name="icon-search"></uui-icon>${searchListItem.name}
-			</uui-button>
-		</li>`;
-	};
-
-	#setCurrentQuery = (query: string) => {
-		this.#logViewerContext?.setFilterExpression(query);
-	};
 
 	override render() {
 		return html`
