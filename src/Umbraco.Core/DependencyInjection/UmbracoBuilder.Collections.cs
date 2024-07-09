@@ -54,6 +54,7 @@ public static partial class UmbracoBuilderExtensions
         builder.DynamicRootOriginFinders()
             .Append<ByKeyDynamicRootOriginFinder>()
             .Append<ParentDynamicRootOriginFinder>()
+            .Append<ParentOrSelfDynamicRootOriginFinder>()
             .Append<CurrentDynamicRootOriginFinder>()
             .Append<SiteDynamicRootOriginFinder>()
             .Append<RootDynamicRootOriginFinder>();
