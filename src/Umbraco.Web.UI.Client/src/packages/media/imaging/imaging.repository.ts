@@ -36,7 +36,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 
 		for (const unique of uniques) {
 			const existingCrop = this.#dataStore.getCrop(unique, imagingModel);
-			if (existingCrop) {
+			if (existingCrop !== undefined) {
 				urls.set(unique, existingCrop);
 				continue;
 			}
@@ -48,9 +48,11 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 				continue;
 			}
 
-			if (urlModels?.[0].url) {
-				const url = urlModels[0].url;
-				this.#dataStore.addCrop(unique, url, imagingModel);
+			const url = urlModels?.[0].url;
+
+			this.#dataStore.addCrop(unique, url ?? '', imagingModel);
+
+			if (url) {
 				urls.set(unique, url);
 			}
 		}
