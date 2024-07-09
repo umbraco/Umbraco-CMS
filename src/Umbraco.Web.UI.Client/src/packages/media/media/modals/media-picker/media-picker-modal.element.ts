@@ -95,9 +95,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	async #mapMediaUrls(items: Array<UmbMediaItemModel>): Promise<Array<UmbMediaCardItemModel>> {
 		if (!items.length) return [];
 
-		const { data } = await this.#imagingRepository.requestResizedItems(
+		const { data } = await this.#imagingRepository.requestThumbnailUrls(
 			items.map((item) => item.unique),
-			{ height: 400, width: 400, mode: ImageCropModeModel.MIN },
+			400,
+			400,
 		);
 
 		return items

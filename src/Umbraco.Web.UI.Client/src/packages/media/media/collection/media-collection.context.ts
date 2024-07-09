@@ -4,7 +4,6 @@ import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
@@ -12,7 +11,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 > {
 	#imagingRepository: UmbImagingRepository;
 
-	#thumbnailItems = new UmbArrayState<UmbMediaCollectionItemModel>([], (x) => x);
+	#thumbnailItems = new UmbArrayState<UmbMediaCollectionItemModel>([], (x) => x.unique);
 	public readonly thumbnailItems = this.#thumbnailItems.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -22,9 +21,10 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 		this.observe(this.items, async (items) => {
 			if (!items?.length) return;
 
-			const { data } = await this.#imagingRepository.requestResizedItems(
+			const { data } = await this.#imagingRepository.requestThumbnailUrls(
 				items.map((m) => m.unique),
-				{ height: 400, width: 400, mode: ImageCropModeModel.MIN },
+				400,
+				400,
 			);
 
 			this.#thumbnailItems.setValue(
