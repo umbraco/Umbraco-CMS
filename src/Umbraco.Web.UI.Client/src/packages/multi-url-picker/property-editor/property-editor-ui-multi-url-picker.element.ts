@@ -1,5 +1,5 @@
 import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
-import type { UmbInputMultiUrlElement } from '../components/input-multi-url/input-multi-url.element.js';
+import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -7,6 +7,8 @@ import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+
+import '../components/input-multi-url/index.js';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
