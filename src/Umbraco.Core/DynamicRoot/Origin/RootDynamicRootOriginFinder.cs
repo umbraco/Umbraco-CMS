@@ -28,6 +28,10 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
         }
 
         var entity = _entityService.Get(query.Context.ParentKey);
+        if (entity is null && query.Context.CurrentKey.HasValue)
+        {
+             entity = _entityService.Get(query.Context.CurrentKey.Value);
+        }
 
         if (entity is null || _allowedObjectTypes.Contains(entity.NodeObjectType) is false)
         {

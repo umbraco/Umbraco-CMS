@@ -20,12 +20,12 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
 
     public override Guid? FindOriginKey(DynamicRootNodeQuery query)
     {
-        if (query.OriginAlias != SupportedOriginType || query.Context.CurrentKey.HasValue is false)
+        if (query.OriginAlias != SupportedOriginType)
         {
             return null;
         }
 
-        IEntitySlim? entity = _entityService.Get(query.Context.CurrentKey.Value);
+        IEntitySlim? entity = query.Context.CurrentKey.HasValue is false ? _entityService.Get(query.Context.ParentKey) : _entityService.Get(query.Context.CurrentKey.Value);
         if (entity is null || entity.NodeObjectType != Constants.ObjectTypes.Document)
         {
             return null;
