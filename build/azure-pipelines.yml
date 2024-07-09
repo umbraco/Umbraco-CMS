@@ -217,16 +217,30 @@ stages:
             displayName: Replace BASE_PATH on assets
             workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
           - task: ArchiveFiles@2
-            displayName: Archive js Docs
+            displayName: Archive Storybook
             inputs:
               rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
               includeRootFolder: false
               archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
-            displayName: Publish js Docs
+            displayName: Publish Storybook
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
               artifact: ui-docs
+          - script: npm run generate:ui-api-docs
+            displayName: Generate API Docs
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client
+          - task: ArchiveFiles@2
+            displayName: Archive UI API Docs
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/ui-api
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
+          - task: PublishPipelineArtifact@1
+            displayName: Publish UI API Docs
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
+              artifact: ui-api-docs
 
   ###############################################
   ## Test
@@ -846,7 +860,7 @@ stages:
               BlobPrefix: v$(umbracoMajorVersion)/csharp
               CleanTargetBeforeCopy: true
       - job:
-        displayName: Upload js Docs
+        displayName: Upload Storybook
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -859,7 +873,7 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-docs
           - task: AzureFileCopy@4
-            displayName: 'Copy UI Docs to blob storage'
+            displayName: 'Copy Storybook to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/ui-docs/*'
               azureSubscription: umbraco-storage
@@ -867,4 +881,27 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/ui
+              CleanTargetBeforeCopy: true
+      - job:
+        displayName: Upload UI API Docs
+        steps:
+          - checkout: none
+          - task: DownloadPipelineArtifact@2
+            displayName: Download artifact
+            inputs:
+              artifact: ui-api-docs
+              path: $(Build.SourcesDirectory)
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: $(Build.SourcesDirectory)/ui-api-docs.zip
+              destinationFolder: $(Build.ArtifactStagingDirectory)/ui-api-docs
+          - task: AzureFileCopy@4
+            displayName: 'Copy UI API Docs to blob storage'
+            inputs:
+              SourcePath: '$(Build.ArtifactStagingDirectory)/ui-api-docs/*'
+              azureSubscription: umbraco-storage
+              Destination: AzureBlob
+              storage: umbracoapidocs
+              ContainerName: '$web'
+              BlobPrefix: v$(umbracoMajorVersion)/ui-api
               CleanTargetBeforeCopy: true

@@ -14526,6 +14526,41 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media-type/configuration": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MediaTypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media-type/folder": {
       "post": {
         "tags": [
@@ -19094,6 +19129,41 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/member-type/configuration": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "operationId": "GetMemberTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MemberTypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/member-type/root": {
       "get": {
         "tags": [
@@ -23174,7 +23244,7 @@
         "tags": [
           "Relation"
         ],
-        "operationId": "GetRelationTypeById",
+        "operationId": "GetRelationByRelationTypeId",
         "parameters": [
           {
             "name": "id",
@@ -35281,7 +35351,8 @@
             "type": "boolean"
           },
           "usernameIsEmail": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true
           },
           "passwordConfiguration": {
             "oneOf": [
@@ -36124,7 +36195,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -36551,6 +36623,7 @@
         "required": [
           "dataTypesCanBeChanged",
           "disableTemplates",
+          "reservedFieldNames",
           "useSegments"
         ],
         "type": "object",
@@ -36563,6 +36636,13 @@
           },
           "useSegments": {
             "type": "boolean"
+          },
+          "reservedFieldNames": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -38238,7 +38318,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -38544,6 +38625,22 @@
           },
           "icon": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaTypeConfigurationResponseModel": {
+        "required": [
+          "reservedFieldNames"
+        ],
+        "type": "object",
+        "properties": {
+          "reservedFieldNames": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -38999,7 +39096,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -39226,6 +39324,22 @@
           },
           "icon": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MemberTypeConfigurationResponseModel": {
+        "required": [
+          "reservedFieldNames"
+        ],
+        "type": "object",
+        "properties": {
+          "reservedFieldNames": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -44436,11 +44550,15 @@
       "UserConfigurationResponseModel": {
         "required": [
           "canInviteUsers",
-          "passwordConfiguration"
+          "passwordConfiguration",
+          "usernameIsEmail"
         ],
         "type": "object",
         "properties": {
           "canInviteUsers": {
+            "type": "boolean"
+          },
+          "usernameIsEmail": {
             "type": "boolean"
           },
           "passwordConfiguration": {
