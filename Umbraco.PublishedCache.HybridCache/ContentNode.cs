@@ -153,7 +153,7 @@ internal class ContentNode
         // create the model - we want to be fast, so no lock here: we may create
         // more than 1 instance, but the lock below ensures we only ever return
         // 1 unique instance - and locking is a nice explicit way to ensure this
-        IPublishedContent? m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory).CreateModel(_publishedModelFactory);
+        IPublishedContent? m = new PublishedContent(this, contentData, _variationContextAccessor!, _publishedModelFactory!).CreateModel(_publishedModelFactory);
 
         // locking 'this' is not a best-practice but ContentNode is internal and
         // we know what we do, so it is fine here and avoids allocating an object

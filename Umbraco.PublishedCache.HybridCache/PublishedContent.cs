@@ -1,50 +1,42 @@
-﻿using System.Text.Json.Serialization;
-using Umbraco.Cms.Core.Exceptions;
+﻿using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 internal sealed class PublishedContent : PublishedContentBase
 {
-    private readonly IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
-    private readonly IVariationContextAccessor? _variationContextAccessor;
     private readonly IPublishedModelFactory? _publishedModelFactory;
     private readonly ContentData _contentData;
     private readonly ContentNode _contentNode;
     private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
     private readonly string? _urlSegment;
 
-    // [JsonConstructor]
     public PublishedContent(
         ContentNode contentNode,
         ContentData contentData,
-        IPublishedSnapshotAccessor? publishedSnapshotAccessor,
-        IVariationContextAccessor? variationContextAccessor,
-        IPublishedModelFactory? publishedModelFactory)
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedModelFactory publishedModelFactory)
         : base(variationContextAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _variationContextAccessor = variationContextAccessor;
+        VariationContextAccessor = variationContextAccessor;
         _publishedModelFactory = publishedModelFactory;
         _contentNode = contentNode;
 
         _contentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
         _urlSegment = _contentData.UrlSegment;
 
-        // // TODO: Implement properties
-        // var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
-        // var i = 0;
-        // foreach (IPublishedPropertyType propertyType in _contentNode.ContentType.PropertyTypes)
-        // {
-        //     // add one property per property type - this is required, for the indexing to work
-        //     // if contentData supplies pdatas, use them, else use null
-        //     contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? pdatas); // else will be null
-        //     properties[i++] = new Property(propertyType, this, pdatas, _publishedSnapshotAccessor, propertyType.CacheLevel);
-        // }
-        //
-        // Properties = properties;
+        var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
+        var i = 0;
+        foreach (IPublishedPropertyType propertyType in _contentNode.ContentType.PropertyTypes)
+        {
+            // add one property per property type - this is required, for the indexing to work
+            // if contentData supplies pdatas, use them, else use null
+            contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? pdatas); // else will be null
+            properties[i++] = new PublishedProperty(propertyType, this, pdatas, propertyType.CacheLevel);
+        }
+
+        Properties = properties;
     }
 
     public override IPublishedContentType ContentType => _contentNode.ContentType;
@@ -74,6 +66,10 @@ internal sealed class PublishedContent : PublishedContentBase
     public override DateTime UpdateDate { get; }
 
     public bool IsPreviewing { get; } = false;
+
+    // Needed for publishedProperty
+    internal IVariationContextAccessor VariationContextAccessor { get; }
+
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
@@ -130,7 +126,7 @@ internal sealed class PublishedContent : PublishedContentBase
         }
 
         // handle context culture
-        culture ??= _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
+        culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
 
         // there is a 'published' published content, and varies
         // = depends on the culture
