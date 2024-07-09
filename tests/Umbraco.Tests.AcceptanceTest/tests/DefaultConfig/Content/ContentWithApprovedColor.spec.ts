@@ -62,8 +62,8 @@ test('can create content with the custom approved color data type', async ({umbr
   const customDataTypeName = 'CustomApprovedColor';
   const colorValue = 'd73737';
   const colorLabel = '';
-  const customDataTypeData = await umbracoApi.dataType.createApprovedColorDataTypeWithColor(customDataTypeName, colorValue, colorLabel);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeData.id);
+  const customDataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithColor(customDataTypeName, colorValue, colorLabel);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
