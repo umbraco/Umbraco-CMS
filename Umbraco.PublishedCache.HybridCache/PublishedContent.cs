@@ -106,13 +106,38 @@ internal sealed class PublishedContent : PublishedContentBase
         }
     }
 
-    public override PublishedItemType ItemType { get; }
+    /// <inheritdoc/>
+    public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
     public override bool IsDraft(string? culture = null) => throw new NotImplementedException();
 
-    public override bool IsPublished(string? culture = null) => throw new NotImplementedException();
+    public override bool IsPublished(string? culture = null)
+    {
+        // whether we are the 'draft' or 'published' content, need to determine whether
+        // there is a 'published' version for the specified culture (or at all, for
+        // invariant content items)
 
-    public override IEnumerable<IPublishedContent> ChildrenForAllCultures { get; } = null!;
+        // if there is no 'published' published content, no culture can be published
+        if (!_contentNode.HasPublished)
+        {
+            return false;
+        }
+
+        // if there is a 'published' published content, and does not vary = published
+        if (!ContentType.VariesByCulture())
+        {
+            return true;
+        }
+
+        // handle context culture
+        culture ??= _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
+
+        // there is a 'published' published content, and varies
+        // = depends on the culture
+        return _contentNode.HasPublishedCulture(culture);
+    }
+
+    public override IEnumerable<IPublishedContent> ChildrenForAllCultures { get; } = Enumerable.Empty<IPublishedContent>();
 
     public override IPublishedContent? Parent { get; } = null!;
 }

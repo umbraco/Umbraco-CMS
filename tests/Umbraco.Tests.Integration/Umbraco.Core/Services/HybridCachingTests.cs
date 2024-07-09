@@ -98,16 +98,14 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
     public async Task Can_Get_Content_By_Id()
     {
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
-
-        Assert.IsNotNull(textPage);
+        AssertTextPage(textPage);
     }
 
     [Test]
     public async Task Can_Get_Content_By_Key()
     {
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
-
-        Assert.IsNotNull(textPage);
+        AssertTextPage(textPage);
     }
 
     [Test]
@@ -115,9 +113,8 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
     {
         var textPage = await _mockedCache.GetById(Textpage.Key, true);
         var textPage2 = await _mockedCache.GetById(Textpage.Key, true);
-        Assert.IsNotNull(textPage);
-        Assert.IsNotNull(textPage2);
-
+        AssertTextPage(textPage);
+        AssertTextPage(textPage2);
         _mockedCacheService.Verify(x => x.GetByKey(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
@@ -126,9 +123,16 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
     {
         var textPage = await _mockedCache.GetById(Textpage.Id, true);
         var textPage2 = await _mockedCache.GetById(Textpage.Id, true);
-        Assert.IsNotNull(textPage);
-        Assert.IsNotNull(textPage2);
-
+        AssertTextPage(textPage);
+        AssertTextPage(textPage2);
         _mockedCacheService.Verify(x => x.GetById(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
+    }
+
+    private void AssertTextPage(IPublishedContent textPage)
+    {
+        Assert.IsNotNull(textPage);
+        Assert.AreEqual(Textpage.Name, textPage.Name);
+        Assert.AreEqual(Textpage.Published, textPage.IsPublished());
+        Assert.AreEqual(Textpage.Properties.Count, textPage.Properties.Count());
     }
 }
