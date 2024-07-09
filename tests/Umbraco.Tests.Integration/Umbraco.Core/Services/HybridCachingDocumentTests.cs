@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -139,14 +140,30 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
 
     private void AssertTextPage(IPublishedContent textPage)
     {
-        Assert.IsNotNull(textPage);
-        Assert.AreEqual(Textpage.Name, textPage.Name);
-        Assert.AreEqual(Textpage.Published, textPage.IsPublished());
-        Assert.AreEqual(Textpage.Properties.Count, textPage.Properties.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(textPage);
+            Assert.AreEqual(Textpage.Name, textPage.Name);
+            Assert.AreEqual(Textpage.Published, textPage.IsPublished());
+        });
+        AssertProperties(Textpage.Properties, textPage.Properties);
     }
 
-    private void AssertProperties()
+    private void AssertProperties(IPropertyCollection propertyCollection, IEnumerable<IPublishedProperty> publishedProperties)
     {
-        
+        foreach (var prop in propertyCollection)
+        {
+            AssertProperty(prop, publishedProperties.First(x => x.Alias == prop.Alias));
+        }
+    }
+
+    private void AssertProperty(IProperty property, IPublishedProperty publishedProperty)
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(property.Alias, publishedProperty.Alias);
+            Assert.AreEqual(property.PropertyType.Alias, publishedProperty.PropertyType.Alias);
+        });
+
     }
 }
