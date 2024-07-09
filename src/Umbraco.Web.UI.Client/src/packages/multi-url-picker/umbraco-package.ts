@@ -6,10 +6,4 @@ export const extensions = [
 		type: 'bundle',
 		js: () => import('./manifests.js'),
 	},
-	{
-		name: 'Multi Url Picker Entry Point',
-		alias: 'Umb.EntryPoint.MultiUrlPicker',
-		type: 'entryPoint',
-		js: () => import('./entry-point.js'),
-	},
 ];
