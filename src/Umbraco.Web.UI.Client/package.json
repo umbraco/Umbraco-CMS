@@ -56,6 +56,7 @@
 		"./menu": "./dist-cms/packages/core/menu/index.js",
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./models": "./dist-cms/packages/core/models/index.js",
+		"./multi-url-picker": "./dist-cms/packages/multi-url-picker/index.js",
 		"./notification": "./dist-cms/packages/core/notification/index.js",
 		"./object-type": "./dist-cms/packages/object-type/index.js",
 		"./package": "./dist-cms/packages/packages/package/index.js",
@@ -133,11 +134,10 @@
 		"./src/packages/documents",
 		"./src/packages/health-check",
 		"./src/packages/language",
+		"./src/packages/multi-url-picker",
 		"./src/packages/tags",
 		"./src/packages/umbraco-news",
-		"./src/packages/webhook",
-		"./src/packages/health-check",
-		"./src/packages/tags"
+		"./src/packages/webhook"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
