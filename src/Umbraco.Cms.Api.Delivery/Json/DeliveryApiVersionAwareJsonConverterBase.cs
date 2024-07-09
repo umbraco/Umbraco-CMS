@@ -23,12 +23,13 @@ public abstract class DeliveryApiVersionAwareJsonConverterBase<T> : JsonConverte
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
         Type type = typeof(T);
-        PropertyInfo[] properties = type.GetProperties().OrderBy(GetPropertyOrder).ToArray();
         var apiVersion = GetApiVersion();
+
+        // Get the properties in the specified order
+        PropertyInfo[] properties = type.GetProperties().OrderBy(GetPropertyOrder).ToArray();
 
         writer.WriteStartObject();
 
-        // Serialize properties in the specified order
         foreach (PropertyInfo property in properties)
         {
             // Filter out properties based on the API version
