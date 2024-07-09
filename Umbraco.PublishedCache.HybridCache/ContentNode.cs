@@ -48,22 +48,6 @@ internal class ContentNode
         CreatorId = creatorId;
     }
 
-    public ContentNode(
-        int id,
-        Guid uid,
-        IPublishedContentType contentType,
-        string path,
-        int sortOrder,
-        DateTime createDate,
-        int creatorId,
-        ContentData draftData,
-        ContentData publishedData,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedModelFactory publishedModelFactory)
-        : this(id, uid, path, sortOrder, createDate, creatorId) =>
-        SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory);
-
     // 2-phases ctor, phase 1
     public ContentNode(
         int id,
@@ -79,24 +63,6 @@ internal class ContentNode
         SortOrder = sortOrder;
         CreateDate = createDate;
         CreatorId = creatorId;
-    }
-
-    // clone
-    public ContentNode(ContentNode origin, IPublishedModelFactory publishedModelFactory, IPublishedContentType? contentType = null)
-    {
-        _publishedModelFactory = publishedModelFactory;
-        Id = origin.Id;
-        Uid = origin.Uid;
-        ContentType = contentType ?? origin.ContentType;
-        Path = origin.Path;
-        SortOrder = origin.SortOrder;
-        CreateDate = origin.CreateDate;
-        CreatorId = origin.CreatorId;
-
-        _draftData = origin._draftData;
-        _publishedData = origin._publishedData;
-        _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
-        _variationContextAccessor = origin._variationContextAccessor;
     }
 
     public bool HasPublished => _publishedData != null;
@@ -117,7 +83,6 @@ internal class ContentNode
         IPublishedContentType contentType,
         ContentData? draftData,
         ContentData? publishedData,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IVariationContextAccessor variationContextAccessor,
         IPublishedModelFactory publishedModelFactory)
     {
@@ -128,7 +93,6 @@ internal class ContentNode
             throw new ArgumentException("Both draftData and publishedData cannot be null at the same time.");
         }
 
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _variationContextAccessor = variationContextAccessor;
         _publishedModelFactory = publishedModelFactory;
 

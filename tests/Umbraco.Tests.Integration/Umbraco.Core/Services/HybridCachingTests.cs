@@ -1,14 +1,13 @@
 ﻿using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache;
+using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
@@ -32,10 +31,9 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
         services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
-
         services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
         services.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
-
+        services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
     }
 
     [SetUp]
@@ -84,12 +82,7 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
         _mockedCache = new ContentCache(
             GetRequiredService<HybridCache>(),
             _mockedCacheService.Object,
-            GetRequiredService<IPublishedSnapshotAccessor>(),
-            GetRequiredService<IVariationContextAccessor>(),
-            GetRequiredService<IPublishedModelFactory>(),
-            GetRequiredService<IContentTypeService>(),
-            GetRequiredService<IPublishedContentTypeFactory>(),
-            GetRequiredService<ILoggerFactory>());
+            GetRequiredService<IPublishedContentFactory>());
     }
 
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();

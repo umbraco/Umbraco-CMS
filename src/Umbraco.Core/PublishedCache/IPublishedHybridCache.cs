@@ -25,19 +25,11 @@ public interface IPublishedHybridCache
     /// <summary>
     ///     Gets a value indicating whether the cache contains a specified content.
     /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <param name="contentId">The content unique identifier.</param>
+    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <returns>A value indicating whether to the cache contains the specified content.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    Task<bool> HasById(bool preview, int contentId);
-
-    /// <summary>
-    ///     Gets a value indicating whether the cache contains a specified content.
-    /// </summary>
-    /// <param name="contentId">The content unique identifier.</param>
-    /// <returns>A value indicating whether to the cache contains the specified content.</returns>
-    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    Task<bool> HasById(int contentId);
+    Task<bool> HasById(int contentId, bool preview = false);
 
     /// <summary>
     ///     Gets a value indicating whether the cache contains published content.
@@ -45,12 +37,5 @@ public interface IPublishedHybridCache
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <returns>A value indicating whether the cache contains published content.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    Task<bool> HasContent(bool preview);
-
-    /// <summary>
-    ///     Gets a value indicating whether the cache contains published content.
-    /// </summary>
-    /// <returns>A value indicating whether the cache contains published content.</returns>
-    /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    Task<bool> HasContent();
+    Task<bool> HasContent(bool preview = false);
 }
