@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class HybridCachingTests : UmbracoIntegrationTestWithContent
+public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
 {
     private IPublishedHybridCache _mockedCache;
     private Mock<ICacheService> _mockedCacheService;
@@ -88,16 +88,32 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
 
     [Test]
-    public async Task Can_Get_Content_By_Id()
+    public async Task Can_Get_Unpublished_Content_By_Id()
     {
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
         AssertTextPage(textPage);
     }
 
     [Test]
-    public async Task Can_Get_Content_By_Key()
+    public async Task Can_Get_Unpublished_Content_By_Key()
     {
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+        AssertTextPage(textPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Published_Content_By_Id()
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id);
+        AssertTextPage(textPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Published_Content_By_Key()
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key);
         AssertTextPage(textPage);
     }
 
@@ -127,5 +143,10 @@ public class HybridCachingTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(Textpage.Name, textPage.Name);
         Assert.AreEqual(Textpage.Published, textPage.IsPublished());
         Assert.AreEqual(Textpage.Properties.Count, textPage.Properties.Count());
+    }
+
+    private void AssertProperties()
+    {
+        
     }
 }
