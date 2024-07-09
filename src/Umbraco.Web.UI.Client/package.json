@@ -157,6 +157,7 @@
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
 		"check:paths": "node ./devops/build/check-path-length.js src 140",
 		"compile": "tsc",
+		"postinstall": "npm run generate:tsconfig",
 		"dev": "vite",
 		"dev:server": "VITE_UMBRACO_USE_MSW=off vite",
 		"dev:mock": "VITE_UMBRACO_USE_MSW=on vite",
