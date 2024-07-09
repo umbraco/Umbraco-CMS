@@ -1,5 +1,5 @@
-import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
-import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.token.js';
+import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
+import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -18,9 +18,9 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-const elementName = 'umb-multi-url-picker';
+const elementName = 'umb-input-multi-url';
 @customElement(elementName)
-export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -296,6 +296,6 @@ export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement,
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbMultiUrlPickerElement;
+		[elementName]: UmbInputMultiUrlElement;
 	}
 }
