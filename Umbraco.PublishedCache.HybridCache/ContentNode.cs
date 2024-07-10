@@ -20,10 +20,7 @@ internal class ContentNode
     private IPublishedContent? _draftModel;
     private ContentData? _publishedData;
     private IPublishedContent? _publishedModel;
-    private IPublishedModelFactory? _publishedModelFactory;
     private IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
-
-    private IVariationContextAccessor? _variationContextAccessor;
 
     // special ctor for root pseudo node
     public ContentNode() => Path = string.Empty;
@@ -67,9 +64,9 @@ internal class ContentNode
 
     public bool HasPublished => _publishedData != null;
 
-    public IPublishedContent? DraftModel => GetModel(ref _draftModel, _draftData);
+    public ContentData? DraftModel => _draftData;
 
-    public IPublishedContent? PublishedModel => GetModel(ref _publishedModel, _publishedData);
+    public ContentData? PublishedModel => _publishedData;
 
     public readonly Guid Uid;
     public IPublishedContentType ContentType = null!;
@@ -82,9 +79,7 @@ internal class ContentNode
     public void SetContentTypeAndData(
         IPublishedContentType contentType,
         ContentData? draftData,
-        ContentData? publishedData,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedModelFactory publishedModelFactory)
+        ContentData? publishedData)
     {
         ContentType = contentType;
 
@@ -93,38 +88,10 @@ internal class ContentNode
             throw new ArgumentException("Both draftData and publishedData cannot be null at the same time.");
         }
 
-        _variationContextAccessor = variationContextAccessor;
-        _publishedModelFactory = publishedModelFactory;
-
         _draftData = draftData;
         _publishedData = publishedData;
     }
 
     public bool HasPublishedCulture(string culture) => _publishedData != null && (_publishedData.CultureInfos?.ContainsKey(culture) ?? false);
-
-    private IPublishedContent? GetModel(ref IPublishedContent? model, ContentData? contentData)
-    {
-        if (model != null)
-        {
-            return model;
-        }
-
-        if (contentData == null)
-        {
-            return null;
-        }
-
-        // create the model - we want to be fast, so no lock here: we may create
-        // more than 1 instance, but the lock below ensures we only ever return
-        // 1 unique instance - and locking is a nice explicit way to ensure this
-        IPublishedContent? m = new PublishedContent(this, contentData, _variationContextAccessor!).CreateModel(_publishedModelFactory);
-
-        // locking 'this' is not a best-practice but ContentNode is internal and
-        // we know what we do, so it is fine here and avoids allocating an object
-        lock (this)
-        {
-            return model ??= m;
-        }
-    }
 #pragma warning restore IDE1006 // Naming Styles
 }

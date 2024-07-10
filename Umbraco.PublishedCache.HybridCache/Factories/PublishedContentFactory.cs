@@ -10,18 +10,15 @@ internal class PublishedContentFactory : IPublishedContentFactory
 {
     private readonly PublishedContentTypeCache _contentTypeCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly IPublishedModelFactory _publishedModelFactory;
 
 
     public PublishedContentFactory(
         IVariationContextAccessor variationContextAccessor,
-        IPublishedModelFactory publishedModelFactory,
         IContentTypeService contentTypeService,
         IPublishedContentTypeFactory publishedContentTypeFactory,
         ILoggerFactory loggerFactory)
     {
         _variationContextAccessor = variationContextAccessor;
-        _publishedModelFactory = publishedModelFactory;
         _contentTypeCache = new PublishedContentTypeCache(
             contentTypeService,
             null,
@@ -32,26 +29,27 @@ internal class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        var n = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
+        var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
-        n.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published, _variationContextAccessor, _publishedModelFactory);
+        contentNode.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published);
 
-        return preview ? n.DraftModel ?? GetPublishedContentAsDraft(n.PublishedModel) : n.PublishedModel;
+        return preview ? GetModel(contentNode, contentNode.DraftModel) ?? GetPublishedContentAsDraft(GetModel(contentNode, contentNode.PublishedModel)) : GetModel(contentNode, contentNode.PublishedModel);
     }
 
-    private IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content)
-    {
-        if (content == null)
-        {
-            return null;
-        }
+    private IPublishedContent? GetModel(ContentNode node, ContentData? contentData) =>
+        contentData == null
+            ? null
+            : new PublishedContent(
+                node,
+                contentData,
+                _variationContextAccessor);
 
-        // an object in the cache is either an IPublishedContentOrMedia,
-        // or a model inheriting from PublishedContentExtended - in which
-        // case we need to unwrap to get to the original IPublishedContentOrMedia.
-        PublishedContent inner = UnwrapIPublishedContent(content);
-        return inner.CreateModel(_publishedModelFactory);
-    }
+    private IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>
+        content == null ? null :
+            // an object in the cache is either an IPublishedContentOrMedia,
+            // or a model inheriting from PublishedContentExtended - in which
+            // case we need to unwrap to get to the original IPublishedContentOrMedia.
+            UnwrapIPublishedContent(content);
 
     private PublishedContent UnwrapIPublishedContent(IPublishedContent content)
     {
