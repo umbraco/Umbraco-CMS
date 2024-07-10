@@ -65,9 +65,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 	#imagingRepository = new UmbImagingRepository(this);
 
-	protected override async firstUpdated() {
-		await this.#generateThumbnailUrl();
-		this._isLoading = false;
+	protected override firstUpdated() {
+		this.#generateThumbnailUrl();
 	}
 
 	override render() {
@@ -101,7 +100,9 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			this.width,
 			this.mode,
 		);
-		this._thumbnailUrl = data[0]?.url ?? '';
+
+		this._thumbnailUrl = data[0].url ?? '';
+		this._isLoading = false;
 	}
 
 	static override styles = [
