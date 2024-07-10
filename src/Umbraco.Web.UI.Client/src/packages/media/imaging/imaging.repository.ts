@@ -69,7 +69,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	 * @memberof UmbImagingRepository
 	 */
 	async requestThumbnailUrls(uniques: Array<string>, height: number, width: number, mode = ImageCropModeModel.MIN) {
-		const imagingModel = { height: height, width: width, mode };
+		const imagingModel: UmbImagingModel = { height, width, mode };
 		return this.requestResizedItems(uniques, imagingModel);
 	}
 }
