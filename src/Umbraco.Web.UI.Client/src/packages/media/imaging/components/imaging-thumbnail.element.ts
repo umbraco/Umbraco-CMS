@@ -101,7 +101,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			this.mode,
 		);
 
-		this._thumbnailUrl = data[0].url ?? '';
+		this._thumbnailUrl = data?.[0].url ?? '';
 		this._isLoading = false;
 	}
 
