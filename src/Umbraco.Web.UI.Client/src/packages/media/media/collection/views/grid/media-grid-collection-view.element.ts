@@ -8,6 +8,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
+import '@umbraco-cms/backoffice/imaging';
+
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()

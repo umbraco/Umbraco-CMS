@@ -11,6 +11,8 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
+import '@umbraco-cms/backoffice/imaging';
+
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
 @customElement('umb-media-picker-modal')

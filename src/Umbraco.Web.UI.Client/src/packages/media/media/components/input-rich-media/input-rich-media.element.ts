@@ -16,6 +16,8 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
+import '@umbraco-cms/backoffice/imaging';
+
 type UmbRichMediaCardModel = {
 	unique: string;
 	media: string;
