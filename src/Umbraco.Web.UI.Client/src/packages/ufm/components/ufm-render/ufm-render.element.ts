@@ -97,6 +97,7 @@ export class UmbUfmRenderElement extends UmbLitElement {
 		css`
 			* {
 				max-width: 100%;
+				word-wrap: break-word;
 			}
 
 			pre {
