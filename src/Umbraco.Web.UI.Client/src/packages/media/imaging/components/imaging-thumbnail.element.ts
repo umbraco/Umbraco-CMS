@@ -93,7 +93,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	}
 
 	#renderLoading() {
-		return html`<div class="container"><uui-loader></uui-loader></div>`;
+		return html`<div id="loader"><uui-loader></uui-loader></div>`;
 	}
 
 	#renderThumbnail() {
@@ -131,12 +131,19 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 				display: block;
 				position: relative;
 				overflow: hidden;
-			}
-
-			.container {
 				display: flex;
 				justify-content: center;
 				align-items: center;
+				width: 100%;
+				height: 100%;
+			}
+
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100%;
+				width: 100%;
 			}
 
 			#figure {
