@@ -14,6 +14,9 @@ export default [
 	js.configs.recommended,
 	...tseslint.configs.recommended,
 	eslintPluginPrettierRecommended,
+	wcPlugin.configs['flat/recommended'],
+	litPlugin.configs['flat/recommended'],
+	localRules.configs.all,
 
 	// Global ignores
 	{
@@ -40,29 +43,21 @@ export default [
 		plugins: {
 			import: importPlugin,
 			'local-rules': localRules,
-			wc: wcPlugin,
-			lit: litPlugin,
 			'lit-a11y': litA11yPlugin,
 			storybook: storybookPlugin,
 		},
 		rules: {
 			semi: ['warn', 'always'],
-			"prettier/prettier": ["warn", {"endOfLine": "auto" }],
+			"prettier/prettier": ["warn", { "endOfLine": "auto" }],
 			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'no-var': 'error',
+			...importPlugin.configs.recommended.rules,
+			'import/namespace': 'off',
 			'import/no-unresolved': 'off',
 			'import/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
 			'import/no-self-import': 'error',
 			'import/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
-			'local-rules/bad-type-import': 'error',
-			'local-rules/enforce-element-suffix-on-element-class-name': 'error',
-			'local-rules/enforce-umb-prefix-on-element-name': 'error',
-			'local-rules/ensure-relative-import-use-js-extension': 'error',
-			'local-rules/no-direct-api-import': 'warn',
-			'local-rules/prefer-import-aliases': 'error',
 			'local-rules/prefer-static-styles-last': 'warn',
-			'local-rules/umb-class-prefix': 'error',
-			'local-rules/no-relative-import-to-import-map-module': 'error',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
