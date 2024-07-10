@@ -163,6 +163,7 @@ internal class PublishedProperty : PublishedPropertyBase
                 cacheValues = _cacheValues ??= new CacheValues();
                 break;
             case PropertyCacheLevel.Elements:
+            case PropertyCacheLevel.Snapshot:
                 // TODO: Figure out an elements cache
                 // cache within the property object itself, ie within the content object
                 cacheValues = _cacheValues ??= new CacheValues();

@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 internal sealed class PublishedContent : PublishedContentBase
 {
     private readonly IPublishedModelFactory? _publishedModelFactory;
+    private IPublishedProperty[] _properties;
     private readonly ContentData _contentData;
     private readonly ContentNode _contentNode;
     private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
@@ -36,16 +37,33 @@ internal sealed class PublishedContent : PublishedContentBase
             properties[i++] = new PublishedProperty(propertyType, this, pdatas, propertyType.CacheLevel);
         }
 
-        Properties = properties;
+        _properties = properties;
     }
 
     public override IPublishedContentType ContentType => _contentNode.ContentType;
 
     public override Guid Key { get; }
 
-    public override IEnumerable<IPublishedProperty> Properties { get; } = Enumerable.Empty<IPublishedProperty>();
+    public override IEnumerable<IPublishedProperty> Properties => _properties;
 
-    public override IPublishedProperty? GetProperty(string alias) => null;
+    public override IPublishedProperty? GetProperty(string alias)
+    {
+        var index = _contentNode.ContentType.GetPropertyIndex(alias);
+        if (index < 0)
+        {
+            return null; // happens when 'alias' does not match a content type property alias
+        }
+
+        // should never happen - properties array must be in sync with property type
+        if (index >= _properties.Length)
+        {
+            throw new IndexOutOfRangeException(
+                "Index points outside the properties array, which means the properties array is corrupt.");
+        }
+
+        IPublishedProperty property = _properties[index];
+        return property;
+    }
 
     public override int Id { get; }
 

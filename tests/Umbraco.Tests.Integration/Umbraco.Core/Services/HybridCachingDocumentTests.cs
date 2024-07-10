@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
@@ -33,6 +34,7 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
+    public IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
     [Test]
     public async Task Can_Get_Unpublished_Content_By_Id()
@@ -98,6 +100,8 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         Textpage.SetValue("title", newTitle);
         ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
         Assert.AreEqual(newTitle, textPage.Value("title"));
     }
 
