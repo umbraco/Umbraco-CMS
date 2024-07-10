@@ -1,30 +1,63 @@
 import type { UmbImagingModel } from './types.js';
 import { UmbImagingServerDataSource } from './imaging.server.data.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_IMAGING_STORE_CONTEXT } from './imaging.store.token.js';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
 
-export class UmbImagingRepository extends UmbControllerBase implements UmbApi {
+export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
+	#dataStore?: typeof UMB_IMAGING_STORE_CONTEXT.TYPE;
 	#itemSource: UmbImagingServerDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#itemSource = new UmbImagingServerDataSource(host);
+
+		this.consumeContext(UMB_IMAGING_STORE_CONTEXT, (instance) => {
+			this.#dataStore = instance;
+		});
 	}
 
 	/**
 	 * Requests the items for the given uniques
 	 * @param {Array<string>} uniques
-	 * @return {*}
 	 * @memberof UmbImagingRepository
 	 */
-	async requestResizedItems(uniques: Array<string>, imagingModel?: UmbImagingModel) {
+	async requestResizedItems(
+		uniques: Array<string>,
+		imagingModel?: UmbImagingModel,
+	): Promise<{ data: UmbMediaUrlModel[] }> {
 		if (!uniques.length) throw new Error('Uniques are missing');
+		if (!this.#dataStore) throw new Error('Data store is missing');
 
-		const { data, error: _error } = await this.#itemSource.getItems(uniques, imagingModel);
-		const error: any = _error;
-		return { data, error };
+		const urls = new Map<string, string>();
+
+		for (const unique of uniques) {
+			const existingCrop = this.#dataStore.getCrop(unique, imagingModel);
+			if (existingCrop !== undefined) {
+				urls.set(unique, existingCrop);
+				continue;
+			}
+
+			const { data: urlModels, error } = await this.#itemSource.getItems([unique], imagingModel);
+
+			if (error) {
+				console.error('[UmbImagingRepository] Error fetching items', error);
+				continue;
+			}
+
+			const url = urlModels?.[0].url;
+
+			this.#dataStore.addCrop(unique, url ?? '', imagingModel);
+
+			if (url) {
+				urls.set(unique, url);
+			}
+		}
+
+		return { data: Array.from(urls).map(([unique, url]) => ({ unique, url })) };
 	}
 
 	/**
@@ -32,12 +65,12 @@ export class UmbImagingRepository extends UmbControllerBase implements UmbApi {
 	 * @param {Array<string>} uniques
 	 * @param {number} height
 	 * @param {number} width
-	 * @returns {*}
+	 * @param {ImageCropModeModel} mode - The crop mode
 	 * @memberof UmbImagingRepository
 	 */
-	async requestThumbnailUrls(uniques: Array<string>, height: number, width: number) {
-		const imagingModel = { height: height, width: width, mode: ImageCropModeModel.MIN };
-		return await this.requestResizedItems(uniques, imagingModel);
+	async requestThumbnailUrls(uniques: Array<string>, height: number, width: number, mode = ImageCropModeModel.MIN) {
+		const imagingModel: UmbImagingModel = { height, width, mode };
+		return this.requestResizedItems(uniques, imagingModel);
 	}
 }
 
