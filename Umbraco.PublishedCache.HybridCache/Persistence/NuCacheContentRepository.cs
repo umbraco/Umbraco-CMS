@@ -938,10 +938,10 @@ WHERE cmsContentNu.nodeId IN (
                 var published = true;
                 ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
                 publishedContentData = new ContentData(
-                    dto.EditName,
+                    dto.PubName,
                     null,
                     dto.VersionId,
-                    dto.EditVersionDate,
+                    dto.PubVersionDate,
                     dto.CreatorId,
                     -1,
                     published,
