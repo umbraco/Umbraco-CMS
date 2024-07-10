@@ -11,10 +11,10 @@ export default [
 	// Recommended config applied to all files
 	js.configs.recommended,
 	...tseslint.configs.recommended,
-	eslintPluginPrettierRecommended,
 	wcPlugin.configs['flat/recommended'],
 	litPlugin.configs['flat/recommended'],
 	localRules.configs.all,
+	eslintPluginPrettierRecommended,
 
 	// Global ignores
 	{
