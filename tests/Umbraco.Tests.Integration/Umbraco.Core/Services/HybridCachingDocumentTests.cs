@@ -42,129 +42,326 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Can_Get_Draft_Content_By_Id()
     {
+        //Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+
+        //Assert
         AssertTextPage(textPage);
     }
 
     [Test]
     public async Task Can_Get_Draft_Content_By_Key()
     {
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        // Assert
         AssertTextPage(textPage);
     }
 
     [Test]
     public async Task Can_Get_Published_Content_By_Id()
     {
+        // Arrange
         ContentService.Publish(Textpage, Array.Empty<string>());
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Id);
+
+        // Assert
         AssertTextPage(textPage);
     }
 
     [Test]
     public async Task Can_Get_Published_Content_By_Key()
     {
+        // Arrange
         ContentService.Publish(Textpage, Array.Empty<string>());
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Key);
+
+        // Assert
         AssertTextPage(textPage);
     }
 
     [Test]
     public async Task Can_Get_Draft_Of_Published_Content_By_Id()
     {
+        // Arrange
         ContentService.Publish(Textpage, Array.Empty<string>());
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+
+        // Assert
         AssertTextPage(textPage);
     }
 
     [Test]
     public async Task Can_Get_Draft_Of_Published_Content_By_Key()
     {
+        // Arrange
         ContentService.Publish(Textpage, Array.Empty<string>());
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        // Assert
         AssertTextPage(textPage);
     }
 
-
     [Test]
-    [TestCase(true, true)]
-    [TestCase(false, false)]
-    public async Task Can_Get_Updated_Draft_Content_By_Id(bool preview, bool result)
+    public async Task Can_Get_Updated_Draft_Content_By_Id()
     {
-        ContentService.Publish(Textpage, Array.Empty<string>());
+        // Arrange
         string newName = "New Name";
         Textpage.Name = newName;
-        ContentService.Save(Textpage, -1);
-        var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
-        Assert.AreEqual(result, newName.Equals(textPage.Name));
-    }
 
-    [Test]
-    [TestCase(true, true)]
-    [TestCase(false, false)]
-    public async Task Can_Get_Updated_Draft_Content_By_Key(bool preview, bool result)
-    {
-        ContentService.Publish(Textpage, Array.Empty<string>());
-        string newName = "New Name";
-        Textpage.Name = newName;
+        // Act
         ContentService.Save(Textpage, -1);
-        var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
-        Assert.AreEqual(result, newName.Equals(textPage.Name));
-    }
-
-    [Test]
-    public async Task Can_Get_Draft_Property_By_Id()
-    {
-        ContentService.Publish(Textpage, Array.Empty<string>());
-        var titleValue = Textpage.GetValue("title");
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
 
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        // Assert
+        Assert.AreEqual(newName, textPage.Name);
     }
 
     [Test]
-    public async Task Can_Get_Draft_Property_By_Key()
+    public async Task Can_Get_Updated_Draft_Content_By_Key()
     {
-        ContentService.Publish(Textpage, Array.Empty<string>());
-        var titleValue = Textpage.GetValue("title");
+        // Arrange
+        string newName = "New Name";
+        Textpage.Name = newName;
+
+        // Act
+        ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
 
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        // Assert
+        Assert.AreEqual(newName, textPage.Name);
     }
 
     [Test]
-    public async Task Can_Get_Updated_Draft_Property_By_Id()
+    [TestCase(true, true)]
+    [TestCase(false, false)]
+    // BETTER NAMING, CURRENTLY THIS IS TESTING BOTH THE PUBLISHED AND THE DRAFT OF THE PUBLISHED.
+    public async Task Can_Get_Updated_Draft_Published_Content_By_Id(bool preview, bool result)
     {
         // Arrange
         ContentService.Publish(Textpage, Array.Empty<string>());
+        string newName = "New Name";
+        Textpage.Name = newName;
+
+        // Act
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
+
+        // Assert
+        Assert.AreEqual(result, newName.Equals(textPage.Name));
+    }
+
+    [Test]
+    [TestCase(true, true)]
+    [TestCase(false, false)]
+    // BETTER NAMING, CURRENTLY THIS IS TESTING BOTH THE PUBLISHED AND THE DRAFT OF THE PUBLISHED.
+    public async Task Can_Get_Updated_Draft_Published_Content_By_Key(bool preview, bool result)
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        string newName = "New Name";
+        Textpage.Name = newName;
+
+        // Act
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
+
+        // Assert
+        Assert.AreEqual(result, newName.Equals(textPage.Name));
+    }
+
+    [Test]
+    public async Task Can_Get_Draft_Content_Property_By_Id()
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var titleValue = Textpage.GetValue("title");
+
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Draft_Content_Property_By_Key()
+    {
+        // Arrange
+        ContentService.Save(Textpage, -1);
+        var titleValue = Textpage.GetValue("title");
+
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Published_Content_Property_By_Id()
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var titleValue = Textpage.GetValue("title");
+
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Published_Content_Property_By_Key()
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var titleValue = Textpage.GetValue("title");
+
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Draft_Of_Published_Content_Property_By_Id()
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var titleValue = Textpage.GetValue("title");
+
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Draft_Of_Published_Content_Property_By_Key()
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var titleValue = Textpage.GetValue("title");
+
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Draft_Content_Property_By_Id()
+    {
+        // Arrange
         string newTitle = "New Name";
 
         // Act
         Textpage.SetValue("title", newTitle);
         ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
 
         // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
         Assert.AreEqual(newTitle, textPage.Value("title"));
     }
 
     [Test]
-    public async Task Can_Get_Updated_Draft_Property_By_Key()
+    public async Task Can_Get_Updated_Draft_Content_Property_By_Key()
     {
         // Arrange
-        ContentService.Publish(Textpage, Array.Empty<string>());
         string newTitle = "New Name";
 
         // Act
         Textpage.SetValue("title", newTitle);
         ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
 
         // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(newTitle, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Published_Content_Property_By_Id()
+    {
+        // Arrange
+        string newTitle = "New Name";
+
+        // Act
+        Textpage.SetValue("title", newTitle);
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(newTitle, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Published_Content_Property_By_Key()
+    {
+        // Arrange
+        string newTitle = "New Name";
+
+        // Act
+        Textpage.SetValue("title", newTitle);
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(newTitle, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Id()
+    {
+        // Arrange
+        string newTitle = "New Name";
+
+        // Act
+        Textpage.SetValue("title", newTitle);
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(newTitle, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Key()
+    {
+        // Arrange
+        string newTitle = "New Name";
+
+        // Act
+        Textpage.SetValue("title", newTitle);
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
         Assert.AreEqual(newTitle, textPage.Value("title"));
     }
 
@@ -173,11 +370,14 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     [TestCase(false)]
     public async Task Can_Not_Get_Deleted_Content_By_Id(bool preview)
     {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+
         // Act
         ContentService.Delete(Textpage);
 
         // Assert
-        var textPageDeleted = await PublishedHybridCache.GetById(Textpage.Id, true);
+        var textPageDeleted = await PublishedHybridCache.GetById(Textpage.Id, preview);
         Assert.AreEqual(null, textPageDeleted);
     }
 
