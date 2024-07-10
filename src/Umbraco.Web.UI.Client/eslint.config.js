@@ -4,8 +4,6 @@ import importPlugin from 'eslint-plugin-import';
 import localRules from 'eslint-plugin-local-rules';
 import wcPlugin from 'eslint-plugin-wc';
 import litPlugin from 'eslint-plugin-lit';
-import litA11yPlugin from 'eslint-plugin-lit-a11y';
-import storybookPlugin from 'eslint-plugin-storybook';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import tseslint from 'typescript-eslint';
 
@@ -45,8 +43,6 @@ export default [
 		plugins: {
 			import: importPlugin,
 			'local-rules': localRules,
-			'lit-a11y': litA11yPlugin,
-			storybook: storybookPlugin,
 		},
 		rules: {
 			semi: ['warn', 'always'],
