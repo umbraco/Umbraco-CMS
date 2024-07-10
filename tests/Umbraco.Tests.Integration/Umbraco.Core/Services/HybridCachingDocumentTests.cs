@@ -59,6 +59,15 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public async Task Can_Get_Draft_Property_By_Key()
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+        AssertTextPage(textPage);
+    }
+
+    [Test]
     public async Task Can_Get_Published_Content_By_Key()
     {
         ContentService.Publish(Textpage, Array.Empty<string>());

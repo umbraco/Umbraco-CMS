@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 internal sealed class PublishedContent : PublishedContentBase
 {
-    private readonly IPublishedModelFactory? _publishedModelFactory;
     private IPublishedProperty[] _properties;
     private readonly ContentData _contentData;
     private readonly ContentNode _contentNode;
@@ -16,12 +15,10 @@ internal sealed class PublishedContent : PublishedContentBase
     public PublishedContent(
         ContentNode contentNode,
         ContentData contentData,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedModelFactory publishedModelFactory)
+        IVariationContextAccessor variationContextAccessor)
         : base(variationContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
-        _publishedModelFactory = publishedModelFactory;
         _contentNode = contentNode;
 
         _contentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
