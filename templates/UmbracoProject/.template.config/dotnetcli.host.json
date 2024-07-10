@@ -18,6 +18,10 @@
       "longName": "use-delivery-api",
       "shortName": "da"
     },
+    "Docker": {
+      "longName": "add-docker",
+      "shortName": ""
+    },
     "SkipRestore": {
       "longName": "no-restore",
       "shortName": ""

@@ -26,6 +26,12 @@
           "exclude": [
             ".gitignore"
           ]
+        },
+        {
+          "condition": "(!Docker)",
+          "exclude": [
+            "Dockerfile"
+          ]
         }
       ]
     }
@@ -67,6 +73,13 @@
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "true"
+    },
+    "Docker": {
+      "displayName": "Add Docker file",
+      "description": "Adds a docker file to the project.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
     },
     "SkipRestore": {
       "displayName": "Skip restore",

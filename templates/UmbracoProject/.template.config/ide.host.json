@@ -59,6 +59,10 @@
     {
       "id": "NoNodesViewPath",
       "isVisible": true
+    },
+    {
+      "id": "Docker",
+      "isVisible": true
     }
   ]
 }
