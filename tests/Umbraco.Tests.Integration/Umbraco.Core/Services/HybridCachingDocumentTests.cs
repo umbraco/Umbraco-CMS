@@ -119,6 +119,43 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [TestCase(true, true)]
+    [TestCase(false, false)]
+    public async Task Can_Get_Published_Draft_Content_By_Id(bool preview, bool result)
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        string newName = "New Name";
+        Textpage.Name = newName;
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
+        Assert.AreEqual(result, newName.Equals(textPage.Name));
+    }
+
+    [Test]
+    [TestCase(true, true)]
+    [TestCase(false, false)]
+    public async Task Can_Get_Published_Draft_Content_By_Key(bool preview, bool result)
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        string newName = "New Name";
+        Textpage.Name = newName;
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
+        Assert.AreEqual(result, newName.Equals(textPage.Name));
+    }
+
+    [Test]
+    public async Task Can_Get_Draft_Property_By_Id()
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        string newTitle = "New Name";
+        Textpage.SetValue("title", newTitle);
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+        Assert.AreEqual(newTitle, textPage.Value("title"));
+    }
+
+    [Test]
     public async Task Content_Is_Cached_By_Key()
     {
         var textPage = await _mockedCache.GetById(Textpage.Key, true);
