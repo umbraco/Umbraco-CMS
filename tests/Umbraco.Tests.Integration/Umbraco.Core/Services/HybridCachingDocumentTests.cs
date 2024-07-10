@@ -36,15 +36,18 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
     public IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
+
+    // Create CRUD Tests for Content, Also cultures.
+
     [Test]
-    public async Task Can_Get_Unpublished_Content_By_Id()
+    public async Task Can_Get_Draft_Content_By_Id()
     {
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
         AssertTextPage(textPage);
     }
 
     [Test]
-    public async Task Can_Get_Unpublished_Content_By_Key()
+    public async Task Can_Get_Draft_Content_By_Key()
     {
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
         AssertTextPage(textPage);
@@ -59,15 +62,6 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public async Task Can_Get_Draft_Property_By_Key()
-    {
-        ContentService.Publish(Textpage, Array.Empty<string>());
-        ContentService.Save(Textpage, -1);
-        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
-        AssertTextPage(textPage);
-    }
-
-    [Test]
     public async Task Can_Get_Published_Content_By_Key()
     {
         ContentService.Publish(Textpage, Array.Empty<string>());
@@ -76,9 +70,26 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public async Task Can_Get_Draft_Of_Published_Content_By_Id()
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+        AssertTextPage(textPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Draft_Of_Published_Content_By_Key()
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+        AssertTextPage(textPage);
+    }
+
+
+    [Test]
     [TestCase(true, true)]
     [TestCase(false, false)]
-    public async Task Can_Get_Published_Draft_Content_By_Id(bool preview, bool result)
+    public async Task Can_Get_Updated_Draft_Content_By_Id(bool preview, bool result)
     {
         ContentService.Publish(Textpage, Array.Empty<string>());
         string newName = "New Name";
@@ -91,7 +102,7 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     [Test]
     [TestCase(true, true)]
     [TestCase(false, false)]
-    public async Task Can_Get_Published_Draft_Content_By_Key(bool preview, bool result)
+    public async Task Can_Get_Updated_Draft_Content_By_Key(bool preview, bool result)
     {
         ContentService.Publish(Textpage, Array.Empty<string>());
         string newName = "New Name";
@@ -105,13 +116,83 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     public async Task Can_Get_Draft_Property_By_Id()
     {
         ContentService.Publish(Textpage, Array.Empty<string>());
-        string newTitle = "New Name";
-        Textpage.SetValue("title", newTitle);
-        ContentService.Save(Textpage, -1);
+        var titleValue = Textpage.GetValue("title");
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
 
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Draft_Property_By_Key()
+    {
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var titleValue = Textpage.GetValue("title");
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        Assert.AreEqual(titleValue, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Draft_Property_By_Id()
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        string newTitle = "New Name";
+
+        // Act
+        Textpage.SetValue("title", newTitle);
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+
+        // Assert
         Assert.AreEqual(newTitle, textPage.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Updated_Draft_Property_By_Key()
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        string newTitle = "New Name";
+
+        // Act
+        Textpage.SetValue("title", newTitle);
+        ContentService.Save(Textpage, -1);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+
+        // Assert
+        Assert.AreEqual(newTitle, textPage.Value("title"));
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Not_Get_Deleted_Content_By_Id(bool preview)
+    {
+        // Act
+        ContentService.Delete(Textpage);
+
+        // Assert
+        var textPageDeleted = await PublishedHybridCache.GetById(Textpage.Id, true);
+        Assert.AreEqual(null, textPageDeleted);
+    }
+
+    // TestCases for published and draft
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Not_Get_Deleted_Content_By_Key(bool preview)
+    {
+        // Act
+        ContentService.Delete(Textpage);
+
+        // Assert
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
+        Assert.AreEqual(null, textPage);
     }
 
     private void AssertTextPage(IPublishedContent textPage)
@@ -140,6 +221,5 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
             Assert.AreEqual(property.Alias, publishedProperty.Alias);
             Assert.AreEqual(property.PropertyType.Alias, publishedProperty.PropertyType.Alias);
         });
-
     }
 }
