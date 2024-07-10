@@ -36,7 +36,7 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
     [TestCase(1, new[] { "PropertyAll", "PropertyV1Max", "PropertyV2Max", "PropertyV2Only", "PropertyV2Min" })]
     [TestCase(2, new[] { "PropertyAll", "PropertyV1Max", "PropertyV2Max", "PropertyV2Only", "PropertyV2Min" })]
     [TestCase(3, new[] { "PropertyAll", "PropertyV1Max", "PropertyV2Max", "PropertyV2Only", "PropertyV2Min" })]
-    public void Can_Include_All_Properties_When_No_HttpContext(int apiVersion, string[] expectedPropertyNames)
+    public void Can_Include_All_Properties_When_HttpContext_Is_Not_Available(int apiVersion, string[] expectedPropertyNames)
     {
         // Arrange
         using var memoryStream = new MemoryStream();
@@ -76,20 +76,8 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
     [TestCase(3, new[] { "PropertyAll", "PropertyV2Min" }, new[] { "PropertyV1Max", "PropertyV2Only", "PropertyV2Max" })]
     public void Can_Include_Correct_Properties_Based_On_Version_Attribute(int apiVersion, string[] expectedPropertyNames, string[] expectedDisallowedPropertyNames)
     {
-        // Arrange
-        using var memoryStream = new MemoryStream();
-        using var jsonWriter = new Utf8JsonWriter(memoryStream);
-
-        SetUpMocks(apiVersion);
-        var sut = new TestJsonConverter(_httpContextAccessorMock.Object);
-
-        // Act
-        sut.Write(jsonWriter, new TestResponseModel(), new JsonSerializerOptions());
-        jsonWriter.Flush();
-
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        using var reader = new StreamReader(memoryStream);
-        var output = reader.ReadToEnd();
+        var jsonOptions = new JsonSerializerOptions();
+        var output = GetJsonOutput(apiVersion, jsonOptions);
 
         // Assert
         Assert.Multiple(() =>
@@ -105,20 +93,8 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
     [TestCase(3, new[] { "PropertyAll", "PropertyV2Min" })]
     public void Can_Serialize_Properties_Correctly_Based_On_Version_Attribute(int apiVersion, string[] expectedPropertyNames)
     {
-        // Arrange
-        using var memoryStream = new MemoryStream();
-        using var jsonWriter = new Utf8JsonWriter(memoryStream);
-
-        SetUpMocks(apiVersion);
-        var sut = new TestJsonConverter(_httpContextAccessorMock.Object);
-
-        // Act
-        sut.Write(jsonWriter, new TestResponseModel(), new JsonSerializerOptions());
-        jsonWriter.Flush();
-
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        using var reader = new StreamReader(memoryStream);
-        var output = reader.ReadToEnd();
+        var jsonOptions = new JsonSerializerOptions();
+        var output = GetJsonOutput(apiVersion, jsonOptions);
 
         // Assert
         Assert.Multiple(() =>
@@ -141,26 +117,13 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
     [TestCase(3, new[] { "propertyAll", "propertyV2Min" }, new[] { "propertyV1Max", "propertyV2Only", "propertyV2Max" })]
     public void Can_Respect_Property_Naming_Policy_On_Json_Options(int apiVersion, string[] expectedPropertyNames, string[] expectedDisallowedPropertyNames)
     {
-        // Arrange
-        using var memoryStream = new MemoryStream();
-        using var jsonWriter = new Utf8JsonWriter(memoryStream);
-
-        SetUpMocks(apiVersion);
-        var sut = new TestJsonConverter(_httpContextAccessorMock.Object);
-
         // Set up CamelCase naming policy
         var jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
-        // Act
-        sut.Write(jsonWriter, new TestResponseModel(), jsonOptions);
-        jsonWriter.Flush();
-
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        using var reader = new StreamReader(memoryStream);
-        var output = reader.ReadToEnd();
+        var output = GetJsonOutput(apiVersion, jsonOptions);
 
         // Assert
         Assert.Multiple(() =>
@@ -175,20 +138,8 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
     [TestCase(2, "PropertyV2Min", "PropertyAll")]
     public void Can_Respect_Property_Order(int apiVersion, string expectedFirstPropertyName, string expectedLastPropertyName)
     {
-        // Arrange
-        using var memoryStream = new MemoryStream();
-        using var jsonWriter = new Utf8JsonWriter(memoryStream);
-
-        SetUpMocks(apiVersion);
-        var sut = new TestJsonConverter(_httpContextAccessorMock.Object);
-
-        // Act
-        sut.Write(jsonWriter, new TestResponseModel(), new JsonSerializerOptions());
-        jsonWriter.Flush();
-
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        using var reader = new StreamReader(memoryStream);
-        var output = reader.ReadToEnd();
+        var jsonOptions = new JsonSerializerOptions();
+        var output = GetJsonOutput(apiVersion, jsonOptions);
 
         // Parse the JSON to verify the order of properties
         using var jsonDocument = JsonDocument.Parse(output);
@@ -204,6 +155,25 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
             Assert.AreEqual(expectedFirstPropertyName, firstProperty.Name);
             Assert.AreEqual(expectedLastPropertyName, lastProperty.Name);
         });
+    }
+
+    private string GetJsonOutput(int apiVersion, JsonSerializerOptions jsonOptions)
+    {
+        // Arrange
+        using var memoryStream = new MemoryStream();
+        using var jsonWriter = new Utf8JsonWriter(memoryStream);
+
+        SetUpMocks(apiVersion);
+        var sut = new TestJsonConverter(_httpContextAccessorMock.Object);
+
+        // Act
+        sut.Write(jsonWriter, new TestResponseModel(), jsonOptions);
+        jsonWriter.Flush();
+
+        memoryStream.Seek(0, SeekOrigin.Begin);
+        using var reader = new StreamReader(memoryStream);
+
+        return reader.ReadToEnd();
     }
 
     private string GetPropertyValue(string propertyName)
