@@ -65,12 +65,31 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 	#imagingRepository = new UmbImagingRepository(this);
 
-	protected override firstUpdated() {
-		this.#generateThumbnailUrl();
-	}
+	#intersectionObserver?: IntersectionObserver;
 
 	override render() {
 		return html` ${this.#renderThumbnail()} ${when(this._isLoading, () => this.#renderLoading())} `;
+	}
+
+	override connectedCallback() {
+		super.connectedCallback();
+
+		if (this.loading === 'lazy') {
+			this.#intersectionObserver = new IntersectionObserver((entries) => {
+				if (entries[0].isIntersecting) {
+					this.#generateThumbnailUrl();
+					this.#intersectionObserver?.disconnect();
+				}
+			});
+			this.#intersectionObserver.observe(this);
+		} else {
+			this.#generateThumbnailUrl();
+		}
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#intersectionObserver?.disconnect();
 	}
 
 	#renderLoading() {
