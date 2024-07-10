@@ -4,11 +4,10 @@ import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../mo
 import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import type { UmbUploadableFileModel } from '../../dropzone/index.js';
-import { customElement, html, ifDefined, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -162,8 +161,6 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 	#itemRepository = new UmbMediaItemRepository(this);
 
-	#imagingRepository = new UmbImagingRepository(this);
-
 	#modalRouter: UmbModalRouteRegistrationController;
 	#modalManager?: UmbModalManagerContext;
 
@@ -249,16 +246,13 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		const uniques = this.items.map((item) => item.mediaKey);
 
 		const { data: items } = await this.#itemRepository.requestItems(uniques);
-		const { data: thumbnails } = await this.#imagingRepository.requestThumbnailUrls(uniques, 400, 400);
 
 		this._cards = this.items.map((item) => {
 			const media = items?.find((x) => x.unique === item.mediaKey);
-			const thumbnail = thumbnails?.find((x) => x.unique === item.mediaKey);
 			return {
 				unique: item.key,
 				media: item.mediaKey,
 				name: media?.name ?? '',
-				src: thumbnail?.url,
 				icon: media?.mediaType?.icon,
 				isTrashed: media?.isTrashed ?? false,
 			};
@@ -366,9 +360,10 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		const href = this._routeBuilder?.({ key: item.unique });
 		return html`
 			<uui-card-media id=${item.unique} name=${item.name} .href=${href}>
-				${item.src
-					? html`<img src=${item.src} alt=${item.name} />`
-					: html`<umb-icon name=${ifDefined(item.icon)}></umb-icon>`}
+				<umb-imaging-thumbnail
+					unique=${item.media}
+					alt=${item.name}
+					icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
