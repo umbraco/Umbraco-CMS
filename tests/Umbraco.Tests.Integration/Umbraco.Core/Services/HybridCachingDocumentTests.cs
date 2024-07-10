@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Hybrid;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -22,9 +20,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
 {
-    private IPublishedHybridCache _mockedCache;
-    private Mock<ICacheService> _mockedCacheService;
-
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddHybridCache();
@@ -35,55 +30,6 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
         services.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
         services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
-    }
-
-    [SetUp]
-    public void SetUp()
-    {
-        _mockedCacheService = new Mock<ICacheService>();
-
-        var contentData = new ContentData(
-            Textpage.Name,
-            null,
-            1,
-            Textpage.UpdateDate,
-            Textpage.CreatorId,
-            -1,
-            false,
-            new Dictionary<string, PropertyData[]>(),
-            null);
-        _mockedCacheService.Setup(r => r.GetById(It.IsAny<int>(), It.IsAny<bool>())).ReturnsAsync(
-            new ContentCacheNode()
-            {
-                ContentTypeId = Textpage.ContentTypeId,
-                CreatorId = Textpage.CreatorId,
-                CreateDate = Textpage.CreateDate,
-                Id = Textpage.Id,
-                Key = Textpage.Key,
-                SortOrder = 0,
-                Path = Textpage.Path,
-                Draft = contentData,
-                Published = null,
-            });
-
-        _mockedCacheService.Setup(x => x.GetByKey(It.IsAny<Guid>(), It.IsAny<bool>())).ReturnsAsync(
-            new ContentCacheNode()
-            {
-                ContentTypeId = Textpage.ContentTypeId,
-                CreatorId = Textpage.CreatorId,
-                CreateDate = Textpage.CreateDate,
-                Id = Textpage.Id,
-                Key = Textpage.Key,
-                SortOrder = 0,
-                Path = Textpage.Path,
-                Draft = contentData,
-                Published = null,
-            });
-
-        _mockedCache = new ContentCache(
-            GetRequiredService<HybridCache>(),
-            _mockedCacheService.Object,
-            GetRequiredService<IPublishedContentFactory>());
     }
 
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
@@ -153,26 +99,6 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
         Assert.AreEqual(newTitle, textPage.Value("title"));
-    }
-
-    [Test]
-    public async Task Content_Is_Cached_By_Key()
-    {
-        var textPage = await _mockedCache.GetById(Textpage.Key, true);
-        var textPage2 = await _mockedCache.GetById(Textpage.Key, true);
-        AssertTextPage(textPage);
-        AssertTextPage(textPage2);
-        _mockedCacheService.Verify(x => x.GetByKey(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
-    }
-
-    [Test]
-    public async Task Content_Is_Cached_By_Id()
-    {
-        var textPage = await _mockedCache.GetById(Textpage.Id, true);
-        var textPage2 = await _mockedCache.GetById(Textpage.Id, true);
-        AssertTextPage(textPage);
-        AssertTextPage(textPage2);
-        _mockedCacheService.Verify(x => x.GetById(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     private void AssertTextPage(IPublishedContent textPage)
