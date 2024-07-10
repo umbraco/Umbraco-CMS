@@ -21,11 +21,13 @@ export default [
 	// Global ignores
 	{
 		ignores: [
+			'**/eslint.config.js',
 			'**/rollup.config.js',
 			'**/vite.config.ts',
 			'src/external',
 			'src/packages/core/icon-registry/icons',
 			'src/packages/core/icon-registry/icons.ts',
+			'src/**/*.test.ts',
 		],
 	},
 
