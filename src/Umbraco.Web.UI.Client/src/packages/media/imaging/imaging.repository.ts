@@ -1,7 +1,6 @@
-import type { UmbImagingModel } from './types.js';
+import { UmbImagingCropMode, type UmbImagingModel } from './types.js';
 import { UmbImagingServerDataSource } from './imaging.server.data.js';
 import { UMB_IMAGING_STORE_CONTEXT } from './imaging.store.token.js';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -68,7 +67,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	 * @param {ImageCropModeModel} mode - The crop mode
 	 * @memberof UmbImagingRepository
 	 */
-	async requestThumbnailUrls(uniques: Array<string>, height: number, width: number, mode = ImageCropModeModel.MIN) {
+	async requestThumbnailUrls(uniques: Array<string>, height: number, width: number, mode = UmbImagingCropMode.MIN) {
 		const imagingModel: UmbImagingModel = { height, width, mode };
 		return this.requestResizedItems(uniques, imagingModel);
 	}
