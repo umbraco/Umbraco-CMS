@@ -16,16 +16,18 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	unique = '';
 
 	/**
-	 * The width of the thumbnail.
+	 * The width of the thumbnail in pixels.
+	 * @default 300
 	 */
 	@property({ type: Number })
-	width = 400;
+	width = 300;
 
 	/**
-	 * The height of the thumbnail.
+	 * The height of the thumbnail in pixels.
+	 * @default 300
 	 */
 	@property({ type: Number })
-	height = 400;
+	height = 300;
 
 	/**
 	 * The mode of the thumbnail.
