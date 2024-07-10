@@ -1,7 +1,9 @@
-import type { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { ImageCropModeModel as UmbImagingCropMode } from '@umbraco-cms/backoffice/external/backend-api';
+
+export { UmbImagingCropMode };
 
 export interface UmbImagingModel {
 	height?: number;
 	width?: number;
-	mode?: ImageCropModeModel;
+	mode?: UmbImagingCropMode;
 }
