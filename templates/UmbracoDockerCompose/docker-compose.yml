@@ -1,6 +1,6 @@
 services:
   umb_database:
-    container_name: umb_database
+    container_name: umbraco_image_database
     build:
       context: ./Database
     ports:
