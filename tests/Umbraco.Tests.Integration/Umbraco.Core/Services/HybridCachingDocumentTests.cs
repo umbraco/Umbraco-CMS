@@ -308,6 +308,7 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
 
         // Act
         Textpage.SetValue("title", newTitle);
+        ContentService.Save(Textpage, -1);
         ContentService.Publish(Textpage, Array.Empty<string>());
         var textPage = await PublishedHybridCache.GetById(Textpage.Key);
 

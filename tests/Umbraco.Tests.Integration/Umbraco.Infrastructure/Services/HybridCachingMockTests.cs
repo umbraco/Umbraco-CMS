@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
@@ -82,7 +83,8 @@ public class HybridCachingMockTests : UmbracoIntegrationTestWithContent
         _mockedCache = new ContentCache(
             GetRequiredService<HybridCache>(),
             _mockedCacheService.Object,
-            GetRequiredService<IPublishedContentFactory>());
+            GetRequiredService<IPublishedContentFactory>(),
+            GetRequiredService<IIdKeyMap>());
     }
 
     [Test]
