@@ -36,7 +36,6 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
     public IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
-
     // Create CRUD Tests for Content, Also cultures.
 
     [Test]
@@ -302,22 +301,6 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public async Task Can_Get_Updated_Published_Content_Property_By_Id()
-    {
-        // Arrange
-        string newTitle = "New Name";
-
-        // Act
-        Textpage.SetValue("title", newTitle);
-        ContentService.Publish(Textpage, Array.Empty<string>());
-        var textPage = await PublishedHybridCache.GetById(Textpage.Id);
-
-        // Assert
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(newTitle, textPage.Value("title"));
-    }
-
-    [Test]
     public async Task Can_Get_Updated_Published_Content_Property_By_Key()
     {
         // Arrange
@@ -334,19 +317,21 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Id()
+    [TestCase(true, "New Name")]
+    [TestCase(false, "Welcome to our Home page")]
+    public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Id(bool preview, string titleName)
     {
         // Arrange
-        string newTitle = "New Name";
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        Textpage.SetValue("title", "New Name");
+        ContentService.Save(Textpage, -1);
 
         // Act
-        Textpage.SetValue("title", newTitle);
-        ContentService.Publish(Textpage, Array.Empty<string>());
-        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(newTitle, textPage.Value("title"));
+        Assert.AreEqual(titleName, textPage.Value("title"));
     }
 
     [Test]
@@ -354,10 +339,11 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         string newTitle = "New Name";
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        Textpage.SetValue("title", newTitle);
+        ContentService.Save(Textpage, -1);
 
         // Act
-        Textpage.SetValue("title", newTitle);
-        ContentService.Publish(Textpage, Array.Empty<string>());
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
 
         // Assert
@@ -381,12 +367,14 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(null, textPageDeleted);
     }
 
-    // TestCases for published and draft
     [Test]
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Not_Get_Deleted_Content_By_Key(bool preview)
     {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+
         // Act
         ContentService.Delete(Textpage);
 
