@@ -116,9 +116,9 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         // Arrange
         string newName = "New Name";
         Textpage.Name = newName;
+        ContentService.Save(Textpage, -1);
 
         // Act
-        ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
 
         // Assert
@@ -131,9 +131,9 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         // Arrange
         string newName = "New Name";
         Textpage.Name = newName;
+        ContentService.Save(Textpage, -1);
 
         // Act
-        ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
 
         // Assert
@@ -150,9 +150,9 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         ContentService.Publish(Textpage, Array.Empty<string>());
         string newName = "New Name";
         Textpage.Name = newName;
+        ContentService.Save(Textpage, -1);
 
         // Act
-        ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
 
         // Assert
@@ -169,9 +169,9 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         ContentService.Publish(Textpage, Array.Empty<string>());
         string newName = "New Name";
         Textpage.Name = newName;
+        ContentService.Save(Textpage, -1);
 
         // Act
-        ContentService.Save(Textpage, -1);
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
 
         // Assert
@@ -273,10 +273,10 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         string newTitle = "New Name";
-
-        // Act
         Textpage.SetValue("title", newTitle);
         ContentService.Save(Textpage, -1);
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
 
         // Assert
@@ -289,10 +289,10 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         string newTitle = "New Name";
-
-        // Act
         Textpage.SetValue("title", newTitle);
         ContentService.Save(Textpage, -1);
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
 
         // Assert
@@ -305,11 +305,11 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         string newTitle = "New Name";
-
-        // Act
         Textpage.SetValue("title", newTitle);
         ContentService.Save(Textpage, -1);
         ContentService.Publish(Textpage, Array.Empty<string>());
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Key);
 
         // Assert
@@ -358,29 +358,45 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     public async Task Can_Not_Get_Deleted_Content_By_Id(bool preview)
     {
         // Arrange
-        ContentService.Publish(Textpage, Array.Empty<string>());
-
-        // Act
+        await PublishedHybridCache.GetById(Textpage.Id, preview);
         ContentService.Delete(Textpage);
 
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
+
         // Assert
-        var textPageDeleted = await PublishedHybridCache.GetById(Textpage.Id, preview);
-        Assert.AreEqual(null, textPageDeleted);
+        Assert.AreEqual(null, textPage);
     }
 
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Can_Not_Get_Deleted_Content_By_Key(bool preview)
+    public async Task Can_Not_Get_Deleted_Published_Content_By_Id(bool preview)
     {
         // Arrange
         ContentService.Publish(Textpage, Array.Empty<string>());
-
-        // Act
         ContentService.Delete(Textpage);
 
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
+
         // Assert
+        Assert.AreEqual(null, textPage);
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Not_Get_Deleted_Published_Content_By_Key(bool preview)
+    {
+        // Arrange
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        ContentService.Delete(Textpage);
+
+        // Act
         var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
+
+        // Assert
         Assert.AreEqual(null, textPage);
     }
 
