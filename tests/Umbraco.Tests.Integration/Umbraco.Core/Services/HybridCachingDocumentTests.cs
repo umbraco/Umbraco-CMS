@@ -371,6 +371,22 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     [Test]
     [TestCase(true)]
     [TestCase(false)]
+    public async Task Can_Not_Get_Deleted_Content_By_Key(bool preview)
+    {
+        // Arrange
+        await PublishedHybridCache.GetById(Textpage.Id, preview);
+        ContentService.Delete(Textpage);
+
+        // Act
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
+
+        // Assert
+        Assert.AreEqual(null, textPage);
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
     public async Task Can_Not_Get_Deleted_Published_Content_By_Id(bool preview)
     {
         // Arrange
