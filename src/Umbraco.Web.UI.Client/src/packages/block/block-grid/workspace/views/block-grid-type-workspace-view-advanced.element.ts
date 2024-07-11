@@ -7,33 +7,33 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 export class UmbBlockGridTypeWorkspaceViewAdvancedElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	override render() {
 		return html`
-			<uui-box headline="Advanced">
+			<uui-box headline=${this.localize.term('blockEditor_headlineAdvanced')}>
 				<umb-property
-					label="Overlay size"
+					label=${this.localize.term('blockEditor_labelEditorSize')}
 					alias="editorSize"
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
 				<umb-property
-					label="Inline editing"
+					label=${this.localize.term('blockEditor_gridInlineEditing')}
 					alias="inlineEditing"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 				<umb-property
-					label="Hide content editor"
+					label=${this.localize.term('blockEditor_forceHideContentEditor')}
 					alias="hideContentEditor"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 			</uui-box>
-			<uui-box headline="Catalogue appearance">
+			<uui-box headline=${this.localize.term('blockEditor_headlineCatalogueAppearance')}>
 				<umb-property
-					label="Background color"
+					label=${this.localize.term('blockEditor_labelBackgroundColor')}
 					alias="backgroundColor"
 					property-editor-ui-alias="Umb.PropertyEditorUi.EyeDropper"
 					.config=${[{ alias: 'showAlpha', value: true }]}></umb-property>
 				<umb-property
-					label="Icon color"
+					label=${this.localize.term('blockEditor_labelIconColor')}
 					alias="iconColor"
 					property-editor-ui-alias="Umb.PropertyEditorUi.EyeDropper"
 					.config=${[{ alias: 'showAlpha', value: true }]}></umb-property>
 				<umb-property
-					label="Thumbnail"
+					label=${this.localize.term('blockEditor_thumbnail')}
 					alias="thumbnail"
 					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"
 					.config=${[
