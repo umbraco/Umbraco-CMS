@@ -1,0 +1,85 @@
+services:
+  umb_database:
+    container_name: umb_database
+    build:
+      context: ./Database
+    ports:
+      - "1433:1433"
+      - "1434:1434"
+    volumes:
+      - umb_database:/var/opt/mssql
+    networks:
+      - umbnet
+    healthcheck:
+      test: value=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password1234 -d master -Q "SELECT state_desc FROM sys.databases WHERE name = 'umbracoDb'" | awk 'NR==3'); if [ $value = "ONLINE" ]; then return 1; else return 0; fi
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+      start_interval: 5s
+
+  umbraco_image:
+    image: umbraco_image
+    volumes:
+      - umb_media:/app/wwwroot/media
+      - umb_scripts:/app/wwwroot/scripts
+      - umb_styles:/app/wwwroot/css
+      - umb_logs:/app/umbraco/Logs
+      - umb_views:/app/Views
+      - umb_data:/app/umbraco
+      - umb_models:/app/umbraco/models
+    build:
+      context: .
+      dockerfile: UmbracoProject/Dockerfile
+    depends_on:
+      umb_database:
+        condition: service_healthy
+    restart: always
+    ports:
+      - "44373:8081"
+      - "44372:8080"
+    networks:
+      - umbnet
+    develop:
+      watch:
+        - path: ./UmbracoProject/umbraco/models
+          action: rebuild
+
+volumes:
+  umb_media:
+    driver: local
+    driver_opts:
+      type: none
+      device: .\UmbracoProject\wwwroot\media
+      o: bind
+  umb_scripts:
+    driver: local
+    driver_opts:
+      type: none
+      device: .\UmbracoProject\wwwroot\scripts
+      o: bind
+  umb_styles:
+    driver: local
+    driver_opts:
+      type: none
+      device: .\UmbracoProject\wwwroot\css
+      o: bind
+  umb_logs:
+  umb_views:
+    driver: local
+    driver_opts:
+      type: none
+      device: .\UmbracoProject\Views
+      o: bind
+  umb_data:
+  umb_models:
+    driver: local
+    driver_opts:
+      type: none
+      device: .\UmbracoProject\umbraco\models
+      o: bind
+  umb_database:
+
+networks:
+  umbnet:
+    driver: bridge

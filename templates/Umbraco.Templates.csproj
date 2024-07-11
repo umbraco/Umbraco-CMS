@@ -20,6 +20,7 @@
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
     <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="UmbracoDockerCompose\**" />
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
