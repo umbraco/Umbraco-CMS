@@ -6,6 +6,8 @@ import type {
 	UmbBlockEditorCustomViewProperties,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+
 import '../ref-rte-block/index.js';
 
 /**
@@ -136,11 +138,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	override connectedCallback() {
 		super.connectedCallback();
-
-		this.classList.add('uui-font');
-
-		this.classList.add('uui-text');
-
 		this.setAttribute('contenteditable', 'false');
 	}
 
@@ -150,27 +147,29 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderBlock() {
 		return html`
-			<umb-extension-slot
-				type="blockEditorCustomView"
-				default-element=${'umb-ref-rte-block'}
-				.props=${this._blockViewProps}
-				>${this.#renderRefBlock()}</umb-extension-slot
-			>
-			<uui-action-bar>
-				${this._showContentEdit && this._workspaceEditContentPath
-					? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
-							<uui-icon name="icon-edit"></uui-icon>
-						</uui-button>`
-					: ''}
-				${this._hasSettings && this._workspaceEditSettingsPath
-					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
-							<uui-icon name="icon-settings"></uui-icon>
-						</uui-button>`
-					: ''}
-				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
-					<uui-icon name="icon-remove"></uui-icon>
-				</uui-button>
-			</uui-action-bar>
+			<div class="uui-text uui-font">
+				<umb-extension-slot
+					type="blockEditorCustomView"
+					default-element=${'umb-ref-rte-block'}
+					.props=${this._blockViewProps}
+					>${this.#renderRefBlock()}</umb-extension-slot
+				>
+				<uui-action-bar>
+					${this._showContentEdit && this._workspaceEditContentPath
+						? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
+								<uui-icon name="icon-edit"></uui-icon>
+							</uui-button>`
+						: ''}
+					${this._hasSettings && this._workspaceEditSettingsPath
+						? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
+								<uui-icon name="icon-settings"></uui-icon>
+							</uui-button>`
+						: ''}
+					<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
+						<uui-icon name="icon-remove"></uui-icon>
+					</uui-button>
+				</uui-action-bar>
+			</div>
 		`;
 	}
 
@@ -179,6 +178,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	static override styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				position: relative;
