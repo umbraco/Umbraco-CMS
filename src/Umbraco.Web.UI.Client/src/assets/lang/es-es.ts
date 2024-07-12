@@ -751,9 +751,13 @@ export default {
 		notifications: 'Notificaciones',
 	},
 	packager: {
+		actions: 'Acciones',
+		created: 'Creada',
+		createPackage: 'Crear paquete',
 		chooseLocalPackageText:
 			'Elige un paquete de tu máquina, seleccionando el botón Examinar<br />y localizando el paquete. Los paquetes de Umbraco normalmente tienen la extensión ".umb" o ".zip".',
 		packageLicense: 'Licencia',
+		installed: 'Instalada',
 		installedPackages: 'Paquetes instalados',
 		noPackages: 'No tienes instalado ningún paquete',
 		noPackagesDescription:
@@ -890,6 +894,7 @@ export default {
 		translation: 'Traducción',
 		users: 'Usuarios',
 		help: 'Ayuda',
+		packages: 'Paquetes'
 	},
 	help: {
 		theBestUmbracoVideoTutorials: 'Los mejores tutoriales en video para Umbraco',
