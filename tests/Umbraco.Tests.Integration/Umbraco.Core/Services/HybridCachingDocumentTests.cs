@@ -86,6 +86,50 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public async Task Has_Content_Returns_False_If_No_Content()
+    {
+        var hasContent = await PublishedHybridCache.HasContent();
+        Assert.IsFalse(hasContent);
+    }
+
+    [Test]
+    public async Task Has_Content_Returns_True_If_There_Is_Content()
+    {
+        // Arrange
+        await PublishedHybridCache.GetById(Textpage.Key);
+
+        // Act
+        var hasContent = await PublishedHybridCache.HasContent();
+
+        // Assert
+        Assert.IsTrue(hasContent);
+    }
+
+    [Test]
+    public async Task Has_Content_By_Id_Returns_False_If_Not_In_Cache()
+    {
+        // Arrange
+        // Act
+        var hasContent = await PublishedHybridCache.HasById(Textpage.Id);
+
+        // Assert
+        Assert.IsFalse(hasContent);
+    }
+
+    [Test]
+    public async Task Has_Content_By_Id_Returns_True_If_In_Cache()
+    {
+        // Arrange
+        await PublishedHybridCache.GetById(Textpage.Id);
+
+        // Act
+        var hasContent = await PublishedHybridCache.HasById(Textpage.Id);
+
+        // Assert
+        Assert.IsTrue(hasContent);
+    }
+
+    [Test]
     public async Task Can_Get_Draft_Of_Published_Content_By_Id()
     {
         // Arrange
