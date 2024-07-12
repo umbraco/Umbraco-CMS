@@ -115,30 +115,32 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     public async Task Can_Get_Updated_Draft_Content_By_Id()
     {
         // Arrange
+        await PublishedHybridCache.GetById(Textpage.Id, true);
         string newName = "New Name";
         Textpage.Name = newName;
         ContentService.Save(Textpage, -1);
 
         // Act
-        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
+        var updatedPage = await PublishedHybridCache.GetById(Textpage.Id, true);
 
         // Assert
-        Assert.AreEqual(newName, textPage.Name);
+        Assert.AreEqual(newName, updatedPage.Name);
     }
 
     [Test]
     public async Task Can_Get_Updated_Draft_Content_By_Key()
     {
         // Arrange
+        await PublishedHybridCache.GetById(Textpage.Id, true);
         string newName = "New Name";
         Textpage.Name = newName;
         ContentService.Save(Textpage, -1);
 
         // Act
-        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
+        var updatedPage = await PublishedHybridCache.GetById(Textpage.Key, true);
 
         // Assert
-        Assert.AreEqual(newName, textPage.Name);
+        Assert.AreEqual(newName, updatedPage.Name);
     }
 
     [Test]
