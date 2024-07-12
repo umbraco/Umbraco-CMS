@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.379.0 - ISC -->
+export default `<!-- @license lucide-static v0.407.0 - ISC -->
 <svg
   class="lucide lucide-cake"
   xmlns="http://www.w3.org/2000/svg"
@@ -15,8 +15,8 @@ export default `<!-- @license lucide-static v0.379.0 - ISC -->
   <path d="M7 8v3" />
   <path d="M12 8v3" />
   <path d="M17 8v3" />
-  <path d="M7 4h0.01" />
-  <path d="M12 4h0.01" />
-  <path d="M17 4h0.01" />
+  <path d="M7 4h.01" />
+  <path d="M12 4h.01" />
+  <path d="M17 4h.01" />
 </svg>
 `;

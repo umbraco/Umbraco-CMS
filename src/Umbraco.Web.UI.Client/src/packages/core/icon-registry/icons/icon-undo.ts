@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.379.0 - ISC -->
+export default `<!-- @license lucide-static v0.407.0 - ISC -->
 <svg
   class="lucide lucide-undo-2"
   xmlns="http://www.w3.org/2000/svg"
@@ -10,6 +10,6 @@ export default `<!-- @license lucide-static v0.379.0 - ISC -->
   stroke-linejoin="round"
 >
   <path d="M9 14 4 9l5-5" />
-  <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11" />
+  <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
 </svg>
 `;

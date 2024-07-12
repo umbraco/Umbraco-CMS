@@ -268,14 +268,18 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			${when(
 				dataTypesEntries.length > 0,
 				() =>
-					html` <h5 class="choice-type-headline">Available configurations</h5>
+					html` <h5 class="choice-type-headline">
+							<umb-localize key="contentTypeEditor_searchResultSettings">Available configurations</umb-localize>
+						</h5>
 						${this._renderDataTypes()}${this.#renderLoadMore()}`,
 			)}
 			${when(
 				editorUIEntries.length > 0,
 				() =>
-					html` <h5 class="choice-type-headline">Create a new configuration</h5>
-						${this._renderUIs()}`,
+					html` <h5 class="choice-type-headline">
+							<umb-localize key="contentTypeEditor_searchResultEditors">Create a new configuration</umb-localize>
+						</h5>
+						${this._renderUIs(true)}`,
 			)}
 		`;
 	}
@@ -298,7 +302,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	private _renderUIs() {
+	private _renderUIs(createAsNewOnPick?: boolean) {
 		if (!this._groupedPropertyEditorUIs) return nothing;
 
 		const entries = Object.entries(this._groupedPropertyEditorUIs);
@@ -306,31 +310,44 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		return entries.map(
 			([key, value]) =>
 				html` <h5 class="category-name">${key === 'undefined' ? 'Uncategorized' : key}</h5>
-					${this._renderGroupUIs(value)}`,
+					${this._renderGroupUIs(value, createAsNewOnPick)}`,
 		);
 	}
 
-	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
+	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>, createAsNewOnPick?: boolean) {
 		return html` <ul id="item-grid">
 			${this._dataTypePickerModalRouteBuilder
 				? repeat(
 						uis,
 						(propertyEditorUI) => propertyEditorUI.alias,
-						(propertyEditorUI) =>
-							html` <li class="item">
-								<uui-button
-									type="button"
-									label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
-									href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
-									<div class="item-content">
-										<umb-icon name="${propertyEditorUI.meta.icon}" class="icon"></umb-icon>
-										${propertyEditorUI.meta.label || propertyEditorUI.name}
-									</div>
-								</uui-button>
-							</li>`,
+						(propertyEditorUI) => {
+							return html` <li class="item">${this._renderDataTypeButton(propertyEditorUI, createAsNewOnPick)}</li>`;
+						},
 					)
 				: ''}
 		</ul>`;
+	}
+
+	private _renderDataTypeButton(propertyEditorUI: ManifestPropertyEditorUi, createAsNewOnPick?: boolean) {
+		if (createAsNewOnPick) {
+			return html` <uui-button
+				label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
+				@click=${() => this._createDataType(propertyEditorUI.alias)}>
+				${this._renderItemContent(propertyEditorUI)}
+			</uui-button>`;
+		} else {
+			return html` <uui-button
+				label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
+				href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+				${this._renderItemContent(propertyEditorUI)}
+			</uui-button>`;
+		}
+	}
+	private _renderItemContent(propertyEditorUI: ManifestPropertyEditorUi) {
+		return html`<div class="item-content">
+			<umb-icon name="${propertyEditorUI.meta.icon}" class="icon"></umb-icon>
+			${propertyEditorUI.meta.label || propertyEditorUI.name}
+		</div>`;
 	}
 
 	private _renderGroupDataTypes(dataTypes: Array<UmbDataTypeItemModel>) {

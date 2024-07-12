@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.379.0 - ISC -->
+export default `<!-- @license lucide-static v0.407.0 - ISC -->
 <svg
   class="lucide lucide-bar-chart-2"
   xmlns="http://www.w3.org/2000/svg"

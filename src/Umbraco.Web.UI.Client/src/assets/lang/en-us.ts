@@ -1841,6 +1841,11 @@ export default {
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
 		emailRequired: 'Required - enter an email address for this user',
+		emailDescription: (usernameIsEmail: boolean) => {
+			return usernameIsEmail
+				? 'The email address is used for notifications, password recovery, and as the username for logging in'
+				: 'The email address is used for notifications and password recovery';
+		},
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
@@ -1872,6 +1877,8 @@ export default {
 		lastLogin: 'Last login',
 		lastPasswordChangeDate: 'Password last changed',
 		loginname: 'Username',
+		loginnameRequired: 'Required - enter a username for this user',
+		loginnameDescription: 'The username is used for logging in',
 		mediastartnode: 'Media start node',
 		mediastartnodehelp: 'Limit the media library to a specific start node',
 		mediastartnodes: 'Media start nodes',

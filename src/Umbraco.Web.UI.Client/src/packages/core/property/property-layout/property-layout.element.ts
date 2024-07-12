@@ -51,7 +51,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	public description = '';
 
 	/**
-	 * @description Make the property appear invalid
+	 * @description Make the property appear invalid.
 	 * @type {boolean}
 	 * @attr
 	 * @default undefined
@@ -59,11 +59,20 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	public invalid?: boolean;
 
+	/**
+	 * @description Display a mandatory indicator.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public mandatory?: boolean;
+
 	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
-				<uui-label id="label" title=${this.alias}>
+				<uui-label id="label" title=${this.alias} ?required=${this.mandatory}>
 					${this.localize.string(this.label)}
 					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
 				</uui-label>

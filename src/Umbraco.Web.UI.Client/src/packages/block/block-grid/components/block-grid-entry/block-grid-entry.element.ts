@@ -2,13 +2,17 @@ import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/extension-registry';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { UMB_BLOCK_GRID, type UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
+
 import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
 import '../block-scale-handler/index.js';
-
 /**
  * @element umb-block-grid-entry
  */
@@ -39,6 +43,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#context = new UmbBlockGridEntryContext(this);
 	#renderTimeout: number | undefined;
+
+	@state()
+	_contentTypeAlias?: string;
 
 	@state()
 	_columnSpan?: number;
@@ -82,11 +89,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_inlineCreateAboveWidth?: string;
 
-	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
-	_blockViewProps: UmbBlockViewPropsType<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
+		contentUdi: undefined!,
+		config: { showContentEdit: false, showSettingsEdit: false },
+	}; // Set to undefined cause it will be set before we render.
 
-	#updateBlockViewProps(incoming: Partial<UmbBlockViewPropsType<UmbBlockGridLayoutModel>>) {
+	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
 		this.requestUpdate('_blockViewProps');
 	}
@@ -95,57 +104,119 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		super();
 
 		// Misc:
-		this.observe(this.#context.showContentEdit, (show) => {
-			this._showContentEdit = show;
-		});
-		this.observe(this.#context.settingsElementTypeKey, (key) => {
-			this._hasSettings = !!key;
-		});
-		this.observe(this.#context.canScale, (canScale) => {
-			this._canScale = canScale;
-		});
-		this.observe(this.#context.label, (label) => {
-			this.#updateBlockViewProps({ label });
-			this._label = label;
-		});
-		this.observe(this.#context.contentElementTypeIcon, (icon) => {
-			this.#updateBlockViewProps({ icon });
-			this._icon = icon;
-		});
-		this.observe(this.#context.inlineEditingMode, (mode) => {
-			this._inlineEditingMode = mode;
-		});
+		this.observe(
+			this.#context.showContentEdit,
+			(showContentEdit) => {
+				this._showContentEdit = showContentEdit;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settingsElementTypeKey,
+			(key) => {
+				this._hasSettings = !!key;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.canScale,
+			(canScale) => {
+				this._canScale = canScale;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.blockType,
+			(blockType) => {
+				this.#updateBlockViewProps({ blockType });
+			},
+			null,
+		);
+		// TODO: Implement index.
+		this.observe(
+			this.#context.label,
+			(label) => {
+				this.#updateBlockViewProps({ label });
+				this._label = label;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeIcon,
+			(icon) => {
+				this.#updateBlockViewProps({ icon });
+				this._icon = icon;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.inlineEditingMode,
+			(mode) => {
+				this._inlineEditingMode = mode;
+			},
+			null,
+		);
 
 		// Data:
-		this.observe(this.#context.layout, (layout) => {
-			this.#updateBlockViewProps({ layout });
-		});
-		this.observe(this.#context.content, (content) => {
-			this.#updateBlockViewProps({ content });
-		});
-		this.observe(this.#context.settings, (settings) => {
-			this.#updateBlockViewProps({ settings });
-		});
+		this.observe(
+			this.#context.layout,
+			(layout) => {
+				this.#updateBlockViewProps({ layout });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.content,
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settings,
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
+			},
+			null,
+		);
 
 		// Paths:
-		this.observe(this.#context.createBeforePath, (createPath) => {
-			//const oldValue = this._createBeforePath;
-			this._createBeforePath = createPath;
-			//this.requestUpdate('_createPath', oldValue);
-		});
-		this.observe(this.#context.createAfterPath, (createPath) => {
-			//const oldValue = this._createAfterPath;
-			this._createAfterPath = createPath;
-			//this.requestUpdate('_createPath', oldValue);
-		});
-		this.observe(this.#context.workspaceEditContentPath, (path) => {
-			this._workspaceEditContentPath = path;
-			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editContent: path } });
-		});
-		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
-			this._workspaceEditSettingsPath = path;
-			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editSettings: path } });
-		});
+		this.observe(
+			this.#context.createBeforePath,
+			(createPath) => {
+				//const oldValue = this._createBeforePath;
+				this._createBeforePath = createPath;
+				//this.requestUpdate('_createPath', oldValue);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.createAfterPath,
+			(createPath) => {
+				//const oldValue = this._createAfterPath;
+				this._createAfterPath = createPath;
+				//this.requestUpdate('_createPath', oldValue);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditContentPath,
+			(path) => {
+				this._workspaceEditContentPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditSettingsPath,
+			(path) => {
+				this._workspaceEditSettingsPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
 	}
 
 	override connectedCallback(): void {
@@ -169,16 +240,25 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			'rowSpan',
 		);
-		this.observe(this.#context.contentElementTypeKey, (contentElementTypeKey) => {
-			if (contentElementTypeKey) {
-				this.setAttribute('data-content-element-type-key', contentElementTypeKey);
-			}
-		});
-		this.observe(this.#context.contentElementTypeAlias, (contentElementTypeAlias) => {
-			if (contentElementTypeAlias) {
-				this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
-			}
-		});
+		this.observe(
+			this.#context.contentElementTypeKey,
+			(contentElementTypeKey) => {
+				if (contentElementTypeKey) {
+					this.setAttribute('data-content-element-type-key', contentElementTypeKey);
+				}
+			},
+			'contentElementTypeKey',
+		);
+		this.observe(
+			this.#context.contentElementTypeAlias,
+			(contentElementTypeAlias) => {
+				if (contentElementTypeAlias) {
+					this._contentTypeAlias = contentElementTypeAlias;
+					this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
+				}
+			},
+			'contentElementTypeAlias',
+		);
 
 		this.#callUpdateInlineCreateButtons();
 	}
@@ -225,18 +305,29 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	};
 
+	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+		if (
+			manifest.forContentTypeAlias &&
+			!stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)
+		) {
+			return false;
+		}
+		if (manifest.forBlockEditor && !stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_GRID)) {
+			return false;
+		}
+		return true;
+	};
+
 	#renderInlineEditBlock() {
-		return html`<umb-block-grid-block-inline
-			.contentUdi=${this.contentUdi}
-			.label=${this._label}></umb-block-grid-block-inline>`;
+		return html`<umb-block-grid-block-inline .label=${this._label}></umb-block-grid-block-inline>`;
 	}
 
 	#renderRefBlock() {
-		return html`<umb-block-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-block-grid-block>`;
+		return html`<umb-block-grid-block .label=${this._label}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {
-		return this.contentUdi
+		return this.contentUdi && this._contentTypeAlias
 			? html`
 					${this._createBeforePath && this._showInlineCreateBefore
 						? html`<uui-button-inline-create
@@ -251,6 +342,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							type="blockEditorCustomView"
 							default-element="umb-block-grid-block"
 							.props=${this._blockViewProps}
+							.filter=${this.#extensionSlotFilterMethod}
 							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
 						<uui-action-bar>
@@ -345,10 +437,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				//display: var(--umb-block-grid--block-ui-display, block);
 				display: block;
 				border-color: var(--uui-color-interactive);
-			}
-
-			uui-action-bar {
-				background-color: var(--uui-color-surface);
 			}
 
 			.umb-block-grid__block {

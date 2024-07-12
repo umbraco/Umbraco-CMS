@@ -1,11 +1,15 @@
 import { UmbInputContentElement } from './input-content.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
-import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import type { UmbTestRunnerWindow } from '@umbraco-cms/internal/test-utils';
+
+import '@umbraco-cms/backoffice/document';
+
 describe('UmbInputContentElement', () => {
 	let element: UmbInputContentElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-content></umb-input-content> `);
+		element = await fixture(html`<umb-input-content></umb-input-content>`);
 	});
 
 	it('is defined with its own instance', () => {

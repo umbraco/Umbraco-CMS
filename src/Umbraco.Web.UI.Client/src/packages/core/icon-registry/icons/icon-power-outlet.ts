@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.379.0 - ISC -->
+export default `<!-- @license lucide-static v0.407.0 - ISC -->
 <svg
   class="lucide lucide-square-power"
   xmlns="http://www.w3.org/2000/svg"
@@ -9,8 +9,8 @@ export default `<!-- @license lucide-static v0.379.0 - ISC -->
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <rect width="18" height="18" x="3" y="3" rx="2" />
-  <path d="M12 7v5" />
-  <path d="M8 9a5.14 5.14 0 0 0 4 8 4.95 4.95 0 0 0 4-8" />
+  <path d="M12 7v4" />
+  <path d="M7.998 9.003a5 5 0 1 0 8-.005" />
+  <rect x="3" y="3" width="18" height="18" rx="2" />
 </svg>
 `;

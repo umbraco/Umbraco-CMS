@@ -1,7 +1,6 @@
 import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -10,6 +9,8 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
+import '@umbraco-cms/backoffice/imaging';
 
 const elementName = 'umb-input-media';
 
@@ -87,7 +88,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -123,8 +124,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	#pickerContext = new UmbMediaPickerContext(this);
 
-	#imagingRepository = new UmbImagingRepository(this);
-
 	constructor() {
 		super();
 
@@ -143,41 +142,22 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 			const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
 			if (selectedItems?.length && !missingCards.length) return;
 
-			if (!selectedItems?.length) {
-				this._cards = [];
-				return;
-			}
-
-			const uniques = selectedItems.map((x) => x.unique);
-
-			const { data: thumbnails } = await this.#imagingRepository.requestThumbnailUrls(uniques, 400, 400);
-
-			this._cards = selectedItems.map((item) => {
-				const thumbnail = thumbnails?.find((x) => x.unique === item.unique);
-				return {
-					...item,
-					src: thumbnail?.url,
-				};
-			});
+			this._cards = selectedItems ?? [];
 		});
 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.selection.length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.selection.length > this.max,
 		);
 	}
 
-	protected override getFormElement() {
-		return undefined;
-	}
-
-	#pickableFilter: (item: UmbMediaItemModel) => boolean = (item) => {
+	#pickableFilter = (item: UmbMediaItemModel): boolean => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
 			return this.allowedContentTypeIds.includes(item.mediaType.unique);
 		}
@@ -192,8 +172,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		});
 	}
 
-	#onRemove(item: UmbMediaCardItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	async #onRemove(item: UmbMediaCardItemModel) {
+		await this.#pickerContext.requestRemoveItem(item.unique);
+		this._cards = this._cards.filter((x) => x.unique !== item.unique);
 	}
 
 	override render() {
@@ -231,9 +212,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
 				href="${this._editMediaPath}edit/${item.unique}">
-				${item.src
-					? html`<img src=${item.src} alt=${item.name} />`
-					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
+				<umb-imaging-thumbnail
+					unique=${item.unique}
+					alt=${item.name}
+					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
