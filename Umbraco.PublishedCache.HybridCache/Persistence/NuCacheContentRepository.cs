@@ -58,8 +58,8 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
         _nucacheSettings = nucacheSettings;
     }
 
-    public void DeleteContentItem(IContentBase item)
-        => Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = item.Id });
+    public void DeleteContentItem(int id)
+        => Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = id });
 
     public void RefreshContent(IContent content)
     {
@@ -196,7 +196,7 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
-    public ContentCacheNode GetContentSource(int id)
+    public ContentCacheNode? GetContentSource(int id)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -207,7 +207,7 @@ AND cmsContentNu.nodeId IS NULL
 
         if (dto == null)
         {
-            return new ContentCacheNode();
+            return null;
         }
 
         IContentCacheDataSerializer serializer =
@@ -273,7 +273,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public ContentCacheNode GetMediaSource(int id)
+    public ContentCacheNode? GetMediaSource(int id)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
@@ -282,9 +282,9 @@ AND cmsContentNu.nodeId IS NULL
 
         ContentSourceDto? dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
 
-        if (dto == null)
+        if (dto is null)
         {
-            return new ContentCacheNode();
+            return null;
         }
 
         IContentCacheDataSerializer serializer =

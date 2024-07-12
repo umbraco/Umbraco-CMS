@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
 internal interface INuCacheContentRepository
 {
-    void DeleteContentItem(IContentBase item);
+    void DeleteContentItem(int id);
 
     IEnumerable<ContentCacheNode> GetAllContentSources();
 
@@ -14,9 +14,9 @@ internal interface INuCacheContentRepository
 
     IEnumerable<ContentCacheNode> GetBranchMediaSources(int id);
 
-    ContentCacheNode GetContentSource(int id);
+    ContentCacheNode? GetContentSource(int id);
 
-    ContentCacheNode GetMediaSource(int id);
+    ContentCacheNode? GetMediaSource(int id);
 
     IEnumerable<ContentCacheNode> GetTypeContentSources(IEnumerable<int>? ids);
 

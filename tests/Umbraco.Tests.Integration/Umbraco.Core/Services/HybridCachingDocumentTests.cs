@@ -34,6 +34,7 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
+
     public IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
     // Create CRUD Tests for Content, Also cultures.
@@ -353,32 +354,30 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    [TestCase(true)]
-    [TestCase(false)]
-    public async Task Can_Not_Get_Deleted_Content_By_Id(bool preview)
+    public async Task Can_Not_Get_Deleted_Content_By_Id()
     {
         // Arrange
-        await PublishedHybridCache.GetById(Textpage.Id, preview);
+        var content = await PublishedHybridCache.GetById(Subpage3.Id, true);
+
+        Assert.IsNotNull(content);
         ContentService.Delete(Textpage);
 
         // Act
-        var textPage = await PublishedHybridCache.GetById(Textpage.Id, preview);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Id, true);
 
         // Assert
-        Assert.AreEqual(null, textPage);
+        Assert.IsNull(textPage);
     }
 
     [Test]
-    [TestCase(true)]
-    [TestCase(false)]
-    public async Task Can_Not_Get_Deleted_Content_By_Key(bool preview)
+    public async Task Can_Not_Get_Deleted_Content_By_Key()
     {
         // Arrange
-        await PublishedHybridCache.GetById(Textpage.Key, preview);
+        await PublishedHybridCache.GetById(Subpage3.Key, true);
         ContentService.Delete(Textpage);
 
         // Act
-        var textPage = await PublishedHybridCache.GetById(Textpage.Key, preview);
+        var textPage = await PublishedHybridCache.GetById(Textpage.Key, true);
 
         // Assert
         Assert.AreEqual(null, textPage);
