@@ -11,11 +11,13 @@ internal sealed class ContentCache : IPublishedHybridCache
 {
     private readonly ICacheService _cacheService;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IContentService _contentService;
 
-    public ContentCache(ICacheService cacheService, IIdKeyMap idKeyMap)
+    public ContentCache(ICacheService cacheService, IIdKeyMap idKeyMap, IContentService contentService)
     {
         _cacheService = cacheService;
         _idKeyMap = idKeyMap;
+        _contentService = contentService;
     }
 
     public async Task<IPublishedContent?> GetById(int contentId, bool preview = false)
@@ -31,7 +33,8 @@ internal sealed class ContentCache : IPublishedHybridCache
 
     public async Task<IPublishedContent?> GetById(Guid contentId, bool preview = false) => await _cacheService.GetByKey(contentId, preview);
 
-    public Task<bool> HasById(int contentId, bool preview = false) => throw new NotImplementedException();
+    public async Task<bool> HasById(int contentId, bool preview = false) => await _cacheService.HasContentById(contentId, preview);
 
-    public Task<bool> HasContent(bool preview = false) => throw new NotImplementedException();
+    // TODO: Look into this, not sure this makes sense at all to have.
+    public Task<bool> HasContent(bool preview = false) => Task.FromResult(_contentService.GetRootContent().Any(x => x.Published == !preview));
 }

@@ -66,6 +66,21 @@ internal sealed class CacheService : ICacheService
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
 
+    public async Task<bool> HasContentById(int id, bool preview = false)
+    {
+        Attempt<Guid>  keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        if (keyAttempt.Success is false)
+        {
+            return false;
+        }
+
+        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+            $"{keyAttempt.Result}", // Unique key to the cache entry
+            cancel => ValueTask.FromResult<ContentCacheNode?>(null));
+
+        return contentCacheNode is not null;
+    }
+
     public async Task RefreshContent(IContent content)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();

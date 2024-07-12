@@ -99,7 +99,7 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         await PublishedHybridCache.GetById(Textpage.Key);
 
         // Act
-        var hasContent = await PublishedHybridCache.HasContent();
+        var hasContent = await PublishedHybridCache.HasContent(true);
 
         // Assert
         Assert.IsTrue(hasContent);
@@ -123,7 +123,7 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         await PublishedHybridCache.GetById(Textpage.Id);
 
         // Act
-        var hasContent = await PublishedHybridCache.HasById(Textpage.Id);
+        var hasContent = await PublishedHybridCache.HasById(Textpage.Id, true);
 
         // Assert
         Assert.IsTrue(hasContent);

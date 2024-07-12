@@ -9,6 +9,8 @@ internal interface ICacheService
 
     Task<IPublishedContent?> GetById(int id, bool preview = false);
 
+    Task<bool> HasContentById(int id, bool preview = false);
+
     Task RefreshContent(IContent content);
 
     Task DeleteItem(int id);
