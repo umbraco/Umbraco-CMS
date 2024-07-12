@@ -17,6 +17,9 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
     private readonly ILogger<DeliveryApiContentIndex> _logger;
 
+    // The special path and icon value transformations are not needed in this case
+    protected override bool ApplySpecialValueTransformations => false;
+
     [Obsolete("Use the constructor that takes an IDeliveryApiCompositeIdHandler instead, scheduled for removal in v15")]
     public DeliveryApiContentIndex(
         ILoggerFactory loggerFactory,

@@ -38,7 +38,13 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     }
 
     public Attempt<string?> IsHealthy() => _diagnostics.IsHealthy();
+
     public virtual IReadOnlyDictionary<string, object?> Metadata => _diagnostics.Metadata;
+
+    /// <summary>
+    ///     Performs special __Path and __Icon value transformations to all deriving indexes when set to true.
+    /// </summary>
+    protected virtual bool ApplySpecialValueTransformations => true;
 
     /// <summary>
     ///     When set to true Umbraco will keep the index in sync with Umbraco data automatically
@@ -115,12 +121,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     {
         base.OnTransformingIndexValues(e);
 
-        // Performs special value transformations to all deriving indexes of this base class
-        // but the DeliveryApiContentIndex (they are not needed in this case).
-        // The alternative is to move the call to ApplySpecialIndexValueTransformations into a new base class
-        // that all implementors but the DeliveryApiContentIndex would inherit from but that would be breaking
-        // for any custom indexes deriving from UmbracoExamineIndex.
-        if (e.Index.Name != Constants.UmbracoIndexes.DeliveryApiContentIndexName)
+        if (ApplySpecialValueTransformations)
         {
             ApplySpecialIndexValueTransformations(e);
         }
