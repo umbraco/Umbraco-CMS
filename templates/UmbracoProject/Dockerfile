@@ -32,6 +32,5 @@ USER root
 RUN mkdir umbraco
 RUN mkdir umbraco/Logs
 RUN chown $APP_UID umbraco --recursive
-RUN if [ -O wwwroot/umbraco ] ; then chown $APP_UID wwwroot/umbraco --recursive ; fi
 USER $APP_UID
 ENTRYPOINT ["dotnet", "UmbracoProject.dll"]
