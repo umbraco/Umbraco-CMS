@@ -14,18 +14,15 @@
 (function () {
     'use strict';
 
-    function TourStepDirective(focusLockService) {
+    function TourStepDirective() {
 
         function link(scope, element, attrs, ctrl) {
 
             scope.close = function () {
                 if (scope.onClose) {
                   scope.onClose();
-                  focusLockService.removeInertAttribute();
                 }
             }
-
-            focusLockService.addInertAttribute();
         }
 
         var directive = {
