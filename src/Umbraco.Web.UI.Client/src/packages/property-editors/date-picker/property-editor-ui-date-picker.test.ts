@@ -43,4 +43,60 @@ describe('UmbPropertyEditorUIDatePickerElement', () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});
 	}
+
+	describe('input', () => {
+		it('should format the value to a datetime-local', async () => {
+			element.value = '2024-05-03 10:44:00';
+			element.config = new UmbPropertyEditorConfigCollection([{ alias: 'format', value: 'YYYY-MM-dd HH:mm:ss' }]);
+			await element.updateComplete;
+			expect((element as any)._inputValue).to.equal('2024-05-03T10:44:00');
+		});
+
+		it('should format the value to a date', async () => {
+			element.value = '2024-05-03 10:44:00';
+			element.config = new UmbPropertyEditorConfigCollection([{ alias: 'format', value: 'YYYY-MM-dd' }]);
+			await element.updateComplete;
+			expect((element as any)._inputValue).to.equal('2024-05-03');
+		});
+
+		it('should format the value to a time', async () => {
+			element.value = '2024-05-03 10:44:00';
+			element.config = new UmbPropertyEditorConfigCollection([{ alias: 'format', value: 'HH:mm' }]);
+			await element.updateComplete;
+			expect((element as any)._inputValue).to.equal('10:44:00');
+		});
+
+		it('should disregard a non-datetime value', async () => {
+			element.value = '03/05/2024 10:44:00';
+			await element.updateComplete;
+			expect((element as any)._inputValue).to.be.undefined;
+		});
+	});
+
+	describe('output', () => {
+		it('should format the value to a datetime-local', async () => {
+			inputElement.value = '2024-05-03T10:44:00';
+			inputElement.dispatchEvent(new CustomEvent('change'));
+			await element.updateComplete;
+			expect(element.value).to.equal('2024-05-03 10:44:00');
+		});
+
+		it('should format the value to a date', async () => {
+			element.config = new UmbPropertyEditorConfigCollection([{ alias: 'format', value: 'YYYY-MM-dd' }]);
+			await element.updateComplete;
+			inputElement.value = '2024-05-03';
+			inputElement.dispatchEvent(new CustomEvent('change'));
+			await element.updateComplete;
+			expect(element.value).to.equal('2024-05-03 00:00:00');
+		});
+
+		it('should format the value to a time', async () => {
+			element.config = new UmbPropertyEditorConfigCollection([{ alias: 'format', value: 'HH:mm' }]);
+			await element.updateComplete;
+			inputElement.value = '10:44:00';
+			inputElement.dispatchEvent(new CustomEvent('change'));
+			await element.updateComplete;
+			expect(element.value).to.equal('0001-01-01 10:44:00');
+		});
+	});
 });
