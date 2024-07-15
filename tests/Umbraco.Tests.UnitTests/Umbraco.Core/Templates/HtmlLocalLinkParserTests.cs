@@ -111,10 +111,10 @@ public class HtmlLocalLinkParserTests
     // current
     [TestCase(
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
-        "<a type=\"document\" href=\"/my-test-url\" title=\"world\">world</a>")]
+        "<a  href=\"/my-test-url\" title=\"world\">world</a>")]
     [TestCase(
         "<a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
-        "<a type=\"media\" href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+        "<a  href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
     // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",
