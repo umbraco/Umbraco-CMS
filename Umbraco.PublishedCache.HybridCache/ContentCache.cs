@@ -34,7 +34,4 @@ internal sealed class ContentCache : IPublishedHybridCache
     public async Task<IPublishedContent?> GetById(Guid contentId, bool preview = false) => await _cacheService.GetByKey(contentId, preview);
 
     public async Task<bool> HasById(int contentId, bool preview = false) => await _cacheService.HasContentById(contentId, preview);
-
-    // TODO: Look into this, not sure this makes sense at all to have.
-    public Task<bool> HasContent(bool preview = false) => Task.FromResult(_contentService.GetRootContent().Any(x => x.Published == !preview));
 }

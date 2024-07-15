@@ -30,12 +30,4 @@ public interface IPublishedHybridCache
     /// <returns>A value indicating whether to the cache contains the specified content.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
     Task<bool> HasById(int contentId, bool preview = false);
-
-    /// <summary>
-    ///     Gets a value indicating whether the cache contains published content.
-    /// </summary>
-    /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-    /// <returns>A value indicating whether the cache contains published content.</returns>
-    /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
-    Task<bool> HasContent(bool preview = false);
 }
