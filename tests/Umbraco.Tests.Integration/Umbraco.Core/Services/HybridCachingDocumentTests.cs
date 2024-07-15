@@ -112,8 +112,6 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Has_Content_By_Id_Has_Content_After_Load()
     {
-
-
         // Arrange
         var hasContent = await PublishedHybridCache.HasById(Textpage.Id, true);
 
