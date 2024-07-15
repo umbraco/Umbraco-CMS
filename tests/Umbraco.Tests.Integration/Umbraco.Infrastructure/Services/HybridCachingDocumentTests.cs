@@ -15,7 +15,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -24,7 +24,7 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddHybridCache();
-        services.AddSingleton<IPublishedHybridCache, ContentCache>();
+        services.AddSingleton<ContentCache>();
         services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
@@ -33,9 +33,9 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
     }
 
-    private IPublishedHybridCache PublishedHybridCache => GetRequiredService<IPublishedHybridCache>();
+    private IPublishedHybridCache PublishedHybridCache => GetRequiredService<ContentCache>();
 
-    public IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
+    private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
     // Create CRUD Tests for Content, Also cultures.
 
