@@ -78,6 +78,11 @@ internal sealed class CacheService : ICacheService
             $"{keyAttempt.Result}", // Unique key to the cache entry
             cancel => ValueTask.FromResult<ContentCacheNode?>(null));
 
+        if (contentCacheNode is null)
+        {
+            await _hybridCache.RemoveAsync($"{keyAttempt.Result}");
+        }
+
         return contentCacheNode is not null;
     }
 

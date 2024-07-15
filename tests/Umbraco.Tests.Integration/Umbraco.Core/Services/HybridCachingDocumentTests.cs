@@ -110,6 +110,24 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public async Task Has_Content_By_Id_Has_Content_After_Load()
+    {
+
+
+        // Arrange
+        var hasContent = await PublishedHybridCache.HasById(Textpage.Id, true);
+
+        Assert.IsFalse(hasContent);
+        await PublishedHybridCache.GetById(Textpage.Id);
+
+        // Act
+        var hasContent2 = await PublishedHybridCache.HasById(Textpage.Id, true);
+
+        // Assert
+        Assert.IsTrue(hasContent2);
+    }
+
+    [Test]
     public async Task Can_Get_Draft_Of_Published_Content_By_Id()
     {
         // Arrange
