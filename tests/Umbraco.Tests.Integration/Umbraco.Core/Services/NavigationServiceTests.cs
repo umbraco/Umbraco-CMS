@@ -19,24 +19,6 @@ public class NavigationServiceTests : UmbracoIntegrationTest
 
     private INavigationService NavigationService => GetRequiredService<INavigationService>();
 
-    private Content Root { get; set; }
-
-    private Content Child1 { get; set; }
-
-    private Content Grandchild1 { get; set; }
-
-    private Content Grandchild2 { get; set; }
-
-    private Content Child2 { get; set; }
-
-    private Content Grandchild3 { get; set; }
-
-    private Content GreatGrandchild1 { get; set; }
-
-    private Content Child3 { get; set; }
-
-    private Content Grandchild4 { get; set; }
-
     [SetUp]
     public async Task Setup()
     {
@@ -59,48 +41,48 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Content
-        Root = ContentBuilder.CreateSimpleContent(contentType, "Root");
-        Root.Key = new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF");
-        ContentService.Save(Root, Constants.Security.SuperUserId);
+        Content root = ContentBuilder.CreateSimpleContent(contentType, "Root");
+        root.Key = new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF");
+        ContentService.Save(root, Constants.Security.SuperUserId);
 
-        Child1 = ContentBuilder.CreateSimpleContent(contentType, "Child 1", Root.Id);
-        Child1.Key = new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE");
-        ContentService.Save(Child1, Constants.Security.SuperUserId);
+        Content child1 = ContentBuilder.CreateSimpleContent(contentType, "Child 1", root.Id);
+        child1.Key = new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE");
+        ContentService.Save(child1, Constants.Security.SuperUserId);
 
-        Grandchild1 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 1", Child1.Id);
-        Grandchild1.Key = new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573");
-        ContentService.Save(Grandchild1, Constants.Security.SuperUserId);
+        Content grandchild1 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 1", child1.Id);
+        grandchild1.Key = new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573");
+        ContentService.Save(grandchild1, Constants.Security.SuperUserId);
 
-        Grandchild2 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 2", Child1.Id);
-        Grandchild2.Key = new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB");
-        ContentService.Save(Grandchild2, Constants.Security.SuperUserId);
+        Content grandchild2 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 2", child1.Id);
+        grandchild2.Key = new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB");
+        ContentService.Save(grandchild2, Constants.Security.SuperUserId);
 
-        Child2 = ContentBuilder.CreateSimpleContent(contentType, "Child 2", Root.Id);
-        Child2.Key = new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96");
-        ContentService.Save(Child2, Constants.Security.SuperUserId);
+        Content child2 = ContentBuilder.CreateSimpleContent(contentType, "Child 2", root.Id);
+        child2.Key = new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96");
+        ContentService.Save(child2, Constants.Security.SuperUserId);
 
-        Grandchild3 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 3", Child2.Id);
-        Grandchild3.Key = new Guid("D63C1621-C74A-4106-8587-817DEE5FB732");
-        ContentService.Save(Grandchild3, Constants.Security.SuperUserId);
+        Content grandchild3 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 3", child2.Id);
+        grandchild3.Key = new Guid("D63C1621-C74A-4106-8587-817DEE5FB732");
+        ContentService.Save(grandchild3, Constants.Security.SuperUserId);
 
-        GreatGrandchild1 = ContentBuilder.CreateSimpleContent(contentType, "Great-grandchild 1", Grandchild3.Id);
-        GreatGrandchild1.Key = new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7");
-        ContentService.Save(GreatGrandchild1, Constants.Security.SuperUserId);
+        Content greatGrandchild1 = ContentBuilder.CreateSimpleContent(contentType, "Great-grandchild 1", grandchild3.Id);
+        greatGrandchild1.Key = new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7");
+        ContentService.Save(greatGrandchild1, Constants.Security.SuperUserId);
 
-        Child3 = ContentBuilder.CreateSimpleContent(contentType, "Child 3", Root.Id);
-        Child3.Key = new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF");
-        ContentService.Save(Child3, Constants.Security.SuperUserId);
+        Content child3 = ContentBuilder.CreateSimpleContent(contentType, "Child 3", root.Id);
+        child3.Key = new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF");
+        ContentService.Save(child3, Constants.Security.SuperUserId);
 
-        Grandchild4 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 3", Child3.Id);
-        Grandchild4.Key = new Guid("F381906C-223C-4466-80F7-B63B4EE073F8");
-        ContentService.Save(Grandchild4, Constants.Security.SuperUserId);
+        Content grandchild4 = ContentBuilder.CreateSimpleContent(contentType, "Grandchild 3", child3.Id);
+        grandchild4.Key = new Guid("F381906C-223C-4466-80F7-B63B4EE073F8");
+        ContentService.Save(grandchild4, Constants.Security.SuperUserId);
     }
 
     [Test]
     public async Task Cannot_Get_Parent_From_Non_Existing_Content_Key()
     {
         // Act
-        var result = await NavigationService.GetParentKeyAsync(Guid.NewGuid());
+        Guid? result = await NavigationService.GetParentKeyAsync(Guid.NewGuid());
 
         // Assert
         Assert.IsNull(result);
