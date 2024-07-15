@@ -462,6 +462,11 @@ public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(textPage);
+            Assert.AreEqual(Textpage.Id, textPage.Id);
+            Assert.AreEqual(Textpage.Key, textPage.Key);
+            Assert.AreEqual(Textpage.CreatorId, textPage.CreatorId);
+            Assert.AreEqual(Textpage.CreateDate, textPage.CreateDate);
+            Assert.AreEqual(Textpage.Edited, !textPage.IsPublished());
             Assert.AreEqual(Textpage.Name, textPage.Name);
             Assert.AreEqual(Textpage.Published, textPage.IsPublished());
         });

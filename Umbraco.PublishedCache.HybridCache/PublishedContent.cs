@@ -35,6 +35,15 @@ internal sealed class PublishedContent : PublishedContentBase
         }
 
         _properties = properties;
+
+        Id = contentNode.Id;
+        Key = contentNode.Uid;
+        CreatorId = contentNode.CreatorId;
+        CreateDate = contentNode.CreateDate;
+        SortOrder = contentNode.SortOrder;
+        WriterId = contentData.WriterId;
+        TemplateId = contentData.TemplateId;
+        UpdateDate = contentData.VersionDate;
     }
 
     public override IPublishedContentType ContentType => _contentNode.ContentType;
@@ -66,7 +75,7 @@ internal sealed class PublishedContent : PublishedContentBase
 
     public override int SortOrder { get; }
 
-    public override int Level { get; }
+    public override int Level { get; } = 0;
 
     public override string Path => _contentNode.Path;
 
