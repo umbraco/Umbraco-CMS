@@ -20,18 +20,18 @@ internal sealed class ContentCache : IPublishedHybridCache
         _contentService = contentService;
     }
 
-    public async Task<IPublishedContent?> GetById(int contentId, bool preview = false)
+    public async Task<IPublishedContent?> GetById(int id, bool preview = false)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(contentId, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         if (keyAttempt.Success is false)
         {
             return null;
         }
 
-        return await _cacheService.GetById(contentId, preview);
+        return await _cacheService.GetById(id, preview);
     }
 
-    public async Task<IPublishedContent?> GetById(Guid contentId, bool preview = false) => await _cacheService.GetByKey(contentId, preview);
+    public async Task<IPublishedContent?> GetById(Guid key, bool preview = false) => await _cacheService.GetByKey(key, preview);
 
-    public async Task<bool> HasById(int contentId, bool preview = false) => await _cacheService.HasContentById(contentId, preview);
+    public async Task<bool> HasById(int id, bool preview = false) => await _cacheService.HasContentById(id, preview);
 }
