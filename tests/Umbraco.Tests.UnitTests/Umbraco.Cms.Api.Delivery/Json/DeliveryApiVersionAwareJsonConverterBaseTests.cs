@@ -64,10 +64,7 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         var output = reader.ReadToEnd();
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(expectedPropertyNames.All(v => output.Contains(v, StringComparison.InvariantCulture)), Is.True);
-        });
+        Assert.That(expectedPropertyNames.All(v => output.Contains(v, StringComparison.InvariantCulture)), Is.True);
     }
 
     [Test]
@@ -96,19 +93,16 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         var jsonOptions = new JsonSerializerOptions();
         var output = GetJsonOutput(apiVersion, jsonOptions);
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            // Verify values correspond to properties
-            var jsonDoc = JsonDocument.Parse(output);
-            var root = jsonDoc.RootElement;
+        // Verify values correspond to properties
+        var jsonDoc = JsonDocument.Parse(output);
+        var root = jsonDoc.RootElement;
 
-            foreach (var propertyName in expectedPropertyNames)
-            {
-                var expectedValue = GetPropertyValue(propertyName);
-                Assert.AreEqual(expectedValue, root.GetProperty(propertyName).GetString());
-            }
-        });
+        // Assert
+        foreach (var propertyName in expectedPropertyNames)
+        {
+            var expectedValue = GetPropertyValue(propertyName);
+            Assert.AreEqual(expectedValue, root.GetProperty(propertyName).GetString());
+        }
     }
 
     [Test]
