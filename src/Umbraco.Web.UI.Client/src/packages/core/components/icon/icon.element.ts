@@ -25,7 +25,11 @@ export class UmbIconElement extends UmbLitElement {
 	 * */
 	@property({ type: String })
 	public set color(value: string) {
-		this.#setColorStyle(value);
+		if (value) {
+			this.#setColorStyle(value);
+		} else {
+			this._color = undefined;
+		}
 	}
 	public get color(): string {
 		return this._color ?? '';
@@ -58,7 +62,7 @@ export class UmbIconElement extends UmbLitElement {
 		if (color) {
 			this.#setFallbackColorStyle(color);
 		} else {
-			this._color = undefined;
+			this._fallbackColor = undefined;
 		}
 
 		this._icon = icon;
