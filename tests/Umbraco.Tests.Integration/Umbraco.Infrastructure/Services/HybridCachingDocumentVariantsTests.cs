@@ -63,6 +63,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
     public async Task Can_Set_Invariant_Title()
     {
         // Arrange
+        await PublishedHybridCache.GetById(VariantPage.Id, true);
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Variant Title";
 
@@ -113,6 +114,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
     public async Task Can_Set_Invariant_Title_On_One_Culture()
     {
         // Arrange
+        await PublishedHybridCache.GetById(VariantPage.Id, true);
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Invariant Title";
 
