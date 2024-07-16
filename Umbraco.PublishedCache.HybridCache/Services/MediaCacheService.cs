@@ -8,7 +8,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal sealed class ContentCacheService : IContentCacheService
+internal class MediaCacheService : IMediaCacheService
 {
     private readonly INuCacheContentRepository _nuCacheContentRepository;
     private readonly IIdKeyMap _idKeyMap;
@@ -16,13 +16,7 @@ internal sealed class ContentCacheService : IContentCacheService
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
 
-
-    public ContentCacheService(
-        INuCacheContentRepository nuCacheContentRepository,
-        IIdKeyMap idKeyMap,
-        ICoreScopeProvider scopeProvider,
-        Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache,
-        IPublishedContentFactory publishedContentFactory)
+    public MediaCacheService(INuCacheContentRepository nuCacheContentRepository, IIdKeyMap idKeyMap, ICoreScopeProvider scopeProvider, Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache, IPublishedContentFactory publishedContentFactory)
     {
         _nuCacheContentRepository = nuCacheContentRepository;
         _idKeyMap = idKeyMap;
@@ -31,10 +25,9 @@ internal sealed class ContentCacheService : IContentCacheService
         _publishedContentFactory = publishedContentFactory;
     }
 
-    // TODO: Stop using IdKeyMap for these, but right now we both need key and id for caching..
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false)
     {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media);
         if (idAttempt.Success is false)
         {
             return null;
@@ -44,15 +37,15 @@ internal sealed class ContentCacheService : IContentCacheService
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             $"{key}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(idAttempt.Result)));
+            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetMediaSource(idAttempt.Result)));
 
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false)
     {
-        Attempt<Guid>  keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid>  keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (keyAttempt.Success is false)
         {
             return null;
@@ -61,14 +54,14 @@ internal sealed class ContentCacheService : IContentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             $"{keyAttempt.Result}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(id)));
+            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetMediaSource(id)));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)
     {
-        Attempt<Guid>  keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (keyAttempt.Success is false)
         {
             return false;
@@ -86,11 +79,12 @@ internal sealed class ContentCacheService : IContentCacheService
         return contentCacheNode is not null;
     }
 
-    public async Task RefreshContentAsync(IContent content)
+
+    public async Task RefreshMediaAsync(IMedia media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        await _hybridCache.RemoveAsync(content.Key.ToString());
-        _nuCacheContentRepository.RefreshContent(content);
+        await _hybridCache.RemoveAsync(media.Key.ToString());
+        _nuCacheContentRepository.RefreshMedia(media);
         scope.Complete();
     }
 

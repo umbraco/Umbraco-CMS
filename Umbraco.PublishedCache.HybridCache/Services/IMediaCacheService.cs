@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal interface IContentCacheService
+public interface IMediaCacheService
 {
     Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false);
 
@@ -11,7 +11,7 @@ internal interface IContentCacheService
 
     Task<bool> HasContentByIdAsync(int id, bool preview = false);
 
-    Task RefreshContentAsync(IContent content);
+    Task RefreshMediaAsync(IMedia media);
 
     Task DeleteItemAsync(int id);
 }

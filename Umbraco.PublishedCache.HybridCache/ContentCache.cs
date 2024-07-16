@@ -26,10 +26,10 @@ internal sealed class ContentCache : IPublishedContentHybridCache
             return null;
         }
 
-        return await _contentCacheService.GetById(id, preview);
+        return await _contentCacheService.GetByIdAsync(id, preview);
     }
 
-    public async Task<IPublishedContent?> GetById(Guid key, bool preview = false) => await _contentCacheService.GetByKey(key, preview);
+    public async Task<IPublishedContent?> GetById(Guid key, bool preview = false) => await _contentCacheService.GetByKeyAsync(key, preview);
 
-    public async Task<bool> HasById(int id, bool preview = false) => await _contentCacheService.HasContentById(id, preview);
+    public async Task<bool> HasById(int id, bool preview = false) => await _contentCacheService.HasContentByIdAsync(id, preview);
 }

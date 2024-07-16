@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class HybridCachingDocumentTests : UmbracoIntegrationTestWithContent
+public class ContentHybridCacheTests : UmbracoIntegrationTestWithContent
 {
     protected override void ConfigureTestServices(IServiceCollection services)
     {

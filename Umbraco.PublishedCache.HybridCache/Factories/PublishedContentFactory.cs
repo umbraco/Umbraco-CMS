@@ -16,13 +16,14 @@ internal class PublishedContentFactory : IPublishedContentFactory
         IVariationContextAccessor variationContextAccessor,
         IContentTypeService contentTypeService,
         IMemberTypeService memberTypeService,
+        IMediaTypeService mediaTypeService,
         IPublishedContentTypeFactory publishedContentTypeFactory,
         ILoggerFactory loggerFactory)
     {
         _variationContextAccessor = variationContextAccessor;
         _contentTypeCache = new PublishedContentTypeCache(
             contentTypeService,
-            null,
+            mediaTypeService,
             memberTypeService,
             publishedContentTypeFactory,
             loggerFactory.CreateLogger<PublishedContentTypeCache>());
@@ -35,6 +36,15 @@ internal class PublishedContentFactory : IPublishedContentFactory
         contentNode.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published);
 
         return preview ? GetModel(contentNode, contentNode.DraftModel) ?? GetPublishedContentAsDraft(GetModel(contentNode, contentNode.PublishedModel)) : GetModel(contentNode, contentNode.PublishedModel);
+    }
+
+    public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
+    {
+        var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
+        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
+        contentNode.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published);
+
+        return GetModel(contentNode, contentNode.PublishedModel);
     }
 
     public IPublishedMember ToPublishedMember(IMember member)
