@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
@@ -33,6 +34,8 @@ public class HybridMemberCacheTests : UmbracoIntegrationTest
 
     private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
 
+    private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
+
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddHybridCache();
@@ -44,7 +47,7 @@ public class HybridMemberCacheTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Draft_Content_By_Id()
+    public async Task Can_Get_Member_By_Key()
     {
         Guid key = Guid.NewGuid();
         await CreateMemberAsync(key);
@@ -53,7 +56,13 @@ public class HybridMemberCacheTests : UmbracoIntegrationTest
         var member = await PublishedMemberHybridCache.GetById(key);
 
         // Assert
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
         Assert.IsNotNull(member);
+        Assert.AreEqual("The title value", member.Value("title"));
+        Assert.AreEqual("test@test.com", member.Email);
+        Assert.AreEqual("test", member.UserName);
+        Assert.IsTrue(member.IsApproved);
+        Assert.AreEqual("T. Est", member.Name);
     }
 
     private async Task CreateMemberAsync(Guid? key = null, bool titleIsSensitive = false)
