@@ -26,7 +26,7 @@ export class UmbIconElement extends UmbLitElement {
 	@property({ type: String })
 	public set color(value: string) {
 		if (value) {
-			this.#setColorStyle(value);
+			this.#setColorStyle(value, true);
 		} else {
 			this._color = undefined;
 		}
@@ -35,20 +35,15 @@ export class UmbIconElement extends UmbLitElement {
 		return this._color ?? '';
 	}
 
-	#setColorStyle(value: string) {
+	#setColorStyle(value: string, dominant = false) {
 		const alias = value.replace('color-', '');
 		const variable = extractUmbColorVariable(alias);
-		this._color = alias ? (variable ? `--uui-icon-color: var(${variable})` : `--uui-icon-color: ${alias}`) : undefined;
-	}
-
-	#setFallbackColorStyle(value: string) {
-		const alias = value.replace('color-', '');
-		const variable = extractUmbColorVariable(alias);
-		this._fallbackColor = alias
-			? variable
-				? `--uui-icon-color: var(${variable})`
-				: `--uui-icon-color: ${alias}`
-			: undefined;
+		const color = alias ? (variable ? `--uui-icon-color: var(${variable})` : `--uui-icon-color: ${alias}`) : undefined;
+		if (dominant) {
+			this._color = color;
+		} else {
+			this._fallbackColor = color;
+		}
 	}
 
 	/**
@@ -60,7 +55,7 @@ export class UmbIconElement extends UmbLitElement {
 		const [icon, color] = value ? value.split(' ') : [];
 
 		if (color) {
-			this.#setFallbackColorStyle(color);
+			this.#setColorStyle(color);
 		} else {
 			this._fallbackColor = undefined;
 		}
