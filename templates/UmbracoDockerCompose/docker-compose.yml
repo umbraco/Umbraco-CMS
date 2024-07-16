@@ -20,6 +20,10 @@ services:
 
   umbraco_image:
     image: umbraco_image
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=Password1234;TrustServerCertificate=true;
+        - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
     volumes:
       - umb_media:/app/wwwroot/media
       - umb_scripts:/app/wwwroot/scripts

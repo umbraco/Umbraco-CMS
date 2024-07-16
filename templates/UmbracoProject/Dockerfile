@@ -3,8 +3,6 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
-ENV ConnectionStrings__umbracoDbDSN="Server=umb_database;Database=umbracoDb;User Id=sa;Password=Password1234;TrustServerCertificate=true;"
-ENV ConnectionStrings__umbracoDbDSN_ProviderName="Microsoft.Data.SqlClient"
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
