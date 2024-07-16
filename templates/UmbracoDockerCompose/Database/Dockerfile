@@ -1,7 +1,6 @@
 FROM mcr.microsoft.com/azure-sql-edge:latest
 
 ENV ACCEPT_EULA=Y
-ENV SA_PASSWORD=Password1234
 
 USER root
 
@@ -15,7 +14,7 @@ ENV MSSQL_LOG_DIR="/var/opt/mssql/log"
 
 EXPOSE 1433/tcp
 COPY setup.sql /
-COPY startup.sh /   
+COPY startup.sh /
 
 ENTRYPOINT [ "/bin/bash", "startup.sh" ]
 CMD [ "/opt/mssql/bin/sqlservr" ]

@@ -3,6 +3,8 @@ services:
     container_name: umbraco_image_database
     build:
       context: ./Database
+    environment:
+      SA_PASSWORD: ${DB_PASSWORD}
     ports:
       - "1433:1433"
       - "1434:1434"
@@ -11,7 +13,7 @@ services:
     networks:
       - umbnet
     healthcheck:
-      test: value=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password1234 -d master -Q "SELECT state_desc FROM sys.databases WHERE name = 'umbracoDb'" | awk 'NR==3'); if [ $value = "ONLINE" ]; then return 1; else return 0; fi
+      test: value=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -d master -Q "SELECT state_desc FROM sys.databases WHERE name = 'umbracoDb'" | awk 'NR==3'); if [ $value = "ONLINE" ]; then return 1; else return 0; fi
       interval: 5m
       timeout: 5s
       retries: 3
@@ -22,7 +24,7 @@ services:
     image: umbraco_image
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
-        - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=Password1234;TrustServerCertificate=true;
+        - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true;
         - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
     volumes:
       - umb_media:/app/wwwroot/media

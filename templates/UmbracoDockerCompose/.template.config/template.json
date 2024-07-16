@@ -18,8 +18,16 @@
     "ProjectName": {
       "type": "parameter",
       "description": "The name of the project the Docker Compose file will be created for",
-      "datatype": "text",
-      "replaces": "UmbracoProject"
+      "datatype": "string",
+      "replaces": "UmbracoProject",
+      "isRequired": true
+    },
+    "DatabasePassword": {
+      "type": "parameter",
+      "description": "The password to the database, will be stored in .env file",
+      "datatype": "string",
+      "replaces": "Password1234",
+      "defaultValue": "Password1234"
     },
     "ImageName": {
       "type": "generated",
