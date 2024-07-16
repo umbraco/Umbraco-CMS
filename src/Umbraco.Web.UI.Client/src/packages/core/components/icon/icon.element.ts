@@ -20,7 +20,8 @@ export class UmbIconElement extends UmbLitElement {
 	private _fallbackColor?: string;
 
 	/**
-	 * Override the icon color.
+	 * Color alias or a color code directly.\
+	 * If a color has been set via the name property, this property will override it.
 	 * */
 	@property({ type: String })
 	public set color(value: string) {
@@ -48,15 +49,15 @@ export class UmbIconElement extends UmbLitElement {
 	}
 
 	/**
-	 * The icon name. Can be appended with a color.
-	 * Example "icon-heart color-red"
+	 * The icon name. Can be appended with a color.\
+	 * Example **icon-heart color-red**
 	 */
 	@property({ type: String })
 	public set name(value: string | undefined) {
-		const [icon, alias] = value ? value.split(' ') : [];
+		const [icon, color] = value ? value.split(' ') : [];
 
-		if (alias) {
-			this.#setFallbackColorStyle(alias);
+		if (color) {
+			this.#setFallbackColorStyle(color);
 		} else {
 			this._color = undefined;
 		}
