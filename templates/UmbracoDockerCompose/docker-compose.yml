@@ -35,6 +35,9 @@ services:
     build:
       context: .
       dockerfile: UmbracoProject/Dockerfile
+      args:
+        - BUILD_CONFIGURATION=Debug
+
     depends_on:
       umb_database:
         condition: service_healthy
