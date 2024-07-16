@@ -25,7 +25,6 @@ export class UmbIconElement extends UmbLitElement {
 	 * */
 	@property({ type: String })
 	public set color(value: string) {
-		if (!value) return;
 		this.#setColorStyle(value);
 	}
 	public get color(): string {
