@@ -24,14 +24,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class HybridCachingMockTests : UmbracoIntegrationTestWithContent
 {
-    private IPublishedHybridCache _mockedCache;
+    private IPublishedContentHybridCache _mockedCache;
     private Mock<INuCacheContentRepository> _mockedNucacheRepository;
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddHybridCache();
-        services.AddSingleton<IPublishedHybridCache, ContentCache>();
+        services.AddSingleton<IPublishedContentHybridCache, ContentCache>();
         services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
-        services.AddSingleton<ICacheService, CacheService>();
+        services.AddSingleton<IContentCacheService, ContentCacheService>();
         services.AddSingleton<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
         services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
         services.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
@@ -67,14 +67,14 @@ public class HybridCachingMockTests : UmbracoIntegrationTestWithContent
                 Published = null,
             });
 
-        var mockedContentService = new CacheService(
+        var mockedContentService = new ContentCacheService(
             _mockedNucacheRepository.Object,
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<HybridCache>(),
             GetRequiredService<IPublishedContentFactory>());
 
-        _mockedCache = new ContentCache(mockedContentService, GetRequiredService<IIdKeyMap>(), GetRequiredService<IContentService>());
+        _mockedCache = new ContentCache(mockedContentService, GetRequiredService<IIdKeyMap>());
     }
 
     [Test]

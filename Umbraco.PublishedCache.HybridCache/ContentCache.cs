@@ -7,17 +7,15 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-internal sealed class ContentCache : IPublishedHybridCache
+internal sealed class ContentCache : IPublishedContentHybridCache
 {
-    private readonly ICacheService _cacheService;
+    private readonly IContentCacheService _contentCacheService;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IContentService _contentService;
 
-    public ContentCache(ICacheService cacheService, IIdKeyMap idKeyMap, IContentService contentService)
+    public ContentCache(IContentCacheService contentCacheService, IIdKeyMap idKeyMap)
     {
-        _cacheService = cacheService;
+        _contentCacheService = contentCacheService;
         _idKeyMap = idKeyMap;
-        _contentService = contentService;
     }
 
     public async Task<IPublishedContent?> GetById(int id, bool preview = false)
@@ -28,10 +26,10 @@ internal sealed class ContentCache : IPublishedHybridCache
             return null;
         }
 
-        return await _cacheService.GetById(id, preview);
+        return await _contentCacheService.GetById(id, preview);
     }
 
-    public async Task<IPublishedContent?> GetById(Guid key, bool preview = false) => await _cacheService.GetByKey(key, preview);
+    public async Task<IPublishedContent?> GetById(Guid key, bool preview = false) => await _contentCacheService.GetByKey(key, preview);
 
-    public async Task<bool> HasById(int id, bool preview = false) => await _cacheService.HasContentById(id, preview);
+    public async Task<bool> HasById(int id, bool preview = false) => await _contentCacheService.HasContentById(id, preview);
 }

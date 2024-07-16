@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
@@ -15,6 +15,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
     public PublishedContentFactory(
         IVariationContextAccessor variationContextAccessor,
         IContentTypeService contentTypeService,
+        IMemberTypeService memberTypeService,
         IPublishedContentTypeFactory publishedContentTypeFactory,
         ILoggerFactory loggerFactory)
     {
@@ -22,7 +23,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
         _contentTypeCache = new PublishedContentTypeCache(
             contentTypeService,
             null,
-            null,
+            memberTypeService,
             publishedContentTypeFactory,
             loggerFactory.CreateLogger<PublishedContentTypeCache>());
     }
@@ -34,6 +35,57 @@ internal class PublishedContentFactory : IPublishedContentFactory
         contentNode.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published);
 
         return preview ? GetModel(contentNode, contentNode.DraftModel) ?? GetPublishedContentAsDraft(GetModel(contentNode, contentNode.PublishedModel)) : GetModel(contentNode, contentNode.PublishedModel);
+    }
+
+    public IPublishedMember ToPublishedMember(IMember member)
+    {
+        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
+        var d = new ContentData(member.Name, null, 0, member.UpdateDate, member.CreatorId, -1, false, GetPropertyValues(contentType, member), null);
+
+        var n = new ContentNode(
+            member.Id,
+            member.Key,
+            contentType,
+            member.Path,
+            member.SortOrder,
+            member.CreateDate,
+            member.CreatorId);
+
+        return new PublishedMember(member, n, d, _variationContextAccessor);
+    }
+
+    private Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
+    {
+        var properties = member
+            .Properties
+            .ToDictionary(
+                x => x.Alias,
+                x => new[] { new PropertyData { Value = x.GetValue(), Culture = string.Empty, Segment = string.Empty } },
+                StringComparer.OrdinalIgnoreCase);
+
+        // see also PublishedContentType
+        AddIf(contentType, properties, nameof(IMember.Email), member.Email);
+        AddIf(contentType, properties, nameof(IMember.Username), member.Username);
+        AddIf(contentType, properties, nameof(IMember.Comments), member.Comments);
+        AddIf(contentType, properties, nameof(IMember.IsApproved), member.IsApproved);
+        AddIf(contentType, properties, nameof(IMember.IsLockedOut), member.IsLockedOut);
+        AddIf(contentType, properties, nameof(IMember.LastLockoutDate), member.LastLockoutDate);
+        AddIf(contentType, properties, nameof(IMember.CreateDate), member.CreateDate);
+        AddIf(contentType, properties, nameof(IMember.LastLoginDate), member.LastLoginDate);
+        AddIf(contentType, properties, nameof(IMember.LastPasswordChangeDate), member.LastPasswordChangeDate);
+
+        return properties;
+    }
+
+    private void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
+    {
+        IPublishedPropertyType? propertyType = contentType.GetPropertyType(alias);
+        if (propertyType == null || propertyType.IsUserProperty)
+        {
+            return;
+        }
+
+        properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
     private IPublishedContent? GetModel(ContentNode node, ContentData? contentData) =>

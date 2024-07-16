@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
-public interface IPublishedHybridCache
+public interface IPublishedContentHybridCache
 {
     /// <summary>
     ///     Gets a content identified by its unique identifier.

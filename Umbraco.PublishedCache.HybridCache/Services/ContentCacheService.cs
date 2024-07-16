@@ -8,7 +8,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal sealed class CacheService : ICacheService
+internal sealed class ContentCacheService : IContentCacheService
 {
     private readonly INuCacheContentRepository _nuCacheContentRepository;
     private readonly IIdKeyMap _idKeyMap;
@@ -17,7 +17,7 @@ internal sealed class CacheService : ICacheService
     private readonly IPublishedContentFactory _publishedContentFactory;
 
 
-    public CacheService(
+    public ContentCacheService(
         INuCacheContentRepository nuCacheContentRepository,
         IIdKeyMap idKeyMap,
         ICoreScopeProvider scopeProvider,

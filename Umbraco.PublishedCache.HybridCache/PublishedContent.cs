@@ -4,7 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-internal sealed class PublishedContent : PublishedContentBase
+internal class PublishedContent : PublishedContentBase
 {
     private IPublishedProperty[] _properties;
     private readonly ContentData _contentData;
@@ -52,30 +52,9 @@ internal sealed class PublishedContent : PublishedContentBase
 
     public override IEnumerable<IPublishedProperty> Properties => _properties;
 
-    public override IPublishedProperty? GetProperty(string alias)
-    {
-        var index = _contentNode.ContentType.GetPropertyIndex(alias);
-        if (index < 0)
-        {
-            return null; // happens when 'alias' does not match a content type property alias
-        }
-
-        // should never happen - properties array must be in sync with property type
-        if (index >= _properties.Length)
-        {
-            throw new IndexOutOfRangeException(
-                "Index points outside the properties array, which means the properties array is corrupt.");
-        }
-
-        IPublishedProperty property = _properties[index];
-        return property;
-    }
-
     public override int Id { get; }
 
     public override int SortOrder { get; }
-
-    public override int Level { get; } = 0;
 
     public override string Path => _contentNode.Path;
 
@@ -93,6 +72,12 @@ internal sealed class PublishedContent : PublishedContentBase
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
+
+    public override int Level { get; } = 0;
+
+    public override IEnumerable<IPublishedContent> ChildrenForAllCultures { get; } = Enumerable.Empty<IPublishedContent>();
+
+    public override IPublishedContent? Parent { get; } = null!;
 
 
     /// <inheritdoc />
@@ -129,6 +114,25 @@ internal sealed class PublishedContent : PublishedContentBase
     /// <inheritdoc/>
     public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
+    public override IPublishedProperty? GetProperty(string alias)
+    {
+        var index = _contentNode.ContentType.GetPropertyIndex(alias);
+        if (index < 0)
+        {
+            return null; // happens when 'alias' does not match a content type property alias
+        }
+
+        // should never happen - properties array must be in sync with property type
+        if (index >= _properties.Length)
+        {
+            throw new IndexOutOfRangeException(
+                "Index points outside the properties array, which means the properties array is corrupt.");
+        }
+
+        IPublishedProperty property = _properties[index];
+        return property;
+    }
+
     public override bool IsDraft(string? culture = null) => throw new NotImplementedException();
 
     public override bool IsPublished(string? culture = null)
@@ -156,8 +160,4 @@ internal sealed class PublishedContent : PublishedContentBase
         // = depends on the culture
         return _contentNode.HasPublishedCulture(culture);
     }
-
-    public override IEnumerable<IPublishedContent> ChildrenForAllCultures { get; } = Enumerable.Empty<IPublishedContent>();
-
-    public override IPublishedContent? Parent { get; } = null!;
 }

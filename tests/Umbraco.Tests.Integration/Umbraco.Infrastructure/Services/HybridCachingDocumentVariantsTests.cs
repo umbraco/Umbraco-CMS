@@ -40,7 +40,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
-    private IPublishedHybridCache PublishedHybridCache => GetRequiredService<ContentCache>();
+    private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<ContentCache>();
 
     private IContent VariantPage { get; set; }
 
@@ -49,7 +49,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
         services.AddHybridCache();
         services.AddSingleton<ContentCache>();
         services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
-        services.AddSingleton<ICacheService, CacheService>();
+        services.AddSingleton<IContentCacheService, ContentCacheService>();
         services.AddSingleton<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
         services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
         services.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
@@ -63,7 +63,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
     public async Task Can_Set_Invariant_Title()
     {
         // Arrange
-        await PublishedHybridCache.GetById(VariantPage.Id, true);
+        await PublishedContentHybridCache.GetById(VariantPage.Id, true);
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Variant Title";
 
@@ -101,7 +101,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
 
         // Act
-        var textPage = await PublishedHybridCache.GetById(VariantPage.Id, true);
+        var textPage = await PublishedContentHybridCache.GetById(VariantPage.Id, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
@@ -114,7 +114,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
     public async Task Can_Set_Invariant_Title_On_One_Culture()
     {
         // Arrange
-        await PublishedHybridCache.GetById(VariantPage.Id, true);
+        await PublishedContentHybridCache.GetById(VariantPage.Id, true);
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Invariant Title";
 
@@ -143,7 +143,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
 
         // Act
-        var textPage = await PublishedHybridCache.GetById(VariantPage.Id, true);
+        var textPage = await PublishedContentHybridCache.GetById(VariantPage.Id, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();

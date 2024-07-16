@@ -7,17 +7,17 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 
 internal sealed class CacheRefreshingNotificationHandler : INotificationAsyncHandler<ContentRefreshNotification>, INotificationAsyncHandler<ContentDeletedNotification>
 {
-    private readonly ICacheService _cacheService;
+    private readonly IContentCacheService _contentCacheService;
 
-    public CacheRefreshingNotificationHandler(ICacheService cacheService) => _cacheService = cacheService;
+    public CacheRefreshingNotificationHandler(IContentCacheService contentCacheService) => _contentCacheService = contentCacheService;
 
-    public async Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken) => await _cacheService.RefreshContent(notification.Entity);
+    public async Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken) => await _contentCacheService.RefreshContent(notification.Entity);
 
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IContent deletedEntity in notification.DeletedEntities)
         {
-            await _cacheService.DeleteItem(deletedEntity.Id);
+            await _contentCacheService.DeleteItem(deletedEntity.Id);
         }
     }
 }
