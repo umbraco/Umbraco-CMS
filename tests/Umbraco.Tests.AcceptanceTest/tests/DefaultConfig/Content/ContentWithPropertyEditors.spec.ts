@@ -86,7 +86,7 @@ test.skip('can create content with the upload file datatype', async ({umbracoApi
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.changeFileTypeWithFileChooser('./fixtures/mediaLibrary/' + uploadFilePath);
+  await umbracoUi.content.uploadFile('./fixtures/mediaLibrary/' + uploadFilePath);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
