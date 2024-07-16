@@ -62,13 +62,40 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
     public BlockEditorData<TValue, TLayout> Convert(TValue? value)
     {
-        if (value?.GetLayouts() is not IEnumerable<TLayout> layouts)
+        if (value is not null)
+        {
+            ConvertRawPropertyValuesToProperties(value.ContentData);
+            ConvertRawPropertyValuesToProperties(value.SettingsData);
+        }
+
+        IEnumerable<TLayout>? layouts = value?.GetLayouts();
+        if (layouts is null)
         {
             return BlockEditorData<TValue, TLayout>.Empty;
         }
 
         IEnumerable<ContentAndSettingsReference> references = GetBlockReferences(layouts);
 
-        return new BlockEditorData<TValue, TLayout>(references, value);
+        return new BlockEditorData<TValue, TLayout>(references, value!);
+    }
+
+    // this method is only meant to have any effect when migrating block editor values
+    // from the original format to the new, variant enabled format
+    private void ConvertRawPropertyValuesToProperties(List<BlockItemData> blockItemDatas)
+    {
+        foreach (BlockItemData blockItemData in blockItemDatas)
+        {
+            // only overwrite the Properties collection if none have been added at this point
+            if (blockItemData.Properties.Any() is false && blockItemData.RawPropertyValues.Any())
+            {
+                blockItemData.Properties = blockItemData
+                    .RawPropertyValues
+                    .Select(item => new BlockPropertyValue { Alias = item.Key, Value = item.Value })
+                    .ToList();
+            }
+
+            // no matter what, clear the RawPropertyValues collection so it is not saved back to the DB
+            blockItemData.RawPropertyValues.Clear();
+        }
     }
 }

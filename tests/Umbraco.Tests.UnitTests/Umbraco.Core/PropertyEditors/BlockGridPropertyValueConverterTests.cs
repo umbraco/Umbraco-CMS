@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
@@ -171,9 +172,10 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
     {
         var publishedSnapshotAccessor = GetPublishedSnapshotAccessor();
         var publishedModelFactory = new NoopPublishedModelFactory();
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
         var editor = new BlockGridPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
-            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
+            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
             new SystemTextJsonSerializer(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new BlockGridPropertyValueConstructorCache());

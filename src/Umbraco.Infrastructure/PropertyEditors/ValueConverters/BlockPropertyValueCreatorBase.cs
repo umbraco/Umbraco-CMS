@@ -62,6 +62,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     protected BlockEditorConverter BlockEditorConverter { get; }
 
     protected TBlockModel CreateBlockModel(
+        IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         string intermediateBlockModelValue,
         bool preview,
@@ -78,10 +79,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Deserialize(intermediateBlockModelValue);
-        return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return CreateBlockModel(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     protected TBlockModel CreateBlockModel(
+        IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         TBlockValue blockValue,
         bool preview,
@@ -92,10 +94,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     {
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Convert(blockValue);
-        return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return CreateBlockModel(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     private TBlockModel CreateBlockModel(
+        IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted,
         bool preview,
@@ -125,7 +128,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(data, referenceCacheLevel, preview);
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
             if (element == null)
             {
                 continue;
@@ -151,7 +154,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(data, referenceCacheLevel, preview);
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
             if (element is null)
             {
                 continue;

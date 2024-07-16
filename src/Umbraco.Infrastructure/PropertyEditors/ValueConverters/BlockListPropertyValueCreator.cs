@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -18,13 +19,13 @@ internal class BlockListPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
         _constructorCache = constructorCache;
     }
 
-    public BlockListModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
+    public BlockListModel CreateBlockModel(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
         BlockListModel CreateEmptyModel() => BlockListModel.Empty;
 
         BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
 
-        BlockListModel blockModel = CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        BlockListModel blockModel = CreateBlockModel(owner, referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }

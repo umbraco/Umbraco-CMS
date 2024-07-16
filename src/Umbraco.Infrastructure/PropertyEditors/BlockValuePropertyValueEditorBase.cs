@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -18,6 +19,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ILogger _logger;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactoryCollection;
+    private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
     protected BlockValuePropertyValueEditorBase(
         DataEditorAttribute attribute,
@@ -28,13 +30,15 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+        DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
+        BlockEditorVarianceHandler blockEditorVarianceHandler)
         : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _propertyEditors = propertyEditors;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _logger = logger;
         _dataValueReferenceFactoryCollection = dataValueReferenceFactoryCollection;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
     }
 
     /// <inheritdoc />
@@ -43,9 +47,14 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     protected IEnumerable<UmbracoEntityReference> GetBlockValueReferences(TValue blockValue)
     {
         var result = new HashSet<UmbracoEntityReference>();
-        BlockItemData.BlockPropertyValue[] propertyValues = blockValue.ContentData.Concat(blockValue.SettingsData)
-            .SelectMany(x => x.PropertyValues.Values).ToArray();
-        foreach (IGrouping<string, object?> valuesByPropertyEditorAlias in propertyValues.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
+        BlockPropertyValue[] blockPropertyValues = blockValue.ContentData.Concat(blockValue.SettingsData)
+            .SelectMany(x => x.Properties).ToArray();
+        if (blockPropertyValues.Any(p => p.PropertyType is null))
+        {
+            throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to find references within them.", nameof(blockValue));
+        }
+
+        foreach (IGrouping<string, object?> valuesByPropertyEditorAlias in blockPropertyValues.GroupBy(x => x.PropertyType!.PropertyEditorAlias, x => x.Value))
         {
             if (!_propertyEditors.TryGet(valuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
             {
@@ -83,9 +92,14 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         // loop through all content and settings data
         foreach (BlockItemData row in blockValue.ContentData.Concat(blockValue.SettingsData))
         {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            foreach (BlockPropertyValue blockPropertyValue in row.Properties)
             {
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                if (blockPropertyValue.PropertyType is null)
+                {
+                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to find tags within them.", nameof(blockValue));
+                }
+
+                IDataEditor? propEditor = _propertyEditors[blockPropertyValue.PropertyType.PropertyEditorAlias];
 
                 IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
                 if (valueEditor is not IDataValueTags tagsProvider)
@@ -93,9 +107,9 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
                     continue;
                 }
 
-                object? configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
+                object? configuration = _dataTypeConfigurationCache.GetConfiguration(blockPropertyValue.PropertyType.DataTypeKey);
 
-                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
+                result.AddRange(tagsProvider.GetTags(blockPropertyValue.Value, configuration, languageId));
             }
         }
 
@@ -108,77 +122,89 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         MapBlockItemDataFromEditor(blockValue.SettingsData);
     }
 
-    protected void MapBlockValueToEditor(IProperty property, TValue blockValue)
+    protected void MapBlockValueToEditor(IProperty property, TValue blockValue, string? culture, string? segment)
     {
-        MapBlockItemDataToEditor(property, blockValue.ContentData);
-        MapBlockItemDataToEditor(property, blockValue.SettingsData);
+        MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
+        MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
     }
 
-    private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
+    private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items, string? culture, string? segment)
     {
-        var valEditors = new Dictionary<Guid, IDataValueEditor>();
+        var valueEditorsByKey = new Dictionary<Guid, IDataValueEditor>();
 
-        foreach (BlockItemData row in items)
+        foreach (BlockItemData item in items)
         {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            foreach (BlockPropertyValue blockPropertyValue in item.Properties)
             {
-                // create a temp property with the value
-                // - force it to be culture invariant as the block editor can't handle culture variant element properties
-                prop.Value.PropertyType.Variations = ContentVariation.Nothing;
-                var tempProp = new Property(prop.Value.PropertyType);
-                tempProp.SetValue(prop.Value.Value);
-
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                if (propEditor == null)
+                IPropertyType? propertyType = blockPropertyValue.PropertyType;
+                if (propertyType is null)
                 {
-                    // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
-                    // if the property editor doesn't exist I think everything will break anyways?
-                    // update the raw value since this is what will get serialized out
-                    row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
+                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them to editor.", nameof(items));
+                }
+
+                IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
+                if (propertyEditor is null)
+                {
+                    // leave the current block property value as-is - will be used to render a fallback output in the client
                     continue;
                 }
 
-                Guid dataTypeKey = prop.Value.PropertyType.DataTypeKey;
-                if (!valEditors.TryGetValue(dataTypeKey, out IDataValueEditor? valEditor))
-                {
-                    var configuration = _dataTypeConfigurationCache.GetConfiguration(dataTypeKey);
-                    valEditor = propEditor.GetValueEditor(configuration);
+                // if changes were made to the element type variation, we need those changes reflected in the block property values.
+                // for regular content this happens when a content type is saved (copies of property values are created in the DB),
+                // but for local block level properties we don't have that kind of handling, so we to do it manually.
+                // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
+                // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
+                _blockEditorVarianceHandler.AlignPropertyVariance(blockPropertyValue, propertyType, culture, segment).GetAwaiter().GetResult();
 
-                    valEditors.Add(dataTypeKey, valEditor);
+                if (!valueEditorsByKey.TryGetValue(propertyType.DataTypeKey, out IDataValueEditor? valueEditor))
+                {
+                    var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
+                    valueEditor = propertyEditor.GetValueEditor(configuration);
+
+                    valueEditorsByKey.Add(propertyType.DataTypeKey, valueEditor);
                 }
 
-                var convValue = valEditor.ToEditor(tempProp);
+                var tempProp = new Property(propertyType);
+                tempProp.SetValue(blockPropertyValue.Value, blockPropertyValue.Culture, blockPropertyValue.Segment);
+
+                var editorValue = valueEditor.ToEditor(tempProp, blockPropertyValue.Culture, blockPropertyValue.Segment);
 
                 // update the raw value since this is what will get serialized out
-                row.RawPropertyValues[prop.Key] = convValue;
+                blockPropertyValue.Value = editorValue;
             }
         }
     }
 
     private void MapBlockItemDataFromEditor(List<BlockItemData> items)
     {
-        foreach (BlockItemData row in items)
+        foreach (BlockItemData item in items)
         {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            foreach (BlockPropertyValue blockPropertyValue in item.Properties)
             {
-                // Fetch the property types prevalue
-                var configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
+                IPropertyType? propertyType = blockPropertyValue.PropertyType;
+                if (propertyType is null)
+                {
+                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(items));
+                }
 
                 // Lookup the property editor
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                if (propEditor == null)
+                IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
+                if (propertyEditor is null)
                 {
                     continue;
                 }
 
+                // Fetch the property types prevalue
+                var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
+
                 // Create a fake content property data object
-                var contentPropData = new ContentPropertyData(prop.Value.Value, configuration);
+                var propertyData = new ContentPropertyData(blockPropertyValue.Value, configuration);
 
                 // Get the property editor to do it's conversion
-                var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
+                var newValue = propertyEditor.GetValueEditor().FromEditor(propertyData, blockPropertyValue.Value);
 
                 // update the raw value since this is what will get serialized out
-                row.RawPropertyValues[prop.Key] = newValue;
+                blockPropertyValue.Value = newValue;
             }
         }
     }

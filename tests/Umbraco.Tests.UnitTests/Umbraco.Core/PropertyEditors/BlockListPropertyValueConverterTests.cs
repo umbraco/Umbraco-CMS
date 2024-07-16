@@ -24,9 +24,10 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     {
         var publishedSnapshotAccessor = GetPublishedSnapshotAccessor();
         var publishedModelFactory = new NoopPublishedModelFactory();
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
-            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
+            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
             Mock.Of<IContentTypeService>(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new SystemTextJsonSerializer(),

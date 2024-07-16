@@ -53,53 +53,75 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                   "contentData": [{
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
                                       "udi": "umb://element/9addc377c02c4db088c273b933704f7b",
-                                      "title": "Valid root content",
-                                      "blocks": {
-                                        "layout": {
-                                          "Umbraco.BlockList": [{
-                                              "contentUdi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
-                                              "settingsUdi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3"
-                                            }, {
-                                              "contentUdi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
-                                              "settingsUdi": "umb://element/77f7ea3507664395bf7f0c9df04530f7"
-                                            }
-                                          ]
-                                        },
-                                        "contentData": [{
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
-                                            "title": "Invalid nested content"
-                                          }, {
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
-                                            "title": "Valid nested content"
+                                      "properties": [
+                                          {
+                                            "alias": "title",
+                                            "value": "Valid root content"
+                                          },
+                                          {
+                                            "alias": "blocks",
+                                            "value": {
+                                                "layout": {
+                                                  "Umbraco.BlockList": [{
+                                                      "contentUdi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
+                                                      "settingsUdi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3"
+                                                    }, {
+                                                      "contentUdi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
+                                                      "settingsUdi": "umb://element/77f7ea3507664395bf7f0c9df04530f7"
+                                                    }
+                                                  ]
+                                                },
+                                                "contentData": [{
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "udi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
+                                                    "properties": [
+                                                        { "alias": "title", "value": "Invalid nested content" }
+                                                    ]
+                                                  }, {
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "udi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
+                                                    "properties": [
+                                                        { "alias": "title", "value": "Valid nested content" }
+                                                    ]
+                                                  }
+                                                ],
+                                                "settingsData": [{
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "udi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3",
+                                                    "properties": [
+                                                        { "alias": "title", "value": "Valid nested setting" }
+                                                    ]
+                                                  }, {
+                                                    "contentTypeKey": "{{setup.ElementType.Key}}",
+                                                    "udi": "umb://element/77f7ea3507664395bf7f0c9df04530f7",
+                                                    "properties": [
+                                                        { "alias": "title", "value": "Invalid nested setting" }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
                                           }
-                                        ],
-                                        "settingsData": [{
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3",
-                                            "title": "Valid nested setting"
-                                          }, {
-                                            "contentTypeKey": "{{setup.ElementType.Key}}",
-                                            "udi": "umb://element/77f7ea3507664395bf7f0c9df04530f7",
-                                            "title": "Invalid nested setting"
-                                          }
-                                        ]
-                                      }
+                                      ]
                                     }, {
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
                                       "udi": "umb://element/3af93b5b5e404c64b1422564309fc4c7",
-                                      "title": "Invalid root content"
+                                      "properties": [
+                                          { "alias": "title", "value": "Invalid root content" }
+                                      ]
                                     }
                                   ],
                                   "settingsData": [{
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
                                         "udi": "umb://element/65db1ecd78e041a584f07296123a0a73",
-                                        "title": "Invalid root setting"
+                                        "properties": [
+                                            { "alias": "title", "value": "Invalid root setting" }
+                                        ]
                                       }, {
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
                                         "udi": "umb://element/efb9583ce67043f282fb2a0cb0f3e736",
-                                        "title": "Valid root setting"
+                                        "properties": [
+                                            { "alias": "title", "value": "Valid root setting" }
+                                        ]
                                       }
                                   ]
                                 }

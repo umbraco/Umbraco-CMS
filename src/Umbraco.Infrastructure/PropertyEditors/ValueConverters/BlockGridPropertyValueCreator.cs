@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -16,7 +17,7 @@ internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
         _constructorCache = constructorCache;
     }
 
-    public BlockGridModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockGridConfiguration.BlockGridBlockConfiguration[] blockConfigurations, int? gridColumns)
+    public BlockGridModel CreateBlockModel(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockGridConfiguration.BlockGridBlockConfiguration[] blockConfigurations, int? gridColumns)
     {
         BlockGridModel CreateEmptyModel() => BlockGridModel.Empty;
 
@@ -46,6 +47,7 @@ internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
         }
 
         BlockGridModel blockModel = CreateBlockModel(
+            owner,
             referenceCacheLevel,
             intermediateBlockModelValue,
             preview,

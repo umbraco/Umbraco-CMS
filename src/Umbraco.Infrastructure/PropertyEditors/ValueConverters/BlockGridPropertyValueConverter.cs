@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-            => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
+            => ConvertIntermediateToBlockGridModel(owner, propertyType, referenceCacheLevel, inter, preview);
 
         /// <inheritdoc />
         public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             const int defaultColumns = 12;
 
-            BlockGridModel? blockGridModel = ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
+            BlockGridModel? blockGridModel = ConvertIntermediateToBlockGridModel(owner, propertyType, referenceCacheLevel, inter, preview);
             if (blockGridModel == null)
             {
                 return new ApiBlockGridModel(defaultColumns, Array.Empty<ApiBlockGridItem>());
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return model;
         }
 
-        private BlockGridModel? ConvertIntermediateToBlockGridModel(IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        private BlockGridModel? ConvertIntermediateToBlockGridModel(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 var creator = new BlockGridPropertyValueCreator(_blockConverter, _jsonSerializer, _constructorCache);
-                return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns);
+                return creator.CreateBlockModel(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns);
             }
         }
     }

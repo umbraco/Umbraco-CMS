@@ -70,8 +70,11 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
     protected override IContentType? GetContentTypeOfNestedItem(BlockItemData nestedItem, IDictionary<Guid, IContentType> contentTypeDictionary)
         => contentTypeDictionary.TryGetValue(nestedItem.ContentTypeKey, out var result) ? result : null;
 
+    // TODO KJA: value indexing must be revamped; a single, non-variant property must be able to yield multiple, variant outputs. this is a temporary workaround.
     protected override IDictionary<string, object?> GetRawProperty(BlockItemData blockItemData)
-        => blockItemData.RawPropertyValues;
+        => blockItemData.Properties
+            .Where(p => p.Culture is null && p.Segment is null)
+            .ToDictionary(p => p.Alias, p => p.Value);
 
     protected override IEnumerable<BlockItemData> GetDataItems(RichTextEditorValue input)
         => input.Blocks?.ContentData ?? new List<BlockItemData>();

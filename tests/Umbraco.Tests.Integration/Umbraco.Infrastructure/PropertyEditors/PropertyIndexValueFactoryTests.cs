@@ -58,8 +58,10 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"singleLineText": "The single line of text in the block",
-                                                                  			"bodyText": "<p>The body text in the block</p>"
+                                                                  			"properties": [
+                                                                  			    { "alias": "singleLineText", "value": "The single line of text in the block" },
+                                                                                { "alias": "bodyText", "value": "<p>The body text in the block</p>" }
+                                                                  			]
                                                                   		}
                                                                   	],
                                                                   	"settingsData": []
@@ -180,14 +182,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             [
                 new(contentElementUdi, elementType.Key, elementType.Alias)
                 {
-                    RawPropertyValues = new Dictionary<string, object?>
+                    Properties = new List<BlockPropertyValue>
                     {
-                        {"singleLineText", "The single line of text in the block"},
-                        {"bodyText", "<p>The body text in the block</p>"}
+                        new() { Alias = "singleLineText", Value = "The single line of text in the block" },
+                        new() { Alias = "bodyText", Value = "<p>The body text in the block</p>" },
                     }
                 }
             ],
-            SettingsData = []
         };
         var propertyValue = JsonSerializer.Serialize(blockListValue);
 
@@ -301,20 +302,26 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             [
                 new(contentElementUdi, elementType.Key, elementType.Alias)
                 {
-                    RawPropertyValues = new()
+                    Udi = contentElementUdi,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Properties = new List<BlockPropertyValue>
                     {
-                        { "singleLineText", "The single line of text in the grid root" },
-                        { "bodyText", "<p>The body text in the grid root</p>" },
-                    },
+                        new() { Alias = "singleLineText", Value = "The single line of text in the grid root" },
+                        new() { Alias = "bodyText", Value = "<p>The body text in the grid root</p>" },
+                    }
                 },
                 new(contentAreaElementUdi, elementType.Key, elementType.Alias)
                 {
-                    RawPropertyValues = new()
+                    Udi = contentAreaElementUdi,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Properties = new List<BlockPropertyValue>
                     {
-                        { "singleLineText", "The single line of text in the grid area" },
-                        { "bodyText", "<p>The body text in the grid area</p>" },
-                    },
-                },
+                        new() { Alias = "singleLineText", Value = "The single line of text in the grid area" },
+                        new() { Alias = "bodyText", Value = "<p>The body text in the grid area</p>" },
+                    }
+                }
             ],
         };
         var propertyValue = JsonSerializer.Serialize(blockGridValue);

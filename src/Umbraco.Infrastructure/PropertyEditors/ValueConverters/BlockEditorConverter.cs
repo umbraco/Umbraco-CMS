@@ -15,16 +15,22 @@ public sealed class BlockEditorConverter
 {
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
     public BlockEditorConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IPublishedModelFactory publishedModelFactory)
+        IPublishedModelFactory publishedModelFactory,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _publishedModelFactory = publishedModelFactory;
+        _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
     }
 
-    public IPublishedElement? ConvertToElement(BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
+    public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         IPublishedContentCache? publishedContentCache =
             _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
@@ -36,7 +42,38 @@ public sealed class BlockEditorConverter
             return null;
         }
 
-        Dictionary<string, object?> propertyValues = data.RawPropertyValues;
+        VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
+
+        var propertyTypesByAlias = publishedContentType
+            .PropertyTypes
+            .ToDictionary(propertyType => propertyType.Alias);
+
+        var propertyValues = new Dictionary<string, object?>();
+        foreach (BlockPropertyValue property in data.Properties)
+        {
+            if (!propertyTypesByAlias.TryGetValue(property.Alias, out IPublishedPropertyType? propertyType))
+            {
+                continue;
+            }
+
+            // if case changes have been made to the element type variation since the parent content was published,
+            // we need to contextualize those changes manually here - unlike for root level properties, where these
+            // things are handled when a content type is saved (copies of property values are created in the DB).
+            _blockEditorVarianceHandler.AlignPropertyVariance(property, propertyType, owner).GetAwaiter().GetResult();
+
+            var culture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
+                ? variationContext.Culture
+                : null;
+            var segment = owner.ContentType.VariesBySegment() && publishedContentType.VariesBySegment() && propertyType.VariesBySegment()
+                ? variationContext.Segment
+                : null;
+
+            if (property.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(culture.NullOrWhiteSpaceAsNull())
+                && property.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(segment.NullOrWhiteSpaceAsNull()))
+            {
+                propertyValues[property.Alias] = property.Value;
+            }
+        }
 
         // Get the UDI from the deserialized object. If this is empty, we can fallback to checking the 'key' if there is one
         Guid key = data.Udi is GuidUdi gudi ? gudi.Guid : Guid.Empty;

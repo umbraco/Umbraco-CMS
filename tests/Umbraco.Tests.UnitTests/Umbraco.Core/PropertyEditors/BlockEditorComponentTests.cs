@@ -269,23 +269,29 @@ public class BlockEditorComponentTests
             ""udi"": """ + (contentGuid1.IsNullOrWhiteSpace()
             ? string.Empty
             : Udi.Create(Constants.UdiEntityType.Element, Guid.Parse(contentGuid1)).ToString()) + @""",
-            ""featureName"": ""Hello"",
-            ""featureDetails"": ""World""
+            ""properties"": [
+                { ""alias"": ""featureName"", ""value"": ""Hello"" },
+                { ""alias"": ""featureDetails"", ""value"": ""World"" }
+            ]
         },
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
             ""udi"": ""umb://element/" + contentGuid2 + @""",
-            ""featureName"": ""Another"",
-            ""featureDetails"": ""Feature""" +
-        (subFeatures == null ? string.Empty : @", ""subFeatures"": " + subFeatures) + @"
+            ""properties"": [
+                { ""alias"": ""featureName"", ""value"": ""Another"" },
+                { ""alias"": ""featureDetails"", ""value"": ""Feature"" },
+                { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
+            ]
         }
     ],
     ""settingsData"": [
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
             ""udi"": ""umb://element/" + settingsGuid1 + @""",
-            ""featureName"": ""Setting 1"",
-            ""featureDetails"": ""Setting 2""
+            ""properties"": [
+                { ""alias"": ""featureName"", ""value"": ""Setting 1"" },
+                { ""alias"": ""featureDetails"", ""value"": ""Setting 2"" }
+            ]
         }
     ]
 }";
@@ -412,34 +418,48 @@ public class BlockEditorComponentTests
     ""contentData"": [{
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/d05861169d124582a7c2826e52a51b47"",
-            ""title"": ""Element one - 12 cols""
+            ""properties"": [
+                { ""alias"": ""title"", ""value"": ""Element one - 12 cols"" }
+            ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/5abad9f1b4e24d7aa269fbd1b50033ac"",
-            ""title"": ""Element one - 6 cols, left side""
+            ""properties"": [
+                { ""alias"": ""title"", ""value"": ""Element one - 6 cols, left side"" }
+            ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
             ""udi"": ""umb://element/76e24aeb6eeb4370892ca521932a96df"",
-            ""text"": ""Element two - 6 cols, right side""
+            ""properties"": [
+                { ""alias"": ""title"", ""value"": ""Element one - 6 cols, right side"" }
+            ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/90549d94555647fdbe4d111c7178ada4"",
-            ""title"": ""One more element one - 12 cols"",
-            ""subFeatures"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @"
+            ""properties"": [
+                { ""alias"": ""title"", ""value"": ""One more element one - 12 cols"" },
+                { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
+            ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
             ""udi"": ""umb://element/5fc866c590be4d01a28a979472a1ffee"",
-            ""text"": ""Nested element two - left side""
+            ""properties"": [
+                { ""alias"": ""title"", ""value"": ""Nested element two - left side"" }
+            ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/264536b65b0f4641aa43d4bfb515831d"",
-            ""title"": ""Nested element one - right side""
+            ""properties"": [
+                { ""alias"": ""title"", ""value"": ""Nested element one - right side"" }
+            ]
         }
     ],
     ""settingsData"": [{
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
             ""udi"": ""umb://element/262d5efd2eeb43ed95e95c094c45ce1c"",
-            ""enabled"": 1
+            ""properties"": [
+                { ""alias"": ""enabled"", ""value"": 1 }
+            ]
         }, {
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
             ""udi"": ""umb://element/4d121eaba49c4e09a7460069d1bee600""
@@ -449,7 +469,9 @@ public class BlockEditorComponentTests
         }, {
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
             ""udi"": ""umb://element/3dfabc96584c4c35ac2e6bf06ffa20de"",
-            ""enabled"": 1
+            ""properties"": [
+                { ""alias"": ""enabled"", ""value"": 1 }
+            ]
         }
     ]
 }";

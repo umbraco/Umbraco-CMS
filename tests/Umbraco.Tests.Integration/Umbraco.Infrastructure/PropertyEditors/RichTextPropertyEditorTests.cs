@@ -106,7 +106,9 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"contentPicker": "umb://document/{{pickedContent.Key:N}}"
+                                                                  			"properties": [
+                                                                                { "alias": "contentPicker", "value": "umb://document/{{pickedContent.Key:N}}" }
+                                                                  			]
                                                                   		}
                                                                   	],
                                                                   	"settingsData": []
@@ -157,7 +159,9 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"tags": "[\"Tag One\", \"Tag Two\", \"Tag Three\"]"
+                                                                  			"properties": [
+                                                                                { "alias": "tags", "value": "[\"Tag One\", \"Tag Two\", \"Tag Three\"]" }
+                                                                  			]
                                                                   		}
                                                                   	],
                                                                   	"settingsData": []

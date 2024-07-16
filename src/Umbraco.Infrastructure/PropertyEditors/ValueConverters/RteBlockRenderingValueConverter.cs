@@ -78,7 +78,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
         // the reference cache level is .Element here, as is also the case when rendering at property level.
         RichTextBlockModel? richTextBlockModel = richTextEditorValue.Blocks is not null
-            ? ParseRichTextBlockModel(richTextEditorValue.Blocks, propertyType, PropertyCacheLevel.Element, preview)
+            ? ParseRichTextBlockModel(owner, richTextEditorValue.Blocks, propertyType, PropertyCacheLevel.Element, preview)
             : null;
 
         return new RichTextEditorIntermediateValue
@@ -181,7 +181,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         return sourceString;
     }
 
-    private RichTextBlockModel? ParseRichTextBlockModel(RichTextBlockValue blocks, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, bool preview)
+    private RichTextBlockModel? ParseRichTextBlockModel(IPublishedElement owner, RichTextBlockValue blocks, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         RichTextConfiguration? configuration = propertyType.DataType.ConfigurationAs<RichTextConfiguration>();
         if (configuration?.Blocks?.Any() is not true)
@@ -190,7 +190,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         }
 
         var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _jsonSerializer, _constructorCache);
-        return creator.CreateBlockModel(referenceCacheLevel, blocks, preview, configuration.Blocks);
+        return creator.CreateBlockModel(owner, referenceCacheLevel, blocks, preview, configuration.Blocks);
     }
 
     private string RenderRichTextBlockModel(string source, RichTextBlockModel? richTextBlockModel)

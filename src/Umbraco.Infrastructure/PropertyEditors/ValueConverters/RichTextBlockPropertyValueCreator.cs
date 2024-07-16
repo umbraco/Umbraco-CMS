@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -21,13 +22,13 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
         _constructorCache = constructorCache;
     }
 
-    public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
+    public RichTextBlockModel CreateBlockModel(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
         RichTextBlockModel CreateEmptyModel() => RichTextBlockModel.Empty;
 
         RichTextBlockModel CreateModel(IList<RichTextBlockItem> items) => new RichTextBlockModel(items);
 
-        RichTextBlockModel blockModel = CreateBlockModel(referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        RichTextBlockModel blockModel = CreateBlockModel(owner, referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }

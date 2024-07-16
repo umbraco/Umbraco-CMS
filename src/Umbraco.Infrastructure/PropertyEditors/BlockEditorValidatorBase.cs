@@ -40,22 +40,17 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
                     throw new InvalidOperationException($"No element type found with key {item.ContentTypeKey}");
                 }
 
-                // now ensure missing properties
-                foreach (IPropertyType elementTypeProp in elementType.CompositionPropertyTypes)
-                {
-                    if (!item.PropertyValues.ContainsKey(elementTypeProp.Alias))
-                    {
-                        // set values to null
-                        item.PropertyValues[elementTypeProp.Alias] = new BlockItemData.BlockPropertyValue(null, elementTypeProp);
-                        item.RawPropertyValues[elementTypeProp.Alias] = null;
-                    }
-                }
-
                 var elementValidation = new ElementTypeValidationModel(item.ContentTypeAlias, item.Key);
-                foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in item.PropertyValues)
+                foreach (BlockPropertyValue blockPropertyValue in item.Properties)
                 {
+                    IPropertyType? propertyType = blockPropertyValue.PropertyType;
+                    if (propertyType is null)
+                    {
+                        throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to validate them.", nameof(blockEditorData));
+                    }
+
                     elementValidation.AddPropertyTypeValidation(
-                        new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value, $"{group.Path}[{i}].{prop.Value.PropertyType.Alias}"));
+                        new PropertyTypeValidationModel(propertyType, blockPropertyValue.Value, $"{group.Path}[{i}].{propertyType.Alias}"));
                 }
 
                 yield return elementValidation;

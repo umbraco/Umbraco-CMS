@@ -161,6 +161,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BlockListPropertyValueConstructorCache>();
         builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<BlockEditorVarianceHandler>();
 
         // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined

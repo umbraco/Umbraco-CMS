@@ -1,0 +1,247 @@
+using Microsoft.Extensions.Logging;
+using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
+
+public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
+{
+    private readonly ILogger<ConvertBlockEditorPropertiesBase> _logger;
+    private readonly IContentTypeService _contentTypeService;
+    private readonly IDataTypeService _dataTypeService;
+    private readonly IJsonSerializer _jsonSerializer;
+    private readonly IUmbracoContextFactory _umbracoContextFactory;
+    private readonly ILanguageService _languageService;
+
+    protected abstract IEnumerable<string> PropertyEditorAliases { get; }
+
+    protected abstract EditorValueHandling DetermineEditorValueHandling(object editorValue);
+
+    protected enum EditorValueHandling
+    {
+        IgnoreConversion,
+        ProceedConversion,
+        HandleAsError
+    }
+
+    public ConvertBlockEditorPropertiesBase(
+        IMigrationContext context,
+        ILogger<ConvertBlockEditorPropertiesBase> logger,
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        IJsonSerializer jsonSerializer,
+        IUmbracoContextFactory umbracoContextFactory,
+        ILanguageService languageService)
+        : base(context)
+    {
+        _logger = logger;
+        _contentTypeService = contentTypeService;
+        _dataTypeService = dataTypeService;
+        _jsonSerializer = jsonSerializer;
+        _umbracoContextFactory = umbracoContextFactory;
+        _languageService = languageService;
+    }
+
+    protected override void Migrate()
+    {
+        using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+        var languagesById = _languageService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(language => language.Id);
+        IContentType[] allContentTypes = _contentTypeService.GetAll().ToArray();
+        var allPropertyTypesByEditor = allContentTypes
+            .SelectMany(ct => ct.PropertyTypes)
+            .GroupBy(pt => pt.PropertyEditorAlias)
+            .ToDictionary(group => group.Key, group => group.ToArray());
+
+        foreach (var propertyEditorAlias in PropertyEditorAliases)
+        {
+            if (allPropertyTypesByEditor.TryGetValue(propertyEditorAlias, out IPropertyType[]? propertyTypes) is false)
+            {
+                continue;
+            }
+
+            _logger.LogInformation("Migration starting for all properties of type: {propertyEditorAlias}", propertyEditorAlias);
+            if (Handle(propertyTypes, languagesById))
+            {
+                _logger.LogInformation("Migration succeeded for all properties of type: {propertyEditorAlias}", propertyEditorAlias);
+            }
+            else
+            {
+                _logger.LogError("Migration failed for one or more properties of type: {propertyEditorAlias}", propertyEditorAlias);
+            }
+        }
+    }
+
+    private bool Handle(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
+    {
+        var success = true;
+
+        foreach (IPropertyType propertyType in propertyTypes)
+        {
+            try
+            {
+                _logger.LogInformation("- starting property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...", propertyType.Name, propertyType.Id, propertyType.Alias);
+                IDataType dataType = _dataTypeService.GetAsync(propertyType.DataTypeKey).GetAwaiter().GetResult()
+                                     ?? throw new InvalidOperationException("The data type could not be fetched.");
+
+                IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
+                                               ?? throw new InvalidOperationException("The data type value editor could not be fetched.");
+
+                Sql<ISqlContext> sql = Sql()
+                    .Select<PropertyDataDto>()
+                    .From<PropertyDataDto>()
+                    .Where<PropertyDataDto>(dto => dto.PropertyTypeId == propertyType.Id);
+                List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(sql);
+                if (propertyDataDtos.Any() is false)
+                {
+                    continue;
+                }
+
+                var updateBatch = propertyDataDtos.Select(propertyDataDto =>
+                    UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
+
+                // NOTE: .ToArray() here so we can modify the original updateBatch collection in the enumeration
+                UpdateBatch<PropertyDataDto>[] enumerableUpdateBatch = updateBatch.ToArray();
+                var progress = 0;
+
+                foreach (UpdateBatch<PropertyDataDto> update in enumerableUpdateBatch)
+                {
+                    progress++;
+                    if (progress % 100 == 0)
+                    {
+                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, enumerableUpdateBatch.Length);
+                    }
+
+                    PropertyDataDto propertyDataDto = update.Poco;
+
+                    // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
+                    var culture = propertyType.VariesByCulture()
+                                  && propertyDataDto.LanguageId.HasValue
+                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
+                        ? language.IsoCode
+                        : null;
+
+                    if (culture is null && propertyType.VariesByCulture())
+                    {
+                        // if we end up here, the property DTO is bound to a language that no longer exists. this is an error scenario,
+                        // and we can't really handle it in any other way than logging; in all likelihood this is an old property version,
+                        // and it won't cause any runtime issues
+                        _logger.LogWarning(
+                            "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                            propertyDataDto.Id,
+                            propertyDataDto.LanguageId,
+                            propertyType.Name,
+                            propertyType.Id,
+                            propertyType.Alias);
+                        continue;
+                    }
+
+                    var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
+                    var property = new Property(propertyType);
+                    property.SetValue(propertyDataDto.Value, culture, segment);
+                    var toEditorValue = valueEditor.ToEditor(property, culture, segment);
+                    switch (toEditorValue)
+                    {
+                        case null:
+                            _logger.LogWarning(
+                                "    - value editor yielded a null value for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                propertyDataDto.Id,
+                                propertyType.Name,
+                                propertyType.Id,
+                                propertyType.Alias);
+                            updateBatch.Remove(update);
+                            continue;
+
+                        case string str when str.IsNullOrWhiteSpace():
+                            // indicates either an empty block editor or corrupt block editor data - we can't do anything about either here
+                            updateBatch.Remove(update);
+                            continue;
+
+                        default:
+                            switch (DetermineEditorValueHandling(toEditorValue))
+                            {
+                                case EditorValueHandling.IgnoreConversion:
+                                    // nothing to convert, continue
+                                    updateBatch.Remove(update);
+                                    continue;
+                                case EditorValueHandling.ProceedConversion:
+                                    // continue the conversion
+                                    break;
+                                case EditorValueHandling.HandleAsError:
+                                    _logger.LogError(
+                                        "    - value editor did not yield a valid ToEditor value for property data with id: {propertyDataId} - the value type was {valueType} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                        propertyDataDto.Id,
+                                        toEditorValue.GetType(),
+                                        propertyType.Name,
+                                        propertyType.Id,
+                                        propertyType.Alias);
+                                    updateBatch.Remove(update);
+                                    continue;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                            break;
+                    }
+
+                    var editorValue = _jsonSerializer.Serialize(toEditorValue);
+                    var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+                    if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
+                    {
+                        _logger.LogError(
+                            "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                            propertyDataDto.Id,
+                            propertyType.Name,
+                            propertyType.Id,
+                            propertyType.Alias);
+                        updateBatch.Remove(update);
+                        continue;
+                    }
+
+                    propertyDataDto.TextValue = stringValue;
+                }
+
+                if (updateBatch.Any() is false)
+                {
+                    _logger.LogInformation("  - no properties to convert, continuing");
+                    continue;
+                }
+
+                _logger.LogInformation("  - {totalConverted} properties converted, saving...", updateBatch.Count);
+                var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+                if (result != updateBatch.Count)
+                {
+                    throw new InvalidOperationException($"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
+                }
+
+                _logger.LogDebug(
+                    "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+                    propertyType.Name,
+                    propertyType.Id,
+                    propertyType.Alias,
+                    propertyType.PropertyEditorAlias,
+                    result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Migration failed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias})",
+                    propertyType.Name,
+                    propertyType.Id,
+                    propertyType.Alias,
+                    propertyType.PropertyEditorAlias);
+
+                success = false;
+            }
+        }
+
+        return success;
+    }
+}

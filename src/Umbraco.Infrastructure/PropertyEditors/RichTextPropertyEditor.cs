@@ -5,11 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -88,8 +88,9 @@ public class RichTextPropertyEditor : DataEditor
             IHtmlSanitizer htmlSanitizer,
             IBlockEditorElementTypeCache elementTypeCache,
             IPropertyValidationService propertyValidationService,
-            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
-            : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
+            BlockEditorVarianceHandler blockEditorVarianceHandler)
+            : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection, blockEditorVarianceHandler)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;
@@ -196,7 +197,7 @@ public class RichTextPropertyEditor : DataEditor
             richTextEditorValue.Markup = _imageSourceParser.EnsureImageSources(richTextEditorValue.Markup);
 
             // return json convertable object
-            return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue));
+            return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue, culture, segment));
         }
 
         /// <summary>
