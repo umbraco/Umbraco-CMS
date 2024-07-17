@@ -76,7 +76,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 			<uui-toggle
 				?checked=${this.value.allowBulkCopy}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkCopy')}
-				label="Allow bulk copy (content only)"></uui-toggle>
+				label="Allow bulk duplicate (content only)"></uui-toggle>
 			<uui-toggle
 				?checked=${this.value.allowBulkMove}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkMove')}
