@@ -70,10 +70,10 @@
     },
     "UseDeliveryApi": {
       "displayName": "Use Delivery API",
-      "description": "Adds code to Startup.cs to enable the Umbraco Delivery API.",
+      "description": "Enables the Delivery API",
       "type": "parameter",
       "datatype": "bool",
-      "defaultValue": "true"
+      "defaultValue": "false"
     },
     "Docker": {
       "displayName": "Add Docker file",
