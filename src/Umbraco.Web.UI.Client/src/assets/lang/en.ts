@@ -1875,6 +1875,8 @@ export default {
 		settingsGroup: 'Settings',
 		templatingGroup: 'Templating',
 		thirdPartyGroup: 'Third Party',
+		structureGroup: 'Structure',
+		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
 	},
 	update: {
