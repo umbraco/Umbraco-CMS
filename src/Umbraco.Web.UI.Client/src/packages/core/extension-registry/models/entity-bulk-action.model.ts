@@ -33,3 +33,16 @@ export interface MetaEntityBulkActionDefaultKind extends MetaEntityBulkAction {
 	 */
 	label?: string;
 }
+
+// MOVE TO
+export interface ManifestEntityBulkActionMoveToKind extends ManifestEntityBulkAction<MetaEntityBulkActionMoveToKind> {
+	type: 'entityBulkAction';
+	kind: 'moveTo';
+}
+
+export interface MetaEntityBulkActionMoveToKind extends MetaEntityBulkActionDefaultKind {
+	bulkMoveRepositoryAlias: string;
+	hideTreeRoot?: boolean;
+	foldersOnly?: boolean;
+	treeAlias: string;
+}
