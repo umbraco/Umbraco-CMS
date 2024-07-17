@@ -30,15 +30,17 @@ export class UmbSectionSidebarMenuElement<
 	manifest?: ManifestType;
 
 	renderHeader() {
-		return html`<h3>${this.manifest?.meta?.label}</h3>`;
+		return html`<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>`;
 	}
 
 	override render() {
-		return html`${this.renderHeader()}
+		return html`
+			${this.renderHeader()}
 			<umb-extension-slot
 				type="menu"
 				.filter="${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}"
-				default-element="umb-menu"></umb-extension-slot>`;
+				default-element="umb-menu"></umb-extension-slot>
+		`;
 	}
 
 	static override styles = [
