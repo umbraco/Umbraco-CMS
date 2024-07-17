@@ -18,7 +18,8 @@ export const entityBulkActions: Array<ManifestEntityBulkAction> = [
 		weight: 50,
 		api: () => import('./publish/publish.action.js'),
 		meta: {
-			label: 'Publish',
+			icon: 'icon-globe',
+			label: '#actions_publish',
 		},
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [
@@ -40,7 +41,8 @@ export const entityBulkActions: Array<ManifestEntityBulkAction> = [
 		weight: 40,
 		api: () => import('./unpublish/unpublish.action.js'),
 		meta: {
-			label: 'Unpublish',
+			icon: 'icon-globe',
+			label: '#actions_unpublish',
 		},
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [
