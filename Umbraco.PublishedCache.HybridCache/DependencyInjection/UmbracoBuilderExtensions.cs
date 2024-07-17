@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
@@ -27,8 +28,12 @@ public static class UmbracoBuilderExtensions
     {
         builder.Services.AddHybridCache();
         builder.Services.AddSingleton<IPublishedContentHybridCache, ContentCache>();
+        builder.Services.AddSingleton<IPublishedMediaHybridCache, MediaCache>();
+        builder.Services.AddSingleton<IPublishedMemberHybridCache, MemberCache>();
         builder.Services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
         builder.Services.AddSingleton<IContentCacheService, ContentCacheService>();
+        builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
+        builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
         builder.Services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
@@ -43,8 +48,11 @@ public static class UmbracoBuilderExtensions
                     throw new IndexOutOfRangeException();
             }
         });
-
+        builder.Services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
         builder.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ContentDeletedNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<MediaDeletedNotification, CacheRefreshingNotificationHandler>();
 
         return builder;
     }

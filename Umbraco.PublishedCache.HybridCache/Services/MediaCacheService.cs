@@ -45,7 +45,7 @@ internal class MediaCacheService : IMediaCacheService
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false)
     {
-        Attempt<Guid>  keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (keyAttempt.Success is false)
         {
             return null;
@@ -56,7 +56,7 @@ internal class MediaCacheService : IMediaCacheService
             $"{keyAttempt.Result}", // Unique key to the cache entry
             cancel => ValueTask.FromResult(_nuCacheContentRepository.GetMediaSource(id)));
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
     }
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)

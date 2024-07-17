@@ -33,21 +33,10 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
 
     private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        services.AddHybridCache();
-        services.AddSingleton<IPublishedMediaHybridCache, MediaCache>();
-        services.AddSingleton<IContentCacheService, ContentCacheService>();
-        services.AddSingleton<IMediaCacheService, MediaCacheService>();
-        services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
-        services.AddSingleton<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
-        services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
-        services.AddNotificationAsyncHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
-        services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
-    }
+    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
     [Test]
-    public async Task Can_Get_Draft_Content_By_Id()
+    public async Task Can_Get_Media_By_Key()
     {
         // Arrange
         var newMediaType = new MediaTypeBuilder()
@@ -75,5 +64,112 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
         Assert.IsNotNull(media);
         Assert.AreEqual("Image", media.Name);
         Assert.AreEqual(newMediaType.Key, media.ContentType.Key);
+    }
+
+    [Test]
+    public async Task Can_Get_Media_By_Id()
+    {
+        // Arrange
+        var newMediaType = new MediaTypeBuilder()
+            .WithAlias("album")
+            .WithName("Album")
+            .Build();
+
+        newMediaType.AllowedAsRoot = true;
+        MediaTypeService.Save(newMediaType);
+
+        var createModel = new MediaCreateModel
+        {
+            ContentTypeKey = newMediaType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = "Image",
+        };
+
+        var result = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Act
+        var media = await PublishedMediaHybridCache.GetByIdAsync(result.Result.Content.Id);
+
+        // Assert
+        Assert.IsNotNull(media);
+        Assert.AreEqual("Image", media.Name);
+        Assert.AreEqual(newMediaType.Key, media.ContentType.Key);
+    }
+
+    [Test]
+    public async Task Can_Get_Media_Property_By_Key()
+    {
+        // Arrange
+        IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
+        mediaType.AllowedAsRoot = true;
+        MediaTypeService.Save(mediaType);
+
+        var createModel = new MediaCreateModel
+        {
+            ContentTypeKey = mediaType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = "Image",
+            InvariantProperties = new List<PropertyValueModel>()
+            {
+                new()
+                {
+                    Alias = "title",
+                    Value = "NewTitle"
+                }
+            }
+        };
+
+        var result = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Act
+        var media = await PublishedMediaHybridCache.GetByKeyAsync(result.Result.Content.Key);
+
+        UmbracoContextFactory.EnsureUmbracoContext();
+
+        // Assert
+        Assert.IsNotNull(media);
+        Assert.AreEqual("Image", media.Name);
+        Assert.AreEqual(mediaType.Key, media.ContentType.Key);
+        Assert.AreEqual("NewTitle", media.Value("title"));
+    }
+
+    [Test]
+    public async Task Can_Get_Media_Property_By_Id()
+    {
+        // Arrange
+        IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
+        mediaType.AllowedAsRoot = true;
+        MediaTypeService.Save(mediaType);
+
+        var createModel = new MediaCreateModel
+        {
+            ContentTypeKey = mediaType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = "Image",
+            InvariantProperties = new List<PropertyValueModel>()
+            {
+                new()
+                {
+                    Alias = "title",
+                    Value = "NewTitle"
+                }
+            }
+        };
+
+        var result = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // Act
+        var media = await PublishedMediaHybridCache.GetByKeyAsync(result.Result.Content.Key);
+
+        UmbracoContextFactory.EnsureUmbracoContext();
+
+        // Assert
+        Assert.IsNotNull(media);
+        Assert.AreEqual("Image", media.Name);
+        Assert.AreEqual(mediaType.Key, media.ContentType.Key);
+        Assert.AreEqual("NewTitle", media.Value("title"));
     }
 }
