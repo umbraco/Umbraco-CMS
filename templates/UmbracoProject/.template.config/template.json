@@ -265,6 +265,31 @@
       "defaultValue": "",
       "replaces": "PACKAGE_PROJECT_NAME_FROM_TEMPLATE"
     },
+    "ModelsBuilderMode": {
+      "type": "parameter",
+      "datatype": "choice",
+      "description": "Choose the models builder mode to use for the project.",
+      "defaultValue": "InMemoryAuto",
+      "replaces": "MODELS_MODE",
+      "choices": [
+        {
+          "choice": "InMemoryAuto",
+          "description": "Generate models in memory, automatically updating when a content type change, this means no need for app rebuild, however models are only available in views."
+        },
+        {
+          "choice": "SourceCodeManual",
+          "description": "Generate models as source code, only updating when requested manually, this means a interaction and rebuild is required when content type(s) change, however models are available in code."
+        },
+        {
+          "choice": "SourceCodeAuto",
+          "description": "Generate models as source code, automatically updating when a content type change, this means a rebuild is required when content type(s) change, however models are available in code."
+        },
+        {
+          "choice": "Nothing",
+          "description": "No models are generated, this is recommended for production assuming generated models are used for development."
+        }
+      ]
+    },
     "Namespace": {
       "type": "derived",
       "valueSource": "name",

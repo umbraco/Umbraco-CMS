@@ -22,6 +22,11 @@
       "persistenceScope": "templateGroup"
     },
     {
+      "id": "ModelsBuilderMode",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
+    },
+    {
       "id": "ExcludeGitignore",
       "isVisible": true,
       "persistenceScope": "templateGroup"

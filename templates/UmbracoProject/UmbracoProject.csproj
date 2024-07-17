@@ -21,11 +21,13 @@
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
 
+  <!--#if (ModelsBuilderMode == "InMemoryAuto") -->
   <PropertyGroup>
     <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
+  <!--#endif -->
 
   <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\buildTransitive\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
   <ItemGroup Condition="'$(PackageProjectName)' != ''">

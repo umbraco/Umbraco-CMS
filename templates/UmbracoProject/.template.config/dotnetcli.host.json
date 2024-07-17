@@ -66,6 +66,10 @@
       "longName": "PackageTestSiteName",
       "shortName": "p",
       "isHidden": true
+    },
+    "ModelsBuilderMode": {
+      "longName": "models-mode",
+      "shortName": "mm"
     }
   },
   "usageExamples": [
