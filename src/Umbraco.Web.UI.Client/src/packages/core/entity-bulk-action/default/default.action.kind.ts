@@ -11,6 +11,7 @@ export const UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST: UmbBackofficeManifest
 		weight: 1000,
 		element: () => import('../entity-bulk-action.element.js'),
 		meta: {
+			icon: '',
 			label: 'Default Entity Bulk Action',
 		},
 	},
