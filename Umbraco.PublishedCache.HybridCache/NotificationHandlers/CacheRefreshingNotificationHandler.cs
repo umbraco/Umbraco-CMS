@@ -36,7 +36,7 @@ internal sealed class CacheRefreshingNotificationHandler :
     {
         foreach (IMedia deletedEntity in notification.DeletedEntities)
         {
-            await _contentCacheService.DeleteItemAsync(deletedEntity.Id);
+            await _mediaCacheService.DeleteItemAsync(deletedEntity.Id);
         }
     }
 }

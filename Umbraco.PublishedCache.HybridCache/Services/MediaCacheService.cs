@@ -88,11 +88,16 @@ internal class MediaCacheService : IMediaCacheService
         scope.Complete();
     }
 
-    public Task DeleteItemAsync(int id)
+    public async Task DeleteItemAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _nuCacheContentRepository.DeleteContentItem(id);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
+        if (keyAttempt.Success)
+        {
+            await _hybridCache.RemoveAsync(keyAttempt.Result.ToString());
+        }
+
         scope.Complete();
-        return Task.CompletedTask;
     }
 }
