@@ -65,17 +65,16 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 	}
 
 	override render() {
+		const label = this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name;
 		return html`
 			<uui-button
 				id="action-button"
-				@click=${this._onClick}
-				look="outline"
 				color="default"
-				label=${ifDefined(
-					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
-				)}
-				href="${ifDefined(this.manifest?.meta.href)}"
-				.state=${this._buttonState}></uui-button>
+				look="outline"
+				label=${ifDefined(label)}
+				href=${ifDefined(this.manifest?.meta.href)}
+				.state=${this._buttonState}
+				@click=${this._onClick}></uui-button>
 		`;
 	}
 }

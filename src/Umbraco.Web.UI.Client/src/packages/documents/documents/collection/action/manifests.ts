@@ -9,7 +9,7 @@ export const createManifest: ManifestCollectionAction = {
 	element: () => import('./create-document-collection-action.element.js'),
 	weight: 100,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 	},
 	conditions: [
 		{
