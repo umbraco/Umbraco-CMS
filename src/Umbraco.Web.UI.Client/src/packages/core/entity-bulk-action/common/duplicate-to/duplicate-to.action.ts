@@ -31,13 +31,13 @@ export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<M
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
-		const bulkMoveRepository = await createExtensionApiByAlias<UmbBulkDuplicateToRepository>(
+		const bulkDuplicateRepository = await createExtensionApiByAlias<UmbBulkDuplicateToRepository>(
 			this,
 			this.args.meta.bulkDuplicateRepositoryAlias,
 		);
-		if (!bulkMoveRepository) throw new Error('Bulk Duplicate Repository is not available');
+		if (!bulkDuplicateRepository) throw new Error('Bulk Duplicate Repository is not available');
 
-		await bulkMoveRepository.requestBulkDuplicateTo({
+		await bulkDuplicateRepository.requestBulkDuplicateTo({
 			uniques: this.selection,
 			destination: { unique: destinationUnique },
 		});
