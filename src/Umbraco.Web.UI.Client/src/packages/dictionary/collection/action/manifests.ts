@@ -9,7 +9,7 @@ export const createManifest: ManifestCollectionAction = {
 	alias: 'Umb.CollectionAction.Dictionary.Create',
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 		href: `section/dictionary/workspace/dictionary/create/parent/${UMB_DICTIONARY_ROOT_ENTITY_TYPE}/null`,
 	},
 	conditions: [

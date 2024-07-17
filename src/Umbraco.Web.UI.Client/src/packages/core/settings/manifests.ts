@@ -32,7 +32,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Structure Settings Sidebar Menu',
 		weight: 300,
 		meta: {
-			label: 'Structure',
+			label: '#treeHeaders_structureGroup',
 			menu: 'Umb.Menu.StructureSettings',
 		},
 		conditions: [
@@ -54,7 +54,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Advanced Settings Sidebar Menu',
 		weight: 100,
 		meta: {
-			label: 'Advanced',
+			label: '#treeHeaders_advancedGroup',
 			menu: 'Umb.Menu.AdvancedSettings',
 		},
 		conditions: [
