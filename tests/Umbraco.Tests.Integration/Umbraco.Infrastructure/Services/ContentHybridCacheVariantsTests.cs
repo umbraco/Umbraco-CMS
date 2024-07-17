@@ -40,21 +40,11 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
-    private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<ContentCache>();
+    private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<IPublishedContentHybridCache>();
 
     private IContent VariantPage { get; set; }
 
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        services.AddHybridCache();
-        services.AddSingleton<ContentCache>();
-        services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
-        services.AddSingleton<IContentCacheService, ContentCacheService>();
-        services.AddSingleton<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
-        services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
-        services.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
-        services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
-    }
+    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
     [SetUp]
     public async Task Setup() => await CreateTestData();

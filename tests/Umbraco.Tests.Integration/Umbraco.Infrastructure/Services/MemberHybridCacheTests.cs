@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class HybridMemberCacheTests : UmbracoIntegrationTest
+public class MemberHybridCacheTests : UmbracoIntegrationTest
 {
     private IPublishedMemberHybridCache PublishedMemberHybridCache => GetRequiredService<IPublishedMemberHybridCache>();
 
@@ -36,15 +36,7 @@ public class HybridMemberCacheTests : UmbracoIntegrationTest
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        services.AddHybridCache();
-        services.AddSingleton<IPublishedMemberHybridCache, MemberCache>();
-        services.AddSingleton<IMemberCacheService, MemberCacheService>();
-        services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
-        services.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
-        services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
-    }
+    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
     [Test]
     public async Task Can_Get_Member_By_Key()

@@ -26,17 +26,8 @@ public class HybridCachingMockTests : UmbracoIntegrationTestWithContent
 {
     private IPublishedContentHybridCache _mockedCache;
     private Mock<INuCacheContentRepository> _mockedNucacheRepository;
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        services.AddHybridCache();
-        services.AddSingleton<IPublishedContentHybridCache, ContentCache>();
-        services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
-        services.AddSingleton<IContentCacheService, ContentCacheService>();
-        services.AddSingleton<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
-        services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
-        services.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
-        services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
-    }
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
     [SetUp]
     public void SetUp()
