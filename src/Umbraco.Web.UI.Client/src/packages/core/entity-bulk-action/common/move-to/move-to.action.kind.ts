@@ -14,6 +14,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		weight: 700,
 		forEntityTypes: [],
 		meta: {
+			icon: 'icon-enter',
 			label: '#actions_move',
 			bulkMoveRepositoryAlias: '',
 			treeAlias: '',
