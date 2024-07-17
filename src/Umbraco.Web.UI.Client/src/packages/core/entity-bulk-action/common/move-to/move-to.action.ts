@@ -1,7 +1,10 @@
 import type { UmbBulkMoveToRepository } from './move-to-repository.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -46,8 +49,13 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<MetaEn
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!eventContext) throw new Error('Event Context is not available');
 
-			const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-			eventContext.dispatchEvent(event);
+			const args = { entityType, unique };
+
+			const reloadChildren = new UmbRequestReloadChildrenOfEntityEvent(args);
+			eventContext.dispatchEvent(reloadChildren);
+
+			const reloadStructure = new UmbRequestReloadStructureForEntityEvent(args);
+			eventContext.dispatchEvent(reloadStructure);
 		}
 	}
 }
