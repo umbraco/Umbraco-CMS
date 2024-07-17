@@ -1,16 +1,25 @@
-import type { UmbEntityBulkActionBase } from './entity-bulk-action-base.js';
-import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityBulkAction } from './entity-bulk-action.interface.js';
+import type { UmbEntityBulkActionElement } from './entity-bulk-action-element.interface.js';
 import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type {
+	ManifestEntityBulkAction,
+	MetaEntityBulkActionDefaultKind,
+} from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-entity-bulk-action')
-export class UmbEntityBulkActionElement<
-	MetaType extends MetaEntityBulkAction = MetaEntityBulkAction,
-	ApiType extends UmbEntityBulkActionBase<MetaType> = UmbEntityBulkActionBase<MetaType>,
-> extends UmbLitElement {
+const elementName = 'umb-entity-bulk-action';
+
+@customElement(elementName)
+export class UmbEntityBulkActionDefaultElement<
+		MetaType extends MetaEntityBulkActionDefaultKind = MetaEntityBulkActionDefaultKind,
+		ApiType extends UmbEntityBulkAction<MetaType> = UmbEntityBulkAction<MetaType>,
+	>
+	extends UmbLitElement
+	implements UmbEntityBulkActionElement
+{
 	@property({ attribute: false })
-	manifest?: ManifestEntityBulkAction<MetaEntityBulkAction>;
+	manifest?: ManifestEntityBulkAction<MetaType>;
 
 	api?: ApiType;
 
@@ -22,16 +31,20 @@ export class UmbEntityBulkActionElement<
 	}
 
 	override render() {
-		return html`<uui-button
-			@click=${this.#onClick}
-			label=${ifDefined(this.manifest?.meta.label)}
-			color="default"
-			look="secondary"></uui-button>`;
+		return html`
+			<uui-button
+				color="default"
+				label=${ifDefined(this.localize.string(this.manifest?.meta.label ?? ''))}
+				look="secondary"
+				@click=${this.#onClick}></uui-button>
+		`;
 	}
 }
 
+export default UmbEntityBulkActionDefaultElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-entity-bulk-action': UmbEntityBulkActionElement;
+		[elementName]: UmbEntityBulkActionDefaultElement;
 	}
 }
