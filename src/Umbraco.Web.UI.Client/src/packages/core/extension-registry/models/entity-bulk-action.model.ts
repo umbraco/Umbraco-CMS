@@ -70,3 +70,13 @@ export interface MetaEntityBulkActionMoveToKind extends MetaEntityBulkActionDefa
 	foldersOnly?: boolean;
 	treeAlias: string;
 }
+
+// TRASH
+export interface ManifestEntityBulkActionTrashKind extends ManifestEntityBulkAction<MetaEntityBulkActionTrashKind> {
+	type: 'entityBulkAction';
+	kind: 'trash';
+}
+
+export interface MetaEntityBulkActionTrashKind extends MetaEntityBulkActionDefaultKind {
+	bulkTrashRepositoryAlias: string;
+}
