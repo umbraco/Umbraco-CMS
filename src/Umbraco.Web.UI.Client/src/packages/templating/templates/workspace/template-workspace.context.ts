@@ -3,13 +3,12 @@ import type { UmbTemplateItemModel } from '../repository/index.js';
 import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repository/index.js';
 import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
@@ -40,12 +39,8 @@ export class UmbTemplateWorkspaceContext
 	readonly entityType = this.#data.asObservablePart((data) => data?.entityType);
 	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
 
-	#isCodeEditorReady = new UmbBooleanState(false);
-	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TEMPLATE_WORKSPACE_ALIAS);
-		this.#loadCodeEditor();
 
 		this.routes.setRoutes([
 			{
@@ -77,15 +72,6 @@ export class UmbTemplateWorkspaceContext
 	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
-	}
-
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
-		}
 	}
 
 	getEntityType(): string {
