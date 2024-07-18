@@ -44,6 +44,20 @@ export interface MetaEntityBulkActionDefaultKind extends MetaEntityBulkAction {
 	label?: string;
 }
 
+// DUPLICATE TO
+export interface ManifestEntityBulkActionDuplicateToKind
+	extends ManifestEntityBulkAction<MetaEntityBulkActionDuplicateToKind> {
+	type: 'entityBulkAction';
+	kind: 'duplicateTo';
+}
+
+export interface MetaEntityBulkActionDuplicateToKind extends ManifestEntityBulkAction {
+	bulkDuplicateRepositoryAlias: string;
+	hideTreeRoot?: boolean;
+	foldersOnly?: boolean;
+	treeAlias: string;
+}
+
 // MOVE TO
 export interface ManifestEntityBulkActionMoveToKind extends ManifestEntityBulkAction<MetaEntityBulkActionMoveToKind> {
 	type: 'entityBulkAction';
