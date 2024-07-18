@@ -13,6 +13,5 @@ export const UmbUserStateFilter = Object.freeze({
 	DISABLED: 'Disabled',
 	LOCKED_OUT: 'LockedOut',
 	INVITED: 'Invited',
-	INACTIVE: 'Inactive',
-	ALL: 'All',
+	INACTIVE: 'Inactive'
 });
