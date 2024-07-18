@@ -14,8 +14,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 internal class PublishedProperty : PublishedPropertyBase
 {
     private readonly PublishedContent _content;
-    private readonly Guid _contentUid;
-    private readonly bool _isMember;
     private readonly bool _isPreviewing;
 
     // the invariant-neutral source and inter values
@@ -24,15 +22,12 @@ internal class PublishedProperty : PublishedPropertyBase
     private readonly ContentVariation _sourceVariations;
 
     // the variant and non-variant object values
-    private CacheValues? _cacheValues;
     private bool _interInitialized;
     private object? _interValue;
 
     // the variant source and inter values
     private readonly object _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
-
-    private string? _valuesCacheKey;
 
     // initializes a published content property with no value
     public PublishedProperty(
@@ -74,18 +69,14 @@ internal class PublishedProperty : PublishedPropertyBase
             }
         }
 
-        _contentUid = content.Key;
         _content = content;
         _isPreviewing = content.IsPreviewing;
-        _isMember = content.ContentType.ItemType == PublishedItemType.Member;
+
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
         _variations = propertyType.Variations | content.ContentType.Variations;
         _sourceVariations = propertyType.Variations;
     }
-
-    // used to cache the CacheValues of this property
-    internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(_contentUid, Alias, _isPreviewing);
 
 
     // determines whether a property has value
@@ -100,27 +91,7 @@ internal class PublishedProperty : PublishedPropertyBase
             return hasValue.Value;
         }
 
-        value = GetInterValue(culture, segment);
-        hasValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
-        if (hasValue.HasValue)
-        {
-            return hasValue.Value;
-        }
-
-        CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
-
-        // initial reference cache level always is .Content
-        const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
-
-        if (!cacheValues.ObjectInitialized)
-        {
-            cacheValues.ObjectValue =
-                PropertyType.ConvertInterToObject(_content, initialCacheLevel, value, _isPreviewing);
-            cacheValues.ObjectInitialized = true;
-        }
-
-        value = cacheValues.ObjectValue;
-        return PropertyType.IsValue(value, PropertyValueLevel.Object) ?? false;
+        return PropertyType.IsValue(GetInterValue(culture, segment), PropertyValueLevel.Object) ?? false;
     }
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
@@ -149,46 +120,9 @@ internal class PublishedProperty : PublishedPropertyBase
             : null;
     }
 
-    private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
-    {
-        CacheValues cacheValues;
-        switch (cacheLevel)
-        {
-            case PropertyCacheLevel.None:
-                // never cache anything
-                cacheValues = new CacheValues();
-                break;
-            case PropertyCacheLevel.Element:
-                // cache within the property object itself, ie within the content object
-                cacheValues = _cacheValues ??= new CacheValues();
-                break;
-            case PropertyCacheLevel.Elements:
-            case PropertyCacheLevel.Snapshot:
-                // TODO: Figure out an elements cache
-                // cache within the property object itself, ie within the content object
-                cacheValues = _cacheValues ??= new CacheValues();
-                break;
-            default:
-                throw new InvalidOperationException("Invalid cache level.");
-        }
-
-        return cacheValues;
-    }
-
-    private CacheValues GetCacheValues(IAppCache? cache)
-    {
-        // no cache, don't cache
-        if (cache == null)
-        {
-            return new CacheValues();
-        }
-
-        return (CacheValues)cache.Get(ValuesCacheKey, () => new CacheValues())!;
-    }
-
     private object? GetInterValue(string? culture, string? segment)
     {
-        if (culture == string.Empty && segment == string.Empty)
+        if (culture is "" && segment is "")
         {
             if (_interInitialized)
             {
@@ -200,132 +134,20 @@ internal class PublishedProperty : PublishedPropertyBase
             return _interValue;
         }
 
-        EnsureSourceValuesInitialized();
-
-        var k = new CompositeStringStringKey(culture, segment);
-
-        SourceInterValue vvalue = _sourceValues!.GetOrAdd(k, _ =>
-            new SourceInterValue
-            {
-                Culture = culture,
-                Segment = segment,
-                SourceValue = GetSourceValue(culture, segment),
-            });
-
-        if (vvalue.InterInitialized)
-        {
-            return vvalue.InterValue;
-        }
-
-        vvalue.InterValue = PropertyType.ConvertSourceToInter(_content, vvalue.SourceValue, _isPreviewing);
-        vvalue.InterInitialized = true;
-        return vvalue.InterValue;
+        return PropertyType.ConvertSourceToInter(_content, GetSourceValue(culture, segment), _isPreviewing);
     }
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
-        object? value;
-        CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
-
-        // initial reference cache level always is .Content
-        const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
-
-        if (cacheValues.ObjectInitialized)
-        {
-            return cacheValues.ObjectValue;
-        }
-
-        cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
-        cacheValues.ObjectInitialized = true;
-        value = cacheValues.ObjectValue;
-
-        return value;
+        return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.None, GetInterValue(culture, segment), _isPreviewing);
     }
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
-
-        object? value;
-        CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
-
-
-        // initial reference cache level always is .Content
-        const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
-
-        object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing, expanding);
-        value = expanding
-            ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
-            : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
-
-        return value;
-    }
-
-    private object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
-    {
-        if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
-        {
-            cacheValues.DeliveryApiDefaultObjectValue = getValue();
-            cacheValues.DeliveryApiDefaultObjectInitialized = true;
-        }
-
-        return cacheValues.DeliveryApiDefaultObjectValue;
-    }
-
-    private object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
-    {
-        if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
-        {
-            cacheValues.DeliveryApiExpandedObjectValue = getValue();
-            cacheValues.DeliveryApiExpandedObjectInitialized = true;
-        }
-
-        return cacheValues.DeliveryApiExpandedObjectValue;
-    }
-
-    private class CacheValue
-    {
-        public bool ObjectInitialized { get; set; }
-
-        public object? ObjectValue { get; set; }
-
-        public bool DeliveryApiDefaultObjectInitialized { get; set; }
-
-        public object? DeliveryApiDefaultObjectValue { get; set; }
-
-        public bool DeliveryApiExpandedObjectInitialized { get; set; }
-
-        public object? DeliveryApiExpandedObjectValue { get; set; }
-    }
-
-    private class CacheValues : CacheValue
-    {
-        private readonly object _locko = new();
-        private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
-
-        public CacheValue For(string? culture, string? segment)
-        {
-            if (culture == string.Empty && segment == string.Empty)
-            {
-                return this;
-            }
-
-            if (_values == null)
-            {
-                lock (_locko)
-                {
-                    _values ??= InitializeConcurrentDictionary<CompositeStringStringKey, CacheValue>();
-                }
-            }
-
-            var k = new CompositeStringStringKey(culture, segment);
-
-            CacheValue value = _values.GetOrAdd(k, _ => new CacheValue());
-
-            return value;
-        }
+        return PropertyType.ConvertInterToDeliveryApiObject(_content, PropertyCacheLevel.None, GetInterValue(culture, segment), _isPreviewing, expanding);
     }
 
     private class SourceInterValue
@@ -346,10 +168,6 @@ internal class PublishedProperty : PublishedPropertyBase
         }
 
         public object? SourceValue { get; set; }
-
-        public bool InterInitialized { get; set; }
-
-        public object? InterValue { get; set; }
     }
 
     private static ConcurrentDictionary<TKey, TValue> InitializeConcurrentDictionary<TKey, TValue>()
@@ -367,15 +185,5 @@ internal class PublishedProperty : PublishedPropertyBase
         {
             _sourceValues ??= InitializeConcurrentDictionary<CompositeStringStringKey, SourceInterValue>();
         }
-    }
-
-    private string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
-    {
-        if (previewing)
-        {
-            return "NuCache.Property.CacheValues[D:" + contentUid + ":" + typeAlias + "]";
-        }
-
-        return "NuCache.Property.CacheValues[P:" + contentUid + ":" + typeAlias + "]";
     }
 }
