@@ -52,7 +52,7 @@ export class UmbIconElement extends UmbLitElement {
 		const value = this.#color || this.#fallbackColor;
 
 		if (!value) {
-			this._style = { '--uui-icon-color': undefined };
+			this._style = { '--uui-icon-color': 'inherit' };
 			return;
 		}
 
