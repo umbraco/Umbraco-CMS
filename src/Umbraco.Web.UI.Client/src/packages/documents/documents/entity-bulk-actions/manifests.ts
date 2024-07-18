@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { manifests as duplicateToManifests } from './duplicate-to/manifests.js';
 import { manifests as moveToManifests } from './move-to/manifests.js';
+import { manifests as trashManifests } from './trash/manifests.js';
 import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
 import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -56,30 +57,11 @@ export const entityBulkActions: Array<ManifestEntityBulkAction> = [
 			},
 		],
 	},
-	/* TODO: implement bulk trash action
-	{
-		type: 'entityBulkAction',
-		kind: 'default',
-		alias: 'Umb.EntityBulkAction.Document.Delete',
-		name: 'Delete Document Entity Bulk Action',
-		weight: 10,
-		api: UmbDocumentDeleteEntityBulkAction,
-		meta: {
-			label: 'Delete',
-		},
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		conditions: [
-			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: UMB_DOCUMENT_COLLECTION_ALIAS,
-			},
-			{
-				alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
-				match: (permissions: UmbCollectionBulkActionPermissions) => permissions.allowBulkDelete,
-			},
-		],
-	},
-	*/
 ];
 
-export const manifests: Array<ManifestTypes> = [...entityBulkActions, ...duplicateToManifests, ...moveToManifests];
+export const manifests: Array<ManifestTypes> = [
+	...entityBulkActions,
+	...duplicateToManifests,
+	...moveToManifests,
+	...trashManifests,
+];
