@@ -1,27 +1,27 @@
 import { css, customElement, html, property, query, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_MEDIA_PICKER_MODAL, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbCodeEditorLoadedEvent } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+
+const elementName = 'umb-input-markdown';
 
 /**
  * @element umb-input-markdown
  * @fires change - when the value of the input changes
  */
-
-@customElement('umb-input-markdown')
+@customElement(elementName)
 export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected override getFormElement() {
 		return this._codeEditor;
@@ -35,7 +35,6 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 	@property()
 	overlaySize?: UUIModalSidebarSize;
 
-	#isCodeEditorReady = new UmbBooleanState(false);
 	#editor?: UmbCodeEditorController;
 
 	@query('umb-code-editor')
@@ -50,17 +49,16 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 	constructor() {
 		super();
-		this.#loadCodeEditor();
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
 
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
+	#onCodeEditorLoaded(event: UmbCodeEditorLoadedEvent) {
+		if (event.type !== UmbCodeEditorLoadedEvent.TYPE) return;
 
+		try {
 			this.#editor = this._codeEditor?.editor;
 
 			this.#editor?.updateOptions({
@@ -68,8 +66,6 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 				minimap: false,
 				folding: false,
 			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
-
-			this.#isCodeEditorReady.setValue(true);
 
 			// TODO: make all action into extensions
 			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
@@ -93,7 +89,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		}
 	}
 
-	async #loadActions() {
+	#loadActions() {
 		//Note: UI Buttons have the keybindings hardcoded in its title. If you change the keybindings here, please update the render as well.
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H1',
@@ -214,7 +210,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 				const uniques = value.selection;
 				const { data: mediaUrls } = await this.#mediaUrlRepository.requestItems(uniques);
-				const mediaUrl = mediaUrls?.length ? mediaUrls[0].url ?? 'URL' : 'URL';
+				const mediaUrl = mediaUrls?.length ? (mediaUrls[0].url ?? 'URL') : 'URL';
 
 				this.#editor?.monacoEditor?.executeEdits('', [
 					{
@@ -423,8 +419,9 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 			<umb-code-editor
 				language="markdown"
 				.code=${this.value as string}
+				@input=${this.#onInput}
 				@keypress=${this.#onKeyPress}
-				@input=${this.#onInput}>
+				@loaded=${this.#onCodeEditorLoaded}>
 			</umb-code-editor>
 			${this.#renderPreview()}
 		`;
@@ -609,6 +606,6 @@ export default UmbInputMarkdownElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-markdown': UmbInputMarkdownElement;
+		[elementName]: UmbInputMarkdownElement;
 	}
 }
