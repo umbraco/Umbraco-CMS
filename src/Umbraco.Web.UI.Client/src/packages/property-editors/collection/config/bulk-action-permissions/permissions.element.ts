@@ -84,7 +84,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 			<uui-toggle
 				?checked=${this.value.allowBulkDelete}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkDelete')}
-				label="Allow bulk delete"></uui-toggle>`;
+				label="Allow bulk trash"></uui-toggle>`;
 	}
 
 	static override styles = [
