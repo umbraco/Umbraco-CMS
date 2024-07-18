@@ -59,7 +59,27 @@
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "*",
-      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
+      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE",
+      "isEnabled": "UmbracoRelease == Latest"
+    },
+    "UmbracoRelease": {
+      "displayName": "Umbraco release type",
+      "description": "The Umbraco release to use, either latest or latest long term supported",
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Latest",
+      "choices": [
+        {
+          "choice": "Latest",
+          "description": "The latest umbraco release"
+        },
+        {
+          "choice": "LTS",
+          "description": "The most recent long term supported version",
+          "displayName": "Long Term Supported"
+        }
+      ],
+      "isRequired": false
     },
     "UseHttpsRedirect": {
       "displayName": "Use HTTPS redirect",
