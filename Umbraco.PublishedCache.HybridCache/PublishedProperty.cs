@@ -33,7 +33,7 @@ internal class PublishedProperty : PublishedPropertyBase
     public PublishedProperty(
         IPublishedPropertyType propertyType,
         PublishedContent content,
-        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.None)
         : this(propertyType, content, null, referenceCacheLevel)
     {
     }
@@ -43,7 +43,7 @@ internal class PublishedProperty : PublishedPropertyBase
         IPublishedPropertyType propertyType,
         PublishedContent content,
         PropertyData[]? sourceValues,
-        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.None)
         : base(propertyType, referenceCacheLevel)
     {
         if (sourceValues != null)
