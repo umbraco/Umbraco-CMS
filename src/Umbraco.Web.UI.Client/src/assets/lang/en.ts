@@ -2604,4 +2604,7 @@ export default {
 		routeNotFoundTitle: 'Not found',
 		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
 	},
+	codeEditor: {
+		label: 'Code editor',
+	},
 } as UmbLocalizationDictionary;

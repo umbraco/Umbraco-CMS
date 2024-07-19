@@ -12,6 +12,7 @@ import type {
 import { themes } from './themes/index.js';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 //TODO - consider firing change event on blur
 
@@ -27,7 +28,7 @@ import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
  * @export
  * @class UmbCodeEditor
  */
-export class UmbCodeEditorController {
+export class UmbCodeEditorController extends UmbControllerBase {
 	#host: UmbCodeEditorHost;
 	#editor?: monaco.editor.IStandaloneCodeEditor;
 	/**
@@ -119,6 +120,7 @@ export class UmbCodeEditorController {
 	 * @memberof UmbCodeEditor
 	 */
 	constructor(host: UmbCodeEditorHost, options?: CodeEditorConstructorOptions) {
+		super(host);
 		this.#options = { ...options };
 		this.#host = host;
 		this.#registerThemes();
@@ -138,11 +140,11 @@ export class UmbCodeEditorController {
 	#initiateEvents() {
 		this.#editor?.onDidChangeModelContent(() => {
 			this.#host.code = this.value ?? '';
-			this.#host.dispatchEvent(new UmbInputEvent());
+			this.dispatchEvent(new UmbInputEvent());
 		});
 
 		this.#editor?.onDidChangeModel(() => {
-			this.#host.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
 		});
 
 		this.#editor?.onDidChangeCursorPosition((e) => {
@@ -191,7 +193,7 @@ export class UmbCodeEditorController {
 			language: this.#host.language,
 			theme: this.#host.theme,
 			readOnly: this.#host.readonly,
-			ariaLabel: this.#host.label,
+			ariaLabel: this.#host.label ?? this.#host.localize.term('codeEditor_label'),
 		});
 
 		this.#initiateEvents();

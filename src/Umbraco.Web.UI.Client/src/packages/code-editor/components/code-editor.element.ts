@@ -60,6 +60,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	 */
 	@property()
 	theme: CodeEditorTheme = CodeEditorTheme.Light;
+
 	/**
 	 * Language of the editor. Default is javascript.
 	 *
@@ -68,13 +69,14 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	 */
 	@property()
 	language: CodeEditorLanguage = 'javascript';
+
 	/**
 	 * Label of the editor. Default is 'Code Editor'.
 	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property()
-	label = 'Code Editor';
+	label?: string;
 
 	//TODO - this should be called a value
 	#code = '';

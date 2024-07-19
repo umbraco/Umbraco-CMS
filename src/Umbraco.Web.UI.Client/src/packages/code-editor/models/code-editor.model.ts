@@ -1,3 +1,5 @@
+import type { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
 export type CodeEditorLanguage =
 	| 'csharp'
 	| 'razor'
@@ -15,13 +17,13 @@ export enum CodeEditorTheme {
 	HighContrastDark = 'umb-hc-dark',
 }
 
-export interface UmbCodeEditorHost extends HTMLElement {
+export interface UmbCodeEditorHost extends UmbLitElement {
 	container: HTMLElement;
 	language: CodeEditorLanguage;
 	theme: CodeEditorTheme;
 	code: string;
 	readonly: boolean;
-	label: string;
+	label?: string;
 }
 
 export interface UmbCodeEditorCursorPosition {
