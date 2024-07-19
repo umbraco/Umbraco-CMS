@@ -497,7 +497,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Code Editor',
 		id: 'dt-codeEditor',
 		parent: null,
-		editorAlias: 'Umbraco.Plain.Text',
+		editorAlias: 'Umbraco.Plain.String',
 		editorUiAlias: 'Umb.PropertyEditorUi.CodeEditor',
 		hasChildren: false,
 		isFolder: false,
