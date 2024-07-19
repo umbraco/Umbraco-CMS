@@ -32,6 +32,7 @@ const elementName = 'umb-code-editor';
  * @implements {UmbCodeEditorHost}
  * @fires input - Fired when the value of the editor changes.
  * @fires change - Fired when the entire model of editor is replaced.
+ * @fires loaded - Fired when the editor is loaded and ready to use.
  */
 @customElement(elementName)
 export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditorHost {
