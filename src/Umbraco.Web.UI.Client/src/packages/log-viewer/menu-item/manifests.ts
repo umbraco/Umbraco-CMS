@@ -1,4 +1,4 @@
-import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenuItem, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
@@ -6,11 +6,11 @@ const menuItem: ManifestMenuItem = {
 	name: 'Log Viewer Menu Item',
 	weight: 300,
 	meta: {
-		label: 'Log Viewer',
+		label: '#treeHeaders_logViewer',
 		icon: 'icon-box-alt',
 		entityType: 'logviewer',
 		menus: ['Umb.Menu.AdvancedSettings'],
 	},
 };
 
-export const manifests = [menuItem];
+export const manifests: Array<ManifestTypes> = [menuItem];

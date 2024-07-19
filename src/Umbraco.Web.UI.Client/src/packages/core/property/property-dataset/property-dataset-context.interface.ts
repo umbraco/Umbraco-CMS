@@ -1,7 +1,7 @@
 import type { UmbVariantId } from '../../variant/variant-id.class.js';
 import type { UmbContext } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 /**
  * A property dataset context, represents the data of a set of properties.

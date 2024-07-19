@@ -13,6 +13,9 @@ export class UmbImageCropperPreviewElement extends LitElement {
 	@property({ type: String, attribute: false })
 	src: string = '';
 
+	@property({ type: String })
+	label?: string;
+
 	@property({ attribute: false })
 	get focalPoint() {
 		return this.#focalPoint;
@@ -24,7 +27,7 @@ export class UmbImageCropperPreviewElement extends LitElement {
 
 	#focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#initializeCrop();
 	}
@@ -33,11 +36,7 @@ export class UmbImageCropperPreviewElement extends LitElement {
 		if (!this.crop) return;
 
 		await this.updateComplete; // Wait for the @query to be resolved
-
-		if (!this.imageElement.complete) {
-			// Wait for the image to load
-			await new Promise((resolve) => (this.imageElement.onload = () => resolve(this.imageElement)));
-		}
+		await new Promise((resolve) => (this.imageElement.onload = () => resolve(this.imageElement)));
 
 		const container = this.imageContainerElement.getBoundingClientRect();
 		const cropAspectRatio = this.crop.width / this.crop.height;
@@ -142,23 +141,23 @@ export class UmbImageCropperPreviewElement extends LitElement {
 		this.imageElement.style.left = `${imageLeft}%`;
 	}
 
-	render() {
+	override render() {
 		if (!this.crop) {
-			return nothing;
+			return html`<span id="label">${this.label}</span>`;
 		}
 
 		return html`
 			<div id="container">
 				<img id="image" src=${this.src} alt="" />
 			</div>
-			<span id="alias">${this.crop.alias}</span>
+			<span id="alias">${this.label ?? this.crop.alias}</span>
 			<span id="dimensions">${this.crop.width} x ${this.crop.height}</span>
 			${this.crop.coordinates
 				? html`<span id="user-defined"><umb-localize key="imagecropper_customCrop">User defined</umb-localize></span>`
 				: nothing}
 		`;
 	}
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: flex;
 			flex-direction: column;
@@ -181,6 +180,9 @@ export class UmbImageCropperPreviewElement extends LitElement {
 			max-width: 100%;
 			max-height: 200px;
 			user-select: none;
+		}
+		#label {
+			font-weight: bold;
 		}
 		#alias {
 			font-weight: bold;

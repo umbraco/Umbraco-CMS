@@ -1,4 +1,6 @@
-export const manifests = [
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.HealthCheck',
@@ -7,7 +9,7 @@ export const manifests = [
 		js: () => import('./dashboard-health-check.element.js'),
 		weight: 102,
 		meta: {
-			label: 'Health Check',
+			label: '#dashboardTabs_settingsHealthCheck',
 			pathname: 'health-check',
 		},
 		conditions: [

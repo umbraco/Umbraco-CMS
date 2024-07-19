@@ -1,19 +1,14 @@
 import type { UmbFileSystemMockDbBase } from './file-system-base.js';
-import type {
-	FileSystemFileCreateRequestModelBaseModel,
-	FileSystemFileResponseModelBaseModel,
-	FileSystemFileUpdateRequestModelBaseModel,
-	FileSystemResponseModelBaseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { CreateFileRequestModel, FileResponseModel, UpdateFileRequestModel } from './types.js';
 
-export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileResponseModelBaseModel> {
+export class UmbMockFileSystemDetailManager<MockItemType extends FileResponseModel> {
 	#db: UmbFileSystemMockDbBase<MockItemType>;
 
 	constructor(db: UmbFileSystemMockDbBase<MockItemType>) {
 		this.#db = db;
 	}
 
-	create(request: FileSystemFileCreateRequestModelBaseModel) {
+	create(request: CreateFileRequestModel) {
 		let path = request.parent ? `${request.parent.path}/${request.name}` : request.name;
 		// ensure dash prefix if its not there
 		path = path.startsWith('/') ? path : `/${path}`;
@@ -24,14 +19,14 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 		return path;
 	}
 
-	read(path: string): FileSystemResponseModelBaseModel | undefined {
+	read(path: string): FileResponseModel | undefined {
 		const item = this.#db.read(path);
 		if (!item) throw new Error('Item not found');
 		const mappedItem = this.#defaultReadResponseMapper(item);
 		return mappedItem;
 	}
 
-	update(path: string, item: FileSystemFileUpdateRequestModelBaseModel) {
+	update(path: string, item: UpdateFileRequestModel) {
 		const mockItem = this.#db.read(path);
 
 		const updatedMockItem = {
@@ -50,7 +45,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 		const currentMockItem = this.#db.read(path);
 		if (!currentMockItem) throw new Error('Item not found');
 
-		const createRequest: FileSystemFileCreateRequestModelBaseModel = {
+		const createRequest: CreateFileRequestModel = {
 			name,
 			parent: currentMockItem.parent,
 			content: currentMockItem.content,
@@ -61,7 +56,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 		return newPath;
 	}
 
-	#defaultCreateMockItemMapper = (path: string, request: FileSystemFileCreateRequestModelBaseModel): MockItemType => {
+	#defaultCreateMockItemMapper = (path: string, request: CreateFileRequestModel): MockItemType => {
 		return {
 			name: request.name,
 			content: request.content,
@@ -72,7 +67,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 		} as unknown as MockItemType;
 	};
 
-	#defaultReadResponseMapper = (item: MockItemType): FileSystemFileResponseModelBaseModel => {
+	#defaultReadResponseMapper = (item: MockItemType): FileResponseModel => {
 		return {
 			path: item.path,
 			parent: item.parent,

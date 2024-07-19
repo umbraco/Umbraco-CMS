@@ -1,13 +1,13 @@
 import { html, css, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbContextSaveSearchModalData {
 	query: string;
 }
 
-export interface UmbContextSaveSearchModalValue extends SavedLogSearchPresenationBaseModel {}
+export interface UmbContextSaveSearchModalValue extends SavedLogSearchResponseModel {}
 
 @customElement('umb-log-viewer-save-search-modal')
 export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElement<
@@ -36,7 +36,7 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 		this._hasValue = (target.value as string).length > 0;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-dialog-layout headline="Save Search">
 				<span>Enter a friendly name for your search query</span>
@@ -63,7 +63,7 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				width: 100%;

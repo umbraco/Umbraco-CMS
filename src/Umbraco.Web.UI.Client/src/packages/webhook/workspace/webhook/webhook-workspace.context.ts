@@ -1,25 +1,133 @@
-import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js';
+import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
+import { UmbWebhookDetailRepository } from '../../repository/index.js';
+import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
+import {
+	type UmbSubmittableWorkspaceContext,
+	UmbSubmittableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	type UmbRoutableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbWebhookWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContext {
-	public readonly workspaceAlias = UMB_WEBHOOK_WORKSPACE;
+export class UmbWebhookWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbWebhookDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
+{
+	public readonly repository: UmbWebhookDetailRepository = new UmbWebhookDetailRepository(this);
 
-	getEntityType() {
-		return UMB_WEBHOOK_ENTITY_TYPE;
-	}
+	#data = new UmbObjectState<UmbWebhookDetailModel | undefined>(undefined);
+	readonly data = this.#data.asObservable();
+
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 
 	constructor(host: UmbControllerHost) {
-		super(host);
-		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
-		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
-		this.provideContext(UMB_APP_WEBHOOK_CONTEXT, this);
+		super(host, 'Umb.Workspace.Webhook');
+
+		this.routes.setRoutes([
+			{
+				path: 'create',
+				component: UmbWebhookWorkspaceEditorElement,
+				setup: async () => {
+					this.create();
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbWebhookWorkspaceEditorElement,
+				setup: (_component, info) => {
+					this.removeUmbControllerByAlias('isNewRedirectController');
+					this.load(info.match.params.unique);
+				},
+			},
+		]);
+	}
+
+	protected override resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
+	async load(unique: string) {
+		this.resetState();
+		const { data } = await this.repository.requestByUnique(unique);
+		if (data) {
+			this.setIsNew(false);
+			this.#data.update(data);
+		}
+	}
+
+	async create() {
+		this.resetState();
+		const { data } = await this.repository.createScaffold();
+		if (!data) return;
+		this.setIsNew(true);
+		this.#data.update(data);
+		return { data };
+	}
+
+	getData() {
+		return this.#data.getValue();
+	}
+
+	getEntityType() {
+		return 'webhook';
+	}
+
+	getUnique() {
+		return this.#data.getValue()?.unique;
+	}
+
+	setEvents(events: Array<UmbWebhookEventModel>) {
+		this.#data.update({ events });
+	}
+
+	setHeaders(headers: { [key: string]: string }) {
+		this.#data.update({ headers });
+	}
+
+	setTypes(types: string[]) {
+		this.#data.update({ contentTypes: types });
+	}
+
+	setUrl(url: string) {
+		this.#data.update({ url });
+	}
+
+	setEnabled(enabled: boolean) {
+		this.#data.update({ enabled });
+	}
+
+	async submit() {
+		const newData = this.getData();
+		if (!newData) {
+			throw new Error('No data to submit');
+		}
+
+		if (this.getIsNew()) {
+			const { error } = await this.repository.create(newData);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.setIsNew(false);
+		} else {
+			const { error } = await this.repository.save(newData);
+			if (error) {
+				throw new Error(error.message);
+			}
+		}
+	}
+
+	override destroy(): void {
+		this.#data.destroy();
+		super.destroy();
 	}
 }
 
 export { UmbWebhookWorkspaceContext as api };
-
-export const UMB_APP_WEBHOOK_CONTEXT = new UmbContextToken<UmbWebhookWorkspaceContext>(UmbWebhookWorkspaceContext.name);

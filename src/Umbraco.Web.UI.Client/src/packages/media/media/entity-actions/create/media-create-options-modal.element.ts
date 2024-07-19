@@ -3,9 +3,19 @@ import type {
 	UmbMediaCreateOptionsModalData,
 	UmbMediaCreateOptionsModalValue,
 } from './media-create-options-modal.token.js';
-import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	nothing,
+	customElement,
+	state,
+	ifDefined,
+	repeat,
+	css,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-media-create-options-modal')
 export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
@@ -21,7 +31,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _headline: string = this.localize.term('general_create');
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const mediaUnique = this.data?.parent.unique;
 		const mediaTypeUnique = this.data?.mediaType?.unique || null;
 
@@ -51,29 +61,22 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	// close the modal when navigating to data type
-	#onNavigate() {
+	#onNavigate(mediaType: UmbAllowedMediaTypeModel) {
+		const url = `section/media/workspace/media/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique ?? 'null'
+		}/${mediaType.unique}`;
+		history.pushState({}, '', url);
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this._headline ?? ''}>
 				<uui-box>
-					${this._allowedMediaTypes.length === 0
-						? html`<umb-localize key="create_noMediaTypes"></umb-localize>`
-						: nothing}
-					${this._allowedMediaTypes.map(
-						(mediaType) => html`
-							<uui-menu-item
-								data-id=${ifDefined(mediaType.unique)}
-								href="${`section/media/workspace/media/create/parent/${this.data?.parent.entityType}/${
-									this.data?.parent.unique ?? 'null'
-								}/${mediaType.unique}`}"
-								label="${mediaType.name}"
-								@click=${this.#onNavigate}>
-								> ${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}
-							</uui-menu-item>
-						`,
+					${when(
+						this._allowedMediaTypes.length === 0,
+						() => this.#renderNotAllowed(),
+						() => this.#renderAllowedMediaTypes(),
 					)}
 				</uui-box>
 				<uui-button
@@ -84,6 +87,46 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
+
+	#renderNotAllowed() {
+		return html`<umb-localize key="create_noMediaTypes">
+				There are no allowed Media Types available for creating media here. You must enable these in
+				<strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the
+				<strong>Allowed child node types</strong> under <strong>Permissions</strong>. </umb-localize
+			><br />
+			<uui-button
+				id="edit-permissions"
+				look="secondary"
+				@click=${() => this._rejectModal()}
+				href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
+				label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>`;
+	}
+
+	#renderAllowedMediaTypes() {
+		return repeat(
+			this._allowedMediaTypes,
+			(mediaType) => mediaType.unique,
+			(mediaType) =>
+				html`<uui-ref-node-document-type
+					data-id=${ifDefined(mediaType.unique)}
+					.name=${mediaType.name}
+					.alias=${mediaType.description ?? ''}
+					select-only
+					selectable
+					@selected=${() => this.#onNavigate(mediaType)}>
+					${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}
+				</uui-ref-node-document-type>`,
+		);
+	}
+
+	static override styles = [
+		UmbTextStyles,
+		css`
+			#edit-permissions {
+				margin-top: var(--uui-size-6);
+			}
+		`,
+	];
 }
 
 export default UmbMediaCreateOptionsModalElement;

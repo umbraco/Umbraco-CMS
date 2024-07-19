@@ -13,15 +13,19 @@ import { UmbBasicState } from './basic-state.js';
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  */
 export class UmbDeepState<T> extends UmbBasicState<T> {
+	#mute?: boolean;
+	#value: T;
+
 	constructor(initialData: T) {
 		super(deepFreeze(initialData));
+		this.#value = this._subject.getValue();
 	}
 
 	/**
-	 * @export
 	 * @method createObservablePart
 	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
 	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
+	 * @returns {Observable<R>}
 	 * @description - Creates an Observable from this State.
 	 */
 	asObservablePart<ReturnType>(
@@ -36,12 +40,66 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 */
-	setValue(data: T): void {
+	override setValue(data: T): void {
 		if (!this._subject) return;
 		const frozenData = deepFreeze(data);
-		// Only update data if its different than current data.
-		if (!jsonStringComparison(frozenData, this._subject.getValue())) {
+		this.#value = frozenData;
+		// Only update data if its not muted and is different than current data. [NL]
+		if (!this.#mute && !jsonStringComparison(frozenData, this._subject.getValue())) {
 			this._subject.next(frozenData);
 		}
+	}
+
+	override getValue(): T {
+		return this.#value;
+	}
+
+	/**
+	 * @method mute
+	 * @description - Set mute for this state.
+	 */
+	mute() {
+		if (this.#mute) return;
+		this.#mute = true;
+	}
+
+	/**
+	 * @method unmute
+	 * @description - Unset the mute of this state.
+	 */
+	unmute() {
+		if (!this.#mute) return;
+		this.#mute = false;
+		// Only update data if it is different than current data. [NL]
+		if (!jsonStringComparison(this.#value, this._subject.getValue())) {
+			this._subject?.next(this.#value);
+		}
+	}
+
+	/**
+	 * @method isMuted
+	 * @description - Check if the state is muted.
+	 * @returns {boolean} - Returns true if the state is muted.
+	 */
+	isMuted() {
+		return this.#mute;
+	}
+
+	/**
+	 * @method getMutePromise
+	 * @description - Get a promise which resolves when the mute is unset.
+	 * @returns {Promise<void>}
+	 */
+	getMutePromise() {
+		return new Promise<void>((resolve) => {
+			if (!this.#mute) {
+				resolve();
+				return;
+			}
+			const subscription = this._subject.subscribe(() => {
+				subscription.unsubscribe();
+				resolve();
+			});
+		});
 	}
 }

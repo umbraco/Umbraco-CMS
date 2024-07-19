@@ -12,6 +12,11 @@ export interface UmbModalConfig {
 	key?: string;
 	type?: UmbModalType;
 	size?: UUIModalSidebarSize;
+
+	/**
+	 * Set the background property of the modal backdrop
+	 */
+	backdropBackground?: string;
 }
 
 export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContext> {
@@ -33,7 +38,7 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	 * @memberof UmbModalManagerContext
 	 */
 	public open<
-		ModalData extends object = object,
+		ModalData extends { [key: string]: any } = { [key: string]: any },
 		ModalValue = unknown,
 		ModalAliasTypeAsToken extends UmbModalToken = UmbModalToken<ModalData, ModalValue>,
 	>(

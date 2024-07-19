@@ -1,21 +1,16 @@
 import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { loadCodeEditor, type UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import type { UmbCodeEditorModalData, UmbCodeEditorModalValue} from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import type { UmbCodeEditorModalData, UmbCodeEditorModalValue } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-code-editor-modal')
+import '@umbraco-cms/backoffice/code-editor';
+
+const elementName = 'umb-code-editor-modal';
+
+@customElement(elementName)
 export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditorModalData, UmbCodeEditorModalValue> {
-	#isCodeEditorReady = new UmbBooleanState(false);
-	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditorElement;
-
-	constructor() {
-		super();
-		this.#loadCodeEditor();
-	}
 
 	#handleConfirm() {
 		this.value = { content: this._codeEditor?.editor?.monacoEditor?.getValue() ?? '' };
@@ -25,46 +20,33 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	#handleCancel() {
 		this.modalContext?.reject();
 	}
-
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
-		}
-	}
-
-	#renderCodeEditor() {
-		return html`<umb-code-editor
-			language=${ifDefined(this.data?.language)}
-			.code=${this.data?.content ?? ''}></umb-code-editor>`;
-	}
-
-	#renderLoading() {
-		return html`<div id="loader-container">
-			<uui-loader></uui-loader>
-		</div>`;
-	}
-
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout .headline=${this.data?.headline ?? 'Code Editor'}>
-				<div id="editor-box">${this.isCodeEditorReady ? this.#renderCodeEditor() : this.#renderLoading()}</div>
+				<div id="editor-box">${this.#renderCodeEditor()}</div>
 				<div slot="actions">
-					<uui-button id="cancel" label="Cancel" @click="${this.#handleCancel}">Cancel</uui-button>
+					<uui-button
+						id="cancel"
+						label=${this.localize.term('general_cancel')}
+						@click=${this.#handleCancel}></uui-button>
 					<uui-button
 						id="confirm"
 						color="${this.data?.color || 'positive'}"
 						look="primary"
-						label="${this.data?.confirmLabel || 'Submit'}"
+						label="${this.data?.confirmLabel || this.localize.term('general_submit')}"
 						@click=${this.#handleConfirm}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
 	}
 
-	static styles = [
+	#renderCodeEditor() {
+		return html`
+			<umb-code-editor language=${ifDefined(this.data?.language)} .code=${this.data?.content ?? ''}></umb-code-editor>
+		`;
+	}
+
+	static override styles = [
 		css`
 			#editor-box {
 				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));
@@ -83,6 +65,6 @@ export default UmbCodeEditorModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-code-editor-modal': UmbCodeEditorModalElement;
+		[elementName]: UmbCodeEditorModalElement;
 	}
 }

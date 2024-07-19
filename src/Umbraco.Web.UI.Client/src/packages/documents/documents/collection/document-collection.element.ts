@@ -5,7 +5,7 @@ import './document-collection-toolbar.element.js';
 
 @customElement('umb-document-collection')
 export class UmbDocumentCollectionElement extends UmbCollectionDefaultElement {
-	protected renderToolbar() {
+	protected override renderToolbar() {
 		return html`<umb-document-collection-toolbar slot="header"></umb-document-collection-toolbar>`;
 	}
 }

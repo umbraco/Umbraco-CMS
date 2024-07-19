@@ -3,11 +3,9 @@ import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/b
 import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_MODAL_CONTEXT,
-	UmbModalBaseElement,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+
 // TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
 import '@umbraco-cms/backoffice/block-type';
 
@@ -51,7 +49,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
 
@@ -86,7 +84,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.#updateFiltered();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
 				${this.#renderViews()} ${this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()}
@@ -115,7 +113,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}>
 						<uui-icon name="icon-search" slot="prepend"></uui-icon>
-				  </uui-input>`
+					</uui-input>`
 				: nothing}
 			${this._filtered.map(
 				(group) => html`
@@ -126,7 +124,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 							(block) => block.contentElementTypeKey,
 							(block) => html`
 								<umb-block-type-card
-									.name=${block.label}
+									.iconFile=${block.thumbnail}
 									.iconColor=${block.iconColor}
 									.backgroundColor=${block.backgroundColor}
 									.contentElementTypeKey=${block.contentElementTypeKey}
@@ -161,7 +159,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#search {
 				width: 100%;

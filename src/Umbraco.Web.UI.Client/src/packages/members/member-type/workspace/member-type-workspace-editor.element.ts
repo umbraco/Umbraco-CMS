@@ -1,10 +1,9 @@
 import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-type-workspace.context-token.js';
+import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-member-type-workspace-editor')
 export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
@@ -12,17 +11,16 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 	private _name?: string;
 
 	@state()
-	private _alias?: string;
+	private _description?: string;
 
 	@state()
-	private _aliasLocked = true;
+	private _alias?: string;
 
 	@state()
 	private _icon?: string;
 
 	@state()
-	private _iconColorAlias?: string;
-	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
+	private _isNew?: boolean;
 
 	#workspaceContext?: typeof UMB_MEMBER_TYPE_WORKSPACE_CONTEXT.TYPE;
 
@@ -38,57 +36,14 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 	#observeMemberType() {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
+		this.observe(
+			this.#workspaceContext.description,
+			(description) => (this._description = description),
+			'_observeDescription',
+		);
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
 		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
-
-		this.observe(
-			this.#workspaceContext.isNew,
-			(isNew) => {
-				if (isNew) {
-					// TODO: Would be good with a more general way to bring focus to the name input.
-					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
-				}
-				this.removeControllerByAlias('_observeIsNew');
-			},
-			'_observeIsNew',
-		);
-	}
-
-	// TODO. find a way where we don't have to do this for all workspaces.
-	#onNameChange(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				const oldName = this._name;
-				const oldAlias = this._alias;
-				const newName = event.target.value.toString();
-				if (this._aliasLocked) {
-					const expectedOldAlias = generateAlias(oldName ?? '');
-					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
-					if (expectedOldAlias === oldAlias) {
-						this.#workspaceContext?.set('alias', generateAlias(newName));
-					}
-				}
-				this.#workspaceContext?.setName(target.value);
-			}
-		}
-	}
-
-	// TODO. find a way where we don't have to do this for all workspaces.
-	#onAliasChange(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.set('alias', target.value);
-			}
-		}
-		event.stopPropagation();
-	}
-
-	#onToggleAliasLock() {
-		this._aliasLocked = !this._aliasLocked;
+		this.observe(this.#workspaceContext.isNew, (isNew) => (this._isNew = isNew), '_observeIsNew');
 	}
 
 	private async _handleIconClick() {
@@ -110,36 +65,47 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {
+		this.#workspaceContext?.setName(event.target.value ?? '');
+		this.#workspaceContext?.setAlias(event.target.alias ?? '');
+	}
+
+	#onDescriptionChange(event: InputEvent & { target: UUITextareaElement }) {
+		this.#workspaceContext?.setDescription(event.target.value.toString() ?? '');
+	}
+
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MemberType">
 				<div id="header" slot="header">
-					<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-						<uui-icon name="${ifDefined(this._icon)}" style="color: ${this._iconColorAlias}"></uui-icon>
+					<uui-button id="icon" compact label="icon" look="outline" @click=${this._handleIconClick}>
+						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 					</uui-button>
 
-					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">
-						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
+					<div id="editors">
+						<umb-input-with-alias
+							id="name"
+							label=${this.localize.term('placeholders_entername')}
+							value=${this._name}
+							alias=${this._alias}
+							?auto-generate-alias=${this._isNew}
+							@change="${this.#onNameAndAliasChange}"
+							${umbFocus()}>
+						</umb-input-with-alias>
+
 						<uui-input
-							name="alias"
-							slot="append"
-							label="alias"
-							@input=${this.#onAliasChange}
-							.value=${this._alias}
-							placeholder="Enter alias..."
-							?disabled=${this._aliasLocked}>
-							<!-- TODO: validation for bad characters -->
-							<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-								<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
-							</div>
-						</uui-input>
-					</uui-input>
+							id="description"
+							.label=${this.localize.term('placeholders_enterDescription')}
+							.value=${this._description}
+							.placeholder=${this.localize.term('placeholders_enterDescription')}
+							@input=${this.#onDescriptionChange}></uui-input>
+					</div>
 				</div>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;
@@ -150,12 +116,30 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				display: flex;
 				flex: 1 1 auto;
+				gap: var(--uui-size-space-2);
+			}
+
+			#editors {
+				display: flex;
+				flex: 1 1 auto;
+				flex-direction: column;
+				gap: var(--uui-size-space-1);
 			}
 
 			#name {
 				width: 100%;
 				flex: 1 1 auto;
 				align-items: center;
+			}
+
+			#description {
+				width: 100%;
+				--uui-input-height: var(--uui-size-8);
+				--uui-input-border-color: transparent;
+			}
+
+			#description:hover {
+				--uui-input-border-color: var(--uui-color-border);
 			}
 
 			#alias-lock {
@@ -169,9 +153,9 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#icon {
-				font-size: calc(var(--uui-size-layout-3) / 2);
-				margin-right: var(--uui-size-space-2);
-				margin-left: calc(var(--uui-size-space-4) * -1);
+				font-size: var(--uui-size-8);
+				height: 60px;
+				width: 60px;
 			}
 		`,
 	];

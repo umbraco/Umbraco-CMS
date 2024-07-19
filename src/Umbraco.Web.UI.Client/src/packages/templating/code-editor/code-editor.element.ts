@@ -1,11 +1,23 @@
-import { UmbCodeEditorController } from './code-editor.controller.js';
+import type { UmbCodeEditorController } from './code-editor.controller.js';
 import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } from './code-editor.model.js';
 import { CodeEditorTheme } from './code-editor.model.js';
+import { UmbCodeEditorLoadedEvent } from './code-editor-loaded.event.js';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
-import { monacoEditorStyles, monacoJumpingCursorHack } from '@umbraco-cms/backoffice/external/monaco-editor';
 import type { PropertyValues, Ref } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, createRef, ref, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	createRef,
+	css,
+	customElement,
+	html,
+	property,
+	ref,
+	state,
+	unsafeCSS,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+const elementName = 'umb-code-editor';
 
 /**
  * A custom element that renders a code editor. Code editor is based on the Monaco Editor library.
@@ -20,8 +32,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * @implements {UmbCodeEditorHost}
  * @fires input - Fired when the value of the editor changes.
  * @fires change - Fired when the entire model of editor is replaced.
+ * @fires loaded - Fired when the editor is loaded and ready to use.
  */
-@customElement('umb-code-editor')
+@customElement(elementName)
 export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditorHost {
 	private containerRef: Ref<HTMLElement> = createRef();
 
@@ -88,8 +101,15 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	@property({ type: Boolean, attribute: 'readonly' })
 	readonly = false;
 
+	@state()
+	private _loading = true;
+
+	@state()
+	private _styles?: string;
+
 	constructor() {
 		super();
+
 		this.consumeContext(UMB_THEME_CONTEXT, (instance) => {
 			this.observe(
 				instance.theme,
@@ -101,11 +121,18 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		});
 	}
 
-	firstUpdated() {
-		this.#editor = new UmbCodeEditorController(this);
+	override async firstUpdated() {
+		const { styles } = await import('@umbraco-cms/backoffice/external/monaco-editor');
+		this._styles = styles;
+
+		const controller = (await import('./code-editor.controller.js')).default;
+		this.#editor = new controller(this);
+
+		this._loading = false;
+		this.dispatchEvent(new UmbCodeEditorLoadedEvent());
 	}
 
-	protected updated(_changedProperties: PropertyValues<this>): void {
+	protected override updated(_changedProperties: PropertyValues<this>): void {
 		if (_changedProperties.has('theme') || _changedProperties.has('language')) {
 			this.#editor?.updateOptions({
 				theme: this.theme,
@@ -148,17 +175,35 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		return this.#editor?.find(text, searchOptions);
 	}
 
-	render() {
-		return html` <div id="editor-container" ${ref(this.containerRef)}></div> `;
+	override render() {
+		return html`
+			${this.#renderStyles()}
+			${when(this._loading, () => html`<div id="loader-container"><uui-loader></uui-loader></div>`)}
+			<div id="editor-container" ${ref(this.containerRef)}></div>
+		`;
 	}
 
-	static styles = [
-		monacoEditorStyles,
-		monacoJumpingCursorHack,
+	#renderStyles() {
+		if (!this._styles) return;
+		return html`
+			<style>
+				${unsafeCSS(this._styles)}
+			</style>
+		`;
+	}
+
+	static override styles = [
 		css`
 			:host {
 				display: block;
 			}
+
+			#loader-container {
+				display: grid;
+				place-items: center;
+				min-height: calc(100dvh - 260px);
+			}
+
 			#editor-container {
 				width: var(--editor-width);
 				height: var(--editor-height, 100%);
@@ -167,6 +212,12 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 				--vscode-scrollbarSlider-background: var(--uui-color-disabled-contrast);
 				--vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
 				--vscode-scrollbarSlider-activeBackground: rgba(0, 0, 0, 0.6);
+
+				/* a hacky workaround this issue: https://github.com/microsoft/monaco-editor/issues/3217
+			   should probably be removed when the issue is fixed */
+				.view-lines {
+					font-feature-settings: revert !important;
+				}
 			}
 		`,
 	];
@@ -174,6 +225,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-code-editor': UmbCodeEditorElement;
+		[elementName]: UmbCodeEditorElement;
 	}
 }

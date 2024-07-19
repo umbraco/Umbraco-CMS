@@ -34,3 +34,5 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 		return { data, error };
 	}
 }
+
+export { UmbDictionaryImportRepository as api };

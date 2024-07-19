@@ -1,16 +1,19 @@
 import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DICTIONARY_MENU_ALIAS } from '../menu/manifests.js';
-import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DICTIONARY_SECTION_ALIAS = 'Umb.Section.Translation';
+import { UMB_DICTIONARY_MENU_ALIAS } from '../menu/index.js';
+import { UMB_DICTIONARY_SECTION_ALIAS } from './constants.js';
+import type {
+	ManifestSection,
+	ManifestSectionSidebarApp,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 const section: ManifestSection = {
 	type: 'section',
 	alias: UMB_DICTIONARY_SECTION_ALIAS,
 	name: 'Dictionary Section',
-	weight: 100,
+	weight: 400,
 	meta: {
-		label: 'Dictionary',
+		label: '#sections_translation',
 		pathname: 'dictionary',
 	},
 	conditions: [
@@ -28,7 +31,7 @@ const menuSectionSidebarApp: ManifestSectionSidebarApp = {
 	name: 'Dictionary Sidebar Menu',
 	weight: 100,
 	meta: {
-		label: 'Dictionary',
+		label: '#sections_translation',
 		menu: UMB_DICTIONARY_MENU_ALIAS,
 		entityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
 	},
@@ -40,4 +43,4 @@ const menuSectionSidebarApp: ManifestSectionSidebarApp = {
 	],
 };
 
-export const manifests = [section, menuSectionSidebarApp];
+export const manifests: Array<ManifestTypes> = [section, menuSectionSidebarApp];

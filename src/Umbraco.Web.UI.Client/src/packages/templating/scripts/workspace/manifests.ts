@@ -1,6 +1,10 @@
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestWorkspaces, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestWorkspaces,
+	ManifestWorkspaceActions,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_WORKSPACE_ALIAS = 'Umb.Workspace.Script';
 export const UMB_SAVE_SCRIPT_WORKSPACE_ACTION_ALIAS = 'Umb.WorkspaceAction.Script.Save';
@@ -22,9 +26,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: UMB_SAVE_SCRIPT_WORKSPACE_ACTION_ALIAS,
 		name: 'Save Script Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -37,4 +41,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceActions];

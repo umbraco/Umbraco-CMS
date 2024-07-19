@@ -1,7 +1,7 @@
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -20,13 +20,17 @@ export class UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
-		return html`<uui-input
-			label="Max size"
-			type="number"
-			placeholder="Max size"
-			@change=${this.#onChange}
-			.value=${this.value}></uui-input>`;
+	override render() {
+		return html`
+			<uui-input
+				type="number"
+				min="0"
+				label="Max size"
+				placeholder="Max size"
+				.value=${this.value}
+				@change=${this.#onChange}>
+			</uui-input>
+		`;
 	}
 }
 

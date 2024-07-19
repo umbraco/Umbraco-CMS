@@ -1,4 +1,4 @@
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -30,7 +30,7 @@ export class UmbNewUserPasswordServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserByIdResetPassword({
+			UserService.postUserByIdResetPassword({
 				id: unique,
 			}),
 		);

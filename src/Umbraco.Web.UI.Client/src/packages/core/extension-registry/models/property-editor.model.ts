@@ -51,6 +51,7 @@ export interface PropertyEditorSettingsProperty {
 	alias: string;
 	propertyEditorUiAlias: string;
 	config?: UmbPropertyEditorConfig;
+	weight?: number;
 }
 
 export interface PropertyEditorSettingsDefaultData {

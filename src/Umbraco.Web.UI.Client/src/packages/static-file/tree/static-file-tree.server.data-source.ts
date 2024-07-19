@@ -1,4 +1,8 @@
-import { UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_STATIC_FILE_ENTITY_TYPE,
+	UMB_STATIC_FILE_FOLDER_ENTITY_TYPE,
+	UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import type { UmbStaticFileTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type {
@@ -8,7 +12,7 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import {
-	StaticFileResource,
+	StaticFileService,
 	type FileSystemTreeItemPresentationModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -40,25 +44,27 @@ export class UmbStaticFileTreeServerDataSource extends UmbTreeServerDataSourceBa
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	StaticFileResource.getTreeStaticFileRoot({ skip: args.skip, take: args.take });
+	StaticFileService.getTreeStaticFileRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
 
 	if (parentPath === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return StaticFileResource.getTreeStaticFileChildren({
+		return StaticFileService.getTreeStaticFileChildren({
 			parentPath,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	StaticFileResource.getTreeStaticFileAncestors({
-		descendantPath: args.descendantUnique,
+	StaticFileService.getTreeStaticFileAncestors({
+		descendantPath: args.treeItem.unique,
 	});
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeItemModel => {
@@ -66,7 +72,10 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeIte
 
 	return {
 		unique: serializer.toUnique(item.path),
-		parentUnique: item.parent ? serializer.toUnique(item.parent.path) : null,
+		parent: {
+			unique: item.parent ? serializer.toUnique(item.parent.path) : null,
+			entityType: item.parent ? UMB_STATIC_FILE_ENTITY_TYPE : UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
+		},
 		entityType: item.isFolder ? UMB_STATIC_FILE_FOLDER_ENTITY_TYPE : UMB_STATIC_FILE_ENTITY_TYPE,
 		name: item.name,
 		isFolder: item.isFolder,

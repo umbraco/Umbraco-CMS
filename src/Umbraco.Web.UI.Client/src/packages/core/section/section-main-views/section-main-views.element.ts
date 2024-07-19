@@ -79,10 +79,18 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		});
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
-		this._routes = routes?.length > 0 ? [...routes, { path: '', redirectTo: routes?.[0]?.path }] : [];
+		if (routes.length > 0) {
+			routes.push({ path: '', redirectTo: routes?.[0]?.path });
+
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
+		}
+		this._routes = routes;
 	}
 
-	render() {
+	override render() {
 		return this._routes.length > 0
 			? html`
 					<umb-body-layout main-no-padding>
@@ -97,8 +105,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							}}>
 						</umb-router-slot>
 					</umb-body-layout>
-			  `
-			: html`${nothing}`;
+				`
+			: nothing;
 	}
 
 	#renderDashboards() {
@@ -107,18 +115,17 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="header" id="dashboards">
 						${this._dashboards.map((dashboard) => {
-							const dashboardName = dashboard.meta.label ?? dashboard.name;
 							const dashboardPath = this.#constructDashboardPath(dashboard);
 							return html`
 								<uui-tab
 									href="${this._routerPath}/${dashboardPath}"
-									label="${dashboardName}"
+									label="${dashboard.meta.label ? this.localize.string(dashboard.meta.label) : dashboard.name}"
 									?active="${this._activePath === dashboardPath}"></uui-tab>
 							`;
 						})}
 					</uui-tab-group>
-			  `
-			: '';
+				`
+			: nothing;
 	}
 
 	#renderViews() {
@@ -127,7 +134,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
-							const viewName = view.meta.label ?? view.name;
+							const viewName = view.meta.label ? this.localize.string(view.meta.label) : view.name;
 							const viewPath = this.#constructViewPath(view);
 							return html`
 								<uui-tab
@@ -140,11 +147,11 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							`;
 						})}
 					</uui-tab-group>
-			  `
-			: '';
+				`
+			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

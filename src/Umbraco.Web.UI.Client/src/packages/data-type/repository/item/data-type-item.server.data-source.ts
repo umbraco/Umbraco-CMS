@@ -1,7 +1,8 @@
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDataTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -39,10 +40,11 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DataTypeResource.getItemDataType({ id: uniques });
+const getItems = (uniques: Array<string>) => DataTypeService.getItemDataType({ id: uniques });
 
 const mapper = (item: DataTypeItemResponseModel): UmbDataTypeItemModel => {
 	return {
+		entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 		unique: item.id,
 		name: item.name,
 		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?

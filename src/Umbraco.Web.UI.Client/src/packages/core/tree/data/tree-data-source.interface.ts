@@ -1,4 +1,4 @@
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModel } from '../types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @interface UmbTreeDataSourceConstructor
  * @template TreeItemType
  */
-export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemModelBase> {
+export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemModel> {
 	new (host: UmbControllerHost): UmbTreeDataSource<TreeItemType>;
 }
 
@@ -23,25 +23,30 @@ export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemMo
  * @interface UmbTreeDataSource
  * @template TreeItemType
  */
-export interface UmbTreeDataSource<TreeItemType extends UmbTreeItemModelBase> {
+export interface UmbTreeDataSource<
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+	TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
+	TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
+> {
 	/**
 	 * Gets the root items of the tree.
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getRootItems(args: UmbTreeRootItemsRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getRootItems(args: TreeRootItemsRequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the children of the given parent item.
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getChildrenOf(args: UmbTreeChildrenOfRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getChildrenOf(args: TreeChildrenOfRequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the ancestors of the given item.
 	 * @return {*}  {Promise<UmbDataSourceResponse<Array<TreeItemType>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs): Promise<UmbDataSourceResponse<Array<TreeItemType>>>;
+	getAncestorsOf(args: TreeAncestorsOfRequestArgsType): Promise<UmbDataSourceResponse<Array<TreeItemType>>>;
 }

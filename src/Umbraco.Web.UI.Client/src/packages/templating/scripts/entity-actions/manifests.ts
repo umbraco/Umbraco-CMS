@@ -21,4 +21,4 @@ const scriptViewActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...scriptViewActions, ...createManifests, ...renameManifests];
+export const manifests: Array<ManifestTypes> = [...scriptViewActions, ...createManifests, ...renameManifests];

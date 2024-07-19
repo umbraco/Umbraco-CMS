@@ -1,21 +1,29 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, LitElement, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, LitElement, nothing, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-w-table-name-column-layout')
-export class UmbLanguageTableNameColumnLayoutElement extends LitElement {
+@customElement('umb-webhook-table-name-column-layout')
+export class UmbWebhookTableNameColumnLayoutElement extends LitElement {
 	@property({ attribute: false })
-	value!: { unique: string; name: string };
+	value?: { unique: string; name: string };
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
-		return html`<a href=${'section/settings/workspace/language/edit/' + this.value.unique}>${this.value.name}</a>`;
+
+		return html`<a href=${'section/settings/workspace/webhook/edit/' + this.value.unique}>${this.value.name}</a>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				white-space: nowrap;
+			}
+		`,
+	];
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-table-name-column-layout': UmbLanguageTableNameColumnLayoutElement;
+		'umb-webhook-table-name-column-layout': UmbWebhookTableNameColumnLayoutElement;
 	}
 }

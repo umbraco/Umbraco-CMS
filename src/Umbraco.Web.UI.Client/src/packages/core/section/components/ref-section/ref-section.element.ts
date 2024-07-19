@@ -8,17 +8,17 @@ export class UmbRefSectionElement extends UmbElementMixin(UUIRefElement) {
 	@property({ type: Object, attribute: false })
 	item?: UmbSectionItemModel;
 
-	public render() {
+	override render() {
 		return html`
 			<div id="info">
-				<div id="name">${this.item?.meta.label}</div>
+				<div id="name">${this.item?.meta.label ? this.localize.string(this.item.meta.label) : this.item?.name}</div>
 			</div>
 			<slot></slot>
 			<slot name="actions" id="actions-container"></slot>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefElement.styles,
 		css`
 			#name {

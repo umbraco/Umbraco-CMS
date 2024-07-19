@@ -15,11 +15,14 @@ export class UmbStaticFileTreeRepository
 	}
 
 	async requestTreeRoot() {
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
+
 		const data: UmbStaticFileTreeRootModel = {
 			unique: null,
 			entityType: UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
 			name: 'Static Files',
-			hasChildren: true,
+			hasChildren,
 			isFolder: true,
 		};
 

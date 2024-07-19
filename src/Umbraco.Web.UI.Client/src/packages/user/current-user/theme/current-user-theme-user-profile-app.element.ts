@@ -1,10 +1,9 @@
-import type { UmbThemeContext } from '@umbraco-cms/backoffice/themes';
-import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
+import type { UmbThemeContext } from '@umbraco-cms/backoffice/themes';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-current-user-theme-user-profile-app')
 export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
@@ -14,7 +13,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 	private _themeAlias: string | null = null;
 
 	@state()
-	private _themes: Array<ManifestTheme> = [];
+	private _themes: Array<Option> = [];
 
 	constructor() {
 		super();
@@ -31,14 +30,14 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 			this.observe(
 				umbExtensionsRegistry.byType('theme'),
 				(themes) => {
-					this._themes = themes;
+					this._themes = themes.map((t) => ({ name: t.name, value: t.alias, selected: t.alias === this._themeAlias }));
 				},
 				'_observeThemeExtensions',
 			);
 		});
 	}
 
-	#handleThemeChange(event: UUISelectEvent) {
+	#onThemeChange(event: UUISelectEvent) {
 		if (!this.#themeContext) return;
 
 		const theme = event.target.value.toString();
@@ -46,32 +45,20 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 		this.#themeContext.setThemeByAlias(theme);
 	}
 
-	get #options() {
-		return this._themes.map((t) => ({ name: t.name, value: t.alias, selected: t.alias === this._themeAlias }));
-	}
-
-	render() {
+	override render() {
+		if (!this._themes.length) return nothing;
 		return html`
-			<b>Select Theme</b>
-			<uui-select
-				label="theme select"
-				@change=${this.#handleThemeChange}
-				.value=${this._themeAlias}
-				.options=${this.#options}></uui-select>
+			<uui-box headline="Theme">
+				<uui-tag slot="headline" look="placeholder">Experimental</uui-tag>
+				<uui-select label="Select theme" .options=${this._themes} @change=${this.#onThemeChange}></uui-select>
+			</uui-box>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-				padding: var(--uui-size-space-5);
-				background: var(--uui-color-surface);
-				color: var(--uui-color-text);
-				border-radius: var(--uui-border-radius);
-				box-shadow: var(--uui-shadow-depth-1);
+			uui-select {
+				width: 100%;
 			}
 		`,
 	];

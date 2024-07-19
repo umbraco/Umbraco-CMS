@@ -1,89 +1,103 @@
-import type { UmbInputMediaElement } from '../../components/input-media/input-media.element.js';
-import '../../components/input-media/input-media.element.js';
-import type { UmbMediaPickerPropertyValue } from './index.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
+import type { UmbCropModel, UmbMediaPickerPropertyValue } from './index.js';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+
+import '../../components/input-rich-media/input-rich-media.element.js';
+
+const elementName = 'umb-property-editor-ui-media-picker';
 
 /**
  * @element umb-property-editor-ui-media-picker
  */
-@customElement('umb-property-editor-ui-media-picker')
+@customElement(elementName)
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ attribute: false })
-	public set value(value: Array<UmbMediaPickerPropertyValue>) {
-		this.#value = value;
-		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
-	}
-	//TODO: Add support for document specific crops. The server side already supports this.
-
-	public get value() {
-		return this.#value;
-	}
+	value?: Array<UmbMediaPickerPropertyValue>;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const validationLimit = config?.getByAlias('validationLimit');
-		if (!validationLimit) return;
+		if (!config) return;
 
-		const minMax: Record<string, number> = validationLimit.value;
+		this._allowedMediaTypes = config.getValueByAlias<string>('filter')?.split(',') ?? [];
+		this._focalPointEnabled = Boolean(config.getValueByAlias('enableLocalFocalPoint'));
+		this._multiple = Boolean(config.getValueByAlias('multiple'));
+		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
+		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
 
-		this._limitMin = minMax.min ?? 0;
-		this._limitMax = minMax.max ?? Infinity;
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 	}
-	public get config() {
-		return undefined;
-	}
 
 	@state()
-	_items: Array<string> = [];
+	private _startNode: string = '';
 
 	@state()
-	private _limitMin: number = 0;
+	private _focalPointEnabled: boolean = false;
+
 	@state()
-	private _limitMax: number = Infinity;
+	private _preselectedCrops: Array<UmbCropModel> = [];
 
-	#value: Array<UmbMediaPickerPropertyValue> = [];
+	@state()
+	private _allowedMediaTypes: Array<string> = [];
 
-	#onChange(event: CustomEvent) {
-		const selection = (event.target as UmbInputMediaElement).selection;
+	@state()
+	private _multiple: boolean = false;
 
-		const result = selection.map((mediaKey) => {
-			return {
-				key: UmbId.new(),
-				mediaKey,
-				mediaTypeAlias: '',
-				focalPoint: null,
-				crops: [],
-			};
+	@state()
+	private _min: number = 0;
+
+	@state()
+	private _max: number = Infinity;
+
+	@state()
+	private _alias?: string;
+
+	@state()
+	private _variantId?: string;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(context.alias, (alias) => (this._alias = alias));
+			this.observe(context.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
+	}
 
-		this.value = result;
-		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
+	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
+		this.value = event.target.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
-			<umb-input-media
-				@change=${this.#onChange}
-				.selection=${this._items}
-				.min=${this._limitMin}
-				.max=${this._limitMax}>
-				<umb-localize key="general_add">Add</umb-localize>
-			</umb-input-media>
+			<umb-input-rich-media
+				.alias=${this._alias}
+				.allowedContentTypeIds=${this._allowedMediaTypes}
+				.focalPointEnabled=${this._focalPointEnabled}
+				.items=${this.value ?? []}
+				.max=${this._max}
+				.min=${this._min}
+				.preselectedCrops=${this._preselectedCrops}
+				.startNode=${this._startNode}
+				.variantId=${this._variantId}
+				?multiple=${this._multiple}
+				@change=${this.#onChange}>
+			</umb-input-rich-media>
 		`;
 	}
 }
 
-export default UmbPropertyEditorUIMediaPickerElement;
+export { UmbPropertyEditorUIMediaPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-media-picker': UmbPropertyEditorUIMediaPickerElement;
+		[elementName]: UmbPropertyEditorUIMediaPickerElement;
 	}
 }

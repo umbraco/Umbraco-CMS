@@ -7,6 +7,9 @@ const IS_CI = process.env.CI === 'true';
 const IS_AZURE_PIPELINES = process.env.TF_BUILD === 'true';
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const FILE_PATH_COLOR = '\x1b[36m%s\x1b[0m';
+const ERROR_COLOR = '\x1b[31m%s\x1b[0m';
+const SUCCESS_COLOR = '\x1b[32m%s\x1b[0m';
+const processExitCode = 1; // Default to 1 to fail the build, 0 to just log the issues
 
 console.log(`Checking path length in ${PROJECT_DIR} for paths exceeding ${MAX_PATH_LENGTH}...`);
 console.log('CI detected:', IS_CI);
@@ -17,14 +20,12 @@ console.log('-----------------------------------\n');
 
 function checkPathLength(dir) {
 	const files = readdirSync(dir);
+	let hasError = false;
 
 	files.forEach(file => {
 		const filePath = join(dir, file);
 		if (filePath.length > MAX_PATH_LENGTH) {
-
-			if (IS_CI) {
-				//process.exitCode = 1; // TODO: Uncomment this line to fail the build
-			}
+			hasError = true;
 
 			if (IS_AZURE_PIPELINES) {
 				console.error(`##vso[task.logissue type=warning;sourcepath=${filePath};]Path exceeds maximum length of ${MAX_PATH_LENGTH} characters: ${filePath} with ${filePath.length} characters`);
@@ -36,9 +37,27 @@ function checkPathLength(dir) {
 		}
 
 		if (statSync(filePath).isDirectory()) {
-			checkPathLength(filePath, MAX_PATH_LENGTH);
+			const subHasError = checkPathLength(filePath);
+			if (subHasError) {
+				hasError = true;
+			}
 		}
 	});
+
+	return hasError;
 }
 
-checkPathLength(PROJECT_DIR, MAX_PATH_LENGTH);
+const hasError = checkPathLength(PROJECT_DIR, MAX_PATH_LENGTH);
+
+if (hasError) {
+	console.error('\n-----------------------------------');
+	console.error(ERROR_COLOR, 'Path length check failed');
+	console.error('-----------------------------------\n');
+	if (IS_CI && processExitCode) {
+		process.exit(processExitCode);
+	}
+} else {
+	console.log('\n-----------------------------------');
+	console.log(SUCCESS_COLOR, 'Path length check passed');
+	console.log('-----------------------------------\n');
+}

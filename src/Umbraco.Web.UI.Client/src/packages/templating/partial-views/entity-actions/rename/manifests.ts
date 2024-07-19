@@ -14,9 +14,9 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
-		kind: 'rename',
+		kind: 'renameServerFile',
 		alias: UMB_RENAME_PARTIAL_VIEW_ENTITY_ACTION_ALIAS,
-		name: 'Rename PartialView Entity Action',
+		name: 'Rename Partial View Entity Action',
 		forEntityTypes: [UMB_PARTIAL_VIEW_ENTITY_TYPE],
 		meta: {
 			renameRepositoryAlias: UMB_RENAME_PARTIAL_VIEW_REPOSITORY_ALIAS,

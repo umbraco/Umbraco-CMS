@@ -1,85 +1,97 @@
-import icons from '../../../icon-registry/icons/icons.json' assert { type: 'json' };
+import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ICON_REGISTRY_CONTEXT, type UmbIconDefinition } from '@umbraco-cms/backoffice/icon';
+import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-
-import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
-
-// TODO: Make use of UmbPickerLayoutBase
-// TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
-	private _iconList = icons.filter((icon) => !icon.legacy);
+	#icons?: Array<UmbIconDefinition>;
+
+	@query('#search')
+	private _searchInput?: HTMLInputElement;
 
 	@state()
-	private _iconListFiltered: Array<(typeof icons)[0]> = [];
+	private _iconsFiltered?: Array<UmbIconDefinition>;
 
 	@state()
-	private _colorList = umbracoColors;
+	private _colorList = umbracoColors.filter((color) => !color.legacy);
 
 	@state()
-	private _modalValue?: UmbIconPickerModalValue;
+	private _currentIcon?: string;
 
 	@state()
-	private _currentAlias = 'text';
+	private _currentColor = 'text';
 
-	#changeIcon(e: { target: HTMLInputElement; type: string; key: unknown }) {
-		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
-			this.modalContext?.updateValue({ icon: e.target.id });
-		}
+	constructor() {
+		super();
+		this.consumeContext(UMB_ICON_REGISTRY_CONTEXT, (context) => {
+			this.observe(context.approvedIcons, (icons) => {
+				this.#icons = icons;
+				this.#filterIcons();
+			});
+		});
 	}
 
-	#filterIcons(e: { target: HTMLInputElement }) {
-		if (e.target.value) {
-			this._iconListFiltered = this._iconList.filter((icon) =>
-				icon.name.toLowerCase().includes(e.target.value.toLowerCase()),
-			);
+	#filterIcons() {
+		if (!this.#icons) return;
+		const value = this._searchInput?.value;
+		if (value) {
+			this._iconsFiltered = this.#icons.filter((icon) => icon.name.toLowerCase().includes(value.toLowerCase()));
 		} else {
-			this._iconListFiltered = this._iconList;
+			this._iconsFiltered = this.#icons;
 		}
 	}
 
-	#onColorChange(e: UUIColorSwatchesEvent) {
-		this.modalContext?.updateValue({ color: e.target.value });
-		this._currentAlias = e.target.value;
-	}
-
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
-		this._iconListFiltered = this._iconList;
+		this._iconsFiltered = this.#icons;
 
 		if (this.modalContext) {
 			this.observe(
 				this.modalContext?.value,
 				(newValue) => {
-					this._modalValue = newValue;
-					this._currentAlias = newValue?.color ?? 'text';
+					this._currentIcon = newValue?.icon;
+					this._currentColor = newValue?.color ?? 'text';
 				},
 				'_observeModalContextValue',
 			);
 		}
 	}
 
-	render() {
+	#changeIcon(e: InputEvent | KeyboardEvent, iconName: string) {
+		if (e.type == 'click' || (e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')) {
+			this.modalContext?.updateValue({ icon: iconName });
+		}
+	}
+
+	#onColorChange(e: UUIColorSwatchesEvent) {
+		const colorAlias = e.target.value;
+		this.modalContext?.updateValue({ color: colorAlias });
+		this._currentColor = colorAlias;
+	}
+
+	override render() {
+		// TODO: Missing localization in general. [NL]
 		return html`
 			<umb-body-layout headline="Select Icon">
 				<div id="container">
-					${this.renderSearchbar()}
+					${this.renderSearch()}
 					<hr />
 					<uui-color-swatches
-						.value="${this._modalValue?.color ?? ''}"
+						.value=${this._currentColor}
 						label="Color switcher for icons"
-						@change="${this.#onColorChange}">
+						@change=${this.#onColorChange}>
 						${
-							// TODO: Missing translation for the color aliases.
+							// TODO: Missing localization for the color aliases. [NL]
 							this._colorList.map(
 								(color) => html`
 									<uui-color-swatch
-										label="${color.alias}"
-										title="${color.alias}"
+										label=${color.alias}
+										title=${color.alias}
 										value=${color.alias}
 										style="--uui-swatch-color: var(${color.varName})"></uui-color-swatch>
 								`,
@@ -87,54 +99,56 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						}
 					</uui-color-swatches>
 					<hr />
-					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
+					<uui-scroll-container id="icons">${this.renderIcons()}</uui-scroll-container>
 				</div>
 				<uui-button
 					slot="actions"
 					label=${this.localize.term('general_close')}
-					@click="${this._rejectModal}"></uui-button>
+					@click=${this._rejectModal}></uui-button>
 				<uui-button
 					slot="actions"
 					color="positive"
 					look="primary"
-					@click="${this._submitModal}"
+					@click=${this._submitModal}
 					label=${this.localize.term('general_submit')}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
-	renderSearchbar() {
+	renderSearch() {
 		return html` <uui-input
 			type="search"
 			placeholder=${this.localize.term('placeholders_filter')}
 			label=${this.localize.term('placeholders_filter')}
-			id="searchbar"
-			@keyup="${this.#filterIcons}">
-			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
+			id="search"
+			@keyup=${this.#filterIcons}
+			${umbFocus()}>
+			<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
 		</uui-input>`;
 	}
 
-	renderIconSelection() {
-		return repeat(
-			this._iconListFiltered,
-			(icon) => icon.name,
-			(icon) => html`
-				<uui-icon
-					tabindex="0"
-					style="--uui-icon-color: var(${extractUmbColorVariable(this._currentAlias)})"
-					class="icon ${icon.name === this._modalValue?.icon ? 'selected' : ''}"
-					title="${icon.name}"
-					name="${icon.name}"
-					label="${icon.name}"
-					id="${icon.name}"
-					@click="${this.#changeIcon}"
-					@keyup="${this.#changeIcon}">
-				</uui-icon>
-			`,
-		);
+	renderIcons() {
+		return this._iconsFiltered
+			? repeat(
+					this._iconsFiltered,
+					(icon) => icon.name,
+					(icon) => html`
+						<uui-button
+							label=${icon.name}
+							title=${icon.name}
+							class=${icon.name === this._currentIcon ? 'selected' : ''}
+							@click=${(e: InputEvent) => this.#changeIcon(e, icon.name)}
+							@keyup=${(e: KeyboardEvent) => this.#changeIcon(e, icon.name)}>
+							<uui-icon
+								style="--uui-icon-color: var(${extractUmbColorVariable(this._currentColor)})"
+								name=${icon.name}></uui-icon>
+						</uui-button>
+					`,
+				)
+			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -158,15 +172,15 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				margin: 20px 0;
 			}
 
-			#searchbar {
+			#search {
 				width: 100%;
 				align-items: center;
 			}
-			#searchbar_icon {
+			#search_icon {
 				padding-left: var(--uui-size-space-2);
 			}
 
-			#icon-selection {
+			#icons {
 				line-height: 0;
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(40px, calc((100% / 12) - 10px)));
@@ -177,27 +191,17 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				padding: 2px;
 			}
 
-			#icon-selection .icon {
-				display: inline-block;
+			#icons uui-button {
 				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				padding: var(--uui-size-space-3);
-				box-sizing: border-box;
-				cursor: pointer;
+				font-size: 16px; /* specific for icons */
 			}
-
-			#icon-selection .icon-container {
-				display: inline-block;
-			}
-
-			#icon-selection .icon:focus,
-			#icon-selection .icon:hover,
-			#icon-selection .icon.selected {
+			#icons uui-button:focus,
+			#icons uui-button:hover,
+			#icons uui-button.selected {
 				outline: 2px solid var(--uui-color-selected);
 			}
 
-			uui-button {
+			uui-button[slot='actions'] {
 				margin-left: var(--uui-size-space-4);
 			}
 

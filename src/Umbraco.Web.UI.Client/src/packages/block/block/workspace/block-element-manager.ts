@@ -31,6 +31,10 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 	}
 
+	reset() {
+		this.#data.setValue(undefined);
+	}
+
 	setData(data: UmbBlockDataType | undefined) {
 		this.#data.setValue(data);
 		this.#getDataResolver();
@@ -65,16 +69,37 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	}
 
 	async setPropertyValue(alias: string, value: unknown) {
+		this.initiatePropertyValueChange();
 		await this.#getDataPromise;
 
 		this.#data.update({ [alias]: value });
+		this.finishPropertyValueChange();
+	}
+
+	#updateLock = 0;
+	initiatePropertyValueChange() {
+		this.#updateLock++;
+		this.#data.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishPropertyValueChange = () => {
+		this.#updateLock--;
+		this.#triggerPropertyValueChanges();
+	};
+	#triggerPropertyValueChanges() {
+		if (this.#updateLock === 0) {
+			this.#data.unmute();
+		}
 	}
 
 	public createPropertyDatasetContext(host: UmbControllerHost) {
 		return new UmbBlockElementPropertyDatasetContext(host, this);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		this.structure.destroy();
 		super.destroy();

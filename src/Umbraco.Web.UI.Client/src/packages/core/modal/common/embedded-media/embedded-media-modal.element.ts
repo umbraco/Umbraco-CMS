@@ -1,261 +1,156 @@
-import { css, html, unsafeHTML, when, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbOEmbedRepository } from './repository/oembed.repository.js';
+import { css, html, unsafeHTML, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	OEmbedResult,
-	UmbEmbeddedMediaModalData,
-	UmbEmbeddedMediaModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	OEmbedStatus,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
-import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-
-interface UmbEmbeddedMediaModalModel {
-	url?: string;
-	info?: string;
-	a11yInfo?: string;
-	originalWidth: number;
-	originalHeight: number;
-	width: number;
-	height: number;
-	constrain: boolean;
-}
+import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalValue
 > {
-	#loading = false;
-	#embedResult!: OEmbedResult;
-
-	#handleConfirm() {
-		this.value = {
-			preview: this.#embedResult.markup,
-			originalWidth: this._model.width,
-			originalHeight: this._model.originalHeight,
-			width: this.#embedResult.width,
-			height: this.#embedResult.height,
-		};
-		this.modalContext?.submit();
-	}
-
-	#handleCancel() {
-		this.modalContext?.reject();
-	}
+	#oEmbedRepository = new UmbOEmbedRepository(this);
+	#validUrl?: string;
 
 	@state()
-	private _model: UmbEmbeddedMediaModalModel = {
-		url: '',
-		width: 360,
-		height: 240,
-		constrain: true,
-		info: '',
-		a11yInfo: '',
-		originalHeight: 240,
-		originalWidth: 360,
-	};
+	private _loading?: UUIButtonState;
 
-	connectedCallback() {
+	@state()
+	private _width = 360;
+
+	@state()
+	private _height = 240;
+
+	@state()
+	private _url = '';
+
+	override connectedCallback() {
 		super.connectedCallback();
+		if (this.data?.width) this._width = this.data.width;
+		if (this.data?.height) this._height = this.data.height;
+		if (this.data?.constrain) this.value = { ...this.value, constrain: this.data.constrain };
+
 		if (this.data?.url) {
-			Object.assign(this._model, this.data);
+			this._url = this.data.url;
 			this.#getPreview();
 		}
 	}
 
 	async #getPreview() {
-		this._model.info = '';
-		this._model.a11yInfo = '';
+		this._loading = 'waiting';
 
-		this.#loading = true;
-		this.requestUpdate('_model');
+		const { data } = await this.#oEmbedRepository.requestOEmbed({
+			url: this._url,
+			maxWidth: this._width,
+			maxHeight: this._height,
+		});
 
-		try {
-			// TODO => use backend cli when available
-			const result = await fetch(
-				umbracoPath('/rteembed?') +
-					new URLSearchParams({
-						url: this._model.url,
-						width: this._model.width?.toString(),
-						height: this._model.height?.toString(),
-					} as { [key: string]: string }),
-			);
-
-			this.#embedResult = await result.json();
-
-			switch (this.#embedResult.oEmbedStatus) {
-				case 0:
-					this.#onPreviewFailed('Not supported');
-					break;
-				case 1:
-					this.#onPreviewFailed('Could not embed media - please ensure the URL is valid');
-					break;
-				case 2:
-					this._model.info = '';
-					this._model.a11yInfo = 'Retrieved URL';
-					break;
-			}
-		} catch (e) {
-			this.#onPreviewFailed('Could not embed media - please ensure the URL is valid');
+		if (data) {
+			this.#validUrl = this._url;
+			this.value = { ...this.value, markup: data.markup, url: this.#validUrl };
+			this._loading = 'success';
+		} else {
+			this.#validUrl = undefined;
+			this._loading = 'failed';
 		}
-
-		this.#loading = false;
-		this.requestUpdate('_model');
 	}
 
-	#onPreviewFailed(message: string) {
-		this._model.info = message;
-		this._model.a11yInfo = message;
+	#onUrlChange(e: UUIInputEvent) {
+		this._url = e.target.value as string;
 	}
 
-	#onUrlChange(e: InputEvent) {
-		this._model.url = (e.target as HTMLInputElement).value;
-		this.requestUpdate('_model');
+	#onWidthChange(e: UUIInputEvent) {
+		this._width = parseInt(e.target.value as string, 10);
+		this.#getPreview();
 	}
 
-	#onWidthChange(e: InputEvent) {
-		this._model.width = parseInt((e.target as HTMLInputElement).value, 10);
-		this.#changeSize('width');
-	}
-
-	#onHeightChange(e: InputEvent) {
-		this._model.height = parseInt((e.target as HTMLInputElement).value, 10);
-		this.#changeSize('height');
-	}
-
-	/**
-	 * Calculates the width or height axis dimension when the other is changed.
-	 * If constrain is false, axis change independently
-	 * @param axis {string}
-	 */
-	#changeSize(axis: 'width' | 'height') {
-		const resize = this._model.originalWidth !== this._model.width || this._model.originalHeight !== this._model.height;
-
-		if (this._model.constrain) {
-			if (axis === 'width') {
-				this._model.height = Math.round((this._model.width / this._model.originalWidth) * this._model.height);
-			} else {
-				this._model.width = Math.round((this._model.height / this._model.originalHeight) * this._model.width);
-			}
-		}
-
-		this._model.originalWidth = this._model.width;
-		this._model.originalHeight = this._model.height;
-
-		if (this._model.url !== '' && resize) {
-			this.#getPreview();
-		}
+	#onHeightChange(e: UUIInputEvent) {
+		this._height = parseInt(e.target.value as string, 10);
+		this.#getPreview();
 	}
 
 	#onConstrainChange() {
-		this._model.constrain = !this._model.constrain;
+		const constrain = !this.value?.constrain;
+		this.value = { ...this.value, constrain };
 	}
 
-	/**
-	 * If the embed does not support dimensions, or was not requested successfully
-	 * the width, height and constrain controls are disabled
-	 * @returns {boolean}
-	 */
-	#dimensionControlsDisabled() {
-		return !this.#embedResult?.supportsDimensions || this.#embedResult?.oEmbedStatus !== OEmbedStatus.Success;
-	}
-
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Embed">
 				<uui-box>
-					<umb-property-layout label="URL" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_url')} orientation="vertical">
 						<div slot="editor">
-							<uui-input .value=${this._model.url} type="text" @change=${this.#onUrlChange} required="true">
+							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true">
 								<uui-button
 									slot="append"
 									look="primary"
 									color="positive"
 									@click=${this.#getPreview}
-									?disabled=${!this._model.url}
-									label="Retrieve"></uui-button>
+									label=${this.localize.term('general_retrieve')}></uui-button>
 							</uui-input>
 						</div>
 					</umb-property-layout>
 
 					${when(
-						this.#embedResult?.oEmbedStatus === OEmbedStatus.Success || this._model.a11yInfo,
+						this.#validUrl !== undefined,
 						() =>
-							html` <umb-property-layout label="Preview" orientation="vertical">
+							html` <umb-property-layout label=${this.localize.term('general_preview')} orientation="vertical">
 								<div slot="editor">
-									${when(this.#loading, () => html`<uui-loader-circle></uui-loader-circle>`)}
-									${when(this.#embedResult?.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
-									${when(this._model.info, () => html` <p aria-hidden="true">${this._model.info}</p>`)}
-									${when(
-										this._model.a11yInfo,
-										() => html` <p class="sr-only" role="alert">${this._model.a11yInfo}</p>`,
-									)}
+									${when(this._loading === 'waiting', () => html`<uui-loader-circle></uui-loader-circle>`)}
+									${when(this.value?.markup, () => html`${unsafeHTML(this.value.markup)}`)}
 								</div>
 							</umb-property-layout>`,
 					)}
 
-					<umb-property-layout label="Width" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_width')} orientation="vertical">
 						<uui-input
 							slot="editor"
-							.value=${this._model.width}
+							.value=${this._width}
 							type="number"
-							?disabled=${this.#dimensionControlsDisabled()}
-							@change=${this.#onWidthChange}></uui-input>
+							@change=${this.#onWidthChange}
+							?disabled=${this.#validUrl ? false : true}></uui-input>
 					</umb-property-layout>
 
-					<umb-property-layout label="Height" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_height')} orientation="vertical">
 						<uui-input
 							slot="editor"
-							.value=${this._model.height}
+							.value=${this._height}
 							type="number"
-							?disabled=${this.#dimensionControlsDisabled()}
-							@change=${this.#onHeightChange}></uui-input>
+							@change=${this.#onHeightChange}
+							?disabled=${this.#validUrl ? false : true}></uui-input>
 					</umb-property-layout>
 
-					<umb-property-layout label="Constrain" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_constrainProportions')} orientation="vertical">
 						<uui-toggle
 							slot="editor"
 							@change=${this.#onConstrainChange}
-							?disabled=${this.#dimensionControlsDisabled()}
-							.checked=${this._model.constrain}></uui-toggle>
+							.checked=${this.value?.constrain ?? false}></uui-toggle>
 					</umb-property-layout>
 				</uui-box>
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this.#handleCancel}>Cancel</uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('buttons_confirmActionCancel')}
+					@click=${() => this.modalContext?.reject()}></uui-button>
 				<uui-button
 					slot="actions"
 					id="submit"
 					color="positive"
 					look="primary"
-					label="Submit"
-					@click=${this.#handleConfirm}></uui-button>
+					label=${this.localize.term('buttons_confirmActionConfirm')}
+					@click=${() => this.modalContext?.submit()}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
-			h3 {
-				margin-left: var(--uui-size-space-5);
-				margin-right: var(--uui-size-space-5);
-			}
-
 			uui-input {
 				width: 100%;
 				--uui-button-border-radius: 0;
-			}
-
-			.sr-only {
-				clip: rect(0, 0, 0, 0);
-				border: 0;
-				height: 1px;
-				margin: -1px;
-				overflow: hidden;
-				padding: 0;
-				position: absolute;
-				width: 1px;
 			}
 
 			umb-property-layout:first-child {
@@ -264,10 +159,6 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 			umb-property-layout:last-child {
 				padding-bottom: 0;
-			}
-
-			p {
-				margin-bottom: 0;
 			}
 		`,
 	];

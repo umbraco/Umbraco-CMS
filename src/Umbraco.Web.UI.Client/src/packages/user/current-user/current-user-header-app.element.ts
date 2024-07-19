@@ -1,13 +1,12 @@
 import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal.token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
+import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-current-user-header-app')
-export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
+export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 	@state()
 	private _currentUser?: UmbCurrentUserModel;
 
@@ -79,7 +78,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 		return this._userAvatarUrls.length > 0;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				@click=${this.#handleUserClick}
@@ -95,12 +94,11 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
-		UmbTextStyles,
+	static override styles: CSSResultGroup = [
+		UmbHeaderAppButtonElement.styles,
 		css`
 			uui-button {
 				font-size: 14px;
-				--uui-button-background-color: transparent;
 			}
 		`,
 	];

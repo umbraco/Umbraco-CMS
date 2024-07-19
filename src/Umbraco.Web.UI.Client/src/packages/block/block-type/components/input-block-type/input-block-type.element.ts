@@ -1,14 +1,20 @@
+import type { UmbBlockTypeWithGroupKey } from '../../types.js';
 import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
-import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import '../block-type-card/index.js';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
+import {
+	UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT,
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
+
+import '../block-type-card/index.js';
 
 /** TODO: Look into sending a "change" event when there is a change, rather than create, delete, and change event. Make sure it doesn't break move for RTE/List/Grid. [LI] */
 @customElement('umb-input-block-type')
@@ -29,9 +35,11 @@ export class UmbInputBlockTypeElement<
 			this.dispatchEvent(new CustomEvent('change', { detail: { item } }));
 		},
 		onEnd: () => {
+			// TODO: Investigate if onEnd is called when a container move has been performed, if not then I would say it should be. [NL]
 			this.dispatchEvent(new CustomEvent('change', { detail: { moveComplete: true } }));
 		},
 	});
+	#elementPickerModal;
 
 	@property({ type: Array, attribute: false })
 	public set value(items) {
@@ -43,7 +51,18 @@ export class UmbInputBlockTypeElement<
 	}
 
 	@property({ type: String })
+	public set propertyAlias(value: string | undefined) {
+		this.#elementPickerModal.setUniquePathValue('propertyAlias', value);
+	}
+	public get propertyAlias(): string | undefined {
+		return undefined;
+	}
+
+	@property({ type: String })
 	workspacePath?: string;
+
+	@state()
+	private _pickerPath?: string;
 
 	@state()
 	private _items: Array<BlockType> = [];
@@ -60,31 +79,44 @@ export class UmbInputBlockTypeElement<
 				this.#filter = value as Array<UmbBlockTypeBaseModel>;
 			});
 		});
-	}
 
-	async create() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		this.#elementPickerModal = new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_PICKER_MODAL)
+			.addUniquePaths(['propertyAlias'])
+			.onSetup(() => {
+				return {
+					data: {
+						hideTreeRoot: true,
+						multiple: false,
+						createAction: {
+							extendWithPathParams: {
+								parentUnique: null,
+								presetAlias: 'element',
+							},
+						},
+						pickableFilter: (docType) =>
+							// Only pick elements:
+							docType.isElement &&
+							// Prevent picking the an already used element type:
+							this.#filter &&
+							this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
+					},
+					value: {
+						selection: [],
+					},
+				};
+			})
+			.onSubmit((value) => {
+				const selectedElementType = value.selection[0];
 
-		// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
-		const modalContext = modalManager.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
-			data: {
-				hideTreeRoot: true,
-				multiple: false,
-				pickableFilter: (docType) =>
-					// Only pick elements:
-					docType.isElement &&
-					// Prevent picking the an already used element type:
-					this.#filter &&
-					this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
-			},
-		});
-
-		const modalValue = await modalContext?.onSubmit();
-		const selectedElementType = modalValue.selection[0];
-
-		if (selectedElementType) {
-			this.dispatchEvent(new CustomEvent('create', { detail: { contentElementTypeKey: selectedElementType } }));
-		}
+				if (selectedElementType) {
+					this.dispatchEvent(new CustomEvent('create', { detail: { contentElementTypeKey: selectedElementType } }));
+				}
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const oldPath = this._pickerPath;
+				this._pickerPath = routeBuilder({});
+				this.requestUpdate('_pickerPath', oldPath);
+			});
 	}
 
 	deleteItem(contentElementTypeKey: string) {
@@ -92,21 +124,20 @@ export class UmbInputBlockTypeElement<
 		this.dispatchEvent(new UmbDeleteEvent());
 	}
 
-	protected getFormElement() {
-		return undefined;
-	}
-
 	async #onRequestDelete(item: BlockType) {
+		const store = await this.getContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT);
+		const contentType = store.getItems([item.contentElementTypeKey]);
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove [TODO: Get name]?`,
-			content: 'Are you sure you want to remove this block type?',
+			headline: `Remove ${contentType[0]?.name}?`,
+			// TODO: Translations: [NL]
+			content: 'Are you sure you want to remove this Block Type Configuration?',
 			confirmLabel: 'Remove',
 		});
 		this.deleteItem(item.contentElementTypeKey);
 	}
 
-	render() {
+	override render() {
 		return html`<div id="blocks">
 			${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
 		</div>`;
@@ -115,11 +146,10 @@ export class UmbInputBlockTypeElement<
 	#renderItem = (block: BlockType) => {
 		return html`
 			<umb-block-type-card
-				.data-umb-content-element-key=${block.contentElementTypeKey}
-				.name=${block.label}
+				.iconFile=${block.thumbnail}
 				.iconColor=${block.iconColor}
 				.backgroundColor=${block.backgroundColor}
-				.href="${this.workspacePath}/edit/${block.contentElementTypeKey}"
+				.href="${this.workspacePath}edit/${block.contentElementTypeKey}"
 				.contentElementTypeKey=${block.contentElementTypeKey}>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#onRequestDelete(block)} label="Remove block">
@@ -131,15 +161,17 @@ export class UmbInputBlockTypeElement<
 	};
 
 	#renderButton() {
-		return html`
-			<uui-button id="add-button" look="placeholder" @click=${() => this.create()} label="open">
-				<uui-icon name="icon-add"></uui-icon>
-				Add
-			</uui-button>
-		`;
+		return this._pickerPath
+			? html`
+					<uui-button id="add-button" look="placeholder" href=${this._pickerPath} label="open">
+						<uui-icon name="icon-add"></uui-icon>
+						Add
+					</uui-button>
+				`
+			: null;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			div {
 				display: grid;

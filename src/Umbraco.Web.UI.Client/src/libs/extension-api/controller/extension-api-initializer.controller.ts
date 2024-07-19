@@ -119,7 +119,7 @@ export class UmbExtensionApiInitializer<
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#constructorArguments = undefined;
 	}

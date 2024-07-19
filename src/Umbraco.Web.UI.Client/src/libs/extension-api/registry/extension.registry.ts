@@ -80,6 +80,7 @@ export class UmbExtensionRegistry<
 
 	private _kinds = new UmbBasicState<Array<ManifestKind<ManifestTypes>>>([]);
 	public readonly kinds = this._kinds.asObservable();
+	#exclusions: Array<string> = [];
 
 	defineKind(kind: ManifestKind<ManifestTypes>): void {
 		const extensionsValues = this._extensions.getValue();
@@ -104,6 +105,15 @@ export class UmbExtensionRegistry<
 		nextData.push(kind as ManifestKind<ManifestTypes>);
 		this._kinds.setValue(nextData);
 	}
+
+	exclude(alias: string): void {
+		this.#exclusions.push(alias);
+		this._extensions.setValue(this._extensions.getValue().filter(this.#acceptExtension));
+	}
+
+	#acceptExtension = (ext: ManifestTypes): boolean => {
+		return !this.#exclusions.includes(ext.alias);
+	};
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
 		const isValid = this.#checkExtension(manifest);
@@ -160,6 +170,10 @@ export class UmbExtensionRegistry<
 
 		if (manifest.type === 'kind') {
 			this.defineKind(manifest as ManifestKind<ManifestTypes>);
+			return false;
+		}
+
+		if (!this.#acceptExtension(manifest as ManifestTypes)) {
 			return false;
 		}
 

@@ -1,15 +1,6 @@
 import type { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	repeat,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, nothing, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -21,7 +12,7 @@ import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
  * @element umb-multiple-color-picker-input
  */
 @customElement('umb-multiple-color-picker-input')
-export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element: UmbMultipleColorPickerItemInputElement) => {
 			return element.value.toString();
@@ -95,7 +86,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	readonly = false;
 
 	@property({ type: Boolean })
-	showLabels = true;
+	showLabels = false;
 
 	constructor() {
 		super();
@@ -105,8 +96,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 			this.observe(
 				await workspace.propertyValueByAlias<boolean>('useLabel'),
 				(value) => {
-					// Only set a true/false value. If value is undefined, keep the default value of True, if value is defined, set the value but remove the undefined type from the Type Union.
-					this.showLabels = value === undefined ? true : (value as Exclude<typeof value, undefined>);
+					this.showLabels = !!value;
 				},
 				'observeUseLabel',
 			);
@@ -128,12 +118,12 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	private _items: Array<UmbSwatchDetails> = [];
 
 	@property({ type: Array })
-	public get items(): Array<UmbSwatchDetails> {
-		return this._items;
-	}
 	public set items(items: Array<UmbSwatchDetails>) {
 		this._items = items ?? [];
 		this.#sorter.setModel(this.items);
+	}
+	public get items(): Array<UmbSwatchDetails> {
+		return this._items;
 	}
 
 	#onAdd() {
@@ -172,50 +162,52 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
-		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
-			${this.#renderAddButton()} `;
+	override render() {
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
 		return html`
-			${repeat(
-				this._items,
-				(item) => item.value,
-				(item, index) =>
-					html` <umb-multiple-color-picker-item-input
-						?showLabels=${this.showLabels}
-						value=${item.value}
-						label=${ifDefined(item.label)}
-						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
-						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
-						?disabled=${this.disabled}
-						?readonly=${this.readonly}
-						required
-						required-message="Item ${index + 1} is missing a value"></umb-multiple-color-picker-item-input>`,
-			)}
+			<div id="sorter-wrapper">
+				${repeat(
+					this._items,
+					(item) => item.value,
+					(item, index) => html`
+						<umb-multiple-color-picker-item-input
+							label=${item.label}
+							value=${item.value}
+							required
+							required-message="Item ${index + 1} is missing a value"
+							?disabled=${this.disabled}
+							?readonly=${this.readonly}
+							?showLabels=${this.showLabels}
+							@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
+							@delete=${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}>
+						</umb-multiple-color-picker-item-input>
+					`,
+				)}
+			</div>
 		`;
 	}
 
 	#renderAddButton() {
+		if (this.disabled || this.readonly) return nothing;
 		return html`
-			${this.disabled || this.readonly
-				? nothing
-				: html`<uui-button
-						id="action"
-						label=${this.localize.term('general_add')}
-						look="placeholder"
-						color="default"
-						@click="${this.#onAdd}"
-						?disabled=${this.disabled}></uui-button>`}
+			<uui-button
+				id="action"
+				label=${this.localize.term('general_add')}
+				look="placeholder"
+				color="default"
+				?disabled=${this.disabled}
+				@click=${this.#onAdd}></uui-button>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#action {
 				display: block;

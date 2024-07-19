@@ -7,7 +7,7 @@ import type {
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
-	SavedLogSearchPresenationBaseModel,
+	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -111,24 +111,20 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		this.#repository = new UmbLogViewerRepository(host);
 	}
 
-	hostConnected() {
+	override hostConnected() {
 		super.hostConnected();
 		window.addEventListener('changestate', this.onChangeState);
 		this.onChangeState();
 	}
 
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		super.hostDisconnected();
 		window.removeEventListener('changestate', this.onChangeState);
 	}
 
 	onChangeState = () => {
 		const searchQuery = query();
-		let sanitizedQuery = '';
-		if (searchQuery.lq) {
-			sanitizedQuery = decodeURIComponent(searchQuery.lq);
-		}
-		this.setFilterExpression(sanitizedQuery);
+		this.setFilterExpression(searchQuery.lq);
 
 		let validLogLevels: LogLevelModel[] = [];
 		if (searchQuery.loglevels) {
@@ -213,7 +209,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		}
 	}
 
-	async saveSearch({ name, query }: SavedLogSearchPresenationBaseModel) {
+	async saveSearch({ name, query }: SavedLogSearchResponseModel) {
 		const previousSavedSearches = this.#savedSearches.getValue()?.items ?? [];
 		try {
 			this.#savedSearches.update({ items: [...previousSavedSearches, { name, query }] });

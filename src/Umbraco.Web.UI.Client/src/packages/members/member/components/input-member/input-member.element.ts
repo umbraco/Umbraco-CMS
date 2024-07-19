@@ -1,31 +1,33 @@
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import { UmbMemberPickerContext } from './input-member.context.js';
-import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-const SORTER_CONFIG: UmbSorterConfig<string> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('detail');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry;
-	},
-	identifier: 'Umb.SorterIdentifier.InputMember',
-	itemSelector: 'uui-ref-node',
-	containerSelector: 'uui-ref-list',
-};
+const elementName = 'umb-input-member';
 
-@customElement('umb-input-member')
-export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
-	#sorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+@customElement(elementName)
+export class UmbInputMemberElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.id;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.InputMember',
+		itemSelector: 'uui-ref-node',
+		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 
@@ -72,7 +74,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -89,13 +91,12 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
-	@property()
-	public set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selection = splitStringToArray(idsString);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@property({ type: Object, attribute: false })
@@ -121,118 +122,95 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 				this._editMemberPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => {
-			this._items = selectedItems;
-		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.selection.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.selection.length > this.max,
 		);
+
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observeItems');
 	}
 
-	protected _openPicker() {
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-		});
-	}
-
-	protected _requestRemoveItem(item: UmbMemberItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique!);
-	}
-
-	protected getFormElement() {
-		return undefined;
-	}
+	#pickableFilter = (item: UmbMemberItemModel): boolean => {
+		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+			return this.allowedContentTypeIds.includes(item.memberType.unique);
+		}
+		return true;
+	};
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			filter: this.filter,
+			pickableFilter: this.#pickableFilter,
 		});
 	}
 
-	#requestRemoveItem(item: MemberItemResponseModel) {
-		this.#pickerContext.requestRemoveItem(item.id!);
+	#onRemove(item: UmbMemberItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
-		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+	override render() {
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
-		if (!this._items) return;
-		return html`<uui-ref-list>
-			${repeat(
-				this._items,
-				(item) => item.unique,
-				(item) => this.#renderItem(item),
-			)}
-		</uui-ref-list>`;
+		if (!this._items) return nothing;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</uui-ref-list>
+		`;
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.selection.length >= this.max) return;
-		return html`<uui-button
-			id="add-button"
-			look="placeholder"
-			@click=${this.#openPicker}
-			label=${this.localize.term('general_choose')}></uui-button>`;
+		if (this.selection.length >= this.max) return nothing;
+		return html`
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}></uui-button>
+		`;
 	}
 
 	#renderItem(item: UmbMemberItemModel) {
-		if (!item.unique) return;
-		// TODO: get the correct variant name
-		const name = item.variants[0].name;
+		if (!item.unique) return nothing;
 		return html`
-			<uui-ref-node name=${ifDefined(item.variants[0].name)} detail=${ifDefined(item.unique)}>
-				${this.#renderIsTrashed(item)}
+			<uui-ref-node name=${item.name} id=${item.unique}>
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button
-						@click=${() => this._requestRemoveItem(item)}
-						label="${this.localize.term('general_remove')} ${name}">
-						${this.localize.term('general_remove')}
-					</uui-button>
+					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
 	}
 
 	#renderOpenButton(item: UmbMemberItemModel) {
-		if (!this.showOpenButton) return;
-		// TODO: get the correct variant name
-		const name = item.variants[0].name;
+		if (!this.showOpenButton) return nothing;
 		return html`
 			<uui-button
-				compact
 				href="${this._editMemberPath}edit/${item.unique}"
-				label=${this.localize.term('general_edit') + ` ${name}`}>
-				<uui-icon name="icon-edit"></uui-icon>
+				label="${this.localize.term('general_open')} ${item.name}">
+				${this.localize.term('general_open')}
 			</uui-button>
 		`;
 	}
-	#renderIsTrashed(item: UmbMemberItemModel) {
-		// TODO: Uncomment, once the Management API model support deleted members. [LK]
-		// if (!item.isTrashed) return;
-		// return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
-	}
 
-	static styles = [
+	static override styles = [
 		css`
-			#add-button {
-				width: 100%;
+			#btn-add {
+				display: block;
 			}
 
 			uui-ref-node[drag-placeholder] {
@@ -242,10 +220,10 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbInputMemberElement;
+export { UmbInputMemberElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-member': UmbInputMemberElement;
+		[elementName]: UmbInputMemberElement;
 	}
 }

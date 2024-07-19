@@ -5,30 +5,22 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 
 @customElement('umb-block-list-type-workspace-view-settings')
 export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	render() {
+	override render() {
 		return html`
-			<uui-box headline="Editor Appearance">
+			<uui-box headline=${this.localize.term('blockEditor_headlineEditorAppearance')}>
 				<umb-property
-					label="Label"
+					label=${this.localize.term('general_label')}
 					alias="label"
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
-				<!--<umb-property
-					label="Custom view"
-					alias="view"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
 				<umb-property
-					label="Custom stylesheet"
-					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>-->
-				<umb-property
-					label="Overlay size"
+					label=${this.localize.term('blockEditor_labelEditorSize')}
 					alias="editorSize"
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
 			</uui-box>
-			<uui-box headline="Data models">
+			<uui-box headline=${this.localize.term('blockEditor_headlineDataModels')}>
 				<!-- TODO: implement readonly mode for umb-property -->
 				<umb-property
-					label="Content Model"
+					label=${this.localize.term('blockEditor_labelContentElementType')}
 					alias="contentElementTypeKey"
 					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
 					readonly
@@ -43,7 +35,7 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 						},
 					]}></umb-property>
 				<umb-property
-					label="Settings Model"
+					label=${this.localize.term('blockEditor_labelSettingsElementType')}
 					alias="settingsElementTypeKey"
 					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
 					.config=${[
@@ -57,30 +49,38 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 						},
 					]}></umb-property>
 			</uui-box>
-			<uui-box headline="Catalogue appearance">
+			<uui-box headline=${this.localize.term('blockEditor_headlineCatalogueAppearance')}>
 				<umb-property
-					label="Background color"
+					label=${this.localize.term('blockEditor_labelBackgroundColor')}
 					alias="backgroundColor"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.EyeDropper"
+					.config=${[{ alias: 'showAlpha', value: true }]}></umb-property>
 				<umb-property
-					label="Icon color"
+					label=${this.localize.term('blockEditor_labelIconColor')}
 					alias="iconColor"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.EyeDropper"
+					.config=${[{ alias: 'showAlpha', value: true }]}></umb-property>
 				<umb-property
-					label="Custom stylesheet"
-					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
+					label=${this.localize.term('blockEditor_thumbnail')}
+					alias="thumbnail"
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"
+					.config=${[
+						{
+							alias: 'singleItemMode',
+							value: true,
+						},
+					]}></umb-property>
 			</uui-box>
-			<uui-box headline="Advanced">
+			<uui-box headline=${this.localize.term('blockEditor_headlineAdvanced')}>
 				<umb-property
-					label="Hide Content Editor"
+					label=${this.localize.term('blockEditor_forceHideContentEditor')}
 					alias="forceHideContentEditorInOverlay"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 			</uui-box>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -1,8 +1,8 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-data-type-details-workspace-view')
@@ -19,35 +19,35 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	@state()
 	private _propertyEditorSchemaAlias?: string | null = null;
 
-	private _workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (_instance) => {
-			this._workspaceContext = _instance;
-			this._observeDataType();
+		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext;
+			this.#observeDataType();
 		});
 	}
 
-	private _observeDataType() {
-		if (!this._workspaceContext) {
+	#observeDataType() {
+		if (!this.#workspaceContext) {
 			return;
 		}
 
-		this.observe(this._workspaceContext.propertyEditorUiAlias, (value) => {
+		this.observe(this.#workspaceContext.propertyEditorUiAlias, (value) => {
 			this._propertyEditorUiAlias = value;
 		});
 
-		this.observe(this._workspaceContext.propertyEditorSchemaAlias, (value) => {
+		this.observe(this.#workspaceContext.propertyEditorSchemaAlias, (value) => {
 			this._propertyEditorSchemaAlias = value;
 		});
 
-		this.observe(this._workspaceContext.propertyEditorUiName, (value) => {
+		this.observe(this.#workspaceContext.propertyEditorUiName, (value) => {
 			this._propertyEditorUiName = value;
 		});
 
-		this.observe(this._workspaceContext.propertyEditorUiIcon, (value) => {
+		this.observe(this.#workspaceContext.propertyEditorUiIcon, (value) => {
 			this._propertyEditorUiIcon = value;
 		});
 	}
@@ -63,54 +63,68 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 			.onSubmit()
 			.catch(() => undefined);
 
-		this._workspaceContext?.setPropertyEditorUiAlias(value?.selection[0]);
+		if (value) {
+			this.#workspaceContext?.setPropertyEditorUiAlias(value.selection[0]);
+		}
 	}
 
-	render() {
+	override render() {
 		return html`
-			<uui-box> ${this.#renderPropertyEditorReference()} </uui-box>
-			${this.#renderPropertyEditorConfig()} </uui-box>
+			<uui-box>
+				<umb-property-layout label="Property Editor" description=${this.localize.term('propertyEditorPicker_title')}>
+					${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
+						? this.#renderPropertyEditorReference()
+						: this.#renderChooseButton()}
+				</umb-property-layout>
+			</uui-box>
+			${this.#renderSettings()}
+		`;
+	}
+
+	#renderSettings() {
+		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
+		return html`
+			<uui-box headline=${this.localize.term('general_settings')}>
+				<umb-property-editor-config></umb-property-editor-config>
+			</uui-box>
+		`;
+	}
+
+	#renderChooseButton() {
+		return html`
+			<uui-button
+				slot="editor"
+				id="btn-add"
+				label=${this.localize.term('propertyEditorPicker_title')}
+				look="placeholder"
+				color="default"
+				@click=${this.#openPropertyEditorUIPicker}></uui-button>
 		`;
 	}
 
 	#renderPropertyEditorReference() {
+		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
 		return html`
-			<umb-property-layout label="Property Editor" description="Select a property editor">
-				${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
-					? html`
-							<umb-ref-property-editor-ui
-								slot="editor"
-								name=${this._propertyEditorUiName ?? ''}
-								alias=${this._propertyEditorUiAlias}
-								property-editor-schema-alias=${this._propertyEditorSchemaAlias}
-								standalone>
-								${this._propertyEditorUiIcon
-									? html` <umb-icon name="${this._propertyEditorUiIcon}" slot="icon"></umb-icon> `
-									: ''}
-								<uui-action-bar slot="actions">
-									<uui-button label="Change" @click=${this.#openPropertyEditorUIPicker}></uui-button>
-								</uui-action-bar>
-							</umb-ref-property-editor-ui>
-						`
-					: html`
-							<uui-button
-								slot="editor"
-								label="Select Property Editor"
-								look="placeholder"
-								color="default"
-								@click=${this.#openPropertyEditorUIPicker}></uui-button>
-						`}
-			</umb-property-layout>
+			<umb-ref-property-editor-ui
+				slot="editor"
+				name=${this._propertyEditorUiName ?? ''}
+				alias=${this._propertyEditorUiAlias}
+				property-editor-schema-alias=${this._propertyEditorSchemaAlias}
+				standalone
+				@open=${this.#openPropertyEditorUIPicker}>
+				${this._propertyEditorUiIcon
+					? html`<umb-icon name=${this._propertyEditorUiIcon} slot="icon"></umb-icon>`
+					: nothing}
+				<uui-action-bar slot="actions">
+					<uui-button
+						label=${this.localize.term('general_change')}
+						@click=${this.#openPropertyEditorUIPicker}></uui-button>
+				</uui-action-bar>
+			</umb-ref-property-editor-ui>
 		`;
 	}
 
-	#renderPropertyEditorConfig() {
-		return html`<uui-box headline="Settings">
-			<umb-property-editor-config></umb-property-editor-config>
-		</uui-box> `;
-	}
-
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -121,6 +135,10 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			#btn-add {
+				display: block;
 			}
 		`,
 	];

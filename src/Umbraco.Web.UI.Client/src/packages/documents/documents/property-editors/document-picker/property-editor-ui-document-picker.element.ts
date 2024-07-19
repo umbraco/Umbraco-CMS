@@ -1,11 +1,12 @@
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -13,34 +14,50 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	public value?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
+		if (!config) return;
 
-		this._limitMin = (validationLimit?.value as any)?.min;
-		this._limitMax = (validationLimit?.value as any)?.max;
-	}
-	public get config() {
-		return undefined;
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		if (minMax) {
+			this._min = minMax.min && minMax.min > 0 ? minMax.min : 0;
+			this._max = minMax.max && minMax.max > 0 ? minMax.max : 1;
+		}
+
+		this._startNodeId = config.getValueByAlias('startNodeId');
+		this._showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
 
 	@state()
-	private _limitMin?: number;
-	@state()
-	private _limitMax?: number;
+	private _min = 0;
 
-	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentElement).selection.join(',');
+	// NOTE: The legacy "Content Picker" property-editor only supported 1 item,
+	// so that's why it's being enforced here. We'll evolve this in a future version. [LK]
+	@state()
+	private _max = 1;
+
+	@state()
+	private _startNodeId?: string;
+
+	@state()
+	private _showOpenButton?: boolean;
+
+	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	// TODO: Implement mandatory?
-	render() {
+	override render() {
+		const startNode: UmbTreeStartNode | undefined = this._startNodeId
+			? { unique: this._startNodeId, entityType: UMB_DOCUMENT_ENTITY_TYPE }
+			: undefined;
+
 		return html`
 			<umb-input-document
-				@change=${this._onChange}
-				.value=${this.value ?? ''}
-				.min=${this._limitMin ?? 0}
-				.max=${this._limitMax ?? Infinity}>
-				<umb-localize key="general_add">Add</umb-localize>
+				.min=${this._min}
+				.max=${this._max}
+				.startNode=${startNode}
+				.value=${this.value}
+				?showOpenButton=${this._showOpenButton}
+				@change=${this.#onChange}>
 			</umb-input-document>
 		`;
 	}

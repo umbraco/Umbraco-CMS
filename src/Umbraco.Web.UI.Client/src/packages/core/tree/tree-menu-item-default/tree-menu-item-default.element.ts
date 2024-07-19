@@ -25,7 +25,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 	@property({ type: Object })
 	manifest?: ManifestMenuItemTreeKind;
 
-	render() {
+	override render() {
 		return this.manifest
 			? html`
 					<umb-tree
@@ -37,7 +37,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 								multiple: false,
 							},
 						}}></umb-tree>
-			  `
+				`
 			: nothing;
 	}
 }

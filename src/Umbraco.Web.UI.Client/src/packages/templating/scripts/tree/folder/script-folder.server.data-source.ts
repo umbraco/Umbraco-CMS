@@ -1,7 +1,7 @@
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbCreateFolderModel, UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
 import type { CreateScriptFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { ScriptResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -38,7 +38,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.getScriptFolderByPath({
+			ScriptService.getScriptFolderByPath({
 				path: encodeURIComponent(path),
 			}),
 		);
@@ -75,7 +75,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.postScriptFolder({
+			ScriptService.postScriptFolder({
 				requestBody,
 			}),
 		);
@@ -103,13 +103,13 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.deleteScriptFolderByPath({
+			ScriptService.deleteScriptFolderByPath({
 				path: encodeURIComponent(path),
 			}),
 		);
 	}
 
-	async update(args: UmbUpdateFolderModel): Promise<any> {
+	async update(): Promise<any> {
 		throw new Error('Updating is not supported');
 	}
 }

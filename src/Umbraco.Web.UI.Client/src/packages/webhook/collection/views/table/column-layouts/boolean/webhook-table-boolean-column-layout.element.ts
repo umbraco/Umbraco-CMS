@@ -6,7 +6,7 @@ export class UmbWebhookTableBooleanColumnLayoutElement extends UmbLitElement {
 	@property({ attribute: false })
 	value = false;
 
-	render() {
+	override render() {
 		return this.value ? html`<uui-icon name="icon-check"></uui-icon>` : nothing;
 	}
 }

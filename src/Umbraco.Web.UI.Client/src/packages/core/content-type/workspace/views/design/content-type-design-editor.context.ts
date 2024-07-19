@@ -24,7 +24,7 @@ export class UmbContentTypeDesignEditorContext extends UmbContextBase<UmbContent
 		this.#isSorting.setValue(isSorting);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#isSorting.destroy();
 		super.destroy();
 	}

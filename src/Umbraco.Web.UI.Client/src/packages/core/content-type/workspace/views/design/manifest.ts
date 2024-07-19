@@ -11,7 +11,7 @@ export const contentTypeDesignEditorManifest: UmbBackofficeManifestKind = {
 		element: () => import('./content-type-design-editor.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Design',
+			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
 		},

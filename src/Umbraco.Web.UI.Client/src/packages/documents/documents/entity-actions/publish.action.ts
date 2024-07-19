@@ -3,17 +3,18 @@ import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '..
 import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('The document unique identifier is missing');
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
@@ -44,11 +45,18 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 			}),
 		);
 
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
 		// If the document has only one variant, we can skip the modal and publish directly:
 		if (options.length === 1) {
 			const variantId = UmbVariantId.Create(documentData.variants[0]);
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 			await publishingRepository.publish(this.args.unique, [{ variantId }]);
+			actionEventContext.dispatchEvent(event);
 			return;
 		}
 
@@ -84,6 +92,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 				this.args.unique,
 				variantIds.map((variantId) => ({ variantId })),
 			);
+			actionEventContext.dispatchEvent(event);
 		}
 	}
 }

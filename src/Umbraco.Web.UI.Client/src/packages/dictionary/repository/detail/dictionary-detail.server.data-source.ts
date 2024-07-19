@@ -4,9 +4,9 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDictionaryItemRequestModel,
-	DictionaryItemModelBaseModel,
+	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -53,7 +53,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, DictionaryService.getDictionaryById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -89,7 +89,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.postDictionary({
+			DictionaryService.postDictionary({
 				requestBody,
 			}),
 		);
@@ -111,14 +111,14 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: DictionaryItemModelBaseModel = {
+		const requestBody: UpdateDictionaryItemRequestModel = {
 			name: model.name,
 			translations: model.translations,
 		};
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.putDictionaryById({
+			DictionaryService.putDictionaryById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -142,7 +142,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.deleteDictionaryById({
+			DictionaryService.deleteDictionaryById({
 				id: unique,
 			}),
 		);

@@ -1,4 +1,4 @@
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -31,7 +31,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 		if (!unique) throw new Error('unique is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.postDocumentByIdPublicAccess({ id: unique, requestBody: data }),
+			DocumentService.postDocumentByIdPublicAccess({ id: unique, requestBody: data }),
 		);
 	}
 
@@ -42,7 +42,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdPublicAccess({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.getDocumentByIdPublicAccess({ id: unique }));
 	}
 
 	/**
@@ -53,7 +53,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async update(unique: string, requestBody: PublicAccessRequestModel) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublicAccess({ id: unique, requestBody }));
+		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdPublicAccess({ id: unique, requestBody }));
 	}
 
 	/**
@@ -63,6 +63,6 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.deleteDocumentByIdPublicAccess({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentByIdPublicAccess({ id: unique }));
 	}
 }

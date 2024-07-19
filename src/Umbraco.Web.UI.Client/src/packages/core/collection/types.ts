@@ -1,5 +1,5 @@
-import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbCollectionBulkActionPermissions {
@@ -14,10 +14,10 @@ export interface UmbCollectionConfiguration {
 	unique?: string;
 	dataTypeId?: string;
 	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
+	layouts?: Array<UmbCollectionLayoutConfiguration>;
 	orderBy?: string;
 	orderDirection?: string;
 	pageSize?: number;
-	useInfiniteEditor?: boolean;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 }
 
@@ -29,6 +29,12 @@ export interface UmbCollectionColumnConfiguration {
 	elementName?: string;
 	// TODO: [LK] Remove `nameTemplate`, to be replaced with `elementName`.
 	nameTemplate?: string;
+}
+
+export interface UmbCollectionLayoutConfiguration {
+	icon?: string;
+	name: string;
+	collectionView: string;
 }
 
 export interface UmbCollectionContext {

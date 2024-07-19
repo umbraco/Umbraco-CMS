@@ -14,30 +14,30 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+
 	@property({ type: Array })
 	public set value(value: Array<string>) {
 		if (!value) return;
-		this._value = value.map((unique) => this.#serverFilePathUniqueSerializer.toUnique(unique));
+		this.#value = value.map((unique) => this.#serverFilePathUniqueSerializer.toUnique(unique));
 	}
 	public get value(): Array<string> {
-		if (!this._value) return [];
-		return this._value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique)) as string[];
+		if (!this.#value) return [];
+		return this.#value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique)) as string[];
 	}
-	private _value: Array<string> = [];
+	#value: Array<string> = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
-
 	#onChange(event: CustomEvent) {
 		const target = event.target as UmbStylesheetInputElement;
-		this._value = target.selection;
+		this.#value = target.selection ?? [];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
-		return html`<umb-stylesheet-input @change=${this.#onChange} .selection=${this._value}></umb-stylesheet-input>`;
+	override render() {
+		return html`<umb-stylesheet-input @change=${this.#onChange} .selection=${this.#value}></umb-stylesheet-input>`;
 	}
 }
 

@@ -1,5 +1,5 @@
 import type { UmbUserDisplayStatus } from '../../../utils.js';
-import { getDisplayStateFromUserStatus } from '../../../utils.js';
+import { TimeFormatOptions, getDisplayStateFromUserStatus } from '../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -45,29 +45,29 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			{
 				labelKey: 'user_lastLogin',
 				value: user.lastLoginDate
-					? this.localize.date(user.lastLoginDate)
-					: `${user.name + ' ' + this.localize.term('user_noLogin')} `,
+					? this.localize.date(user.lastLoginDate, TimeFormatOptions)
+					: `${user.name} ${this.localize.term('user_noLogin')}`,
 			},
 			{ labelKey: 'user_failedPasswordAttempts', value: user.failedLoginAttempts },
 			{
 				labelKey: 'user_lastLockoutDate',
 				value: user.lastLockoutDate
-					? this.localize.date(user.lastLockoutDate)
-					: `${user.name + ' ' + this.localize.term('user_noLockouts')}`,
+					? this.localize.date(user.lastLockoutDate, TimeFormatOptions)
+					: `${user.name} ${this.localize.term('user_noLockouts')}`,
 			},
 			{
 				labelKey: 'user_lastPasswordChangeDate',
 				value: user.lastPasswordChangeDate
-					? this.localize.date(user.lastPasswordChangeDate)
-					: `${user.name + ' ' + this.localize.term('user_noPasswordChange')}`,
+					? this.localize.date(user.lastPasswordChangeDate, TimeFormatOptions)
+					: `${user.name} ${this.localize.term('user_noPasswordChange')}`,
 			},
-			{ labelKey: 'user_createDate', value: this.localize.date(user.createDate!) },
-			{ labelKey: 'user_updateDate', value: this.localize.date(user.updateDate!) },
+			{ labelKey: 'user_createDate', value: this.localize.date(user.createDate!, TimeFormatOptions) },
+			{ labelKey: 'user_updateDate', value: this.localize.date(user.updateDate!, TimeFormatOptions) },
 			{ labelKey: 'general_id', value: user.unique },
 		];
 	};
 
-	render() {
+	override render() {
 		if (this._userInfo.length === 0) return nothing;
 		return html`<uui-box id="user-info">${this.#renderState()} ${this.#renderInfoList()} </uui-box>`;
 	}
@@ -101,7 +101,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-tag {

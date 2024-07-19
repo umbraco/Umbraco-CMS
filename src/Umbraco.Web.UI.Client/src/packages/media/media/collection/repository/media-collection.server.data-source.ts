@@ -1,5 +1,5 @@
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../types.js';
-import { DirectionModel, MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel, MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { MediaCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
@@ -23,7 +23,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 			take: query.take ?? 100,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MediaResource.getCollectionMedia(params));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MediaService.getCollectionMedia(params));
 
 		if (data) {
 			const items = data.items.map((item: MediaCollectionResponseModel) => {
@@ -32,13 +32,17 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 
 				const model: UmbMediaCollectionItemModel = {
 					unique: item.id,
+					entityType: 'media',
+					contentTypeAlias: item.mediaType.alias,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.mediaType.icon,
 					name: variant.name,
+					sortOrder: item.sortOrder,
 					updateDate: new Date(variant.updateDate),
+					updater: item.creator, // TODO: Check if the `updater` is available for media items. [LK]
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value };
+						return { alias: item.alias, value: item.value as string };
 					}),
 				};
 				return model;

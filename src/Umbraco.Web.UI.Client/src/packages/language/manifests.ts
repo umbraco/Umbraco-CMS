@@ -6,8 +6,9 @@ import { manifests as appLanguageSelect } from './app-language-select/manifests.
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as globalContextManifests } from './global-contexts/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...repositoryManifests,
 	...entityActions,
 	...menuManifests,

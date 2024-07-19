@@ -3,6 +3,11 @@ import {
 	UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
 	UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
 } from '../entity.js';
+import {
+	UMB_MEDIA_TYPE_TREE_ALIAS,
+	UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
+	UMB_MEDIA_TYPE_TREE_STORE_ALIAS,
+} from './constants.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
@@ -10,11 +15,8 @@ import type {
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Tree';
-export const UMB_MEDIA_TYPE_TREE_STORE_ALIAS = 'Umb.Store.MediaType.Tree';
-export const UMB_MEDIA_TYPE_TREE_ALIAS = 'Umb.Tree.MediaType';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
@@ -48,7 +50,7 @@ const treeItem: ManifestTreeItem = {
 	forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE],
 };
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	treeRepository,
 	treeStore,
 	tree,

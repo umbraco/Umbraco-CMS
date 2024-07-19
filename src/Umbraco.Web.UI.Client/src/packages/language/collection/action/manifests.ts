@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const createManifest: ManifestCollectionAction = {
 	type: 'collectionAction',
@@ -8,7 +8,7 @@ export const createManifest: ManifestCollectionAction = {
 	alias: 'Umb.CollectionAction.Language.Create',
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 		href: 'section/settings/workspace/language/create',
 	},
 	conditions: [
@@ -19,4 +19,4 @@ export const createManifest: ManifestCollectionAction = {
 	],
 };
 
-export const manifests = [createManifest];
+export const manifests: Array<ManifestTypes> = [createManifest];

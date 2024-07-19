@@ -105,7 +105,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#conditionControllers === undefined || this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
-		this.removeControllerByAlias('_observeConditions');
+		this.removeUmbControllerByAlias('_observeConditions');
 	}
 
 	#gotManifest() {
@@ -149,7 +149,7 @@ export abstract class UmbBaseExtensionInitializer<
 				'_observeConditions',
 			);
 		} else {
-			this.removeControllerByAlias('_observeConditions');
+			this.removeUmbControllerByAlias('_observeConditions');
 		}
 
 		if (noChangeInConditions) {
@@ -175,6 +175,12 @@ export abstract class UmbBaseExtensionInitializer<
 		const newConditionControllers = await Promise.all(
 			configsOfThisType.map((conditionConfig) => this.#createConditionController(conditionManifest, conditionConfig)),
 		);
+
+		// If we got destroyed in the mean time, then we don't need to continue:
+		if (!this.#extensionRegistry) {
+			newConditionControllers.forEach((controller) => controller?.destroy());
+			return;
+		}
 
 		const oldLength = this.#conditionControllers.length;
 
@@ -205,6 +211,7 @@ export abstract class UmbBaseExtensionInitializer<
 		// Check if we already have a controller for this config:
 		const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
 		if (!existing) {
+			// TODO: Be aware that we might not have a host element any longer at this moment, but I did not want to make a fix for it jet, as its a good indication to if something else is terrible wrong [NL]
 			const conditionController = await createExtensionApi(this, conditionManifest, [
 				{
 					manifest: conditionManifest,
@@ -287,7 +294,7 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	*/
 
-	public hostDisconnected(): void {
+	public override hostDisconnected(): void {
 		super.hostDisconnected();
 		this._isConditionsPositive = false;
 		if (this.#isPermitted === true) {
@@ -305,7 +312,7 @@ export abstract class UmbBaseExtensionInitializer<
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		if (!this.#extensionRegistry) return;
 		this.#manifest = undefined;
 		this.#promiseResolvers = [];

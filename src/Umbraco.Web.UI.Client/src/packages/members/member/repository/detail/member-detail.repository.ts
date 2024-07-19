@@ -20,7 +20,7 @@ export class UmbMemberDetailRepository extends UmbDetailRepositoryBase<UmbMember
 		super(host, UmbMemberServerDataSource, UMB_MEMBER_DETAIL_STORE_CONTEXT);
 	}
 
-	async create(model: UmbMemberDetailModel) {
+	override async create(model: UmbMemberDetailModel) {
 		return super.create(model, null);
 	}
 }

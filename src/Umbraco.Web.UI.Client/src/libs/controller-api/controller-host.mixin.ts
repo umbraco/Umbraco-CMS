@@ -1,6 +1,6 @@
-import type { ClassConstructor } from '../extension-api/types/utils.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getHostElement'> {
 	hostConnected(): void;
@@ -29,7 +29,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		 * Tests if a controller is assigned to this element.
 		 * @param {UmbController} ctrl
 		 */
-		hasController(ctrl: UmbController): boolean {
+		hasUmbController(ctrl: UmbController): boolean {
 			return this.#controllers.indexOf(ctrl) !== -1;
 		}
 
@@ -37,7 +37,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		 * Retrieve controllers matching a filter of this element.
 		 * @param {method} filterMethod
 		 */
-		getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[] {
+		getUmbControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[] {
 			return this.#controllers.filter(filterMethod);
 		}
 
@@ -45,14 +45,14 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		 * Append a controller to this element.
 		 * @param {UmbController} ctrl
 		 */
-		addController(ctrl: UmbController): void {
+		addUmbController(ctrl: UmbController): void {
 			// If this specific class is already added, then skip out.
 			if (this.#controllers.indexOf(ctrl) !== -1) {
 				return;
 			}
 
 			// Check if there is one already with same unique
-			this.removeControllerByAlias(ctrl.controllerAlias);
+			this.removeUmbControllerByAlias(ctrl.controllerAlias);
 
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
@@ -71,7 +71,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		 * Notice this will also destroy the controller.
 		 * @param {UmbController} ctrl
 		 */
-		removeController(ctrl: UmbController): void {
+		removeUmbController(ctrl: UmbController): void {
 			const index = this.#controllers.indexOf(ctrl);
 			if (index !== -1) {
 				this.#controllers.splice(index, 1);
@@ -87,11 +87,11 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		 * Notice this will also destroy the controller.
 		 * @param {string | symbol} controllerAlias
 		 */
-		removeControllerByAlias(controllerAlias: UmbController['controllerAlias']): void {
+		removeUmbControllerByAlias(controllerAlias: UmbController['controllerAlias']): void {
 			if (controllerAlias) {
 				this.#controllers.forEach((x) => {
 					if (x.controllerAlias === controllerAlias) {
-						this.removeController(x);
+						this.removeUmbController(x);
 					}
 				});
 			}

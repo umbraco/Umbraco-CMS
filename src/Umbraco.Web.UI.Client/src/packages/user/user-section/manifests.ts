@@ -1,14 +1,13 @@
-import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_MANAGEMENT_SECTION_ALIAS = 'Umb.Section.Users';
+import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from './constants.js';
+import type { ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const section: ManifestSection = {
 	type: 'section',
 	alias: UMB_USER_MANAGEMENT_SECTION_ALIAS,
 	name: 'User Management Section',
-	weight: 100,
+	weight: 600,
 	meta: {
-		label: 'Users',
+		label: '#sections_users',
 		pathname: 'user-management',
 	},
 	conditions: [
@@ -19,4 +18,4 @@ const section: ManifestSection = {
 	],
 };
 
-export const manifests = [section];
+export const manifests: Array<ManifestTypes> = [section];

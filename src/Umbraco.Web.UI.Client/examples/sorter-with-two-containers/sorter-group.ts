@@ -48,7 +48,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		this.#sorter.setModel(this._items);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<div class="sorter-container">
 				${repeat(
@@ -63,7 +63,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

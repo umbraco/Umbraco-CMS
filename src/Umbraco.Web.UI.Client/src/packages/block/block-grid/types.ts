@@ -2,6 +2,7 @@ import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/ba
 import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 
 export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
+export const UMB_BLOCK_GRID = 'block-grid';
 
 // Configuration models:
 export interface UmbBlockGridTypeModel extends UmbBlockTypeWithGroupKey {

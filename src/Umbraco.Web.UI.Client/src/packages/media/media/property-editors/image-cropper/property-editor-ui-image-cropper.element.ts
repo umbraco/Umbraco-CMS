@@ -15,6 +15,7 @@ import {
 export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ attribute: false })
 	value: UmbImageCropperPropertyEditorValue = {
+		temporaryFileId: null,
 		src: '',
 		crops: [],
 		focalPoint: { left: 0.5, top: 0.5 },
@@ -23,11 +24,12 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 	@state()
 	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
 
-	updated(changedProperties: Map<string | number | symbol, unknown>) {
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
 		if (changedProperties.has('value')) {
 			if (!this.value) {
 				this.value = {
+					temporaryFileId: null,
 					src: '',
 					crops: [],
 					focalPoint: { left: 0.5, top: 0.5 },
@@ -45,7 +47,7 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
 
 		return html`<umb-input-image-cropper

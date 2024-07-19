@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_WEBHOOK_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Webhook.Table';
 
@@ -21,4 +21,4 @@ const tableCollectionView: ManifestCollectionView = {
 	],
 };
 
-export const manifests = [tableCollectionView];
+export const manifests: Array<ManifestTypes> = [tableCollectionView];

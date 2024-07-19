@@ -3,6 +3,7 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 // TODO: Revisit this component, it can be made via a kind with api instead. [NL]
+// TODO: This seems like legacy code [NL]
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 	@state()
@@ -23,7 +24,7 @@ export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 
 		this._saveButtonState = 'waiting';
 		await this._workspaceContext
-			.save()
+			.requestSubmit()
 			.then(() => {
 				this._saveButtonState = 'success';
 			})
@@ -32,7 +33,7 @@ export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 			});
 	}
 
-	render() {
+	override render() {
 		return html`<uui-button
 			@click=${this._handleSave}
 			look="primary"

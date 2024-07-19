@@ -3,9 +3,8 @@ import type { UmbMemberGroupDetailModel } from '../types.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContext,
-	UmbSaveableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
+	type UmbSubmittableWorkspaceContext,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
@@ -13,8 +12,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbMemberGroupWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbMemberGroupDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbMemberGroupDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberGroupDetailRepository(this);
 	#getDataPromise?: Promise<any>;
@@ -24,8 +23,6 @@ export class UmbMemberGroupWorkspaceContext
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS);
@@ -59,7 +56,7 @@ export class UmbMemberGroupWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -101,18 +98,22 @@ export class UmbMemberGroupWorkspaceContext
 		return { data };
 	}
 
-	async save() {
+	async submit() {
 		const data = this.getData();
 		if (!data) throw new Error('No data to save');
 
 		if (this.getIsNew()) {
-			await this.repository.create(data);
+			const { error } = await this.repository.create(data);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.setIsNew(false);
 		} else {
-			await this.repository.save(data);
+			const { error } = await this.repository.save(data);
+			if (error) {
+				throw new Error(error.message);
+			}
 		}
-
-		this.setIsNew(false);
-		this.workspaceComplete(data);
 	}
 
 	getData() {
@@ -135,7 +136,7 @@ export class UmbMemberGroupWorkspaceContext
 		this.#data.update({ name });
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

@@ -1,7 +1,8 @@
+import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -28,10 +29,11 @@ export class UmbMemberItemServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MemberResource.getItemMember({ id: uniques });
+const getItems = (uniques: Array<string>) => MemberService.getItemMember({ id: uniques });
 
 const mapper = (item: MemberItemResponseModel): UmbMemberItemModel => {
 	return {
+		entityType: UMB_MEMBER_ENTITY_TYPE,
 		unique: item.id,
 		name: item.variants[0].name || '',
 		memberType: {

@@ -1,28 +1,45 @@
-import type { RelationItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	DefaultReferenceResponseModel,
+	DocumentReferenceResponseModel,
+	MediaReferenceResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export const items: Array<RelationItemResponseModel> = [
+export const items: Array<
+	DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel
+> = [
 	{
-		nodeId: 'simple-document-id',
-		nodeName: 'Simple Document',
-		nodeType: 'document',
-		nodePublished: true,
-		contentTypeIcon: 'icon-document',
-		contentTypeName: 'Simple Document Type',
-		contentTypeAlias: 'blogPost',
-		relationTypeIsBidirectional: false,
-		relationTypeIsDependency: true,
-		relationTypeName: 'Related Document',
-	},
+		id: 'simple-document-id',
+		name: 'Simple Document',
+		published: true,
+		documentType: {
+			alias: 'blogPost',
+			icon: 'icon-document',
+			name: 'Simple Document Type',
+		},
+	} satisfies DocumentReferenceResponseModel,
 	{
-		nodeId: '1234',
-		nodeName: 'Image Block',
-		nodeType: 'element',
-		nodePublished: true,
-		contentTypeIcon: 'icon-settings',
-		contentTypeName: 'Image Block',
-		contentTypeAlias: 'imageBlock',
-		relationTypeIsBidirectional: false,
-		relationTypeIsDependency: true,
-		relationTypeName: 'Related Document',
-	},
+		id: '1234',
+		name: 'Image Block',
+		published: true,
+		documentType: {
+			alias: 'imageBlock',
+			icon: 'icon-settings',
+			name: 'Image Block',
+		},
+	} satisfies DocumentReferenceResponseModel,
+	{
+		id: 'media-id',
+		name: 'Simple Media',
+		mediaType: {
+			alias: 'image',
+			icon: 'icon-picture',
+			name: 'Image',
+		},
+	} satisfies MediaReferenceResponseModel,
+	{
+		id: 'default-id',
+		name: 'Some other reference',
+		type: 'Default',
+		icon: 'icon-bug',
+	} satisfies DefaultReferenceResponseModel,
 ];

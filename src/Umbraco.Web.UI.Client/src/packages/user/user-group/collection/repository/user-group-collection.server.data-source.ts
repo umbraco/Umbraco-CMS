@@ -1,7 +1,7 @@
 import type { UmbUserGroupCollectionFilterModel } from '../types.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
-import { UserGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -27,26 +27,28 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			UserGroupResource.getUserGroup({ skip: filter.skip, take: filter.take }),
+			UserGroupService.getFilterUserGroup({ skip: filter.skip, take: filter.take, filter: filter.query }),
 		);
 
 		if (data) {
 			const mappedItems = data.items.map((item) => {
 				const userGroup: UmbUserGroupDetailModel = {
-					unique: item.id,
-					entityType: UMB_USER_GROUP_ENTITY_TYPE,
-					isSystemGroup: item.isSystemGroup,
-					name: item.name,
-					icon: item.icon || null,
-					sections: item.sections,
-					languages: item.languages,
-					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
-					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
+					alias: item.alias,
+					aliasCanBeChanged: item.aliasCanBeChanged,
 					documentRootAccess: item.documentRootAccess,
-					mediaStartNode: item.mediaStartNode ? { unique: item.mediaStartNode.id } : null,
-					mediaRootAccess: item.mediaRootAccess,
+					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
+					entityType: UMB_USER_GROUP_ENTITY_TYPE,
 					fallbackPermissions: item.fallbackPermissions,
+					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+					icon: item.icon || null,
+					isDeletable: item.isDeletable,
+					languages: item.languages,
+					mediaRootAccess: item.mediaRootAccess,
+					mediaStartNode: item.mediaStartNode ? { unique: item.mediaStartNode.id } : null,
+					name: item.name,
 					permissions: item.permissions,
+					sections: item.sections,
+					unique: item.id,
 				};
 				return userGroup;
 			});

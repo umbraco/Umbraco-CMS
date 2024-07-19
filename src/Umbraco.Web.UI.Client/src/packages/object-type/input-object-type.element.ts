@@ -1,19 +1,19 @@
 import { UmbObjectTypeRepository } from './object-type.repository.js';
 import { html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-object-type')
-export class UmbInputObjectTypeElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputObjectTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@query('uui-select')
 	private select!: UUISelectElement;
 
 	@property()
-	public set value(value: UUISelectElement['value']) {
+	public override set value(value: UUISelectElement['value']) {
 		this.select.value = value;
 	}
-	public get value(): UUISelectElement['value'] {
+	public override get value(): UUISelectElement['value'] {
 		return this.select.value;
 	}
 
@@ -27,14 +27,14 @@ export class UmbInputObjectTypeElement extends FormControlMixin(UmbLitElement) {
 
 		this.#repository = new UmbObjectTypeRepository(this);
 
-		this.#repository.read().then(({ data, error }) => {
+		this.#repository.read().then(({ data }) => {
 			if (!data) return;
 
 			this._options = data.items.map((item) => ({ value: item.id, name: item.name ?? '' }));
 		});
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -42,11 +42,11 @@ export class UmbInputObjectTypeElement extends FormControlMixin(UmbLitElement) {
 		this.dispatchEvent(new CustomEvent('change'));
 	}
 
-	render() {
+	override render() {
 		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select> `;
 	}
 
-	static styles = [];
+	static override styles = [];
 }
 
 export default UmbInputObjectTypeElement;

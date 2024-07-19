@@ -8,7 +8,7 @@ export const createManifest: ManifestTypes = {
 	alias: 'Umb.CollectionAction.MemberGroup.Create',
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 		href: 'section/member-management/workspace/member-group/create',
 	},
 	conditions: [
@@ -19,4 +19,4 @@ export const createManifest: ManifestTypes = {
 	],
 };
 
-export const manifests = [createManifest];
+export const manifests: Array<ManifestTypes> = [createManifest];

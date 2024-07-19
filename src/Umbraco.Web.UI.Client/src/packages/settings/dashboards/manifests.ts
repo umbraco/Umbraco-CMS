@@ -1,4 +1,4 @@
-import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Settings';
 
@@ -7,11 +7,10 @@ const dashboards: Array<ManifestDashboard> = [
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.PublishedStatus',
 		name: 'Published Status Dashboard',
-		elementName: 'umb-dashboard-published-status',
-		js: () => import('./published-status/dashboard-published-status.element.js'),
-		weight: 200,
+		element: () => import('./published-status/dashboard-published-status.element.js'),
+		weight: 300,
 		meta: {
-			label: 'Published Status',
+			label: '#dashboardTabs_settingsPublishedStatus',
 			pathname: 'published-status',
 		},
 		conditions: [
@@ -25,11 +24,10 @@ const dashboards: Array<ManifestDashboard> = [
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Profiling',
 		name: 'Profiling',
-		elementName: 'umb-dashboard-performance-profiling',
-		js: () => import('./performance-profiling/dashboard-performance-profiling.element.js'),
+		element: () => import('./performance-profiling/dashboard-performance-profiling.element.js'),
 		weight: 101,
 		meta: {
-			label: 'Profiling',
+			label: '#dashboardTabs_settingsProfiler',
 			pathname: 'profiling',
 		},
 		conditions: [
@@ -43,8 +41,7 @@ const dashboards: Array<ManifestDashboard> = [
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Telemetry',
 		name: 'Telemetry',
-		elementName: 'umb-dashboard-telemetry',
-		js: () => import('./telemetry/dashboard-telemetry.element.js'),
+		element: () => import('./telemetry/dashboard-telemetry.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Telemetry Data',
@@ -59,4 +56,4 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 ];
 
-export const manifests = [...dashboards];
+export const manifests: Array<ManifestTypes> = [...dashboards];

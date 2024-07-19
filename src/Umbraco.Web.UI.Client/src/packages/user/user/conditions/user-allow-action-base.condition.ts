@@ -8,12 +8,20 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 export abstract class UmbUserActionConditionBase
 	extends UmbConditionBase<UmbConditionConfigBase>
 	implements UmbExtensionCondition
 {
+	/**
+	 * The unique identifier of the user being edited
+	 */
 	protected userUnique?: string;
+
+	/**
+	 * The state of the user being edited
+	 */
 	protected userState?: UmbUserStateEnum | null;
 
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
@@ -21,23 +29,13 @@ export abstract class UmbUserActionConditionBase
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.unique,
-				(unique) => {
+				observeMultiple([context.unique, context.state]),
+				([unique, state]) => {
 					this.userUnique = unique;
-					this._onUserDataChange();
-				},
-				'umbUserUnique',
-			);
-			this.observe(
-				context.state,
-				(state) => {
 					this.userState = state;
-					// TODO: Investigate if we can remove this observation and just use the unique change to trigger the state change. [NL]
-					// Can user state change over time? if not then this observation is not needed and then we just need to retrieve the state when the unique has changed. [NL]
-					// These two could also be combined via the observeMultiple method, that could prevent triggering onUserDataChanged twice. [NL]
 					this._onUserDataChange();
 				},
-				'umbUserState',
+				'_umbActiveUser',
 			);
 		});
 	}
@@ -51,6 +49,7 @@ export abstract class UmbUserActionConditionBase
 	protected async isCurrentUser() {
 		return this.userUnique ? isCurrentUser(this._host, this.userUnique) : false;
 	}
+
 	/**
 	 * Called when the user data changes
 	 * @protected

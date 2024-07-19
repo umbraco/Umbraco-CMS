@@ -1,6 +1,7 @@
-import { UMB_DOCUMENT_TYPE_TREE_ALIAS } from '../tree/manifests.js';
+import { UMB_DOCUMENT_TYPE_TREE_ALIAS } from '../tree/index.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',

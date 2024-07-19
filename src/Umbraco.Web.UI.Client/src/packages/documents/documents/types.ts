@@ -3,6 +3,7 @@ import type { UmbVariantModel, UmbVariantOptionModel, UmbVariantPublishModel } f
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 export { UmbDocumentVariantState };
+export type { UmbDocumentUserPermissionConditionConfig } from './user-permissions/condition/document-user-permission.condition.js';
 
 export interface UmbDocumentDetailModel {
 	documentType: {

@@ -1,8 +1,9 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_TEMPLATE_WORKSPACE_ALIAS = 'Umb.Workspace.Template';
@@ -26,12 +27,12 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Template.Save',
 		name: 'Save Template',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		weight: 70,
 		meta: {
 			look: 'primary',
 			color: 'positive',
-			label: 'Save',
+			label: '#buttons_save',
 		},
 		conditions: [
 			{
@@ -42,4 +43,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

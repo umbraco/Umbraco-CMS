@@ -3,7 +3,7 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -66,7 +66,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MediaResource.getMediaById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MediaService.getMediaById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -123,7 +123,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaResource.postMedia({
+			MediaService.postMedia({
 				requestBody,
 			}),
 		);
@@ -152,7 +152,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaResource.putMediaById({
+			MediaService.putMediaById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -174,7 +174,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		// TODO: update to delete when implemented
-		return tryExecuteAndNotify(this.#host, MediaResource.putMediaByIdMoveToRecycleBin({ id: unique }));
+		return tryExecuteAndNotify(this.#host, MediaService.deleteMediaById({ id: unique }));
 	}
 }

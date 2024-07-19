@@ -1,9 +1,9 @@
-import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbMemberTypeTreeItemModel } from './types.js';
 import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -33,10 +33,10 @@ export class UmbMemberTypeTreeServerDataSource extends UmbTreeServerDataSourceBa
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MemberTypeResource.getTreeMemberTypeRoot({ skip: args.skip, take: args.take });
+	MemberTypeService.getTreeMemberTypeRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		throw new Error('Not supported for the member type tree');
@@ -50,7 +50,10 @@ const getAncestorsOf = () => {
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbMemberTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_MEMBER_TYPE_ENTITY_TYPE : UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
+		},
 		name: item.name,
 		entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,

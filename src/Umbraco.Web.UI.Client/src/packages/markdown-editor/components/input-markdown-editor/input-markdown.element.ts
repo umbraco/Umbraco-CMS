@@ -1,29 +1,28 @@
-import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
+import { css, customElement, html, property, query, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
-import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { css, html, customElement, query, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, type UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_LINK_PICKER_MODAL,
-	UMB_MEDIA_TREE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MEDIA_PICKER_MODAL, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
+import { UmbCodeEditorLoadedEvent } from '@umbraco-cms/backoffice/code-editor';
+import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
+const elementName = 'umb-input-markdown';
 
 /**
  * @element umb-input-markdown
  * @fires change - when the value of the input changes
  */
-
-@customElement('umb-input-markdown')
-export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
-	protected getFormElement() {
+@customElement(elementName)
+export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, '') {
+	protected override getFormElement() {
 		return this._codeEditor;
 	}
 
@@ -35,31 +34,20 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	@property()
 	overlaySize?: UUIModalSidebarSize;
 
-	#isCodeEditorReady = new UmbBooleanState(false);
 	#editor?: UmbCodeEditorController;
 
-	@query('umb-code-editor')
-	_codeEditor?: UmbCodeEditorElement;
+	@query('umb-code-editor', true)
+	private _codeEditor?: UmbCodeEditorElement;
 
-	private _modalContext?: UmbModalManagerContext;
+	@state()
+	private _actionExtensions: Array<monaco.editor.IActionDescriptor> = [];
 
-	private serverUrl?: string;
+	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
-	constructor() {
-		super();
-		this.#loadCodeEditor();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.serverUrl = instance.getServerUrl();
-		});
-	}
+	#onCodeEditorLoaded(event: UmbCodeEditorLoadedEvent) {
+		if (event.type !== UmbCodeEditorLoadedEvent.TYPE) return;
 
-	async #loadCodeEditor() {
 		try {
-			await loadCodeEditor();
-
 			this.#editor = this._codeEditor?.editor;
 
 			this.#editor?.updateOptions({
@@ -68,14 +56,29 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				folding: false,
 			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
 
-			this.#isCodeEditorReady.setValue(true);
+			// TODO: make all action into extensions
+			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
+				manifests.forEach(async (manifest) => {
+					const api = await createExtensionApi(this, manifest, [this]);
+					const action: monaco.editor.IActionDescriptor = {
+						id: api.getUnique(),
+						label: api.getLabel(),
+						keybindings: api.getKeybindings(),
+						run: async () => await api.execute({ editor: this.#editor, overlaySize: this.overlaySize }),
+					};
+					this.#editor?.monacoEditor?.addAction(action);
+					this._actionExtensions.push(action);
+					this.requestUpdate('_actionExtensions');
+				});
+			});
+
 			this.#loadActions();
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
-	async #loadActions() {
+	#loadActions() {
 		//Note: UI Buttons have the keybindings hardcoded in its title. If you change the keybindings here, please update the render as well.
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H1',
@@ -160,18 +163,19 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			run: () => this._insertLine(),
 		});
 		this.#editor?.monacoEditor?.addAction({
-			label: 'Add Link',
-			id: 'link',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
-			run: () => this._insertLink(),
-		});
-		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Image',
 			id: 'image',
 			//keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ], // What keybinding would be good for image?
-			run: () => this._insertMedia(),
+			run: () => this.#insertMedia(),
 			// TODO: Update when media picker is complete.
 		});
+	}
+
+	#onActionClick(event: any, action: monaco.editor.IActionDescriptor) {
+		event.stopPropagation();
+		const hasAction = this.#editor?.monacoEditor?.getAction(action.id);
+		if (!hasAction) throw new Error(`Action ${action.id} not found in the editor.`);
+		this.#editor?.monacoEditor?.getAction(action.id)?.run();
 	}
 
 	private _focusEditor(): void {
@@ -179,76 +183,33 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		this.#editor?.monacoEditor?.focus();
 	}
 
-	private _insertLink() {
-		const selection = this.#editor?.getSelections()[0];
-		if (!selection || !this._modalContext) return;
-
-		const selectedValue = this.#editor?.getValueInRange(selection);
-
-		this._focusEditor(); // Focus before opening modal
-		const modalContext = this._modalContext.open(this, UMB_LINK_PICKER_MODAL, {
-			data: {
-				index: null,
-				config: { overlaySize: this.overlaySize },
-			},
-			value: {
-				link: { name: selectedValue },
-			},
-		});
-
-		modalContext
-			?.onSubmit()
-			.then((value) => {
-				if (!value) return;
-
-				const name = this.localize.term('general_name');
-				const url = this.localize.term('general_url');
-
-				this.#editor?.monacoEditor?.executeEdits('', [
-					{ range: selection, text: `[${value.link.name || name}](${value.link.url || url})` },
-				]);
-
-				if (!value.link.name) {
-					this.#editor?.select({
-						startColumn: selection.startColumn + 1,
-						endColumn: selection.startColumn + 1 + name.length,
-						endLineNumber: selection.startLineNumber,
-						startLineNumber: selection.startLineNumber,
-					});
-				} else if (!value.link.url) {
-					this.#editor?.select({
-						startColumn: selection.startColumn + 3 + value.link.name.length,
-						endColumn: selection.startColumn + 3 + value.link.name.length + url.length,
-						endLineNumber: selection.startLineNumber,
-						startLineNumber: selection.startLineNumber,
-					});
-				}
-			})
-			.catch(() => undefined)
-			.finally(() => this._focusEditor());
-	}
-
-	private _insertMedia() {
+	async #insertMedia() {
 		const selection = this.#editor?.getSelections()[0];
 		if (!selection) return;
 
-		const alt = this.#editor?.getValueInRange(selection) || 'alt text';
+		const alt = this.#editor?.getValueInRange(selection) || 'enter image description here';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
-		const modalContext = this._modalContext?.open(this, UMB_MEDIA_TREE_PICKER_MODAL);
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_MEDIA_PICKER_MODAL);
 
 		modalContext
 			?.onSubmit()
-			.then((value) => {
+			.then(async (value) => {
 				if (!value) return;
-				const imgUrl = value.selection[0];
+
+				const uniques = value.selection;
+				const { data: mediaUrls } = await this.#mediaUrlRepository.requestItems(uniques);
+				const mediaUrl = mediaUrls?.length ? (mediaUrls[0].url ?? 'URL') : 'URL';
+
 				this.#editor?.monacoEditor?.executeEdits('', [
-					//TODO: Get the correct media URL
 					{
 						range: selection,
-						text: `![${alt}](${imgUrl ? `${this.serverUrl}'/media/'${imgUrl}` : 'URL'})`,
+						text: `![${alt}](${mediaUrl})`,
 					},
 				]);
+
 				this.#editor?.select({
 					startColumn: selection.startColumn + 2,
 					endColumn: selection.startColumn + alt.length + 2, // +2 because of ![
@@ -419,108 +380,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		this._focusEditor();
 	}
 
-	private _renderBasicActions() {
-		return html`<div>
-				<uui-button
-					compact
-					look="secondary"
-					label="Heading"
-					title="Heading, &lt;Ctrl+Shift+1&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('h1')?.run()}>
-					H
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Bold"
-					title="Bold, &lt;Ctrl+B&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('b')?.run()}>
-					B
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Italic"
-					title="Italic, &lt;Ctrl+I&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('i')?.run()}>
-					I
-				</uui-button>
-			</div>
-			<div>
-				<uui-button
-					compact
-					look="secondary"
-					label="Quote"
-					title="Quote, &lt;Ctrl+Shift+.&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('q')?.run()}>
-					<uui-icon name="icon-quote"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Ordered List"
-					title="Ordered List, &lt;Ctrl+Shift+7&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('ol')?.run()}>
-					<uui-icon name="icon-ordered-list"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Unordered List"
-					title="Unordered List, &lt;Ctrl+Shift+8&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('ul')?.run()}>
-					<uui-icon name="icon-bulleted-list"></uui-icon>
-				</uui-button>
-			</div>
-			<div>
-				<uui-button
-					compact
-					look="secondary"
-					label="Code"
-					title="Code, &lt;Ctrl+E&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('code')?.run()}>
-					<uui-icon name="icon-code"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Line"
-					title="Line"
-					@click=${() => this.#editor?.monacoEditor?.getAction('line')?.run()}>
-					<uui-icon name="icon-width"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Link"
-					title="Link, &lt;Ctrl+K&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('link')?.run()}>
-					<uui-icon name="icon-link"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Image"
-					title="Image"
-					@click=${() => this.#editor?.monacoEditor?.getAction('image')?.run()}>
-					<uui-icon name="icon-picture"></uui-icon>
-				</uui-button>
-			</div>
-			<div>
-				<uui-button
-					compact
-					label="Press F1 for all actions"
-					title="Press F1 for all actions"
-					@click=${() => {
-						this._focusEditor();
-						this.#editor?.monacoEditor?.trigger('', 'editor.action.quickCommand', '');
-					}}>
-					<uui-key>F1</uui-key>
-				</uui-button>
-			</div>`;
-	}
-
-	onKeyPress(e: KeyboardEvent) {
+	#onKeyPress(e: KeyboardEvent) {
 		if (e.key !== 'Enter') return;
 		//TODO: Tab does not seem to trigger keyboard events. We need to make some logic for ordered and unordered lists when tab is being used.
 
@@ -541,50 +401,157 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	#onInput(e: CustomEvent) {
 		e.stopPropagation();
 		this.value = this.#editor?.monacoEditor?.getValue() ?? '';
-		this.dispatchEvent(new CustomEvent('change'));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
-		return html` <div id="actions">${this._renderBasicActions()}</div>
+	override render() {
+		return html`
+			${this.#renderToolbar()}
 			<umb-code-editor
 				language="markdown"
 				.code=${this.value as string}
-				@keypress=${this.onKeyPress}
 				@input=${this.#onInput}
-				theme="umb-light"></umb-code-editor>
-			${when(this.preview && this.value, () => this.renderPreview(this.value as string))}`;
+				@keypress=${this.#onKeyPress}
+				@loaded=${this.#onCodeEditorLoaded}>
+			</umb-code-editor>
+			${this.#renderPreview()}
+		`;
 	}
 
-	renderPreview(markdown: string) {
-		const markdownAsHtml = marked.parse(markdown) as string;
+	#renderToolbar() {
+		return html`
+			<div id="toolbar">
+				<uui-button-group>
+					<uui-button
+						compact
+						look="secondary"
+						label="Heading"
+						title="Heading, &lt;Ctrl+Shift+1&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('h1')?.run()}>
+						H
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Bold"
+						title="Bold, &lt;Ctrl+B&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('b')?.run()}>
+						B
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Italic"
+						title="Italic, &lt;Ctrl+I&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('i')?.run()}>
+						I
+					</uui-button>
+				</uui-button-group>
+
+				<uui-button-group>
+					<uui-button
+						compact
+						look="secondary"
+						label="Quote"
+						title="Quote, &lt;Ctrl+Shift+.&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('q')?.run()}>
+						<uui-icon name="icon-quote"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Ordered List"
+						title="Ordered List, &lt;Ctrl+Shift+7&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('ol')?.run()}>
+						<uui-icon name="icon-ordered-list"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Unordered List"
+						title="Unordered List, &lt;Ctrl+Shift+8&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('ul')?.run()}>
+						<uui-icon name="icon-bulleted-list"></uui-icon>
+					</uui-button>
+				</uui-button-group>
+				<uui-button-group>
+					<uui-button
+						compact
+						look="secondary"
+						label="Code"
+						title="Code, &lt;Ctrl+E&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('code')?.run()}>
+						<uui-icon name="icon-code"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Line"
+						title="Line"
+						@click=${() => this.#editor?.monacoEditor?.getAction('line')?.run()}>
+						<uui-icon name="icon-width"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Image"
+						title="Image"
+						@click=${() => this.#editor?.monacoEditor?.getAction('image')?.run()}>
+						<uui-icon name="icon-picture"></uui-icon>
+					</uui-button>
+				</uui-button-group>
+
+				<uui-button-group>
+					${this._actionExtensions.map(
+						(action) => html`
+							<uui-button
+								compact
+								look="secondary"
+								label=${action.label}
+								@click=${(event: any) => this.#onActionClick(event, action)}>
+								<uui-icon name="icon-link"></uui-icon>
+							</uui-button>
+						`,
+					)}
+				</uui-button-group>
+
+				<uui-button-group>
+					<uui-button
+						compact
+						label="Press F1 for all actions"
+						title="Press F1 for all actions"
+						@click=${() => {
+							this._focusEditor();
+							this.#editor?.monacoEditor?.trigger('', 'editor.action.quickCommand', '');
+						}}>
+						<uui-key>F1</uui-key>
+					</uui-button>
+				</uui-button-group>
+			</div>
+		`;
+	}
+
+	#renderPreview() {
+		if (!this.preview || !this.value) return;
+		const markdownAsHtml = marked.parse(this.value as string) as string;
 		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
-		return html`<uui-scroll-container id="preview"> ${unsafeHTML(sanitizedHtml)} </uui-scroll-container>`;
+		return html`<uui-scroll-container id="preview">${unsafeHTML(sanitizedHtml)}</uui-scroll-container>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
 				display: flex;
 				flex-direction: column;
 			}
-			#actions {
+
+			#toolbar {
 				background-color: var(--uui-color-background-alt);
 				display: flex;
-				gap: var(--uui-size-6);
-			}
-
-			#preview {
-				max-height: 400px;
-			}
-
-			#actions div {
-				display: flex;
-				gap: var(--uui-size-1);
-			}
-
-			#actions div:last-child {
-				margin-left: auto;
+				flex-wrap: wrap;
+				gap: var(--uui-size-2);
+				margin-bottom: var(--uui-size-2);
 			}
 
 			umb-code-editor {
@@ -597,23 +564,31 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				width: 50px;
 			}
 
-			blockquote {
+			#preview {
+				max-height: 400px;
+			}
+
+			#preview blockquote {
 				border-left: 2px solid var(--uui-color-default-emphasis);
 				margin-inline: 0;
 				padding-inline: var(--uui-size-3);
 			}
 
-			p > code,
-			pre {
+			#preview img {
+				max-width: 100%;
+			}
+
+			#preview hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-palette-cocoa-black);
+			}
+
+			#preview p > code,
+			#preview pre {
 				border: 1px solid var(--uui-color-divider-emphasis);
 				border-radius: var(--uui-border-radius);
 				padding: 0 var(--uui-size-1);
 				background-color: var(--uui-color-background);
-			}
-
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-palette-cocoa-black);
 			}
 		`,
 	];
@@ -622,6 +597,6 @@ export default UmbInputMarkdownElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-markdown': UmbInputMarkdownElement;
+		[elementName]: UmbInputMarkdownElement;
 	}
 }

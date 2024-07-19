@@ -1,18 +1,19 @@
+import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalRouteRegistrationController, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
-	type UmbContentTypeModel,
-	type UmbContentTypePropertyStructureHelper,
-	type UmbPropertyTypeModel,
-	type UmbPropertyTypeScaffoldModel,
+import type {
+	UmbContentTypeModel,
+	UmbContentTypePropertyStructureHelper,
+	UmbPropertyTypeModel,
+	UmbPropertyTypeScaffoldModel,
 } from '@umbraco-cms/backoffice/content-type';
+import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -23,8 +24,8 @@ import {
 export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	//
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-
-	#settingsModal;
+	#dataTypeUnique?: string;
+	#context = new UmbPropertyTypeContext(this);
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -49,38 +50,33 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 	public set property(value: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined) {
 		const oldValue = this._property;
+		if (value === oldValue) return;
 		this._property = value;
+		this.#context.setAlias(value?.alias);
+		this.#context.setLabel(value?.name);
 		this.#checkInherited();
-		this.#settingsModal.setUniquePathValue('propertyId', value?.id);
-		this.setDataType(this._property?.dataType?.unique);
+		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
 	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
 
-	/**
-	 * Inherited, Determines if the property is part of the main content type thats being edited.
-	 * If true, then the property is inherited from another content type, not a part of the main content type.
-	 * @type {boolean}
-	 * @attr
-	 * @default undefined
-	 */
-	@property({ type: Boolean })
-	public inherited?: boolean;
-
 	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
 	public sortModeActive = false;
 
-	@property({ type: String, attribute: 'owner-content-type-id' })
-	public ownerContentTypeId?: string;
-
-	@property({ type: String, attribute: 'owner-content-type-name' })
-	public ownerContentTypeName?: string;
-
-	@property({ type: String, attribute: 'edit-content-type-path' })
+	@property({ attribute: false })
 	public editContentTypePath?: string;
 
+	@property({ type: Boolean, reflect: true, attribute: '_inherited' })
+	public _inherited?: boolean;
+
 	@state()
-	protected _modalRoute?: string;
+	public _inheritedContentTypeId?: string;
+
+	@state()
+	public _inheritedContentTypeName?: string;
+
+	@property({ type: String, reflect: false })
+	protected editPropertyTypePath?: string;
 
 	@state()
 	private _dataTypeName?: string;
@@ -88,46 +84,28 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@state()
 	private _aliasLocked = true;
 
-	constructor() {
-		super();
-
-		// TODO: consider if this can be registered more globally/contextually. [NL]
-		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
-			.addUniquePaths(['propertyId'])
-			.onSetup(() => {
-				const id = this.ownerContentTypeId;
-				if (id === undefined) return false;
-				const propertyData = this.property;
-				if (propertyData === undefined) return false;
-				return { data: { contentTypeId: id }, value: propertyData };
-			})
-			.onSubmit((result) => {
-				this._partialUpdate(result as UmbPropertyTypeModel);
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._modalRoute = routeBuilder(null);
-			});
-	}
-
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
 			// We can first match with something if we have a name [NL]
 			this.observe(
-				await this._propertyStructureHelper!.isOwnerProperty(this._property.id),
-				(isOwned) => {
-					this.inherited = !isOwned;
+				await this._propertyStructureHelper!.contentTypeOfProperty(this._property.id),
+				(contentType) => {
+					this._inherited =
+						this._propertyStructureHelper?.getStructureManager()?.getOwnerContentTypeUnique() !== contentType?.unique;
+					this._inheritedContentTypeId = contentType?.unique;
+					this._inheritedContentTypeName = contentType?.name;
 				},
 				'observeIsOwnerProperty',
 			);
 		}
 	}
 
-	_partialUpdate(partialObject: UmbPropertyTypeModel) {
+	#partialUpdate(partialObject: UmbPropertyTypeModel) {
 		if (!this._property || !this._propertyStructureHelper) return;
 		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
 	}
 
-	_singleValueUpdate<PropertyNameType extends keyof UmbPropertyTypeModel>(
+	#singleValueUpdate<PropertyNameType extends keyof UmbPropertyTypeModel>(
 		propertyName: PropertyNameType,
 		value: UmbPropertyTypeModel[PropertyNameType],
 	) {
@@ -141,9 +119,15 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._aliasLocked = !this._aliasLocked;
 	}
 
-	async setDataType(dataTypeId: string | undefined) {
-		if (!dataTypeId) return;
-		this.#dataTypeDetailRepository.requestByUnique(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
+	async #setDataType(dataTypeUnique: string | undefined) {
+		if (!dataTypeUnique) {
+			this._dataTypeName = undefined;
+			this.#dataTypeUnique = undefined;
+			return;
+		}
+		if (dataTypeUnique === this.#dataTypeUnique) return;
+		this.#dataTypeUnique = dataTypeUnique;
+		this.#dataTypeDetailRepository.requestByUnique(dataTypeUnique).then((x) => (this._dataTypeName = x?.data?.name));
 	}
 
 	async #requestRemove(e: Event) {
@@ -167,7 +151,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._propertyStructureHelper?.removeProperty(this._property.id);
 	}
 
-	#onNameChange(event: UUIInputEvent) {
+	#onNameChanged(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
@@ -179,17 +163,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					const expectedOldAlias = generateAlias(oldName ?? '');
 					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
 					if (expectedOldAlias === oldAlias) {
-						this._singleValueUpdate('alias', generateAlias(newName ?? ''));
+						this.#singleValueUpdate('alias', generateAlias(newName ?? ''));
 					}
 				}
-				this._singleValueUpdate('name', newName);
+				this.#singleValueUpdate('name', newName);
 			}
 		}
 	}
 
-	render() {
+	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
-		return this.inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
+		return this._inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
 	}
 
 	renderInheritedProperty() {
@@ -206,22 +190,24 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				</div>
 				<div id="editor">
 					${this.renderPropertyTags()}
-					<uui-tag look="default" class="inherited">
-						<uui-icon name="icon-merge"></uui-icon>
-						<span
-							>${this.localize.term('contentTypeEditor_inheritedFrom')}
-							<a href=${this.editContentTypePath + 'edit/' + this.ownerContentTypeId}>
-								${this.ownerContentTypeName ?? '??'}
-							</a>
-						</span>
-					</uui-tag>
+					${this._inherited
+						? html`<uui-tag look="default" class="inherited">
+								<uui-icon name="icon-merge"></uui-icon>
+								<span
+									>${this.localize.term('contentTypeEditor_inheritedFrom')}
+									<a href=${this.editContentTypePath + 'edit/' + this._inheritedContentTypeId}>
+										${this._inheritedContentTypeName ?? '??'}
+									</a>
+								</span>
+							</uui-tag>`
+						: nothing}
 				</div>
 			`;
 		}
 	}
 
 	renderEditableProperty() {
-		if (!this.property) return;
+		if (!this.property || !this.editPropertyTypePath) return;
 
 		if (this.sortModeActive) {
 			return this.renderSortableProperty();
@@ -234,7 +220,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						placeholder=${this.localize.term('placeholders_label')}
 						label="label"
 						.value=${this.property.name}
-						@input=${this.#onNameChange}></uui-input>
+						@input=${this.#onNameChanged}></uui-input>
 					${this.renderPropertyAlias()}
 					<slot name="action-menu"></slot>
 					<p>
@@ -245,14 +231,16 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 							placeholder=${this.localize.term('placeholders_enterDescription')}
 							.value=${this.property.description}
 							@input=${(e: CustomEvent) => {
-								if (e.target) this._singleValueUpdate('description', (e.target as HTMLInputElement).value);
+								if (e.target) this.#singleValueUpdate('description', (e.target as HTMLInputElement).value);
 							}}></uui-textarea>
 					</p>
 				</div>
 				<uui-button
 					id="editor"
+					look="secondary"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
-					href=${ifDefined(this._modalRoute)}>
+					href=${this.editPropertyTypePath +
+					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.id })}>
 					${this.renderPropertyTags()}
 					<uui-action-bar>
 						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
@@ -268,15 +256,16 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (!this.property) return;
 		return html`
 			<div class="sortable">
-				<uui-icon name="${this.inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
-				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
+				<uui-icon name="icon-navigation"></uui-icon>
+				<span>${this.property.name}</span>
+				<span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
 			</div>
 			<uui-input
 				type="number"
-				?readonly=${this.inherited}
+				?disabled=${this._inherited}
 				label="sort order"
 				@change=${(e: UUIInputEvent) =>
-					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
+					this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
 		`;
 	}
@@ -291,7 +280,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					.value=${this.property.alias}
 					?disabled=${this._aliasLocked}
 					@input=${(e: CustomEvent) => {
-						if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
+						if (e.target) this.#singleValueUpdate('alias', (e.target as HTMLInputElement).value);
 					}}>
 					<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 					<!-- TODO: validation for bad characters -->
@@ -325,7 +314,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host(:not([sort-mode-active])) {
@@ -365,17 +354,22 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				margin-bottom: 0;
 			}
 
-			:host([sort-mode-active]:not([inherited])) {
+			:host([sort-mode-active]:not([_inherited])) {
 				cursor: grab;
 			}
 
 			:host([sort-mode-active]) .sortable {
 				flex: 1;
 				display: flex;
-				background-color: var(--uui-color-divider);
 				align-items: center;
 				padding: 0 var(--uui-size-3);
 				gap: var(--uui-size-3);
+			}
+			:host([sort-mode-active][_inherited]) .sortable {
+				color: var(--uui-color-disabled-contrast);
+			}
+			:host([sort-mode-active]:not([_inherited])) .sortable {
+				background-color: var(--uui-color-divider);
 			}
 
 			:host([sort-mode-active]) uui-input {
@@ -408,7 +402,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#editor {
 				position: relative;
-				background-color: var(--uui-color-background);
 			}
 			#alias-input,
 			#label-input,
@@ -468,11 +461,13 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: absolute;
 				top: var(--uui-size-space-2);
 				right: var(--uui-size-space-2);
-				display: none;
+				opacity: 0;
 			}
+
 			#editor:hover uui-action-bar,
-			#editor:focus uui-action-bar {
-				display: block;
+			#editor:focus uui-action-bar,
+			#editor:focus-within uui-action-bar {
+				opacity: 1;
 			}
 
 			a {

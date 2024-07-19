@@ -1,5 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
-import { UmbDocumentTrackedReferenceRepository } from '../../tracked-reference/index.js';
+import { UmbDocumentReferenceRepository } from '../../reference/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../global-contexts/index.js';
 import type {
 	UmbDocumentUnpublishModalData,
@@ -18,20 +18,20 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	UmbDocumentUnpublishModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
-	#trackedReferencesRepository = new UmbDocumentTrackedReferenceRepository(this);
+	#referencesRepository = new UmbDocumentReferenceRepository(this);
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_hasTrackedReferences = false;
+	_hasReferences = false;
 
 	@state()
 	_hasUnpublishPermission = true;
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
-		this.#getTrackedReferences();
+		this.#getReferences();
 	}
 
 	async #configureSelectionManager() {
@@ -56,14 +56,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelection(selected);
 	}
 
-	async #getTrackedReferences() {
+	async #getReferences() {
 		if (!this.data?.documentUnique) return;
 
-		const { data, error } = await this.#trackedReferencesRepository.requestTrackedReference(
-			this.data?.documentUnique,
-			0,
-			1,
-		);
+		const { data, error } = await this.#referencesRepository.requestReferencedBy(this.data?.documentUnique, 0, 1);
 
 		if (error) {
 			console.error(error);
@@ -72,10 +68,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 		if (!data) return;
 
-		this._hasTrackedReferences = data.total > 0;
+		this._hasReferences = data.total > 0;
 
-		// If there are tracked references, we also want to check if we are allowed to unpublish the document:
-		if (this._hasTrackedReferences) {
+		// If there are references, we also want to check if we are allowed to unpublish the document:
+		if (this._hasReferences) {
 			const documentConfigurationContext = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
 			this._hasUnpublishPermission =
 				(await documentConfigurationContext.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
@@ -95,7 +91,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_unpublish')}>
 			<p id="subtitle">
 				<umb-localize key="content_languagesToUnpublish">
@@ -115,13 +111,13 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 			${this.data?.documentUnique
 				? html`
-						<umb-document-tracked-reference-table
-							id="tracked-references"
-							unique=${this.data?.documentUnique}></umb-document-tracked-reference-table>
+						<umb-document-reference-table
+							id="references"
+							unique=${this.data?.documentUnique}></umb-document-reference-table>
 					`
 				: nothing}
-			${this._hasTrackedReferences
-				? html`<uui-box id="tracked-references-warning">
+			${this._hasReferences
+				? html`<uui-box id="references-warning">
 						<umb-localize key="references_unpublishWarning">
 							This item or its descendants is being referenced. Unpublishing can lead to broken links on your website.
 							Please take the appropriate actions.
@@ -141,7 +137,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -150,11 +146,11 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				max-width: 90vw;
 			}
 
-			#tracked-references {
+			#references {
 				--uui-table-cell-padding: 0;
 			}
 
-			#tracked-references-warning {
+			#references-warning {
 				margin-top: 1rem;
 				background-color: var(--uui-color-danger);
 				color: var(--uui-color-danger-contrast);

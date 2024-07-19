@@ -4,7 +4,7 @@ import {
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
 import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { ScriptResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -38,7 +38,7 @@ export class UmbRenameScriptServerDataSource {
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.putScriptByPathRename({
+			ScriptService.putScriptByPathRename({
 				path: encodeURIComponent(path),
 				requestBody,
 			}),

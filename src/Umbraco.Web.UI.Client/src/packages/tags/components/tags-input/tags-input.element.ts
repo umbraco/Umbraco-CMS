@@ -11,12 +11,12 @@ import {
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-tags-input')
-export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String })
 	group?: string;
 
@@ -33,6 +33,15 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	public get items(): string[] {
 		return this._items;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _matches: Array<TagResponseModel> = [];
@@ -54,11 +63,11 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 
 	#repository = new UmbTagRepository(this);
 
-	public focus() {
+	public override focus() {
 		this._tagInput.focus();
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -98,7 +107,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	protected updated(): void {
+	protected override updated(): void {
 		this._mainTag.style.width = `${this._widthTracker.offsetWidth - 4}px`;
 	}
 
@@ -180,7 +189,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 
 	/** Render */
 
-	render() {
+	override render() {
 		return html`
 			<div id="wrapper">
 				${this.#enteredTags()}
@@ -188,18 +197,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 					<uui-tag id="input-width-tracker" aria-hidden="true" style="visibility:hidden;opacity:0;position:absolute;">
 						${this._currentInput}
 					</uui-tag>
-					<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
-						<input
-							id="tag-input"
-							aria-label="tag input"
-							placeholder="Enter tag"
-							.value="${this._currentInput ?? undefined}"
-							@keydown="${this.#onKeydown}"
-							@input="${this.#onInput}"
-							@blur="${this.#onBlur}" />
-						<uui-icon id="icon-add" name="icon-add"></uui-icon>
-						${this.#renderTagOptions()}
-					</uui-tag>
+					${this.#renderAddButton()}
 				</span>
 			</div>
 		`;
@@ -210,7 +208,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 			return html`
 				<uui-tag class="tag">
 					<span>${tag}</span>
-					<uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon>
+					${this.#renderRemoveButton(tag)}
 				</uui-tag>
 			`;
 		})}`;
@@ -233,7 +231,8 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 								name="${tag.group ?? ''}"
 								@click="${() => this.#optionClick(index)}"
 								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, index)}"
-								value="${tag.text ?? ''}" />
+								value="${tag.text ?? ''}"
+								?readonly=${this.readonly} />
 							<label for="tag-${tag.id}"> ${tag.text} </label>`;
 					},
 				)}
@@ -241,7 +240,31 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	static styles = [
+	#renderAddButton() {
+		if (this.readonly) return nothing;
+
+		return html`
+			<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
+				<input
+					id="tag-input"
+					aria-label="tag input"
+					placeholder="Enter tag"
+					.value="${this._currentInput ?? undefined}"
+					@keydown="${this.#onKeydown}"
+					@input="${this.#onInput}"
+					@blur="${this.#onBlur}" />
+				<uui-icon id="icon-add" name="icon-add"></uui-icon>
+				${this.#renderTagOptions()}
+			</uui-tag>
+		`;
+	}
+
+	#renderRemoveButton(tag: string) {
+		if (this.readonly) return nothing;
+		return html` <uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon> `;
+	}
+
+	static override styles = [
 		css`
 			#wrapper {
 				box-sizing: border-box;
@@ -253,6 +276,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 				border: 1px solid var(--uui-color-border);
 				background-color: var(--uui-input-background-color, var(--uui-color-surface));
 				flex: 1;
+				min-height: 40px;
 			}
 
 			#main-tag-wrapper {

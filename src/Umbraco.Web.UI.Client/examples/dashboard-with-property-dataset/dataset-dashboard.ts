@@ -18,7 +18,7 @@ export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {
 		this.requestUpdate('data', oldValue);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box class="uui-text">
 				<h1 class="uui-h2" style="margin-top: var(--uui-size-layout-1);">Dataset Example</h1>
@@ -39,7 +39,7 @@ export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {
 							},
 							{
 								alias: 'items',
-								value: [ 'First Option' , 'Second Option', 'Third Option' ],
+								value: ['First Option', 'Second Option', 'Third Option'],
 							},
 						]}
 						property-editor-ui-alias="Umb.PropertyEditorUi.Dropdown"></umb-property>
@@ -51,7 +51,7 @@ export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

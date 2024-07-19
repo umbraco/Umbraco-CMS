@@ -1,5 +1,4 @@
 import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from './section-picker-modal.token.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
@@ -25,7 +24,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable));
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
@@ -42,14 +41,14 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select sections">
 				<uui-box>
 					${this._sections.map(
 						(item) => html`
 							<uui-menu-item
-								label=${item.meta.label}
+								label=${this.localize.string(item.meta.label)}
 								?selectable=${this._selectable}
 								?selected=${this.#selectionManager.isSelected(item.alias)}
 								@selected=${() => this.#selectionManager.select(item.alias)}

@@ -1,53 +1,35 @@
-import type { UmbDocumentCollectionItemModel } from '../../../types.js';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
+import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-table-column-name')
 export class UmbDocumentTableColumnNameElement extends UmbLitElement implements UmbTableColumnLayoutElement {
-	@state()
-	private _editDocumentPath = '';
-
-	@property({ type: Object, attribute: false })
 	column!: UmbTableColumn;
-
-	@property({ type: Object, attribute: false })
 	item!: UmbTableItem;
 
 	@property({ attribute: false })
-	value!: UmbDocumentCollectionItemModel;
+	value!: UmbEditableDocumentCollectionItemModel;
 
-	constructor() {
-		super();
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('document')
-			.onSetup(() => {
-				return { data: { entityType: 'document', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentPath = routeBuilder({});
-			});
-	}
-
-	#onClick(event: Event) {
-		// TODO: [LK] Review the `stopPropagation` usage, as it causes a page reload.
-		// But we still need a say to prevent the `umb-table` from triggering a selection event.
+	#onClick(event: Event & { target: UUIButtonElement }) {
+		event.preventDefault();
 		event.stopPropagation();
+		window.history.pushState(null, '', event.target.href);
 	}
 
-	render() {
-		return html`<uui-button
-			look="default"
-			color="default"
-			compact
-			href="${this._editDocumentPath}edit/${this.value.unique}"
-			label="${this.value.name}"
-			@click=${this.#onClick}></uui-button>`;
+	override render() {
+		if (!this.value) return nothing;
+		return html`
+			<uui-button
+				compact
+				href=${this.value.editPath}
+				label=${this.value.item.name}
+				@click=${this.#onClick}></uui-button>
+		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-button {
 				text-align: left;

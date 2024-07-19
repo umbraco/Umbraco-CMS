@@ -62,7 +62,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('contentTypeEditor_structure')}>
 				<umb-property-layout alias="Root" label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}>
@@ -81,12 +81,10 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-document-type
-							element-types-only
+							.documentTypesOnly=${true}
 							.selection=${this._allowedContentTypeUniques ?? []}
-							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
-									e.target as UmbInputDocumentTypeElement
-								).selection.map((id, index) => ({
+							@change="${(e: CustomEvent & { target: UmbInputDocumentTypeElement }) => {
+								const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map((id, index) => ({
 									contentType: { unique: id },
 									sortOrder: index,
 								}));
@@ -102,7 +100,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<umb-input-collection-configuration
 							default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
-							.value=${this._collection ?? ''}
+							.value=${this._collection ?? undefined}
 							@change=${(e: CustomEvent) => {
 								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });
@@ -114,7 +112,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

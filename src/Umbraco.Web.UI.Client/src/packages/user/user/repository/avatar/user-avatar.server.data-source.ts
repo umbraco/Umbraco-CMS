@@ -1,5 +1,5 @@
 import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -25,7 +25,7 @@ export class UmbUserAvatarServerDataSource {
 			},
 		};
 
-		return tryExecuteAndNotify(this.#host, UserResource.postUserAvatarById({ id: unique, requestBody }));
+		return tryExecuteAndNotify(this.#host, UserService.postUserAvatarById({ id: unique, requestBody }));
 	}
 
 	/**
@@ -35,6 +35,6 @@ export class UmbUserAvatarServerDataSource {
 	 * @memberof UmbUserServerDataSource
 	 */
 	deleteAvatar(unique: string): Promise<UmbDataSourceErrorResponse> {
-		return tryExecuteAndNotify(this.#host, UserResource.deleteUserAvatarById({ id: unique }));
+		return tryExecuteAndNotify(this.#host, UserService.deleteUserAvatarById({ id: unique }));
 	}
 }

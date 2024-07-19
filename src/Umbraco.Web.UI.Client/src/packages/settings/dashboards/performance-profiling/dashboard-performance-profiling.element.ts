@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, query, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { ProfilingResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ProfilingService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-performance-profiling')
@@ -21,21 +21,21 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 		this._profilingStatus = value;
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this._getProfilingStatus();
 	}
 
 	private async _getProfilingStatus() {
-		const { data } = await tryExecuteAndNotify(this, ProfilingResource.getProfilingStatus());
+		const { data } = await tryExecuteAndNotify(this, ProfilingService.getProfilingStatus());
 
-		if (!data || !data.enabled) return;
-		this._profilingStatus = data.enabled;
+		if (!data) return;
+		this._profilingStatus = data.enabled ?? false;
 	}
 
 	private async _changeProfilingStatus() {
 		const { error } = await tryExecuteAndNotify(
 			this,
-			ProfilingResource.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } }),
+			ProfilingService.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } }),
 		);
 
 		if (error) {
@@ -60,11 +60,11 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 					<h4>${this.localize.term('profiling_reminder')}</h4>
 
 					${unsafeHTML(this.localize.term('profiling_reminderDescription'))}
-			  `
+				`
 			: html` ${unsafeHTML(this.localize.term('profiling_profilerEnabledDescription'))} `;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('profiling_performanceProfiling')}>
 				${typeof this._profilingStatus === 'undefined' ? html`<uui-loader></uui-loader>` : this.renderProfilingStatus()}
@@ -72,7 +72,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

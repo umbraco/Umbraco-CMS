@@ -1,25 +1,20 @@
 import { TimeOptions } from './utils.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_WORKSPACE_MODAL,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
+import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+
+// import of local components
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
-import {
-	UMB_DOCUMENT_WORKSPACE_CONTEXT,
-	type UmbDocumentVariantModel,
-	type UmbDocumentWorkspaceContext,
-} from '@umbraco-cms/backoffice/document';
-import { DocumentVariantStateModel, type DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
-import {
-	type UmbDocumentTypeDetailModel,
-	UmbDocumentTypeDetailRepository,
-} from '@umbraco-cms/backoffice/document-type';
-import { UmbTemplateDetailRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -46,9 +41,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	private _documentTypeIcon?: string;
 
 	@state()
-	private _editDocumentTypePath = '';
-
-	@state()
 	private _allowedTemplates?: UmbDocumentTypeDetailModel['allowedTemplates'];
 
 	/**Template */
@@ -59,49 +51,54 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	private _templateName?: string;
 
 	@state()
-	private _editTemplatePath = '';
-
-	@state()
 	private _variants: UmbDocumentVariantModel[] = [];
 
-	#workspaceContext?: UmbDocumentWorkspaceContext;
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
-	#templateRepository = new UmbTemplateDetailRepository(this);
-	#documentTypeRepository = new UmbDocumentTypeDetailRepository(this);
+	#templateRepository = new UmbTemplateItemRepository(this);
+
+	@state()
+	private _routeBuilder?: UmbModalRouteBuilder;
 
 	constructor() {
 		super();
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('document-type')
-			.onSetup(() => {
-				return { data: { entityType: 'document-type', preset: {} } };
+			.addAdditionalPath(':entityType')
+			.onSetup((params) => {
+				return { data: { entityType: params.entityType, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentTypePath = routeBuilder({});
+				this._routeBuilder = routeBuilder;
 			});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
 			this._documentTypeUnique = this.#workspaceContext.getContentTypeId()!;
-			this.#getData();
-			this._observeContent();
+			this.#observeContent();
 		});
 	}
 
-	async #getData() {
-		const { data } = await this.#documentTypeRepository.requestByUnique(this._documentTypeUnique);
-		this._documentTypeName = data?.name;
-		this._documentTypeIcon = data?.icon;
-		this._allowedTemplates = data?.allowedTemplates;
-	}
-
-	private _observeContent() {
+	#observeContent() {
 		if (!this.#workspaceContext) return;
 
-		this.observe(this.#workspaceContext.urls, (urls) => {
-			this._urls = urls;
-		});
+		this.observe(
+			this.#workspaceContext.structure.ownerContentType,
+			(documentType) => {
+				this._documentTypeName = documentType?.name;
+				this._documentTypeIcon = documentType?.icon;
+				this._allowedTemplates = documentType?.allowedTemplates;
+			},
+			'_documentType',
+		);
+
+		this.observe(
+			this.#workspaceContext.urls,
+			(urls) => {
+				this._urls = urls;
+			},
+			'_documentUrls',
+		);
 
 		this.observe(
 			this.#workspaceContext.unique,
@@ -117,17 +114,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				this._templateUnique = templateUnique!;
 				if (!templateUnique) return;
 
-				const { data } = await this.#templateRepository.requestByUnique(templateUnique!);
-				this._templateName = data?.name;
-
-				new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-					.addAdditionalPath('template')
-					.onSetup(() => {
-						return { data: { entityType: 'template', preset: {} } };
-					})
-					.observeRouteBuilder((routeBuilder) => {
-						this._editTemplatePath = routeBuilder({});
-					});
+				const { data } = await this.#templateRepository.requestItems([templateUnique]);
+				if (!data?.length) return;
+				this._templateName = data[0].name;
 			},
 			'_templateUnique',
 		);
@@ -144,9 +133,12 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#observeVariants() {
 		// Find the oldest variant
-		const oldestVariant = this._variants
-			.filter((v) => !!v.createDate)
-			.reduce((prev, current) => (prev.createDate! < current.createDate! ? prev : current));
+		const oldestVariant =
+			this._variants.length > 0
+				? this._variants
+						.filter((v) => !!v.createDate)
+						.reduce((prev, current) => (prev.createDate! < current.createDate! ? prev : current))
+				: null;
 
 		this._createDate = oldestVariant?.createDate ?? new Date().toISOString();
 	}
@@ -155,41 +147,47 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		return repeat(
 			this._variants,
 			(variant) => `${variant.culture}_${variant.segment}`,
-			(variant) =>
-				html`<div>
-					<span class="variant-name">${variant.culture ?? this._invariantCulture}</span> ${this.#renderStateTag(
-						variant,
-					)}
-				</div>`,
+			(variant) => html`
+				<div class="variant-state">
+					<span>${variant.culture ?? this._invariantCulture}</span>
+					${this.#renderStateTag(variant)}
+				</div>
+			`,
 		);
 	}
 
 	#renderStateTag(variant: UmbDocumentVariantModel) {
 		switch (variant.state) {
 			case DocumentVariantStateModel.DRAFT:
-				return html`<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}>
-					${this.localize.term('content_unpublished')}
-				</uui-tag>`;
+				return html`
+					<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}>
+						${this.localize.term('content_unpublished')}
+					</uui-tag>
+				`;
 			case DocumentVariantStateModel.PUBLISHED:
-				return html`<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}>
-					${this.localize.term('content_published')}
-				</uui-tag>`;
+				return html`
+					<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}>
+						${this.localize.term('content_published')}
+					</uui-tag>
+				`;
 			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
-				return html`<uui-tag
-					color="positive"
-					look="primary"
-					label=${this.localize.term('content_publishedPendingChanges')}>
-					${this.localize.term('content_published')}
-				</uui-tag>`;
+				return html`
+					<uui-tag color="positive" look="primary" label=${this.localize.term('content_publishedPendingChanges')}>
+						${this.localize.term('content_published')}
+					</uui-tag>
+				`;
 			default:
-				return html`<uui-tag look="primary" label=${this.localize.term('content_published')}>
-					${this.localize.term('content_published')}
-				</uui-tag>`;
+				return html`
+					<uui-tag look="primary" label=${this.localize.term('content_published')}>
+						${this.localize.term('content_published')}
+					</uui-tag>
+				`;
 		}
 	}
 
-	render() {
-		return html`<div class="container">
+	override render() {
+		return html`
+			<div class="container">
 				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
 					<div id="link-section">${this.#renderLinksSection()}</div>
 				</uui-box>
@@ -201,8 +199,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 					.documentUnique=${this._documentUnique}></umb-document-workspace-view-info-history>
 			</div>
 			<div class="container">
-				<uui-box headline="General" id="general-section">${this.#renderGeneralSection()}</uui-box>
-			</div>`;
+				<uui-box headline=${this.localize.term('general_general')} id="general-section"
+					>${this.#renderGeneralSection()}</uui-box
+				>
+			</div>
+		`;
 	}
 
 	#renderLinksSection() {
@@ -222,18 +223,23 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				)}
 			`;
 		} else {
-			return html`<div class="link-item">
-				<span class="link-language">${this._invariantCulture}</span>
-				<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
-			</div>`;
+			return html`
+				<div class="link-item">
+					<span class="link-language">${this._invariantCulture}</span>
+					<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
+				</div>
+			`;
 		}
 	}
 
 	#renderGeneralSection() {
+		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
+		const editTemplatePath = this._routeBuilder?.({ entityType: 'template' }) ?? '';
+
 		return html`
 			<div class="general-item">
 				<strong><umb-localize key="content_publishStatus">Publication Status</umb-localize></strong>
-				<span> ${this.#renderVariantStates()} </span>
+				<umb-stack look="compact">${this.#renderVariantStates()}</umb-stack>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate">Created</umb-localize></strong>
@@ -245,7 +251,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
-					href=${this._editDocumentTypePath + 'edit/' + this._documentTypeUnique}
+					href=${editDocumentTypePath + 'edit/' + this._documentTypeUnique}
 					name=${ifDefined(this._documentTypeName)}>
 					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
 				</uui-ref-node-document-type>
@@ -253,18 +259,25 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="template_template">Template</umb-localize></strong>
 				${this._templateUnique
-					? html`<uui-ref-node
-							standalone
-							name=${ifDefined(this._templateName)}
-							href=${this._editTemplatePath + 'edit/' + this._templateUnique}>
-							<uui-icon slot="icon" name="icon-newspaper"></uui-icon>
-							<uui-action-bar slot="actions">
-								<uui-button label=${this.localize.term('general_edit')} @click=${this.#openTemplatePicker}></uui-button>
-							</uui-action-bar>
-						</uui-ref-node>`
-					: html`<uui-button
-							label=${this.localize.term('general_edit')}
-							@click=${this.#openTemplatePicker}></uui-button>`}
+					? html`
+							<uui-ref-node
+								standalone
+								name=${ifDefined(this._templateName)}
+								href=${editTemplatePath + 'edit/' + this._templateUnique}>
+								<uui-icon slot="icon" name="icon-newspaper"></uui-icon>
+								<uui-action-bar slot="actions">
+									<uui-button
+										label=${this.localize.term('general_choose')}
+										@click=${this.#openTemplatePicker}></uui-button>
+								</uui-action-bar>
+							</uui-ref-node>
+						`
+					: html`
+							<uui-button
+								label=${this.localize.term('general_choose')}
+								look="placeholder"
+								@click=${this.#openTemplatePicker}></uui-button>
+						`}
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
@@ -277,7 +290,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modal = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
-				hideTreeRoot: true,
 				multiple: false,
 				pickableFilter: (template) =>
 					this._allowedTemplates?.find((allowed) => template.unique === allowed.id) ? true : false,
@@ -298,7 +310,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		this.#workspaceContext?.setTemplate(templateUnique);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -331,9 +343,13 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				margin-bottom: var(--uui-size-space-6);
 			}
 
-			.variant-name {
+			.variant-state {
+				display: flex;
+				gap: var(--uui-size-space-4);
+			}
+
+			.variant-state > span {
 				color: var(--uui-color-divider-emphasis);
-				padding-right: var(--uui-size-space-2);
 			}
 
 			// Link section

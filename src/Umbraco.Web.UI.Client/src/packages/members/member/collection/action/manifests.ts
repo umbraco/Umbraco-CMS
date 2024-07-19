@@ -8,7 +8,7 @@ export const createManifest: ManifestTypes = {
 	alias: 'Umb.CollectionAction.Member.Create',
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 		href: 'section/member-management/workspace/member/create/member-type-1-id', // TODO: remove hardcoded member type id
 	},
 	js: () => import('./create-member-collection-action.element.js'),
@@ -21,4 +21,4 @@ export const createManifest: ManifestTypes = {
 	// element: () => import('./create-member-collection-action.element.js'),
 };
 
-export const manifests = [createManifest];
+export const manifests: Array<ManifestTypes> = [createManifest];

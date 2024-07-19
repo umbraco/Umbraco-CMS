@@ -1,6 +1,5 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_MEDIA_TYPE_STRUCTURE_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Structure';
+import { UMB_MEDIA_TYPE_STRUCTURE_REPOSITORY_ALIAS } from './constants.js';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const structureRepository: ManifestRepository = {
 	type: 'repository',
@@ -9,4 +8,4 @@ const structureRepository: ManifestRepository = {
 	api: () => import('./media-type-structure.repository.js'),
 };
 
-export const manifests = [structureRepository];
+export const manifests: Array<ManifestTypes> = [structureRepository];

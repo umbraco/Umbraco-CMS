@@ -5,6 +5,7 @@ export interface UmbConfirmModalData {
 	headline: string;
 	content: TemplateResult | string;
 	color?: 'positive' | 'danger';
+	cancelLabel?: string;
 	confirmLabel?: string;
 }
 

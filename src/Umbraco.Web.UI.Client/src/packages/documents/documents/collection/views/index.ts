@@ -1,23 +1,25 @@
 import type { UmbDocumentCollectionItemModel } from '../types.js';
+import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
 export { UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS, UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './manifests.js';
 
-export function getPropertyValueByAlias(sortOrder: number, item: UmbDocumentCollectionItemModel, alias: string) {
+export function getPropertyValueByAlias(item: UmbDocumentCollectionItemModel, alias: string) {
 	switch (alias) {
+		case 'contentTypeAlias':
+			return item.contentTypeAlias;
 		case 'createDate':
 			return item.createDate.toLocaleString();
 		case 'creator':
-			return item.creator;
-		case 'entityName':
-			return item.name;
-		case 'entityState':
-			return item.state.replace(/([A-Z])/g, ' $1');
 		case 'owner':
 			return item.creator;
+		case 'name':
+			return item.name;
+		case 'state':
+			return fromCamelCase(item.state);
 		case 'published':
 			return item.state !== 'Draft' ? 'True' : 'False';
 		case 'sortOrder':
-			return sortOrder;
+			return item.sortOrder;
 		case 'updateDate':
 			return item.updateDate.toLocaleString();
 		case 'updater':

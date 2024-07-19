@@ -22,7 +22,7 @@ export const plugins: PluginOption[] = [
 				dest: 'umbraco/backoffice/css',
 			},
 			{
-				src: 'src/assets/*.svg',
+				src: 'src/assets/*',
 				dest: 'umbraco/backoffice/assets',
 			},
 			{

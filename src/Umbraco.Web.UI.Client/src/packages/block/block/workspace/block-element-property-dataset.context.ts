@@ -1,5 +1,5 @@
-import type { UmbBlockElementManager } from './block-element-manager.js';
 import { UMB_BLOCK_ELEMENT_PROPERTY_DATASET_CONTEXT } from './block-element-property-dataset.context-token.js';
+import type { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

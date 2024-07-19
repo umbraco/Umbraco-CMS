@@ -34,17 +34,17 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 				'userPermissionLabels',
 			);
 		} else {
-			this.removeControllerByAlias('userPermissionLabels');
+			this.removeUmbControllerByAlias('userPermissionLabels');
 		}
 	}
 
 	#setUserPermissionLabels(manifests: Array<ManifestEntityUserPermission>) {
 		this.#userPermissionLabels = manifests.map((manifest) =>
-			manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label ?? '',
+			manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name,
 		);
 	}
 
-	protected renderDetail() {
+	protected override renderDetail() {
 		const details: string[] = [];
 
 		if (this.#userPermissionLabels.length > 0) {
@@ -58,7 +58,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		return html`<small id="detail">${details.join(' | ')}<slot name="detail"></slot></small>`;
 	}
 
-	static styles = [...UUIRefNodeElement.styles];
+	static override styles = [...UUIRefNodeElement.styles];
 }
 
 declare global {

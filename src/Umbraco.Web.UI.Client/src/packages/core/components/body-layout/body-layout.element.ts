@@ -56,7 +56,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (this.headerTransparent) {
 			requestAnimationFrame(() => {
@@ -65,7 +65,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		}
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._scrollContainer?.removeEventListener('scroll', this.#onScroll);
 	}
@@ -75,7 +75,11 @@ export class UmbBodyLayoutElement extends LitElement {
 		this.toggleAttribute('scrolling', this._scrollContainer.scrollTop > 0);
 	};
 
-	render() {
+	#setSlotVisibility(target: HTMLElement, hasChildren: boolean) {
+		target.style.display = hasChildren ? 'flex' : 'none';
+	}
+
+	override render() {
 		return html`
 			<div
 				id="header"
@@ -92,18 +96,21 @@ export class UmbBodyLayoutElement extends LitElement {
 					name="header"
 					@slotchange=${(e: Event) => {
 						this._headerSlotHasChildren = this.#hasNodes(e);
+						this.#setSlotVisibility(e.target as HTMLElement, this._headerSlotHasChildren);
 					}}></slot>
 				<slot
 					id="navigation-slot"
 					name="navigation"
 					@slotchange=${(e: Event) => {
-						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
+						this._navigationSlotHasChildren = this.#hasNodes(e);
+						this.#setSlotVisibility(e.target as HTMLElement, this._navigationSlotHasChildren);
 					}}></slot>
 				<slot
 					id="action-menu-slot"
 					name="action-menu"
 					@slotchange=${(e: Event) => {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
+						this.#setSlotVisibility(e.target as HTMLElement, this._actionsMenuSlotHasChildren);
 					}}></slot>
 			</div>
 
@@ -129,12 +136,12 @@ export class UmbBodyLayoutElement extends LitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
 				display: flex;
-				background-color: var(--uui-color-background);
+				background-color: var(--umb-body-layout-color-background, var(--uui-color-background));
 				width: 100%;
 				height: 100%;
 				flex-direction: column;
@@ -185,18 +192,16 @@ export class UmbBodyLayoutElement extends LitElement {
 			}
 
 			#header-slot,
-			#tabs-slot,
 			#action-menu-slot,
 			#navigation-slot {
-				display: flex;
+				display: none;
 				height: 100%;
 				align-items: center;
 				box-sizing: border-box;
 				min-width: 0;
 			}
 
-			#navigation-slot,
-			#tabs-slot {
+			#navigation-slot {
 				margin-left: auto;
 			}
 

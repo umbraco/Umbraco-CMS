@@ -1,25 +1,40 @@
 import type { UmbUserEntityType } from './entity.js';
-import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import {
+	type UserConfigurationResponseModel,
+	UserStateModel,
+	type UserTwoFactorProviderModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbUserStateEnum = UserStateModel;
 export const UmbUserStateEnum = UserStateModel;
 
-export interface UmbUserDetailModel {
-	entityType: UmbUserEntityType;
-	email: string;
-	userName: string;
-	name: string;
-	userGroupUniques: Array<string>;
-	unique: string;
-	languageIsoCode: string | null;
-	documentStartNodeUniques: Array<string>;
-	mediaStartNodeUniques: Array<string>;
+export interface UmbUserDetailModel extends UmbUserStartNodesModel {
 	avatarUrls: Array<string>;
-	state: UmbUserStateEnum | null;
-	failedLoginAttempts: number;
 	createDate: string | null;
-	updateDate: string | null;
-	lastLoginDate: string | null;
+	email: string;
+	entityType: UmbUserEntityType;
+	failedLoginAttempts: number;
+	isAdmin: boolean;
+	languageIsoCode: string | null;
 	lastLockoutDate: string | null;
+	lastLoginDate: string | null;
 	lastPasswordChangeDate: string | null;
+	name: string;
+	state: UmbUserStateEnum | null;
+	unique: string;
+	updateDate: string | null;
+	userGroupUniques: Array<UmbReferenceByUnique>;
+	userName: string;
 }
+
+export interface UmbUserStartNodesModel {
+	documentStartNodeUniques: Array<UmbReferenceByUnique>;
+	hasDocumentRootAccess: boolean;
+	hasMediaRootAccess: boolean;
+	mediaStartNodeUniques: Array<UmbReferenceByUnique>;
+}
+
+export type UmbUserMfaProviderModel = UserTwoFactorProviderModel;
+
+export type UmbUserConfigurationModel = UserConfigurationResponseModel;

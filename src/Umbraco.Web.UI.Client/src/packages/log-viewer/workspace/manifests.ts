@@ -1,5 +1,6 @@
 import type {
 	ManifestModal,
+	ManifestTypes,
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
@@ -44,7 +45,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		element: () => import('./views/search/index.js'),
 		weight: 200,
 		meta: {
-			label: 'Search',
+			label: '#general_search',
 			pathname: 'search',
 			icon: 'icon-search',
 		},
@@ -68,4 +69,4 @@ const modals: Array<ManifestModal> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...modals];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions, ...modals];

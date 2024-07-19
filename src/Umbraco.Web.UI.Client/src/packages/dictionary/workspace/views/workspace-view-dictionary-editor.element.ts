@@ -18,7 +18,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 
 	#workspaceContext!: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
 
-	async connectedCallback() {
+	override async connectedCallback() {
 		super.connectedCallback();
 
 		this.consumeContext(UMB_DICTIONARY_WORKSPACE_CONTEXT, (_instance) => {
@@ -27,7 +27,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const { data } = await this.#languageCollectionRepository.requestCollection({});
 		if (data) {
 			this._languages = data.items;
@@ -58,14 +58,14 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	#onTextareaChange(e: Event) {
 		if (e instanceof UUITextareaEvent) {
 			const target = e.composedPath()[0] as UUITextareaElement;
-			const translation = target.value.toString();
+			const translation = (target.value as string).toString();
 			const isoCode = target.getAttribute('name')!;
 
 			this.#workspaceContext.setPropertyValue(isoCode, translation);
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				${unsafeHTML(this.localize.term('dictionaryItem_description', this._dictionary?.name || 'unnamed'))}
@@ -78,7 +78,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

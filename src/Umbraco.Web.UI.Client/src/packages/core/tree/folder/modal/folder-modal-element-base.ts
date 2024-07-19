@@ -4,6 +4,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbFolderModel, UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 export abstract class UmbFolderModalElementBase<
 	FolderModalDataType extends { folderRepositoryAlias: string },
@@ -14,7 +15,7 @@ export abstract class UmbFolderModalElementBase<
 
 	folderRepository?: UmbFolderRepository;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#observeRepository();
 	}
@@ -54,28 +55,34 @@ export abstract class UmbFolderModalElementBase<
 		this.onFormSubmit({ name });
 	}
 
-	render() {
+	override render() {
 		return html`
-			<umb-body-layout headline=${this._isNew ? 'Create Folder' : 'Update Folder'}>
+			<umb-body-layout headline=${this.localize.term(this._isNew ? 'actions_folderCreate' : 'actions_folderRename')}>
 				<uui-box>
 					<uui-form>
 						<form id="FolderForm" @submit="${this.#onSubmit}">
 							<uui-form-layout-item>
-								<uui-label id="nameLabel" for="name" slot="label" required>Folder name</uui-label>
+								<uui-label id="nameLabel" for="name" slot="label" required>
+									<umb-localize key="create_enterFolderName">Enter folder name</umb-localize>
+								</uui-label>
 								<uui-input
 									type="text"
 									id="name"
 									name="name"
-									placeholder="Enter folder name..."
+									.label=${this.localize.term('create_enterFolderName')}
 									.value="${this.value?.folder?.name || ''}"
 									required
-									required-message="Folder name is required"></uui-input>
+									${umbFocus()}></uui-input>
 							</uui-form-layout-item>
 						</form>
 					</uui-form>
 				</uui-box>
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('buttons_confirmActionCancel')}
+					@click="${this._rejectModal}"></uui-button>
 				<uui-button
 					form="FolderForm"
 					type="submit"
@@ -83,12 +90,12 @@ export abstract class UmbFolderModalElementBase<
 					id="confirm"
 					color="positive"
 					look="primary"
-					label=${this._isNew ? 'Create Folder' : 'Update Folder'}></uui-button>
+					label=${this.localize.term(this._isNew ? 'actions_folderCreate' : 'actions_folderRename')}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#name {

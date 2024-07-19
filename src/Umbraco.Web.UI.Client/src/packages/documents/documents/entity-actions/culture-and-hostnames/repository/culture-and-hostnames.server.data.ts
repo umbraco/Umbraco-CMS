@@ -1,5 +1,5 @@
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
-import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UpdateDomainsRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -28,17 +28,17 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdDomains({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.getDocumentByIdDomains({ id: unique }));
 	}
 
 	/**
 	 * Updates Culture and Hostnames for the given Document unique
 	 * @param {string} unique
-	 * @param {DomainsPresentationModelBaseModel} data
+	 * @param {UpdateDomainsRequestModel} data
 	 * @memberof UmbDocumentCultureAndHostnamesServerDataSource
 	 */
-	async update(unique: string, data: DomainsPresentationModelBaseModel) {
+	async update(unique: string, data: UpdateDomainsRequestModel) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdDomains({ id: unique, requestBody: data }));
+		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdDomains({ id: unique, requestBody: data }));
 	}
 }

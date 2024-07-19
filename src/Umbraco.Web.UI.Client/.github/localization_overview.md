@@ -201,6 +201,7 @@ Then we need your help! With Bellissima we added new localization keys, and we s
 - documentationHeader
 - documentationDescription
 - communityHeader
+- communityDescription
 - trainingHeader
 - trainingDescription
 - supportHeader

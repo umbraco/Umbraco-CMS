@@ -1,5 +1,4 @@
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UmbPartialViewCreateOptionsEntityAction } from './create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -8,19 +7,19 @@ export const manifests: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.PartialView.CreateOptions',
 		name: 'Partial View Create Options Entity Action',
-		weight: 1000,
-		api: UmbPartialViewCreateOptionsEntityAction,
+		weight: 1200,
+		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create...',
+			label: '#actions_create',
 		},
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.PartialView.CreateOptions',
 		name: 'Partial View Create Options Modal',
-		js: () => import('./options-modal/partial-view-create-options-modal.element.js'),
+		element: () => import('./options-modal/partial-view-create-options-modal.element.js'),
 	},
 	{
 		type: 'modal',

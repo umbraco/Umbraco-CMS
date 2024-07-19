@@ -1,87 +1,63 @@
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
+import type { UmbMediaCollectionContext } from './media-collection.context.js';
+import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
+import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
+import type { UmbProgressEvent } from '@umbraco-cms/backoffice/event';
 
 import './media-collection-toolbar.element.js';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
+	#mediaCollection?: UmbMediaCollectionContext;
+
+	@state()
+	private _progress = -1;
+
+	@state()
+	private _unique: string | null = null;
+
 	constructor() {
 		super();
-		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
-		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
-		document.addEventListener('drop', this.#handleDrop.bind(this));
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (instance) => {
+			this.#mediaCollection = instance;
+		});
+		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
+			this.observe(instance.unique, (unique) => {
+				this._unique = unique ?? null;
+			});
+		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
-		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
-		document.removeEventListener('drop', this.#handleDrop.bind(this));
+	async #onChange() {
+		this._progress = -1;
+		this.#mediaCollection?.requestCollection();
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: this._unique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+			unique: this._unique,
+		});
+		eventContext.dispatchEvent(event);
 	}
 
-	#handleDragEnter() {
-		this.toggleAttribute('dragging', true);
+	#onProgress(event: UmbProgressEvent) {
+		this._progress = event.progress;
 	}
 
-	#handleDragLeave() {
-		this.toggleAttribute('dragging', false);
-	}
-
-	#handleDrop(event: DragEvent) {
-		event.preventDefault();
-		console.log('#handleDrop', event);
-		this.toggleAttribute('dragging', false);
-	}
-
-	#onFileChange(event: Event) {
-		console.log('#onFileChange', event);
-	}
-
-	protected renderToolbar() {
+	protected override renderToolbar() {
 		return html`
 			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
-			<!-- TODO: Add the Media Upload dropzone component in here. [LK] -->
-			<uui-file-dropzone
-				id="dropzone"
-				multiple
-				@file-change=${this.#onFileChange}
-				label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"
-				accept=""></uui-file-dropzone>
+			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
+			<umb-dropzone
+				.parentUnique=${this._unique}
+				@change=${this.#onChange}
+				@progress=${this.#onProgress}></umb-dropzone>
 		`;
 	}
-
-	static styles = [
-		css`
-			:host([dragging]) #dropzone {
-				opacity: 1;
-				pointer-events: all;
-			}
-			[dropzone] {
-				opacity: 0;
-			}
-			#dropzone {
-				opacity: 0;
-				pointer-events: none;
-				display: block;
-				position: absolute;
-				inset: 0px;
-				z-index: 100;
-				backdrop-filter: opacity(1); /* Removes the built in blur effect */
-				border-radius: var(--uui-border-radius);
-				overflow: clip;
-				border: 1px solid var(--uui-color-focus);
-			}
-			#dropzone:after {
-				content: '';
-				display: block;
-				position: absolute;
-				inset: 0;
-				border-radius: var(--uui-border-radius);
-				background-color: var(--uui-color-focus);
-				opacity: 0.2;
-			}
-		`,
-	];
 }
 
 export default UmbMediaCollectionElement;

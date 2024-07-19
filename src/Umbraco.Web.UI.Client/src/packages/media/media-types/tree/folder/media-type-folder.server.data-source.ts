@@ -1,5 +1,5 @@
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
-import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -32,7 +32,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.getMediaTypeFolderById({
+			MediaTypeService.getMediaTypeFolderById({
 				id: unique,
 			}),
 		);
@@ -67,7 +67,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.postMediaTypeFolder({
+			MediaTypeService.postMediaTypeFolder({
 				requestBody,
 			}),
 		);
@@ -91,7 +91,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.putMediaTypeFolderById({
+			MediaTypeService.putMediaTypeFolderById({
 				id: args.unique,
 				requestBody: { name: args.name },
 			}),
@@ -114,7 +114,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.deleteMediaTypeFolderById({
+			MediaTypeService.deleteMediaTypeFolderById({
 				id: unique,
 			}),
 		);

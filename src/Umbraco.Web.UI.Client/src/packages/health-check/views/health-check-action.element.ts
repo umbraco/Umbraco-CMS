@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { HealthCheckActionRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -19,7 +19,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			HealthCheckResource.postHealthCheckExecuteAction({ requestBody: this.action }),
+			HealthCheckService.postHealthCheckExecuteAction({ requestBody: this.action }),
 		);
 
 		if (error) {
@@ -31,7 +31,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('action-executed'));
 	}
 
-	render() {
+	override render() {
 		return html` <div class="action uui-text">
 			<p>${this.action.description || html`<span class="no-description">This action has no description</span>`}</p>
 			<uui-form>
@@ -95,7 +95,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		return nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

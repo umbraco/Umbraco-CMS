@@ -1,6 +1,7 @@
 import { extractUmbColorVariable } from '../../resources/extractUmbColorVariable.function.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined, css, styleMap } from '@umbraco-cms/backoffice/external/lit';
+import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -10,42 +11,63 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-icon')
 export class UmbIconElement extends UmbLitElement {
+	#color?: string;
+	#fallbackColor?: string;
+
 	@state()
 	private _icon?: string;
 
 	@state()
-	private _color?: string;
+	private _style: StyleInfo = {};
 
+	/**
+	 * Color alias or a color code directly.\
+	 * If a color has been set via the name property, this property will override it.
+	 * */
 	@property({ type: String })
 	public set color(value: string) {
-		if (!value) return;
-		this.#setColorStyle(value);
+		this.#color = value;
+		this.#updateColorStyle();
 	}
-	public get color(): string {
-		return this._color ?? '';
-	}
-
-	#setColorStyle(value: string) {
-		const alias = value.replace('color-', '');
-		const variable = extractUmbColorVariable(alias);
-		this._color = alias ? (variable ? `--uui-icon-color: var(${variable})` : `--uui-icon-color: ${alias}`) : undefined;
+	public get color(): string | undefined {
+		return this.#color || this.#fallbackColor;
 	}
 
+	/**
+	 * The icon name. Can be appended with a color.\
+	 * Example **icon-heart color-red**
+	 */
 	@property({ type: String })
 	public set name(value: string | undefined) {
-		const [icon, alias] = value ? value.split(' ') : [];
-		if (alias) this.#setColorStyle(alias);
+		const [icon, color] = value ? value.split(' ') : [];
+		this.#fallbackColor = color;
 		this._icon = icon;
+		this.#updateColorStyle();
 	}
 	public get name(): string | undefined {
 		return this._icon;
 	}
 
-	render() {
-		return html`<uui-icon name=${ifDefined(this._icon)} style=${ifDefined(this._color)}></uui-icon>`;
+	#updateColorStyle() {
+		const value = this.#color || this.#fallbackColor;
+
+		if (!value) {
+			this._style = { '--uui-icon-color': 'inherit' };
+			return;
+		}
+
+		const color = value.replace('color-', '');
+		const variable = extractUmbColorVariable(color);
+		const styling = variable ? `var(${variable})` : color;
+
+		this._style = { '--uui-icon-color': styling };
 	}
 
-	static styles = [
+	override render() {
+		return html`<uui-icon name=${ifDefined(this._icon)} style=${styleMap(this._style)}></uui-icon>`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

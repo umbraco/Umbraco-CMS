@@ -1,4 +1,4 @@
-import type { ManifestSectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionsViews: Array<ManifestSectionView> = [
 	{
@@ -8,7 +8,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		js: () => import('./member-group-section-view.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Member Groups',
+			label: '#treeHeaders_memberGroups',
 			pathname: 'member-groups',
 			icon: 'icon-users',
 		},
@@ -21,4 +21,4 @@ const sectionsViews: Array<ManifestSectionView> = [
 	},
 ];
 
-export const manifests = [...sectionsViews];
+export const manifests: Array<ManifestTypes> = [...sectionsViews];

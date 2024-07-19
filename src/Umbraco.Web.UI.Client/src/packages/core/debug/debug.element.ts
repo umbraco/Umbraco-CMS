@@ -1,23 +1,20 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-
-import type { DebugContextData, DebugContextItemData } from '@umbraco-cms/backoffice/context-api';
+import { css, customElement, html, map, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { contextData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbDebugContextData, UmbDebugContextItemData } from '@umbraco-cms/backoffice/context-api';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
 export class UmbDebugElement extends UmbLitElement {
-	@property({ reflect: true, type: Boolean })
+	@property({ type: Boolean })
 	visible = false;
 
-	@property({ reflect: true, type: Boolean })
+	@property({ type: Boolean })
 	dialog = false;
 
 	@state()
-	contextData = Array<DebugContextData>();
+	private _contextData = Array<UmbDebugContextData>();
 
 	@state()
 	private _debugPaneOpen = false;
@@ -31,156 +28,144 @@ export class UmbDebugElement extends UmbLitElement {
 		});
 	}
 
-	render() {
-		if (this.visible) {
-			return this.dialog ? this._renderDialog() : this._renderPanel();
-		} else {
-			return nothing;
-		}
-	}
-
-	private _update() {
-		// Dispatch it
+	#update() {
 		this.dispatchEvent(
 			new UmbContextDebugRequest((contexts: Map<any, any>) => {
 				// The Contexts are collected
 				// When travelling up through the DOM from this element
 				// to the root of <umb-app> which then uses the callback prop
-				// of the this event tha has been raised to assign the contexts
+				// of this event that has been raised to assign the contexts
 				// back to this property of the WebComponent
 
 				// Massage the data into a simplier array of objects
-				// From a function in the context-api '
-				this.contextData = contextData(contexts);
-				this.requestUpdate('contextData');
+				// from a function in the context-api.
+				this._contextData = contextData(contexts);
+				this.requestUpdate('_contextData');
 			}),
 		);
 	}
 
-	private _toggleDebugPane() {
+	#toggleDebugPane() {
 		this._debugPaneOpen = !this._debugPaneOpen;
 		if (this._debugPaneOpen) {
-			this._update();
+			this.#update();
 		}
 	}
 
-	private _openDialog() {
+	#openDialog() {
+		this.#update();
+
 		this._modalContext?.open(this, UMB_CONTEXT_DEBUGGER_MODAL, {
 			data: {
-				content: html`${this._renderContextAliases()}`,
+				content: this.#renderContextAliases(),
 			},
 		});
 	}
 
-	private _renderDialog() {
-		return html` <div id="container">
-			<uui-badge color="danger" look="primary" attention @click="${this._openDialog}">
-				<uui-icon name="icon-bug"></uui-icon> Debug
-			</uui-badge>
-		</div>`;
+	override render() {
+		if (!this.visible) return nothing;
+		return this.dialog ? this.#renderDialog() : this.#renderPanel();
 	}
 
-	private _renderPanel() {
-		return html` <div id="container">
-			<uui-button color="danger" look="primary" @click="${this._toggleDebugPane}">
-				<uui-icon name="icon-bug"></uui-icon>
-				Debug
-			</uui-button>
-
-			<div class="events ${this._debugPaneOpen ? 'open' : ''}">
-				<div>
-					<ul>
-						${this._renderContextAliases()}
-					</ul>
-				</div>
+	#renderDialog() {
+		return html`
+			<div>
+				<uui-badge color="danger" look="primary" @click=${this.#openDialog}>
+					<uui-icon name="icon-bug"></uui-icon>
+					<span>Debug</span>
+				</uui-badge>
 			</div>
+		`;
+	}
+
+	#renderPanel() {
+		return html`
+			<div id="container">
+				<uui-button color="danger" look="primary" @click=${this.#toggleDebugPane}>
+					<uui-icon name="icon-bug"></uui-icon>
+					<span>Debug</span>
+				</uui-button>
+				${when(this._debugPaneOpen, () => this.#renderContextAliases())}
+			</div>
+		`;
+	}
+
+	#renderContextAliases() {
+		return html`<div class="events">
+			${map(this._contextData, (context) => {
+				return html`
+					<details>
+						<summary><strong>${context.alias}</strong></summary>
+						${this.#renderInstance(context.data)}
+					</details>
+				`;
+			})}
 		</div>`;
 	}
 
-	private _renderContextAliases() {
-		return repeat(
-			this.contextData,
-			(contextData) => contextData.alias,
-			(contextData) => {
-				return html` <li>
-					Context: <strong>${contextData.alias}</strong>
-					<em>(${contextData.type})</em>
-					<ul>
-						${this._renderInstance(contextData.data)}
-					</ul>
-				</li>`;
-			},
-		);
-	}
-
-	private _renderInstance(instance: DebugContextItemData) {
-		const instanceTemplates: TemplateResult[] = [];
-
-		if (instance.type === 'function') {
-			return instanceTemplates.push(html`<li>Callable Function</li>`);
-		} else if (instance.type === 'object') {
-			if (instance.methods?.length) {
-				instanceTemplates.push(html`
-					<li>
-						<strong>Methods</strong>
-						<ul>
-							${instance.methods?.map((methodName) => html`<li>${methodName}</li>`)}
-						</ul>
-					</li>
-				`);
+	#renderInstance(instance: UmbDebugContextItemData) {
+		switch (instance.type) {
+			case 'function': {
+				return html`<h3>Callable Function</h3>`;
 			}
 
-			const props: TemplateResult[] = [];
-			instance.properties?.forEach((property) => {
-				switch (property.type) {
-					case 'string':
-					case 'number':
-					case 'boolean':
-					case 'object':
-						props.push(html`<li>${property.key} <em>(${property.type})</em> = ${property.value}</li>`);
-						break;
+			case 'object': {
+				return html`
+					<details>
+						<summary>Methods</summary>
+						<ul>
+							${map(instance.methods, (methodName) => html`<li>${methodName}</li>`)}
+						</ul>
+					</details>
 
-					default:
-						props.push(html`<li>${property.key} <em>(${property.type})</em></li>`);
-						break;
-				}
-			});
+					<details>
+						<summary>Properties</summary>
+						<ul>
+							${map(instance.properties, (property) => {
+								switch (property.type) {
+									case 'string':
+									case 'number':
+									case 'boolean':
+									case 'object':
+										return html`<li>${property.key} <em>(${property.type})</em> = ${property.value}</li>`;
 
-			instanceTemplates.push(html`
-				<li>
-					<strong>Properties</strong>
-					<ul>
-						${props}
-					</ul>
-				</li>
-			`);
-		} else if (instance.type === 'primitive') {
-			instanceTemplates.push(html`<li>Context is a primitive with value: ${instance.value}</li>`);
+									default:
+										return html`<li>${property.key} <em>(${property.type})</em></li>`;
+								}
+							})}
+						</ul>
+					</details>
+				`;
+			}
+
+			case 'primitive': {
+				return html`<p>Context is a primitive with value: ${instance.value}</p>`;
+			}
+
+			default: {
+				return html`<p>Unknown type: ${instance.type}</p>`;
+			}
 		}
-
-		return instanceTemplates;
 	}
 
-	static styles = [
-		UmbTextStyles,
+	static override styles = [
 		css`
 			:host {
 				float: right;
+				font-family: monospace;
+				position: relative;
+				z-index: 10000;
 			}
 
 			#container {
-				display: block;
-				font-family: monospace;
-
-				z-index: 10000;
-
-				position: relative;
-				width: 100%;
-				padding: 10px 0;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
 			}
 
 			uui-badge {
 				cursor: pointer;
+				gap: 0.5rem;
 			}
 
 			uui-icon {
@@ -190,22 +175,19 @@ export class UmbDebugElement extends UmbLitElement {
 			.events {
 				background-color: var(--uui-color-danger);
 				color: var(--uui-color-selected-contrast);
-				max-height: 0;
-				transition: max-height 0.25s ease-out;
-				overflow: hidden;
+				padding: 1rem;
 			}
 
-			.events.open {
-				max-height: 500px;
-				overflow: auto;
+			summary {
+				cursor: pointer;
 			}
 
-			.events > div {
-				padding: 10px;
+			details > details {
+				margin-left: 1rem;
 			}
 
-			h4 {
-				margin: 0;
+			ul {
+				margin-top: 0;
 			}
 		`,
 	];

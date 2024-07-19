@@ -2,7 +2,7 @@ import type {
 	UmbMediaCaptionAltTextModalData,
 	UmbMediaCaptionAltTextModalValue,
 } from './media-caption-alt-text-modal.token.js';
-import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import '@umbraco-cms/backoffice/block-type';
 import { UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';
@@ -16,7 +16,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 	#mediaUnique?: string;
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#mediaUnique = this.data?.mediaUnique;
 		this.#getMediaDetail();
@@ -30,7 +30,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		this.value = { altText: data.variants[0].name, caption: undefined, url: data.urls[0]?.url ?? '' };
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout .headline=${this.localize.term('defaultdialogs_editSelectedMedia')}>
 				<div id="wrapper">
@@ -64,7 +64,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				margin-bottom: var(--uui-size-layout-1);

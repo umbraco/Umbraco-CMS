@@ -2,8 +2,9 @@ import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_STYLESHEET_WORKSPACE_ALIAS = 'Umb.Workspace.Stylesheet';
 
@@ -23,10 +24,10 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.CodeEditor',
 		name: 'Stylesheet Workspace Code Editor View',
-		js: () => import('./views/code-editor/stylesheet-code-editor-workspace-view.element.js'),
+		element: () => import('./views/code-editor/stylesheet-code-editor-workspace-view.element.js'),
 		weight: 700,
 		meta: {
-			label: 'Code',
+			label: '#stylesheet_tabCode',
 			pathname: 'code',
 			icon: 'icon-brackets',
 		},
@@ -41,10 +42,10 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.RichTextEditor',
 		name: 'Stylesheet Workspace Rich Text Editor View',
-		js: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
+		element: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
 		weight: 800,
 		meta: {
-			label: 'Rich Text Editor',
+			label: '#stylesheet_tabRules',
 			pathname: 'rich-text-editor',
 			icon: 'icon-font',
 		},
@@ -62,9 +63,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Stylesheet.Save',
 		name: 'Save Stylesheet Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -77,4 +78,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

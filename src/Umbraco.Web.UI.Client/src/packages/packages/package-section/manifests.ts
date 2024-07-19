@@ -1,4 +1,4 @@
-import type { ManifestSection, ManifestSectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection, ManifestSectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Packages';
 
@@ -6,9 +6,9 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: sectionAlias,
 	name: 'Packages Section',
-	weight: 200,
+	weight: 700,
 	meta: {
-		label: 'Packages',
+		label: '#sections_packages',
 		pathname: 'packages',
 	},
 	conditions: [
@@ -22,9 +22,9 @@ const section: ManifestSection = {
 const sectionsViews: Array<ManifestSectionView> = [
 	{
 		type: 'sectionView',
-		alias: 'Umb.SectionView.Packages.Repo',
-		name: 'Packages Repo Section View',
-		js: () => import('./views/market-place/packages-market-place-section-view.element.js'),
+		alias: 'Umb.SectionView.Packages.Marketplace',
+		name: 'Packages Marketplace Section View',
+		element: () => import('./views/marketplace/packages-marketplace-section-view.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Packages',
@@ -42,10 +42,10 @@ const sectionsViews: Array<ManifestSectionView> = [
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Packages.Installed',
 		name: 'Installed Packages Section View',
-		js: () => import('./views/installed/installed-packages-section-view.element.js'),
+		element: () => import('./views/installed/installed-packages-section-view.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Installed',
+			label: '#packager_installed',
 			pathname: 'installed',
 			icon: 'icon-box',
 		},
@@ -56,15 +56,14 @@ const sectionsViews: Array<ManifestSectionView> = [
 			},
 		],
 	},
-	/* // Temp removed until is is finished
 	{
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Packages.Builder',
 		name: 'Packages Builder Section View',
-		js: () => import('./views/created/created-packages-section-view.element.js'),
+		element: () => import('./views/created/created-packages-section-view.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Created',
+			label: '#packager_created',
 			pathname: 'created',
 			icon: 'icon-files',
 		},
@@ -75,7 +74,6 @@ const sectionsViews: Array<ManifestSectionView> = [
 			},
 		],
 	},
-	*/
 ];
 
-export const manifests = [section, ...sectionsViews];
+export const manifests: Array<ManifestTypes> = [section, ...sectionsViews];

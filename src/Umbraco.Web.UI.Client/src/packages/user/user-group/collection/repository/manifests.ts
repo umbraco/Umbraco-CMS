@@ -1,6 +1,5 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_GROUP_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.UserGroupCollection';
+import { UMB_USER_GROUP_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const repository: ManifestRepository = {
 	type: 'repository',
@@ -9,4 +8,4 @@ const repository: ManifestRepository = {
 	api: () => import('./user-group-collection.repository.js'),
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

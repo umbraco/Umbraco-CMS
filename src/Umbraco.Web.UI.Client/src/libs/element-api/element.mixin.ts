@@ -10,7 +10,10 @@ import { UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/o
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
-		localize: UmbLocalizationController = new UmbLocalizationController(this);
+		#localize?: UmbLocalizationController;
+		public get localize(): UmbLocalizationController {
+			return (this.#localize ??= new UmbLocalizationController(this));
+		}
 
 		observe<
 			ObservableType extends Observable<T> | undefined,
@@ -41,7 +44,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 				) as unknown as SpecificR;
 			} else {
 				callback(undefined as SpecificT);
-				this.removeControllerByAlias(controllerAlias);
+				this.removeUmbControllerByAlias(controllerAlias);
 				return undefined as SpecificR;
 			}
 		}

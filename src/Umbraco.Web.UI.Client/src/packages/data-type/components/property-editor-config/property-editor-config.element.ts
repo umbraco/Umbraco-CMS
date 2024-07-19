@@ -3,6 +3,7 @@ import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/back
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-config
@@ -38,23 +39,24 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._properties?.length > 0
 			? repeat(
 					this._properties,
 					(property) => property.alias,
 					(property) =>
 						html`<umb-property
-							label="${property.label}"
-							description="${ifDefined(property.description)}"
-							alias="${property.alias}"
-							property-editor-ui-alias="${property.propertyEditorUiAlias}"
+							.dataPath="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
+							label=${property.label}
+							description=${ifDefined(property.description)}
+							alias=${property.alias}
+							property-editor-ui-alias=${property.propertyEditorUiAlias}
 							.config=${property.config}></umb-property>`,
-			  )
+				)
 			: html`<div>No configuration</div>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorConfigElement;

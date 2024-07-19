@@ -25,3 +25,5 @@ export class UmbDictionaryExportRepository extends UmbRepositoryBase {
 		return this.#exportSource.export(unique, includeChildren);
 	}
 }
+
+export { UmbDictionaryExportRepository as api };

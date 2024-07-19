@@ -1,6 +1,5 @@
 import { UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS, UMB_LANGUAGE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbLanguageCreateEntityAction } from './language-create-entity-action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -20,14 +19,14 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Language.Create',
 		name: 'Create Language Entity Action',
-		weight: 900,
-		api: UmbLanguageCreateEntityAction,
+		weight: 1200,
+		api: () => import('./language-create-entity-action.js'),
 		forEntityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
+			label: '#actions_create',
 		},
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests: Array<ManifestTypes> = [...entityActions];

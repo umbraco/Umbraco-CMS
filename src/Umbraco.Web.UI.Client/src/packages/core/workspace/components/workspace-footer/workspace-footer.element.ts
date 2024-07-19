@@ -1,4 +1,4 @@
-import { UMB_SAVEABLE_WORKSPACE_CONTEXT } from '../../contexts/tokens/saveable-workspace.context-token.js';
+import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../contexts/tokens/submittable-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
@@ -37,7 +37,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_SAVEABLE_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT, (context) => {
 			this._isNew = context.getIsNew();
 		});
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
@@ -50,7 +50,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	};
 
 	// TODO: Some event/callback from umb-extension-slot that can be utilized to hide the footer, if empty.
-	render() {
+	override render() {
 		return html`
 			<umb-footer-layout>
 				<umb-extension-slot type="workspaceFooterApp"></umb-extension-slot>
@@ -72,12 +72,17 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
 				display: block;
 				width: 100%;
+			}
+
+			/* prevents text in action buttons from wrapping */
+			umb-extension-with-api-slot {
+				text-wrap: nowrap;
 			}
 
 			umb-extension-slot[slot='actions'] {

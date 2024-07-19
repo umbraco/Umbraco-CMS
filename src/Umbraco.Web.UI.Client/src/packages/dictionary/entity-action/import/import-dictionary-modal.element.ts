@@ -1,4 +1,3 @@
-import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryImportRepository } from '../../repository/index.js';
 import type { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from './import-dictionary-modal.token.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -39,7 +38,6 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	private _treeElement?: UmbTreeElement;
 
 	#fileReader;
-	#fileNodes!: NodeListOf<ChildNode>;
 	#fileContent: Array<UmbDictionaryItemPreview> = [];
 	#dictionaryImportRepository = new UmbDictionaryImportRepository(this);
 	#temporaryFileRepository = new UmbTemporaryFileRepository(this);
@@ -57,7 +55,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		};
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this._parentUnique = this.data?.unique ?? null;
 		this._selectionConfiguration.selection = this._parentUnique ? [this._parentUnique] : [];
@@ -74,7 +72,6 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(htmlString, 'text/xml');
 		const elements = doc.childNodes;
-		this.#fileNodes = elements;
 
 		this.#fileContent = this.#dictionaryPreviewItemBuilder(elements);
 		this.requestUpdate();
@@ -122,7 +119,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this._temporaryFileId = '';
 	}
 
-	render() {
+	override render() {
 		return html` <umb-body-layout headline=${this.localize.term('general_import')}>
 			<uui-box>
 				${when(
@@ -191,7 +188,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 			</uui-form>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

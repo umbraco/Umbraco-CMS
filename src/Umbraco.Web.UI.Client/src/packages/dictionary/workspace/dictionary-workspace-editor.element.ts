@@ -2,7 +2,7 @@ import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from './dictionary-workspace.context
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-dictionary-workspace-editor')
 export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
@@ -36,24 +36,22 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Dictionary">
+			<umb-workspace-editor alias="Umb.Workspace.Dictionary" back-path="section/dictionary/dashboard">
 				<div id="header" slot="header">
-					<uui-button href="section/dictionary/dashboard" label=${this.localize.term('general_backToOverview')} compact>
-						<uui-icon name="icon-arrow-left"></uui-icon>
-					</uui-button>
 					<uui-input
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._name ?? ''}
 						@input="${this.#handleInput}"
-						label="${this.localize.term('general_dictionary')} ${this.localize.term('general_name')}"></uui-input>
+						label="${this.localize.term('general_dictionary')} ${this.localize.term('general_name')}"
+						${umbFocus()}></uui-input>
 				</div>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#header {
 				display: flex;

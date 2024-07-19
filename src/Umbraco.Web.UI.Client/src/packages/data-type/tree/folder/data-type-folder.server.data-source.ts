@@ -1,5 +1,5 @@
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
-import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -32,7 +32,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.getDataTypeFolderById({
+			DataTypeService.getDataTypeFolderById({
 				id: unique,
 			}),
 		);
@@ -67,7 +67,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.postDataTypeFolder({
+			DataTypeService.postDataTypeFolder({
 				requestBody,
 			}),
 		);
@@ -91,7 +91,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.putDataTypeFolderById({
+			DataTypeService.putDataTypeFolderById({
 				id: args.unique,
 				requestBody: { name: args.name },
 			}),
@@ -114,7 +114,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.deleteDataTypeFolderById({
+			DataTypeService.deleteDataTypeFolderById({
 				id: unique,
 			}),
 		);

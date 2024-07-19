@@ -1,4 +1,4 @@
-import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_STATIC_FILE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.StaticFileItem';
 export const UMB_STATIC_FILE_STORE_ALIAS = 'Umb.Store.StaticFileItem';
@@ -17,4 +17,4 @@ const itemStore: ManifestItemStore = {
 	api: () => import('./static-file-item.store.js'),
 };
 
-export const manifests = [itemRepository, itemStore];
+export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];

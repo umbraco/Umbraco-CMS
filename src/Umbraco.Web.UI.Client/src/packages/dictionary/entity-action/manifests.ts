@@ -1,5 +1,6 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
+import { manifests as moveManifests } from './move-to/manifests.js';
 import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -13,17 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
-		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'move',
-		alias: 'Umb.EntityAction.Dictionary.Move',
-		name: 'Move Dictionary Entity Action',
-		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
-		meta: {
-			moveRepositoryAlias: UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
+			label: '#dictionary_createNew',
 		},
 	},
 	{
@@ -36,7 +27,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-download-alt',
-			label: 'Export',
+			label: '#actions_export',
 		},
 	},
 	{
@@ -49,7 +40,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-page-up',
-			label: 'Import',
+			label: '#actions_import',
 		},
 	},
 	{
@@ -80,4 +71,4 @@ const modals: Array<ManifestModal> = [
 	},
 ];
 
-export const manifests = [...entityActions, ...modals];
+export const manifests: Array<ManifestTypes> = [...entityActions, ...modals, ...moveManifests];

@@ -36,6 +36,9 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	#extensionController?: UmbExtensionElementAndApiInitializer<ManifestType>;
 
 	@state()
+	_api: ManifestType['API_TYPE'] | undefined;
+
+	@state()
 	_element: ManifestType['ELEMENT_TYPE'] | undefined;
 
 	abstract getExtensionType(): string;
@@ -56,18 +59,44 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	}
 
 	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementAndApiInitializer<ManifestType>) => {
-		this._element = isPermitted ? controller.component : undefined;
-		this.requestUpdate('_element');
+		this.apiChanged(isPermitted ? controller.api : undefined);
+		this.elementChanged(isPermitted ? controller.component : undefined);
 	};
 
-	protected render() {
+	/**
+	 * Called when the API is changed.
+	 * @protected
+	 * @param {(ManifestType['API_TYPE'] | undefined)} api
+	 * @memberof UmbExtensionElementAndApiSlotElementBase
+	 */
+	protected apiChanged(api: ManifestType['API_TYPE'] | undefined) {
+		this._api = api;
+	}
+
+	/**
+	 * Called when the element is changed.
+	 * @protected
+	 * @param {(ManifestType['ELEMENT_TYPE'] | undefined)} element
+	 * @memberof UmbExtensionElementAndApiSlotElementBase
+	 */
+	protected elementChanged(element: ManifestType['ELEMENT_TYPE'] | undefined) {
+		this._element = element;
+		this.requestUpdate('_element');
+	}
+
+	/**
+	 * Render the element.
+	 * @return {*}
+	 * @memberof UmbExtensionElementAndApiSlotElementBase
+	 */
+	override render() {
 		return this._element;
 	}
 
 	/**
 	 * Disable the Shadow DOM for this element. This is needed because this is a wrapper element and should not stop the event propagation.
 	 */
-	protected createRenderRoot() {
+	protected override createRenderRoot() {
 		return this;
 	}
 }

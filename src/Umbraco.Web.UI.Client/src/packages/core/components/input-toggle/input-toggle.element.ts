@@ -1,20 +1,21 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-toggle')
-export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
-	_checked = false;
+export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: Boolean })
 	public set checked(toggle: boolean) {
-		this._checked = toggle;
+		this.#checked = toggle;
 		super.value = toggle.toString();
 		this.#updateLabel();
 	}
 	public get checked(): boolean {
-		return this._checked;
+		return this.#checked;
 	}
+	#checked = false;
 
 	@property({ type: Boolean })
 	showLabels = false;
@@ -28,33 +29,33 @@ export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
 	@state()
 	_currentLabel?: string;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#updateLabel();
 	}
 
-	#onChange(e: UUIBooleanInputEvent) {
-		this.checked = e.target.checked;
-		e.stopPropagation();
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+	#onChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		this.checked = event.target.checked;
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#updateLabel() {
 		this._currentLabel = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : '';
 	}
 
-	render() {
+	override render() {
 		return html`<uui-toggle
-			.checked="${this._checked}"
-			.label="${this._currentLabel}"
-			@change="${this.#onChange}"></uui-toggle>`;
+			.checked=${this.#checked}
+			.label=${this._currentLabel}
+			@change=${this.#onChange}></uui-toggle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-toggle {
 				width: 100%;

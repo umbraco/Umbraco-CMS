@@ -1,8 +1,8 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import type { IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { HealthStatusModel, IndexerResource } from '@umbraco-cms/backoffice/external/backend-api';
+import type { HealthStatusResponseModel, IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthStatusModel, IndexerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -23,37 +23,53 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	@state()
 	private _loading = true;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
-		this._getIndexData();
+		this.#loadData();
 	}
 
-	private async _getIndexData() {
+	async #loadData() {
+		this._indexData = await this.#getIndexData();
+
+		if (this._indexData?.healthStatus.status === HealthStatusModel.REBUILDING) {
+			this._buttonState = 'waiting';
+			this._continuousPolling();
+		} else {
+			this._loading = false;
+		}
+	}
+
+	async #getIndexData() {
 		const { data } = await tryExecuteAndNotify(
 			this,
-			IndexerResource.getIndexerByIndexName({ indexName: this.indexName }),
+			IndexerService.getIndexerByIndexName({ indexName: this.indexName }),
 		);
-		this._indexData = data;
+		return data;
+	}
 
-		// TODO: Add continuous polling to update the status
-		if (this._indexData?.healthStatus === HealthStatusModel.REBUILDING) {
-			this._buttonState = 'waiting';
+	private async _continuousPolling() {
+		//Checking the server every 5 seconds to see if the index is still rebuilding.
+		while (this._buttonState === 'waiting') {
+			await new Promise((resolve) => setTimeout(resolve, 5000));
+			this._indexData = await this.#getIndexData();
+			if (this._indexData?.healthStatus.status !== HealthStatusModel.REBUILDING) {
+				this._buttonState = 'success';
+			}
 		}
-
-		this._loading = false;
+		return;
 	}
 
 	private async _onRebuildHandler() {
 		await umbConfirmModal(this, {
-			headline: `Rebuild ${this.indexName}`,
-			content: html`
-				This will cause the index to be rebuilt.<br />
+			headline: `${this.localize.term('examineManagement_rebuildIndex')} ${this.indexName}`,
+			content: html`<umb-localize key="examineManagement_rebuildIndexWarning"
+				>This will cause the index to be rebuilt.<br />
 				Depending on how much content there is in your site this could take a while.<br />
 				It is not recommended to rebuild an index during times of high website traffic or when editors are editing
-				content.
-			`,
+				content.</umb-localize
+			> `,
 			color: 'danger',
-			confirmLabel: 'Rebuild',
+			confirmLabel: this.localize.term('examineManagement_rebuildIndex'),
 		});
 
 		this._rebuild();
@@ -62,60 +78,71 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			IndexerResource.postIndexerByIndexNameRebuild({ indexName: this.indexName }),
+			IndexerService.postIndexerByIndexNameRebuild({ indexName: this.indexName }),
 		);
 		if (error) {
 			this._buttonState = 'failed';
 			return;
 		}
-
 		this._buttonState = 'success';
-		await this._getIndexData();
+		await this.#loadData();
 	}
 
-	render() {
+	#renderHealthStatus(healthStatus: HealthStatusResponseModel) {
+		const msg = healthStatus.message ? healthStatus.message : healthStatus.status;
+		switch (healthStatus.status) {
+			case HealthStatusModel.HEALTHY:
+				return html`<umb-icon name="icon-check color-green"></umb-icon>${msg}`;
+			case HealthStatusModel.UNHEALTHY:
+				return html`<umb-icon name="icon-error color-red"></umb-icon>${msg}`;
+			case HealthStatusModel.REBUILDING:
+				return html`<umb-icon name="icon-time color-yellow"></umb-icon>${msg}`;
+			default:
+				return;
+		}
+	}
+
+	override render() {
 		if (!this._indexData || this._loading) return html` <uui-loader-bar></uui-loader-bar>`;
 
 		return html`
 			<uui-box headline="${this.indexName}">
 				<p>
-					<strong>Health Status</strong><br />
-					The health status of the ${this.indexName} and if it can be read
+					<strong><umb-localize key="examineManagement_healthStatus">Health Status</umb-localize></strong
+					><br />
+					<umb-localize key="examineManagement_healthStatusDescription"
+						>The health status of the ${this.indexName} and if it can be read</umb-localize
+					>
 				</p>
-				<div>
-					<uui-icon-essentials>
-						${
-							this._indexData.healthStatus === HealthStatusModel.UNHEALTHY
-								? html`<uui-icon name="wrong" class="danger"></uui-icon>`
-								: html`<uui-icon name="check" class="positive"></uui-icon>`
-						}
-						</uui-icon>
-					</uui-icon-essentials>
-					${this._indexData.healthStatus}
-				</div>
+				<div id="health-status">${this.#renderHealthStatus(this._indexData.healthStatus)}</div>
 			</uui-box>
 			${this.renderIndexSearch()} ${this.renderPropertyList()} ${this.renderTools()}
 		`;
 	}
 
 	private renderIndexSearch() {
-		if (!this._indexData || this._indexData.healthStatus !== HealthStatusModel.HEALTHY) return nothing;
+		// Do we want to show the search while rebuilding?
+		if (!this._indexData || this._indexData.healthStatus.status === HealthStatusModel.REBUILDING) return nothing;
 		return html`<umb-dashboard-examine-searcher .searcherName="${this.indexName}"></umb-dashboard-examine-searcher>`;
 	}
 
 	private renderPropertyList() {
 		if (!this._indexData) return nothing;
 
-		return html`<uui-box headline="Index info">
-			<p>Lists the properties of the ${this.indexName}</p>
+		return html`<uui-box headline=${this.localize.term('examineManagement_indexInfo')}>
+			<p>
+				<umb-localize key="examineManagement_indexInfoDescription"
+					>Lists the properties of the ${this.indexName}</umb-localize
+				>
+			</p>
 			<uui-table class="info">
 				<uui-table-row>
-					<uui-table-cell style="width:0px; font-weight: bold;"> documentCount </uui-table-cell>
-					<uui-table-cell>${this._indexData.documentCount} </uui-table-cell>
+					<uui-table-cell style="width:0px; font-weight: bold;">DocumentCount</uui-table-cell>
+					<uui-table-cell>${this._indexData.documentCount}</uui-table-cell>
 				</uui-table-row>
 				<uui-table-row>
-					<uui-table-cell style="width:0px; font-weight: bold;"> fieldCount </uui-table-cell>
-					<uui-table-cell>${this._indexData.fieldCount} </uui-table-cell>
+					<uui-table-cell style="width:0px; font-weight: bold;">FieldCount</uui-table-cell>
+					<uui-table-cell>${this._indexData.fieldCount}</uui-table-cell>
 				</uui-table-row>
 				${this._indexData.providerProperties
 					? Object.entries(this._indexData.providerProperties).map((entry) => {
@@ -123,30 +150,33 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 								<uui-table-cell style="width:0; font-weight: bold;"> ${entry[0]} </uui-table-cell>
 								<uui-table-cell clip-text> ${entry[1]} </uui-table-cell>
 							</uui-table-row>`;
-					  })
+						})
 					: ''}
 			</uui-table>
 		</uui-box>`;
 	}
 
 	private renderTools() {
-		return html` <uui-box headline="Tools">
-			<p>Tools to manage the ${this.indexName}</p>
+		return html` <uui-box headline=${this.localize.term('examineManagement_tools')}>
+			<p><umb-localize key="examineManagement_toolsDescription">Tools to manage the ${this.indexName}</umb-localize></p>
 			<uui-button
 				color="danger"
 				look="primary"
 				.state="${this._buttonState}"
 				@click="${this._onRebuildHandler}"
 				.disabled="${this._indexData?.canRebuild ? false : true}"
-				label="Rebuild index">
-				Rebuild
-			</uui-button>
+				label=${this.localize.term('examineManagement_rebuildIndex')}></uui-button>
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
+			#health-status {
+				display: flex;
+				gap: var(--uui-size-6);
+			}
+
 			:host {
 				display: block;
 			}
@@ -188,13 +218,6 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			uui-icon {
 				vertical-align: top;
 				padding-right: var(--uui-size-space-5);
-			}
-
-			.positive {
-				color: var(--uui-color-positive);
-			}
-			.danger {
-				color: var(--uui-color-danger);
 			}
 
 			button {

@@ -1,5 +1,5 @@
 import type { UmbEnableUserDataSource } from './types.js';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -31,9 +31,9 @@ export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserEnable({
+			UserService.postUserEnable({
 				requestBody: {
-					userIds,
+					userIds: userIds.map((id) => ({ id })),
 				},
 			}),
 		);

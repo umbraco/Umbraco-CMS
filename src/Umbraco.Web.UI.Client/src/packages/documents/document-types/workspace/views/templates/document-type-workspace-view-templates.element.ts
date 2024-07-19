@@ -1,7 +1,7 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
 import type { UmbInputTemplateElement } from '@umbraco-cms/backoffice/template';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -11,6 +11,9 @@ import '@umbraco-cms/backoffice/template'; // TODO: This is needed to register t
 @customElement('umb-document-type-workspace-view-templates')
 export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
+
+	@state()
+	private _isElementType = false;
 
 	@state()
 	private _defaultTemplateId: string | null = null;
@@ -28,6 +31,15 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 
 	private _observeDocumentType() {
 		if (!this.#workspaceContext) return;
+
+		this.observe(
+			this.#workspaceContext.isElement,
+			(isElement) => {
+				this._isElementType = isElement ?? false;
+			},
+			'_observeIsElement',
+		);
+
 		this.observe(
 			this.#workspaceContext.defaultTemplate,
 			(defaultTemplate) => {
@@ -35,7 +47,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				this._defaultTemplateId = defaultTemplate ? defaultTemplate.id : null;
 				this.requestUpdate('_defaultTemplateId', oldValue);
 			},
-			'defaultTemplate',
+			'_observeDefaultTemplate',
 		);
 		this.observe(
 			this.#workspaceContext.allowedTemplateIds,
@@ -44,7 +56,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				this._allowedTemplateIds = allowedTemplateIds?.map((template) => template.id);
 				this.requestUpdate('_allowedTemplateIds', oldValue);
 			},
-			'allowedTemplateIds',
+			'_observeAllowedTemplateIds',
 		);
 	}
 
@@ -61,21 +73,45 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		this.#workspaceContext?.setDefaultTemplate({ id: input.defaultUnique });
 	}
 
-	render() {
-		return html`<uui-box headline="${this.localize.term('treeHeaders_templates')}">
-			<umb-property-layout alias="Templates" label="${this.localize.term('contentTypeEditor_allowedTemplatesHeading')}">
-				<div slot="description">${this.localize.term('contentTypeEditor_allowedTemplatesDescription')}</div>
-				<div id="templates" slot="editor">
-					<umb-input-template
-						.defaultUnique=${this._defaultTemplateId ?? ''}
-						.selection=${this._allowedTemplateIds}
-						@change=${this.#templateInputChange}></umb-input-template>
-				</div>
-			</umb-property-layout>
-		</uui-box>`;
+	override render() {
+		return this._isElementType ? this.#renderUnsupported() : this.#renderTemplates();
 	}
 
-	static styles = [
+	#renderUnsupported() {
+		return html`
+			<div class="empty-state">
+				<h2>
+					<umb-localize key="contentTypeEditor_elementDoesNotSupport">
+						This is not applicable for an Element type.
+					</umb-localize>
+				</h2>
+			</div>
+		`;
+	}
+
+	#renderTemplates() {
+		return html`
+			<uui-box headline="${this.localize.term('treeHeaders_templates')}">
+				${when(
+					this.#workspaceContext?.createTemplateMode,
+					() => html`<p><em>The default template will be created once this document type has been saved.</em></p>`,
+				)}
+				<umb-property-layout
+					alias="Templates"
+					label="${this.localize.term('contentTypeEditor_allowedTemplatesHeading')}">
+					<div slot="description">${this.localize.term('contentTypeEditor_allowedTemplatesDescription')}</div>
+					<div id="templates" slot="editor">
+						<umb-input-template
+							.defaultUnique=${this._defaultTemplateId ?? ''}
+							.selection=${this._allowedTemplateIds}
+							@change=${this.#templateInputChange}></umb-input-template>
+					</div>
+				</umb-property-layout>
+			</uui-box>
+		`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -99,6 +135,15 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 			umb-property-layout:first-child {
 				padding-top: 0;
 				border: none;
+			}
+			.empty-state {
+				display: flex;
+				justify-content: space-around;
+				flex-direction: column;
+				align-items: center;
+			}
+			.empty-state h2 {
+				color: var(--uui-color-border-emphasis);
 			}
 		`,
 	];

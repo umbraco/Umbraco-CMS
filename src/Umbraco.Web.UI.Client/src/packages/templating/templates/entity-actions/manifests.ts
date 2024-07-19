@@ -1,6 +1,5 @@
 import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS, UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbCreateEntityAction } from './create/create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -9,11 +8,12 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Template.Create',
 		name: 'Create Template Entity Action',
-		api: UmbCreateEntityAction,
+		weight: 1200,
+		api: () => import('./create/create.action.js'),
 		forEntityTypes: [UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
+			label: '#actions_create',
 		},
 	},
 	{
@@ -29,4 +29,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests: Array<ManifestTypes> = [...entityActions];

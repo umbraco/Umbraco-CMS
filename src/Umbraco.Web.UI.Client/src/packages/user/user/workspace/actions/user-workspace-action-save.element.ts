@@ -2,6 +2,8 @@ import { UMB_USER_WORKSPACE_CONTEXT } from '../user-workspace.context-token.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+// TODO: This seems like legacy code [NL]
 @customElement('umb-user-workspace-action-save')
 export class UmbUserWorkspaceActionSaveElement extends UmbLitElement {
 	@state()
@@ -22,7 +24,7 @@ export class UmbUserWorkspaceActionSaveElement extends UmbLitElement {
 
 		this._saveButtonState = 'waiting';
 		await this._workspaceContext
-			.save()
+			.requestSubmit()
 			.then(() => {
 				this._saveButtonState = 'success';
 			})
@@ -31,7 +33,7 @@ export class UmbUserWorkspaceActionSaveElement extends UmbLitElement {
 			});
 	}
 
-	render() {
+	override render() {
 		return html`<uui-button
 			@click=${this._handleSave}
 			look="primary"

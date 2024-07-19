@@ -1,9 +1,9 @@
 import { UmbPackageRepository } from '../../../package/repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
-import { html, css, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, css, customElement, state, repeat, nothing, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import './installed-packages-section-view-item.element.js';
@@ -23,95 +23,94 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 		this.#packageRepository = new UmbPackageRepository(this);
 	}
 
-	firstUpdated() {
-		this._loadInstalledPackages();
+	override firstUpdated() {
+		this.#loadInstalledPackages();
 	}
 
-	/**
-	 * Fetch the installed packages from the server
-	 */
-	private async _loadInstalledPackages() {
+	async #loadInstalledPackages() {
 		const data = await Promise.all([this.#packageRepository.rootItems(), this.#packageRepository.migrations()]);
 
 		const [package$, migration$] = data;
 
-		this.observe(combineLatest([package$, migration$]), ([packages, migrations]) => {
-			this._installedPackages = packages.map((p) => {
-				const migration = migrations.find((m) => m.packageName === p.name);
+		this.observe(observeMultiple([package$, migration$]), ([packages, migrations]) => {
+			this._installedPackages = packages.map((pkg) => {
+				const migration = migrations.find((m) => m.packageName === pkg.name);
 				if (migration) {
 					// Remove that migration from the list
-					migrations = migrations.filter((m) => m.packageName !== p.name);
+					migrations = migrations.filter((m) => m.packageName !== pkg.name);
 				}
 
 				return {
-					...p,
+					...pkg,
 					hasPendingMigrations: migration?.hasPendingMigrations ?? false,
 				};
 			});
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			this._migrationPackages = [
-				...migrations.map((m) => ({
-					name: m.packageName,
-					hasPendingMigrations: m.hasPendingMigrations ?? false,
-				})),
-			];
-			/*this._installedPackages = [
-				...this._installedPackages,
-				...migrations.map((m) => ({
-					name: m.packageName,
-					hasPendingMigrations: m.hasPendingMigrations ?? false,
-				})),
-			];*/
+			this._migrationPackages = migrations.map((m) => ({
+				name: m.packageName,
+				hasPendingMigrations: m.hasPendingMigrations ?? false,
+				extensions: [],
+			}));
 		});
 	}
 
-	render() {
-		if (this._installedPackages.length) return html`${this._renderCustomMigrations()} ${this._renderInstalled()} `;
-		return html`<div class="no-packages">
-			<h2><strong>No packages have been installed</strong></h2>
-			<p>
-				Browse through the available packages using the <strong>'Packages'</strong> icon in the top right of your screen
-			</p>
-		</div>`;
+	override render() {
+		if (!this._installedPackages.length) return this.#renderNoPackages();
+		return html`${this.#renderCustomMigrations()} ${this.#renderInstalled()} `;
 	}
 
-	private _renderInstalled() {
-		return html`<uui-box headline="Installed packages" style="--uui-box-default-padding:0">
-			<uui-ref-list>
-				${repeat(
-					this._installedPackages,
-					(item) => item.name,
-					(item) =>
-						html`<umb-installed-packages-section-view-item
-							.name=${item.name}
-							.version=${item.version}
-							.hasPendingMigrations=${item.hasPendingMigrations}></umb-installed-packages-section-view-item>`,
-				)}
-			</uui-ref-list>
-		</uui-box>`;
+	#renderNoPackages() {
+		return html`
+			<div class="no-packages">
+				<h2><strong>${this.localize.term('packager_noPackages')}</strong></h2>
+				<p>${unsafeHTML(this.localize.term('packager_noPackagesDescription'))}</p>
+			</div>
+		`;
 	}
 
-	private _renderCustomMigrations() {
-		if (!this._migrationPackages) return;
-		return html`<uui-box headline="Migrations" style="--uui-box-default-padding:0">
-			<uui-ref-list>
-				${repeat(
-					this._migrationPackages,
-					(item) => item.name,
-					(item) =>
-						html`<umb-installed-packages-section-view-item
-							.name=${item.name}
-							.version=${item.version}
-							.customIcon="${'icon-sync'}"
-							.hasPendingMigrations=${item.hasPendingMigrations}></umb-installed-packages-section-view-item>`,
-				)}
-			</uui-ref-list>
-		</uui-box>`;
+	#renderInstalled() {
+		return html`
+			<uui-box headline=${this.localize.term('packager_installedPackages')} style="--uui-box-default-padding:0">
+				<uui-ref-list>
+					${repeat(
+						this._installedPackages,
+						(item) => item.name,
+						(item) => html`
+							<umb-installed-packages-section-view-item
+								.name=${item.name}
+								.version=${item.version}
+								.hasPendingMigrations=${item.hasPendingMigrations}>
+							</umb-installed-packages-section-view-item>
+						`,
+					)}
+				</uui-ref-list>
+			</uui-box>
+		`;
 	}
 
-	static styles = [
+	#renderCustomMigrations() {
+		if (!this._migrationPackages.length) return nothing;
+		return html`
+			<uui-box headline="Migrations" style="--uui-box-default-padding:0">
+				<uui-ref-list>
+					${repeat(
+						this._migrationPackages,
+						(item) => item.name,
+						(item) => html`
+							<umb-installed-packages-section-view-item
+								custom-icon="icon-sync"
+								.name=${item.name}
+								.version=${item.version}
+								.hasPendingMigrations=${item.hasPendingMigrations}>
+							</umb-installed-packages-section-view-item>
+						`,
+					)}
+				</uui-ref-list>
+			</uui-box>
+		`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

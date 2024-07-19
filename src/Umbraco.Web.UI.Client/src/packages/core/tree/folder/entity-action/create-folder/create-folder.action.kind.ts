@@ -16,7 +16,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create folder...',
+			label: '#actions_folderCreate',
 		},
 	},
 };

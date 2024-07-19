@@ -5,7 +5,7 @@ import type {
 	PublishDocumentWithDescendantsRequestModel,
 	UnpublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -52,7 +52,7 @@ export class UmbDocumentPublishingServerDataSource {
 			publishSchedules,
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublish({ id: unique, requestBody }));
+		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdPublish({ id: unique, requestBody }));
 	}
 
 	/**
@@ -75,14 +75,14 @@ export class UmbDocumentPublishingServerDataSource {
 				cultures: null,
 			};
 
-			return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id: unique, requestBody }));
+			return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
 		}
 
 		const requestBody: UnpublishDocumentRequestModel = {
 			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id: unique, requestBody }));
+		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdUnpublish({ id: unique, requestBody }));
 	}
 
 	/**
@@ -103,7 +103,7 @@ export class UmbDocumentPublishingServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
+			DocumentService.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
 		);
 	}
 }

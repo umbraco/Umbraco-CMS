@@ -17,10 +17,18 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
+import {
+	UMB_BLOCK_GRID_TYPE,
+	UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
+	type UmbBlockGridTypeGroupType,
+} from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_PROPERTY_CONTEXT,
+	UMB_PROPERTY_DATASET_CONTEXT,
+	type UmbPropertyDatasetContext,
+} from '@umbraco-cms/backoffice/property';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
@@ -56,24 +64,27 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#datasetContext?: UmbPropertyDatasetContext;
 	#blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
-		typeof UMB_WORKSPACE_MODAL.DATA,
-		typeof UMB_WORKSPACE_MODAL.VALUE
+		typeof UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL.VALUE
 	>;
 
-	private _value: Array<UmbBlockTypeWithGroupKey> = [];
+	#value: Array<UmbBlockTypeWithGroupKey> = [];
 	@property({ attribute: false })
 	get value() {
-		return this._value;
+		return this.#value;
 	}
 	set value(value: Array<UmbBlockTypeWithGroupKey>) {
-		this._value = value ?? [];
+		this.#value = value ?? [];
+		this.#mapValuesToBlockGroups();
 	}
+
+	@state()
+	public _alias?: string;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	@state()
-	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
+	#blockGroups?: Array<UmbBlockGridTypeGroupType>;
 
 	@state()
 	private _groupsWithBlockTypes: Array<MappedGroupWithBlockTypes> = [];
@@ -86,44 +97,56 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
-			this.#datasetContext = instance;
-			this.#observeProperties();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, async (context) => {
+			this._alias = context.getAlias();
 		});
 
-		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+			this.#datasetContext = context;
+			//this.#observeBlocks();
+			this.#observeBlockGroups();
+		});
+
+		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(
+			this,
+			UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
+		)
 			.addAdditionalPath(UMB_BLOCK_GRID_TYPE)
-			.onSetup(() => {
-				return { data: { entityType: UMB_BLOCK_GRID_TYPE, preset: {} }, modal: { size: 'large' } };
-			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newpath = routeBuilder({});
 				this._workspacePath = newpath;
 			});
 	}
 
-	async #observeProperties() {
+	async #observeBlockGroups() {
 		if (!this.#datasetContext) return;
-
 		this.observe(await this.#datasetContext.propertyValueByAlias('blockGroups'), (value) => {
-			this._blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
+			this.#blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
 			this.#mapValuesToBlockGroups();
 		});
+	}
+	// TODO: No need for this, we just got the value via the value property.. [NL]
+	/*
+	async #observeBlocks() {
+		if (!this.#datasetContext) return;
 		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), (value) => {
 			this.value = (value as Array<UmbBlockTypeWithGroupKey>) ?? [];
 			this.#mapValuesToBlockGroups();
 		});
 	}
+	*/
 
 	#mapValuesToBlockGroups() {
+		if (!this.#blockGroups) return;
 		// Map blocks that are not in any group, or in a group that does not exist
-		this._notGroupedBlockTypes = this._value.filter(
-			(block) => !block.groupKey || !this._blockGroups.find((group) => group.key === block.groupKey),
+		this._notGroupedBlockTypes = this.#value.filter(
+			(block) => !block.groupKey || !this.#blockGroups!.find((group) => group.key === block.groupKey),
 		);
 
 		// Map blocks to the group they belong to
-		this._groupsWithBlockTypes = this._blockGroups.map((group) => {
-			return { name: group.name, key: group.key, blocks: this._value.filter((value) => value.groupKey === group.key) };
+		this._groupsWithBlockTypes = this.#blockGroups.map((group) => {
+			return { name: group.name, key: group.key, blocks: this.#value.filter((value) => value.groupKey === group.key) };
 		});
 
 		this.#sorter.setModel(this._groupsWithBlockTypes);
@@ -131,7 +154,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#onDelete(e: CustomEvent, groupKey?: string) {
 		const updatedValues = (e.target as UmbInputBlockTypeElement).value.map((value) => ({ ...value, groupKey }));
-		const filteredValues = this.value.filter((value) => value.groupKey !== groupKey);
+		const filteredValues = this.#value.filter((value) => value.groupKey !== groupKey);
 		this.value = [...filteredValues, ...updatedValues];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
@@ -151,7 +174,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 				: (this.#moveData = value.map((block) => ({ ...block, groupKey: newGroupKey })));
 		} else if (e.detail?.moveComplete) {
 			// Move complete, get the blocks that were in an untouched group
-			const blocks = this.value
+			const blocks = this.#value
 				.filter((block) => !value.find((value) => value.contentElementTypeKey === block.contentElementTypeKey))
 				.filter(
 					(block) => !this.#moveData?.find((value) => value.contentElementTypeKey === block.contentElementTypeKey),
@@ -176,11 +199,11 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		// This one that deletes might require the ability to parse what to send as an argument to the method, then a filtering can occur before.
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
-			this._blockGroups.filter((group) => group.key !== groupKey),
+			this.#blockGroups?.filter((group) => group.key !== groupKey),
 		);
 
 		// If a group is deleted, Move the blocks to no group:
-		this.value = this._value.map((block) => (block.groupKey === groupKey ? { ...block, groupKey: undefined } : block));
+		this.value = this.#value.map((block) => (block.groupKey === groupKey ? { ...block, groupKey: undefined } : block));
 	}
 
 	#changeGroupName(e: UUIInputEvent, groupKey: string) {
@@ -188,14 +211,15 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		// TODO: make one method for updating the blockGroupsDataSetValue:
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
-			this._blockGroups.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),
+			this.#blockGroups?.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),
 		);
 	}
 
-	render() {
+	override render() {
 		return html`<div id="groups">
 			${this._notGroupedBlockTypes
 				? html`<umb-input-block-type
+						.propertyAlias=${this._alias}
 						.value=${this._notGroupedBlockTypes}
 						.workspacePath=${this._workspacePath}
 						@change=${this.#onChange}
@@ -210,6 +234,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 						${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
 						<umb-input-block-type
 							data-umb-group-key=${group.key}
+							.propertyAlias=${this._alias + '_' + group.key}
 							.value=${group.blocks}
 							.workspacePath=${this._workspacePath}
 							@change=${this.#onChange}
@@ -234,7 +259,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input:not(:hover, :focus) {

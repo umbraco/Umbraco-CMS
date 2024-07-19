@@ -1,5 +1,5 @@
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
-import type { UmbDataTypeDetailModel } from '../types.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
@@ -7,10 +7,9 @@ import type {
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -19,20 +18,20 @@ import {
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
@@ -40,6 +39,7 @@ export class UmbDataTypeWorkspaceContext
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
@@ -52,15 +52,15 @@ export class UmbDataTypeWorkspaceContext
 
 	readonly name = this.#currentData.asObservablePart((data) => data?.name);
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly entityType = this.#currentData.asObservablePart((data) => data?.entityType);
 
 	readonly propertyEditorUiAlias = this.#currentData.asObservablePart((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this.#currentData.asObservablePart((data) => data?.editorAlias);
 
-	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
+	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias).sortBy(
+		(a, b) => (a.weight || 0) - (b.weight || 0),
+	);
 	readonly properties = this.#properties.asObservable();
-
-	#defaults = new UmbArrayState<PropertyEditorSettingsDefaultData>([], (entry) => entry.alias);
-	readonly defaults = this.#defaults.asObservable();
 
 	#propertyEditorSchemaSettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
 	#propertyEditorUISettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
@@ -79,8 +79,6 @@ export class UmbDataTypeWorkspaceContext
 
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
@@ -113,16 +111,28 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
+		this.#propertyEditorSchemaSettingsProperties = [];
+		this.#propertyEditorUISettingsProperties = [];
+		this.#propertyEditorSchemaSettingsDefaultData = [];
+		this.#propertyEditorUISettingsDefaultData = [];
+		this.#settingsDefaultData = undefined;
+
+		this._mergeConfigProperties();
 	}
+
+	// Hold the last set property editor ui alias, so we know when it changes, so we can reset values. [NL]
+	#lastPropertyEditorUIAlias?: string | null;
 
 	#observePropertyEditorUIAlias() {
 		this.observe(
 			this.propertyEditorUiAlias,
 			async (propertyEditorUiAlias) => {
+				const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
+				this.#lastPropertyEditorUIAlias = propertyEditorUiAlias;
 				// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
 				if (propertyEditorUiAlias === undefined) return;
 
@@ -136,8 +146,13 @@ export class UmbDataTypeWorkspaceContext
 					await this.#observePropertyEditorSchemaAlias();
 				}
 
+				if (
+					this.getIsNew() ||
+					(previousPropertyEditorUIAlias && previousPropertyEditorUIAlias !== propertyEditorUiAlias)
+				) {
+					this.#transferConfigDefaultData();
+				}
 				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
 			},
 			'editorUiAlias',
 		);
@@ -146,28 +161,29 @@ export class UmbDataTypeWorkspaceContext
 	#observePropertyEditorSchemaAlias() {
 		return this.observe(
 			this.propertyEditorSchemaAlias,
-			async (propertyEditorSchemaAlias) => {
-				if (!propertyEditorSchemaAlias) {
-					this.setPropertyEditorSchemaAlias(UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
-					return;
-				}
-
-				await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
+			(propertyEditorSchemaAlias) => {
+				this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
 			},
 			'schemaAlias',
 		).asPromise();
 	}
 
-	#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
-		return this.observe(
-			umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias),
+	#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias?: string) {
+		this.observe(
+			propertyEditorSchemaAlias
+				? umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias)
+				: undefined,
 			(manifest) => {
-				this.#propertyEditorSchemaSettingsProperties = manifest?.meta.settings?.properties || [];
+				// Maps properties to have a weight, so they can be sorted
+				this.#propertyEditorSchemaSettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
+					...x,
+					weight: x.weight ?? i,
+				}));
 				this.#propertyEditorSchemaSettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 				this.#propertyEditorSchemaConfigDefaultUIAlias = manifest?.meta.defaultPropertyEditorUiAlias || null;
 			},
 			'schema',
-		).asPromise();
+		);
 	}
 
 	#setPropertyEditorUIConfig(propertyEditorUIAlias: string) {
@@ -178,7 +194,11 @@ export class UmbDataTypeWorkspaceContext
 				this.#propertyEditorUiName.setValue(manifest?.name || null);
 
 				this.#propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
-				this.#propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
+				// Maps properties to have a weight, so they can be sorted, notice UI properties have a +1000 weight compared to schema properties.
+				this.#propertyEditorUISettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
+					...x,
+					weight: x.weight ?? 1000 + i,
+				}));
 				this.#propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 			},
 			'editorUi',
@@ -194,14 +214,20 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	private _mergeConfigDefaultData() {
+	#transferConfigDefaultData() {
 		if (!this.#propertyEditorSchemaSettingsDefaultData || !this.#propertyEditorUISettingsDefaultData) return;
+
+		const data = this.#currentData.getValue();
+		if (!data) return;
 
 		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
-		];
-		this.#defaults.setValue(this.#settingsDefaultData);
+		] satisfies Array<UmbDataTypePropertyModel>;
+		// We check for satisfied type, because we will be directly transferring them to become value. Future note, if they are not satisfied, we need to transfer alias and value. [NL]
+
+		this.#persistedData.update({ values: this.#settingsDefaultData });
+		this.#currentData.update({ values: this.#settingsDefaultData });
 	}
 
 	public getPropertyDefaultValue(alias: string) {
@@ -244,6 +270,7 @@ export class UmbDataTypeWorkspaceContext
 		this.#getDataPromise = request;
 		let { data } = await request;
 		if (!data) return undefined;
+
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
 		}
@@ -281,18 +308,8 @@ export class UmbDataTypeWorkspaceContext
 
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
-
-		return combineLatest([
-			this.#currentData.asObservablePart(
-				(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-			this.#defaults.asObservablePart(
-				(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-		]).pipe(
-			map(([value, defaultValue]) => {
-				return value ?? defaultValue;
-			}),
+		return this.#currentData.asObservablePart(
+			(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
 		);
 	}
 
@@ -316,24 +333,35 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async save() {
-		if (!this.#currentData.value) return;
-		if (!this.#currentData.value.unique) return;
+	async submit() {
+		if (!this.#currentData.value) {
+			throw new Error('Data is not set');
+		}
+		if (!this.#currentData.value.unique) {
+			throw new Error('Unique is not set');
+		}
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			await this.repository.create(this.#currentData.value, parent.unique);
+			const { error, data } = await this.repository.create(this.#currentData.value, parent.unique);
+			if (error || !data) {
+				throw error?.message ?? 'Repository did not return data after create.';
+			}
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
+			this.setIsNew(false);
 		} else {
-			await this.repository.save(this.#currentData.value);
+			const { error, data } = await this.repository.save(this.#currentData.value);
+			if (error || !data) {
+				throw error?.message ?? 'Repository did not return data after create.';
+			}
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -343,25 +371,16 @@ export class UmbDataTypeWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		this.setIsNew(false);
-		this.workspaceComplete(this.#currentData.value);
-	}
-
-	protected workspaceComplete(data: EntityType | undefined) {
-		this.dispatchEvent(new CustomEvent('workspace-complete'));
-		super.workspaceComplete(data);
 	}
 
 	async delete(unique: string) {
 		await this.repository.delete(unique);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.#properties.destroy();
-		this.#defaults.destroy();
 		this.#propertyEditorUiIcon.destroy();
 		this.#propertyEditorUiName.destroy();
 		this.repository.destroy();

@@ -1,7 +1,7 @@
 import './upgrader-view.element.js';
 
-import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbUpgraderViewElement } from './upgrader-view.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {

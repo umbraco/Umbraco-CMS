@@ -6,10 +6,10 @@ import type {
 	CreateMediaTypeRequestModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Media Type that fetches data from the server
@@ -67,7 +67,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MediaTypeResource.getMediaTypeById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MediaTypeService.getMediaTypeById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -100,7 +100,15 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 					appearance: property.appearance,
 				};
 			}),
-			containers: data.containers as UmbPropertyTypeContainerModel[],
+			containers: data.containers.map((container) => {
+				return {
+					id: container.id,
+					parent: container.parent ? { id: container.parent.id } : null,
+					name: container.name ?? '',
+					type: container.type as UmbPropertyContainerTypes, // TODO: check if the value is valid
+					sortOrder: container.sortOrder,
+				};
+			}),
 			allowedContentTypes: data.allowedMediaTypes.map((allowedMediaType) => {
 				return {
 					contentType: { unique: allowedMediaType.mediaType.id },
@@ -174,7 +182,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.postMediaType({
+			MediaTypeService.postMediaType({
 				requestBody,
 			}),
 		);
@@ -238,7 +246,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.putMediaTypeById({
+			MediaTypeService.putMediaTypeById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -262,7 +270,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 		return tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.deleteMediaTypeById({
+			MediaTypeService.deleteMediaTypeById({
 				id: unique,
 			}),
 		);

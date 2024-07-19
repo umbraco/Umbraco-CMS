@@ -1,4 +1,4 @@
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -31,7 +31,7 @@ export class UmbChangeUserPasswordServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserByIdChangePassword({
+			UserService.postUserByIdChangePassword({
 				id,
 				requestBody: {
 					newPassword,

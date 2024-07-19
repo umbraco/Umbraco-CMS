@@ -1,4 +1,3 @@
-import { handlers as auditLogHandlers } from './handlers/audit-log.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
 import { handlers as documentTypeHandlers } from './handlers/document-type/index.js';
 import { handlers as installHandlers } from './handlers/install.handlers.js';
@@ -16,13 +15,11 @@ import { handlers as languageHandlers } from './handlers/language/index.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
 import { handlers as packageHandlers } from './handlers/package.handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
-import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
 	serverHandlers.serverInformationHandler,
-	manifestsHandlers.manifestEmptyHandler,
-	...auditLogHandlers,
+	...manifestsHandlers.manifestEmptyHandlers,
 	...installHandlers,
 	...upgradeHandlers,
 	...userHandlers,
@@ -38,5 +35,4 @@ export const handlers = [
 	...redirectManagementHandlers,
 	...packageHandlers,
 	...configHandlers,
-	...trackedReferenceHandlers,
 ];

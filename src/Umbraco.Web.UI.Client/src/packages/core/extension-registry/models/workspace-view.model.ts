@@ -15,6 +15,11 @@ export interface ManifestWorkspaceView<MetaType extends MetaWorkspaceView = Meta
 
 export interface MetaWorkspaceView extends MetaManifestWithView {}
 
+export interface ManifestWorkspaceViewCollectionKind extends ManifestWorkspaceView<MetaWorkspaceView> {
+	type: 'workspaceView';
+	kind: 'collection';
+}
+
 export interface ManifestWorkspaceViewContentTypeDesignEditorKind extends ManifestWorkspaceView {
 	type: 'workspaceView';
 	kind: 'contentTypeDesignEditor';

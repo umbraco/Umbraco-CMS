@@ -1,7 +1,9 @@
-import { html, customElement, property, css, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, repeat, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 export type UmbCrop = {
 	label: string;
@@ -18,6 +20,9 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	@query('#label')
+	private _labelInput!: HTMLInputElement;
+
 	//TODO MAKE TYPE
 	@property({ attribute: false })
 	value: UmbCrop[] = [];
@@ -25,9 +30,11 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	@state()
 	editCropAlias = '';
 
+	#oldInputValue = '';
+
 	#onRemove(alias: string) {
 		this.value = [...this.value.filter((item) => item.alias !== alias)];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onEdit(crop: UmbCrop) {
@@ -88,9 +95,10 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		} else {
 			this.value = [...this.value, newCrop];
 		}
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 
 		form.reset();
+		this._labelInput.focus();
 	}
 
 	#renderActions() {
@@ -100,15 +108,40 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 			: html`<uui-button look="secondary" type="submit" label="Add"></uui-button>`;
 	}
 
-	render() {
+	#onLabelInput() {
+		const value = this._labelInput.value ?? '';
+
+		const aliasValue = generateAlias(value);
+
+		const alias = this.shadowRoot?.querySelector('#alias') as HTMLInputElement;
+
+		if (!alias) return;
+
+		const oldAliasValue = generateAlias(this.#oldInputValue);
+
+		if (alias.value === oldAliasValue || !alias.value) {
+			alias.value = aliasValue;
+		}
+
+		this.#oldInputValue = value;
+	}
+
+	override render() {
 		if (!this.value) this.value = [];
 
 		return html`
 			<uui-form>
 				<form @submit=${this.#onSubmit}>
-				<div class="input">
+					<div class="input">
 						<uui-label for="label">Label</uui-label>
-						<uui-input label="Label" id="label" name="label" type="text" autocomplete="false" value=""></uui-input>
+						<uui-input
+							@input=${this.#onLabelInput}
+							label="Label"
+							id="label"
+							name="label"
+							type="text"
+							autocomplete="false"
+							value=""></uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="alias">Alias</uui-label>
@@ -116,13 +149,13 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 					</div>
 					<div class="input">
 						<uui-label for="width">Width</uui-label>
-						<uui-input label="Width" id="width" name="width" type="number" autocomplete="false" value="">
+						<uui-input label="Width" id="width" name="width" type="number" autocomplete="false" value="" min="0">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="height">Height</uui-label>
-						<uui-input label="Height" id="height" name="height" type="number" autocomplete="false" value="">
+						<uui-input label="Height" id="height" name="height" type="number" autocomplete="false" value="" min="0">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
@@ -139,8 +172,14 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 							<span><strong>${item.label}</strong> <em>(${item.alias})</em></span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>
 							<div class="crop-actions">
-								<uui-button label="Edit" @click=${() => this.#onEdit(item)}>Edit</uui-button>
-								<uui-button label="Remove" color="danger" @click=${() => this.#onRemove(item.alias)}>Remove</uui-button>
+								<uui-button
+									label=${this.localize.term('general_edit')}
+									color="default"
+									@click=${() => this.#onEdit(item)}></uui-button>
+								<uui-button
+									label=${this.localize.term('general_remove')}
+									color="danger"
+									@click=${() => this.#onRemove(item.alias)}></uui-button>
 							</div>
 						</div>
 					`,
@@ -149,7 +188,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

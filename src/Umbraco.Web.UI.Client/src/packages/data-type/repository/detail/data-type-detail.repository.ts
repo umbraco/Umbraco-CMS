@@ -24,3 +24,5 @@ export class UmbDataTypeDetailRepository extends UmbDetailRepositoryBase<UmbData
 		return this.#detailStore!.withPropertyEditorUiAlias(propertyEditorUiAlias);
 	}
 }
+
+export { UmbDataTypeDetailRepository as api };

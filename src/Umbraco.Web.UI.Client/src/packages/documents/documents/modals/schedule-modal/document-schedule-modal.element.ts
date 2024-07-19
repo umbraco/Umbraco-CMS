@@ -33,7 +33,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
 
@@ -68,7 +68,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('general_scheduledPublishing')}>
 			<p id="subtitle">
 				${when(
@@ -159,7 +159,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

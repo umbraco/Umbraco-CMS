@@ -35,6 +35,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 */
 	sortBy(sortMethod?: (a: T, b: T) => number) {
 		this.#sortMethod = sortMethod;
+		const value = this.getValue();
+		if (value) {
+			super.setValue([...value].sort(this.#sortMethod));
+		}
 		return this;
 	}
 
@@ -48,9 +52,9 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.setValue('Goodnight')
 	 * // myState.value is equal 'Goodnight'.
 	 */
-	setValue(value: T[]) {
+	override setValue(value: T[]) {
 		if (this.#sortMethod) {
-			super.setValue(value.sort(this.#sortMethod));
+			super.setValue([...value].sort(this.#sortMethod));
 		} else {
 			super.setValue(value);
 		}
@@ -70,8 +74,8 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.remove([1, 2]);
 	 */
 	remove(uniques: unknown[]) {
-		let next = this.getValue();
 		if (this.getUniqueMethod) {
+			let next = this.getValue();
 			uniques.forEach((unique) => {
 				next = next.filter((x) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -99,8 +103,8 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.removeOne(1);
 	 */
 	removeOne(unique: unknown) {
-		let next = this.getValue();
 		if (this.getUniqueMethod) {
+			let next = this.getValue();
 			next = next.filter((x) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
@@ -240,7 +244,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 		return this;
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 		this.#sortMethod = undefined;
 		(this.getUniqueMethod as any) = undefined;

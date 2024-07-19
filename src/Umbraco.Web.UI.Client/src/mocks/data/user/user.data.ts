@@ -1,4 +1,8 @@
-import type { UserItemResponseModel, UserResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	UserItemResponseModel,
+	UserResponseModel,
+	UserTwoFactorProviderModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
@@ -7,7 +11,9 @@ export const data: Array<UmbMockUserModel> = [
 	{
 		id: 'bca6c733-a63d-4353-a271-9a8b6bcca8bd',
 		documentStartNodeIds: [],
+		hasDocumentRootAccess: true,
 		mediaStartNodeIds: [],
+		hasMediaRootAccess: true,
 		name: 'Umbraco User',
 		email: 'noreply@umbraco.com',
 		languageIsoCode: 'en-us',
@@ -18,14 +24,17 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2/10/2022',
 		createDate: '3/13/2022',
 		failedLoginAttempts: 946,
-		userGroupIds: ['user-group-administrators-id', 'user-group-editors-id'],
+		userGroupIds: [{ id: 'user-group-administrators-id' }, { id: 'user-group-editors-id' }],
 		userName: '',
 		avatarUrls: [],
+		isAdmin: true,
 	},
 	{
 		id: '82e11d3d-b91d-43c9-9071-34d28e62e81d',
-		documentStartNodeIds: ['simple-document-id'],
-		mediaStartNodeIds: ['f2f81a40-c989-4b6b-84e2-057cecd3adc1'],
+		documentStartNodeIds: [{ id: 'simple-document-id' }],
+		hasDocumentRootAccess: true,
+		mediaStartNodeIds: [{ id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1' }],
+		hasMediaRootAccess: true,
 		name: 'Amelie Walker',
 		email: 'awalker1@domain.com',
 		languageIsoCode: 'da-dk',
@@ -36,14 +45,17 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
-		userGroupIds: ['user-group-administrators-id'],
+		userGroupIds: [{ id: 'user-group-administrators-id' }],
 		userName: '',
 		avatarUrls: [],
+		isAdmin: true,
 	},
 	{
 		id: 'aa1d83a9-bc7f-47d2-b288-58d8a31f5017',
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
+		hasDocumentRootAccess: true,
+		hasMediaRootAccess: true,
 		name: 'Oliver Kim',
 		email: 'okim1@domain.com',
 		languageIsoCode: 'da-dk',
@@ -54,14 +66,17 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
-		userGroupIds: ['user-group-administrators-id'],
+		userGroupIds: [{ id: 'user-group-editors-id' }],
 		userName: '',
 		avatarUrls: [],
+		isAdmin: false,
 	},
 	{
 		id: 'ff2f4a50-d3d4-4bc4-869d-c7948c160e54',
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
+		hasDocumentRootAccess: true,
+		hasMediaRootAccess: true,
 		name: 'Eliana Nieves',
 		email: 'enieves1@domain.com',
 		languageIsoCode: 'en-us',
@@ -72,14 +87,17 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
-		userGroupIds: ['user-group-administrators-id'],
+		userGroupIds: [{ id: 'user-group-editors-id' }],
 		userName: '',
 		avatarUrls: [],
+		isAdmin: false,
 	},
 	{
 		id: 'c290c6d9-9f12-4838-8567-621b52a178de',
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
+		hasDocumentRootAccess: true,
+		hasMediaRootAccess: true,
 		name: 'Jasmine Patel',
 		email: 'jpatel1@domain.com',
 		languageIsoCode: 'en-us',
@@ -90,8 +108,24 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 25,
-		userGroupIds: ['user-group-administrators-id'],
+		userGroupIds: [{ id: 'user-group-editors-id' }, { id: 'user-group-sensitive-data-id' }],
 		userName: '',
 		avatarUrls: [],
+		isAdmin: false,
+	},
+];
+
+/**
+ * Mock data for MFA login providers
+ * This is usually linked to a user, but for the sake of the mock, we're just going to have a list of providers
+ */
+export const mfaLoginProviders: Array<UserTwoFactorProviderModel> = [
+	{
+		isEnabledOnUser: true,
+		providerName: 'Google Authenticator',
+	},
+	{
+		isEnabledOnUser: false,
+		providerName: 'sms',
 	},
 ];

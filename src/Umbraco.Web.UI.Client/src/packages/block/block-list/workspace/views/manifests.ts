@@ -1,5 +1,5 @@
 import { UMB_BLOCK_LIST_TYPE_WORKSPACE_ALIAS } from '../index.js';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 
 export const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
@@ -9,7 +9,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./block-list-type-workspace-view.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#blockEditor_tabBlockSettings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 		},
@@ -22,4 +22,4 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-export const manifests = [...workspaceViews];
+export const manifests: Array<ManifestTypes> = [...workspaceViews];

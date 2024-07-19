@@ -1,14 +1,23 @@
-import { getPropertyValueByAlias } from '../index.js';
-import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import { getPropertyValueByAlias } from '../index.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
+
+import '@umbraco-cms/backoffice/ufm';
 
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
+	@state()
+	private _editDocumentPath = '';
+
 	@state()
 	private _items: Array<UmbDocumentCollectionItemModel> = [];
 
@@ -19,9 +28,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	private _selection: Array<string | null> = [];
 
 	@state()
-	private _skip: number = 0;
-
-	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
 	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
@@ -29,44 +35,55 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document')
+			.onSetup(() => {
+				return { data: { entityType: 'document', preset: {} } };
+			})
+			.onReject(() => {
+				this.#collectionContext?.requestCollection();
+			})
+			.onSubmit(() => {
+				this.#collectionContext?.requestCollection();
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentPath = routeBuilder({});
+			});
 	}
 
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
+
+		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
 
 		this.observe(
 			this.#collectionContext.userDefinedProperties,
 			(userDefinedProperties) => {
 				this._userDefinedProperties = userDefinedProperties;
 			},
-			'umbCollectionUserDefinedPropertiesObserver',
+			'_observeUserDefinedProperties',
 		);
 
-		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
+		this.observe(this.#collectionContext.items, (items) => (this._items = items), '_observeItems');
 
 		this.observe(
 			this.#collectionContext.selection.selection,
 			(selection) => (this._selection = selection),
-			'umbCollectionSelectionObserver',
-		);
-
-		this.observe(
-			this.#collectionContext.pagination.skip,
-			(skip) => {
-				this._skip = skip;
-			},
-			'umbCollectionSkipObserver',
+			'_observeSelection',
 		);
 	}
 
-	// TODO: How should we handle url stuff? [?]
-	#onOpen(id: string) {
-		// TODO: this will not be needed when cards works as links with href [?]
-		history.pushState(null, '', 'section/content/workspace/document/edit/' + id);
+	#onOpen(event: Event, unique: string) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const url = this._editDocumentPath + UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique });
+		window.history.pushState(null, '', url);
 	}
 
 	#onSelect(item: UmbDocumentCollectionItemModel) {
@@ -81,84 +98,101 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
 
-	render() {
-		if (this._loading) {
-			return html`<div class="container"><uui-loader></uui-loader></div>`;
-		}
+	override render() {
+		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
+	}
 
-		if (this._items.length === 0) {
-			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
-		}
-
+	#renderEmpty() {
+		if (this._items.length > 0) return nothing;
 		return html`
-			<div id="document-grid">
-				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item, index) => this.#renderCard(index, item),
+			<div class="container">
+				${when(
+					this._loading,
+					() => html`<uui-loader></uui-loader>`,
+					() => html`<p>${this.localize.term('content_listViewNoItems')}</p>`,
 				)}
 			</div>
 		`;
 	}
 
-	#renderCard(index: number, item: UmbDocumentCollectionItemModel) {
-		const sortOrder = this._skip + index;
+	#renderItems() {
+		if (this._items.length === 0) return nothing;
+		return html`
+			<div id="document-grid">
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</div>
+			${when(this._loading, () => html`<uui-loader-bar></uui-loader-bar>`)}
+		`;
+	}
+
+	#renderItem(item: UmbDocumentCollectionItemModel) {
 		return html`
 			<uui-card-content-node
 				.name=${item.name ?? 'Unnamed Document'}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
-				@open=${() => this.#onOpen(item.unique ?? '')}
+				@open=${(event: Event) => this.#onOpen(event, item.unique)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-icon slot="icon" name=${item.icon}></umb-icon>
-				${this.#renderState(item)} ${this.#renderProperties(sortOrder, item)}
+				${this.#renderState(item)} ${this.#renderProperties(item)}
 			</uui-card-content-node>
 		`;
 	}
 
-	#renderState(item: UmbDocumentCollectionItemModel) {
-		switch (item.state) {
+	#getStateTagConfig(state: string): { color: UUIInterfaceColor; label: string } {
+		switch (state) {
 			case 'Published':
-				return html`<uui-tag slot="tag" color="positive" look="secondary"
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+				return { color: 'positive', label: this.localize.term('content_published') };
 			case 'PublishedPendingChanges':
-				return html`<uui-tag slot="tag" color="warning" look="secondary"
-					>${this.localize.term('content_publishedPendingChanges')}</uui-tag
-				>`;
+				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
 			case 'Draft':
-				return html`<uui-tag slot="tag" color="default" look="secondary"
-					>${this.localize.term('content_unpublished')}</uui-tag
-				>`;
+				return { color: 'default', label: this.localize.term('content_unpublished') };
 			case 'NotCreated':
-				return html`<uui-tag slot="tag" color="danger" look="secondary"
-					>${this.localize.term('content_notCreated')}</uui-tag
-				>`;
+				return { color: 'danger', label: this.localize.term('content_notCreated') };
 			default:
-				// TODO: [LK] Check if we have a `SplitPascalCase`-esque utility function that could be used here.
-				return html`<uui-tag slot="tag" color="danger" look="secondary"
-					>${item.state.replace(/([A-Z])/g, ' $1')}</uui-tag
-				>`;
+				return { color: 'danger', label: fromCamelCase(state) };
 		}
 	}
 
-	#renderProperties(sortOrder: number, item: UmbDocumentCollectionItemModel) {
+	#renderState(item: UmbDocumentCollectionItemModel) {
+		const tagConfig = this.#getStateTagConfig(item.state);
+		return html`<uui-tag slot="tag" color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
+	}
+
+	#renderProperties(item: UmbDocumentCollectionItemModel) {
 		if (!this._userDefinedProperties) return;
 		return html`
 			<ul>
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) =>
-						html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(sortOrder, item, column.alias)}</li>`,
+					(column) => html`
+						<li>
+							<span>${column.header}:</span>
+							${when(
+								column.nameTemplate,
+								() => html`
+									<umb-ufm-render
+										inline
+										.markdown=${column.nameTemplate}
+										.value=${getPropertyValueByAlias(item, column.alias)}></umb-ufm-render>
+								`,
+								() => html`${getPropertyValueByAlias(item, column.alias)}`,
+							)}
+						</li>
+					`,
 				)}
 			</ul>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

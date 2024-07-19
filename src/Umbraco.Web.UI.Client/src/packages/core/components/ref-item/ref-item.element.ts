@@ -1,5 +1,6 @@
-import { html, customElement, css, property, when, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIRefElement, UUIRefEvent, UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-ref-item')
@@ -21,7 +22,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 		this.addEventListener(UUIRefEvent.OPEN, () => this.dispatchEvent(new Event('click')));
 	}
 
-	public render() {
+	override render() {
 		return html`
 			<button
 				type="button"
@@ -30,11 +31,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 				@click=${this.handleOpenClick}
 				@keydown=${this.handleOpenKeydown}
 				?disabled=${this.disabled}>
-				${when(
-					this.icon,
-					() => html`<span id="icon"><uui-icon name=${this.icon ?? ''}></uui-icon></span>`,
-					() => nothing,
-				)}
+				${when(this.icon, () => html`<span id="icon"><uui-icon name=${this.icon ?? ''}></uui-icon></span>`)}
 				<div id="info">
 					<div id="name">${this.name}</div>
 					<small id="detail">${this.detail}</small>
@@ -45,9 +42,10 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefElement.styles,
 		...UUIRefNodeElement.styles,
+		UmbTextStyles,
 		css`
 			:host {
 				padding: calc(var(--uui-size-4) + 1px);

@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIBlockRteBlockConfigurationElement } from './property-editor-ui-block-rte-type-configuration.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-block-rte-type-configuration.element.js';

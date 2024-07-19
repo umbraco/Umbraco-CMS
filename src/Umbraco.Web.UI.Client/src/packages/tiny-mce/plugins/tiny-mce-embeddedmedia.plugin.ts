@@ -1,15 +1,23 @@
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from '@umbraco-cms/backoffice/modal';
 import { UMB_EMBEDDED_MEDIA_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+		const localize = new UmbLocalizationController(args.host);
 
-		this.editor.ui.registry.addButton('umbembeddialog', {
+		this.editor.ui.registry.addToggleButton('umbembeddialog', {
 			icon: 'embed',
-			tooltip: 'Embed',
+			tooltip: localize.term('general_embed'),
 			onAction: () => this.#onAction(),
+			onSetup: function (api) {
+				const changed = args.editor.selection.selectorChangedWithUnbind('div.umb-embed-holder', (state) =>
+					api.setActive(state),
+				);
+				return () => changed.unbind();
+			},
 		});
 	}
 
@@ -44,17 +52,18 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	#insertInEditor(embed: UmbEmbeddedMediaModalValue, activeElement: HTMLElement) {
 		// Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
 		// This turns it into a selectable/cutable block to move about
+
 		const wrapper = this.editor.dom.create(
 			'div',
 			{
 				class: 'mceNonEditable umb-embed-holder',
 				'data-embed-url': embed.url ?? '',
-				'data-embed-height': embed.height,
-				'data-embed-width': embed.width,
+				'data-embed-height': embed.height!,
+				'data-embed-width': embed.width!,
 				'data-embed-constrain': embed.constrain ?? false,
 				contenteditable: false,
 			},
-			embed.preview,
+			embed.markup,
 		);
 
 		// Only replace if activeElement is an Embed element.

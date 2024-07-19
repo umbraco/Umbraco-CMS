@@ -1,9 +1,9 @@
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
-import type { MetaEntityBulkAction, ManifestEntityBulkAction } from '../../index.js';
+import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 function apiArgsMethod(manifest: ManifestEntityBulkAction<MetaEntityBulkAction>) {
 	return [{ meta: manifest.meta }] as unknown[];
@@ -22,11 +22,11 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: typeof UMB_DEFAULT_COLLECTION_CONTEXT.TYPE;
+	private _collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});
@@ -73,7 +73,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		this._collectionContext?.selection.clearSelection();
 	}
 
-	render() {
+	override render() {
 		if (this._selectionLength === 0) return nothing;
 
 		return html`
@@ -82,7 +82,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					<uui-button
 						@click=${this._handleClearSelection}
 						@keydown=${this._handleKeyDown}
-						label="Clear"
+						label=${this.localize.term('buttons_clearSelection')}
 						look="secondary"></uui-button>
 					${this._renderSelectionCount()}
 				</div>
@@ -99,7 +99,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

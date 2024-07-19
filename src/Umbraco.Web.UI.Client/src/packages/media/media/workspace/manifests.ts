@@ -1,9 +1,12 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -19,10 +22,9 @@ const workspace: ManifestWorkspaces = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'collection',
 		alias: 'Umb.WorkspaceView.Media.Collection',
 		name: 'Media Workspace Collection View',
-		element: () => import('./views/collection/media-workspace-view-collection.element.js'),
-		weight: 300,
 		meta: {
 			label: 'Collection',
 			pathname: 'collection',
@@ -40,12 +42,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 	{
 		type: 'workspaceView',
+		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
-		js: () => import('./views/edit/media-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Media',
+			label: '#general_details',
 			pathname: 'media',
 			icon: 'icon-picture',
 		},
@@ -54,16 +56,19 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
 			},
+			{
+				alias: UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
+			},
 		],
 	},
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Info',
 		name: 'Media Workspace Info View',
-		js: () => import('./views/info/media-workspace-view-info.element.js'),
+		element: () => import('./views/info/media-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Info',
+			label: '#general_info',
 			pathname: 'info',
 			icon: 'info',
 		},
@@ -82,9 +87,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -93,8 +98,11 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

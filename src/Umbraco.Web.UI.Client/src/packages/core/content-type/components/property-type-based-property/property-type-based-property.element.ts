@@ -1,18 +1,17 @@
 import type { UmbPropertyEditorConfig } from '../../../property-editor/index.js';
 import type { UmbPropertyTypeModel } from '../../types.js';
-import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
+import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbContentPropertyContext } from '@umbraco-cms/backoffice/content';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	public get property(): UmbPropertyTypeModel | undefined {
-		return this._property;
-	}
 	public set property(value: UmbPropertyTypeModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
@@ -20,7 +19,13 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._observeDataType(this._property?.dataType.unique);
 		}
 	}
+	public get property(): UmbPropertyTypeModel | undefined {
+		return this._property;
+	}
 	private _property?: UmbPropertyTypeModel;
+
+	@property({ type: String, attribute: 'data-path' })
+	public dataPath?: string;
 
 	@state()
 	private _propertyEditorUiAlias?: string;
@@ -31,6 +36,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	private _dataTypeObserver?: UmbObserverController<UmbDataTypeDetailModel | undefined>;
 
+	#contentPropertyContext = new UmbContentPropertyContext(this);
+
 	private async _observeDataType(dataTypeUnique?: string) {
 		this._dataTypeObserver?.destroy();
 		if (dataTypeUnique) {
@@ -39,6 +46,9 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._dataTypeObserver = this.observe(
 				await this._dataTypeDetailRepository.byUnique(dataTypeUnique),
 				(dataType) => {
+					const contextValue = dataType ? { unique: dataType.unique } : undefined;
+					this.#contentPropertyContext.setDataType(contextValue);
+
 					this._dataTypeData = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
 					// If there is no UI, we will look up the Property editor model to find the default UI alias:
@@ -50,12 +60,12 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 							(extension) => {
 								if (!extension) return;
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
-								this.removeControllerByAlias('_observePropertyEditorSchema');
+								this.removeUmbControllerByAlias('_observePropertyEditorSchema');
 							},
 							'_observePropertyEditorSchema',
 						);
 					} else {
-						this.removeControllerByAlias('_observePropertyEditorSchema');
+						this.removeUmbControllerByAlias('_observePropertyEditorSchema');
 					}
 				},
 				'_observeDataType',
@@ -63,16 +73,23 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		}
 	}
 
-	render() {
-		return html`<umb-property
-			alias=${ifDefined(this._property?.alias)}
-			label=${ifDefined(this._property?.name)}
-			description=${ifDefined(this._property?.description || undefined)}
-			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
-			.config=${this._dataTypeData}></umb-property>`;
+	override render() {
+		if (!this._propertyEditorUiAlias || !this._property?.alias) return;
+		return html`
+			<umb-property
+				.dataPath=${this.dataPath}
+				.alias=${this._property.alias}
+				.label=${this._property.name}
+				.description=${this._property.description ?? undefined}
+				.appearance=${this._property.appearance}
+				property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
+				.config=${this._dataTypeData}
+				.validation=${this._property.validation}>
+			</umb-property>
+		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

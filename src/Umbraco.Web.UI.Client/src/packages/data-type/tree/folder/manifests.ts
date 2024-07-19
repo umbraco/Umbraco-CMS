@@ -1,5 +1,4 @@
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UmbDataTypeFolderRepository } from './data-type-folder.repository.js';
 import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Folder';
@@ -8,7 +7,7 @@ const folderRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 	name: 'Data Type Folder Repository',
-	api: UmbDataTypeFolderRepository,
+	api: () => import('./data-type-folder.repository.js'),
 };
 
 const entityActions: Array<ManifestTypes> = [
@@ -34,4 +33,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [folderRepository, ...entityActions];
+export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];

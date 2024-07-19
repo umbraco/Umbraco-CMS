@@ -1,35 +1,19 @@
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-history-item')
 export class UmbHistoryItemElement extends UmbLitElement {
 	@property({ type: String })
-	src?: string;
-
-	@property({ type: String })
 	name?: string;
 
 	@property({ type: String })
 	detail?: string;
 
-	@state()
-	private _serverUrl?: string;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this._serverUrl = instance.getServerUrl();
-		});
-	}
-
-	render() {
+	override render() {
 		return html`
 			<div class="user-info">
-				<uui-avatar
-					.name="${this.name ?? 'Unknown'}"
-					.imgSrc="${this.src ? this._serverUrl + this.src : ''}"></uui-avatar>
+				<slot name="avatar"></slot>
 				<div>
 					<span class="name">${this.name}</span>
 					<span class="detail">${this.detail}</span>
@@ -40,7 +24,7 @@ export class UmbHistoryItemElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -55,10 +39,12 @@ export class UmbHistoryItemElement extends UmbLitElement {
 				--uui-button-height: calc(var(--uui-size-2) * 4);
 				margin-right: var(--uui-size-2);
 			}
+
 			#actions-container {
 				opacity: 0;
 				transition: opacity 120ms;
 			}
+
 			:host(:hover) #actions-container {
 				opacity: 1;
 			}

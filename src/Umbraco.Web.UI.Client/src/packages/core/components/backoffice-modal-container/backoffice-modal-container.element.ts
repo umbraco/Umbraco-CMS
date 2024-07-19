@@ -1,6 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, repeat, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, repeat, customElement, state, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalElement } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -12,6 +12,9 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 
 	@state()
 	_modals: Array<UmbModalContext> = [];
+
+	@property({ reflect: true, attribute: 'fill-background' })
+	fillBackground = false;
 
 	private _modalManager?: UmbModalManagerContext;
 
@@ -35,6 +38,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	/** We cannot render the umb-modal element directly in the uui-modal-container because it wont get recognized by UUI.
 	 *  We therefore have a helper class which creates the uui-modal element and returns it. */
 	#createModalElements(modals: Array<UmbModalContext>) {
+		this.removeAttribute('fill-background');
 		const oldValue = this._modals;
 		this._modals = modals;
 
@@ -61,6 +65,15 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 			modal.addEventListener('umb:destroy', this.#onCloseEnd.bind(this, modal.key));
 
 			this._modalElementMap.set(modal.key, modalElement);
+
+			// If any of the modals are fillBackground, set the fillBackground property to true
+			if (modal.backdropBackground) {
+				this.fillBackground = true;
+				this.shadowRoot
+					?.getElementById('container')
+					?.style.setProperty('--backdrop-background', modal.backdropBackground);
+			}
+
 			this.requestUpdate();
 		});
 	}
@@ -76,26 +89,35 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		return modalElement.render();
 	}
 
-	render() {
+	override render() {
 		return html`
-			<uui-modal-container>
+			<uui-modal-container id="container">
 				${this._modals.length > 0
 					? repeat(
 							this._modals,
 							(modal) => modal.key,
 							(modal) => this.#renderModal(modal.key),
-					  )
+						)
 					: ''}
 			</uui-modal-container>
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {
 				position: absolute;
 				z-index: 1000;
+			}
+
+			:host([fill-background]) {
+				--uui-modal-dialog-border-radius: 0;
+				--uui-shadow-depth-5: 0;
+			}
+
+			:host([fill-background]) #container::after {
+				background: var(--backdrop-background);
 			}
 		`,
 	];

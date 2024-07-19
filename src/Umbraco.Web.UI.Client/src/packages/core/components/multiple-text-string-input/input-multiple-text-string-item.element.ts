@@ -1,15 +1,15 @@
-import { css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, nothing, property, query, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-input-multiple-text-string-item
  */
 @customElement('umb-input-multiple-text-string-item')
-export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -66,46 +66,50 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 		event.stopPropagation();
 	}
 
-	public async focus() {
+	public override async focus() {
 		await this.updateComplete;
 		this._input?.focus();
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
-			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation"></uui-icon>`}
+			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation" class="handle"></uui-icon>`}
+
 			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input
 					id="input"
 					label="Value"
-					value="${this.value}"
-					@input="${this.#onInput}"
-					@change="${this.#onChange}"
+					value=${this.value}
+					@input=${this.#onInput}
+					@change=${this.#onChange}
 					?disabled=${this.disabled}
 					?readonly=${this.readonly}
-					required="${this.required}"
+					required=${this.required}
 					required-message="Value is missing"></uui-input>
 			</uui-form-validation-message>
 
-			${this.readonly
-				? nothing
-				: html`<uui-button
-						label="Delete ${this.value}"
-						look="primary"
+			${when(
+				!this.readonly,
+				() => html`
+					<uui-button
+						compact
 						color="danger"
-						@click="${this.#onDelete}"
+						label="${this.localize.term('general_remove')} ${this.value}"
+						look="outline"
 						?disabled=${this.disabled}
-						compact>
+						@click=${this.#onDelete}>
 						<uui-icon name="icon-trash"></uui-icon>
-				  </uui-button>`}
+					</uui-button>
+				`,
+			)}
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;
@@ -120,6 +124,10 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 
 			#input {
 				width: 100%;
+			}
+
+			.handle {
+				cursor: move;
 			}
 		`,
 	];

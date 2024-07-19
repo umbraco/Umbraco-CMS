@@ -25,3 +25,5 @@ export class UmbDataTypeDetailStore extends UmbDetailStoreBase<UmbDataTypeDetail
 }
 
 export const UMB_DATA_TYPE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeDetailStore');
+
+export { UmbDataTypeDetailStore as api };

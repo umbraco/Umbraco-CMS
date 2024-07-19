@@ -1,11 +1,10 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 
 /**
  * @element umb-workspace-editor
@@ -15,7 +14,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * @slot name - Slot for name
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
- * @slot default - slot for main content
+ * @slot - slot for main content
  * @export
  * @class UmbWorkspaceEditor
  * @extends {UmbLitElement}
@@ -31,6 +30,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	@property({ type: Boolean })
 	public enforceNoFooter = false;
+
+	@property({ attribute: 'back-path' })
+	public backPath?: string;
 
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceView> = [];
@@ -54,10 +56,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		this._routes = [];
+		let newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			this._routes = this._workspaceViews.map((manifest) => {
+			newRoutes = this._workspaceViews.map((manifest) => {
 				return {
 					path: `view/${manifest.meta.pathname}`,
 					component: () => createExtensionElement(manifest),
@@ -69,33 +71,36 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				} as UmbRoute;
 			});
 
-			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
-			const firstView = this._workspaceViews[0];
-			if (firstView) {
-				this._routes.push({
-					path: ``,
-					redirectTo: `view/${firstView.meta.pathname}`,
-				});
-			}
+			// Duplicate first workspace and use it for the empty path scenario. [NL]
+			newRoutes.push({ ...newRoutes[0], path: '' });
+
+			newRoutes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
 		}
+
+		this._routes = newRoutes;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout main-no-padding .headline=${this.headline}>
+				${this.#renderBackButton()}
 				<slot name="header" slot="header"></slot>
 				${this.#renderViews()}
 				<slot name="action-menu" slot="action-menu"></slot>
 				${this.#renderRoutes()}
 				<slot></slot>
-				${this.enforceNoFooter
-					? ''
-					: html`
-							<umb-workspace-footer slot="footer">
-								<slot name="footer-info"></slot>
-								<slot name="actions" slot="actions"></slot>
-							</umb-workspace-footer>
-						`}
+				${when(
+					!this.enforceNoFooter,
+					() => html`
+						<umb-workspace-footer slot="footer">
+							<slot name="footer-info"></slot>
+							<slot name="actions" slot="actions"></slot>
+						</umb-workspace-footer>
+					`,
+				)}
 			</umb-body-layout>
 		`;
 	}
@@ -108,15 +113,18 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,
-								(view) => html`
-									<uui-tab
-										.label="${view.meta.label || view.name}"
-										href="${this._routerPath}/view/${view.meta.pathname}"
-										?active="${'view/' + view.meta.pathname === this._activePath}">
-										<umb-icon slot="icon" name="${view.meta.icon}"></umb-icon>
-										${view.meta.label || view.name}
-									</uui-tab>
-								`,
+								(view, index) =>
+									// Notice how we use index 0 to determine which workspace that is active with empty path. [NL]
+									html`
+										<uui-tab
+											href="${this._routerPath}/view/${view.meta.pathname}"
+											.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
+											?active=${'view/' + view.meta.pathname === this._activePath ||
+											(index === 0 && this._activePath === '')}>
+											<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
+											${view.meta.label ? this.localize.string(view.meta.label) : view.name}
+										</uui-tab>
+									`,
 							)}
 						</uui-tab-group>
 					`
@@ -124,25 +132,36 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderRoutes() {
+	#renderBackButton() {
+		if (!this.backPath) return nothing;
 		return html`
-			${this._routes && this._routes.length > 0
-				? html`
-						<umb-router-slot
-							id="router-slot"
-							.routes="${this._routes}"
-							@init=${(event: UmbRouterSlotInitEvent) => {
-								this._routerPath = event.target.absoluteRouterPath;
-							}}
-							@change=${(event: UmbRouterSlotChangeEvent) => {
-								this._activePath = event.target.localActiveViewPath;
-							}}></umb-router-slot>
-					`
-				: nothing}
+			<uui-button
+				slot="header"
+				class="back-button"
+				compact
+				href=${this.backPath}
+				label=${this.localize.term('general_back')}>
+				<uui-icon name="icon-arrow-left"></uui-icon>
+			</uui-button>
 		`;
 	}
 
-	static styles = [
+	#renderRoutes() {
+		if (!this._routes || this._routes.length === 0) return nothing;
+		return html`
+			<umb-router-slot
+				id="router-slot"
+				.routes=${this._routes}
+				@init=${(event: UmbRouterSlotInitEvent) => {
+					this._routerPath = event.target.absoluteRouterPath;
+				}}
+				@change=${(event: UmbRouterSlotChangeEvent) => {
+					this._activePath = event.target.localActiveViewPath;
+				}}></umb-router-slot>
+		`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -155,6 +174,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
+			}
+
+			.back-button {
+				margin-right: var(--uui-size-space-4);
 			}
 
 			uui-input {

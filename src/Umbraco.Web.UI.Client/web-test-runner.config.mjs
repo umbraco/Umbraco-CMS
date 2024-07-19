@@ -12,17 +12,20 @@ if (!['dev', 'prod'].includes(mode)) {
 	throw new Error(`MODE must be "dev" or "prod", was "${mode}"`);
 }
 
+const silencedLogs = ['Lit is in dev mode.', 'Multiple versions of Lit loaded.', '-- Extension of alias "', 'Error: Failed to create extension api from alias'];
+
 /** @type {import('@web/dev-server').DevServerConfig} */
 export default {
 	rootDir: '.',
 	files: ['./src/**/*.test.ts'],
-	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: true },
+	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: false },
 	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
+	/* TODO: fix coverage report
 	coverageConfig: {
 		reporters: ['lcovonly', 'text-summary'],
 	},
+	*/
 	plugins: [
-		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
 			inject: {
 				importMap: createImportMap({
@@ -35,9 +38,18 @@ export default {
 			},
 		}),
 		commonjs({
-			include: ['node_modules/**', 'src/external/**'],
+			include: ['node_modules/base64-js/**/*', 'node_modules/tinymce/**/*'],
 		}),
+		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 	],
+	filterBrowserLogs(log) {
+		for (const arg of log.args) {
+			if (typeof arg === 'string' && silencedLogs.some((l) => arg.includes(l))) {
+				return false;
+			}
+		}
+		return true;
+	},
 	testRunnerHtml: (testFramework, devMode) =>
 		`<html lang="en-us">
 			<head>
@@ -52,22 +64,12 @@ export default {
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">
+				<script type="module">
+					import '@umbraco-cms/backoffice/components';
+				</script>
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
-				<script type="module">
-					/* Hack to disable Lit dev mode warnings */
-					const systemWarn = window.console.warn;
-					window.console.warn = (...args) => {
-						if (args[0].indexOf('Lit is in dev mode.') === 0) {
-							return;
-						}
-						if (args[0].indexOf('Multiple versions of Lit loaded.') === 0) {
-							return;
-						}
-						systemWarn(...args);
-					};
-				</script>
         <script type="module">
 					import 'element-internals-polyfill';
 					import '@umbraco-ui/uui';

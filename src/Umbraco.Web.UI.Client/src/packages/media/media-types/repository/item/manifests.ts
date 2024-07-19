@@ -1,7 +1,5 @@
-import type { ManifestItemStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Item';
-export const UMB_MEDIA_TYPE_ITEM_STORE_ALIAS = 'Umb.Store.MediaType.Item';
+import { UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_ITEM_STORE_ALIAS } from './constants.js';
+import type { ManifestItemStore, ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const itemRepository: ManifestRepository = {
 	type: 'repository',
@@ -17,4 +15,4 @@ const itemStore: ManifestItemStore = {
 	api: () => import('./media-type-item.store.js'),
 };
 
-export const manifests = [itemRepository, itemStore];
+export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];

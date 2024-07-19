@@ -1,6 +1,6 @@
 import type { UmbDictionaryCollectionModel } from '../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -32,7 +32,7 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.#observeCollectionItems();
 		});
@@ -113,13 +113,13 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 			style="color:var(--uui-color-danger-standalone);display:inline-block"></uui-icon>`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

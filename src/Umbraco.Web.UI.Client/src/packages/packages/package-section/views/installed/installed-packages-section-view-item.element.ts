@@ -1,28 +1,27 @@
 import { html, css, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestPackageView } from '@umbraco-cms/backoffice/extension-registry';
+import { PackageService } from '@umbraco-cms/backoffice/external/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { ManifestPackageView } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-installed-packages-section-view-item')
 export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@property()
-	public get name(): string | undefined {
-		return this.#name;
-	}
 	public set name(value: string | undefined) {
 		const oldValue = this.#name;
 		if (oldValue === value) return;
 		this.#name = value;
 		this.#observePackageView();
 		this.requestUpdate('name', oldValue);
+	}
+	public get name(): string | undefined {
+		return this.#name;
 	}
 	#name?: string | undefined;
 
@@ -32,7 +31,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	hasPendingMigrations = false;
 
-	@property()
+	@property({ attribute: 'custom-icon' })
 	customIcon?: string;
 
 	@state()
@@ -53,11 +52,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 
 	#observePackageView() {
 		this.observe(
-			umbExtensionsRegistry.byType('packageView').pipe(
-				map((extensions) => {
-					return extensions.filter((extension) => extension.meta.packageName === this.#name);
-				}),
-			),
+			umbExtensionsRegistry.byTypeAndFilter('packageView', (manifest) => manifest.meta.packageName === this.#name),
 			(manifests) => {
 				if (manifests.length === 0) {
 					this._packageView = undefined;
@@ -69,54 +64,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		);
 	}
 
-	async _onMigration() {
-		if (!this.name) return;
-
-		await umbConfirmModal(this, {
-			color: 'positive',
-			headline: `Run migrations for ${this.name}?`,
-			content: `Do you want to start run migrations for ${this.name}`,
-			confirmLabel: 'Run migrations',
-		});
-
-		this._migrationButtonState = 'waiting';
-		const { error } = await tryExecuteAndNotify(
-			this,
-			PackageResource.postPackageByNameRunMigration({ name: this.name }),
-		);
-		if (error) return;
-		this.#notificationContext?.peek('positive', { data: { message: 'Migrations completed' } });
-		this._migrationButtonState = 'success';
-		this.hasPendingMigrations = false;
-	}
-
-	render() {
-		return this.name
-			? html`
-					<uui-ref-node-package
-						name=${ifDefined(this.name)}
-						version="${ifDefined(this.version ?? undefined)}"
-						@open=${this._onConfigure}
-						?disabled="${!this._packageView}">
-						${this.customIcon ? html`<umb-icon slot="icon" name="${this.customIcon}"></umb-icon>` : nothing}
-						<div slot="tag">
-							${this.hasPendingMigrations
-								? html`<uui-button
-										@click="${this._onMigration}"
-										.state=${this._migrationButtonState}
-										color="warning"
-										look="primary"
-										label="Run pending package migrations">
-										Run pending migrations
-								  </uui-button>`
-								: nothing}
-						</div>
-					</uui-ref-node-package>
-			  `
-			: '';
-	}
-
-	private async _onConfigure() {
+	async #onConfigure() {
 		if (!this._packageView) {
 			console.warn('Tried to configure package without view');
 			return;
@@ -130,7 +78,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		}
 
 		// TODO: add dedicated modal for package views, and register it in a manifest.
-		alert('package view modal temporarily disabled. See comment in code.');
+		throw new Error('package view modal temporarily disabled.');
 		/*
 		this._modalContext?.open(this, element, {
 			data: { name: this.name, version: this.version },
@@ -140,7 +88,62 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		*/
 	}
 
-	static styles = css`
+	async #onMigration() {
+		if (!this.name) return;
+
+		await umbConfirmModal(this, {
+			color: 'positive',
+			headline: `Run migrations for ${this.name}?`,
+			content: `Do you want to start run migrations for ${this.name}`,
+			confirmLabel: 'Run migrations',
+		});
+
+		this._migrationButtonState = 'waiting';
+		const { error } = await tryExecuteAndNotify(
+			this,
+			PackageService.postPackageByNameRunMigration({ name: this.name }),
+		);
+
+		if (error) return;
+
+		this.#notificationContext?.peek('positive', {
+			data: {
+				headline: 'Migrations completed',
+				message: this.localize.term('packager_packageMigrationsComplete'),
+			},
+		});
+
+		this._migrationButtonState = 'success';
+		this.hasPendingMigrations = false;
+	}
+
+	override render() {
+		return this.name
+			? html`
+					<uui-ref-node-package
+						name=${ifDefined(this.name)}
+						version="${ifDefined(this.version ?? undefined)}"
+						@open=${this.#onConfigure}
+						?disabled="${!this._packageView}">
+						${this.customIcon ? html`<umb-icon slot="icon" name=${this.customIcon}></umb-icon>` : nothing}
+						<div slot="tag">
+							${this.hasPendingMigrations
+								? html`<uui-button
+										@click="${this.#onMigration}"
+										.state=${this._migrationButtonState}
+										color="warning"
+										look="primary"
+										label=${this.localize.term('packageMigrationsRun')}>
+										Run pending migrations
+									</uui-button>`
+								: nothing}
+						</div>
+					</uui-ref-node-package>
+				`
+			: '';
+	}
+
+	static override styles = css`
 		:host {
 			display: flex;
 			min-height: 47px;

@@ -1,7 +1,6 @@
-export interface UmbStructureItemModelBase {
-	unique: string | null;
-	entityType: string;
-}
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+export interface UmbStructureItemModelBase extends UmbEntityModel {}
 
 export interface UmbStructureItemModel extends UmbStructureItemModelBase {
 	name: string;

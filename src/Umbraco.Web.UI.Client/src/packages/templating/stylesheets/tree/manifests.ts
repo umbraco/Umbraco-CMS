@@ -10,6 +10,7 @@ import type {
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
@@ -49,7 +50,7 @@ const treeItem: ManifestTreeItem = {
 	forEntityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 };
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	treeRepository,
 	treeStore,
 	tree,

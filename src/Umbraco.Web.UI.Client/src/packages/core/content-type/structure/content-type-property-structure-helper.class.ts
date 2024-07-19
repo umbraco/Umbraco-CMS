@@ -7,7 +7,7 @@ import type {
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
@@ -23,6 +23,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	private _containerId?: string | null;
 
+	// State which holds all the properties of the current container, this is a composition of all properties from the containers that matches our target [NL]
 	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
@@ -76,8 +77,14 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		if (!this.#structure || this._containerId === undefined) return;
 
 		if (this._containerId === null) {
-			this.#observePropertyStructureOf(null);
-			this.removeControllerByAlias('_observeContainers');
+			this.observe(
+				this.#structure.propertyStructuresOf(null),
+				(properties) => {
+					this.#propertyStructure.setValue(properties);
+				},
+				'observePropertyStructures',
+			);
+			this.removeUmbControllerByAlias('_observeContainers');
 		} else {
 			this.observe(
 				this.#structure.containerById(this._containerId),
@@ -86,7 +93,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 						this._containerName = container.name ?? '';
 						this._containerType = container.type;
 						if (container.parent) {
-							// We have a parent for our main container, so lets observe that one as well:
+							// We have a parent for our main container, so lets observe that one as well: [NL]
 							this.observe(
 								this.#structure!.containerById(container.parent.id),
 								(parent) => {
@@ -95,7 +102,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 										this._parentType = parent.type;
 										this.#observeSimilarContainers();
 									} else {
-										this.removeControllerByAlias('_observeContainers');
+										this.removeUmbControllerByAlias('_observeContainers');
 										this._parentName = undefined;
 										this._parentType = undefined;
 									}
@@ -103,13 +110,13 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 								'_observeMainParentContainer',
 							);
 						} else {
-							this.removeControllerByAlias('_observeMainParentContainer');
+							this.removeUmbControllerByAlias('_observeMainParentContainer');
 							this._parentName = null; //In this way we want to look for one without a parent. [NL]
 							this._parentType = undefined;
 							this.#observeSimilarContainers();
 						}
 					} else {
-						this.removeControllerByAlias('_observeContainers');
+						this.removeUmbControllerByAlias('_observeContainers');
 						this._containerName = undefined;
 						this._containerType = undefined;
 						this.#propertyStructure.setValue([]);
@@ -121,7 +128,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	}
 
 	#observeSimilarContainers() {
-		if (!this._containerName || !this._containerType || this._parentName === undefined) return;
+		if (this._containerName === undefined || !this._containerType || this._parentName === undefined) return;
 		this.observe(
 			this.#structure!.containersByNameAndTypeAndParent(
 				this._containerName,
@@ -139,35 +146,21 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 					this.#propertyStructure.setValue(_propertyStructure);
 				}
 
-				groupContainers.forEach((group) => this.#observePropertyStructureOf(group.id));
+				this.observe(
+					mergeObservables(
+						groupContainers.map((group) => this.#structure!.propertyStructuresOf(group.id)),
+						(sources) => {
+							return sources.flatMap((x) => x);
+						},
+					),
+					(properties) => {
+						this.#propertyStructure.setValue(properties);
+					},
+					'observePropertyStructures',
+				);
 				this.#containers = groupContainers;
 			},
 			'_observeContainers',
-		);
-	}
-
-	#observePropertyStructureOf(groupId?: string | null) {
-		if (!this.#structure || groupId === undefined) return;
-
-		this.observe(
-			this.#structure.propertyStructuresOf(groupId),
-			(properties) => {
-				// Lets remove the properties that does not exists any longer:
-				const _propertyStructure = this.#propertyStructure
-					.getValue()
-					.filter((x) => !(x.container?.id === groupId && !properties.some((y) => y.id === x.id)));
-
-				// Lets append the properties that does not exists already:
-				properties?.forEach((property) => {
-					if (!_propertyStructure.find((x) => x.alias === property.alias)) {
-						_propertyStructure.push(property);
-					}
-				});
-
-				// Fire update to subscribers:
-				this.#propertyStructure.setValue(_propertyStructure);
-			},
-			'_observePropertyStructureOfGroup' + groupId,
 		);
 	}
 
@@ -178,25 +171,15 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return this.#structure.ownerContentTypePart((x) => x?.properties.some((y) => y.id === propertyId));
 	}
 
+	async contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		return this.#structure.contentTypeOfProperty(propertyId);
+	}
+
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
-
-	async createPropertyScaffold(ownerId?: string) {
-		await this.#init;
-		if (!this.#structure) return;
-
-		return await this.#structure.createPropertyScaffold(ownerId);
-	}
-	/*
-		Only used by legacy implementation:
-		@deprecated
-	*/
-	async addProperty(containerId?: string, sortOrder?: number) {
-		await this.#init;
-		if (!this.#structure) return;
-
-		return await this.#structure.createProperty(null, containerId, sortOrder);
-	}
 
 	async insertProperty(property: UmbPropertyTypeModel, sortOrder?: number) {
 		await this.#init;

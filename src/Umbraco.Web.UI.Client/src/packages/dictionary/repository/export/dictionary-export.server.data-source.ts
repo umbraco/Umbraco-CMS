@@ -1,4 +1,4 @@
-import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -19,7 +19,7 @@ export class UmbDictionaryExportServerDataSource {
 	async export(unique: string, includeChildren: boolean) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.getDictionaryByIdExport({ id: unique, includeChildren }),
+			DictionaryService.getDictionaryByIdExport({ id: unique, includeChildren }),
 		);
 	}
 }

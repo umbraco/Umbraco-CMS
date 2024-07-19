@@ -12,7 +12,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue
 > {
-	set data(data: UmbEntityUserPermissionSettingsModalData | undefined) {
+	override set data(data: UmbEntityUserPermissionSettingsModalData | undefined) {
 		super.data = data;
 		this._entityType = data?.entityType;
 		this._headline = data?.headline ?? this._headline;
@@ -29,7 +29,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 		this.updateValue({ allowedVerbs: target.allowedVerbs });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this._headline}>
 				<uui-box>
@@ -53,7 +53,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.permission-toggle {

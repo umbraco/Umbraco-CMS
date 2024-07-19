@@ -2,7 +2,7 @@ import type {
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -17,7 +17,7 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	public readonly results = this.#results.asObservable();
 
 	async getGroupChecks(name: string) {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroupByName({ name }));
+		const { data } = await tryExecuteAndNotify(this, HealthCheckService.getHealthCheckGroupByName({ name }));
 
 		if (data) {
 			this.#checks.setValue(data);
@@ -27,7 +27,7 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	}
 
 	async checkGroup(name: string) {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckGroupByNameCheck({ name }));
+		const { data } = await tryExecuteAndNotify(this, HealthCheckService.postHealthCheckGroupByNameCheck({ name }));
 
 		if (data) {
 			this.#results.setValue(data);

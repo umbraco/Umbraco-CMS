@@ -1,9 +1,12 @@
-import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS, DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+} from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
+import { manifests as moveManifests } from './move-to/manifests.js';
+import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityType = 'document-type';
 
 const entityActions: Array<ManifestTypes> = [
 	{
@@ -11,36 +14,17 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'delete',
 		alias: 'Umb.EntityAction.DocumentType.Delete',
 		name: 'Delete Document-Type Entity Action',
-		forEntityTypes: [entityType],
+		forEntityTypes: [UMB_DOCUMENT_TYPE_ENTITY_TYPE],
 		meta: {
-			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-			detailRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'move',
-		alias: 'Umb.EntityAction.DocumentType.Move',
-		name: 'Move Document Type Entity Action',
-		forEntityTypes: [entityType],
-		meta: {
-			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-			moveRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			pickerModal: UMB_DOCUMENT_TYPE_PICKER_MODAL,
-		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'duplicate',
-		alias: 'Umb.EntityAction.DocumentType.Duplicate',
-		name: 'Duplicate Document Type Entity Action',
-		forEntityTypes: [entityType],
-		meta: {
-			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-			duplicateRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			pickerModal: UMB_DOCUMENT_TYPE_PICKER_MODAL,
+			itemRepositoryAlias: UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 ];
 
-export const manifests = [...entityActions, ...createManifests];
+export const manifests: Array<ManifestTypes> = [
+	...entityActions,
+	...createManifests,
+	...moveManifests,
+	...duplicateManifests,
+];

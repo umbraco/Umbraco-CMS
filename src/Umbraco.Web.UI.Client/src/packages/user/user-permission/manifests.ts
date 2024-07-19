@@ -1,4 +1,4 @@
-import { manifest as userPermissionConditionManifest } from './conditions/user-permission.condition.js';
 import { manifests as userPermissionModalManifests } from './modals/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [userPermissionConditionManifest, ...userPermissionModalManifests];
+export const manifests: Array<ManifestTypes> = [...userPermissionModalManifests];

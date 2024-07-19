@@ -1,12 +1,9 @@
+import { UMB_USER_GROUP_COLLECTION_CONTEXT } from '../user-group-collection.context-token.js';
+import type { UmbUserGroupDetailModel } from '../../types.js';
+import type { UmbUserGroupCollectionContext } from '../user-group-collection.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-
-import '../components/user-group-table-name-column-layout.element.js';
-import '../components/user-group-table-sections-column-layout.element.js';
-
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -15,7 +12,13 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import type { UmbUserGroupDetailModel } from '../../types.js';
+import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
+import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+
+import '../components/user-group-table-name-column-layout.element.js';
+import '../components/user-group-table-sections-column-layout.element.js';
 
 @customElement('umb-user-group-collection-table-view')
 export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
@@ -52,12 +55,19 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext;
+	#collectionContext?: UmbUserGroupCollectionContext;
+
+	// TODO: hardcoded dependencies on document and media modules. We should figure out how these dependencies can be added through extensions.
+	#documentItemRepository = new UmbDocumentItemRepository(this);
+	#mediaItemRepository = new UmbMediaItemRepository(this);
+
+	#documentStartNodeMap = new Map<string, string>();
+	#mediaStartNodeMap = new Map<string, string>();
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_USER_GROUP_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext.selection.selection,
@@ -74,7 +84,17 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(userGroups: Array<UmbUserGroupDetailModel>) {
+	private async _createTableItems(userGroups: Array<UmbUserGroupDetailModel>) {
+		await Promise.all([
+			this.#requestAndCacheStartNodes(
+				userGroups,
+				'documentStartNode',
+				this.#documentItemRepository,
+				this.#documentStartNodeMap,
+			),
+			this.#requestAndCacheStartNodes(userGroups, 'mediaStartNode', this.#mediaItemRepository, this.#mediaStartNodeMap),
+		]);
+
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
 				id: userGroup.unique,
@@ -92,51 +112,71 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.documentStartNode?.unique || this.localize.term('content_contentRoot'),
+						value: userGroup.documentStartNode
+							? this.#documentStartNodeMap.get(userGroup.documentStartNode.unique)
+							: this.localize.term('content_contentRoot'),
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNode?.unique || this.localize.term('media_mediaRoot'),
+						value: userGroup.mediaStartNode?.unique
+							? this.#mediaStartNodeMap.get(userGroup.mediaStartNode.unique)
+							: this.localize.term('media_mediaRoot'),
 					},
 				],
 			};
 		});
 	}
 
-	private _handleSelected(event: UmbTableSelectedEvent) {
+	async #requestAndCacheStartNodes(
+		userGroups: Array<UmbUserGroupDetailModel>,
+		startNodeField: 'documentStartNode' | 'mediaStartNode',
+		itemRepository: UmbItemRepository<UmbUniqueItemModel>,
+		map: Map<string, string>,
+	) {
+		const allStartNodes = userGroups.map((userGroup) => userGroup[startNodeField]?.unique).filter(Boolean) as string[];
+		const uniqueStartNodes = [...new Set(allStartNodes)];
+		const uncachedStartNodes = uniqueStartNodes.filter((unique) => !map.has(unique));
+
+		// If there are no uncached start nodes, we don't need to make a request
+		if (uncachedStartNodes.length === 0) return;
+
+		const { data: items } = await itemRepository.requestItems(uncachedStartNodes);
+
+		if (items) {
+			items.forEach((item) => {
+				// cache the start node
+				map.set(item.unique, item.name);
+			});
+		}
+	}
+
+	#onSelected(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
 		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleDeselected(event: UmbTableDeselectedEvent) {
+	#onDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
 		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this._handleSelected}"
-				@deselected="${this._handleDeselected}"></umb-table>
+				@selected="${this.#onSelected}"
+				@deselected="${this.#onDeselected}"></umb-table>
 		`;
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			umb-table {
-				padding: 0;
-			}
-		`,
-	];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbUserGroupCollectionTableViewElement;

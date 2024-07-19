@@ -1,5 +1,5 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
@@ -8,6 +8,9 @@ import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-ty
 @customElement('umb-block-grid-type-workspace-view-areas')
 export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//
+	@state()
+	_areaColumnsConfigurationObject?: UmbPropertyEditorConfig;
+
 	@state()
 	_areaConfigConfigurationObject?: UmbPropertyEditorConfig;
 
@@ -18,7 +21,8 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 			this.observe(
 				await context.propertyValueByAlias<undefined | string>('gridColumns'),
 				(value) => {
-					const dataTypeGridColumns = value ? parseInt(value, 10) : undefined;
+					const dataTypeGridColumns = value ? parseInt(value, 10) : 12;
+					this._areaColumnsConfigurationObject = [{ alias: 'placeholder', value: dataTypeGridColumns }];
 					this._areaConfigConfigurationObject = [{ alias: 'defaultAreaGridColumns', value: dataTypeGridColumns }];
 				},
 				'observeGridColumns',
@@ -26,25 +30,28 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 		}).passContextAliasMatches();
 	}
 
-	render() {
-		return html`
-			<uui-box headline="Areas">
-				<umb-property
-					label=${this.localize.term('blockEditor_areasLayoutColumns')}
-					alias="areaGridColumns"
-					property-editor-ui-alias="Umb.PropertyEditorUi.Number"></umb-property>
-				<umb-property
-					label=${this.localize.term('blockEditor_areasConfigurations')}
-					alias="areas"
-					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridAreasConfig"
-					.config=${this._areaConfigConfigurationObject}
-					>></umb-property
-				>
-			</uui-box>
-		`;
+	override render() {
+		return this._areaConfigConfigurationObject
+			? html`
+					<uui-box headline="Areas">
+						<umb-property
+							label=${this.localize.term('blockEditor_areasLayoutColumns')}
+							alias="areaGridColumns"
+							property-editor-ui-alias="Umb.PropertyEditorUi.Integer"
+							.config=${this._areaColumnsConfigurationObject}></umb-property>
+						<umb-property
+							label=${this.localize.term('blockEditor_areasConfigurations')}
+							alias="areas"
+							property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridAreasConfig"
+							.config=${this._areaConfigConfigurationObject}
+							>></umb-property
+						>
+					</uui-box>
+				`
+			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

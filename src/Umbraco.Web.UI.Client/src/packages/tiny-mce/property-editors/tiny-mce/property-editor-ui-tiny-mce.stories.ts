@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbPropertyEditorUITinyMceElement } from './property-editor-ui-tiny-mce.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import './property-editor-ui-tiny-mce.element.js';
@@ -80,7 +80,11 @@ const meta: Meta<UmbPropertyEditorUITinyMceElement> = {
 	args: {
 		config: undefined,
 		value: {
-			blocks: {},
+			blocks: {
+				layout: {},
+				contentData: [],
+				settingsData: [],
+			},
 			markup: `
 			<h2>TinyMCE</h2>
 			<p>I am a default value for the TinyMCE text editor story.</p>

@@ -4,10 +4,10 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbCompositionPickerModalData {
 	compositionRepositoryAlias: string;
 	selection: Array<string>;
-	unique: string;
-	//Do we really need to send this to the server - Why isn't unique enough?
+	unique: string | null;
 	isElement: boolean;
 	currentPropertyAliases: Array<string>;
+	isNew: boolean;
 }
 
 export interface UmbCompositionPickerModalValue {

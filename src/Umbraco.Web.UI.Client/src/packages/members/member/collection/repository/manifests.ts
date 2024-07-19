@@ -1,4 +1,4 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEMBER_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.Member.Collection';
 
@@ -9,4 +9,4 @@ const repository: ManifestRepository = {
 	api: () => import('./member-collection.repository.js'),
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

@@ -1,7 +1,5 @@
-import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_GROUP_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.UserGroupItem';
-export const UMB_USER_GROUP_STORE_ALIAS = 'Umb.Store.UserGroupItem';
+import { UMB_USER_GROUP_ITEM_REPOSITORY_ALIAS, UMB_USER_GROUP_STORE_ALIAS } from './constants.js';
+import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const itemRepository: ManifestRepository = {
 	type: 'repository',
@@ -17,4 +15,4 @@ const itemStore: ManifestItemStore = {
 	api: () => import('./user-group-item.store.js'),
 };
 
-export const manifests = [itemRepository, itemStore];
+export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];

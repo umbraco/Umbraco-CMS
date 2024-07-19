@@ -1,6 +1,6 @@
-import { expect } from '@open-wc/testing';
 import type { ManifestElementWithElementName, ManifestKind, ManifestBase } from '../types/index.js';
 import { UmbExtensionRegistry } from './extension.registry.js';
+import { expect } from '@open-wc/testing';
 
 interface TestManifestWithMeta extends ManifestBase {
 	meta: unknown;
@@ -366,5 +366,90 @@ describe('UmbExtensionRegistry with kinds', () => {
 				}
 			})
 			.unsubscribe();
+	});
+});
+
+describe('UmbExtensionRegistry with exclusions', () => {
+	let extensionRegistry: UmbExtensionRegistry<any>;
+	let manifests: Array<
+		ManifestElementWithElementName | TestManifestWithMeta | ManifestKind<ManifestElementWithElementName>
+	>;
+
+	beforeEach(() => {
+		extensionRegistry = new UmbExtensionRegistry<any>();
+		manifests = [
+			{
+				type: 'kind',
+				alias: 'Umb.Test.Kind',
+				matchType: 'section',
+				matchKind: 'test-kind',
+				manifest: {
+					type: 'section',
+					elementName: 'my-kind-element',
+					meta: {
+						label: 'my-kind-meta-label',
+					},
+				},
+			},
+			{
+				type: 'section',
+				kind: 'test-kind' as unknown as undefined, // We do not know about this one, so it makes good sense that its not a valid option.
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				weight: 1,
+				meta: {
+					pathname: 'test-section-1',
+				},
+			},
+			{
+				type: 'section',
+				name: 'test-section-2',
+				alias: 'Umb.Test.Section.2',
+				weight: 200,
+				meta: {
+					label: 'Test Section 2',
+					pathname: 'test-section-2',
+				},
+			},
+		];
+
+		manifests.forEach((manifest) => extensionRegistry.register(manifest));
+	});
+
+	it('should have the extensions registered', () => {
+		expect(extensionRegistry.isRegistered('Umb.Test.Kind')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.2')).to.be.true;
+	});
+
+	it('must not say that Umb.Test.Section.1d is registered, when its added to the exclusion list', () => {
+		extensionRegistry.exclude('Umb.Test.Section.1');
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.false;
+		// But check that the other ones are still registered:
+		expect(extensionRegistry.isRegistered('Umb.Test.Kind')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.2')).to.be.true;
+	});
+
+	it('does not affect kinds when a kind-alias is put in the exclusion list', () => {
+		extensionRegistry.exclude('Umb.Test.Kind');
+		// This had no effect, so all of them are still available.
+		expect(extensionRegistry.isRegistered('Umb.Test.Kind')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.2')).to.be.true;
+	});
+
+	it('prevents late comers from begin registered', () => {
+		extensionRegistry.exclude('Umb.Test.Section.Late');
+		extensionRegistry.register({
+			type: 'section',
+			name: 'test-section-late',
+			alias: 'Umb.Test.Section.Late',
+			weight: 200,
+			meta: {
+				label: 'Test Section Late',
+				pathname: 'test-section-Late',
+			},
+		});
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.Late')).to.be.false;
 	});
 });

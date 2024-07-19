@@ -1,5 +1,5 @@
-import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../user-section/manifests.js';
-import type { ManifestSectionView } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../user-section/index.js';
+import type { ManifestSectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionsViews: Array<ManifestSectionView> = [
 	{
@@ -9,7 +9,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		js: () => import('./user-group-section-view.element.js'),
 		weight: 100,
 		meta: {
-			label: 'User Groups',
+			label: '#user_usergroups',
 			pathname: 'user-groups',
 			icon: 'icon-users',
 		},
@@ -22,4 +22,4 @@ const sectionsViews: Array<ManifestSectionView> = [
 	},
 ];
 
-export const manifests = [...sectionsViews];
+export const manifests: Array<ManifestTypes> = [...sectionsViews];

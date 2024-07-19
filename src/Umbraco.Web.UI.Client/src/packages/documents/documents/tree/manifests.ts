@@ -1,11 +1,11 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
-import { UmbDocumentTreeItemContext } from './tree-item/document-tree-item.context.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Document.Tree';
@@ -28,9 +28,10 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
-	kind: 'default',
 	alias: UMB_DOCUMENT_TREE_ALIAS,
 	name: 'Document Tree',
+	api: () => import('./document-tree.context.js'),
+	element: () => import('./document-tree.element.js'),
 	meta: {
 		repositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
 	},
@@ -41,8 +42,23 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.Document',
 	name: 'Document Tree Item',
 	element: () => import('./tree-item/document-tree-item.element.js'),
-	api: UmbDocumentTreeItemContext,
-	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
+	api: () => import('./tree-item/document-tree-item.context.js'),
+	forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 };
 
-export const manifests = [...reloadTreeItemChildrenManifests, tree, treeItem, treeRepository, treeStore];
+const rootTreeItem: ManifestTreeItem = {
+	type: 'treeItem',
+	kind: 'default',
+	alias: 'Umb.TreeItem.Document.Root',
+	name: 'Document Tree Root',
+	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE],
+};
+
+export const manifests: Array<ManifestTypes> = [
+	...reloadTreeItemChildrenManifests,
+	tree,
+	treeItem,
+	rootTreeItem,
+	treeRepository,
+	treeStore,
+];

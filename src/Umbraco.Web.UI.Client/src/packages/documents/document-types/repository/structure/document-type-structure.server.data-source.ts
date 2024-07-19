@@ -1,6 +1,6 @@
 import type { UmbAllowedDocumentTypeModel } from './types.js';
 import type { AllowedDocumentTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -22,10 +22,10 @@ export class UmbDocumentTypeStructureServerDataSource extends UmbContentTypeStru
 const getAllowedChildrenOf = (unique: string | null) => {
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentTypeResource.getDocumentTypeByIdAllowedChildren({ id: unique });
+		return DocumentTypeService.getDocumentTypeByIdAllowedChildren({ id: unique });
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentTypeResource.getDocumentTypeAllowedAtRoot({});
+		return DocumentTypeService.getDocumentTypeAllowedAtRoot({});
 	}
 };
 

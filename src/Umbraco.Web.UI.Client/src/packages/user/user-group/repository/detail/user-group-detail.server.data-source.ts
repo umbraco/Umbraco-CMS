@@ -4,7 +4,7 @@ import type {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -36,20 +36,22 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	 */
 	async createScaffold() {
 		const data: UmbUserGroupDetailModel = {
-			entityType: UMB_USER_GROUP_ENTITY_TYPE,
-			unique: UmbId.new(),
-			isSystemGroup: false,
-			name: '',
-			icon: null,
-			sections: [],
-			languages: [],
-			hasAccessToAllLanguages: false,
-			documentStartNode: null,
+			alias: '',
+			aliasCanBeChanged: true,
 			documentRootAccess: false,
-			mediaStartNode: null,
-			mediaRootAccess: false,
+			documentStartNode: null,
+			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			fallbackPermissions: [],
+			hasAccessToAllLanguages: false,
+			icon: 'icon-users',
+			isDeletable: true,
+			languages: [],
+			mediaRootAccess: false,
+			mediaStartNode: null,
+			name: '',
 			permissions: [],
+			sections: [],
+			unique: UmbId.new(),
 		};
 
 		return { data };
@@ -64,7 +66,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroupById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserGroupService.getUserGroupById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -72,20 +74,22 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 		// TODO: make data mapper to prevent errors
 		const userGroup: UmbUserGroupDetailModel = {
-			entityType: UMB_USER_GROUP_ENTITY_TYPE,
-			unique: data.id,
-			isSystemGroup: data.isSystemGroup,
-			name: data.name,
-			icon: data.icon || null,
-			sections: data.sections,
-			languages: data.languages,
-			hasAccessToAllLanguages: data.hasAccessToAllLanguages,
-			documentStartNode: data.documentStartNode ? { unique: data.documentStartNode.id } : null,
+			alias: data.alias,
 			documentRootAccess: data.documentRootAccess,
-			mediaStartNode: data.mediaStartNode ? { unique: data.mediaStartNode.id } : null,
-			mediaRootAccess: data.mediaRootAccess,
+			documentStartNode: data.documentStartNode ? { unique: data.documentStartNode.id } : null,
+			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			fallbackPermissions: data.fallbackPermissions,
+			hasAccessToAllLanguages: data.hasAccessToAllLanguages,
+			icon: data.icon || null,
+			isDeletable: data.isDeletable,
+			aliasCanBeChanged: data.aliasCanBeChanged,
+			languages: data.languages,
+			mediaRootAccess: data.mediaRootAccess,
+			mediaStartNode: data.mediaStartNode ? { unique: data.mediaStartNode.id } : null,
+			name: data.name,
 			permissions: data.permissions,
+			sections: data.sections,
+			unique: data.id,
 		};
 
 		return { data: userGroup };
@@ -102,22 +106,23 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateUserGroupRequestModel = {
-			name: model.name,
-			icon: model.icon,
-			sections: model.sections,
-			languages: model.languages,
-			hasAccessToAllLanguages: model.hasAccessToAllLanguages,
-			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
+			alias: model.alias,
 			documentRootAccess: model.documentRootAccess,
-			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
-			mediaRootAccess: model.mediaRootAccess,
+			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
 			fallbackPermissions: model.fallbackPermissions,
+			hasAccessToAllLanguages: model.hasAccessToAllLanguages,
+			icon: model.icon,
+			languages: model.languages,
+			mediaRootAccess: model.mediaRootAccess,
+			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
+			name: model.name,
 			permissions: model.permissions,
+			sections: model.sections,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			UserGroupResource.postUserGroup({
+			UserGroupService.postUserGroup({
 				requestBody,
 			}),
 		);
@@ -140,22 +145,23 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateUserGroupRequestModel = {
-			name: model.name,
-			icon: model.icon,
-			sections: model.sections,
-			languages: model.languages,
-			hasAccessToAllLanguages: model.hasAccessToAllLanguages,
-			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
+			alias: model.alias,
 			documentRootAccess: model.documentRootAccess,
-			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
-			mediaRootAccess: model.mediaRootAccess,
+			documentStartNode: model.documentStartNode ? { id: model.documentStartNode.unique } : null,
 			fallbackPermissions: model.fallbackPermissions,
+			hasAccessToAllLanguages: model.hasAccessToAllLanguages,
+			icon: model.icon,
+			languages: model.languages,
+			mediaRootAccess: model.mediaRootAccess,
+			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
+			name: model.name,
 			permissions: model.permissions,
+			sections: model.sections,
 		};
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			UserGroupResource.putUserGroupById({
+			UserGroupService.putUserGroupById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -179,7 +185,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserGroupResource.deleteUserGroupById({
+			UserGroupService.deleteUserGroupById({
 				id: unique,
 			}),
 		);

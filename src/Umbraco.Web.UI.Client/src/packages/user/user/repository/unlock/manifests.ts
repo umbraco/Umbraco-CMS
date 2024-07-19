@@ -1,6 +1,5 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_UNLOCK_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Unlock';
+import { UMB_UNLOCK_USER_REPOSITORY_ALIAS } from './constants.js';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const unlockRepository: ManifestRepository = {
 	type: 'repository',
@@ -9,4 +8,4 @@ const unlockRepository: ManifestRepository = {
 	api: () => import('./unlock-user.repository.js'),
 };
 
-export const manifests = [unlockRepository];
+export const manifests: Array<ManifestTypes> = [unlockRepository];

@@ -3,7 +3,7 @@ import type {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
-} from '../context-api/index.js';
+} from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';

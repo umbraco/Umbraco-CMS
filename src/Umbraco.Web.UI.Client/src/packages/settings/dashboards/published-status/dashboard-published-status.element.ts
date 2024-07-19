@@ -1,7 +1,7 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import { PublishedCacheResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishedCacheService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -23,14 +23,14 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	@state()
 	private _buttonStateCollect: UUIButtonState = undefined;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this._getPublishedStatus();
 	}
 
 	// Refresh
 	private async _getPublishedStatus() {
-		const { data } = await tryExecuteAndNotify(this, PublishedCacheResource.getPublishedCacheStatus());
+		const { data } = await tryExecuteAndNotify(this, PublishedCacheService.getPublishedCacheStatus());
 		if (data) {
 			this._publishedStatusText = data;
 		}
@@ -46,7 +46,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	private async _reloadMemoryCache() {
 		this._buttonStateReload = 'waiting';
 		this._buttonState = 'waiting';
-		const { error } = await tryExecuteAndNotify(this, PublishedCacheResource.postPublishedCacheReload());
+		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheReload());
 		if (error) {
 			this._buttonStateReload = 'failed';
 			this._buttonState = 'failed';
@@ -70,7 +70,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	// Rebuild
 	private async _rebuildDatabaseCache() {
 		this._buttonStateRebuild = 'waiting';
-		const { error } = await tryExecuteAndNotify(this, PublishedCacheResource.postPublishedCacheRebuild());
+		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheRebuild());
 		if (error) {
 			this._buttonStateRebuild = 'failed';
 		} else {
@@ -92,7 +92,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	//Collect
 	private async _cacheCollect() {
 		this._buttonStateCollect = 'waiting';
-		const { error } = await tryExecuteAndNotify(this, PublishedCacheResource.postPublishedCacheCollect());
+		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheCollect());
 		if (error) {
 			this._buttonStateCollect = 'failed';
 		} else {
@@ -110,7 +110,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		this._cacheCollect();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline="Published Cache Status">
 				<p>${this._publishedStatusText}</p>
@@ -178,7 +178,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

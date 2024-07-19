@@ -1,11 +1,17 @@
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js';
-import type { ManifestWorkspace, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestTypes,
+	ManifestWorkspace,
+	ManifestWorkspaceActions,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_WEBHOOK_WORKSPACE,
 	name: 'Webhook Root Workspace',
-	element: () => import('./webhook-workspace.element.js'),
 	api: () => import('./webhook-workspace.context.js'),
 	meta: {
 		entityType: UMB_WEBHOOK_ENTITY_TYPE,
@@ -15,9 +21,9 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhook.Overview',
-		name: 'Webhook Root Workspace Overview View',
-		js: () => import('../views/overview/webhook-overview-view.element.js'),
+		alias: 'Umb.WorkspaceView.Webhook.Details',
+		name: 'Webhook Root Workspace Details View',
+		js: () => import('./views/webhook-details-workspace-view.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Overview',
@@ -31,16 +37,19 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			},
 		],
 	},
+];
+
+const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
-		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhook.Search',
-		name: 'Webhook Root Workspace Logs View',
-		js: () => import('../views/overview/webhook-overview-view.element.js'),
-		weight: 200,
+		type: 'workspaceAction',
+		kind: 'default',
+		alias: 'Umb.WorkspaceAction.Webhook.Save',
+		name: 'Save Webhook Workspace Action',
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Logs',
-			pathname: 'logs',
-			icon: 'icon-box-alt',
+			look: 'primary',
+			color: 'positive',
+			label: '#buttons_save',
 		},
 		conditions: [
 			{
@@ -51,4 +60,4 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

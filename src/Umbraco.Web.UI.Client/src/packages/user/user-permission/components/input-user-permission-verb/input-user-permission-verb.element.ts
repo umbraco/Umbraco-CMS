@@ -21,7 +21,7 @@ export class UmbUserPermissionVerbElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<div id="setting">
 			<uui-toggle label=${this.label} ?checked=${this.allowed} @change=${this.#onChange}>
 				<div id="meta">
@@ -32,7 +32,7 @@ export class UmbUserPermissionVerbElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#setting {

@@ -67,7 +67,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 			const selectedFile = await this.#selectAvatar();
 			this.#userWorkspaceContext?.uploadAvatar(selectedFile);
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	};
 
@@ -115,7 +115,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		return this._userAvatarUrls.length > 0;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<form id="AvatarUploadForm" novalidate>
@@ -139,7 +139,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

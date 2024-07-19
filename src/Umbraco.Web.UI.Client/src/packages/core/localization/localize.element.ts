@@ -22,16 +22,14 @@ export class UmbLocalizeElement extends UmbLitElement {
 	 * @example args="[1,2,3]"
 	 * @type {any[] | undefined}
 	 */
-	@property({
-		type: Array,
-	})
+	@property({ type: Array })
 	args?: unknown[];
 
 	/**
 	 * If true, the key will be rendered instead of the localized value if the key is not found.
 	 * @attr
 	 */
-	@property()
+	@property({ type: Boolean })
 	debug = false;
 
 	@state()
@@ -49,15 +47,15 @@ export class UmbLocalizeElement extends UmbLitElement {
 		return localizedValue;
 	}
 
-	protected render() {
+	override render() {
 		return this.text.trim()
 			? html`${unsafeHTML(this.text)}`
 			: this.debug
-			? html`<span style="color:red">${this.key}</span>`
-			: html`<slot></slot>`;
+				? html`<span style="color:red">${this.key}</span>`
+				: html`<slot></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: contents;

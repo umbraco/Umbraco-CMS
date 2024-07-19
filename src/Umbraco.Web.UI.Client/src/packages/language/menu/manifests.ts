@@ -1,11 +1,13 @@
-export const manifests = [
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'menuItem',
 		alias: 'Umb.MenuItem.Languages',
 		name: 'Languages Menu Item',
 		weight: 100,
 		meta: {
-			label: 'Languages',
+			label: '#treeHeaders_languages',
 			icon: 'icon-globe',
 			entityType: 'language-root',
 			menus: ['Umb.Menu.StructureSettings'],

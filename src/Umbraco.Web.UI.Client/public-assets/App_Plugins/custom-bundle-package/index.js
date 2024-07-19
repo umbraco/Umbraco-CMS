@@ -1,4 +1,4 @@
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'section',
 		alias: 'MyBundle.Section.Custom',
@@ -9,5 +9,5 @@ export const manifests = [
 			label: 'My Bundle Section',
 			pathname: 'my-custom-bundle',
 		},
-	}
+	},
 ];

@@ -2,12 +2,12 @@ import { UmbCultureRepository } from '../../repository/culture.repository.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, repeat, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { CultureReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-input-culture-select')
-export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputCultureSelectElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -36,11 +36,11 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 
 	#cultureRepository = new UmbCultureRepository(this);
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	protected async firstUpdated() {
+	protected override async firstUpdated() {
 		const { data } = await this.#cultureRepository.requestCultures();
 		if (data) {
 			this._cultures = data.items;
@@ -56,8 +56,10 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 	#onCultureChange(event: UUIComboboxEvent) {
 		event.stopPropagation();
 		const target = event.composedPath()[0] as UUIComboboxElement;
-		this._value = target.value;
-		const culture = this._cultures.find((culture) => culture.name === this._value);
+		this.value = target.value;
+		const culture = this._cultures.find(
+			(culture) => culture.name.toLowerCase() === (this.value as string).toLowerCase(),
+		);
 		this.selectedCultureName = culture?.englishName;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -69,10 +71,10 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 	}
 
 	get #fromAvailableCultures() {
-		return this._cultures.find((culture) => culture.name === this.value);
+		return this._cultures.find((culture) => culture.name.toLowerCase() === (this.value as string)?.toLowerCase());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<!-- TODO: comboxbox doesn't support disabled or readonly mode yet. This is a temp solution -->
 			${this.disabled || this.readonly
@@ -94,7 +96,7 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 								)}
 							</uui-combobox-list>
 						</uui-combobox>
-				  `}
+					`}
 		`;
 	}
 }

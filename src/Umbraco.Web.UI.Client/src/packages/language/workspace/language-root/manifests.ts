@@ -1,4 +1,4 @@
-import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -10,4 +10,4 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-export const manifests = [workspace];
+export const manifests: Array<ManifestTypes> = [workspace];

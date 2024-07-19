@@ -1,11 +1,11 @@
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import type { UmbBlockWorkspaceData } from '../workspace/index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -26,6 +26,10 @@ export abstract class UmbBlockManagerContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
+	get contentTypesLoaded() {
+		return Promise.all(this.#contentTypeRequests);
+	}
+	#contentTypeRequests: Array<Promise<unknown>> = [];
 	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
 
 	#propertyAlias = new UmbStringState(undefined);
@@ -63,6 +67,9 @@ export abstract class UmbBlockManagerContext<
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this._editorConfiguration.setValue(configs);
+	}
+	getEditorConfiguration(): UmbPropertyEditorConfigCollection | undefined {
+		return this._editorConfiguration.getValue();
 	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
@@ -115,7 +122,9 @@ export abstract class UmbBlockManagerContext<
 	async #ensureContentType(unique: string) {
 		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
 
-		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
+		const contentTypeRequest = this.#contentTypeRepository.requestByUnique(unique);
+		this.#contentTypeRequests.push(contentTypeRequest);
+		const { data } = await contentTypeRequest;
 		if (!data) {
 			this.#contentTypes.removeOne(unique);
 			return;
@@ -131,6 +140,9 @@ export abstract class UmbBlockManagerContext<
 	}
 	contentTypeNameOf(contentTypeKey: string) {
 		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey)?.name);
+	}
+	getContentTypeNameOf(contentTypeKey: string) {
+		return this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.name;
 	}
 	blockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.asObservablePart((source) =>
@@ -154,10 +166,11 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentUdi: string) {
 		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
-
-	/*setOneLayout(layoutData: BlockLayoutType) {
-		return this._layouts.appendOne(layoutData);
-	}*/
+	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	setOneLayout(layoutData: BlockLayoutType, modalData?: UmbBlockWorkspaceData) {
+		this._layouts.appendOne(layoutData);
+	}
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
 	}
@@ -172,16 +185,42 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.removeOne(settingsUdi);
 	}
 
+	setOneContentProperty(udi: string, propertyAlias: string, value: unknown) {
+		this.#contents.updateOne(udi, { [propertyAlias]: value });
+	}
+	setOneSettingsProperty(udi: string, propertyAlias: string, value: unknown) {
+		this.#settings.updateOne(udi, { [propertyAlias]: value });
+	}
+
+	contentProperty(udi: string, propertyAlias: string) {
+		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+	}
+	settingsProperty(udi: string, propertyAlias: string) {
+		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+	}
+
 	abstract create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
 		modalData?: UmbBlockWorkspaceData,
 	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
 
-	protected createBlockData<ModalDataType extends UmbBlockWorkspaceData>(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-	) {
+	public createBlockSettingsData(contentElementTypeKey: string) {
+		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
+		if (!blockType) {
+			throw new Error(`Cannot create block settings, missing block type for ${contentElementTypeKey}`);
+		}
+		if (!blockType.settingsElementTypeKey) {
+			throw new Error(`Cannot create block settings, missing settings element type for ${contentElementTypeKey}`);
+		}
+
+		return {
+			udi: buildUdi('element', UmbId.new()),
+			contentTypeKey: blockType.settingsElementTypeKey,
+		};
+	}
+
+	protected createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
@@ -226,6 +265,8 @@ export abstract class UmbBlockManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
+		// TODO: [v15]: ignoring unused var here here to prevent a breaking change
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		modalData: ModalDataType,
 	) {
 		// Create content entry:

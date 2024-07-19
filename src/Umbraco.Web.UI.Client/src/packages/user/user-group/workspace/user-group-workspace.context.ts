@@ -2,18 +2,17 @@ import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
 import type { UmbUserGroupDetailModel } from '../types.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
-import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbUserGroupDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbUserGroupDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbUserGroupDetailRepository = new UmbUserGroupDetailRepository(this);
@@ -23,6 +22,8 @@ export class UmbUserGroupWorkspaceContext
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name || '');
+	readonly alias = this.#data.asObservablePart((data) => data?.alias || '');
+	readonly aliasCanBeChanged = this.#data.asObservablePart((data) => data?.aliasCanBeChanged);
 	readonly icon = this.#data.asObservablePart((data) => data?.icon || null);
 	readonly sections = this.#data.asObservablePart((data) => data?.sections || []);
 	readonly languages = this.#data.asObservablePart((data) => data?.languages || []);
@@ -34,8 +35,6 @@ export class UmbUserGroupWorkspaceContext
 	readonly fallbackPermissions = this.#data.asObservablePart((data) => data?.fallbackPermissions || []);
 	readonly permissions = this.#data.asObservablePart((data) => data?.permissions || []);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.UserGroup');
 
@@ -43,7 +42,7 @@ export class UmbUserGroupWorkspaceContext
 			{
 				path: 'create',
 				component: UmbUserGroupWorkspaceEditorElement,
-				setup: (component, info) => {
+				setup: () => {
 					this.create();
 
 					new UmbWorkspaceIsNewRedirectController(
@@ -64,7 +63,7 @@ export class UmbUserGroupWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -98,21 +97,26 @@ export class UmbUserGroupWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	async save() {
-		if (!this.#data.value) return;
+	async submit() {
+		if (!this.#data.value) throw new Error('Data is missing');
 
-		//TODO: Could we clean this code up?
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			const { error, data } = await this.repository.create(this.#data.value);
+			if (data) {
+				this.#data.setValue(data);
+				this.setIsNew(false);
+			}
+			if (error) throw new Error(error.message);
 		} else if (this.#data.value.unique) {
-			await this.repository.save(this.#data.value);
-		} else return;
-
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+			const { error, data } = await this.repository.save(this.#data.value);
+			if (data) {
+				this.#data.setValue(data);
+			}
+			if (error) throw new Error(error.message);
+		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

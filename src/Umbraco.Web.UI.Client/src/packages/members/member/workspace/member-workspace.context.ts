@@ -1,16 +1,14 @@
 import { UmbMemberDetailRepository } from '../repository/index.js';
 import type { UmbMemberDetailModel, UmbMemberVariantModel, UmbMemberVariantOptionModel } from '../types.js';
-import { UmbMemberPropertyDataContext } from '../property-dataset-context/member-property-dataset-context.js';
+import { UmbMemberPropertyDatasetContext } from '../property-dataset-context/member-property-dataset-context.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
-import { UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
+import { type UmbMemberTypeDetailModel, UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbRoutableWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
@@ -23,12 +21,15 @@ import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/var
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
-	implements UmbVariantDatasetWorkspaceContext<UmbMemberVariantModel>, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
+	implements UmbContentWorkspaceContext<UmbMemberTypeDetailModel, UmbMemberVariantModel>
 {
+	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
+
 	public readonly repository = new UmbMemberDetailRepository(this);
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
@@ -58,7 +59,6 @@ export class UmbMemberWorkspaceContext
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -126,7 +126,7 @@ export class UmbMemberWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
@@ -216,16 +216,6 @@ export class UmbMemberWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		/*
-		const oldVariants = this.#currentData.getValue()?.variants || [];
-		const variants = partialUpdateFrozenArray(
-			oldVariants,
-			{ name },
-			variantId ? (x) => variantId.compare(x) : () => true,
-		);
-		this.#currentData.update({ variants });
-		*/
-		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
@@ -283,6 +273,25 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
+	#updateLock = 0;
+	initiatePropertyValueChange() {
+		this.#updateLock++;
+		this.#currentData.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishPropertyValueChange = () => {
+		this.#updateLock--;
+		this.#triggerPropertyValueChanges();
+	};
+	#triggerPropertyValueChanges() {
+		if (this.#updateLock === 0) {
+			this.#currentData.unmute();
+		}
+	}
+
 	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbMemberVariantModel>) {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
@@ -326,7 +335,7 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#currentData.value) throw new Error('Data is missing');
 		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
@@ -334,17 +343,22 @@ export class UmbMemberWorkspaceContext
 
 		if (this.getIsNew()) {
 			const { data } = await this.repository.create(this.#currentData.value);
+			if (!data) {
+				throw new Error('Could not create member.');
+			}
 			newData = data;
+			this.setIsNew(false);
 		} else {
 			const { data } = await this.repository.save(this.#currentData.value);
+			if (!data) {
+				throw new Error('Could not create member.');
+			}
 			newData = data;
 		}
 
 		if (newData) {
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
-			this.setIsNew(false);
-			this.workspaceComplete(newData);
 		}
 	}
 
@@ -355,11 +369,14 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbMemberPropertyDataContext(host, this, variantId);
+	public createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbMemberPropertyDatasetContext {
+		return new UmbMemberPropertyDatasetContext(host, this, variantId);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#currentData.destroy();
 		super.destroy();
 		this.#persistedData.destroy();
@@ -380,43 +397,40 @@ export class UmbMemberWorkspaceContext
 		this.#currentData.setValue({ ...currentData, ...data });
 	}
 
-	get email() {
+	get email(): string {
 		return this.#get('email') || '';
 	}
 
-	get username() {
+	get username(): string {
 		return this.#get('username') || '';
 	}
 
-	get isLockedOut() {
+	get isLockedOut(): boolean {
 		return this.#get('isLockedOut') || false;
 	}
 
-	get isTwoFactorEnabled() {
+	get isTwoFactorEnabled(): boolean {
 		return this.#get('isTwoFactorEnabled') || false;
 	}
 
-	get isApproved() {
+	get isApproved(): boolean {
 		return this.#get('isApproved') || false;
 	}
 
-	get failedPasswordAttempts() {
+	get failedPasswordAttempts(): number {
 		return this.#get('failedPasswordAttempts') || 0;
 	}
 
-	//TODO Use localization for "never"
-	get lastLockOutDate() {
-		return this.#get('lastLockoutDate') || 'never';
+	get lastLockOutDate(): string | null {
+		return this.#get('lastLockoutDate') ?? null;
 	}
 
-	get lastLoginDate() {
-		return this.#get('lastLoginDate') || 'never';
+	get lastLoginDate(): string | null {
+		return this.#get('lastLoginDate') ?? null;
 	}
 
-	get lastPasswordChangeDate() {
-		const date = this.#get('lastPasswordChangeDate');
-		if (!date) return 'never';
-		return new Date(date).toLocaleString();
+	get lastPasswordChangeDate(): string | null {
+		return this.#get('lastPasswordChangeDate') ?? null;
 	}
 
 	get memberGroups() {

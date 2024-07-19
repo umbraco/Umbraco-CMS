@@ -1,12 +1,12 @@
+import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceViews,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-
-export const UMB_MEDIA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MediaType';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -26,7 +26,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		alias: 'Umb.WorkspaceView.MediaType.Design',
 		name: 'Media Type Workspace Design View',
 		meta: {
-			label: 'Design',
+			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
 		},
@@ -41,10 +41,10 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.MediaType.Structure',
 		name: 'Media Type Workspace Structure View',
-		js: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
+		element: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
 		weight: 800,
 		meta: {
-			label: 'Structure',
+			label: '#contentTypeEditor_structure',
 			pathname: 'structure',
 			icon: 'icon-mindmap',
 		},
@@ -63,9 +63,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.MediaType.Save',
 		name: 'Save Media Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -78,4 +78,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

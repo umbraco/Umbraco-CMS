@@ -1,4 +1,4 @@
-import { manifest as markdownManifest } from './markdown-editor/manifests.js';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as markdownManifest } from './markdown-editor/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestPropertyEditorUi> = [markdownManifest];
+export const manifests: Array<ManifestTypes> = [...markdownManifest];

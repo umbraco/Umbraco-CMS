@@ -1,10 +1,10 @@
 import type { UmbMemberTypeEntityType, UmbMemberTypeRootEntityType } from '../entity.js';
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbMemberTypeTreeItemModel extends UmbUniqueTreeItemModel {
+export interface UmbMemberTypeTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbMemberTypeEntityType;
 }
 
-export interface UmbMemberTypeTreeRootModel extends UmbUniqueTreeRootModel {
+export interface UmbMemberTypeTreeRootModel extends UmbTreeRootModel {
 	entityType: UmbMemberTypeRootEntityType;
 }

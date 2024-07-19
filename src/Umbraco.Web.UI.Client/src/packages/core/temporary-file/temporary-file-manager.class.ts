@@ -1,38 +1,53 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export type TemporaryFileStatus = 'complete' | 'waiting' | 'error';
+///export type TemporaryFileStatus = 'success' | 'waiting' | 'error';
 
-export interface TemporaryFileQueueItem {
-	unique: string;
+export enum TemporaryFileStatus {
+	SUCCESS = 'success',
+	WAITING = 'waiting',
+	ERROR = 'error',
+}
+
+export interface UmbTemporaryFileModel {
 	file: File;
+	temporaryUnique: string;
 	status?: TemporaryFileStatus;
 }
 
-export class UmbTemporaryFileManager extends UmbControllerBase {
+export class UmbTemporaryFileManager<
+	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
+> extends UmbControllerBase {
 	#temporaryFileRepository;
 
-	#queue = new UmbArrayState<TemporaryFileQueueItem>([], (item) => item.unique);
+	#queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
-
-	#isReady = new UmbBooleanState(true);
-	public readonly isReady = this.#isReady.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 	}
 
-	uploadOne(unique: string, file: File, status: TemporaryFileStatus = 'waiting') {
-		this.#queue.appendOne({ unique, file, status });
-		this.handleQueue();
+	async uploadOne(uploadableItem: UploadableItem): Promise<UploadableItem> {
+		this.#queue.setValue([]);
+
+		const item: UploadableItem = {
+			status: TemporaryFileStatus.WAITING,
+			...uploadableItem,
+		};
+
+		this.#queue.appendOne(item);
+		return (await this.#handleQueue())[0];
 	}
 
-	upload(queueItems: Array<TemporaryFileQueueItem>) {
-		this.#queue.append(queueItems);
-		this.handleQueue();
+	async upload(queueItems: Array<UploadableItem>): Promise<Array<UploadableItem>> {
+		this.#queue.setValue([]);
+
+		const items = queueItems.map((item): UploadableItem => ({ status: TemporaryFileStatus.WAITING, ...item }));
+		this.#queue.append(items);
+		return this.#handleQueue();
 	}
 
 	removeOne(unique: string) {
@@ -43,32 +58,30 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 		this.#queue.remove(uniques);
 	}
 
-	private async handleQueue() {
+	async #handleQueue() {
+		const filesCompleted: Array<UploadableItem> = [];
 		const queue = this.#queue.getValue();
 
-		if (!queue.length && this.getIsReady()) return;
+		if (!queue.length) return filesCompleted;
 
-		this.#isReady.setValue(false);
+		for (const item of queue) {
+			if (!item.temporaryUnique) throw new Error(`Unique is missing for item ${item}`);
 
-		queue.forEach(async (item) => {
-			if (item.status !== 'waiting') return;
+			const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file);
+			//await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
 
-			const { error } = await this.#temporaryFileRepository.upload(item.unique, item.file);
-			await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
-
+			let status: TemporaryFileStatus;
 			if (error) {
-				this.#queue.updateOne(item.unique, { ...item, status: 'error' });
+				status = TemporaryFileStatus.ERROR;
+				this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 			} else {
-				this.#queue.updateOne(item.unique, { ...item, status: 'complete' });
+				status = TemporaryFileStatus.SUCCESS;
+				this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 			}
-		});
 
-		if (!queue.find((item) => item.status === 'waiting') && !this.getIsReady()) {
-			this.#isReady.setValue(true);
+			filesCompleted.push({ ...item, status });
 		}
-	}
 
-	getIsReady() {
-		return this.#queue.getValue();
+		return filesCompleted;
 	}
 }

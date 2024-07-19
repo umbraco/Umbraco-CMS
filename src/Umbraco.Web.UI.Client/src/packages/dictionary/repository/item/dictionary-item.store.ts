@@ -22,3 +22,5 @@ export class UmbDictionaryItemStore extends UmbItemStoreBase<UmbDictionaryItemMo
 }
 
 export const UMB_DICTIONARY_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDictionaryItemStore>('UmbDictionaryItemStore');
+
+export { UmbDictionaryItemStore as api };

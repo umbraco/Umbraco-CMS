@@ -1,14 +1,14 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
+import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 import { createExtensionApiByAlias, type MetaEntityActionDeleteKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionDeleteKind> {
 	// TODO: make base type for item and detail models
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot delete an item without a unique identifier.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(

@@ -2,7 +2,7 @@ import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from './data-type-workspace.context-t
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 /**
  * @element umb-data-type-workspace-editor
@@ -24,27 +24,8 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#workspaceContext.createPropertyDatasetContext(this);
-			this.#observeIsNew();
 			this.#observeName();
 		});
-	}
-
-	// TODO: invent some general way for all workspaces, with a name?, to put focus on the name when new.
-	#observeIsNew() {
-		if (!this.#workspaceContext) return;
-		this.observe(
-			this.#workspaceContext.isNew,
-			(isNew) => {
-				if (isNew) {
-					// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.)
-					requestAnimationFrame(() => {
-						(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
-					});
-				}
-				this.removeControllerByAlias('isNewRedirectController');
-			},
-			'_observeIsNew',
-		);
 	}
 
 	#observeName() {
@@ -67,15 +48,20 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DataType">
-				<uui-input slot="header" id="nameInput" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
+				<uui-input
+					slot="header"
+					id="nameInput"
+					.value=${this._dataTypeName}
+					@input="${this.#handleInput}"
+					${umbFocus()}></uui-input>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

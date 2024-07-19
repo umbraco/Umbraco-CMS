@@ -1,9 +1,13 @@
 import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbInvariantDatasetWorkspaceContext, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbInvariantDatasetWorkspaceContext,
+	UmbRoutableWorkspaceContext,
+	UmbWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
@@ -12,8 +16,8 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbBlockGridTypeAreaType>
-	implements UmbInvariantDatasetWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbBlockGridTypeAreaType>
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = true;
@@ -34,7 +38,21 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
 
-	protected resetState(): void {
+	set manifest(manifest: ManifestWorkspace) {
+		this.routes.setRoutes([
+			{
+				path: 'edit/:id',
+				component: () => import('./block-grid-area-type-workspace-editor.element.js'),
+				setup: (_component, info) => {
+					const id = info.match.params.id;
+					(_component as any).workspaceAlias = manifest.alias;
+					this.load(id);
+				},
+			},
+		]);
+	}
+
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -45,18 +63,17 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.value, (value) => {
-				if (value) {
-					const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
-					if (blockTypeData) {
-						this.#data.setValue(blockTypeData);
-						return;
-					}
+		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
+		this.observe(context.value, (value) => {
+			if (value) {
+				const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
+				if (blockTypeData) {
+					this.#data.setValue(blockTypeData);
+					return;
 				}
-				// Fallback to undefined:
-				this.#data.setValue(undefined);
-			});
+			}
+			// Fallback to undefined:
+			this.#data.setValue(undefined);
 		});
 	}
 
@@ -87,10 +104,13 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	}
 
 	getName() {
-		return 'block name content element type here...';
+		return this.#data.getValue()?.alias;
 	}
+
+	// TODO: [v15] ignoring unused name parameter to avoid breaking changes
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setName(name: string | undefined) {
-		alert('You cannot set a name of a block-type.');
+		throw new Error('You cannot set a name of a area-type.');
 	}
 
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: keyof UmbBlockGridTypeAreaType) {
@@ -108,19 +128,20 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		}
 	}
 
-	async save() {
-		if (!this.#data.value) return;
+	async submit() {
+		if (!this.#data.value) {
+			throw new Error('No data to submit.');
+		}
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
-			context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
-		});
+		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
+
+		// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
+		context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#data.value);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

@@ -2,7 +2,10 @@ import type { UmbBlockGridTypeColumnSpanOption } from '../../types.js';
 import { html, customElement, property, css, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-property-editor-ui-block-grid-column-span')
@@ -30,26 +33,26 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 			this.value = [...value, { columnSpan: index }];
 		}
 
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		const template = repeat(
 			this._columnsArray,
 			(index) => index,
 			(index) => {
-				const number = index + 1;
+				const colNumber = index + 1;
 				let classes = 'default';
 
 				if (this.value && this.value.length > 0) {
-					const applied = this.value.find((column) => column.columnSpan >= index);
-					const picked = this.value.find((column) => column.columnSpan === index);
+					const applied = this.value.find((column) => column.columnSpan >= colNumber);
+					const picked = this.value.find((column) => column.columnSpan === colNumber);
 					classes = picked ? 'picked applied' : applied ? 'applied' : 'default';
 				}
 
 				return html`<div class="${classes}" data-index=${index}>
-					<span>${number}</span>
-					<button type="button" aria-label=${number} @click=${() => this.#pickColumn(index)}></button>
+					<span>${colNumber}</span>
+					<button type="button" aria-label=${colNumber} @click=${() => this.#pickColumn(colNumber)}></button>
 				</div>`;
 			},
 		);
@@ -57,7 +60,7 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 		return html`<div id="wrapper">${template}</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#wrapper {

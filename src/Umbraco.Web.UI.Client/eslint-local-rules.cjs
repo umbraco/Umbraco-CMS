@@ -10,6 +10,7 @@ const noDirectApiImportRule = require('./devops/eslint/rules/no-direct-api-impor
 const preferImportAliasesRule = require('./devops/eslint/rules/prefer-import-aliases.cjs');
 const preferStaticStylesLastRule = require('./devops/eslint/rules/prefer-static-styles-last.cjs');
 const umbClassPrefixRule = require('./devops/eslint/rules/umb-class-prefix.cjs');
+const noRelativeImportToImportMapModule = require('./devops/eslint/rules/no-relative-import-to-import-map-module.cjs');
 
 module.exports = {
 	'bad-type-import': badTypeImportRule,
@@ -22,4 +23,5 @@ module.exports = {
 	'prefer-import-aliases': preferImportAliasesRule,
 	'prefer-static-styles-last': preferStaticStylesLastRule,
 	'umb-class-prefix': umbClassPrefixRule,
+	'no-relative-import-to-import-map-module': noRelativeImportToImportMapModule,
 };

@@ -1,5 +1,5 @@
-import type { Meta, Story } from '@storybook/web-components';
 import type { UmbDashboardTelemetryElement } from './dashboard-telemetry.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './dashboard-telemetry.element.js';

@@ -1,11 +1,11 @@
 import type { UmbTreeItemContext } from '../index.js';
-import type { UmbTreeItemModelBase } from '../../types.js';
+import type { UmbTreeItemModel } from '../../types.js';
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
 import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
-export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModelBase> extends UmbLitElement {
+export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModel> extends UmbLitElement {
 	_item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
 	get item(): TreeItemModelType | undefined {
@@ -15,6 +15,9 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		this._item = newVal;
 		this.#initTreeItem();
 	}
+
+	@property({ type: Boolean, attribute: false })
+	hideActions: boolean = false;
 
 	@state()
 	private _isActive = false;
@@ -105,7 +108,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
-	render() {
+	override render() {
 		return html`
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
@@ -117,7 +120,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
-				label="${ifDefined(this._item?.name)}"
+				label="${ifDefined(this.localize.string(this._item?.name || ''))}"
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
 				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
@@ -162,6 +165,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	}
 
 	#renderActions() {
+		if (this.hideActions) return;
 		return this.#treeItemContext && this._item
 			? html`<umb-entity-actions-bundle
 					slot="actions"
@@ -178,7 +182,10 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				? repeat(
 						this._childItems,
 						(item, index) => item.name + '___' + index,
-						(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
+						(item) =>
+							html`<umb-tree-item
+								.entityType=${item.entityType}
+								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>`,
 					)
 				: ''}
 		`;

@@ -1,16 +1,19 @@
 import type { UmbInputMultipleTextStringItemElement } from './input-multiple-text-string-item.element.js';
 import { css, html, nothing, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-multiple-text-string
  */
 @customElement('umb-input-multiple-text-string')
-export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undefined | string, typeof UmbLitElement>(
+	UmbLitElement,
+	undefined,
+) {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('data-sort-entry-id');
@@ -71,7 +74,16 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	disabled = false;
+	public set disabled(value) {
+		this.#disabled = value;
+		if (value) {
+			this.#sorter.disable();
+		}
+	}
+	public get disabled() {
+		return this.#disabled;
+	}
+	#disabled = false;
 
 	/**
 	 * Makes the input readonly
@@ -80,7 +92,16 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public set readonly(value) {
+		this.#readonly = value;
+		if (value) {
+			this.#sorter.disable();
+		}
+	}
+	public get readonly() {
+		return this.#readonly;
+	}
+	#readonly = false;
 
 	constructor() {
 		super();
@@ -165,13 +186,13 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	protected getFormElement() {
+	override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
-			${this.#renderAddButton()} `;
+			${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
@@ -179,36 +200,37 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 			${repeat(
 				this._items,
 				(item, index) => index,
-				(item, index) =>
-					html` <umb-input-multiple-text-string-item
-						value=${item}
+				(item, index) => html`
+					<umb-input-multiple-text-string-item
 						name="item-${index}"
 						data-sort-entry-id=${item}
-						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
-						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
+						required
+						required-message="Item ${index + 1} is missing a value"
+						value=${item}
 						?disabled=${this.disabled}
 						?readonly=${this.readonly}
-						required
-						required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>`,
+						@delete=${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}
+						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}>
+					</umb-input-multiple-text-string-item>
+				`,
 			)}
 		`;
 	}
 
 	#renderAddButton() {
+		if (this.disabled || this.readonly) return nothing;
 		return html`
-			${this.disabled || this.readonly
-				? nothing
-				: html`<uui-button
-						id="action"
-						label="Add"
-						look="placeholder"
-						color="default"
-						@click="${this.#onAdd}"
-						?disabled=${this.disabled}></uui-button>`}
+			<uui-button
+				color="default"
+				id="action"
+				label="Add"
+				look="placeholder"
+				?disabled=${this.disabled}
+				@click=${this.#onAdd}></uui-button>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#action {
 				display: block;

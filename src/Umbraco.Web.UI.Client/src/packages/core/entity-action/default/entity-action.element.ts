@@ -1,4 +1,5 @@
 import type { UmbEntityAction } from '../entity-action.interface.js';
+import type { UmbEntityActionElement } from '../entity-action-element.interface.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -6,10 +7,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-action')
-export class UmbEntityActionElement<
-	MetaType extends MetaEntityActionDefaultKind = MetaEntityActionDefaultKind,
-	ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
-> extends UmbLitElement {
+export class UmbEntityActionDefaultElement<
+		MetaType extends MetaEntityActionDefaultKind = MetaEntityActionDefaultKind,
+		ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
+	>
+	extends UmbLitElement
+	implements UmbEntityActionElement
+{
 	#api?: ApiType;
 
 	// TODO: Do these need to be properties? [NL]
@@ -36,6 +40,11 @@ export class UmbEntityActionElement<
 	@state()
 	_href?: string;
 
+	override async focus() {
+		await this.updateComplete;
+		this.shadowRoot?.querySelector('uui-menu-item')?.focus();
+	}
+
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
@@ -50,10 +59,12 @@ export class UmbEntityActionElement<
 		event.stopPropagation();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-menu-item
-				label=${ifDefined(this.manifest?.meta.label)}
+				label=${ifDefined(
+					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
+				)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
@@ -64,10 +75,10 @@ export class UmbEntityActionElement<
 		`;
 	}
 }
-export default UmbEntityActionElement;
+export default UmbEntityActionDefaultElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-entity-action': UmbEntityActionElement;
+		'umb-entity-action': UmbEntityActionDefaultElement;
 	}
 }

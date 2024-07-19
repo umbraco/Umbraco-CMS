@@ -1,4 +1,3 @@
-import { handlers as auditLogHandlers } from './handlers/audit-log.handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
 import { handlers as cultureHandlers } from './handlers/culture.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
@@ -11,7 +10,6 @@ import { handlers as healthCheckHandlers } from './handlers/health-check.handler
 import { handlers as installHandlers } from './handlers/install.handlers.js';
 import { handlers as languageHandlers } from './handlers/language/index.js';
 import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js';
-import { handlers as webhookHandlers } from './handlers/webhook.handlers.js';
 import { handlers as mediaHandlers } from './handlers/media/index.js';
 import { handlers as mediaTypeHandlers } from './handlers/media-type/index.js';
 import { handlers as memberGroupHandlers } from './handlers/member-group/index.js';
@@ -31,16 +29,14 @@ import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js';
 import { handlers as templateHandlers } from './handlers/template/index.js';
-import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
-import { relationHandlers, relationTypeHandlers } from './handlers/relations/index.js';
 import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
+import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 
 const handlers = [
-	...auditLogHandlers,
 	...configHandlers,
 	...cultureHandlers,
 	...dataTypeHandlers,
@@ -53,7 +49,6 @@ const handlers = [
 	...installHandlers,
 	...languageHandlers,
 	...logViewerHandlers,
-	...webhookHandlers,
 	...mediaHandlers,
 	...mediaTypeHandlers,
 	...memberGroupHandlers,
@@ -66,8 +61,6 @@ const handlers = [
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
-	...relationHandlers,
-	...relationTypeHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
 	...staticFileHandlers,
@@ -75,10 +68,10 @@ const handlers = [
 	...tagHandlers,
 	...telemetryHandlers,
 	...templateHandlers,
-	...trackedReferenceHandlers,
 	...upgradeHandlers,
 	...userGroupsHandlers,
 	...userHandlers,
+	...documentBlueprintHandlers,
 	serverHandlers.serverInformationHandler,
 ];
 
@@ -95,11 +88,11 @@ switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
 
 switch (import.meta.env.VITE_UMBRACO_EXTENSION_MOCKS) {
 	case 'on':
-		handlers.push(manifestsHandlers.manifestDevelopmentHandler);
+		handlers.push(...manifestsHandlers.manifestDevelopmentHandlers);
 		break;
 
 	default:
-		handlers.push(manifestsHandlers.manifestEmptyHandler);
+		handlers.push(...manifestsHandlers.manifestEmptyHandlers);
 }
 
 export { handlers };

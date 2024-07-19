@@ -18,11 +18,11 @@
 		},
 		{
 			"name": "icon-alert-alt",
-			"file": "alert-triangle.svg"
+			"file": "triangle-alert.svg"
 		},
 		{
 			"name": "icon-alert",
-			"file": "alert-triangle.svg"
+			"file": "triangle-alert.svg"
 		},
 		{
 			"name": "icon-alt",
@@ -38,7 +38,7 @@
 		},
 		{
 			"name": "icon-application-error",
-			"file": "application-error.svg"
+			"file": "circle-x.svg"
 		},
 		{
 			"name": "icon-application-window-alt",
@@ -114,7 +114,7 @@
 		},
 		{
 			"name": "icon-badge-add",
-			"file": "plus-circle.svg"
+			"file": "circle-plus.svg"
 		},
 		{
 			"_name": "icon-badge-count",
@@ -122,7 +122,7 @@
 		},
 		{
 			"name": "icon-badge-remove",
-			"file": "minus-circle.svg"
+			"file": "circle-minus.svg"
 		},
 		{
 			"name": "icon-badge-restricted",
@@ -131,7 +131,7 @@
 		},
 		{
 			"name": "icon-ball",
-			"file": "dribble.svg"
+			"file": "dribbble.svg"
 		},
 		{
 			"_name": "icon-band-aid",
@@ -303,7 +303,7 @@
 		},
 		{
 			"name": "icon-brush-alt-2",
-			"file": "paintbrush-2.svg"
+			"file": "paintbrush-vertical.svg"
 		},
 		{
 			"name": "icon-brush-alt",
@@ -410,7 +410,7 @@
 		},
 		{
 			"name": "icon-checkbox",
-			"file": "check-square.svg"
+			"file": "square-check.svg"
 		},
 		{
 			"_name": "icon-chess",
@@ -431,7 +431,7 @@
 		},
 		{
 			"name": "icon-circle-dotted-active",
-			"file": "check-circle.svg"
+			"file": "circle-check.svg"
 		},
 		{
 			"name": "icon-circle-dotted",
@@ -460,7 +460,7 @@
 		},
 		{
 			"name": "icon-cloud-upload",
-			"file": "upload-cloud.svg"
+			"file": "cloud-upload.svg"
 		},
 		{
 			"name": "icon-cloud",
@@ -488,7 +488,7 @@
 		},
 		{
 			"name": "icon-coin-dollar",
-			"file": "dollar.svg"
+			"file": "dollar-sign.svg"
 		},
 		{
 			"name": "icon-coin-euro",
@@ -496,7 +496,7 @@
 		},
 		{
 			"name": "icon-coin-pound",
-			"file": "pound.svg"
+			"file": "pound-sterling.svg"
 		},
 		{
 			"name": "icon-coin-yen",
@@ -565,7 +565,7 @@
 		},
 		{
 			"name": "icon-combination-lock-open",
-			"file": "unlock-keyhole.svg"
+			"file": "lock-keyhole-open.svg"
 		},
 		{
 			"name": "icon-combination-lock",
@@ -589,7 +589,7 @@
 		},
 		{
 			"name": "icon-console",
-			"file": "terminal-square.svg"
+			"file": "square-terminal.svg"
 		},
 		{
 			"name": "icon-contrast",
@@ -756,7 +756,7 @@
 		},
 		{
 			"name": "icon-donate",
-			"file": "helping-hand.svg",
+			"file": "hand-helping.svg",
 			"legacy": true
 		},
 		{
@@ -816,7 +816,7 @@
 		},
 		{
 			"name": "icon-escape",
-			"file": "arrow-up-left-from-circle.svg"
+			"file": "circle-arrow-out-up-left.svg"
 		},
 		{
 			"name": "icon-ethernet",
@@ -832,7 +832,7 @@
 		},
 		{
 			"name": "icon-exit-fullscreen",
-			"file": "exit-fullscreen.svg"
+			"file": "minimize-2.svg"
 		},
 		{
 			"name": "icon-facebook-like",
@@ -852,7 +852,7 @@
 		},
 		{
 			"name": "icon-file-cabinet",
-			"file": "library-square.svg"
+			"file": "square-library.svg"
 		},
 		{
 			"name": "icon-files",
@@ -860,7 +860,7 @@
 		},
 		{
 			"name": "icon-filter-arrows",
-			"file": "filter-arrows.svg"
+			"file": "arrow-down-a-z.svg"
 		},
 		{
 			"name": "icon-filter",
@@ -1090,7 +1090,7 @@
 		},
 		{
 			"name": "icon-help-alt",
-			"file": "help-circle.svg"
+			"file": "circle-help.svg"
 		},
 		{
 			"name": "icon-help",
@@ -1098,7 +1098,7 @@
 		},
 		{
 			"name": "icon-home",
-			"file": "home.svg"
+			"file": "house.svg"
 		},
 		{
 			"name": "icon-hourglass",
@@ -1124,7 +1124,7 @@
 		},
 		{
 			"name": "icon-indent",
-			"file": "indent.svg"
+			"file": "indent-increase.svg"
 		},
 		{
 			"name": "icon-infinity",
@@ -1193,7 +1193,7 @@
 		},
 		{
 			"name": "icon-layout",
-			"file": "layout.svg"
+			"file": "layout-dashboard.svg"
 		},
 		{
 			"name": "icon-left-double-arrow",
@@ -1222,11 +1222,11 @@
 		},
 		{
 			"name": "icon-lightbulb-active",
-			"file": "bulb.svg"
+			"file": "lightbulb.svg"
 		},
 		{
 			"name": "icon-lightbulb",
-			"file": "bulb.svg",
+			"file": "lightbulb-off.svg",
 			"legacy": true
 		},
 		{
@@ -1257,11 +1257,11 @@
 		},
 		{
 			"name": "icon-locate",
-			"file": "locate"
+			"file": "locate.svg"
 		},
 		{
 			"name": "icon-location-near-me",
-			"file": "map-pinned",
+			"file": "map-pinned.svg",
 			"legacy": true
 		},
 		{
@@ -1404,7 +1404,7 @@
 		},
 		{
 			"name": "icon-multiple-windows",
-			"file": "multiple-windows.svg"
+			"file": "book-copy.svg"
 		},
 		{
 			"name": "icon-music",
@@ -1457,7 +1457,7 @@
 		},
 		{
 			"name": "icon-navigation-top",
-			"file": "arrow-up-to-line",
+			"file": "arrow-up-to-line.svg",
 			"legacy": true
 		},
 		{
@@ -1486,7 +1486,7 @@
 		{
 			"name": "icon-newspaper-alt",
 			"file": "newspaper.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-newspaper",
@@ -1544,7 +1544,7 @@
 		},
 		{
 			"name": "icon-outdent",
-			"file": "outdent.svg"
+			"file": "indent-decrease.svg"
 		},
 		{
 			"name": "icon-page-add",
@@ -1715,7 +1715,7 @@
 		},
 		{
 			"name": "icon-power-outlet",
-			"file": "power-square.svg",
+			"file": "square-power.svg",
 			"legacy": true
 		},
 		{
@@ -1737,22 +1737,22 @@
 		{
 			"name": "icon-price-dollar",
 			"file": "badge-dollar-sign.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-euro",
 			"file": "badge-euro.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-pound",
 			"file": "badge-pound-sterling.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-yen",
-			"file": "badge-japanese-yen",
-			"legacy":true
+			"file": "badge-japanese-yen.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-print",
@@ -1810,8 +1810,7 @@
 		},
 		{
 			"name": "icon-readonly",
-			"file": "ban.svg",
-			"legacy": true
+			"file": "pencil-off.svg"
 		},
 		{
 			"name": "icon-receipt-alt",
@@ -1825,6 +1824,10 @@
 			"name": "icon-record",
 			"file": "disc-3.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-rectangle-ellipsis",
+			"file": "rectangle-ellipsis.svg"
 		},
 		{
 			"name": "icon-redo",
@@ -1857,7 +1860,7 @@
 		},
 		{
 			"name": "icon-resize",
-			"file": "resize.svg"
+			"file": "scaling.svg"
 		},
 		{
 			"name": "icon-return-to-top",
@@ -1904,7 +1907,7 @@
 		},
 		{
 			"name": "icon-school",
-			"file": "school-2.svg"
+			"file": "school.svg"
 		},
 		{
 			"name": "icon-screensharing",
@@ -2065,11 +2068,11 @@
 		},
 		{
 			"name": "icon-speed-gauge",
-			"file": "gauge-circle.svg"
+			"file": "circle-gauge.svg"
 		},
 		{
 			"name": "icon-split-alt",
-			"file": "split-alt.svg"
+			"file": "square-split-horizontal.svg"
 		},
 		{
 			"name": "icon-split",
@@ -2101,7 +2104,7 @@
 		},
 		{
 			"name": "icon-stop-alt",
-			"file": "x-octagon.svg"
+			"file": "octagon-x.svg"
 		},
 		{
 			"name": "icon-stop-hand",
@@ -2118,7 +2121,7 @@
 		},
 		{
 			"name": "icon-stream",
-			"file": "activity-square.svg",
+			"file": "square-activity.svg",
 			"legacy": true
 		},
 		{
@@ -2169,7 +2172,7 @@
 		},
 		{
 			"name": "icon-terminal",
-			"file": "terminal-square.svg"
+			"file": "square-terminal.svg"
 		},
 		{
 			"name": "icon-theater",
@@ -2303,7 +2306,7 @@
 		},
 		{
 			"name": "icon-unlocked",
-			"file": "unlock.svg"
+			"file": "lock-open.svg"
 		},
 		{
 			"name": "icon-untitled",
@@ -2378,7 +2381,7 @@
 		},
 		{
 			"name": "icon-wand",
-			"file": "wand-2.svg"
+			"file": "wand-sparkles.svg"
 		},
 		{
 			"name": "icon-webhook",
@@ -2398,7 +2401,11 @@
 		},
 		{
 			"name": "icon-window-popin",
-			"file": "arrow-down-left-square.svg"
+			"file": "square-arrow-down-left.svg"
+		},
+		{
+			"name": "icon-window-popout",
+			"file": "square-arrow-up-right.svg"
 		},
 		{
 			"name": "icon-window-sizes",
@@ -2414,7 +2421,7 @@
 		},
 		{
 			"name": "icon-wrong",
-			"file": "x-circle.svg"
+			"file": "circle-x.svg"
 		},
 		{
 			"name": "icon-zip",
@@ -2429,10 +2436,6 @@
 			"name": "icon-zoom-in",
 			"file": "zoom-in.svg"
 		},
-
-
-
-
 		{
 			"name": "icon-zoom-out",
 			"file": "zoom-out.svg"
@@ -2444,6 +2447,40 @@
 		{
 			"name": "icon-database",
 			"file": "database.svg"
+		}
+	],
+	"simpleIcons": [
+		{
+			"name": "icon-facebook",
+			"file": "facebook.svg"
+		},
+		{
+			"name": "icon-gitbook",
+			"file": "gitbook.svg"
+		},
+		{
+			"name": "icon-github",
+			"file": "github.svg"
+		},
+		{
+			"name": "icon-gitlab",
+			"file": "gitlab.svg"
+		},
+		{
+			"name": "icon-google",
+			"file": "google.svg"
+		},
+		{
+			"name": "icon-linkedin",
+			"file": "linkedin.svg"
+		},
+		{
+			"name": "icon-mastodon",
+			"file": "mastodon.svg"
+		},
+		{
+			"name": "icon-twitter-x",
+			"file": "x.svg"
 		}
 	],
 	"umbraco": [

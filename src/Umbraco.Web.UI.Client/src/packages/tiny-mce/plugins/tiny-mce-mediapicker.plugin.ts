@@ -1,11 +1,12 @@
+import { getGuid } from '../utils.js';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL } from '../modals/media-caption-alt-text/media-caption-alt-text-modal.token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
-import { UMB_MEDIA_TREE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { sizeImageInEditor, uploadBlobImages } from '@umbraco-cms/backoffice/media';
+import { sizeImageInEditor, uploadBlobImages, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -25,13 +26,12 @@ interface MediaPickerResultData {
 }
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
-	#currentUser?: UmbCurrentUserModel;
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#temporaryFileRepository;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+		const localize = new UmbLocalizationController(args.host);
 
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(args.host);
 
@@ -48,7 +48,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		this.editor.ui.registry.addToggleButton('umbmediapicker', {
 			icon: 'image',
-			tooltip: 'Media Picker',
+			tooltip: localize.term('general_mediaPicker'),
 			onAction: () => this.#onAction(),
 			onSetup: (api) => {
 				const changed = this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) =>
@@ -137,16 +137,13 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		// TODO => startNodeId and startNodeIsVirtual do not exist on ContentTreeItemResponseModel
 
-		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_TREE_PICKER_MODAL, {
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				hideTreeRoot: true,
-
-				//startNodeId,
 				//startNodeIsVirtual,
 			},
 			value: {
-				selection: currentTarget.udi ? [...currentTarget.udi] : [],
+				selection: currentTarget.udi ? [getGuid(currentTarget.udi)] : [],
 			},
 		});
 
@@ -164,8 +161,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, { data: { mediaUnique } });
 
-		await modalHandler?.onSubmit().catch(() => undefined);
-		const mediaData = modalHandler?.getValue();
+		const mediaData = await modalHandler?.onSubmit().catch(() => null);
+		if (!mediaData) return;
 
 		const media: MediaPickerTargetData = {
 			altText: mediaData?.altText,

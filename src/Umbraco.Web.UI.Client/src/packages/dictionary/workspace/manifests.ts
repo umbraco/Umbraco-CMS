@@ -1,9 +1,10 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspaces = {
@@ -22,10 +23,10 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Dictionary.Edit',
 		name: 'Dictionary Workspace Edit View',
-		js: () => import('./views/workspace-view-dictionary-editor.element.js'),
+		element: () => import('./views/workspace-view-dictionary-editor.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Edit',
+			label: '#general_edit',
 			pathname: 'edit',
 			icon: 'edit',
 		},
@@ -45,9 +46,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Dictionary.Save',
 		name: 'Save Dictionary Workspace Action',
 		weight: 90,
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -60,4 +61,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

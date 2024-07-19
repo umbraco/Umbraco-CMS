@@ -1,12 +1,11 @@
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
@@ -34,9 +33,7 @@ export class UmbThemeContext extends UmbContextBase<UmbThemeContext> {
 		if (themeAlias) {
 			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
 			this.#themeObserver = this.observe(
-				umbExtensionsRegistry
-					.byType('theme')
-					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
+				umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
 				async (themes) => {
 					this.#styleElement?.remove();
 					if (themes.length > 0 && themes[0].css) {
@@ -60,7 +57,6 @@ export class UmbThemeContext extends UmbContextBase<UmbThemeContext> {
 							document.head.appendChild(this.#styleElement);
 						}
 					} else {
-						console.log('remove style element', this.#styleElement);
 						// We could not load a theme for this alias, so we remove the theme.
 						localStorage.removeItem(LOCAL_STORAGE_KEY);
 						this.#styleElement?.childNodes.forEach((node) => node.remove());

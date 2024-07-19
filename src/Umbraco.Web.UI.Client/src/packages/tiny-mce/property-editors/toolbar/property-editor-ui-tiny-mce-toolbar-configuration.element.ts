@@ -5,7 +5,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 const tinyIconSet = tinymce.IconManager.get('default');
@@ -60,7 +63,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 
 	#selectedValues: string[] = [];
 
-	protected async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
+	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
 		this.config?.getValueByAlias<ToolbarConfig[]>('toolbar')?.forEach((v) => {
@@ -87,7 +90,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 				p.meta.toolbar.forEach((t: any) => {
 					this._toolbarConfig.push({
 						alias: t.alias,
-						label: t.label,
+						label: this.localize.string(t.label),
 						icon: t.icon ?? 'icon-autofill',
 						selected: this.value.includes(t.alias),
 					});
@@ -106,10 +109,10 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 
 		this.value = value;
 
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<ul>
 			${repeat(
 				this._toolbarConfig,
@@ -125,7 +128,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		</ul>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			ul {

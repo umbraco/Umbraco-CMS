@@ -19,4 +19,4 @@ export const userProfileApps: Array<ManifestTypes> = [
 		api: () => import('./current-user-history.store.js'),
 	},
 ];
-export const manifests = [...userProfileApps];
+export const manifests: Array<ManifestTypes> = [...userProfileApps];

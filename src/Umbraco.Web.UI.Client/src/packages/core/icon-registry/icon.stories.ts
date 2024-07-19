@@ -1,5 +1,5 @@
+import icons from './icons.js';
 import type { Meta, Story } from '@storybook/web-components';
-import icons from './icons/icons.json';
 import { html, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -8,6 +8,7 @@ export default {
 } as Meta;
 
 const Template: Story = () => {
+	const approvedIcons = icons.filter((x) => x.legacy !== true);
 	return html`
 		<div
 			style="display: grid;
@@ -17,7 +18,7 @@ const Template: Story = () => {
     place-items: start;
     justify-content: space-between;">
 			${repeat(
-				icons,
+				approvedIcons,
 				(icon) => icon.name,
 				(icon) =>
 					html` <div

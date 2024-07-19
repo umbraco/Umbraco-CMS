@@ -1,4 +1,4 @@
-import { UMB_MENU_CONTEXT } from '../../menu/menu.context.js';
+import { UMB_MENU_CONTEXT } from '../../menu/components/menu/menu.context.js';
 import { UmbConditionBase } from './condition-base.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {

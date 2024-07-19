@@ -1,7 +1,10 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
@@ -25,10 +28,10 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 
 	#addGroup() {
 		this.value = [...this._value, { name: 'Unnamed group', key: UmbId.new() }];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button label=${this.localize.term('blockEditor_addBlockGroup')} look="placeholder" @click=${this.#addGroup}>
 				${this.localize.term('blockEditor_addBlockGroup')}
@@ -36,7 +39,7 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-button {

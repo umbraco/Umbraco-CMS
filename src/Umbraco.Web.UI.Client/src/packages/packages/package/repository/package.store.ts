@@ -1,11 +1,14 @@
 import type { UmbPackage } from '../../types.js';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type {
+	PackageConfigurationResponseModel,
+	PackageMigrationStatusResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('UmbPackageStore');
 
@@ -15,6 +18,8 @@ export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('Umb
  * @extends {UmbStoreBase}
  */
 export class UmbPackageStore extends UmbStoreBase {
+	#configuration = new UmbObjectState<PackageConfigurationResponseModel>({ marketplaceUrl: '' });
+
 	/**
 	 * Array of packages with extensions
 	 * @private
@@ -25,6 +30,8 @@ export class UmbPackageStore extends UmbStoreBase {
 	#extensions = new UmbArrayState<ManifestBase>([], (e) => e.alias);
 
 	#migrations = new UmbArrayState<PackageMigrationStatusResponseModel>([], (e) => e.packageName);
+
+	configuration = this.#configuration.asObservable();
 
 	/**
 	 * Observable of packages with extensions
@@ -51,7 +58,7 @@ export class UmbPackageStore extends UmbStoreBase {
 	/**
 	 * Append items to the store
 	 */
-	appendItems(packages: Array<UmbPackage>) {
+	override appendItems(packages: Array<UmbPackage>) {
 		this.#packages.next(packages);
 		this.isPackagesLoaded = true;
 	}
@@ -62,6 +69,10 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	appendMigrations(migrations: PackageMigrationStatusResponseModel[]) {
 		this.#migrations.append(migrations);
+	}
+
+	setConfiguration(configuration: PackageConfigurationResponseModel) {
+		this.#configuration.setValue(configuration);
 	}
 }
 

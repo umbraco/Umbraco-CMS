@@ -1,7 +1,7 @@
 import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -41,14 +41,6 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	#renderBackButton() {
-		return html`
-			<uui-button compact href="/section/member-management/view/member-groups">
-				<uui-icon name="icon-arrow-left"> </uui-icon>
-			</uui-button>
-		`;
-	}
-
 	#renderActions() {
 		// Actions only works if we have a valid unique.
 		if (!this._unique || this.#workspaceContext?.getIsNew()) return nothing;
@@ -56,19 +48,18 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`;
 	}
 
-	render() {
+	override render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.MemberGroup">
+			<umb-workspace-editor alias="Umb.Workspace.MemberGroup" back-path="/section/member-management/view/member-groups">
 				${this.#renderActions()}
 				<div id="header" slot="header">
-					${this.#renderBackButton()}
-					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}"></uui-input>
+					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}" ${umbFocus()}></uui-input>
 				</div>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -78,7 +69,6 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 			}
 			#header {
 				display: flex;
-				gap: var(--uui-size-space-4);
 				align-items: center;
 				width: 100%;
 			}

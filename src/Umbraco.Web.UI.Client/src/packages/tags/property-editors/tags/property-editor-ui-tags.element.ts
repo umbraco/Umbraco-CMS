@@ -1,7 +1,10 @@
 import type { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -21,6 +24,15 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	public get value(): Array<string> {
 		return this._value;
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _group?: string;
@@ -51,15 +63,16 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 
 	#onChange(event: CustomEvent) {
 		this.value = ((event.target as UmbTagsInputElement).value as string).split(',');
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-tags-input
-			group="${ifDefined(this._group)}"
+			group=${ifDefined(this._group)}
 			.culture=${this._culture}
 			.items=${this.value}
-			@change=${this.#onChange}></umb-tags-input>`;
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></umb-tags-input>`;
 	}
 }
 

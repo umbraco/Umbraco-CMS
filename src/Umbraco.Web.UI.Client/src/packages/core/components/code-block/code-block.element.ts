@@ -1,13 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	css,
-	html,
-	LitElement,
-	customElement,
-	property,
-	queryAssignedNodes,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
 
 //TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
 
@@ -24,44 +16,50 @@ export class UmbCodeBlockElement extends LitElement {
 	@property({ type: Boolean })
 	copy = false;
 
-	@queryAssignedNodes()
-	nodes!: NodeListOf<ChildNode>;
-
 	@state()
-	copyState: 'idle' | 'success' = 'idle';
+	private _copyState: 'idle' | 'success' = 'idle';
 
 	async copyCode() {
 		const text = this.textContent;
 		if (text) {
 			await navigator.clipboard.writeText(text);
-			this.copyState = 'success';
+			this._copyState = 'success';
 			setTimeout(() => {
-				this.copyState = 'idle';
+				this._copyState = 'idle';
 			}, 2000);
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
-			${this.language
-				? html`<div id="header">
-						<span id="lang">${this.language}</span> ${this.copy
-							? html`<button @click=${this.copyCode}>
-									${this.copyState === 'idle'
-										? html`<uui-icon name="copy"></uui-icon>Copy`
-										: html`<uui-icon name="check"></uui-icon>Copied!`}
-							  </button>`
-							: ''}
-				  </div>`
-				: ''}
-			<pre
-				style="${this.language
-					? 'border-top: 1px solid var(--uui-color-divider-emphasis);'
-					: ''}"><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
+			${this.#renderHeader()}
+			<pre><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
 		`; // Avoid breaks between elements of <pre></pre>
 	}
 
-	static styles = [
+	#renderHeader() {
+		if (!this.language && !this.copy) return;
+		return html`
+			<div id="header">
+				<span id="lang">${this.language}</span>
+				${when(
+					this.copy,
+					() => html`
+						<uui-button compat color=${this._copyState === 'idle' ? 'default' : 'positive'} @click=${this.copyCode}>
+							${when(
+								this._copyState === 'idle',
+								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
+								() =>
+									html`<uui-icon name="check"></uui-icon> <umb-localize key="general_copied">Copied!</umb-localize>`,
+							)}
+						</uui-button>
+					`,
+				)}
+			</div>
+		`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -81,12 +79,6 @@ export class UmbCodeBlockElement extends LitElement {
 				background-color: var(--uui-color-surface-alt);
 				color: #303033;
 				display: block;
-				font-family:
-					Lato,
-					Helvetica Neue,
-					Helvetica,
-					Arial,
-					sans-serif;
 				margin: 0;
 				overflow-x: auto;
 				padding: 9.5px;
@@ -95,7 +87,7 @@ export class UmbCodeBlockElement extends LitElement {
 			pre,
 			code {
 				word-wrap: normal;
-				white-space: pre-line;
+				white-space: pre;
 			}
 
 			#header {
@@ -103,12 +95,12 @@ export class UmbCodeBlockElement extends LitElement {
 				justify-content: space-between;
 				align-items: center;
 				background-color: var(--uui-color-surface-alt);
+				border-bottom: 1px solid var(--uui-color-divider-emphasis);
 			}
 
 			#lang {
 				margin-left: 16px;
 				font-weight: bold;
-				text-transform: uppercase;
 			}
 
 			button {

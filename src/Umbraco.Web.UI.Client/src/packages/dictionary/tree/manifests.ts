@@ -1,30 +1,30 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbDictionaryTreeRepository } from './dictionary-tree.repository.js';
-import { UmbDictionaryTreeStore } from './dictionary-tree.store.js';
+import {
+	UMB_DICTIONARY_TREE_ALIAS,
+	UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
+	UMB_DICTIONARY_TREE_STORE_ALIAS,
+} from './constants.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DICTIONARY_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary.Tree';
-export const UMB_DICTIONARY_TREE_STORE_ALIAS = 'Umb.Store.Dictionary.Tree';
-export const UMB_DICTIONARY_TREE_ALIAS = 'Umb.Tree.Dictionary';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
 	name: 'Dictionary Tree Repository',
-	api: UmbDictionaryTreeRepository,
+	api: () => import('./dictionary-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_DICTIONARY_TREE_STORE_ALIAS,
 	name: 'Dictionary Tree Store',
-	api: UmbDictionaryTreeStore,
+	api: () => import('./dictionary-tree.store.js'),
 };
 
 const tree: ManifestTree = {
@@ -45,4 +45,10 @@ const treeItem: ManifestTreeItem = {
 	forEntityTypes: [UMB_DICTIONARY_ROOT_ENTITY_TYPE, UMB_DICTIONARY_ENTITY_TYPE],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifests];
+export const manifests: Array<ManifestTypes> = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...reloadTreeItemChildrenManifests,
+];

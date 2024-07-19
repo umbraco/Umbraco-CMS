@@ -4,44 +4,39 @@ import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
 import { UMB_STYLESHEET_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContext,
-	UmbSaveableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
+	type UmbSubmittableWorkspaceContext,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbStylesheetDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbStylesheetDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbStylesheetDetailRepository(this);
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
+	readonly entityType = this.#data.asObservablePart((data) => data?.entityType);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
-	readonly path = this.#data.asObservablePart((data) => data?.path);
-
-	#isCodeEditorReady = new UmbBooleanState(false);
-	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS);
-		this.#loadCodeEditor();
 
 		this.routes.setRoutes([
 			{
@@ -63,6 +58,7 @@ export class UmbStylesheetWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbStylesheetWorkspaceEditorElement,
 				setup: (component: PageComponent, info: IRoutingInfo) => {
+					// TODO: Decode uniques [NL]
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -70,18 +66,9 @@ export class UmbStylesheetWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
-	}
-
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
-		}
 	}
 
 	getEntityType(): string {
@@ -108,11 +95,21 @@ export class UmbStylesheetWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data, asObservable } = await this.repository.requestByUnique(unique);
 
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);
+
+			this.observe(asObservable(), (data) => this.onDetailStoreChanges(data), 'umbDetailStoreObserver');
+		}
+	}
+
+	onDetailStoreChanges(data: UmbStylesheetDetailModel | undefined) {
+		// Data is removed from the store
+		// TODO: revisit. We need to handle what should happen when the data is removed from the store
+		if (data === undefined) {
+			this.#data.setValue(undefined);
 		}
 	}
 
@@ -127,45 +124,43 @@ export class UmbStylesheetWorkspaceContext
 		}
 	}
 
-	public async save() {
+	public async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
-
-		let newData = undefined;
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			const { data } = await this.repository.create(this.#data.value, parent.unique);
-			newData = data;
+			const { error, data } = await this.repository.create(this.#data.value, parent.unique);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.#data.setValue(data);
+			this.setIsNew(false);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 		} else {
-			const { data } = await this.repository.save(this.#data.value);
-			newData = data;
+			const { error, data } = await this.repository.save(this.#data.value);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.#data.setValue(data);
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.getUnique()!,
 				entityType: this.getEntityType(),
 			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-
-		if (newData) {
-			this.#data.setValue(newData);
-			this.setIsNew(false);
-			this.workspaceComplete(newData);
+			eventContext.dispatchEvent(event);
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

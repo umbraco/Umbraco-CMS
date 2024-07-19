@@ -1,15 +1,13 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_TREE_ALIAS, UMB_MEDIA_TREE_REPOSITORY_ALIAS, UMB_MEDIA_TREE_STORE_ALIAS } from './constants.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_MEDIA_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Media.Tree';
-export const UMB_MEDIA_TREE_STORE_ALIAS = 'Umb.Store.Media.Tree';
-export const UMB_MEDIA_TREE_ALIAS = 'Umb.Tree.Media';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
@@ -27,9 +25,10 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
-	kind: 'default',
 	alias: UMB_MEDIA_TREE_ALIAS,
 	name: 'Media Tree',
+	element: () => import('./media-tree.element.js'),
+	api: () => import('./media-tree.context.js'),
 	meta: {
 		repositoryAlias: UMB_MEDIA_TREE_REPOSITORY_ALIAS,
 	},
@@ -40,7 +39,24 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: 'Umb.TreeItem.Media',
 	name: 'Media Tree Item',
-	forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
+	element: () => import('./tree-item/media-tree-item.element.js'),
+	api: () => import('./tree-item/media-tree-item.context.js'),
+	forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifests];
+const rootTreeItem: ManifestTreeItem = {
+	type: 'treeItem',
+	kind: 'default',
+	alias: 'Umb.TreeItem.Media.Root',
+	name: 'Media Tree Root',
+	forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE],
+};
+
+export const manifests: Array<ManifestTypes> = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	rootTreeItem,
+	...reloadTreeItemChildrenManifests,
+];

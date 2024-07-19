@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -11,10 +11,21 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	@state()
 	private _variesByCulture?: boolean;
+
 	@state()
 	private _variesBySegment?: boolean;
+
 	@state()
 	private _isElement?: boolean;
+
+	@state()
+	private _keepAllVersionsNewerThanDays?: number | null;
+
+	@state()
+	private _keepLatestVersionPerDayForDays?: number | null;
+
+	@state()
+	private _preventCleanup?: boolean;
 
 	constructor() {
 		super();
@@ -22,11 +33,11 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext;
-			this._observeDocumentType();
+			this.#observeDocumentType();
 		});
 	}
 
-	private _observeDocumentType() {
+	#observeDocumentType() {
 		if (!this.#workspaceContext) return;
 		this.observe(
 			this.#workspaceContext.variesByCulture,
@@ -37,13 +48,52 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			(variesBySegment) => (this._variesBySegment = variesBySegment),
 		);
 		this.observe(this.#workspaceContext.isElement, (isElement) => (this._isElement = isElement));
+
+		this.observe(this.#workspaceContext.cleanup, (cleanup) => {
+			this._preventCleanup = cleanup?.preventCleanup;
+			this._keepAllVersionsNewerThanDays = cleanup?.keepAllVersionsNewerThanDays;
+			this._keepLatestVersionPerDayForDays = cleanup?.keepLatestVersionPerDayForDays;
+		});
 	}
 
-	render() {
+	#setCleanup() {
+		this.#workspaceContext?.setCleanup({
+			preventCleanup: this._preventCleanup ?? false,
+			keepAllVersionsNewerThanDays: this._keepAllVersionsNewerThanDays,
+			keepLatestVersionPerDayForDays: this._keepLatestVersionPerDayForDays,
+		});
+	}
+
+	#onChangePreventCleanup(event: UUIBooleanInputEvent) {
+		this._preventCleanup = event.target.checked;
+		if (this._preventCleanup) {
+			this._keepAllVersionsNewerThanDays = null;
+			this._keepLatestVersionPerDayForDays = null;
+		}
+		this.#setCleanup();
+	}
+
+	#onChangeKeepAllVersionsNewerThanDays(event: Event & { target: HTMLInputElement }) {
+		this._keepAllVersionsNewerThanDays = parseInt(event.target.value);
+		this.#setCleanup();
+	}
+
+	#onChangeKeepLatestVersionPerDayForDays(event: Event & { target: HTMLInputElement }) {
+		this._keepLatestVersionPerDayForDays = parseInt(event.target.value);
+		this.#setCleanup();
+	}
+
+	override render() {
 		return html`
 			<uui-box headline="Data variations">
-				<umb-property-layout alias="VaryByCulture" label="Allow vary by culture">
-					<div slot="description">Allow editors to create content of different languages.</div>
+				<umb-property-layout
+					alias="VaryByCulture"
+					label=${this.localize.term('contentTypeEditor_cultureVariantHeading')}>
+					<div slot="description">
+						<umb-localize key="contentTypeEditor_cultureVariantDescription"
+							>Allow editors to create content of different languages.</umb-localize
+						>
+					</div>
 					<div slot="editor">
 						<uui-toggle
 							?checked=${this._variesByCulture}
@@ -53,8 +103,14 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							label="Vary by culture"></uui-toggle>
 					</div>
 				</umb-property-layout>
-				<umb-property-layout alias="VaryBySegments" label="Allow segmentation">
-					<div slot="description">Allow editors to segment their content.</div>
+				<umb-property-layout
+					alias="VaryBySegments"
+					label=${this.localize.term('contentTypeEditor_segmentVariantHeading')}>
+					<div slot="description">
+						<umb-localize key="contentTypeEditor_segmentVariantDescription"
+							>Allow editors to segment their content.</umb-localize
+						>
+					</div>
 					<div slot="editor">
 						<uui-toggle
 							?checked=${this._variesBySegment}
@@ -64,9 +120,11 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							label="Vary by segments"></uui-toggle>
 					</div>
 				</umb-property-layout>
-				<umb-property-layout alias="ElementType" label="Is an Element Type">
+				<umb-property-layout alias="ElementType" label=${this.localize.term('contentTypeEditor_elementHeading')}>
 					<div slot="description">
-						An Element Type is used for content instances in Property Editors, like the Block Editors.
+						<umb-localize key="contentTypeEditor_elementDescription"
+							>An Element Type is used for content instances in Property Editors, like the Block Editors.</umb-localize
+						>
 					</div>
 					<div slot="editor">
 						<uui-toggle
@@ -74,29 +132,70 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setIsElement((e.target as UUIToggleElement).checked);
 							}}
-							label="Element type"></uui-toggle>
+							label=${this.localize.term('contentTypeEditor_elementType')}></uui-toggle>
 					</div>
 				</umb-property-layout>
 			</uui-box>
 			<uui-box headline="History cleanup">
-				<umb-property-layout alias="HistoryCleanup" label="History cleanup">
+				<umb-property-layout
+					alias="HistoryCleanup"
+					label=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
 					<div slot="description">
-						Allow overriding the global history cleanup settings. (TODO: this ui is not working.. )
+						<umb-localize key="contentTypeEditor_historyCleanupDescription"
+							>Allow overriding the global history cleanup settings.</umb-localize
+						>
 					</div>
 					<div slot="editor">
-						<!-- TODO: Bind this with context/data -->
-						<uui-toggle .checked="${true}" label="Auto cleanup"></uui-toggle>
-						<uui-label for="versions-newer-than-days">Keep all versions newer than X days</uui-label>
-						<umb-property-editor-ui-number id="versions-newer-than-days"></umb-property-editor-ui-number>
-						<uui-label for="latest-version-per-day-days">Keep latest version per day for X days</uui-label>
-						<umb-property-editor-ui-number id="latest-version-per-day-days"></umb-property-editor-ui-number>
+						<uui-form-layout-item>
+							<uui-toggle
+								id="prevent-cleanup"
+								label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
+								.checked=${this._preventCleanup ?? false}
+								@change=${this.#onChangePreventCleanup}></uui-toggle>
+						</uui-form-layout-item>
+
+						${when(
+							!this._preventCleanup,
+							() => html`
+								<uui-form-layout-item>
+									<uui-label slot="label" for="versions-newer-than-days">
+										<umb-localize key="contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays"
+											>Keep all versions newer than days</umb-localize
+										>
+									</uui-label>
+
+									<uui-input
+										type="number"
+										id="versions-newer-than-days"
+										min="0"
+										placeholder="7"
+										.value=${this._keepAllVersionsNewerThanDays}
+										@change=${this.#onChangeKeepAllVersionsNewerThanDays}></uui-input>
+								</uui-form-layout-item>
+
+								<uui-form-layout-item>
+									<uui-label slot="label" for="latest-version-per-day-days">
+										<umb-localize key="contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays"
+											>Keep latest version per day for days</umb-localize
+										>
+									</uui-label>
+									<uui-input
+										type="number"
+										id="latest-version-per-day-days"
+										min="0"
+										placeholder="90"
+										.value=${this._keepLatestVersionPerDayForDays}
+										@change=${this.#onChangeKeepLatestVersionPerDayForDays}></uui-input>
+								</uui-form-layout-item>
+							`,
+						)}
 					</div>
 				</umb-property-layout>
 			</uui-box>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

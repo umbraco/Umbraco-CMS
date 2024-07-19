@@ -1,10 +1,10 @@
 import { umbUserGroupMockDb } from '../user-group/user-group.db.js';
-import { arrayFilter, stringFilter, queryFilter } from '../utils.js';
+import { stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import type { UmbMockUserModel } from './user.data.js';
-import { data } from './user.data.js';
+import { data, mfaLoginProviders } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateUserRequestModel,
@@ -17,11 +17,22 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-const userGroupFilter = (filterOptions: any, item: UmbMockUserModel) =>
-	arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
-const userStateFilter = (filterOptions: any, item: UmbMockUserModel) =>
+interface UserFilterOptions {
+	skip: number;
+	take: number;
+	orderBy: string;
+	orderDirection: string;
+	userGroupIds: Array<{ id: string }>;
+	userStates: Array<string>;
+	filter: string;
+}
+
+const userGroupFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
+	objectArrayFilter(filterOptions.userGroupIds, item.userGroupIds, 'id');
+const userStateFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
 	stringFilter(filterOptions.userStates, item.state);
-const userQueryFilter = (filterOptions: any, item: UmbMockUserModel) => queryFilter(filterOptions.filter, item.name);
+const userQueryFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
+	queryFilter(filterOptions.filter, item.name);
 
 // Temp mocked database
 class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
@@ -38,7 +49,8 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	 * @memberof UmbUserData
 	 */
 	setUserGroups(data: UpdateUserGroupsOnUserRequestModel): void {
-		const users = this.data.filter((user) => data.userIds?.includes(user.id ?? ''));
+		const users = this.data.filter((user) => data.userIds?.map((reference) => reference.id).includes(user.id));
+
 		users.forEach((user) => {
 			user.userGroupIds = data.userGroupIds;
 		});
@@ -61,16 +73,44 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			name: firstUser.name,
 			email: firstUser.email,
 			userName: firstUser.email,
+			hasAccessToSensitiveData: true,
 			avatarUrls: [],
 			hasAccessToAllLanguages: true,
-			languageIsoCode: firstUser.languageIsoCode,
+			languageIsoCode: firstUser.languageIsoCode || null,
 			languages: [],
 			documentStartNodeIds: firstUser.documentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
+			hasDocumentRootAccess: firstUser.hasDocumentRootAccess,
+			hasMediaRootAccess: firstUser.hasMediaRootAccess,
 			fallbackPermissions: [],
 			permissions,
 			allowedSections,
+			isAdmin: firstUser.isAdmin,
 		};
+	}
+
+	getMfaLoginProviders() {
+		return mfaLoginProviders;
+	}
+
+	enableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	disableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = false;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -126,10 +166,10 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		return { userId: newUserId };
 	}
 
-	filter(options: any): PagedUserResponseModel {
+	filter(options: UserFilterOptions): PagedUserResponseModel {
 		const allItems = this.getAll();
 
-		const filterOptions = {
+		const filterOptions: UserFilterOptions = {
 			skip: options.skip || 0,
 			take: options.take || 25,
 			orderBy: options.orderBy || 'name',
@@ -157,6 +197,7 @@ const itemMapper = (item: UmbMockUserModel): UserItemResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
+		avatarUrls: item.avatarUrls,
 	};
 };
 
@@ -170,6 +211,8 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		languageIsoCode: null,
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
+		hasDocumentRootAccess: false,
+		hasMediaRootAccess: false,
 		avatarUrls: [],
 		state: UserStateModel.INACTIVE,
 		failedLoginAttempts: 0,
@@ -178,6 +221,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastLoginDate: null,
 		lastLockoutDate: null,
 		lastPasswordChangeDate: null,
+		isAdmin: item.userGroupIds.map((reference) => reference.id).includes(umbUserGroupMockDb.getAll()[0].id),
 	};
 };
 
@@ -191,6 +235,8 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		languageIsoCode: item.languageIsoCode,
 		documentStartNodeIds: item.documentStartNodeIds,
 		mediaStartNodeIds: item.mediaStartNodeIds,
+		hasDocumentRootAccess: item.hasDocumentRootAccess,
+		hasMediaRootAccess: item.hasMediaRootAccess,
 		avatarUrls: item.avatarUrls,
 		state: item.state,
 		failedLoginAttempts: item.failedLoginAttempts,
@@ -199,6 +245,7 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		lastLoginDate: item.lastLoginDate,
 		lastLockoutDate: item.lastLockoutDate,
 		lastPasswordChangeDate: item.lastPasswordChangeDate,
+		isAdmin: item.isAdmin,
 	};
 };
 

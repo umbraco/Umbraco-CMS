@@ -11,14 +11,13 @@ export const manifest: UmbBackofficeManifestKind = {
 		type: 'entityAction',
 		kind: 'duplicate',
 		api: () => import('./duplicate.action.js'),
-		weight: 600,
+		weight: 650,
 		forEntityTypes: [],
 		meta: {
-			icon: 'icon-documents',
-			label: 'Duplicate to...',
-			itemRepositoryAlias: '',
+			icon: 'icon-enter',
+			label: '#actions_copy',
+			treeRepositoryAlias: '',
 			duplicateRepositoryAlias: '',
-			pickerModal: '',
 		},
 	},
 };

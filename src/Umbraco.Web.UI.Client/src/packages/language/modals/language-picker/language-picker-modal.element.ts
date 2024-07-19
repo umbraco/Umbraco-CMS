@@ -16,14 +16,18 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	#collectionRepository = new UmbLanguageCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
+
+		this.observe(this.#selectionManager.selection, (selection) => {
+			this.value = { selection };
+		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
 		this._languages = data?.items ?? [];
 	}
@@ -37,7 +41,6 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this.value = { selection: this.#selectionManager.getSelection() };
 		this.modalContext?.submit();
 	}
 
@@ -45,23 +48,27 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline="Select languages">
 			<uui-box>
-				${repeat(
-					this.#filteredLanguages,
-					(item) => item.unique,
-					(item) => html`
-						<uui-menu-item
-							label=${item.name ?? ''}
-							selectable
-							@selected=${() => this.#selectionManager.select(item.unique)}
-							@deselected=${() => this.#selectionManager.deselect(item.unique)}
-							?selected=${this.#selectionManager.isSelected(item.unique)}>
-							<uui-icon slot="icon" name="icon-globe"></uui-icon>
-						</uui-menu-item>
-					`,
-				)}
+				${this.#filteredLanguages.length > 0
+					? repeat(
+							this.#filteredLanguages,
+							(item) => item.unique,
+							(item) => html`
+								<uui-menu-item
+									label=${item.name ?? ''}
+									selectable
+									@selected=${() => this.#selectionManager.select(item.unique)}
+									@deselected=${() => this.#selectionManager.deselect(item.unique)}
+									?selected=${this.value.selection.includes(item.unique)}>
+									<uui-icon slot="icon" name="icon-globe"></uui-icon>
+								</uui-menu-item>
+							`,
+						)
+					: html`<umb-localize key="language_noFallbackLanguages">
+							There are no other languages to choose from
+						</umb-localize>`}
 			</uui-box>
 			<div slot="actions">
 				<uui-button label="Close" @click=${this.#close}></uui-button>

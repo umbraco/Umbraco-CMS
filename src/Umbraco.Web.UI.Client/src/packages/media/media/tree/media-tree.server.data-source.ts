@@ -1,12 +1,12 @@
-import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
-import type { UmbMediaTreeItemModel } from './types.js';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import type {
-	UmbTreeAncestorsOfRequestArgs,
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-} from '@umbraco-cms/backoffice/tree';
+	UmbMediaTreeChildrenOfRequestArgs,
+	UmbMediaTreeItemModel,
+	UmbMediaTreeRootItemsRequestArgs,
+} from './types.js';
+import type { UmbTreeAncestorsOfRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { MediaResource, type MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaService, type MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -17,7 +17,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	MediaTreeItemResponseModel,
-	UmbMediaTreeItemModel
+	UmbMediaTreeItemModel,
+	UmbMediaTreeRootItemsRequestArgs,
+	UmbMediaTreeChildrenOfRequestArgs
 > {
 	/**
 	 * Creates an instance of UmbMediaTreeServerDataSource.
@@ -34,31 +36,37 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	}
 }
 
-const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+const getRootItems = (args: UmbMediaTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MediaResource.getTreeMediaRoot({ skip: args.skip, take: args.take });
+	MediaService.getTreeMediaRoot({ dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take });
 
-const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+const getChildrenOf = (args: UmbMediaTreeChildrenOfRequestArgs) => {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return MediaResource.getTreeMediaChildren({
-			parentId: args.parentUnique,
+		return MediaService.getTreeMediaChildren({
+			parentId: args.parent.unique,
+			dataTypeId: args.dataType?.unique,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MediaResource.getTreeMediaAncestors({
-		descendantId: args.descendantUnique,
+	MediaService.getTreeMediaAncestors({
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+		},
 		entityType: UMB_MEDIA_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		noAccess: item.noAccess,

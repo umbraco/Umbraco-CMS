@@ -1,49 +1,32 @@
 import { UmbLogMessagesServerDataSource, UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data.js';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type {
 	DirectionModel,
 	LogLevelModel,
-	SavedLogSearchPresenationBaseModel,
+	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-// Move to documentation / JSdoc
-/* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
-// element -> context -> repository -> (store) -> data source
-// All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbLogViewerRepository {
 	#host: UmbControllerHost;
 	#searchDataSource: UmbLogSearchesServerDataSource;
 	#messagesDataSource: UmbLogMessagesServerDataSource;
-	#notificationService?: UmbNotificationContext;
-	#init;
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 		this.#searchDataSource = new UmbLogSearchesServerDataSource(this.#host);
 		this.#messagesDataSource = new UmbLogMessagesServerDataSource(this.#host);
-
-		this.#init = new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT, (instance) => {
-			this.#notificationService = instance;
-		}).asPromise();
 	}
 
 	async getSavedSearches({ skip, take }: { skip: number; take: number }) {
-		await this.#init;
-
 		return this.#searchDataSource.getAllSavedSearches({ skip, take });
 	}
 
-	async saveSearch({ name, query }: SavedLogSearchPresenationBaseModel) {
-		await this.#init;
-		this.#searchDataSource.postLogViewerSavedSearch({ name, query });
+	async saveSearch({ name, query }: SavedLogSearchResponseModel) {
+		return this.#searchDataSource.postLogViewerSavedSearch({ name, query });
 	}
 
 	async removeSearch({ name }: { name: string }) {
-		await this.#init;
-		this.#searchDataSource.deleteSavedSearchByName({ name });
+		return this.#searchDataSource.deleteSavedSearchByName({ name });
 	}
 
 	async getMessageTemplates({
@@ -57,14 +40,10 @@ export class UmbLogViewerRepository {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		await this.#init;
-
 		return this.#messagesDataSource.getLogViewerMessageTemplate({ skip, take, startDate, endDate });
 	}
 
 	async getLogCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		await this.#init;
-
 		return this.#messagesDataSource.getLogViewerLevelCount({ startDate, endDate });
 	}
 
@@ -85,8 +64,6 @@ export class UmbLogViewerRepository {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		await this.#init;
-
 		return this.#messagesDataSource.getLogViewerLogs({
 			skip,
 			take,
@@ -99,12 +76,10 @@ export class UmbLogViewerRepository {
 	}
 
 	async getLogLevels({ skip = 0, take = 100 }: { skip: number; take: number }) {
-		await this.#init;
 		return this.#messagesDataSource.getLogViewerLevel({ skip, take });
 	}
 
 	async getLogViewerValidateLogsSize({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		await this.#init;
 		return this.#messagesDataSource.getLogViewerValidateLogsSize({ startDate, endDate });
 	}
 }

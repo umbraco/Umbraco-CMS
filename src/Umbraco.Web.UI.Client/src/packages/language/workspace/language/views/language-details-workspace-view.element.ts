@@ -10,6 +10,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import '@umbraco-cms/backoffice/culture';
 
 @customElement('umb-language-details-workspace-view')
 export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -105,16 +106,17 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<umb-property-layout label="Language">
 					<div slot="editor">
 						<!-- TODO: disable already created cultures in the select -->
-						<umb-input-culture-select
-							value=${ifDefined(this._language?.unique)}
-							@change=${this.#handleCultureChange}
-							?readonly=${this._isNew === false}></umb-input-culture-select>
+						${this._isNew
+							? html` <umb-input-culture-select
+									value=${ifDefined(this._language?.unique)}
+									@change=${this.#handleCultureChange}></umb-input-culture-select>`
+							: this._language?.name}
 					</div>
 				</umb-property-layout>
 
@@ -169,7 +171,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

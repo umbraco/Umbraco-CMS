@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_EXTENSION_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Extension.Table';
 
@@ -7,7 +7,7 @@ const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: UMB_EXTENSION_TABLE_COLLECTION_VIEW_ALIAS,
 	name: 'Extension Table Collection View',
-	js: () => import('./table/extension-table-collection-view.element.js'),
+	element: () => import('./table/extension-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
 		icon: 'icon-list',
@@ -21,4 +21,4 @@ const tableCollectionView: ManifestCollectionView = {
 	],
 };
 
-export const manifests = [tableCollectionView];
+export const manifests: Array<ManifestTypes> = [tableCollectionView];

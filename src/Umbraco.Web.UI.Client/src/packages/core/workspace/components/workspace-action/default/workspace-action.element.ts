@@ -1,6 +1,6 @@
-import type { UmbWorkspaceAction } from '../../../../index.js';
+import type { UmbWorkspaceAction } from '../workspace-action.interface.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
@@ -27,6 +27,9 @@ export class UmbWorkspaceActionElement<
 	@state()
 	_href?: string;
 
+	@state()
+	_isDisabled = false;
+
 	@property({ type: Object, attribute: false })
 	public set manifest(value: ManifestWorkspaceAction<MetaType> | undefined) {
 		if (!value) return;
@@ -50,6 +53,8 @@ export class UmbWorkspaceActionElement<
 			this._href = href;
 			// TODO: Do we need to update the component here? [NL]
 		});
+
+		this.#observeIsDisabled();
 	}
 	public get api(): ApiType | undefined {
 		return this.#api;
@@ -93,7 +98,17 @@ export class UmbWorkspaceActionElement<
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
-	render() {
+	#observeIsDisabled() {
+		this.observe(
+			this.#api?.isDisabled,
+			(isDisabled) => {
+				this._isDisabled = isDisabled || false;
+			},
+			'isDisabledObserver',
+		);
+	}
+
+	override render() {
 		return html`
 			<uui-button-group>
 				<uui-button
@@ -102,7 +117,10 @@ export class UmbWorkspaceActionElement<
 					@click=${this._onClick}
 					look=${this.#manifest?.meta.look || 'default'}
 					color=${this.#manifest?.meta.color || 'default'}
-					label=${this.#manifest?.meta.label || ''}
+					label=${ifDefined(
+						this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
+					)}
+					.disabled=${this._isDisabled}
 					.state=${this._buttonState}></uui-button>
 				<umb-workspace-action-menu
 					.forWorkspaceActions=${this._aliases}

@@ -1,4 +1,6 @@
-export const manifests = [
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.MemberPicker',

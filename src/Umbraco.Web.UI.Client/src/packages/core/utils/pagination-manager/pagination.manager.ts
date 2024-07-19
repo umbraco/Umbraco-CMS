@@ -2,16 +2,22 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbPaginationManager extends EventTarget {
+	#defaultValues = {
+		totalItems: 0,
+		totalPages: 1,
+		currentPage: 1,
+	};
+
 	#pageSize = new UmbNumberState(10);
 	public readonly pageSize = this.#pageSize.asObservable();
 
-	#totalItems = new UmbNumberState(0);
+	#totalItems = new UmbNumberState(this.#defaultValues.totalItems);
 	public readonly totalItems = this.#totalItems.asObservable();
 
-	#totalPages = new UmbNumberState(1);
+	#totalPages = new UmbNumberState(this.#defaultValues.totalPages);
 	public readonly totalPages = this.#totalPages.asObservable();
 
-	#currentPage = new UmbNumberState(1);
+	#currentPage = new UmbNumberState(this.#defaultValues.currentPage);
 	public readonly currentPage = this.#currentPage.asObservable();
 
 	#skip = new UmbNumberState(0);
@@ -99,6 +105,17 @@ export class UmbPaginationManager extends EventTarget {
 	 */
 	public getSkip() {
 		return this.#skip.getValue();
+	}
+
+	/**
+	 * Clears the pagination manager values and resets them to their default values
+	 * @memberof UmbPaginationManager
+	 */
+	public clear() {
+		this.#totalItems.setValue(this.#defaultValues.totalItems);
+		this.#totalPages.setValue(this.#defaultValues.totalPages);
+		this.#currentPage.setValue(this.#defaultValues.currentPage);
+		this.#skip.setValue(0);
 	}
 
 	/**

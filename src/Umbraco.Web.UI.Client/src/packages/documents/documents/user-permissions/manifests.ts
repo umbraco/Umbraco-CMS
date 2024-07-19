@@ -17,9 +17,11 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
 } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as conditionManifests } from './condition/manifests.js';
 import type {
 	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const permissions: Array<ManifestEntityUserPermission> = [
@@ -30,8 +32,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Read'],
-			labelKey: 'actions_browse',
-			descriptionKey: 'actionDescriptions_browse',
+			label: '#actions_browse',
+			description: '#actionDescriptions_browse',
 		},
 	},
 	{
@@ -41,8 +43,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.CreateBlueprint'],
-			labelKey: 'actions_createblueprint',
-			descriptionKey: 'actionDescriptions_createblueprint',
+			label: '#actions_createblueprint',
+			description: '#actionDescriptions_createblueprint',
 		},
 	},
 	{
@@ -52,8 +54,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Delete'],
-			labelKey: 'actions_delete',
-			descriptionKey: 'actionDescriptions_delete',
+			label: '#actions_delete',
+			description: '#actionDescriptions_delete',
 		},
 	},
 	{
@@ -63,8 +65,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Create'],
-			labelKey: 'actions_create',
-			descriptionKey: 'actionDescriptions_create',
+			label: '#actions_create',
+			description: '#actionDescriptions_create',
 		},
 	},
 	{
@@ -74,8 +76,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Notifications'],
-			labelKey: 'actions_notify',
-			descriptionKey: 'actionDescriptions_notify',
+			label: '#actions_notify',
+			description: '#actionDescriptions_notify',
 		},
 	},
 	{
@@ -85,8 +87,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Publish'],
-			labelKey: 'actions_publish',
-			descriptionKey: 'actionDescriptions_publish',
+			label: '#actions_publish',
+			description: '#actionDescriptions_publish',
 		},
 	},
 	{
@@ -96,8 +98,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Permissions'],
-			labelKey: 'actions_setPermissions',
-			descriptionKey: 'actionDescriptions_rights',
+			label: '#actions_setPermissions',
+			description: '#actionDescriptions_rights',
 		},
 	},
 	{
@@ -107,8 +109,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Unpublish'],
-			labelKey: 'actions_unpublish',
-			descriptionKey: 'actionDescriptions_unpublish',
+			label: '#actions_unpublish',
+			description: '#actionDescriptions_unpublish',
 		},
 	},
 	{
@@ -118,8 +120,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Update'],
-			labelKey: 'actions_update',
-			descriptionKey: 'actionDescriptions_update',
+			label: '#actions_update',
+			description: '#actionDescriptions_update',
 		},
 	},
 	{
@@ -129,8 +131,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Duplicate'],
-			labelKey: 'actions_copy',
-			descriptionKey: 'actionDescriptions_copy',
+			label: '#actions_copy',
+			description: '#actionDescriptions_copy',
 			group: 'structure',
 		},
 	},
@@ -141,8 +143,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Move'],
-			labelKey: 'actions_move',
-			descriptionKey: 'actionDescriptions_move',
+			label: '#actions_move',
+			description: '#actionDescriptions_move',
 			group: 'structure',
 		},
 	},
@@ -153,8 +155,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Sort'],
-			labelKey: 'actions_sort',
-			descriptionKey: 'actionDescriptions_sort',
+			label: '#actions_sort',
+			description: '#actionDescriptions_sort',
 			group: 'structure',
 		},
 	},
@@ -165,8 +167,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.CultureAndHostnames'],
-			labelKey: 'actions_assigndomain',
-			descriptionKey: 'actionDescriptions_assignDomain',
+			label: '#actions_assigndomain',
+			description: '#actionDescriptions_assignDomain',
 			group: 'administration',
 		},
 	},
@@ -177,8 +179,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.PublicAccess'],
-			labelKey: 'actions_protect',
-			descriptionKey: 'actionDescriptions_protect',
+			label: '#actions_protect',
+			description: '#actionDescriptions_protect',
 			group: 'administration',
 		},
 	},
@@ -189,8 +191,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Rollback'],
-			labelKey: 'actions_rollback',
-			descriptionKey: 'actionDescriptions_rollback',
+			label: '#actions_rollback',
+			description: '#actionDescriptions_rollback',
 			group: 'administration',
 		},
 	},
@@ -211,4 +213,9 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 	},
 ];
 
-export const manifests = [...repositoryManifests, ...permissions, ...granularPermissions];
+export const manifests: Array<ManifestTypes> = [
+	...repositoryManifests,
+	...permissions,
+	...granularPermissions,
+	...conditionManifests,
+];

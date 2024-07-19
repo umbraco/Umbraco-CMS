@@ -1,4 +1,4 @@
-import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
+import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbTemplateTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { TemplateResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -37,29 +37,37 @@ export class UmbTemplateTreeServerDataSource extends UmbTreeServerDataSourceBase
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	TemplateResource.getTreeTemplateRoot({ skip: args.skip, take: args.take });
+	TemplateService.getTreeTemplateRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
-		return getRootItems(args);
+	if (args.parent.unique === null) {
+		return getRootItems({
+			skip: args.skip,
+			take: args.take,
+		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return TemplateResource.getTreeTemplateChildren({
-			parentId: args.parentUnique,
+		return TemplateService.getTreeTemplateChildren({
+			parentId: args.parent.unique,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	TemplateResource.getTreeTemplateAncestors({
-		descendantId: args.descendantUnique,
+	TemplateService.getTreeTemplateAncestors({
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_TEMPLATE_ENTITY_TYPE : UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+		},
 		name: item.name,
 		entityType: UMB_TEMPLATE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,

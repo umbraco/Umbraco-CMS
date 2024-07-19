@@ -51,7 +51,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 		this.#hostEl = host.getHostElement() as HTMLElement;
-		this.#host.addController(this);
+		this.#host.addUmbController(this);
 	}
 
 	hostConnected(): void {
@@ -63,7 +63,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	}
 
 	destroy(): void {
-		this.#host?.removeController(this);
+		this.#host?.removeUmbController(this);
 		this.#hostEl = undefined as any;
 		this.#usedKeys.length = 0;
 	}
@@ -100,6 +100,8 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		const locale = new Intl.Locale(lang);
 		const language = locale?.language.toLowerCase();
 		const region = locale?.region?.toLowerCase() ?? '';
+		// TODO: Its a bit of a tight coupling here, as this code relies on localizations begin a map. We should abstract that away. [NL]
+		// TODO: Currently we don't check if the `lang` is available. We should do that. We could maybe checking if the `lang` is in the `languages` map. [NL]?
 		const primary = umbLocalizationManager.localizations.get(`${language}-${region}`) as LocalizationSetType;
 		const secondary = umbLocalizationManager.localizations.get(language) as LocalizationSetType;
 
@@ -158,5 +160,22 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/** Outputs a localized time in relative format. */
 	relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions): string {
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
+	}
+
+	string(text: string): string {
+		// find all words starting with #
+		const regex = /#\w+/g;
+
+		const localizedText = text.replace(regex, (match: string) => {
+			const key = match.slice(1);
+			// TODO: find solution to pass dynamic string to term
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const localized = this.term(key);
+			// we didn't find a localized string, so we return the original string with the #
+			return localized === key ? match : localized;
+		});
+
+		return localizedText;
 	}
 }

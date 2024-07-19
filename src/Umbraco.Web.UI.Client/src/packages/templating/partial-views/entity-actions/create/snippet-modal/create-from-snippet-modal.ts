@@ -3,7 +3,7 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { PartialViewSnippetItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 
 interface UmbSnippetLinkModel {
 	name: string;
@@ -24,8 +24,8 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 		}/snippet/${snippet.id}`;
 	}
 
-	protected async firstUpdated() {
-		const { data } = await tryExecuteAndNotify(this, PartialViewResource.getPartialViewSnippet({ take: 10000 }));
+	protected override async firstUpdated() {
+		const { data } = await tryExecuteAndNotify(this, PartialViewService.getPartialViewSnippet({ take: 10000 }));
 
 		if (data) {
 			this._snippets = data.items.map((snippet) => {
@@ -42,7 +42,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Create Partial View from snippet">
 				<uui-box>

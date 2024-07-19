@@ -1,12 +1,14 @@
 import type { UmbSectionItemModel } from '../../repository/index.js';
 import { UmbSectionPickerContext } from './input-section.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-section')
-export class UmbInputSectionElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputSectionElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -60,15 +62,12 @@ export class UmbInputSectionElement extends FormControlMixin(UmbLitElement) {
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
-	public set value(selectionString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		if (typeof selectionString !== 'string') return;
-		if (selectionString === this.value) return;
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@state()
@@ -91,20 +90,22 @@ export class UmbInputSectionElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${() => this.#pickerContext.openPicker()}
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
@@ -119,9 +120,9 @@ export class UmbInputSectionElement extends FormControlMixin(UmbLitElement) {
 		</umb-ref-section>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

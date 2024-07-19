@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - release/*
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+      - release/*
   workflow_dispatch:
     inputs:
       issue_number:

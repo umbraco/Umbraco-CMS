@@ -1,12 +1,18 @@
 import type { UmbModalConfig } from '../context/modal-manager.context.js';
 
-export interface UmbModalTokenDefaults<ModalDataType extends object = object, ModalValueType = unknown> {
+export interface UmbModalTokenDefaults<
+	ModalDataType extends { [key: string]: any } = { [key: string]: any },
+	ModalValueType = unknown,
+> {
 	modal?: UmbModalConfig;
 	data?: ModalDataType;
 	value?: ModalValueType;
 }
 
-export class UmbModalToken<ModalDataType extends object = object, ModalValueType = unknown> {
+export class UmbModalToken<
+	ModalDataType extends { [key: string]: any } = { [key: string]: any },
+	ModalValueType = unknown,
+> {
 	/**
 	 * Get the data type of the token's data.
 	 *

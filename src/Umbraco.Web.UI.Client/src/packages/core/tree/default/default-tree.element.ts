@@ -1,6 +1,12 @@
-import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
+import type {
+	UmbTreeItemModel,
+	UmbTreeItemModelBase,
+	UmbTreeRootModel,
+	UmbTreeSelectionConfiguration,
+	UmbTreeStartNode,
+} from '../types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import { UMB_DEFAULT_TREE_CONTEXT } from './default-tree.context.js';
+import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -17,7 +23,16 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	selectionConfiguration: UmbTreeSelectionConfiguration = this._selectionConfiguration;
 
 	@property({ type: Boolean, attribute: false })
+	hideTreeItemActions: boolean = false;
+
+	@property({ type: Boolean, attribute: false })
 	hideTreeRoot: boolean = false;
+
+	@property({ type: Object, attribute: false })
+	startNode?: UmbTreeStartNode;
+
+	@property({ type: Boolean, attribute: false })
+	foldersOnly?: boolean = false;
 
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
@@ -26,10 +41,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
 	@state()
-	private _rootItems: UmbTreeItemModelBase[] = [];
+	private _rootItems: UmbTreeItemModel[] = [];
 
 	@state()
-	private _treeRoot?: UmbTreeItemModelBase;
+	private _treeRoot?: UmbTreeRootModel;
 
 	@state()
 	private _currentPage = 1;
@@ -37,7 +52,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
-	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModelBase>;
+	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>;
 	#init: Promise<unknown>;
 
 	constructor() {
@@ -45,7 +60,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		this.#init = Promise.all([
 			// TODO: Notice this can be retrieve via a api property. [NL]
-			this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (instance) => {
+			this.consumeContext(UMB_TREE_CONTEXT, (instance) => {
 				this.#treeContext = instance;
 				this.observe(this.#treeContext.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
 				this.observe(this.#treeContext.rootItems, (rootItems) => (this._rootItems = rootItems));
@@ -55,7 +70,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		]);
 	}
 
-	protected async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+	protected override async updated(
+		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
+	): Promise<void> {
 		super.updated(_changedProperties);
 		await this.#init;
 
@@ -67,11 +84,16 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.#treeContext!.selection.setSelection(this._selectionConfiguration.selection ?? []);
 		}
 
+		if (_changedProperties.has('startNode')) {
+			this.#treeContext!.setStartNode(this.startNode);
+		}
+
 		if (_changedProperties.has('hideTreeRoot')) {
-			if (this.hideTreeRoot === true) {
-				await this.#init;
-				this.#treeContext!.loadRootItems();
-			}
+			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
+		}
+
+		if (_changedProperties.has('foldersOnly')) {
+			this.#treeContext!.setFoldersOnly(this.foldersOnly ?? false);
 		}
 
 		if (_changedProperties.has('selectableFilter')) {
@@ -87,25 +109,30 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return this.#treeContext?.selection.getSelection();
 	}
 
-	render() {
+	override render() {
 		return html` ${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
 	}
 
 	#renderTreeRoot() {
 		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
 		return html`
-			<umb-tree-item .entityType=${this._treeRoot.entityType} .props=${{ item: this._treeRoot }}></umb-tree-item>
+			<umb-tree-item
+				.entityType=${this._treeRoot.entityType}
+				.props=${{ hideActions: this.hideTreeItemActions, item: this._treeRoot }}></umb-tree-item>
 		`;
 	}
 
 	#renderRootItems() {
-		// only shot the root items directly if the tree root is hidden
+		// only show the root items directly if the tree root is hidden
 		if (this.hideTreeRoot === true) {
 			return html`
 				${repeat(
 					this._rootItems,
 					(item, index) => item.name + '___' + index,
-					(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
+					(item) =>
+						html`<umb-tree-item
+							.entityType=${item.entityType}
+							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>`,
 				)}
 				${this.#renderPaging()}
 			`;

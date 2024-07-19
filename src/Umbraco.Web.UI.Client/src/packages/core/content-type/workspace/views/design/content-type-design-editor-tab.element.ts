@@ -1,17 +1,17 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
-import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
 import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
+import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbContentTypeContainerStructureHelper,
-	type UmbContentTypeModel,
-	type UmbPropertyTypeContainerModel,
-} from '@umbraco-cms/backoffice/content-type';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 import './content-type-design-editor-properties.element.js';
 import './content-type-design-editor-group.element.js';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement> = {
 	getUniqueOfElement: (element) => element.group?.id,
@@ -71,16 +71,17 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		},
 	});
 
-	private _containerId?: string | null;
+	#workspaceModal?: UmbModalRouteRegistrationController;
+	#containerId?: string | null;
 
 	@property({ type: String })
 	public get containerId(): string | null | undefined {
-		return this._containerId;
+		return this.#containerId;
 	}
 	public set containerId(value: string | null | undefined) {
-		const oldValue = this._containerId;
-		if (value === this._containerId) return;
-		this._containerId = value;
+		const oldValue = this.#containerId;
+		if (value === this.#containerId) return;
+		this.#containerId = value;
 		this.#groupStructureHelper.setContainerId(value);
 		this.requestUpdate('containerId', oldValue);
 	}
@@ -94,6 +95,9 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	@state()
 	_sortModeActive?: boolean;
 
+	@state()
+	_editContentTypePath?: string;
+
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	constructor() {
@@ -101,7 +105,20 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#groupStructureHelper.setStructureManager(context.structure);
+
+			const entityType = context.getEntityType();
+
+			this.#workspaceModal?.destroy();
+			this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+				.addAdditionalPath(entityType)
+				.onSetup(async () => {
+					return { data: { entityType: entityType, preset: {} } };
+				})
+				.observeRouteBuilder((routeBuilder) => {
+					this._editContentTypePath = routeBuilder({});
+				});
 		});
+
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
 				context.isSorting,
@@ -116,43 +133,46 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				'_observeIsSorting',
 			);
 		});
-		this.observe(this.#groupStructureHelper.mergedContainers, (groups) => {
-			this._groups = groups;
-			this.#sorter.setModel(this._groups);
-		});
-		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
-			this._hasProperties = hasProperties;
-			this.requestUpdate('_hasProperties');
-		});
+
+		this.observe(
+			this.#groupStructureHelper.mergedContainers,
+			(groups) => {
+				this._groups = groups;
+				this.#sorter.setModel(this._groups);
+			},
+			null,
+		);
+
+		this.observe(
+			this.#groupStructureHelper.hasProperties,
+			(hasProperties) => {
+				this._hasProperties = hasProperties;
+				this.requestUpdate('_hasProperties');
+			},
+			null,
+		);
 	}
 
 	#onAddGroup = () => {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
 		const len = this._groups.length;
 		const sortOrder = len === 0 ? 0 : this._groups[len - 1].sortOrder + 1;
-		this.#groupStructureHelper.addContainer(this._containerId, sortOrder);
+		this.#groupStructureHelper.addContainer(this.#containerId, sortOrder);
 	};
 
-	render() {
+	override render() {
 		return html`
-		${
-			this._sortModeActive
-				? html`<uui-button
-						id="convert-to-tab"
-						label=${this.localize.term('contentTypeEditor_convertToTab') + '(Not implemented)'}
-						look="placeholder"></uui-button>`
-				: ''
-		}
-		${
-			this._hasProperties
-				? html`
-						<uui-box>
-							<umb-content-type-design-editor-properties
-								container-id=${this.containerId!}></umb-content-type-design-editor-properties>
-						</uui-box>
-					`
-				: ''
-		}
+			${
+				this.#containerId
+					? html`
+							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
+								<umb-content-type-design-editor-properties
+									.containerId=${this.containerId}></umb-content-type-design-editor-properties>
+							</uui-box>
+						`
+					: nothing
+			}
+
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
 					${repeat(
 						this._groups,
@@ -161,6 +181,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 							<umb-content-type-design-editor-group
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}
+								.editContentTypePath=${this._editContentTypePath}
 								.group=${group}
 								.groupStructureHelper=${this.#groupStructureHelper as any}>
 							</umb-content-type-design-editor-group>
@@ -174,16 +195,16 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	#renderAddGroupButton() {
 		if (this._sortModeActive) return;
-		return html`<uui-button
-			label=${this.localize.term('contentTypeEditor_addGroup')}
-			id="add"
-			look="placeholder"
-			@click=${this.#onAddGroup}>
-			${this.localize.term('contentTypeEditor_addGroup')}
-		</uui-button>`;
+		return html`
+			<uui-button
+				id="btn-add"
+				label=${this.localize.term('contentTypeEditor_addGroup')}
+				look="placeholder"
+				@click=${this.#onAddGroup}></uui-button>
+		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			[drag-placeholder] {
 				opacity: 0.5;
@@ -193,17 +214,18 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				visibility: hidden;
 			}
 
-			#add {
+			#btn-add {
 				width: 100%;
-			}
-
-			#add:first-child {
-				margin-top: var(--uui-size-layout-1);
+				--uui-button-height: var(--uui-size-24);
 			}
 
 			uui-box,
 			umb-content-type-design-editor-group {
 				margin-bottom: var(--uui-size-layout-1);
+			}
+			uui-box.opaque {
+				background-color: transparent;
+				border-color: transparent;
 			}
 
 			.container-list {

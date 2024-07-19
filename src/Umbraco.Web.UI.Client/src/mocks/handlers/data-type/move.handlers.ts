@@ -5,7 +5,7 @@ import type { MoveDataTypeRequestModel } from '@umbraco-cms/backoffice/external/
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const moveHandlers = [
-	rest.post(umbracoPath(`${UMB_SLUG}/:id/move`), async (req, res, ctx) => {
+	rest.put(umbracoPath(`${UMB_SLUG}/:id/move`), async (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
 

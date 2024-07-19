@@ -2,7 +2,7 @@ import type { UmbAllowedMediaTypeModel } from './types.js';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  *
@@ -17,15 +17,19 @@ export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructu
 	constructor(host: UmbControllerHost) {
 		super(host, { getAllowedChildrenOf, mapper });
 	}
+
+	getMediaTypesOfFileExtension({ fileExtension, skip, take }: { fileExtension: string; skip: number; take: number }) {
+		return getAllowedMediaTypesOfExtension({ fileExtension, skip, take });
+	}
 }
 
 const getAllowedChildrenOf = (unique: string | null) => {
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return MediaTypeResource.getMediaTypeByIdAllowedChildren({ id: unique });
+		return MediaTypeService.getMediaTypeByIdAllowedChildren({ id: unique });
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return MediaTypeResource.getMediaTypeAllowedAtRoot({});
+		return MediaTypeService.getMediaTypeAllowedAtRoot({});
 	}
 };
 
@@ -36,4 +40,18 @@ const mapper = (item: AllowedMediaTypeModel): UmbAllowedMediaTypeModel => {
 		description: item.description || null,
 		icon: item.icon || null,
 	};
+};
+
+const getAllowedMediaTypesOfExtension = async ({
+	fileExtension,
+	skip,
+	take,
+}: {
+	fileExtension: string;
+	skip: number;
+	take: number;
+}) => {
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	const { items } = await MediaTypeService.getItemMediaTypeAllowed({ fileExtension, skip, take });
+	return items.map((item) => mapper(item));
 };

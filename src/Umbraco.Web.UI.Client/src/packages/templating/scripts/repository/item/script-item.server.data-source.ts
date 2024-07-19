@@ -4,7 +4,7 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { ScriptResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source for script items that fetches data from the server
@@ -37,13 +37,13 @@ export class UmbScriptItemServerDataSource implements UmbItemDataSource<UmbScrip
 		const paths = uniques
 			.map((unique) => {
 				const serverPath = this.#serverFilePathUniqueSerializer.toServerPath(unique);
-				return serverPath ? encodeURI(serverPath) : null;
+				return serverPath ? serverPath : null;
 			})
 			.filter((x) => x !== null) as string[];
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.getItemScript({
+			ScriptService.getItemScript({
 				path: paths,
 			}),
 		);

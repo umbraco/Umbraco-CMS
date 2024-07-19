@@ -1,7 +1,7 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, query, state, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestLocalization } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -12,7 +12,7 @@ interface UmbCultureInputOption {
 }
 
 @customElement('umb-ui-culture-input')
-export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@state()
 	private _options: Array<UmbCultureInputOption> = [];
 
@@ -20,13 +20,13 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 	private _selectElement!: HTMLInputElement;
 
 	@property({ type: String })
-	get value() {
-		return this._value;
+	override get value() {
+		return super.value;
 	}
-	set value(value: FormDataEntryValue | FormData) {
+	override set value(value: FormDataEntryValue | FormData) {
 		if (typeof value === 'string') {
-			const oldValue = this._value;
-			this._value = value.toLowerCase();
+			const oldValue = super.value;
+			super.value = value.toLowerCase();
 			this.requestUpdate('value', oldValue);
 		}
 	}
@@ -55,7 +55,7 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 			}));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this._selectElement;
 	}
 
@@ -69,8 +69,8 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	render() {
-		return html` <uui-combobox value="${this._value}" @change=${this.#onChange}>
+	override render() {
+		return html` <uui-combobox value="${this.value}" @change=${this.#onChange}>
 			<uui-combobox-list>
 				${this._options.map(
 					(option) => html`<uui-combobox-list-option value="${option.value}">${option.name}</uui-combobox-list-option>`,
@@ -79,7 +79,7 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 		</uui-combobox>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

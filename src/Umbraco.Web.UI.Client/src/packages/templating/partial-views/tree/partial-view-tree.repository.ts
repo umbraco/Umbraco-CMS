@@ -1,10 +1,10 @@
 import { UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbPartialViewTreeServerDataSource } from './partial-view-tree.server.data-source.js';
 import type { UmbPartialViewTreeItemModel, UmbPartialViewTreeRootModel } from './types.js';
-import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT } from './partial-view-tree.store.js';
-import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT } from './partial-view-tree.store.context-token.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 
 export class UmbPartialViewTreeRepository
 	extends UmbTreeRepositoryBase<UmbPartialViewTreeItemModel, UmbPartialViewTreeRootModel>
@@ -15,11 +15,14 @@ export class UmbPartialViewTreeRepository
 	}
 
 	async requestTreeRoot() {
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
+
 		const data: UmbPartialViewTreeRootModel = {
 			unique: null,
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
-			name: 'Partial Views',
-			hasChildren: true,
+			name: '#treeHeaders_partialViews',
+			hasChildren,
 			isFolder: true,
 		};
 

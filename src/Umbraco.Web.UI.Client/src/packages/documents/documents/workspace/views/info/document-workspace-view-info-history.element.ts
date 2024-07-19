@@ -1,109 +1,115 @@
-import { HistoryTagStyleAndText, TimeOptions } from './utils.js';
-import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
-import {
-	css,
-	html,
-	customElement,
-	state,
-	property,
-	nothing,
-	repeat,
-	ifDefined,
-} from '@umbraco-cms/backoffice/external/lit';
-import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
+import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
+import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
+import { TimeOptions, getDocumentHistoryTagStyleAndText } from './utils.js';
+import { css, html, customElement, state, nothing, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
+import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
-	#logRepository: UmbAuditLogRepository;
-	#itemsPerPage = 10;
-
-	@property()
-	documentUnique = '';
+	@state()
+	_currentPageNumber = 1;
 
 	@state()
-	private _total?: number;
+	_totalPages = 1;
 
 	@state()
-	private _items?: Array<AuditLogWithUsernameResponseModel>;
+	private _items: Array<UmbDocumentAuditLogModel> = [];
 
-	@state()
-	private _currentPage = 1;
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
+	#pagination = new UmbPaginationManager();
+	#userItemRepository = new UmbUserItemRepository(this);
+
+	#userMap = new Map<string, UmbUserItemModel>();
 
 	constructor() {
 		super();
-		this.#logRepository = new UmbAuditLogRepository(this);
+
+		this.#pagination.setPageSize(10);
+		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
+		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
+
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
+			this.#requestAuditLogs();
+		});
 	}
 
-	protected firstUpdated(): void {
-		this.#getLogs();
-	}
+	async #requestAuditLogs() {
+		const unique = this.#workspaceContext?.getUnique();
+		if (!unique) throw new Error('Document unique is required');
 
-	async #getLogs() {
-		this._items = undefined; // Reset items to show loader
-		if (!this.documentUnique) return;
-
-		/*const { data } = await this.#logRepository.getAuditLogByUnique({
-			id: this.documentUnique,
-			orderDirection: DirectionModel.DESCENDING,
-			skip: (this._currentPage - 1) * this.#itemsPerPage,
-			take: this.#itemsPerPage,
+		const { data } = await this.#auditLogRepository.requestAuditLog({
+			unique,
+			skip: this.#pagination.getSkip(),
+			take: this.#pagination.getPageSize(),
 		});
 
-		if (!data) return;
-		this._total = data.total;
-		this._items = data.items;
-		*/
-
-		//TODO: I think there is an issue with the API (backend) - error with ID. Hacking for now.
-		// Uncomment previous code and delete the following when issue fixed.
-		// This should also make it load significantly faster
-
-		const { data } = await this.#logRepository.getLog({
-			orderDirection: DirectionModel.DESCENDING,
-			skip: 0,
-			take: 99999,
-		});
-
-		if (!data) return;
-
-		// Hack list to only get the items for the current document
-		const list = data.items.filter((item) => item.entity?.id === this.documentUnique);
-		this._total = list.length;
-
-		// Hack list to only get the items for the current page
-		this._items = list.slice(
-			(this._currentPage - 1) * this.#itemsPerPage,
-			(this._currentPage - 1) * this.#itemsPerPage + this.#itemsPerPage,
-		);
+		if (data) {
+			this._items = data.items;
+			this.#pagination.setTotalItems(data.total);
+			this.#requestAndCacheUserItems();
+		}
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
-		if (this._currentPage === event.target.current) return;
-		this._currentPage = event.target.current;
-
-		this.#getLogs();
+		this.#pagination.setCurrentPageNumber(event.target?.current);
+		this.#requestAuditLogs();
 	}
 
-	render() {
+	#onRollbackModalOpen = async () => {
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
+
+		await modalContext.onSubmit();
+		// TODO: This notification won't actually show at the moment because we perform a full page reload after rollback. However, when we can do it without a full page reload, this should be used.
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext.peek('positive', { data: { message: this.localize.term('rollback_documentRolledBack') } });
+	};
+
+	async #requestAndCacheUserItems() {
+		const allUsers = this._items?.map((item) => item.user.unique).filter(Boolean) as string[];
+		const uniqueUsers = [...new Set(allUsers)];
+		const uncachedUsers = uniqueUsers.filter((unique) => !this.#userMap.has(unique));
+
+		// If there are no uncached user items, we don't need to make a request
+		if (uncachedUsers.length === 0) return;
+
+		const { data: items } = await this.#userItemRepository.requestItems(uncachedUsers);
+
+		if (items) {
+			items.forEach((item) => {
+				// cache the user item
+				this.#userMap.set(item.unique, item);
+				this.requestUpdate('_items');
+			});
+		}
+	}
+
+	override render() {
 		return html`<uui-box>
-				<div id="rollback" slot="header">
-					<h2><umb-localize key="general_history">History</umb-localize></h2>
-					<uui-button
-						label=${this.localize.term('actions_rollback')}
-						look="secondary"
-						slot="actions"
-						@click=${() => alert('TODO: Rollback Modal')}>
-						<uui-icon name="icon-undo"></uui-icon>
-						<umb-localize key="actions_rollback"></umb-localize>
-					</uui-button>
-				</div>
-				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
-			</uui-box>
-			${this.#renderHistoryPagination()}`;
+			<div id="rollback" slot="header">
+				<h2><umb-localize key="general_history">History</umb-localize></h2>
+				<uui-button
+					label=${this.localize.term('actions_rollback')}
+					look="secondary"
+					slot="actions"
+					@click=${this.#onRollbackModalOpen}>
+					<uui-icon name="icon-undo"></uui-icon> ${this.localize.term('actions_rollback')}
+				</uui-button>
+			</div>
+			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
+			${this.#renderPagination()}
+		</uui-box> `;
 	}
 
 	#renderHistory() {
@@ -114,15 +120,20 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						this._items,
 						(item) => item.timestamp,
 						(item) => {
-							const { text, style } = HistoryTagStyleAndText(item.logType);
+							const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
+							const user = this.#userMap.get(item.user.unique);
+							const userName = user?.name ?? 'Unknown';
+							const avatarUrl = user && Array.isArray(user.avatarUrls) ? user.avatarUrls[1] : undefined;
+
 							return html`<umb-history-item
-								.name=${item.userName ?? 'Unknown'}
-								src=${ifDefined(
-									Array.isArray(item.userAvatars) ? item.userAvatars[item.userAvatars.length - 1] : undefined,
-								)}
-								detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								.name=${userName}
+								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								<uui-avatar slot="avatar" .name="${userName}" img-src=${ifDefined(avatarUrl)}></uui-avatar>
+
 								<span class="log-type">
-									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
+									<uui-tag look=${style.look} color=${style.color}>
+										${this.localize.term(text.label, item.parameters)}
+									</uui-tag>
 									${this.localize.term(text.desc, item.parameters)}
 								</span>
 							</umb-history-item>`;
@@ -135,19 +146,21 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		}
 	}
 
-	#renderHistoryPagination() {
-		if (!this._total) return nothing;
-
-		const totalPages = Math.ceil(this._total / this.#itemsPerPage);
-
-		if (totalPages <= 1) return nothing;
-
-		return html`<div class="pagination">
-			<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
-		</div>`;
+	#renderPagination() {
+		return html`
+			${this._totalPages > 1
+				? html`
+						<uui-pagination
+							class="pagination"
+							.current=${this._currentPageNumber}
+							.total=${this._totalPages}
+							@change=${this.#onPageChange}></uui-pagination>
+					`
+				: nothing}
+		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-loader-circle {
@@ -179,10 +192,11 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 				flex: 1;
 				display: inline-block;
 			}
+
 			.pagination {
 				display: flex;
 				justify-content: center;
-				margin-top: var(--uui-size-space-4);
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];

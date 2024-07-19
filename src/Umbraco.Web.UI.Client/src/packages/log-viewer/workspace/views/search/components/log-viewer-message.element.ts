@@ -1,5 +1,3 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
@@ -37,24 +35,16 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	@property()
 	exception = '';
 
-	willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
+	override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
 		if (changedProperties.has('timestamp')) {
 			this.date = new Date(this.timestamp);
 		}
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('open')) {
 			this.open ? this.details.setAttribute('open', 'true') : this.details.removeAttribute('open');
 		}
-	}
-
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-		});
 	}
 
 	private _searchMenuData: Array<{ label: string; href: () => string; icon: string; title: string }> = [
@@ -131,7 +121,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		this.open = (event.target as HTMLDetailsElement).open;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<details @open=${this.#setOpen}>
 				<summary>
@@ -193,7 +183,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host > details {

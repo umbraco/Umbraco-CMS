@@ -1,5 +1,9 @@
 import { manifests as defaultManifests } from './components/property-action/manifests.js';
-import type { ManifestPropertyActions } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestPropertyActions,
+	ManifestTypes,
+	UmbBackofficeManifestKind,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const propertyActionManifests: Array<ManifestPropertyActions> = [
 	{
@@ -28,4 +32,7 @@ export const propertyActionManifests: Array<ManifestPropertyActions> = [
 	},
 ];
 
-export const manifests = [...defaultManifests, ...propertyActionManifests];
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+	...defaultManifests,
+	...propertyActionManifests,
+];

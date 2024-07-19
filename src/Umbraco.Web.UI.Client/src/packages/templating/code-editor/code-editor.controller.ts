@@ -144,6 +144,7 @@ export class UmbCodeEditorController {
 		this.#editor?.onDidChangeModel(() => {
 			this.#host.dispatchEvent(new UmbChangeEvent());
 		});
+
 		this.#editor?.onDidChangeCursorPosition((e) => {
 			this.#position = e.position;
 			this.#secondaryPositions = e.secondaryPositions;
@@ -192,6 +193,7 @@ export class UmbCodeEditorController {
 			readOnly: this.#host.readonly,
 			ariaLabel: this.#host.label,
 		});
+
 		this.#initiateEvents();
 	}
 	/**
@@ -376,3 +378,5 @@ export class UmbCodeEditorController {
 		});
 	}
 }
+
+export default UmbCodeEditorController;

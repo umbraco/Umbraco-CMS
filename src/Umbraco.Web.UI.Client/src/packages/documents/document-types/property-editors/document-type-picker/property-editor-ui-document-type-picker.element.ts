@@ -1,11 +1,10 @@
 import type { UmbInputDocumentTypeElement } from '../../components/input-document-type/input-document-type.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-property-editor-ui-document-type-picker')
 export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -13,49 +12,44 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 	public value?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (config) {
-			const validationLimit = config.getValueByAlias<any>('validationLimit');
-			this._limitMin = validationLimit?.min;
-			this._limitMax = validationLimit?.max;
+		if (!config) return;
 
-			// We have the need in Block Editors, to just pick a single ID not as an array. So for that we use the multiPicker config, which can be set to true if you wanted to be able to pick multiple.
-			this._multiPicker = config.getValueByAlias('multiPicker') ?? false;
-			this._onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
-		}
-	}
-	public get config() {
-		return undefined;
+		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this.min = minMax?.min ?? 0;
+		this.max = minMax?.max ?? Infinity;
+
+		this.onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
+		this.showOpenButton = config?.getValueByAlias('showOpenButton') ?? false;
 	}
 
 	@state()
-	private _limitMin?: number;
-	@state()
-	private _limitMax?: number;
-	@state()
-	private _multiPicker?: boolean;
-	@state()
-	private _onlyElementTypes?: boolean;
+	min = 0;
 
-	private _onChange(event: CustomEvent) {
-		const selection = (event.target as UmbInputDocumentTypeElement).selection;
-		this.value = this._multiPicker ? selection.join(',') : selection[0];
+	@state()
+	max = Infinity;
+
+	@state()
+	showOpenButton?: boolean;
+
+	@state()
+	onlyElementTypes?: boolean;
+
+	#onChange(event: CustomEvent & { target: UmbInputDocumentTypeElement }) {
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	// TODO: Implement mandatory?
-	render() {
-		return this._multiPicker !== undefined
-			? html`
-					<umb-input-document-type
-						@change=${this._onChange}
-						.value=${this.value ?? ''}
-						.min=${this._limitMin ?? 0}
-						.max=${this._limitMax ?? Infinity}
-						.elementTypesOnly=${this._onlyElementTypes ?? false}>
-						<umb-localize key="general_add">Add</umb-localize>
-					</umb-input-document-type>
-				`
-			: '';
+	override render() {
+		return html`
+			<umb-input-document-type
+				.min=${this.min}
+				.max=${this.max}
+				.value=${this.value}
+				?elementTypesOnly=${this.onlyElementTypes}
+				?showOpenButton=${this.showOpenButton}
+				@change=${this.#onChange}>
+			</umb-input-document-type>
+		`;
 	}
 }
 

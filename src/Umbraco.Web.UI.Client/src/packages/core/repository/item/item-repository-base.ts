@@ -36,8 +36,8 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		if (!uniques) throw new Error('Uniques are missing');
 		await this._init;
 
-		const { data, error } = await this.#itemSource.getItems(uniques);
-
+		const { data, error: _error } = await this.#itemSource.getItems(uniques);
+		const error: any = _error;
 		if (data) {
 			this._itemStore!.appendItems(data);
 		}

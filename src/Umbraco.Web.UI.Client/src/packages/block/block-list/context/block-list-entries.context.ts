@@ -1,10 +1,11 @@
 import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import type { UmbBlockListWorkspaceData } from '../index.js';
+import { UMB_BLOCK_LIST_WORKSPACE_MODAL, type UmbBlockListWorkspaceData } from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
-import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context.js';
+import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -14,6 +15,10 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 > {
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
+	#workspaceModal: UmbModalRouteRegistrationController;
+
+	// We will just say its always allowed for list for now: [NL]
+	public readonly canCreate = new UmbBooleanState(true).asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT);
@@ -35,6 +40,17 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
+			});
+
+		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_LIST_WORKSPACE_MODAL)
+			.addUniquePaths(['propertyAlias', 'variantId'])
+			.addAdditionalPath('block')
+			.onSetup(() => {
+				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const newPath = routeBuilder({});
+				this._workspacePath.setValue(newPath);
 			});
 	}
 
@@ -60,6 +76,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			this._manager.propertyAlias,
 			(alias) => {
 				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
+				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
 			},
 			'observePropertyAlias',
 		);
@@ -67,9 +84,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		this.observe(
 			this._manager.variantId,
 			(variantId) => {
-				if (variantId) {
-					this.#catalogueModal.setUniquePathValue('variantId', variantId.toString());
-				}
+				// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
+				this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
+				this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 			},
 			'observePropertyAlias',
 		);
@@ -81,6 +98,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 
 	getPathForClipboard(index: number) {
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
+	}
+
+	override async setLayouts(layouts: Array<UmbBlockListLayoutModel>) {
+		await this._retrieveManager;
+		this._manager?.setLayouts(layouts);
 	}
 
 	async create(
@@ -105,7 +127,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	// create Block?
-	async delete(contentUdi: string) {
+	override async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
 	}

@@ -1,6 +1,6 @@
-import type { UmbBlockGridTypeAreaType } from '../../index.js';
-import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from '../../context/block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/index.js';
+import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from '../../context/block-grid-manager.context.js';
+import type { UmbBlockGridTypeAreaType } from '../../index.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -11,7 +11,8 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { incrementString } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
@@ -96,6 +97,13 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		this.#context.setLayoutColumns(this._areaGridColumns);
 	}
 
+	#generateUniqueAreaAlias(alias: string) {
+		while (this._value.find((area) => area.alias === alias)) {
+			alias = incrementString(alias);
+		}
+		return alias;
+	}
+
 	#addNewArea() {
 		if (!this._areaGridColumns) return;
 		const halfGridColumns = this._areaGridColumns * 0.5;
@@ -105,7 +113,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 			...this._value,
 			{
 				key: UmbId.new(),
-				alias: '', // TODO: Should we auto generate something here?
+				alias: this.#generateUniqueAreaAlias('area'),
 				columnSpan: columnSpan,
 				rowSpan: 1,
 				minAllowed: 0,
@@ -119,8 +127,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		//TODO: open area edit workspace
 	}
 
-	// TODO: Needs localizations:
-	render() {
+	override render() {
 		return this._areaGridColumns
 			? html`${this._styleElement}
 					<div

@@ -1,11 +1,15 @@
-import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
-import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
+import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 
 /**
  * @element umb-block-list-entry
@@ -35,12 +39,18 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#context = new UmbBlockListEntryContext(this);
 
 	@state()
+	_contentTypeAlias?: string;
+
+	@state()
 	_showContentEdit = false;
 	@state()
 	_hasSettings = false;
 
 	@state()
 	_label = '';
+
+	@state()
+	_icon?: string;
 
 	@state()
 	_workspaceEditContentPath?: string;
@@ -51,49 +61,143 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_inlineEditingMode?: boolean;
 
-	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
-	_blockViewProps: UmbBlockViewPropsType<UmbBlockListLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
+		contentUdi: undefined!,
+		config: { showContentEdit: false, showSettingsEdit: false },
+	}; // Set to undefined cause it will be set before we render.
+
+	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel>>) {
+		this._blockViewProps = { ...this._blockViewProps, ...incoming };
+		this.requestUpdate('_blockViewProps');
+	}
 
 	constructor() {
 		super();
 
-		this.observe(this.#context.showContentEdit, (showContentEdit) => {
-			this._showContentEdit = showContentEdit;
-		});
-		this.observe(this.#context.settingsElementTypeKey, (settingsElementTypeKey) => {
-			this._hasSettings = !!settingsElementTypeKey;
-		});
-		this.observe(this.#context.label, (label) => {
-			const oldValue = this._label;
-			this._blockViewProps.label = label;
-			this._label = label;
-			this.requestUpdate('label', oldValue);
-		});
-		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
-			this._inlineEditingMode = inlineEditingMode;
-		});
+		this.observe(
+			this.#context.showContentEdit,
+			(showContentEdit) => {
+				this._showContentEdit = showContentEdit;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showContentEdit } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settingsElementTypeKey,
+			(key) => {
+				this._hasSettings = !!key;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.blockType,
+			(blockType) => {
+				this.#updateBlockViewProps({ blockType });
+			},
+			null,
+		);
+		// TODO: Implement index.
+		this.observe(
+			this.#context.label,
+			(label) => {
+				this.#updateBlockViewProps({ label });
+				this._label = label;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeIcon,
+			(icon) => {
+				this.#updateBlockViewProps({ icon });
+				this._icon = icon;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.inlineEditingMode,
+			(inlineEditingMode) => {
+				this._inlineEditingMode = inlineEditingMode;
+			},
+			null,
+		);
 		// Data props:
-		this.observe(this.#context.layout, (layout) => {
-			this._blockViewProps.layout = layout;
-		});
-		this.observe(this.#context.content, (content) => {
-			this._blockViewProps.content = content;
-		});
-		this.observe(this.#context.settings, (settings) => {
-			this._blockViewProps.settings = settings;
-		});
-		this.observe(this.#context.workspaceEditContentPath, (path) => {
-			this._workspaceEditContentPath = path;
-			this._blockViewProps.urls.editContent = path;
-			this.requestUpdate('_blockViewProps');
-		});
-		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
-			this._workspaceEditSettingsPath = path;
-			this._blockViewProps.urls.editSettings = path;
-			this.requestUpdate('_blockViewProps');
-		});
+		this.observe(
+			this.#context.layout,
+			(layout) => {
+				this.#updateBlockViewProps({ layout });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.content,
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settings,
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditContentPath,
+			(path) => {
+				this._workspaceEditContentPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editContentPath: path } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.workspaceEditSettingsPath,
+			(path) => {
+				this._workspaceEditSettingsPath = path;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
 	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		// element styling:
+		this.observe(
+			this.#context.contentElementTypeKey,
+			(contentElementTypeKey) => {
+				if (contentElementTypeKey) {
+					this.setAttribute('data-content-element-type-key', contentElementTypeKey);
+				}
+			},
+			'contentElementTypeKey',
+		);
+		this.observe(
+			this.#context.contentElementTypeAlias,
+			(contentElementTypeAlias) => {
+				if (contentElementTypeAlias) {
+					this._contentTypeAlias = contentElementTypeAlias;
+					this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
+				}
+			},
+			'contentElementTypeAlias',
+		);
+	}
+
+	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+		if (
+			manifest.forContentTypeAlias &&
+			!stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)
+		) {
+			return false;
+		}
+		if (manifest.forBlockEditor && !stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_LIST)) {
+			return false;
+		}
+		return true;
+	};
 
 	#renderRefBlock() {
 		return html`<umb-ref-list-block .label=${this._label}></umb-ref-list-block>`;
@@ -109,18 +213,19 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				type="blockEditorCustomView"
 				default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
 				.props=${this._blockViewProps}
+				.filter=${this.#extensionSlotFilterMethod}
 				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
 			>
 			<uui-action-bar>
 				${this._showContentEdit && this._workspaceEditContentPath
 					? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
-					  </uui-button>`
+						</uui-button>`
 					: ''}
 				${this._hasSettings && this._workspaceEditSettingsPath
 					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
 							<uui-icon name="icon-settings"></uui-icon>
-					  </uui-button>`
+						</uui-button>`
 					: ''}
 				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>
@@ -129,11 +234,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		`;
 	}
 
-	render() {
+	override render() {
 		return this.#renderBlock();
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

@@ -1,13 +1,12 @@
+import { UMB_COLLECTION_VIEW_USER_GRID, UMB_COLLECTION_VIEW_USER_TABLE } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_COLLECTION_VIEW_USER_TABLE = 'Umb.CollectionView.User.Table';
+import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: UMB_COLLECTION_VIEW_USER_TABLE,
 	name: 'User Table Collection View',
-	js: () => import('./table/user-table-collection-view.element.js'),
+	element: () => import('./table/user-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
 		icon: 'icon-list',
@@ -21,13 +20,11 @@ const tableCollectionView: ManifestCollectionView = {
 	],
 };
 
-export const UMB_COLLECTION_VIEW_USER_GRID = 'Umb.CollectionView.User.Grid';
-
 const gridCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: UMB_COLLECTION_VIEW_USER_GRID,
-	name: 'User Table Collection View',
-	js: () => import('./grid/user-grid-collection-view.element.js'),
+	name: 'User Grid Collection View',
+	element: () => import('./grid/user-grid-collection-view.element.js'),
 	weight: 200,
 	meta: {
 		label: 'Grid',
@@ -42,4 +39,4 @@ const gridCollectionView: ManifestCollectionView = {
 	],
 };
 
-export const manifests = [tableCollectionView, gridCollectionView];
+export const manifests: Array<ManifestTypes> = [tableCollectionView, gridCollectionView];

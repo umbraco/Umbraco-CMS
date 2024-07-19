@@ -108,7 +108,7 @@ export class UmbExtensionElementInitializer<
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#properties = undefined;
 	}

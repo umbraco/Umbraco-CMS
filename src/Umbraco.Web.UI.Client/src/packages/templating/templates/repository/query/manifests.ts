@@ -1,4 +1,4 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_TEMPLATE_QUERY_REPOSITORY_ALIAS = 'Umb.Repository.TemplateQuery';
 
@@ -9,4 +9,4 @@ const queryRepository: ManifestRepository = {
 	api: () => import('./template-query.repository.js'),
 };
 
-export const manifests = [queryRepository];
+export const manifests: Array<ManifestTypes> = [queryRepository];

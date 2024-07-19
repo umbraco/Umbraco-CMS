@@ -1,0 +1,31 @@
+import { OEmbedService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+
+/**
+ * A data source for the OEmbed that fetches data from a given URL.
+ * @export
+ * @class UmbOEmbedServerDataSource
+ * @implements {RepositoryDetailDataSource}
+ */
+export class UmbOEmbedServerDataSource {
+	#host: UmbControllerHost;
+
+	/**
+	 * Creates an instance of UmbOEmbedServerDataSource.
+	 * @param {UmbControllerHost} host
+	 * @memberof UmbOEmbedServerDataSource
+	 */
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	/**
+	 * Fetches markup for the given URL.
+	 * @param {string} unique
+	 * @memberof UmbOEmbedServerDataSource
+	 */
+	async getOEmbedQuery({ url, maxWidth, maxHeight }: { url?: string; maxWidth?: number; maxHeight?: number }) {
+		return tryExecuteAndNotify(this.#host, OEmbedService.getOembedQuery({ url, maxWidth, maxHeight }));
+	}
+}

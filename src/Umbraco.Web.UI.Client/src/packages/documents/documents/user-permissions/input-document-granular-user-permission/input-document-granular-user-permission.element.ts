@@ -9,10 +9,10 @@ import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-document-granular-user-permission')
-export class UmbInputDocumentGranularUserPermissionElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputDocumentGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
 	_permissions: Array<UmbDocumentUserPermissionModel> = [];
 	public get permissions(): Array<UmbDocumentUserPermissionModel> {
 		return this._permissions;
@@ -37,7 +37,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => (this.#modalManagerContext = instance));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -66,7 +66,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#addGranularPermission() {
+	async #addGranularPermission() {
 		this.#documentPickerModalContext = this.#modalManagerContext?.open(this, UMB_DOCUMENT_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
@@ -83,17 +83,24 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 			if (!unique) return;
 
 			const documentItem = await this.#requestDocumentItem(unique);
-			const result = await this.#selectEntityUserPermissionsForDocument(documentItem);
-			this.#documentPickerModalContext?.reject();
 
-			const permissionItem: UmbDocumentUserPermissionModel = {
-				$type: 'DocumentPermissionPresentationModel',
-				document: { id: unique },
-				verbs: result,
-			};
+			this.#selectEntityUserPermissionsForDocument(documentItem).then(
+				(result) => {
+					this.#documentPickerModalContext?.reject();
 
-			this.permissions = [...this._permissions, permissionItem];
-			this.dispatchEvent(new UmbChangeEvent());
+					const permissionItem: UmbDocumentUserPermissionModel = {
+						$type: 'DocumentPermissionPresentationModel',
+						document: { id: unique },
+						verbs: result,
+					};
+
+					this.permissions = [...this._permissions, permissionItem];
+					this.dispatchEvent(new UmbChangeEvent());
+				},
+				() => {
+					this.#documentPickerModalContext?.reject();
+				},
+			);
 		});
 	}
 
@@ -127,7 +134,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 			const value = await this.#entityUserPermissionModalContext?.onSubmit();
 			return value?.allowedVerbs;
 		} catch (error) {
-			return allowedVerbs;
+			throw new Error();
 		}
 	}
 
@@ -139,24 +146,26 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
 		if (!this._items) return;
-		return html`<uui-ref-list>
-			${repeat(
-				this._items,
-				(item) => item.unique,
-				(item) => this.#renderRef(item),
-			)}
-		</uui-ref-list>`;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderRef(item),
+				)}
+			</uui-ref-list>
+		`;
 	}
 
 	#renderAddButton() {
 		return html`<uui-button
-			id="add-button"
+			id="btn-add"
 			look="placeholder"
 			@click=${this.#addGranularPermission}
 			label=${this.localize.term('general_add')}></uui-button>`;
@@ -218,21 +227,14 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 			)
 			.map((m) => {
 				const manifest = m as ManifestEntityUserPermission;
-
-				if (manifest.meta.labelKey) {
-					return this.localize.term(manifest.meta.labelKey);
-				} else if (manifest.meta.label) {
-					return manifest.meta.label;
-				} else {
-					return manifest.name;
-				}
+				return manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
 			})
 			.join(', ');
 	}
 
-	static styles = [
+	static override styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

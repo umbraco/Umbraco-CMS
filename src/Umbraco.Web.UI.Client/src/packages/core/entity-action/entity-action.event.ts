@@ -1,9 +1,7 @@
 import { UmbControllerEvent } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export interface UmbEntityActionEventArgs {
-	unique: string | null;
-	entityType: string;
-}
+export interface UmbEntityActionEventArgs extends UmbEntityModel {}
 
 export class UmbEntityActionEvent extends UmbControllerEvent {
 	#args: UmbEntityActionEventArgs;

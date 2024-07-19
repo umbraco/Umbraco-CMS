@@ -1,4 +1,5 @@
 import { manifest as blockListTypeConfiguration } from './block-list-type-configuration/manifests.js';
-import { manifest as blockGridEditor } from './block-list-editor/manifests.js';
+import { manifests as blockGridEditorManifests } from './block-list-editor/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [blockListTypeConfiguration, blockGridEditor];
+export const manifests: Array<ManifestTypes> = [blockListTypeConfiguration, ...blockGridEditorManifests];

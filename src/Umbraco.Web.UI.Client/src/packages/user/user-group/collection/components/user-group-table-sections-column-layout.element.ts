@@ -14,7 +14,7 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement 
 	@state()
 	private _sectionsNames: Array<string> = [];
 
-	updated(changedProperties: Map<string, any>) {
+	override updated(changedProperties: Map<string, any>) {
 		if (changedProperties.has('value')) {
 			this.observeSectionNames();
 		}
@@ -24,13 +24,15 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement 
 		this.observe(
 			umbExtensionsRegistry.byType('section'),
 			(sections) => {
-				this._sectionsNames = sections.filter((x) => this.value.includes(x.alias)).map((x) => x.meta.label || x.name);
+				this._sectionsNames = sections
+					.filter((x) => this.value.includes(x.alias))
+					.map((x) => (x.meta.label ? this.localize.string(x.meta.label) : x.name));
 			},
 			'umbUserGroupTableSectionsColumnLayoutObserver',
 		);
 	}
 
-	render() {
+	override render() {
 		return html`${this._sectionsNames.join(', ')}`;
 	}
 }

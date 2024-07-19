@@ -1,51 +1,89 @@
 // Needed to disable the import/no-duplicates rule, cause otherwise we do not get the custom element registered:
-// eslint-disable-next-line import/no-duplicates
+
 import type { UmbInputStaticFileElement } from '@umbraco-cms/backoffice/static-file';
-// eslint-disable-next-line import/no-duplicates
+
 import '@umbraco-cms/backoffice/static-file';
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-property-editor-ui-block-grid-layout-stylesheet')
 export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	private _value: Array<string> = [];
+	#pickableFilter = (item: any) => item.unique.endsWith('css');
+	#singleItemMode = false;
+	// TODO: get rid of UmbServerFilePathUniqueSerializer in v.15 [NL]
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
-	@property({ type: Array })
-	public set value(value: Array<string>) {
-		this._value = value || [];
-	}
-	public get value(): Array<string> {
-		return this._value;
-	}
+	@state()
+	private _value?: string | Array<string>;
 
 	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	public set value(value: string | Array<string> | undefined) {
+		if (Array.isArray(value)) {
+			this._value = value.map((unique) => this.#serverFilePathUniqueSerializer.toUnique(unique));
+		} else if (value) {
+			this._value = this.#serverFilePathUniqueSerializer.toUnique(value);
+		} else {
+			this._value = undefined;
+		}
+	}
+	public get value(): string | Array<string> | undefined {
+		if (Array.isArray(this._value)) {
+			return this._value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique) ?? '');
+		} else if (this._value) {
+			return this.#serverFilePathUniqueSerializer.toServerPath(this._value) ?? '';
+		} else {
+			return undefined;
+		}
+	}
+
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#singleItemMode = config?.getValueByAlias<boolean>('singleItemMode') ?? false;
+		const validationLimit = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+
+		this._limitMin = validationLimit?.min ?? 0;
+		this._limitMax = this.#singleItemMode ? 1 : validationLimit?.max ?? Infinity;
+	}
+
+	@state()
+	private _limitMin: number = 0;
+	@state()
+	private _limitMax: number = Infinity;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputStaticFileElement).selection;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		if (this.#singleItemMode) {
+			this._value = (event.target as UmbInputStaticFileElement).selection[0];
+		} else {
+			this._value = (event.target as UmbInputStaticFileElement).selection;
+		}
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	// TODO: Implement mandatory?
-	render() {
+	override render() {
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}
-				.selection=${this._value}
-				.min=${0}
-				.max=${1}></umb-input-static-file>
+				.pickableFilter=${this.#pickableFilter}
+				.selection=${this._value ? (Array.isArray(this._value) ? this._value : [this._value]) : []}
+				.min=${this._limitMin}
+				.max=${this._limitMax}></umb-input-static-file>
 			<br />
-			<a href="#Missinhg_link_to_default_layout_stylesheet">Link to default layout stylesheet</a>
+			<a href="/umbraco/backoffice/assets/css/umbraco-blockgridlayout.css">Link to default layout stylesheet</a>
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridLayoutStylesheetElement;

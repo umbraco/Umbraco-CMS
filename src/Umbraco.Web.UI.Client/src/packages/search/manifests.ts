@@ -1,4 +1,7 @@
+import { manifests as examineManifests } from './examine-management-dashboard/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+import './examine-management-dashboard/index.js';
 
 export const manifests: Array<ManifestTypes> = [
 	{
@@ -27,7 +30,7 @@ export const manifests: Array<ManifestTypes> = [
 		js: () => import('./examine-management-dashboard/dashboard-examine-management.element.js'),
 		weight: 400,
 		meta: {
-			label: 'Examine Management',
+			label: '#dashboardTabs_settingsExamine',
 			pathname: 'examine-management',
 		},
 		conditions: [
@@ -37,10 +40,5 @@ export const manifests: Array<ManifestTypes> = [
 			},
 		],
 	},
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.ExamineFieldsSettings',
-		name: 'Examine Field Settings Modal',
-		js: () => import('./examine-management-dashboard/views/modal-views/fields-settings-modal.element.js'),
-	},
+	...examineManifests,
 ];

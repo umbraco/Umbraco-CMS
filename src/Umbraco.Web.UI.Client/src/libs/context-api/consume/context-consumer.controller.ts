@@ -21,11 +21,11 @@ export class UmbContextConsumerController<BaseType = unknown, ResultType extends
 	) {
 		super(host.getHostElement(), contextAlias, callback);
 		this.#host = host;
-		host.addController(this);
+		host.addUmbController(this);
 	}
 
-	public destroy(): void {
-		this.#host?.removeController(this);
+	public override destroy(): void {
+		this.#host?.removeUmbController(this);
 		(this.#host as any) = undefined;
 		super.destroy();
 	}

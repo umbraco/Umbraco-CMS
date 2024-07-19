@@ -1,4 +1,4 @@
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const kind: UmbBackofficeManifestKind = {
 	type: 'kind',
@@ -12,4 +12,4 @@ const kind: UmbBackofficeManifestKind = {
 	},
 };
 
-export const manifests = [kind];
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [kind];

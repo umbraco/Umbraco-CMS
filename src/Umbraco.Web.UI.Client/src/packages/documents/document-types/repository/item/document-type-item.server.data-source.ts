@@ -1,7 +1,8 @@
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -25,13 +26,15 @@ export class UmbDocumentTypeItemServerDataSource extends UmbItemServerDataSource
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentTypeResource.getItemDocumentType({ id: uniques });
+const getItems = (uniques: Array<string>) => DocumentTypeService.getItemDocumentType({ id: uniques });
 
 const mapper = (item: DocumentTypeItemResponseModel): UmbDocumentTypeItemModel => {
 	return {
+		entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 		isElement: item.isElement,
 		icon: item.icon,
 		unique: item.id,
 		name: item.name,
+		description: item.description,
 	};
 };

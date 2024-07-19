@@ -98,22 +98,25 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				path: '',
 				resolve: () => {
-					// Retrieve the current app language variant id from the context and redirect to the correct route.
-					history.pushState({}, '', `${this.#workspaceRoute}/${this.#appCulture}/${this.#variants![0].unique}`);
+					const route = routes.find((route) => route.path === this.#appCulture);
+
+					if (!route) {
+						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
+						history.pushState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 3].path}`);
+						return;
+					}
+
+					history.pushState({}, '', `${this.#workspaceRoute}/${route?.path}`);
 				},
 			});
 		}
 
-		const oldValue = this._routes;
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
-		// is there any differences in the amount ot the paths? [NL]
-		if (oldValue && oldValue.length === routes.length) {
-			// is there any differences in the paths? [NL]
-			const hasDifferences = oldValue.some((route, index) => route.path !== routes[index].path);
-			if (!hasDifferences) return;
-		}
 		this._routes = routes;
-		this.requestUpdate('_routes', oldValue);
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
@@ -121,13 +124,13 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
 	};
 
-	render() {
-		return this._routes && this._routes.length > 0
+	override render() {
+		return this._routes
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
