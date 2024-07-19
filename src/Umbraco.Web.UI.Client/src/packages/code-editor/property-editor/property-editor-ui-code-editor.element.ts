@@ -1,6 +1,6 @@
 import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
 import type { CodeEditorLanguage } from '../models/index.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -38,6 +38,16 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 			.code=${this.value ?? ''}
 			@input=${this.#onChange}></umb-code-editor>`;
 	}
+
+	static override styles = [
+		css`
+			umb-code-editor {
+				--editor-height: 400px;
+				border-radius: var(--uui-border-radius);
+				border: 1px solid var(--uui-color-divider-emphasis);
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUICodeEditorElement;
