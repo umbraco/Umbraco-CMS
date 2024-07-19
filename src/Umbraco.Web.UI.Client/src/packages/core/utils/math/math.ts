@@ -1,36 +1,5 @@
-/**
- * Clamps a value to be within a specified range defined by a minimum and maximum value.
- *
- * @param {number} value - The value to be clamped.
- * @param {number} min - The minimum value allowed in the range.
- * @param {number} max - The maximum value allowed in the range.
- *
- * @returns {number} The clamped value, which is limited to the range between `min` and `max`.
- *   - If `value` is less than `min`, it is set to `min`.
- *   - If `value` is greater than `max`, it is set to `max`.
- *   - If `value` is already within the range [min, max], it remains unchanged.
- *
- * @example
- * // Clamp a value to ensure it falls within a specific range.
- * const inputValue = 15;
- * const minValue = 10;
- * const maxValue = 20;
- * const result = clamp(inputValue, minValue, maxValue);
- * // result is 15, as it falls within the range [minValue, maxValue].
- *
- * // Clamp a value that is outside the specified range.
- * const outsideValue = 5;
- * const result2 = clamp(outsideValue, minValue, maxValue);
- * // result2 is 10, as it's clamped to the minimum value (minValue).
- *
- * // Clamp a value that exceeds the maximum limit.
- * const exceedingValue = 25;
- * const result3 = clamp(exceedingValue, minValue, maxValue);
- * // result3 is 20, as it's clamped to the maximum value (maxValue).
- */
-export function clamp(value: number, min: number, max: number): number {
-	return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '@umbraco-cms/backoffice/external/uui';
+export { clamp };
 
 /**
  * Performs linear interpolation (lerp) between two numbers based on a blending factor.
