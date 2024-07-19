@@ -57,10 +57,10 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-editor alias="Umb.Workspace.Script">
 				<div id="workspace-header" slot="header">
 					<uui-input
-						placeholder="Enter name..."
+						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._name}
 						@input=${this.#onNameInput}
-						label="Script name"
+						label=${this.localize.term('placeholders_entername')}
 						?readonly=${this._isNew === false}
 						${umbFocus()}>
 					</uui-input>

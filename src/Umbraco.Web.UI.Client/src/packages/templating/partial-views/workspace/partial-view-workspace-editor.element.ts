@@ -82,22 +82,23 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-editor alias="Umb.Workspace.PartialView">
 				<div id="workspace-header" slot="header">
 					<uui-input
-						placeholder="Enter name..."
+						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._name}
 						@input=${this.#onNameInput}
-						label="Partial view name"
+						label=${this.localize.term('placeholders_entername')}
 						?readonly=${this._isNew === false}
 						${umbFocus()}></uui-input>
 				</div>
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
-						<uui-button
+						<umb-localize
 							look="secondary"
 							id="query-builder-button"
-							label="Query builder"
+							label=${this.localize.term('template_queryBuilder')}
 							@click=${this.#openQueryBuilder}>
-							<uui-icon name="icon-wand"></uui-icon>Query builder
+							<uui-icon name="icon-wand"></uui-icon>
+							<umb-localize key="template_queryBuilder">Query builder</umb-localize>
 						</uui-button>
 					</div>
 					${this.#renderCodeEditor()}
