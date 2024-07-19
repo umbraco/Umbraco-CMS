@@ -380,5 +380,3 @@ export class UmbCodeEditorController extends UmbControllerBase {
 		});
 	}
 }
-
-export default UmbCodeEditorController;

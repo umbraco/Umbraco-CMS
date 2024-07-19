@@ -131,8 +131,8 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		const { styles } = await import('@umbraco-cms/backoffice/external/monaco-editor');
 		this._styles = styles;
 
-		const controller = (await import('../code-editor.controller.js')).default;
-		this.#editor = new controller(this);
+		const { UmbCodeEditorController } = await import('../code-editor.controller.js');
+		this.#editor = new UmbCodeEditorController(this);
 
 		this._loading = false;
 		this.dispatchEvent(new UmbCodeEditorLoadedEvent());
