@@ -324,7 +324,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// Only look at the shadowRoot if the containerElement is host.
 		const containerElement = this.#useContainerShadowRoot
-			? this.#containerElement.shadowRoot ?? this.#containerElement
+			? (this.#containerElement.shadowRoot ?? this.#containerElement)
 			: this.#containerElement;
 		containerElement.addEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
 
@@ -348,7 +348,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (this.#containerElement) {
 			// Only look at the shadowRoot if the containerElement is host.
 			const containerElement = this.#useContainerShadowRoot
-				? this.#containerElement.shadowRoot ?? this.#containerElement
+				? (this.#containerElement.shadowRoot ?? this.#containerElement)
 				: this.#containerElement;
 
 			containerElement.removeEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
@@ -617,7 +617,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		const containerElement = this.#useContainerShadowRoot
-			? this.#containerElement.shadowRoot ?? this.#containerElement
+			? (this.#containerElement.shadowRoot ?? this.#containerElement)
 			: this.#containerElement;
 
 		// We want to retrieve the children of the container, every time to ensure we got the right order and index

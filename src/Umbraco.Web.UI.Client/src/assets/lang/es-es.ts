@@ -894,7 +894,7 @@ export default {
 		translation: 'Traducción',
 		users: 'Usuarios',
 		help: 'Ayuda',
-		packages: 'Paquetes'
+		packages: 'Paquetes',
 	},
 	help: {
 		theBestUmbracoVideoTutorials: 'Los mejores tutoriales en video para Umbraco',

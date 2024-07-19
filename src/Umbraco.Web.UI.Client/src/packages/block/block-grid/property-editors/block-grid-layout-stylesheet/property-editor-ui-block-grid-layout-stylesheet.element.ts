@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		const validationLimit = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 
 		this._limitMin = validationLimit?.min ?? 0;
-		this._limitMax = this.#singleItemMode ? 1 : validationLimit?.max ?? Infinity;
+		this._limitMax = this.#singleItemMode ? 1 : (validationLimit?.max ?? Infinity);
 	}
 
 	@state()

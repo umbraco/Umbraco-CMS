@@ -65,7 +65,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 		this._min = config.getValueByAlias('min');
 		this._max = config.getValueByAlias('max');
-		this._step = config.getValueByAlias('step') ?? hasSeconds ? 1 : undefined;
+		this._step = (config.getValueByAlias('step') ?? hasSeconds) ? 1 : undefined;
 
 		if (this.value) {
 			this.#formatValue(this.value);

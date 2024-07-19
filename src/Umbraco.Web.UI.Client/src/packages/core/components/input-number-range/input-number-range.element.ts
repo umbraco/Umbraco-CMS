@@ -119,7 +119,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.maxLabel}
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
-				placeholder=${this.validationRange?.max === Infinity ? '∞' : this.validationRange?.max ?? ''}
+				placeholder=${this.validationRange?.max === Infinity ? '∞' : (this.validationRange?.max ?? '')}
 				.value=${this._maxValue}
 				@input=${this.#onMaxInput}></uui-input>
 		`;
