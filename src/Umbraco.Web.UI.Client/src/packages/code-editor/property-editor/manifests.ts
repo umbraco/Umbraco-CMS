@@ -21,12 +21,12 @@ export const manifest: ManifestPropertyEditorUi = {
 						{
 							alias: 'items',
 							value: [
+								{ name: 'JavaScript', value: 'javascript', selected: true },
+								{ name: 'HTML', value: 'html' },
+								{ name: 'TypeScript', value: 'typescript' },
 								{ name: 'C#', value: 'csharp' },
 								{ name: 'Razor', value: 'csharp' },
-								{ name: 'HTML', value: 'html' },
 								{ name: 'CSS', value: 'css' },
-								{ name: 'JavaScript', value: 'javascript' },
-								{ name: 'TypeScript', value: 'typescript' },
 								{ name: 'Markdown', value: 'markdown' },
 								{ name: 'JSON', value: 'json' },
 							],
