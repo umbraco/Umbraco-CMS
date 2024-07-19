@@ -2533,4 +2533,11 @@ export default {
 		routeNotFoundTitle: 'Not found',
 		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
 	},
+	codeEditor: {
+		label: 'Code editor',
+		languageConfigLabel: 'Language',
+		languageConfigDescription: 'Select the language for syntax highlighting and IntelliSense.',
+		heightConfigLabel: 'Height',
+		heightConfigDescription: 'Set the height of the code editor in pixels.',
+	},
 } as UmbLocalizationDictionary;

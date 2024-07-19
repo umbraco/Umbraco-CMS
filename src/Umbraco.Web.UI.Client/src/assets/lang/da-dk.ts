@@ -2532,4 +2532,11 @@ export default {
 		routeNotFoundTitle: 'Ikke fundet',
 		routeNotFoundDescription: 'Den side du leder efter kunne ikke findes. Kontroller adressen og prøv igen.',
 	},
+	codeEditor: {
+		label: 'Code editor',
+		languageConfigLabel: 'Sprog',
+		languageConfigDescription: 'Vælg sprog til syntax highlighting og IntelliSense.',
+		heightConfigLabel: 'Højde',
+		heightConfigDescription: 'Indstil højden på editorvinduet i pixels.',
+	},
 } as UmbLocalizationDictionary;
