@@ -40,6 +40,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 		if (!this.value) {
 			const defaultValue = Number(config.getValueByAlias<string>('defaultValue') ?? '0');
 			this.value = defaultValue;
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		}
 	}
 
