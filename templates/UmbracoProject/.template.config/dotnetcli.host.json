@@ -70,6 +70,10 @@
     "ModelsBuilderMode": {
       "longName": "models-mode",
       "shortName": "mm"
+    },
+    "StarterKit": {
+      "longName": "starter-kit",
+      "shortName": "sk"
     }
   },
   "usageExamples": [

@@ -68,6 +68,10 @@
     {
       "id": "Docker",
       "isVisible": true
+    },
+    {
+      "id": "StarterKit",
+      "isVisible": true
     }
   ]
 }
