@@ -9,11 +9,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_MEDIA_PICKER_MODAL, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCodeEditorLoadedEvent } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-markdown';
 
@@ -22,7 +21,7 @@ const elementName = 'umb-input-markdown';
  * @fires change - when the value of the input changes
  */
 @customElement(elementName)
-export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, '') {
 	protected override getFormElement() {
 		return this._codeEditor;
 	}
@@ -37,23 +36,13 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#editor?: UmbCodeEditorController;
 
-	@query('umb-code-editor')
+	@query('umb-code-editor', true)
 	private _codeEditor?: UmbCodeEditorElement;
 
 	@state()
 	private _actionExtensions: Array<monaco.editor.IActionDescriptor> = [];
 
-	private _modalContext?: UmbModalManagerContext;
-
 	#mediaUrlRepository = new UmbMediaUrlRepository(this);
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-	}
 
 	#onCodeEditorLoaded(event: UmbCodeEditorLoadedEvent) {
 		if (event.type !== UmbCodeEditorLoadedEvent.TYPE) return;
@@ -194,14 +183,16 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#editor?.monacoEditor?.focus();
 	}
 
-	#insertMedia() {
+	async #insertMedia() {
 		const selection = this.#editor?.getSelections()[0];
 		if (!selection) return;
 
 		const alt = this.#editor?.getValueInRange(selection) || 'enter image description here';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
-		const modalContext = this._modalContext?.open(this, UMB_MEDIA_PICKER_MODAL);
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_MEDIA_PICKER_MODAL);
 
 		modalContext
 			?.onSubmit()
