@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
@@ -15,10 +14,10 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 
     public ApiRichTextMarkupParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
-        IPublishedUrlProvider publishedUrlProvider,
+        IApiMediaUrlProvider mediaUrlProvider,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         ILogger<ApiRichTextMarkupParser> logger)
-        : base(apiContentRouteBuilder, publishedUrlProvider)
+        : base(apiContentRouteBuilder, mediaUrlProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _logger = logger;
@@ -53,8 +52,9 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         foreach (HtmlNode link in links)
         {
             ReplaceLocalLinks(
-                publishedSnapshot,
+                    publishedSnapshot,
                 link.GetAttributeValue("href", string.Empty),
+                link.GetAttributeValue("type", "unknown"),
                 route =>
                 {
                     link.SetAttributeValue("href", route.Path);

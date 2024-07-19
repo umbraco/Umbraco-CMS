@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -474,7 +473,7 @@ public class RichTextParserTests : PropertyValueConverterTests
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 
-    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IPublishedUrlProvider urlProvider)
+    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IApiMediaUrlProvider apiMediaUrlProvider)
     {
         var contentMock = new Mock<IPublishedContent>();
         contentMock.SetupGet(m => m.Key).Returns(_contentKey);
@@ -502,14 +501,14 @@ public class RichTextParserTests : PropertyValueConverterTests
             .Setup(m => m.Build(contentMock.Object, null))
             .Returns(new ApiContentRoute("/some-content-path", new ApiContentStartItem(_contentRootKey, "the-root-path")));
 
-        var urlProviderMock = new Mock<IPublishedUrlProvider>();
-        urlProviderMock
-            .Setup(m => m.GetMediaUrl(mediaMock.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string>(), It.IsAny<Uri?>()))
+        var apiMediaUrlProviderMock = new Mock<IApiMediaUrlProvider>();
+        apiMediaUrlProviderMock
+            .Setup(m => m.GetUrl(mediaMock.Object))
             .Returns("/some-media-url");
 
         routeBuilder = routeBuilderMock.Object;
         snapshotAccessor = snapshotAccessorMock.Object;
-        urlProvider = urlProviderMock.Object;
+        apiMediaUrlProvider = apiMediaUrlProviderMock.Object;
     }
 
     private IPublishedElement CreateElement(Guid id, int propertyValue)

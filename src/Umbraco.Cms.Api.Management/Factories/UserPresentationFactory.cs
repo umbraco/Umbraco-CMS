@@ -150,6 +150,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         {
             // You should not be able to invite users if any providers has deny local login set.
             CanInviteUsers = _emailSender.CanSendRequiredEmail() && _externalLoginProviders.HasDenyLocalLogin() is false,
+            UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         });
 
@@ -209,6 +210,23 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
             AllowedSections = allowedSections,
             IsAdmin = user.IsAdmin()
+        });
+    }
+
+    public async Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user)
+    {
+        var mediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
+        var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
+
+        return await Task.FromResult(new CalculatedUserStartNodesResponseModel()
+        {
+            Id = user.Key,
+            MediaStartNodeIds = mediaStartNodeKeys,
+            HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
+            DocumentStartNodeIds = documentStartNodeKeys,
+            HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
         });
     }
 

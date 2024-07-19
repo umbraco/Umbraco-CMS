@@ -45,7 +45,7 @@ public class BackOfficeAreaRoutesTests
         var endpoints = new TestRouteBuilder();
         routes.CreateRoutes(endpoints);
 
-        Assert.AreEqual(1, endpoints.DataSources.Count);
+        Assert.AreEqual(2, endpoints.DataSources.Count);
         var route = endpoints.DataSources.First();
         Assert.AreEqual(2, route.Endpoints.Count);
 
