@@ -1,7 +1,11 @@
-import type { UmbCodeEditorController } from './code-editor.controller.js';
-import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } from './code-editor.model.js';
-import { CodeEditorTheme } from './code-editor.model.js';
-import { UmbCodeEditorLoadedEvent } from './code-editor-loaded.event.js';
+import type { UmbCodeEditorController } from '../code-editor.controller.js';
+import {
+	CodeEditorTheme,
+	UmbCodeEditorLoadedEvent,
+	type CodeEditorLanguage,
+	type CodeEditorSearchOptions,
+	type UmbCodeEditorHost,
+} from '../models/index.js';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import type { PropertyValues, Ref } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -125,7 +129,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		const { styles } = await import('@umbraco-cms/backoffice/external/monaco-editor');
 		this._styles = styles;
 
-		const controller = (await import('./code-editor.controller.js')).default;
+		const controller = (await import('../code-editor.controller.js')).default;
 		this.#editor = new controller(this);
 
 		this._loading = false;

@@ -1,4 +1,12 @@
-export type CodeEditorLanguage = 'razor' | 'typescript' | 'javascript' | 'css' | 'markdown' | 'json' | 'html';
+export type CodeEditorLanguage =
+	| 'csharp'
+	| 'razor'
+	| 'typescript'
+	| 'javascript'
+	| 'css'
+	| 'markdown'
+	| 'json'
+	| 'html';
 
 export enum CodeEditorTheme {
 	Light = 'umb-light',

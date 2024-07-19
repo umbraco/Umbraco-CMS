@@ -8,7 +8,7 @@ import type {
 	UmbCodeEditorHost,
 	UmbCodeEditorRange,
 	UmbCodeEditorSelection,
-} from './code-editor.model.js';
+} from './models/code-editor.model.js';
 import { themes } from './themes/index.js';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
