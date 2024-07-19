@@ -4,7 +4,7 @@ import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent, type UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -398,9 +398,9 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 		}
 	}
 
-	#onInput(e: CustomEvent) {
+	#onInput(e: UmbInputEvent) {
 		e.stopPropagation();
-		this.value = this.#editor?.monacoEditor?.getValue() ?? '';
+		this.value = this.#editor?.value ?? '';
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
