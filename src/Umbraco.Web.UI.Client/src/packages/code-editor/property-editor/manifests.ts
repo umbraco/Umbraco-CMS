@@ -14,8 +14,8 @@ export const manifest: ManifestPropertyEditorUi = {
 			properties: [
 				{
 					alias: 'language',
-					label: 'Language',
-					description: 'Select the programming language.',
+					label: '#codeEditor_languageConfigLabel',
+					description: '{#codeEditor_languageConfigDescription}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 					config: [
 						{

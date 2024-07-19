@@ -2606,5 +2606,7 @@ export default {
 	},
 	codeEditor: {
 		label: 'Code editor',
+		languageConfigLabel: 'Language',
+		languageConfigDescription: 'Select the language for syntax highlighting and IntelliSense.',
 	},
 } as UmbLocalizationDictionary;
