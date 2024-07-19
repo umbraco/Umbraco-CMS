@@ -140,11 +140,11 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	#initiateEvents() {
 		this.#editor?.onDidChangeModelContent(() => {
 			this.#host.code = this.value ?? '';
-			this.dispatchEvent(new UmbInputEvent());
+			this.#host.dispatchEvent(new UmbInputEvent());
 		});
 
 		this.#editor?.onDidChangeModel(() => {
-			this.dispatchEvent(new UmbChangeEvent());
+			this.#host.dispatchEvent(new UmbChangeEvent());
 		});
 
 		this.#editor?.onDidChangeCursorPosition((e) => {
