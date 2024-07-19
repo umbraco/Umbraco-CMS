@@ -720,7 +720,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				alias: 'codeEditor',
 				name: 'Code Editor',
-				description: '',
+				description: 'umb-code-editor configured with the `html` language.',
 				dataType: {
 					id: 'dt-codeEditor',
 				},
