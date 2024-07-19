@@ -36,7 +36,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 
 	#editor?: UmbCodeEditorController;
 
-	@query('umb-code-editor', true)
+	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
 	@state()
