@@ -130,6 +130,7 @@
 	},
 	"workspaces": [
 		"./src/packages/block",
+		"./src/packages/code-editor",
 		"./src/packages/core",
 		"./src/packages/data-type",
 		"./src/packages/dictionary",
