@@ -10,6 +10,12 @@ export const manifests: Array<ManifestTypes> = [
 			settings: {
 				properties: [
 					{
+						alias: 'defaultValue',
+						label: 'Default value',
+						description: 'Enter the default value',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+					},
+					{
 						alias: 'min',
 						label: 'Minimum',
 						description: 'Enter the minimum amount of number to be entered',
