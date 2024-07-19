@@ -2608,5 +2608,7 @@ export default {
 		label: 'Code editor',
 		languageConfigLabel: 'Language',
 		languageConfigDescription: 'Select the language for syntax highlighting and IntelliSense.',
+		heightConfigLabel: 'Height',
+		heightConfigDescription: 'Set the height of the code editor in pixels.',
 	},
 } as UmbLocalizationDictionary;

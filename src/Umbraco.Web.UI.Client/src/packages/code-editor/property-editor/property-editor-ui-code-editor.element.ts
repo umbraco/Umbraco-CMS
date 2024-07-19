@@ -1,6 +1,6 @@
 import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
 import type { CodeEditorLanguage } from '../models/index.js';
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -21,9 +21,13 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	@state()
 	private _language?: CodeEditorLanguage = 'html';
 
+	@state()
+	private _height = 400;
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._language = config?.getValueByAlias<CodeEditorLanguage>('language') ?? 'html';
+		this._height = config?.getValueByAlias<number>('height') ?? 400;
 	}
 
 	#onChange(e: UmbInputEvent) {
@@ -34,6 +38,7 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 
 	override render() {
 		return html`<umb-code-editor
+			style=${styleMap({ height: `${this._height}px` })}
 			.language=${this._language ?? 'html'}
 			.code=${this.value ?? ''}
 			@input=${this.#onChange}></umb-code-editor>`;
@@ -42,7 +47,6 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	static override styles = [
 		css`
 			umb-code-editor {
-				--editor-height: 400px;
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-divider-emphasis);
 			}
