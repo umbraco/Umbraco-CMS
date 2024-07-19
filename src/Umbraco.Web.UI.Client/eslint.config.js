@@ -55,6 +55,8 @@ export default [
 			'import/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
 			'import/no-self-import': 'error',
 			'import/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
+			'import/no-named-as-default': 'off', // Does not work with eslint 9
+			'import/no-named-as-default-member': 'off', // Does not work with eslint 9
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
