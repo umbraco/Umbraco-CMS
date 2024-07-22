@@ -364,6 +364,7 @@
       "displayName": "Development mode",
       "datatype": "choice",
       "description": "Choose the development mode to use for the project.",
+      "defaultValue": "BackofficeDevelopment",
       "choices": [
         {
           "choice": "BackofficeDevelopment",
