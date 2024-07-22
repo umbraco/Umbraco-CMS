@@ -45,8 +45,7 @@ services:
         condition: service_healthy
     restart: always
     ports:
-      - "44373:8081"
-      - "44372:8080"
+      - "TEMPLATE_PORT:8080"
     networks:
       - umbnet
     develop:

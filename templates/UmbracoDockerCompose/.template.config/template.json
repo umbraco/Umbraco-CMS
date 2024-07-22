@@ -29,6 +29,13 @@
       "replaces": "Password1234",
       "defaultValue": "Password1234"
     },
+    "Port": {
+      "type": "parameter",
+      "description": "The port forward on the docker container, this is the port you use to access the site",
+      "datatype": "string",
+      "replaces": "TEMPLATE_PORT",
+      "defaultValue": "44372"
+    },
     "ImageName": {
       "type": "generated",
       "generator": "casing",
