@@ -40,8 +40,10 @@ public interface IDocumentUrlService
     /// <param name="culture">The culture code.</param>
     /// <param name="segment">The segment.</param>
     /// <param name="isDraft">Whether to set the url of the draft or published document.</param>
-    /// <param name="url">The new url.</param>
-    Task CreateOrUpdateUrlAsync(Guid documentKey, string culture, string segment, bool isDraft, string url);
+    /// <param name="urlSegment">The new url segment.</param>
+    Task CreateOrUpdateUrlSegmentAsync(Guid documentKey, string culture, string segment, bool isDraft, string urlSegment);
+
+    Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents);
 
     /// <summary>
     /// Delete a specific url for a document key, culture and segment and draft information.
@@ -64,6 +66,7 @@ public interface IDocumentUrlService
 
 public class DocumentUrlService : IDocumentUrlService
 {
+    private readonly IDocumentUrlRepository _documentUrlRepository;
     private readonly IDocumentRepository _documentRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly GlobalSettings _globalSettings;
@@ -74,6 +77,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly ILanguageService _languageService;
 
     public DocumentUrlService(
+        IDocumentUrlRepository documentUrlRepository,
         IDocumentRepository documentRepository,
         ICoreScopeProvider coreScopeProvider,
         IOptions<GlobalSettings> globalSettings,
@@ -83,6 +87,7 @@ public class DocumentUrlService : IDocumentUrlService
         IDomainService domainService,
         ILanguageService languageService)
     {
+        _documentUrlRepository = documentUrlRepository;
         _documentRepository = documentRepository;
         _coreScopeProvider = coreScopeProvider;
         _globalSettings = globalSettings.Value;
@@ -112,7 +117,26 @@ public class DocumentUrlService : IDocumentUrlService
 
     public Task<string> GetUrlAsync(Guid documentKey, string culture, string segment, bool isDraft) => throw new NotImplementedException();
 
-    public Task CreateOrUpdateUrlAsync(Guid documentKey, string culture, string segment, bool isDraft, string url) => throw new NotImplementedException();
+    public Task CreateOrUpdateUrlSegmentAsync(Guid documentKey, string culture, string segment, bool isDraft, string url) => throw new NotImplementedException();
+    public Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents)
+    {
+        var keys = new HashSet<Guid>();
+        var cultures = new HashSet<string>();
+        foreach (IContent document in documents)
+        {
+            keys.Add(document.Key);
+            foreach (var culture in document.AvailableCultures)
+            {
+                cultures.Add(culture);
+
+                var urlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture);
+
+            }
+        }
+
+        _documentUrlRepository.Save(keys, cultures);
+
+    }
 
     public Task DeleteUrlAsync(Guid documentKey, string culture, string segment, bool isDraft) => throw new NotImplementedException();
 

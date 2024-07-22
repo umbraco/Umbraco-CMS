@@ -407,6 +407,10 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
 
+        // Handlers for routing
+        builder
+            .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>();
+
         return builder;
     }
 
