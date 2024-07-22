@@ -53,6 +53,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	get editor() {
 		return this.#editor;
 	}
+
 	/**
 	 * Theme of the editor. Default is light. Element will listen to the theme context and update the theme accordingly.
 	 *
