@@ -1,5 +1,6 @@
 import type { UmbCodeEditorController } from '../code-editor.controller.js';
 import {
+	type CodeEditorConstructorOptions,
 	CodeEditorTheme,
 	UmbCodeEditorLoadedEvent,
 	type CodeEditorLanguage,
@@ -80,6 +81,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	//TODO - this should be called a value
 	#code = '';
+
 	/**
 	 * Value of the editor. Default is empty string.
 	 *
@@ -99,13 +101,38 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		}
 		this.requestUpdate('code', oldValue);
 	}
+
 	/**
-	 * Whether the editor is readonly. Default is false.
+	 * Whether the editor is readonly.
 	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property({ type: Boolean, attribute: 'readonly' })
 	readonly = false;
+
+	/**
+	 * Whether to show line numbers.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'disable-line-numbers' })
+	disableLineNumbers = false;
+
+	/**
+	 * Whether to show minimap.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'disable-minimap' })
+	disableMinimap = false;
+
+	/**
+	 * Whether to enable word wrap. Default is false.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'word-wrap' })
+	wordWrap = false;
 
 	@state()
 	private _loading = true;
@@ -132,19 +159,40 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		this._styles = styles;
 
 		const { UmbCodeEditorController } = await import('../code-editor.controller.js');
-		this.#editor = new UmbCodeEditorController(this);
+
+		// Options
+		this.#editor = new UmbCodeEditorController(this, this.#constructorOptions());
 
 		this._loading = false;
 		this.dispatchEvent(new UmbCodeEditorLoadedEvent());
 	}
 
 	protected override updated(_changedProperties: PropertyValues<this>): void {
-		if (_changedProperties.has('theme') || _changedProperties.has('language')) {
-			this.#editor?.updateOptions({
-				theme: this.theme,
-				language: this.language,
-			});
+		if (
+			_changedProperties.has('theme') ||
+			_changedProperties.has('language') ||
+			_changedProperties.has('disableLineNumbers') ||
+			_changedProperties.has('disableMinimap') ||
+			_changedProperties.has('wordWrap') ||
+			_changedProperties.has('readonly') ||
+			_changedProperties.has('code') ||
+			_changedProperties.has('label')
+		) {
+			this.#editor?.updateOptions(this.#constructorOptions());
 		}
+	}
+
+	#constructorOptions(): CodeEditorConstructorOptions {
+		return {
+			language: this.language,
+			theme: this.theme,
+			ariaLabel: this.label ?? this.localize.term('codeEditor_label'),
+			lineNumbers: !this.disableLineNumbers,
+			minimap: !this.disableMinimap,
+			wordWrap: this.wordWrap ? 'on' : 'off',
+			readOnly: this.readonly,
+			value: this.code,
+		};
 	}
 
 	#translateTheme(theme: string) {

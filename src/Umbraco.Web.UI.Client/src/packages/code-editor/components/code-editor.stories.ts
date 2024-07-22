@@ -9,7 +9,7 @@ import './code-editor.element.js';
 const meta: Meta<UmbCodeEditorElement> = {
 	title: 'Components/Code Editor',
 	component: 'umb-code-editor',
-	decorators: [(story) => html`<div style="--editor-height: 800px">${story()}</div>`],
+	decorators: [(story) => html`<div style="--editor-height: 400px">${story()}</div>`],
 	parameters: { layout: 'fullscreen' },
 	argTypes: {
 		theme: {
