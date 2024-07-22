@@ -1,6 +1,10 @@
-﻿namespace Umbraco.Cms.Infrastructure.HybridCache;
+﻿using System.ComponentModel;
 
-internal class ContentCacheNode
+namespace Umbraco.Cms.Infrastructure.HybridCache;
+
+// This is for cache performance reasons, see https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0#reuse-objects
+[ImmutableObject(true)]
+internal sealed class ContentCacheNode
 {
     public ContentCacheNode()
     {
