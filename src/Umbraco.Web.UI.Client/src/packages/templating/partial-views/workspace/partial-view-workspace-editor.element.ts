@@ -92,7 +92,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
-						<umb-localize
+						<uui-button
 							look="secondary"
 							id="query-builder-button"
 							label=${this.localize.term('template_queryBuilder')}
