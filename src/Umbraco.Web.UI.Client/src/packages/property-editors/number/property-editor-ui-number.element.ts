@@ -36,12 +36,6 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 		this._max = this.#parseInt(config.getValueByAlias('max'));
 		this._step = this.#parseInt(config.getValueByAlias('step'));
 		this._placeholder = config.getValueByAlias('placeholder');
-
-		if (!this.value) {
-			const defaultValue = Number(config.getValueByAlias<string>('defaultValue') ?? '0');
-			this.value = defaultValue;
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
-		}
 	}
 
 	#parseInt(input: unknown): number | undefined {

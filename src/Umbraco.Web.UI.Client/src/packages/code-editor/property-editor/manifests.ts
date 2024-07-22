@@ -38,11 +38,11 @@ export const manifest: ManifestPropertyEditorUi = {
 					label: '#codeEditor_heightConfigLabel',
 					description: '{#codeEditor_heightConfigDescription}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
-					config: [
-						{ alias: 'defaultValue', value: 400 },
-						{ alias: 'min', value: 0 },
-					],
+					config: [{ alias: 'min', value: 0 }],
 				},
+			],
+			defaultData: [
+				{ alias: 'height', value: 400 },
 			],
 		},
 	},
