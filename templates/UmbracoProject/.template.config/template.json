@@ -339,15 +339,18 @@
       "choices": [
         {
           "choice": "InMemoryAuto",
-          "description": "Generate models in memory, automatically updating when a content type change, this means no need for app rebuild, however models are only available in views."
+          "description": "Generate models in memory, automatically updating when a content type change, this means no need for app rebuild, however models are only available in views.",
+          "displayName": "In Memory Auto"
         },
         {
           "choice": "SourceCodeManual",
-          "description": "Generate models as source code, only updating when requested manually, this means a interaction and rebuild is required when content type(s) change, however models are available in code."
+          "description": "Generate models as source code, only updating when requested manually, this means a interaction and rebuild is required when content type(s) change, however models are available in code.",
+          "displayName": "Source Code Manual"
         },
         {
           "choice": "SourceCodeAuto",
-          "description": "Generate models as source code, automatically updating when a content type change, this means a rebuild is required when content type(s) change, however models are available in code."
+          "description": "Generate models as source code, automatically updating when a content type change, this means a rebuild is required when content type(s) change, however models are available in code.",
+          "displayName": "Source Code Auto"
         },
         {
           "choice": "Nothing",
