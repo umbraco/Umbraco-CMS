@@ -329,6 +329,25 @@
       "defaultValue": "",
       "replaces": "PACKAGE_PROJECT_NAME_FROM_TEMPLATE"
     },
+    "DevelopmentMode": {
+      "type": "parameter",
+      "displayName": "Development mode",
+      "datatype": "choice",
+      "description": "Choose the development mode to use for the project.",
+      "defaultValue": "BackofficeDevelopment",
+      "choices": [
+        {
+          "choice": "BackofficeDevelopment",
+          "description": "Enables backoffice development, allowing you to develop from within the backoffice.",
+          "displayName": "Backoffice Development"
+        },
+        {
+          "choice": "IDEDevelopment",
+          "description": "Enables IDE development, this allows you to better develop from you IDE and enables perfomance improvements.",
+          "displayName": "IDE Development"
+        }
+      ]
+    },
     "ModelsBuilderMode": {
       "type": "parameter",
       "displayName": "Models builder mode",
@@ -356,25 +375,6 @@
         {
           "choice": "Nothing",
           "description": "No models are generated, this is recommended for production assuming generated models are used for development."
-        }
-      ]
-    },
-    "DevelopmentMode": {
-      "type": "parameter",
-      "displayName": "Development mode",
-      "datatype": "choice",
-      "description": "Choose the development mode to use for the project.",
-      "defaultValue": "BackofficeDevelopment",
-      "choices": [
-        {
-          "choice": "BackofficeDevelopment",
-          "description": "Enables backoffice development, allowing you to develop from within the backoffice.",
-          "displayName": "Backoffice Development"
-        },
-        {
-          "choice": "IDEDevelopment",
-          "description": "Enables IDE development, this allows you to better develop from you IDE and enables perfomance improvements.",
-          "displayName": "IDE Development"
         }
       ]
     },
