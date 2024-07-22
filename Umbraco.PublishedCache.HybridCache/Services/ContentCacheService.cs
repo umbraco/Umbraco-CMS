@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.Caching.Hybrid;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Scoping;
@@ -68,9 +69,20 @@ internal sealed class ContentCacheService : IContentCacheService
 
     public async Task SeedAsync(IReadOnlyCollection<int>? contentTypeIds)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _nuCacheContentRepository.Rebuild(contentTypeIds);
-        scope.Complete();
+        IEnumerable<ContentCacheNode> contentCacheNodes = _nuCacheContentRepository.GetTypeContentSources(contentTypeIds);
+        foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
+        {
+            // Never expire seeded values
+            var entryOptions = new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.MaxValue,
+            };
+
+            await _hybridCache.SetAsync(
+                $"{contentCacheNode.Key}",
+                contentCacheNode,
+                entryOptions);
+        }
     }
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)
