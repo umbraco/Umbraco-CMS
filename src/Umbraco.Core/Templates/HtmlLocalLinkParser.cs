@@ -108,7 +108,11 @@ public sealed class HtmlLocalLinkParser
         return text;
     }
 
-    private string StripTypeAttributeFromTag(string tag, string type) => tag.Replace($"type=\"{type}\"", string.Empty);
+    // under normal circumstances, the type attribute is preceded by a space
+    // to cover the rare occasion where it isn't, we first replace with a a space and then without.
+    private string StripTypeAttributeFromTag(string tag, string type) =>
+        tag.Replace($" type=\"{type}\"", string.Empty)
+            .Replace($"type=\"{type}\"", string.Empty);
 
     private IEnumerable<LocalLinkTag> FindLocalLinkIds(string text)
     {
