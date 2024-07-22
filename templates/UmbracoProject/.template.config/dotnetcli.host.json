@@ -78,6 +78,10 @@
     "StarterKit": {
       "longName": "starter-kit",
       "shortName": "sk"
+    },
+    "DevelopmentMode": {
+      "longName": "development-mode",
+      "shortName": "dm"
     }
   },
   "usageExamples": [

@@ -76,6 +76,10 @@
     {
       "id": "UmbracoRelease",
       "isVisible": true
+    },
+    {
+      "id": "DevelopmentMode",
+      "isVisible": true
     }
   ]
 }

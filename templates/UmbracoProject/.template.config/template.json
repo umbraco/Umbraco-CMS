@@ -335,6 +335,7 @@
       "description": "Choose the models builder mode to use for the project.",
       "defaultValue": "InMemoryAuto",
       "replaces": "MODELS_MODE",
+      "isEnabled": "(DevelopmentMode == 'BackofficeDevelopment')",
       "choices": [
         {
           "choice": "InMemoryAuto",
@@ -351,6 +352,23 @@
         {
           "choice": "Nothing",
           "description": "No models are generated, this is recommended for production assuming generated models are used for development."
+        }
+      ]
+    },
+    "DevelopmentMode": {
+      "type": "parameter",
+      "datatype": "choice",
+      "description": "Choose the development mode to use for the project.",
+      "choices": [
+        {
+          "choice": "BackofficeDevelopment",
+          "description": "Enables backoffice development, allowing you to develop from within the backoffice.",
+          "displayName": "Backoffice Development"
+        },
+        {
+          "choice": "IDEDevelopment",
+          "description": "Enables IDE development, this allows you to better develop from you IDE and enables perfomance improvements.",
+          "displayName": "IDE Development"
         }
       ]
     },
