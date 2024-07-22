@@ -72,6 +72,10 @@
     {
       "id": "StarterKit",
       "isVisible": true
+    },
+    {
+      "id": "UmbracoRelease",
+      "isVisible": true
     }
   ]
 }

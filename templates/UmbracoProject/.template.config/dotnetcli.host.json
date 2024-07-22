@@ -10,6 +10,10 @@
       "longName": "version",
       "shortName": "v"
     },
+    "UmbracoRelease": {
+      "longName": "release",
+      "shortName": "r"
+    },
     "UseHttpsRedirect": {
       "longName": "use-https-redirect",
       "shortName": ""
