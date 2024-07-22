@@ -52,7 +52,7 @@ internal sealed class ContentCacheService : IContentCacheService
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false)
     {
-        Attempt<Guid>  keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         if (keyAttempt.Success is false)
         {
             return null;
@@ -64,6 +64,13 @@ internal sealed class ContentCacheService : IContentCacheService
             cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(id)));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
+    }
+
+    public async Task SeedAsync(IReadOnlyCollection<int>? contentTypeIds)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _nuCacheContentRepository.Rebuild(contentTypeIds);
+        scope.Complete();
     }
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)

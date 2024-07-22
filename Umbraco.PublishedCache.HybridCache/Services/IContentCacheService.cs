@@ -9,6 +9,8 @@ internal interface IContentCacheService
 
     Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false);
 
+    Task SeedAsync(IReadOnlyCollection<int>? contentTypeIds = null);
+
     Task<bool> HasContentByIdAsync(int id, bool preview = false);
 
     Task RefreshContentAsync(IContent content);
