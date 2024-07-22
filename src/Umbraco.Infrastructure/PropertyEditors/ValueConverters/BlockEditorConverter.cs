@@ -75,8 +75,8 @@ public sealed class BlockEditorConverter
             }
         }
 
-        // Get the UDI from the deserialized object. If this is empty, we can fallback to checking the 'key' if there is one
-        Guid key = data.Udi is GuidUdi gudi ? gudi.Guid : Guid.Empty;
+        // Get the key from the deserialized object. If this is empty, we can fallback to checking the 'key' if there is one
+        Guid key = data.Key;
         if (key == Guid.Empty && propertyValues.TryGetValue("key", out var keyo))
         {
             Guid.TryParse(keyo!.ToString(), out key);

@@ -64,14 +64,20 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     {
         if (value is not null)
         {
-            ConvertRawPropertyValuesToProperties(value.ContentData);
-            ConvertRawPropertyValuesToProperties(value.SettingsData);
+            ConvertOriginalBlockFormat(value.ContentData);
+            ConvertOriginalBlockFormat(value.SettingsData);
         }
 
-        IEnumerable<TLayout>? layouts = value?.GetLayouts();
+        TLayout[]? layouts = value?.GetLayouts()?.ToArray();
         if (layouts is null)
         {
             return BlockEditorData<TValue, TLayout>.Empty;
+        }
+
+        foreach (TLayout layout in layouts.Where(l => l.ContentKey == Guid.Empty))
+        {
+            layout.ContentKey = (layout.ContentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(value));
+            layout.SettingsKey = (layout.SettingsUdi as GuidUdi)?.Guid;
         }
 
         IEnumerable<ContentAndSettingsReference> references = GetBlockReferences(layouts);
@@ -81,7 +87,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format
-    private void ConvertRawPropertyValuesToProperties(List<BlockItemData> blockItemDatas)
+    private void ConvertOriginalBlockFormat(List<BlockItemData> blockItemDatas)
     {
         foreach (BlockItemData blockItemData in blockItemDatas)
         {
@@ -96,6 +102,15 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
             // no matter what, clear the RawPropertyValues collection so it is not saved back to the DB
             blockItemData.RawPropertyValues.Clear();
+
+            // assign the correct Key if only a UDI is set
+            if (blockItemData.Key == Guid.Empty && blockItemData.Udi is GuidUdi guidUdi)
+            {
+                blockItemData.Key = guidUdi.Guid;
+            }
+
+            // no matter what, clear the UDI value so it's not saved back to the DB
+            blockItemData.Udi = null;
         }
     }
 }

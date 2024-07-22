@@ -166,18 +166,18 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
     {
-        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey("data-content-udi") is false || attributes["data-content-udi"] is not string dataUdi)
+        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey("data-content-key") is false || attributes["data-content-key"] is not string dataKey)
         {
             return;
         }
 
-        if (UdiParser.TryParse<GuidUdi>(dataUdi, out GuidUdi? guidUdi) is false)
+        if (Guid.TryParse(dataKey, out Guid key) is false)
         {
             return;
         }
 
-        attributes["content-id"] = guidUdi.Guid;
-        attributes.Remove("data-content-udi");
+        attributes["content-id"] = key;
+        attributes.Remove("data-content-key");
     }
 
     private static void SanitizeAttributes(Dictionary<string, object> attributes)

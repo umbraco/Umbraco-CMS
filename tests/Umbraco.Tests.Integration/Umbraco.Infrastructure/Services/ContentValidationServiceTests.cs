@@ -42,17 +42,17 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                 {
                                   "layout": {
                                     "Umbraco.BlockList": [{
-                                        "contentUdi": "umb://element/9addc377c02c4db088c273b933704f7b",
-                                        "settingsUdi": "umb://element/65db1ecd78e041a584f07296123a0a73"
+                                        "contentKey": "9addc377-c02c-4db0-88c2-73b933704f7b",
+                                        "settingsKey": "65db1ecd-78e0-41a5-84f0-7296123a0a73"
                                       }, {
-                                        "contentUdi": "umb://element/3af93b5b5e404c64b1422564309fc4c7",
-                                        "settingsUdi": "umb://element/efb9583ce67043f282fb2a0cb0f3e736"
+                                        "contentKey": "3af93b5b-5e40-4c64-b142-2564309fc4c7",
+                                        "settingsKey": "efb9583c-e670-43f2-82fb-2a0cb0f3e736"
                                       }
                                     ]
                                   },
                                   "contentData": [{
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
-                                      "udi": "umb://element/9addc377c02c4db088c273b933704f7b",
+                                      "key": "9addc377-c02c-4db0-88c2-73b933704f7b",
                                       "properties": [
                                           {
                                             "alias": "title",
@@ -63,23 +63,23 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                             "value": {
                                                 "layout": {
                                                   "Umbraco.BlockList": [{
-                                                      "contentUdi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
-                                                      "settingsUdi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3"
+                                                      "contentKey": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f",
+                                                      "settingsKey": "c9129a46-71bb-4b4e-8f0a-d525ad4a5de3"
                                                     }, {
-                                                      "contentUdi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
-                                                      "settingsUdi": "umb://element/77f7ea3507664395bf7f0c9df04530f7"
+                                                      "contentKey": "b8173e4a-0618-475c-8277-c3c6af68bee6",
+                                                      "settingsKey": "77f7ea35-0766-4395-bf7f-0c9df04530f7"
                                                     }
                                                   ]
                                                 },
                                                 "contentData": [{
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
-                                                    "udi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
+                                                    "key": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f",
                                                     "properties": [
                                                         { "alias": "title", "value": "Invalid nested content" }
                                                     ]
                                                   }, {
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
-                                                    "udi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
+                                                    "key": "b8173e4a-0618-475c-8277-c3c6af68bee6",
                                                     "properties": [
                                                         { "alias": "title", "value": "Valid nested content" }
                                                     ]
@@ -87,13 +87,13 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                                 ],
                                                 "settingsData": [{
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
-                                                    "udi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3",
+                                                    "key": "c9129a46-71bb-4b4e-8f0a-d525ad4a5de3",
                                                     "properties": [
                                                         { "alias": "title", "value": "Valid nested setting" }
                                                     ]
                                                   }, {
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
-                                                    "udi": "umb://element/77f7ea3507664395bf7f0c9df04530f7",
+                                                    "key": "77f7ea35-0766-4395-bf7f-0c9df04530f7",
                                                     "properties": [
                                                         { "alias": "title", "value": "Invalid nested setting" }
                                                     ]
@@ -104,7 +104,7 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                       ]
                                     }, {
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
-                                      "udi": "umb://element/3af93b5b5e404c64b1422564309fc4c7",
+                                      "key": "3af93b5b-5e40-4c64-b142-2564309fc4c7",
                                       "properties": [
                                           { "alias": "title", "value": "Invalid root content" }
                                       ]
@@ -112,13 +112,13 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                   ],
                                   "settingsData": [{
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
-                                        "udi": "umb://element/65db1ecd78e041a584f07296123a0a73",
+                                        "key": "65db1ecd-78e0-41a5-84f0-7296123a0a73",
                                         "properties": [
                                             { "alias": "title", "value": "Invalid root setting" }
                                         ]
                                       }, {
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
-                                        "udi": "umb://element/efb9583ce67043f282fb2a0cb0f3e736",
+                                        "key": "efb9583c-e670-43f2-82fb-2a0cb0f3e736",
                                         "properties": [
                                             { "alias": "title", "value": "Valid root setting" }
                                         ]

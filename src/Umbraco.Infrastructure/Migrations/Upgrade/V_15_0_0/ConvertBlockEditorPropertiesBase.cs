@@ -79,6 +79,10 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         }
     }
 
+    protected virtual object UpdateEditorValue(object editorValue) => editorValue;
+
+    protected virtual string UpdateDatabaseValue(string dbValue) => dbValue;
+
     private bool Handle(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
     {
         var success = true;
@@ -190,6 +194,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             break;
                     }
 
+                    toEditorValue = UpdateEditorValue(toEditorValue);
+
                     var editorValue = _jsonSerializer.Serialize(toEditorValue);
                     var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
                     if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
@@ -203,6 +209,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                         updateBatch.Remove(update);
                         continue;
                     }
+
+                    stringValue = UpdateDatabaseValue(stringValue);
 
                     propertyDataDto.TextValue = stringValue;
                 }

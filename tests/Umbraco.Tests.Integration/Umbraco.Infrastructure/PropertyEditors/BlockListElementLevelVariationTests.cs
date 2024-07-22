@@ -778,8 +778,8 @@ public class BlockListElementLevelVariationTests : UmbracoIntegrationTest
 
         var content = contentBuilder.Build();
 
-        var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var settingsElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
         foreach (var blocksProperty in blocksProperties)
         {
             var blockListValue = new BlockListValue
@@ -790,7 +790,7 @@ public class BlockListElementLevelVariationTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockList,
                         new IBlockLayoutItem[]
                         {
-                            new BlockListLayoutItem { ContentUdi = contentElementUdi, SettingsUdi = settingsElementUdi }
+                            new BlockListLayoutItem { ContentKey = contentElementKey, SettingsKey = settingsElementKey }
                         }
                     }
                 },
@@ -798,7 +798,7 @@ public class BlockListElementLevelVariationTests : UmbracoIntegrationTest
                 [
                     new()
                     {
-                        Udi = contentElementUdi,
+                        Key = contentElementKey,
                         ContentTypeAlias = elementType.Alias,
                         ContentTypeKey = elementType.Key,
                         Properties = blocksProperty.BlockContentValues
@@ -808,7 +808,7 @@ public class BlockListElementLevelVariationTests : UmbracoIntegrationTest
                 [
                     new()
                     {
-                        Udi = settingsElementUdi,
+                        Key = settingsElementKey,
                         ContentTypeAlias = elementType.Alias,
                         ContentTypeKey = elementType.Key,
                         Properties = blocksProperty.BlockSettingsValues

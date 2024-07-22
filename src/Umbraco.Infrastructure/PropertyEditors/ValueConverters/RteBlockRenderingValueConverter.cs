@@ -200,10 +200,10 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             return source;
         }
 
-        var blocksByUdi = richTextBlockModel.ToDictionary(block => block.ContentUdi);
+        var blocksByKey = richTextBlockModel.ToDictionary(block => block.ContentKey);
 
         string RenderBlock(Match match) =>
-            UdiParser.TryParse(match.Groups["udi"].Value, out Udi? udi) && blocksByUdi.TryGetValue(udi, out RichTextBlockItem? richTextBlockItem)
+            Guid.TryParse(match.Groups["key"].Value, out Guid key) && blocksByKey.TryGetValue(key, out RichTextBlockItem? richTextBlockItem)
                 ? _partialViewBlockEngine.ExecuteAsync(richTextBlockItem).GetAwaiter().GetResult()
                 : string.Empty;
 
