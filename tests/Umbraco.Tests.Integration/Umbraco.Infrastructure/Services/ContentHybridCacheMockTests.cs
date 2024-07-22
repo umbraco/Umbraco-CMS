@@ -22,10 +22,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class HybridCachingMockTests : UmbracoIntegrationTestWithContent
+public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 {
     private IPublishedContentHybridCache _mockedCache;
     private Mock<INuCacheContentRepository> _mockedNucacheRepository;
+    private IContentCacheService _mockContentCacheService;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
@@ -58,14 +59,33 @@ public class HybridCachingMockTests : UmbracoIntegrationTestWithContent
                 Published = null,
             });
 
-        var mockedContentService = new ContentCacheService(
+        _mockedNucacheRepository.Setup(r => r.GetTypeContentSources(It.IsAny<IReadOnlyCollection<int>?>())).Returns(
+            new List<ContentCacheNode>()
+            {
+                new()
+                {
+                    ContentTypeId = Textpage.ContentTypeId,
+                    CreatorId = Textpage.CreatorId,
+                    CreateDate = Textpage.CreateDate,
+                    Id = Textpage.Id,
+                    Key = Textpage.Key,
+                    SortOrder = 0,
+                    Path = Textpage.Path,
+                    Draft = contentData,
+                    Published = null,
+                },
+            });
+
+        _mockedNucacheRepository.Setup(r => r.DeleteContentItem(It.IsAny<int>()));
+
+        _mockContentCacheService = new ContentCacheService(
             _mockedNucacheRepository.Object,
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<HybridCache>(),
             GetRequiredService<IPublishedContentFactory>());
 
-        _mockedCache = new ContentCache(mockedContentService, GetRequiredService<IIdKeyMap>());
+        _mockedCache = new ContentCache(_mockContentCacheService, GetRequiredService<IIdKeyMap>());
     }
 
     [Test]
@@ -86,6 +106,30 @@ public class HybridCachingMockTests : UmbracoIntegrationTestWithContent
         AssertTextPage(textPage);
         AssertTextPage(textPage2);
         _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>()), Times.Exactly(1));
+    }
+
+    [Test]
+    public async Task Content_Is_Seeded_By_ContentType_By_Id()
+    {
+        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+
+        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentTypeId});
+        var textPage = await _mockedCache.GetById(Textpage.Id, true);
+        AssertTextPage(textPage);
+
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>()), Times.Exactly(0));
+    }
+
+    [Test]
+    public async Task Content_Is_Seeded_By_ContentType_By_Key()
+    {
+        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+
+        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentTypeId});
+        var textPage = await _mockedCache.GetById(Textpage.Key, true);
+        AssertTextPage(textPage);
+
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>()), Times.Exactly(0));
     }
 
     private void AssertTextPage(IPublishedContent textPage)
