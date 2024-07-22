@@ -50,12 +50,6 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 		try {
 			this.#editor = this._codeEditor?.editor;
 
-			this.#editor?.updateOptions({
-				lineNumbers: false,
-				minimap: false,
-				folding: false,
-			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
-
 			// TODO: make all action into extensions
 			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
 				manifests.forEach(async (manifest) => {
@@ -410,6 +404,9 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 			<umb-code-editor
 				language="markdown"
 				.code=${this.value as string}
+				disable-line-numbers
+				disable-minimap
+				disable-folding
 				@input=${this.#onInput}
 				@keypress=${this.#onKeyPress}
 				@loaded=${this.#onCodeEditorLoaded}>
