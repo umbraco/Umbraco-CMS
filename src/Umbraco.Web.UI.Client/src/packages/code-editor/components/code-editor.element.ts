@@ -134,6 +134,14 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	@property({ type: Boolean, attribute: 'word-wrap' })
 	wordWrap = false;
 
+	/**
+	 * Whether to enable folding. Default is true.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'disable-folding' })
+	disableFolding = false;
+
 	@state()
 	private _loading = true;
 
@@ -176,7 +184,8 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			_changedProperties.has('wordWrap') ||
 			_changedProperties.has('readonly') ||
 			_changedProperties.has('code') ||
-			_changedProperties.has('label')
+			_changedProperties.has('label') ||
+			_changedProperties.has('disableFolding')
 		) {
 			this.#editor?.updateOptions(this.#constructorOptions());
 		}
@@ -191,6 +200,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			minimap: !this.disableMinimap,
 			wordWrap: this.wordWrap ? 'on' : 'off',
 			readOnly: this.readonly,
+			folding: !this.disableFolding,
 			value: this.code,
 		};
 	}
