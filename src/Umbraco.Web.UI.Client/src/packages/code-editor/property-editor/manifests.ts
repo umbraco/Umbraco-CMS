@@ -21,14 +21,14 @@ export const manifest: ManifestPropertyEditorUi = {
 						{
 							alias: 'items',
 							value: [
-								{ name: 'JavaScript', value: 'javascript', selected: true },
-								{ name: 'HTML', value: 'html' },
-								{ name: 'TypeScript', value: 'typescript' },
 								{ name: 'C#', value: 'csharp' },
-								{ name: 'Razor', value: 'csharp' },
 								{ name: 'CSS', value: 'css' },
-								{ name: 'Markdown', value: 'markdown' },
+								{ name: 'HTML', value: 'html' },
+								{ name: 'JavaScript', value: 'javascript' },
 								{ name: 'JSON', value: 'json' },
+								{ name: 'Markdown', value: 'markdown' },
+								{ name: 'Razor (CSHTML)', value: 'razor' },
+								{ name: 'TypeScript', value: 'typescript' },
 							],
 						},
 					],
@@ -42,6 +42,7 @@ export const manifest: ManifestPropertyEditorUi = {
 				},
 			],
 			defaultData: [
+				{ alias: 'language', value: 'javascript' },
 				{ alias: 'height', value: 400 },
 			],
 		},
