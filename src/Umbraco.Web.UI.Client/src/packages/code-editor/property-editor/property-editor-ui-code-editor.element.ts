@@ -21,6 +21,15 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	@state()
 	private _height = 400;
 
+	@state()
+	private _lineNumbers = true;
+
+	@state()
+	private _minimap = true;
+
+	@state()
+	private _wordWrap = false;
+
 	@property()
 	value = '';
 
@@ -30,6 +39,9 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 
 		this._language = config?.getValueByAlias<CodeEditorLanguage>('language') ?? this.#defaultLanguage;
 		this._height = Number(config?.getValueByAlias('height')) || 400;
+		this._lineNumbers = config?.getValueByAlias('lineNumbers') ?? false;
+		this._minimap = config?.getValueByAlias('minimap') ?? false;
+		this._wordWrap = config?.getValueByAlias('wordWrap') ?? false;
 	}
 
 	#onChange(event: UmbInputEvent & { target: UmbCodeEditorElement }) {
@@ -44,6 +56,9 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 				style=${styleMap({ height: `${this._height}px` })}
 				.language=${this._language ?? this.#defaultLanguage}
 				.code=${this.value ?? ''}
+				?disable-line-numbers=${!this._lineNumbers}
+				?disable-minimap=${!this._minimap}
+				?word-wrap=${this._wordWrap}
 				@input=${this.#onChange}>
 			</umb-code-editor>
 		`;

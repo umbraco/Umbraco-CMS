@@ -2538,5 +2538,12 @@ export default {
 		languageConfigDescription: 'Vælg sprog til syntax highlighting og IntelliSense.',
 		heightConfigLabel: 'Højde',
 		heightConfigDescription: 'Indstil højden på editorvinduet i pixels.',
+		lineNumbersConfigLabel: 'Linjenumre',
+		lineNumbersConfigDescription: 'Vis linjenumre i editorvinduet.',
+		minimapConfigLabel: 'Minimap',
+		minimapConfigDescription: 'Vis en minimap i editorvinduet.',
+		wordWrapConfigLabel: 'Ordbrydning',
+		wordWrapConfigDescription:
+			'Slå ordbrydning til eller fra, så tekst automatisk brydes ved vinduets kant i stedet for at skabe en horisontal scrollbar.',
 	},
 } as UmbLocalizationDictionary;

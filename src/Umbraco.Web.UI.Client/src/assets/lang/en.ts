@@ -2610,5 +2610,11 @@ export default {
 		languageConfigDescription: 'Select the language for syntax highlighting and IntelliSense.',
 		heightConfigLabel: 'Height',
 		heightConfigDescription: 'Set the height of the code editor in pixels.',
+		lineNumbersConfigLabel: 'Line numbers',
+		lineNumbersConfigDescription: 'Show line numbers in the code editor.',
+		minimapConfigLabel: 'Minimap',
+		minimapConfigDescription: 'Show a minimap in the code editor.',
+		wordWrapConfigLabel: 'Word wrap',
+		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 } as UmbLocalizationDictionary;
