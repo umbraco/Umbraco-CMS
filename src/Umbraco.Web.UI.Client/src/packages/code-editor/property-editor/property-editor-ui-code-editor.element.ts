@@ -1,13 +1,11 @@
-import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
 import type { CodeEditorLanguage } from '../models/index.js';
-import { html, customElement, property, state, css, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
+import { css, customElement, html, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
+import { UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
-import type { UmbInputEvent } from '@umbraco-cms/backoffice/event';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import '../components/code-editor.element.js';
 
@@ -34,18 +32,21 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 		this._height = Number(config?.getValueByAlias('height')) || 400;
 	}
 
-	#onChange(e: UmbInputEvent) {
-		const target = e.target as UmbCodeEditorElement;
-		this.value = target.code as string;
+	#onChange(event: UmbInputEvent & { target: UmbCodeEditorElement }) {
+		if (!(event instanceof UmbInputEvent)) return;
+		this.value = event.target.code;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	override render() {
-		return html`<umb-code-editor
-			style=${styleMap({ height: `${this._height}px` })}
-			.code=${this.value ?? ''}
-			@input=${this.#onChange}></umb-code-editor>`;
+		return html`
+			<umb-code-editor
+				style=${styleMap({ height: `${this._height}px` })}
 				.language=${this._language ?? this.#defaultLanguage}
+				.code=${this.value ?? ''}
+				@input=${this.#onChange}>
+			</umb-code-editor>
+		`;
 	}
 
 	static override styles = [
@@ -58,7 +59,7 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	];
 }
 
-export default UmbPropertyEditorUICodeEditorElement;
+export { UmbPropertyEditorUICodeEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
