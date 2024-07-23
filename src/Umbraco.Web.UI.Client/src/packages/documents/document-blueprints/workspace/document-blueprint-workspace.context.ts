@@ -139,10 +139,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 				},
 			},
 			{
-				path: 'edit/null',
-				component: () => import('./document-blueprint-root-workspace.element.js'),
-			},
-			{
 				path: 'edit/:unique',
 				component: () => import('./document-blueprint-workspace-editor.element.js'),
 				setup: (_component, info) => {

@@ -22,10 +22,9 @@ const workspace: ManifestWorkspace = {
 
 const rootWorkspace: ManifestWorkspace = {
 	type: 'workspace',
-	kind: 'routable',
 	alias: 'Umb.Workspace.DocumentBlueprint.Root',
 	name: 'Document Blueprint Root Workspace',
-	api: () => import('./document-blueprint-workspace.context.js'),
+	element: () => import('./document-blueprint-root-workspace.element.js'),
 	meta: {
 		entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
 	},
