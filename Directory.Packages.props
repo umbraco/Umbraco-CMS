@@ -33,7 +33,7 @@
     <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0-preview.5.24306.7" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0-preview.5.24306.7" />
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.5.24306.11"/>
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.6.24328.4" />
   </ItemGroup>
   <!-- Umbraco packages -->
   <ItemGroup>
