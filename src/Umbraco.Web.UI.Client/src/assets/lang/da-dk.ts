@@ -328,8 +328,9 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Opret en ny indholdsskabelon fra <em>%0%</em>',
-		createBlueprintFolderUnder: 'Opret en ny mappe under "%0%"',
+		createBlueprintFrom: "Opret en ny indholdsskabelon fra '%0%'",
+		createBlueprintItemUnder: "Opret en ny indholdsskabelon under '%0%'",
+		createBlueprintFolderUnder: "Opret en ny mappe under '%0%'",
 		blankBlueprint: 'Blank',
 		selectBlueprint: 'Vælg en indholdsskabelon',
 		createdBlueprintHeading: 'Indholdsskabelon oprettet',

@@ -343,8 +343,9 @@ export default {
 		selectAllVariants: 'Select all variants',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Create a new Document Blueprint from <em>%0%</em>',
-		createBlueprintFolderUnder: 'Create a new folder under "%0%"',
+		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
+		createBlueprintItemUnder: "Create a new item under '%0%'",
+		createBlueprintFolderUnder: "Create a new folder under '%0%'",
 		blankBlueprint: 'Blank',
 		selectBlueprint: 'Select a Document Blueprint',
 		createdBlueprintHeading: 'Document Blueprint created',

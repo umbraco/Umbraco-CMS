@@ -39,7 +39,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 			entityType: this.data.parent.entityType,
 			meta: {
 				icon: 'icon-folder',
-				label: 'New Folder...',
+				label: this.localize.term('create_newFolder'),
 				folderRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
 			},
 		});
@@ -68,13 +68,13 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
 				<uui-box headline=${this.localize.term('blueprints_createBlueprintFolderUnder', this._parentName)}>
-					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">
+					<uui-menu-item @click=${this.#onCreateFolderClick} label=${this.localize.term('create_newFolder') + '...'}>
 						<uui-icon slot="icon" name="icon-folder"></uui-icon>
 					</uui-menu-item>
 				</uui-box>
-				<uui-box headline="Create an item under Content Templates">
+				<uui-box headline=${this.localize.term('blueprints_createBlueprintItemUnder', this._parentName)}>
 					<umb-localize key="create_createContentBlueprint">
-						Select the Document Type you want to make a content blueprint for
+						Select the Document Type you want to make a Document Blueprint for
 					</umb-localize>
 					<umb-tree
 						alias="Umb.Tree.DocumentType"
@@ -84,7 +84,11 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 						}}
 						@selected=${this.#onSelected}></umb-tree>
 				</uui-box>
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('buttons_confirmActionCancel')}
+					@click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>
 		`;
 	}
