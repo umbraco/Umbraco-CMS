@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# Taken from: https://github.com/CarlSargunar/Umbraco-Docker-Workshop
 if [ "$1" = '/opt/mssql/bin/sqlservr' ]; then
   # If this is the container's first run, initialize the application database
   if [ ! -f /tmp/app-initialized ]; then

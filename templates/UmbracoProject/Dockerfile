@@ -24,8 +24,8 @@ RUN dotnet publish "UmbracoProject.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# We need to make sure that the user running the app has access to the wwwroot and umbraco folder
-# Since these are volumes they are created as root by the docker daemon
+# We need to make sure that the user running the app has write access to the umbraco folder, in order to write logs and other files.
+# Since these are volumes they are created as root by the docker daemon.
 USER root
 RUN mkdir umbraco
 RUN mkdir umbraco/Logs
