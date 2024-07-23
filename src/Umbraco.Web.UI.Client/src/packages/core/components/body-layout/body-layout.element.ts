@@ -18,6 +18,7 @@ import {
  * @slot - Slot for main content
  * @slot icon - Slot for icon
  * @slot name - Slot for name
+ * @slot header - Slot for header element
  * @slot footer - Slot for footer element
  * @slot footer-info - Slot for info in the footer
  * @slot actions - Slot for actions in the footer
