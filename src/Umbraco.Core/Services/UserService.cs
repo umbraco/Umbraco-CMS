@@ -2478,6 +2478,46 @@ internal class UserService : RepositoryService, IUserService
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
     }
 
+    public async Task<bool> AddClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
+        if (currentClientIds.Contains(clientId))
+        {
+            return false;
+        }
+
+        // TODO KJA: ensure that this is an "API" user
+        IUser? user = await GetAsync(userKey);
+        if (user is null)
+        {
+            return false;
+        }
+
+        _userRepository.AddClientId(user.Id, clientId);
+
+        return true;
+    }
+
+    public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.RemoveClientId(userId, clientId);
+    }
+
+    public Task<IUser?> FindByClientIdAsync(string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IUser? user = _userRepository.GetByClientId(clientId);
+
+        // TODO KJA: return null if this is not an "API" user
+        return Task.FromResult(user);
+    }
+
     /// <summary>
     ///     This performs the calculations for inherited nodes based on this
     ///     http://issues.umbraco.org/issue/U4-10075#comment=67-40085
