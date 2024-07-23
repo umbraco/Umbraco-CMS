@@ -75,6 +75,11 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	#onChange(event: CustomEvent & { target: UmbInputDateElement }) {
 		let value = event.target.value.toString();
 
+		if (!value) {
+			this.#syncValue(undefined);
+			return;
+		}
+
 		switch (this._inputType) {
 			case 'time':
 				value = `0001-01-01 ${value}`;
@@ -120,7 +125,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		}
 	}
 
-	#syncValue(value: string) {
+	#syncValue(value?: string) {
 		const valueHasChanged = this.value !== value;
 		if (valueHasChanged) {
 			this.value = value;
