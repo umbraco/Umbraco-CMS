@@ -124,7 +124,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 
 	onChangeState = () => {
 		const searchQuery = query();
-		this.setFilterExpression(searchQuery.lq);
+		this.setFilterExpression(searchQuery.lq ?? '');
 
 		let validLogLevels: LogLevelModel[] = [];
 		if (searchQuery.loglevels) {
