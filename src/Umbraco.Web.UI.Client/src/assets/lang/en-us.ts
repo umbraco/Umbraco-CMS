@@ -336,6 +336,7 @@ export default {
 	},
 	blueprints: {
 		createBlueprintFrom: 'Create a new Document Blueprint from <em>%0%</em>',
+		createBlueprintFolderUnder: 'Create a new folder under "%0%"',
 		blankBlueprint: 'Blank',
 		selectBlueprint: 'Select a Document Blueprint',
 		createdBlueprintHeading: 'Document Blueprint created',
@@ -384,7 +385,7 @@ export default {
 	create: {
 		chooseNode: 'Where do you want to create the new %0%',
 		createUnder: 'Create an item under',
-		createContentBlueprint: 'Select the Document Type you want to make a content blueprint for',
+		createContentBlueprint: 'Select the Document Type you want to make a Document Blueprint for',
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
@@ -1372,7 +1373,7 @@ export default {
 		editMultiContentPublishedText: '%0% documents published and visible on the website',
 		editVariantPublishedText: '%0% published and visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
-		editBlueprintSavedHeader: 'Content Blueprint saved',
+		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
 		editContentSavedHeader: 'Content saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
@@ -1785,7 +1786,7 @@ export default {
 	},
 	treeHeaders: {
 		content: 'Content',
-		contentBlueprints: 'Content Blueprints',
+		contentBlueprints: 'Document Blueprints',
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Recycle Bin',
@@ -2177,7 +2178,7 @@ export default {
 		protectDescription: 'Setup access restrictions on %0%',
 		rightsDescription: 'Setup Permissions on %0%',
 		sortDescription: 'Change sort order for %0%',
-		createblueprintDescription: 'Create Content Blueprint based on %0%',
+		createblueprintDescription: 'Create Document Blueprint based on %0%',
 		openContextMenu: 'Open context menu for',
 		currentLanguage: 'Current language',
 		switchLanguage: 'Switch language to',
@@ -2483,15 +2484,15 @@ export default {
 		addColumnSpanOption: 'Add spanning %0% columns option',
 	},
 	contentTemplatesDashboard: {
-		whatHeadline: 'What are Content Blueprints?',
+		whatHeadline: 'What are Document Blueprints?',
 		whatDescription:
-			'Content Blueprints are pre-defined content that can be selected when creating a new content node.',
-		createHeadline: 'How do I create a Content Blueprint?',
+			'Document Blueprints are pre-defined content that can be selected when creating a new content node.',
+		createHeadline: 'How do I create a Document Blueprint?',
 		createDescription:
-			'<p>There are two ways to create a Content Blueprint:</p><ul><li>Right-click a content node and select "Create Content Blueprint" to create a new Content Blueprint.</li><li>Right-click the Content Blueprints tree in the Settings section and select the Document Type you want to create a Content Blueprint for.</li></ul><p>Once given a name, editors can start using the Content Blueprint as a foundation for their new page.</p>',
-		manageHeadline: 'How do I manage Content Blueprints?',
+			'<p>There are two ways to create a Document Blueprint:</p><ul><li>Right-click a content node and select "Create Document Blueprint" to create a new Document Blueprint.</li><li>Right-click the Document Blueprints tree in the Settings section and select the Document Type you want to create a Document Blueprint for.</li></ul><p>Once given a name, editors can start using the Document Blueprint as a foundation for their new page.</p>',
+		manageHeadline: 'How do I manage Document Blueprints?',
 		manageDescription:
-			'You can edit and delete Content Blueprints from the "Content Blueprints" tree in the Settings section. Expand the Document Type which the Content Blueprint is based on and click it to edit or delete it.',
+			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete it.',
 	},
 	preview: {
 		endLabel: 'End',

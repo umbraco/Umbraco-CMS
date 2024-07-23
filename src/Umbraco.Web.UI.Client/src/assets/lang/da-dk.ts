@@ -329,6 +329,7 @@ export default {
 	},
 	blueprints: {
 		createBlueprintFrom: 'Opret en ny indholdsskabelon fra <em>%0%</em>',
+		createBlueprintFolderUnder: 'Opret en ny mappe under "%0%"',
 		blankBlueprint: 'Blank',
 		selectBlueprint: 'Vælg en indholdsskabelon',
 		createdBlueprintHeading: 'Indholdsskabelon oprettet',
@@ -2109,7 +2110,7 @@ export default {
 		protectDescription: 'Opsæt offentlig adgang på %0%',
 		rightsDescription: 'Opsæt rettigheder på %0%',
 		sortDescription: 'Juster soterings rækkefølgen for %0%',
-		createblueprintDescription: 'Opret indholds skabelon baseret på %0%',
+		createblueprintDescription: 'Opret indholdsskabelon baseret på %0%',
 		openContextMenu: 'Åben kontext menu for',
 		currentLanguage: 'Aktivt sprog',
 		switchLanguage: 'Skift sprog til',
