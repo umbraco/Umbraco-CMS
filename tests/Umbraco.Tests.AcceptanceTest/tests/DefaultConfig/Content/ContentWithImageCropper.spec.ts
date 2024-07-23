@@ -75,7 +75,6 @@ test('can create content with the custom image cropper data type', async ({umbra
   const customDataTypeName = 'CustomImageCropper';
   const cropValue = ['TestCropLabel', 100, 50];
   const customDataTypeId = await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropValue[0], cropValue[1], cropValue[2]);
-  console.log(customDataTypeId);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
