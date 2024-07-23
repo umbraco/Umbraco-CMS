@@ -70,7 +70,7 @@ export function queryString(): string {
  * @returns Params
  */
 export function query(): Query {
-	return toQuery(queryString().substr(1));
+	return toQuery(queryString().substring(1));
 }
 
 /**
