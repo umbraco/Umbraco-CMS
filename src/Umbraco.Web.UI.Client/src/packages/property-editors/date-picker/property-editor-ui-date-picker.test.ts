@@ -98,5 +98,14 @@ describe('UmbPropertyEditorUIDatePickerElement', () => {
 			await element.updateComplete;
 			expect(element.value).to.equal('0001-01-01 10:44:00');
 		});
+
+		it('should be able to clear the value', async () => {
+			element.value = '2024-05-03 10:44:00';
+			await element.updateComplete;
+			inputElement.value = '';
+			inputElement.dispatchEvent(new CustomEvent('change'));
+			await element.updateComplete;
+			expect(element.value).to.be.undefined;
+		});
 	});
 });
