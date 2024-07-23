@@ -1,7 +1,6 @@
-export { UmbCodeEditorElement } from './code-editor.element.js';
-export { UmbCodeEditorLoadedEvent } from './code-editor-loaded.event.js';
+export * from './components/index.js';
+export * from './models/index.js';
 export type { UmbCodeEditorController } from './code-editor.controller.js';
-export type * from './code-editor.model.js';
 
 /**
  * @deprecated Use `import from '@umbraco-cms/backoffice/code-editor';` directly.

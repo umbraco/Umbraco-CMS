@@ -4,7 +4,7 @@ import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent, type UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -36,7 +36,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 
 	#editor?: UmbCodeEditorController;
 
-	@query('umb-code-editor', true)
+	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
 	@state()
@@ -49,12 +49,6 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 
 		try {
 			this.#editor = this._codeEditor?.editor;
-
-			this.#editor?.updateOptions({
-				lineNumbers: false,
-				minimap: false,
-				folding: false,
-			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
 
 			// TODO: make all action into extensions
 			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
@@ -398,9 +392,9 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 		}
 	}
 
-	#onInput(e: CustomEvent) {
+	#onInput(e: UmbInputEvent) {
 		e.stopPropagation();
-		this.value = this.#editor?.monacoEditor?.getValue() ?? '';
+		this.value = this.#editor?.value ?? '';
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -410,6 +404,9 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 			<umb-code-editor
 				language="markdown"
 				.code=${this.value as string}
+				disable-line-numbers
+				disable-minimap
+				disable-folding
 				@input=${this.#onInput}
 				@keypress=${this.#onKeyPress}
 				@loaded=${this.#onCodeEditorLoaded}>

@@ -1,7 +1,12 @@
-import type { UmbCodeEditorController } from './code-editor.controller.js';
-import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } from './code-editor.model.js';
-import { CodeEditorTheme } from './code-editor.model.js';
-import { UmbCodeEditorLoadedEvent } from './code-editor-loaded.event.js';
+import type { UmbCodeEditorController } from '../code-editor.controller.js';
+import {
+	type CodeEditorConstructorOptions,
+	CodeEditorTheme,
+	UmbCodeEditorLoadedEvent,
+	type CodeEditorLanguage,
+	type CodeEditorSearchOptions,
+	type UmbCodeEditorHost,
+} from '../models/index.js';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import type { PropertyValues, Ref } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -48,6 +53,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	get editor() {
 		return this.#editor;
 	}
+
 	/**
 	 * Theme of the editor. Default is light. Element will listen to the theme context and update the theme accordingly.
 	 *
@@ -56,6 +62,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	 */
 	@property()
 	theme: CodeEditorTheme = CodeEditorTheme.Light;
+
 	/**
 	 * Language of the editor. Default is javascript.
 	 *
@@ -64,16 +71,18 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	 */
 	@property()
 	language: CodeEditorLanguage = 'javascript';
+
 	/**
 	 * Label of the editor. Default is 'Code Editor'.
 	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property()
-	label = 'Code Editor';
+	label?: string;
 
 	//TODO - this should be called a value
 	#code = '';
+
 	/**
 	 * Value of the editor. Default is empty string.
 	 *
@@ -93,13 +102,46 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		}
 		this.requestUpdate('code', oldValue);
 	}
+
 	/**
-	 * Whether the editor is readonly. Default is false.
+	 * Whether the editor is readonly.
 	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property({ type: Boolean, attribute: 'readonly' })
 	readonly = false;
+
+	/**
+	 * Whether to show line numbers.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'disable-line-numbers' })
+	disableLineNumbers = false;
+
+	/**
+	 * Whether to show minimap.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'disable-minimap' })
+	disableMinimap = false;
+
+	/**
+	 * Whether to enable word wrap. Default is false.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'word-wrap' })
+	wordWrap = false;
+
+	/**
+	 * Whether to enable folding. Default is true.
+	 *
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'disable-folding' })
+	disableFolding = false;
 
 	@state()
 	private _loading = true;
@@ -125,20 +167,43 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		const { styles } = await import('@umbraco-cms/backoffice/external/monaco-editor');
 		this._styles = styles;
 
-		const controller = (await import('./code-editor.controller.js')).default;
-		this.#editor = new controller(this);
+		const { UmbCodeEditorController } = await import('../code-editor.controller.js');
+
+		// Options
+		this.#editor = new UmbCodeEditorController(this, this.#constructorOptions());
 
 		this._loading = false;
 		this.dispatchEvent(new UmbCodeEditorLoadedEvent());
 	}
 
 	protected override updated(_changedProperties: PropertyValues<this>): void {
-		if (_changedProperties.has('theme') || _changedProperties.has('language')) {
-			this.#editor?.updateOptions({
-				theme: this.theme,
-				language: this.language,
-			});
+		if (
+			_changedProperties.has('theme') ||
+			_changedProperties.has('language') ||
+			_changedProperties.has('disableLineNumbers') ||
+			_changedProperties.has('disableMinimap') ||
+			_changedProperties.has('wordWrap') ||
+			_changedProperties.has('readonly') ||
+			_changedProperties.has('code') ||
+			_changedProperties.has('label') ||
+			_changedProperties.has('disableFolding')
+		) {
+			this.#editor?.updateOptions(this.#constructorOptions());
 		}
+	}
+
+	#constructorOptions(): CodeEditorConstructorOptions {
+		return {
+			language: this.language,
+			theme: this.theme,
+			ariaLabel: this.label ?? this.localize.term('codeEditor_label'),
+			lineNumbers: !this.disableLineNumbers,
+			minimap: !this.disableMinimap,
+			wordWrap: this.wordWrap ? 'on' : 'off',
+			readOnly: this.readonly,
+			folding: !this.disableFolding,
+			value: this.code,
+		};
 	}
 
 	#translateTheme(theme: string) {

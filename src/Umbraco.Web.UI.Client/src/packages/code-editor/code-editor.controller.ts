@@ -8,10 +8,11 @@ import type {
 	UmbCodeEditorHost,
 	UmbCodeEditorRange,
 	UmbCodeEditorSelection,
-} from './code-editor.model.js';
+} from './models/code-editor.model.js';
 import { themes } from './themes/index.js';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 //TODO - consider firing change event on blur
 
@@ -27,9 +28,11 @@ import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
  * @export
  * @class UmbCodeEditor
  */
-export class UmbCodeEditorController {
+export class UmbCodeEditorController extends UmbControllerBase {
 	#host: UmbCodeEditorHost;
+
 	#editor?: monaco.editor.IStandaloneCodeEditor;
+
 	/**
 	 * The monaco editor object. This is the actual monaco editor object. It is exposed for advanced usage, but mind the fact that editor might be swapped in the future for a different library, so use on your own responsibility. For more information see [monaco editor API](https://microsoft.github.io/monaco-editor/docs.html#interfaces/editor.IStandaloneCodeEditor.html).
 	 *
@@ -41,6 +44,7 @@ export class UmbCodeEditorController {
 	}
 
 	#options: CodeEditorConstructorOptions = {};
+
 	/**
 	 * The options used to create the editor.
 	 *
@@ -63,6 +67,7 @@ export class UmbCodeEditorController {
 	};
 
 	#position: UmbCodeEditorCursorPosition | null = null;
+
 	/**
 	 * Provides the current position of the cursor.
 	 *
@@ -72,7 +77,9 @@ export class UmbCodeEditorController {
 	get position() {
 		return this.#position;
 	}
+
 	#secondaryPositions: UmbCodeEditorCursorPosition[] = [];
+
 	/**
 	 * Provides positions of all the secondary cursors.
 	 *
@@ -102,6 +109,7 @@ export class UmbCodeEditorController {
 			this.#editor.setValue(newValue ?? '');
 		}
 	}
+
 	/**
 	 * Provides the current model of the editor. For advanced usage. Bare in mind that in case of the monaco library being swapped in the future, this might not be available. For more information see [monaco editor model API](https://microsoft.github.io/monaco-editor/docs.html#interfaces/editor.ITextModel.html).
 	 *
@@ -112,6 +120,7 @@ export class UmbCodeEditorController {
 		if (!this.#editor) return null;
 		return this.#editor.getModel();
 	}
+
 	/**
 	 * Creates an instance of UmbCodeEditor. You should instantiate this class through the `UmbCodeEditorHost` interface and that should happen when inside DOM nodes of the host container are available, otherwise the editor will not be able to initialize, for example in lit `firstUpdated` lifecycle hook. It will make host emit change and input events when the value of the editor changes.
 	 * @param {UmbCodeEditorHost} host
@@ -119,6 +128,7 @@ export class UmbCodeEditorController {
 	 * @memberof UmbCodeEditor
 	 */
 	constructor(host: UmbCodeEditorHost, options?: CodeEditorConstructorOptions) {
+		super(host);
 		this.#options = { ...options };
 		this.#host = host;
 		this.#registerThemes();
@@ -185,14 +195,7 @@ export class UmbCodeEditorController {
 
 		const mergedOptions = { ...this.#defaultMonacoOptions, ...this.#mapOptions(options) };
 
-		this.#editor = monaco.editor.create(this.#host.container, {
-			...mergedOptions,
-			value: this.#host.code ?? '',
-			language: this.#host.language,
-			theme: this.#host.theme,
-			readOnly: this.#host.readonly,
-			ariaLabel: this.#host.label,
-		});
+		this.#editor = monaco.editor.create(this.#host.container, mergedOptions);
 
 		this.#initiateEvents();
 	}
@@ -378,5 +381,3 @@ export class UmbCodeEditorController {
 		});
 	}
 }
-
-export default UmbCodeEditorController;
