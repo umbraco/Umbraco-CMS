@@ -61,7 +61,7 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
     /// <inheritdoc />
     protected override IEnumerable<IAuditEntry> PerformGetAll(params int[]? ids)
     {
-        if (ids?.Length == 0)
+        if (ids == null || ids.Length == 0)
         {
             Sql<ISqlContext> sql = Sql()
                 .Select<AuditEntryDto>()

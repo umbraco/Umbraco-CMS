@@ -35,7 +35,7 @@ internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
     /// <inheritdoc />
     protected override IEnumerable<ITag> PerformGetAll(params int[]? ids)
     {
-        IEnumerable<TagDto> dtos = ids?.Length == 0
+        IEnumerable<TagDto> dtos = (ids == null || ids.Length == 0)
             ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
             : Database.FetchByGroups<TagDto, int>(ids!, Constants.Sql.MaxParameterCount,
                 batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
@@ -171,12 +171,12 @@ WHERE r.tagId IS NULL";
     public void RemoveAll(int contentId, int propertyTypeId) =>
         Database.Execute(
             "DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId",
-            new {nodeId = contentId, propertyTypeId});
+            new { nodeId = contentId, propertyTypeId });
 
     /// <inheritdoc />
     public void RemoveAll(int contentId) =>
         Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
-            new {nodeId = contentId});
+            new { nodeId = contentId });
 
     // this is a clever way to produce an SQL statement like this:
     //

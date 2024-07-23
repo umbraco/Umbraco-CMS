@@ -361,7 +361,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
 
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
-            var ltemp = new List<TempContent<Content>> {temp};
+            var ltemp = new List<TempContent<Content>> { temp };
             IDictionary<int, PropertyCollection> properties = GetPropertyCollections(ltemp);
             content.Properties = properties[dto.DocumentVersionDto.Id];
 
@@ -450,7 +450,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             variation.Add(new ContentVariation
             {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId), Name = dto.Name, Date = dto.UpdateDate
+                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
+                Name = dto.Name,
+                Date = dto.UpdateDate
             });
         }
 
@@ -480,7 +482,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             variation.Add(new DocumentVariation
             {
-                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId), Edited = dto.Edited
+                Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
+                Edited = dto.Edited
             });
         }
 
@@ -814,7 +817,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 .Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
         );
         DocumentVersionDto? versionDto =
-            Database.Fetch<DocumentVersionDto>(template.Sql(new {versionId})).FirstOrDefault();
+            Database.Fetch<DocumentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
 
         // nothing to delete
         if (versionDto == null)
@@ -853,7 +856,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 .Where<DocumentVersionDto>(x => !x.Published)
         );
         List<ContentVersionDto>? versionDtos =
-            Database.Fetch<ContentVersionDto>(template.Sql(new {nodeId, versionDate}));
+            Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
         foreach (ContentVersionDto? versionDto in versionDtos)
         {
             PerformDeleteVersion(versionDto.NodeId, versionDto.Id);
@@ -862,10 +865,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new {versionId});
-        Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new {versionId});
-        Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new {versionId});
-        Database.Delete<ContentVersionDto>("WHERE id = @versionId", new {versionId});
+        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
+        Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
+        Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
+        Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
     }
 
     #endregion
@@ -1686,7 +1689,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             // content varies by culture
             // then it must have at least a variant name, else it makes no sense
-            if (content.CultureInfos?.Count == 0)
+            if ((content.CultureInfos == null || content.CultureInfos.Count == 0))
             {
                 throw new InvalidOperationException("Cannot save content with an empty name.");
             }
@@ -1731,7 +1734,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     private void EnsureVariantNamesAreUnique(IContent content, bool publishing)
     {
-        if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos?.Count == 0)
+        if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || (content.CultureInfos == null || content.CultureInfos.Count == 0))
         {
             return;
         }
@@ -1771,7 +1774,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             // get a unique name
             IEnumerable<SimilarNodeName> otherNames =
-                cultureNames.Select(x => new SimilarNodeName {Id = x.Id, Name = x.Name});
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
             var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))

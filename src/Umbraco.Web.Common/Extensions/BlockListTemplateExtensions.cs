@@ -14,7 +14,7 @@ public static class BlockListTemplateExtensions
 
     public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, BlockListModel? model, string template = DefaultTemplate)
     {
-        if (model?.Count == 0)
+        if (model == null || model.Count == 0)
         {
             return new HtmlString(string.Empty);
         }
@@ -39,7 +39,7 @@ public static class BlockListTemplateExtensions
 
     public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, BlockListModel? model, string template = DefaultTemplate)
     {
-        if (model?.Count == 0)
+        if (model == null || model.Count == 0)
         {
             return new HtmlString(string.Empty);
         }

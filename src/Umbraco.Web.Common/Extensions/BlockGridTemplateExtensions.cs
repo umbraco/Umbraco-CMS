@@ -33,7 +33,7 @@ public static class BlockGridTemplateExtensions
     /// <seealso href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/property-editors/built-in-umbraco-property-editors/block-editor/block-grid-editor#1.-default-rendering"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, BlockGridModel? model, string template = DefaultTemplate)
     {
-        if (model?.Count == 0)
+        if (model == null || model.Count == 0)
         {
             return new HtmlString(string.Empty);
         }
@@ -82,7 +82,7 @@ public static class BlockGridTemplateExtensions
     /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static IHtmlContent GetBlockGridHtml(this IHtmlHelper html, BlockGridModel? model, string template = DefaultTemplate)
     {
-        if (model?.Count == 0)
+        if (model == null || model.Count == 0)
         {
             return new HtmlString(string.Empty);
         }

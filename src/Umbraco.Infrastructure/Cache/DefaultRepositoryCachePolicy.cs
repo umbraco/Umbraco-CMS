@@ -250,7 +250,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
     protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
     {
-        if (ids?.Length == 0 && entities?.Length == 0 && _options.GetAllCacheAllowZeroCount)
+        if ((ids == null || ids.Length == 0) && (entities == null || entities.Length == 0) && _options.GetAllCacheAllowZeroCount)
         {
             // getting all of them, and finding nothing.
             // if we can cache a zero count, cache an empty array,

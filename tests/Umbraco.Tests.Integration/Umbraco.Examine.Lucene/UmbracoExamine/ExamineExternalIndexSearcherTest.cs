@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -9,12 +9,10 @@ using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -365,7 +363,7 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
             AppendPath(sb, entityPath.Path, false);
             sb.Append(" ");
         }
-        else if (startNodeIds?.Length == 0)
+        else if (startNodeIds == null || startNodeIds.Length == 0)
         {
             // make sure we don't find anything
             sb.Append("+__Path:none ");

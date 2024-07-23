@@ -1476,7 +1476,7 @@ public class ContentService : RepositoryService, IContentService
 
                 // Check if a culture has been unpublished and if there are no cultures left, and then unpublish document as a whole
                 if (publishResult.Result == PublishResultType.SuccessUnpublishCulture &&
-                    content.PublishCultureInfos?.Count == 0)
+                    (content.PublishCultureInfos == null || content.PublishCultureInfos.Count == 0))
                 {
                     // This is a special case! We are unpublishing the last culture and to persist that we need to re-publish without any cultures
                     // so the state needs to remain Publishing to do that. However, we then also need to unpublish the document and to do that
@@ -3106,7 +3106,7 @@ public class ContentService : RepositoryService, IContentService
                     "Internal error, variesByCulture but culturesPublishing is null.");
             }
 
-            if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing?.Count == 0)
+            if (content.Published && culturesPublishing.Count == 0 && (culturesUnpublishing == null || culturesUnpublishing.Count == 0))
             {
                 // no published cultures = cannot be published
                 // This will occur if for example, a culture that is already unpublished is sent to be unpublished again, or vice versa, in that case
@@ -3254,7 +3254,7 @@ public class ContentService : RepositoryService, IContentService
         // if this is a variant then we need to log which cultures have been published/unpublished and return an appropriate result
         if (content.ContentType.VariesByCulture())
         {
-            if (content.Published && culturesUnpublishing?.Count == 0 && culturesPublishing?.Count == 0)
+            if (content.Published && (culturesUnpublishing == null || culturesUnpublishing.Count == 0) && (culturesPublishing == null || culturesPublishing.Count == 0))
             {
                 return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
             }
@@ -3282,7 +3282,7 @@ public class ContentService : RepositoryService, IContentService
                 return new PublishResult(PublishResultType.SuccessMixedCulture, evtMsgs, content);
             }
 
-            if (culturesUnpublishing?.Count > 0 && culturesPublishing?.Count == 0)
+            if (culturesUnpublishing?.Count > 0 && (culturesPublishing == null || culturesPublishing.Count == 0))
             {
                 return new PublishResult(PublishResultType.SuccessUnpublishCulture, evtMsgs, content);
             }

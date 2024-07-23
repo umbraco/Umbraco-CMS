@@ -371,7 +371,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             AppendPath(sb, entityPath.Path, false);
             sb.Append(" ");
         }
-        else if (startNodeIds?.Length == 0)
+        else if (startNodeIds == null || startNodeIds.Length == 0)
         {
             // make sure we don't find anything
             sb.Append("+__Path:none ");

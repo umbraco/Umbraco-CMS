@@ -74,7 +74,7 @@ public class ContentPermissions
     public ContentAccess CheckPermissions(
         IContent content,
         IUser user,
-        string permissionToCheck) => CheckPermissions(content, user, new HashSet<string>(){ permissionToCheck });
+        string permissionToCheck) => CheckPermissions(content, user, new HashSet<string>() { permissionToCheck });
 
     [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
@@ -114,7 +114,7 @@ public class ContentPermissions
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
         IUser? user,
-        string permissionToCheck) => CheckPermissions(entity, user, new HashSet<string>(){ permissionToCheck });
+        string permissionToCheck) => CheckPermissions(entity, user, new HashSet<string>() { permissionToCheck });
 
     [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
@@ -304,20 +304,20 @@ public class ContentPermissions
         hasPathAccess = false;
 
         // check for no access
-        if (startNodeIds?.Length == 0)
+        if (startNodeIds == null || startNodeIds.Length == 0)
         {
             return false;
         }
 
         // check for root access
-        if (startNodeIds?.Contains(Constants.System.Root) ?? false)
+        if (startNodeIds.Contains(Constants.System.Root))
         {
             hasPathAccess = true;
             return true;
         }
 
         // is it self?
-        var self = startNodePaths?.Any(x => x == path) ?? false;
+        var self = startNodePaths != null && !startNodePaths.Any(x => x == path);
         if (self)
         {
             hasPathAccess = true;
@@ -325,7 +325,7 @@ public class ContentPermissions
         }
 
         // is it ancestor?
-        var ancestor = startNodePaths?.Any(x => x.StartsWith(path)) ?? false;
+        var ancestor = startNodePaths != null && startNodePaths.Any(x => x.StartsWith(path));
         if (ancestor)
         {
             // hasPathAccess = false;
@@ -333,7 +333,7 @@ public class ContentPermissions
         }
 
         // is it descendant?
-        var descendant = startNodePaths?.Any(x => path.StartsWith(x)) ?? false;
+        var descendant = startNodePaths != null && startNodePaths.Any(x => path.StartsWith(x));
         if (descendant)
         {
             hasPathAccess = true;

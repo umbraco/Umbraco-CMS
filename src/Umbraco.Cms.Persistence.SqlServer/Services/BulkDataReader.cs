@@ -60,17 +60,19 @@ internal abstract class BulkDataReader : IDataReader
     {
         get
         {
-            if (_columnMappings?.Count == 0)
+            if (_columnMappings == null || _columnMappings.Count == 0)
             {
                 // Need to add the column definitions and mappings.
                 AddSchemaTableRows();
 
-                if (_columnMappings.Count == 0)
+                if (_columnMappings!.Count == 0)
                 {
                     throw new InvalidOperationException("AddSchemaTableRows did not add rows.");
                 }
 
-                Debug.Assert(_schemaTable?.Rows.Count == FieldCount);
+                var count = _schemaTable?.Rows.Count ?? 0;
+
+                Debug.Assert(count == FieldCount);
             }
 
             return new ReadOnlyCollection<SqlBulkCopyColumnMapping>(_columnMappings!);
@@ -1304,7 +1306,9 @@ internal abstract class BulkDataReader : IDataReader
             throw new InvalidOperationException("The IDataReader is closed.");
         }
 
-        if (_schemaTable?.Rows.Count == 0)
+        _schemaTable ??= new();
+
+        if (_schemaTable.Rows.Count == 0)
         {
             // Need to add the column definitions and mappings
             _schemaTable.TableName = TableName;
