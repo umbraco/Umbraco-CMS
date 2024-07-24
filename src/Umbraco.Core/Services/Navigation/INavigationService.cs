@@ -8,7 +8,7 @@ public interface INavigationService
 
     bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
 
-    IEnumerable<Guid> GetDescendantsKeys(Guid parentKey);
+    bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys);
 
     IEnumerable<Guid> GetAncestorsKeys(Guid childKey);
 

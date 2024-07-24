@@ -200,10 +200,14 @@ public class NavigationServiceTests
         var nonExistingKey = Guid.NewGuid();
 
         // Act
-        IEnumerable<Guid> result = _navigationService.GetDescendantsKeys(nonExistingKey);
+        var result = _navigationService.TryGetDescendantsKeys(nonExistingKey, out IEnumerable<Guid> descendantsKeys);
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(descendantsKeys);
+        });
     }
 
     [Test]
@@ -220,10 +224,14 @@ public class NavigationServiceTests
     public void Can_Get_Descendants_From_Existing_Content_Key(Guid parentKey, int descendantsCount)
     {
         // Act
-        IEnumerable<Guid> result = _navigationService.GetDescendantsKeys(parentKey);
+        var result = _navigationService.TryGetDescendantsKeys(parentKey, out IEnumerable<Guid> descendantsKeys);
 
         // Assert
-        Assert.AreEqual(descendantsCount, result.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(descendantsCount, descendantsKeys.Count());
+        });
     }
 
     [Test]
@@ -249,12 +257,13 @@ public class NavigationServiceTests
         Guid[] expectedDescendants = Array.ConvertAll(descendants, Guid.Parse);
 
         // Act
-        List<Guid> result = _navigationService.GetDescendantsKeys(parentKey).ToList();
+        _navigationService.TryGetDescendantsKeys(parentKey, out IEnumerable<Guid> descendantsKeys);
+        List<Guid> descendantsList = descendantsKeys.ToList();
 
         // Assert
         for (var i = 0; i < expectedDescendants.Length; i++)
         {
-            Assert.AreEqual(expectedDescendants[i], result.ElementAt(i));
+            Assert.AreEqual(expectedDescendants[i], descendantsList.ElementAt(i));
         }
     }
 
@@ -426,11 +435,11 @@ public class NavigationServiceTests
         var result = _navigationService.Remove(keyOfNodeToRemove);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
-            Assert.AreEqual(0, _navigationService.GetDescendantsKeys(keyOfNodeToRemove).Count());
-        });
+        Assert.IsTrue(result);
+
+        _navigationService.TryGetDescendantsKeys(keyOfNodeToRemove, out IEnumerable<Guid> descendantsKeys);
+
+        Assert.AreEqual(0, descendantsKeys.Count());
     }
 
     [Test]
@@ -670,14 +679,13 @@ public class NavigationServiceTests
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey, targetParentKey);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
+        Assert.IsTrue(result);
 
-            // Get the number of descendants of the copied node
-            var descendantsCountAfterCopy = _navigationService.GetDescendantsKeys(copiedNodeKey).Count();
-            Assert.AreEqual(initialDescendantsCount, descendantsCountAfterCopy);
-        });
+        // Get the number of descendants of the copied node
+        _navigationService.TryGetDescendantsKeys(copiedNodeKey, out IEnumerable<Guid> descendantsKeys);
+        var descendantsCountAfterCopy = descendantsKeys.Count();
+
+        Assert.AreEqual(initialDescendantsCount, descendantsCountAfterCopy);
     }
 
     [Test]
@@ -688,21 +696,20 @@ public class NavigationServiceTests
     {
         // Arrange
         // Get the number of descendants of the node to copy
-        var descendantsCountOfNodeToCopy = _navigationService.GetDescendantsKeys(nodeToCopy).Count();
+        _navigationService.TryGetDescendantsKeys(nodeToCopy, out IEnumerable<Guid> descendantsKeys);
+        var descendantsCountOfNodeToCopy = descendantsKeys.Count();
 
         // Act
         var result = _navigationService.Copy(nodeToCopy, out _, targetParentKey);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
+        Assert.IsTrue(result);
 
-            var updatedDescendantsCountOfTargetParent = _navigationService.GetDescendantsKeys(targetParentKey).Count();
+        _navigationService.TryGetDescendantsKeys(targetParentKey, out IEnumerable<Guid> updatedTargetParentDescendantsKeys);
+        var updatedDescendantsCountOfTargetParent = updatedTargetParentDescendantsKeys.Count();
 
-            // Verify the number of descendants of the target parent has increased by the number of descendants of the copied node plus the node itself
-            Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToCopy + 1, updatedDescendantsCountOfTargetParent);
-        });
+        // Verify the number of descendants of the target parent has increased by the number of descendants of the copied node plus the node itself
+        Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToCopy + 1, updatedDescendantsCountOfTargetParent);
     }
 
     [Test]
@@ -711,22 +718,19 @@ public class NavigationServiceTests
         // Arrange
         Guid nodeToCopy = Child2;
         Guid targetParentKey = Grandchild4;
-        IEnumerable<Guid> sourceDescendants = _navigationService.GetDescendantsKeys(nodeToCopy);
+        _navigationService.TryGetDescendantsKeys(nodeToCopy, out IEnumerable<Guid> sourceDescendants);
 
         // Act
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey, targetParentKey);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
+        Assert.IsTrue(result);
 
-            // Get the descendants of the copied node
-            IEnumerable<Guid> copiedDescendants = _navigationService.GetDescendantsKeys(copiedNodeKey);
+        // Get the descendants of the copied node
+        _navigationService.TryGetDescendantsKeys(copiedNodeKey, out IEnumerable<Guid> copiedDescendants);
 
-            // Ensure all keys of the copied descendants are different from the source descendants
-            Assert.IsTrue(copiedDescendants.All(copiedDescendantKey => sourceDescendants.Contains(copiedDescendantKey) is false));
-        });
+        // Ensure all keys of the copied descendants are different from the source descendants
+        Assert.IsTrue(copiedDescendants.All(copiedDescendantKey => sourceDescendants.Contains(copiedDescendantKey) is false));
     }
 
     [Test]
@@ -780,14 +784,12 @@ public class NavigationServiceTests
         var result = _navigationService.Move(nodeToMove); // parentKey is null
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
+        Assert.IsTrue(result);
 
-            // Verify the node's new parent is null (moved to content root)
-            _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
-            Assert.IsNull(newParentKey);
-        });
+        // Verify the node's new parent is null (moved to content root)
+        _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
+
+        Assert.IsNull(newParentKey);
     }
 
     [Test]
@@ -801,12 +803,13 @@ public class NavigationServiceTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
+        Assert.IsTrue(result);
+
+        // Verify the node's new parent is updated
+        _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
+
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-
-            // Verify the node's new parent is updated
-            _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
             Assert.IsNotNull(newParentKey);
             Assert.AreEqual(targetParentKey, newParentKey);
         });
@@ -824,12 +827,13 @@ public class NavigationServiceTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
+        Assert.IsTrue(result);
+
+        // Verify the node's new parent is updated
+        _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
+
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-
-            // Verify the node's new parent is updated
-            _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
             Assert.IsNotNull(newParentKey);
             Assert.AreEqual(targetParentKey, newParentKey);
 
@@ -901,14 +905,13 @@ public class NavigationServiceTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
+        Assert.IsTrue(result);
 
-            // Verify that the number of descendants remain the same after moving the node
-            var descendantsCountAfterMove = _navigationService.GetDescendantsKeys(nodeToMove).Count();
-            Assert.AreEqual(initialDescendantsCount, descendantsCountAfterMove);
-        });
+        // Verify that the number of descendants remain the same after moving the node
+        _navigationService.TryGetDescendantsKeys(nodeToMove, out IEnumerable<Guid> descendantsKeys);
+        var descendantsCountAfterMove = descendantsKeys.Count();
+
+        Assert.AreEqual(initialDescendantsCount, descendantsCountAfterMove);
     }
 
     [Test]
@@ -919,20 +922,19 @@ public class NavigationServiceTests
     {
         // Arrange
         // Get the number of descendants of the node to move
-        var descendantsCountOfNodeToMove = _navigationService.GetDescendantsKeys(nodeToMove).Count();
+        _navigationService.TryGetDescendantsKeys(nodeToMove, out IEnumerable<Guid> descendantsKeys);
+        var descendantsCountOfNodeToMove = descendantsKeys.Count();
 
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
+        Assert.IsTrue(result);
 
-            var updatedDescendantsCountOfTargetParent = _navigationService.GetDescendantsKeys(targetParentKey).Count();
+        _navigationService.TryGetDescendantsKeys(targetParentKey, out IEnumerable<Guid> updatedTargetParentDescendantsKeys);
+        var updatedDescendantsCountOfTargetParent = updatedTargetParentDescendantsKeys.Count();
 
-            // Verify the number of descendants of the target parent has increased by the number of descendants of the moved node plus the node itself
-            Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToMove + 1, updatedDescendantsCountOfTargetParent);
-        });
+        // Verify the number of descendants of the target parent has increased by the number of descendants of the moved node plus the node itself
+        Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToMove + 1, updatedDescendantsCountOfTargetParent);
     }
 }

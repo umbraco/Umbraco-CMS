@@ -31,6 +31,7 @@ internal class ContentNavigationService : INavigationService
             return true;
         }
 
+        // Child doesn't exist
         parentKey = null;
         return false;
     }
@@ -43,20 +44,26 @@ internal class ContentNavigationService : INavigationService
             return true;
         }
 
+        // Parent doesn't exist
         childrenKeys = [];
         return false;
     }
 
-    public IEnumerable<Guid> GetDescendantsKeys(Guid parentKey)
+    public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
     {
         var descendants = new List<Guid>();
 
-        if (_navigationStructure.TryGetValue(parentKey, out var parentNode))
+        if (_navigationStructure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
         {
-            GetDescendantsRecursively(parentNode, descendants);
+            // Parent doesn't exist
+            descendantsKeys = [];
+            return false;
         }
 
-        return descendants;
+        GetDescendantsRecursively(parentNode, descendants);
+
+        descendantsKeys = descendants;
+        return true;
     }
 
     public IEnumerable<Guid> GetAncestorsKeys(Guid childKey)
