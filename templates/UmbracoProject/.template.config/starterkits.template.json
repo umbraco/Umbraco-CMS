@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/template.json",
+  "symbols": {
+    "StarterKit": {
+      "displayName": "Starter kit",
+      "type": "parameter",
+      "datatype": "choice",
+      "description": "Choose a starter kit to install.",
+      "defaultValue": "None",
+      "choices": [
+        {
+          "choice": "None",
+          "description": "No starter kit."
+        },
+        {
+          "choice": "TheStarterKit",
+          "description": "The Umbraco starter kit."
+        }
+//        ,{
+//          "choice": "Clean",
+//          "description": "Community made starter kit based on the Clean template."
+//        }
+      ]
+    }
+  },
+  "postActions": [
+    {
+      "condition": "(StarterKit == 'TheStarterKit')",
+      "description": "Install the Umbraco starter kit",
+      "actionId": "B17581D1-C5C9-4489-8F0A-004BE667B814",
+      "continueOnError": false,
+      "args": {
+        "referenceType": "package",
+        "reference": "Umbraco.TheStarterKit",
+        "projectFileExtensions": ".csproj"
+      }
+    }
+//    ,{
+//      "condition": "(StarterKit == 'Clean')",
+//      "description": "Install the Clean starter kit",
+//      "actionId": "B17581D1-C5C9-4489-8F0A-004BE667B814",
+//      "continueOnError": false,
+//      "args": {
+//        "referenceType": "package",
+//        "reference": "Clean",
+//        "projectFileExtensions": ".csproj"
+//      }
+//    }
+  ]
+}
