@@ -8,10 +8,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["UmbracoProject/UmbracoProject.csproj", "UmbracoProject/"]
-# These are for local development, remove these please.
-RUN dotnet nuget add source "https://www.myget.org/F/umbracoprereleases/api/v3/index.json" -n "Umbraco Prerelease"
-COPY LocalFeed /packages
-RUN dotnet nuget add source "/packages" -n "Local Feed"
 RUN dotnet restore "UmbracoProject/UmbracoProject.csproj"
 COPY . .
 WORKDIR "/src/UmbracoProject"
