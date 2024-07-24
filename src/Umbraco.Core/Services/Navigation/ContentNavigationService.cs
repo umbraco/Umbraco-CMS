@@ -66,13 +66,15 @@ internal class ContentNavigationService : INavigationService
         return true;
     }
 
-    public IEnumerable<Guid> GetAncestorsKeys(Guid childKey)
+    public bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
     {
         var ancestors = new List<Guid>();
 
         if (_navigationStructure.TryGetValue(childKey, out NavigationNode? childNode) is false)
         {
-            return ancestors;
+            // Child doesn't exist
+            ancestorsKeys = [];
+            return false;
         }
 
         while (childNode?.Parent is not null)
@@ -81,7 +83,8 @@ internal class ContentNavigationService : INavigationService
             childNode = childNode.Parent;
         }
 
-        return ancestors;
+        ancestorsKeys = ancestors;
+        return true;
     }
 
     public IEnumerable<Guid> GetSiblingsKeys(Guid key)

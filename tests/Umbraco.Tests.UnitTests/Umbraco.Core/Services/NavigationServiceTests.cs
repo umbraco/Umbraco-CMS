@@ -274,10 +274,14 @@ public class NavigationServiceTests
         var nonExistingKey = Guid.NewGuid();
 
         // Act
-        IEnumerable<Guid> result = _navigationService.GetAncestorsKeys(nonExistingKey);
+        var result = _navigationService.TryGetAncestorsKeys(nonExistingKey, out IEnumerable<Guid> ancestorsKeys);
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(ancestorsKeys);
+        });
     }
 
     [Test]
@@ -293,10 +297,14 @@ public class NavigationServiceTests
     public void Can_Get_Ancestors_From_Existing_Content_Key(Guid childKey, int ancestorsCount)
     {
         // Act
-        IEnumerable<Guid> result = _navigationService.GetAncestorsKeys(childKey);
+        var result = _navigationService.TryGetAncestorsKeys(childKey, out IEnumerable<Guid> ancestorsKeys);
 
         // Assert
-        Assert.AreEqual(ancestorsCount, result.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(ancestorsCount, ancestorsKeys.Count());
+        });
     }
 
     [Test]
@@ -316,12 +324,13 @@ public class NavigationServiceTests
         Guid[] expectedAncestors = Array.ConvertAll(ancestors, Guid.Parse);
 
         // Act
-        List<Guid> result = _navigationService.GetAncestorsKeys(childKey).ToList();
+        _navigationService.TryGetAncestorsKeys(childKey, out IEnumerable<Guid> ancestorsKeys);
+        List<Guid> ancestorsList = ancestorsKeys.ToList();
 
         // Assert
         for (var i = 0; i < expectedAncestors.Length; i++)
         {
-            Assert.AreEqual(expectedAncestors[i], result.ElementAt(i));
+            Assert.AreEqual(expectedAncestors[i], ancestorsList.ElementAt(i));
         }
     }
 
