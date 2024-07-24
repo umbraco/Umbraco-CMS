@@ -130,10 +130,14 @@ public class NavigationServiceTests
         var nonExistingKey = Guid.NewGuid();
 
         // Act
-        IEnumerable<Guid> result = _navigationService.GetChildrenKeys(nonExistingKey);
+        var result = _navigationService.TryGetChildrenKeys(nonExistingKey, out IEnumerable<Guid> childrenKeys);
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(childrenKeys);
+        });
     }
 
     [Test]
@@ -149,10 +153,14 @@ public class NavigationServiceTests
     public void Can_Get_Children_From_Existing_Content_Key(Guid parentKey, int childrenCount)
     {
         // Act
-        IEnumerable<Guid> result = _navigationService.GetChildrenKeys(parentKey);
+        var result = _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
 
         // Assert
-        Assert.AreEqual(childrenCount, result.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(childrenCount, childrenKeys.Count());
+        });
     }
 
     [Test]
@@ -175,12 +183,13 @@ public class NavigationServiceTests
         Guid[] expectedChildren = Array.ConvertAll(children, Guid.Parse);
 
         // Act
-        List<Guid> result = _navigationService.GetChildrenKeys(parentKey).ToList();
+        _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
+        List<Guid> childrenList = childrenKeys.ToList();
 
         // Assert
         for (var i = 0; i < expectedChildren.Length; i++)
         {
-            Assert.AreEqual(expectedChildren[i], result.ElementAt(i));
+            Assert.AreEqual(expectedChildren[i], childrenList.ElementAt(i));
         }
     }
 
@@ -458,11 +467,12 @@ public class NavigationServiceTests
         var result = _navigationService.Add(newNodeKey); // parentKey is null
 
         // Assert
+        Assert.IsTrue(result);
+
+        var parentExists = _navigationService.TryGetParentKey(newNodeKey, out Guid? parentKey);
+
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-
-            var parentExists = _navigationService.TryGetParentKey(newNodeKey, out Guid? parentKey);
             Assert.IsTrue(parentExists);
             Assert.IsNull(parentKey);
         });
@@ -476,19 +486,22 @@ public class NavigationServiceTests
     {
         // Arrange
         var newNodeKey = Guid.NewGuid();
-        var currentChildrenCount = _navigationService.GetChildrenKeys(parentKey).Count();
+        _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> currentChildrenKeys);
+        var currentChildrenCount = currentChildrenKeys.Count();
 
         // Act
         var result = _navigationService.Add(newNodeKey, parentKey);
 
         // Assert
+        Assert.IsTrue(result);
+
+        _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> newChildrenKeys);
+        var newChildrenList = newChildrenKeys.ToList();
+
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-
-            List<Guid> newChildren = _navigationService.GetChildrenKeys(parentKey).ToList();
-            Assert.AreEqual(currentChildrenCount + 1, newChildren.Count);
-            Assert.IsTrue(newChildren.Any(childKey => childKey == newNodeKey));
+            Assert.AreEqual(currentChildrenCount + 1, newChildrenList.Count);
+            Assert.IsTrue(newChildrenList.Any(childKey => childKey == newNodeKey));
         });
     }
 
@@ -561,9 +574,13 @@ public class NavigationServiceTests
             Assert.IsTrue(result);
             Assert.AreNotEqual(Guid.Empty, copiedNodeKey);
             Assert.AreNotEqual(nodeToCopy, copiedNodeKey);
+        });
 
-            // Verify the copied node's parent is null (it's been copied to content root)
-            var parentExists = _navigationService.TryGetParentKey(copiedNodeKey, out Guid? copiedNodeParentKey);
+        // Verify the copied node's parent is null (it's been copied to content root)
+        var parentExists = _navigationService.TryGetParentKey(copiedNodeKey, out Guid? copiedNodeParentKey);
+
+        Assert.Multiple(() =>
+        {
             Assert.IsTrue(parentExists);
             Assert.IsNull(copiedNodeParentKey);
         });
@@ -585,10 +602,13 @@ public class NavigationServiceTests
             Assert.IsTrue(result);
             Assert.AreNotEqual(Guid.Empty, copiedNodeKey);
             Assert.AreNotEqual(nodeToCopy, copiedNodeKey);
+        });
 
-            // Verify the node is copied to the correct parent
-            var parentExists = _navigationService.TryGetParentKey(copiedNodeKey, out Guid? copiedNodeParentKey);
-            Assert.IsTrue(parentExists);
+        // Verify the node is copied to the correct parent
+        _navigationService.TryGetParentKey(copiedNodeKey, out Guid? copiedNodeParentKey);
+
+        Assert.Multiple(() =>
+        {
             Assert.IsNotNull(copiedNodeParentKey);
             Assert.AreEqual(targetParentKey, copiedNodeParentKey);
         });
@@ -606,14 +626,12 @@ public class NavigationServiceTests
         var result = _navigationService.Copy(nodeToCopy, out _, targetParentKey);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result);
+        Assert.IsTrue(result);
 
-            // Verify that the original parent is still the same
-            _navigationService.TryGetParentKey(nodeToCopy, out Guid? currentParentKey);
-            Assert.AreEqual(originalParentKey, currentParentKey);
-        });
+        // Verify that the original parent is still the same
+        _navigationService.TryGetParentKey(nodeToCopy, out Guid? currentParentKey);
+
+        Assert.AreEqual(originalParentKey, currentParentKey);
     }
 
     [Test]
@@ -622,20 +640,23 @@ public class NavigationServiceTests
         // Arrange
         Guid nodeToCopy = Grandchild2;
         Guid targetParentKey = Child2;
-        var targetParentChildrenCount = _navigationService.GetChildrenKeys(targetParentKey).Count();
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> targetParentChildrenKeys);
+        var targetParentChildrenCount = targetParentChildrenKeys.Count();
 
         // Act
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey, targetParentKey);
 
         // Assert
+        Assert.IsTrue(result);
+
+        // Verify the node is added to its new parent's children list
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
+        List<Guid> childrenList = childrenKeys.ToList();
+
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-
-            // Verify the node is added to its new parent's children list
-            List<Guid> children = _navigationService.GetChildrenKeys(targetParentKey).ToList();
-            CollectionAssert.Contains(children, copiedNodeKey);
-            Assert.AreEqual(targetParentChildrenCount + 1, children.Count);
+            CollectionAssert.Contains(childrenList, copiedNodeKey);
+            Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
         });
     }
 
@@ -824,20 +845,23 @@ public class NavigationServiceTests
         Guid nodeToMove = Grandchild3;
         Guid targetParentKey = Child3;
         _navigationService.TryGetParentKey(nodeToMove, out Guid? oldParentKey);
-        var oldParentChildrenCount = _navigationService.GetChildrenKeys(oldParentKey!.Value).Count();
+        _navigationService.TryGetChildrenKeys(oldParentKey!.Value, out IEnumerable<Guid> oldParentChildrenKeys);
+        var oldParentChildrenCount = oldParentChildrenKeys.Count();
 
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
+        Assert.IsTrue(result);
+
+        // Verify the node is removed from its old parent's children list
+        _navigationService.TryGetChildrenKeys(oldParentKey.Value, out IEnumerable<Guid> childrenKeys);
+        List<Guid> childrenList = childrenKeys.ToList();
+
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-
-            // Verify the node is removed from its old parent's children list
-            List<Guid> children = _navigationService.GetChildrenKeys(oldParentKey.Value).ToList();
-            CollectionAssert.DoesNotContain(children, nodeToMove);
-            Assert.AreEqual(oldParentChildrenCount - 1, children.Count);
+            CollectionAssert.DoesNotContain(childrenList, nodeToMove);
+            Assert.AreEqual(oldParentChildrenCount - 1, childrenList.Count);
         });
     }
 
@@ -847,20 +871,23 @@ public class NavigationServiceTests
         // Arrange
         Guid nodeToMove = Grandchild2;
         Guid targetParentKey = Child2;
-        var targetParentChildrenCount = _navigationService.GetChildrenKeys(targetParentKey).Count();
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> targetParentChildrenKeys);
+        var targetParentChildrenCount = targetParentChildrenKeys.Count();
 
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
+        Assert.IsTrue(result);
+
+        // Verify the node is added to its new parent's children list
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
+        List<Guid> childrenList = childrenKeys.ToList();
+
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-
-            // Verify the node is added to its new parent's children list
-            List<Guid> children = _navigationService.GetChildrenKeys(targetParentKey).ToList();
-            CollectionAssert.Contains(children, nodeToMove);
-            Assert.AreEqual(targetParentChildrenCount + 1, children.Count);
+            CollectionAssert.Contains(childrenList, nodeToMove);
+            Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
         });
     }
 

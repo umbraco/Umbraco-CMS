@@ -35,10 +35,17 @@ internal class ContentNavigationService : INavigationService
         return false;
     }
 
-    public IEnumerable<Guid> GetChildrenKeys(Guid parentKey)
-        => _navigationStructure.TryGetValue(parentKey, out NavigationNode? parentNode) ?
-            parentNode.Children.Select(child => child.Key) :
-            [];
+    public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
+    {
+        if (_navigationStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
+        {
+            childrenKeys = parentNode.Children.Select(child => child.Key);
+            return true;
+        }
+
+        childrenKeys = [];
+        return false;
+    }
 
     public IEnumerable<Guid> GetDescendantsKeys(Guid parentKey)
     {
@@ -81,18 +88,20 @@ internal class ContentNavigationService : INavigationService
 
         if (node.Parent is null)
         {
-            // To find siblings of node at root, we need to iterate over all items and add those whose Parent is null
+            // To find siblings of node at root, we need to iterate over all items and add those which Parent is null
             siblings = _navigationStructure
                 .Where(kv => kv.Value.Parent is null && kv.Key != key)
                 .Select(kv => kv.Key)
                 .ToList();
+
             return siblings;
         }
 
-        IEnumerable<Guid> childrenKeys = GetChildrenKeys(node.Parent.Key);
-
-        // Filter out the node itself to get its siblings
-        siblings = childrenKeys.Where(childKey => childKey != key).ToList();
+        if (TryGetChildrenKeys(node.Parent.Key, out IEnumerable<Guid> childrenKeys))
+        {
+            // Filter out the node itself to get its siblings
+            siblings = childrenKeys.Where(childKey => childKey != key).ToList();
+        }
 
         return siblings;
     }
