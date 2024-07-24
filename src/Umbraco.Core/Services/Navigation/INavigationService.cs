@@ -2,17 +2,17 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 
 public interface INavigationService
 {
-    Task<Guid?> GetParentKeyAsync(Guid childKey);
-
-    Task<IEnumerable<Guid>> GetChildrenKeysAsync(Guid parentKey);
-
-    Task<IEnumerable<Guid>> GetDescendantsKeysAsync(Guid parentKey);
-
-    Task<IEnumerable<Guid>> GetAncestorsKeysAsync(Guid childKey);
-
-    Task<IEnumerable<Guid>> GetSiblingsKeysAsync(Guid key);
-
     Task RebuildAsync();
+
+    Guid? GetParentKey(Guid childKey);
+
+    IEnumerable<Guid> GetChildrenKeys(Guid parentKey);
+
+    IEnumerable<Guid> GetDescendantsKeys(Guid parentKey);
+
+    IEnumerable<Guid> GetAncestorsKeys(Guid childKey);
+
+    IEnumerable<Guid> GetSiblingsKeys(Guid key);
 
     bool Remove(Guid key);
 

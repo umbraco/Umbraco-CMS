@@ -75,10 +75,10 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Cannot_Get_Parent_From_Non_Existing_Content_Key()
+    public void Cannot_Get_Parent_From_Non_Existing_Content_Key()
     {
         // Act
-        Guid? result = await _navigationService.GetParentKeyAsync(Guid.NewGuid());
+        Guid? result = _navigationService.GetParentKey(Guid.NewGuid());
 
         // Assert
         Assert.IsNull(result);
@@ -94,10 +94,10 @@ public class NavigationServiceTests
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", "D63C1621-C74A-4106-8587-817DEE5FB732")] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "E48DD82A-7059-418E-9B82-CDD5205796CF")] // Child 3
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", "B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Grandchild 4
-    public async Task Can_Get_Parent_From_Existing_Content_Key(Guid childKey, Guid? parentKey)
+    public void Can_Get_Parent_From_Existing_Content_Key(Guid childKey, Guid? parentKey)
     {
         // Act
-        Guid? result = await _navigationService.GetParentKeyAsync(childKey);
+        Guid? result = _navigationService.GetParentKey(childKey);
 
         // Assert
         Assert.Multiple(() =>
@@ -115,10 +115,10 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Cannot_Get_Children_From_Non_Existing_Content_Key()
+    public void Cannot_Get_Children_From_Non_Existing_Content_Key()
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetChildrenKeysAsync(Guid.NewGuid());
+        IEnumerable<Guid> result = _navigationService.GetChildrenKeys(Guid.NewGuid());
 
         // Assert
         Assert.IsEmpty(result);
@@ -134,10 +134,10 @@ public class NavigationServiceTests
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 0)] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 3 - Grandchild 4
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 0)] // Grandchild 4
-    public async Task Can_Get_Children_From_Existing_Content_Key(Guid parentKey, int childrenCount)
+    public void Can_Get_Children_From_Existing_Content_Key(Guid parentKey, int childrenCount)
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetChildrenKeysAsync(parentKey);
+        IEnumerable<Guid> result = _navigationService.GetChildrenKeys(parentKey);
 
         // Assert
         Assert.AreEqual(childrenCount, result.Count());
@@ -157,13 +157,13 @@ public class NavigationServiceTests
     [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", new[] { "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7" })] // Grandchild 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new string[0])] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", new[] { "F381906C-223C-4466-80F7-B63B4EE073F8" })] // Child 3
-    public async Task Can_Get_Children_From_Existing_Content_Key_In_Correct_Order(Guid parentKey, string[] children)
+    public void Can_Get_Children_From_Existing_Content_Key_In_Correct_Order(Guid parentKey, string[] children)
     {
         // Arrange
         Guid[] expectedChildren = Array.ConvertAll(children, Guid.Parse);
 
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetChildrenKeysAsync(parentKey);
+        List<Guid> result = _navigationService.GetChildrenKeys(parentKey).ToList();
 
         // Assert
         for (var i = 0; i < expectedChildren.Length; i++)
@@ -173,10 +173,10 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Cannot_Get_Descendants_From_Non_Existing_Content_Key()
+    public void Cannot_Get_Descendants_From_Non_Existing_Content_Key()
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetDescendantsKeysAsync(Guid.NewGuid());
+        IEnumerable<Guid> result = _navigationService.GetDescendantsKeys(Guid.NewGuid());
 
         // Assert
         Assert.IsEmpty(result);
@@ -193,10 +193,10 @@ public class NavigationServiceTests
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 0)] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 3 - Grandchild 4
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 0)] // Grandchild 4
-    public async Task Can_Get_Descendants_From_Existing_Content_Key(Guid parentKey, int descendantsCount)
+    public void Can_Get_Descendants_From_Existing_Content_Key(Guid parentKey, int descendantsCount)
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetDescendantsKeysAsync(parentKey);
+        IEnumerable<Guid> result = _navigationService.GetDescendantsKeys(parentKey);
 
         // Assert
         Assert.AreEqual(descendantsCount, result.Count());
@@ -219,13 +219,13 @@ public class NavigationServiceTests
     [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", new[] { "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7" })] // Grandchild 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new string[0])] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", new[] { "F381906C-223C-4466-80F7-B63B4EE073F8" })] // Child 3
-    public async Task Can_Get_Descendants_From_Existing_Content_Key_In_Correct_Order(Guid parentKey, string[] descendants)
+    public void Can_Get_Descendants_From_Existing_Content_Key_In_Correct_Order(Guid parentKey, string[] descendants)
     {
         // Arrange
         Guid[] expectedDescendants = Array.ConvertAll(descendants, Guid.Parse);
 
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetDescendantsKeysAsync(parentKey);
+        List<Guid> result = _navigationService.GetDescendantsKeys(parentKey).ToList();
 
         // Assert
         for (var i = 0; i < expectedDescendants.Length; i++)
@@ -235,10 +235,10 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Cannot_Get_Ancestors_From_Non_Existing_Content_Key()
+    public void Cannot_Get_Ancestors_From_Non_Existing_Content_Key()
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetAncestorsKeysAsync(Guid.NewGuid());
+        IEnumerable<Guid> result = _navigationService.GetAncestorsKeys(Guid.NewGuid());
 
         // Assert
         Assert.IsEmpty(result);
@@ -254,10 +254,10 @@ public class NavigationServiceTests
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 3)] // Great-grandchild 1 - Grandchild 3, Child 2, Root
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 3 - Root
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 2)] // Grandchild 4 - Child 3, Root
-    public async Task Can_Get_Ancestors_From_Existing_Content_Key(Guid childKey, int ancestorsCount)
+    public void Can_Get_Ancestors_From_Existing_Content_Key(Guid childKey, int ancestorsCount)
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetAncestorsKeysAsync(childKey);
+        IEnumerable<Guid> result = _navigationService.GetAncestorsKeys(childKey);
 
         // Assert
         Assert.AreEqual(ancestorsCount, result.Count());
@@ -274,13 +274,13 @@ public class NavigationServiceTests
             "D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96",
             "E48DD82A-7059-418E-9B82-CDD5205796CF"
         })] // Great-grandchild 1
-    public async Task Can_Get_Ancestors_From_Existing_Content_Key_In_Correct_Order(Guid childKey, string[] ancestors)
+    public void Can_Get_Ancestors_From_Existing_Content_Key_In_Correct_Order(Guid childKey, string[] ancestors)
     {
         // Arrange
         Guid[] expectedAncestors = Array.ConvertAll(ancestors, Guid.Parse);
 
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetAncestorsKeysAsync(childKey);
+        List<Guid> result = _navigationService.GetAncestorsKeys(childKey).ToList();
 
         // Assert
         for (var i = 0; i < expectedAncestors.Length; i++)
@@ -290,26 +290,26 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Cannot_Get_Siblings_Of_Non_Existing_Content_Key()
+    public void Cannot_Get_Siblings_Of_Non_Existing_Content_Key()
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetSiblingsKeysAsync(Guid.NewGuid());
+        IEnumerable<Guid> result = _navigationService.GetSiblingsKeys(Guid.NewGuid());
 
         // Assert
         Assert.IsEmpty(result);
     }
 
     [Test]
-    public async Task Can_Get_Siblings_Of_Existing_Content_Key_Without_Self()
+    public void Can_Get_Siblings_Of_Existing_Content_Key_Without_Self()
     {
         // Arrange
         Guid nodeKey = Child1;
 
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetSiblingsKeysAsync(nodeKey);
+        List<Guid> result = _navigationService.GetSiblingsKeys(nodeKey).ToList();
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsNotEmpty(result);
             Assert.IsFalse(result.Contains(nodeKey));
@@ -317,20 +317,20 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Can_Get_Siblings_Of_Existing_Content_Key_At_Content_Root()
+    public void Can_Get_Siblings_Of_Existing_Content_Key_At_Content_Root()
     {
         // Arrange
         Guid anotherRoot = new Guid("716380B9-DAA9-4930-A461-95EF39EBAB41");
         _navigationService.Add(anotherRoot);
 
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetSiblingsKeysAsync(anotherRoot);
+        List<Guid> result = _navigationService.GetSiblingsKeys(anotherRoot).ToList();
 
         // Assert
         Assert.Multiple(() =>
         {
             Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual(Root, result.First());
         });
     }
@@ -345,10 +345,10 @@ public class NavigationServiceTests
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 0)] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 2)] // Child 3 - Child 1, Child 2
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", 0)] // Grandchild 4
-    public async Task Can_Get_Siblings_Of_Existing_Content_Key(Guid key, int siblingsCount)
+    public void Can_Get_Siblings_Of_Existing_Content_Key(Guid key, int siblingsCount)
     {
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetSiblingsKeysAsync(key);
+        IEnumerable<Guid> result = _navigationService.GetSiblingsKeys(key);
 
         // Assert
         Assert.AreEqual(siblingsCount, result.Count());
@@ -358,13 +358,13 @@ public class NavigationServiceTests
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new string[0])] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF" })] // Child 1 - Child 2, Child 3
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", new[] { "A1B1B217-B02F-4307-862C-A5E22DB729EB" })] // Grandchild 1 - Grandchild 2
-    public async Task Can_Get_Siblings_Of_Existing_Content_Key_In_Correct_Order(Guid childKey, string[] siblings)
+    public void Can_Get_Siblings_Of_Existing_Content_Key_In_Correct_Order(Guid childKey, string[] siblings)
     {
         // Arrange
         Guid[] expectedSiblings = Array.ConvertAll(siblings, Guid.Parse);
 
         // Act
-        IEnumerable<Guid> result = await _navigationService.GetSiblingsKeysAsync(childKey);
+        List<Guid> result = _navigationService.GetSiblingsKeys(childKey).ToList();
 
         // Assert
         for (var i = 0; i < expectedSiblings.Length; i++)
@@ -393,10 +393,10 @@ public class NavigationServiceTests
         var result = _navigationService.Remove(keyOfNodeToRemove);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
-            Assert.AreEqual(0, (await _navigationService.GetDescendantsKeysAsync(keyOfNodeToRemove)).Count());
+            Assert.AreEqual(0, _navigationService.GetDescendantsKeys(keyOfNodeToRemove).Count());
         });
     }
 
@@ -434,10 +434,10 @@ public class NavigationServiceTests
         var result = _navigationService.Add(newNodeKey); // parentKey is null
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
-            Assert.AreEqual(null, await _navigationService.GetParentKeyAsync(newNodeKey));
+            Assert.AreEqual(null, _navigationService.GetParentKey(newNodeKey));
         });
     }
 
@@ -445,21 +445,22 @@ public class NavigationServiceTests
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
-    public async Task Can_Add_Node_To_Parent(Guid parentKey)
+    public void Can_Add_Node_To_Parent(Guid parentKey)
     {
         // Arrange
         var newNodeKey = Guid.NewGuid();
-        var currentChildrenCount = (await _navigationService.GetChildrenKeysAsync(parentKey)).Count();
+        var currentChildrenCount = _navigationService.GetChildrenKeys(parentKey).Count();
 
         // Act
         var result = _navigationService.Add(newNodeKey, parentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
-            var newChildren = await _navigationService.GetChildrenKeysAsync(parentKey);
-            Assert.AreEqual(currentChildrenCount + 1, newChildren.Count());
+
+            List<Guid> newChildren = _navigationService.GetChildrenKeys(parentKey).ToList();
+            Assert.AreEqual(currentChildrenCount + 1, newChildren.Count);
             Assert.IsTrue(newChildren.Any(childKey => childKey == newNodeKey));
         });
     }
@@ -528,14 +529,14 @@ public class NavigationServiceTests
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey); // parentKey is null
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
             Assert.AreNotEqual(Guid.Empty, copiedNodeKey);
             Assert.AreNotEqual(nodeToCopy, copiedNodeKey);
 
             // Verify the copied node's parent is null (it's been copied to content root)
-            Guid? copiedNodeParentKey = await _navigationService.GetParentKeyAsync(copiedNodeKey);
+            Guid? copiedNodeParentKey = _navigationService.GetParentKey(copiedNodeKey);
             Assert.IsNull(copiedNodeParentKey);
         });
     }
@@ -551,61 +552,61 @@ public class NavigationServiceTests
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
             Assert.AreNotEqual(Guid.Empty, copiedNodeKey);
             Assert.AreNotEqual(nodeToCopy, copiedNodeKey);
 
             // Verify the node is copied to the correct parent
-            Guid? copiedNodeParentKey = await _navigationService.GetParentKeyAsync(copiedNodeKey);
+            Guid? copiedNodeParentKey = _navigationService.GetParentKey(copiedNodeKey);
             Assert.IsNotNull(copiedNodeParentKey);
             Assert.AreEqual(targetParentKey, copiedNodeParentKey);
         });
     }
 
     [Test]
-    public async Task Copying_Node_Does_Not_Update_Source_Node_Parent()
+    public void Copying_Node_Does_Not_Update_Source_Node_Parent()
     {
         // Arrange
         Guid nodeToCopy = Grandchild1;
         Guid targetParentKey = Child3;
-        Guid? originalParentKey = await _navigationService.GetParentKeyAsync(nodeToCopy);
+        Guid? originalParentKey = _navigationService.GetParentKey(nodeToCopy);
 
         // Act
         var result = _navigationService.Copy(nodeToCopy, out _, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify that the original parent is still the same
-            Guid? currentParentKey = await _navigationService.GetParentKeyAsync(nodeToCopy);
+            Guid? currentParentKey = _navigationService.GetParentKey(nodeToCopy);
             Assert.AreEqual(originalParentKey, currentParentKey);
         });
     }
 
     [Test]
-    public async Task Copied_Node_Is_Added_To_Its_New_Parent()
+    public void Copied_Node_Is_Added_To_Its_New_Parent()
     {
         // Arrange
         Guid nodeToCopy = Grandchild2;
         Guid targetParentKey = Child2;
-        var targetParentChildrenCount = (await _navigationService.GetChildrenKeysAsync(targetParentKey)).Count();
+        var targetParentChildrenCount = _navigationService.GetChildrenKeys(targetParentKey).Count();
 
         // Act
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify the node is added to its new parent's children list
-            IEnumerable<Guid> children = await _navigationService.GetChildrenKeysAsync(targetParentKey);
+            List<Guid> children = _navigationService.GetChildrenKeys(targetParentKey).ToList();
             CollectionAssert.Contains(children, copiedNodeKey);
-            Assert.AreEqual(targetParentChildrenCount + 1, children.Count());
+            Assert.AreEqual(targetParentChildrenCount + 1, children.Count);
         });
     }
 
@@ -619,12 +620,12 @@ public class NavigationServiceTests
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Get the number of descendants of the copied node
-            var descendantsCountAfterCopy = (await _navigationService.GetDescendantsKeysAsync(copiedNodeKey)).Count();
+            var descendantsCountAfterCopy = _navigationService.GetDescendantsKeys(copiedNodeKey).Count();
             Assert.AreEqual(initialDescendantsCount, descendantsCountAfterCopy);
         });
     }
@@ -633,21 +634,21 @@ public class NavigationServiceTests
     [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", "E48DD82A-7059-418E-9B82-CDD5205796CF", 8)] // Grandchild 2 to Root
     [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", "B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Grandchild 3 to Child 3
     [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "F381906C-223C-4466-80F7-B63B4EE073F8", 0)] // Child 2 to Grandchild 4
-    public async Task Number_Of_Target_Parent_Descendants_Updates_When_Copying_Node_With_Descendants(Guid nodeToCopy, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
+    public void Number_Of_Target_Parent_Descendants_Updates_When_Copying_Node_With_Descendants(Guid nodeToCopy, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
     {
         // Arrange
         // Get the number of descendants of the node to copy
-        var descendantsCountOfNodeToCopy = (await _navigationService.GetDescendantsKeysAsync(nodeToCopy)).Count();
+        var descendantsCountOfNodeToCopy = _navigationService.GetDescendantsKeys(nodeToCopy).Count();
 
         // Act
         var result = _navigationService.Copy(nodeToCopy, out _, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
-            var updatedDescendantsCountOfTargetParent = (await _navigationService.GetDescendantsKeysAsync(targetParentKey)).Count();
+            var updatedDescendantsCountOfTargetParent = _navigationService.GetDescendantsKeys(targetParentKey).Count();
 
             // Verify the number of descendants of the target parent has increased by the number of descendants of the copied node plus the node itself
             Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToCopy + 1, updatedDescendantsCountOfTargetParent);
@@ -655,23 +656,23 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Copied_Node_Descendants_Have_Different_Keys_Than_Source_Node_Descendants()
+    public void Copied_Node_Descendants_Have_Different_Keys_Than_Source_Node_Descendants()
     {
         // Arrange
         Guid nodeToCopy = Child2;
         Guid targetParentKey = Grandchild4;
-        IEnumerable<Guid> sourceDescendants = await _navigationService.GetDescendantsKeysAsync(nodeToCopy);
+        IEnumerable<Guid> sourceDescendants = _navigationService.GetDescendantsKeys(nodeToCopy);
 
         // Act
         var result = _navigationService.Copy(nodeToCopy, out Guid copiedNodeKey, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Get the descendants of the copied node
-            IEnumerable<Guid> copiedDescendants = await _navigationService.GetDescendantsKeysAsync(copiedNodeKey);
+            IEnumerable<Guid> copiedDescendants = _navigationService.GetDescendantsKeys(copiedNodeKey);
 
             // Ensure all keys of the copied descendants are different from the source descendants
             Assert.IsTrue(copiedDescendants.All(copiedDescendantKey => sourceDescendants.Contains(copiedDescendantKey) is false));
@@ -729,12 +730,12 @@ public class NavigationServiceTests
         var result = _navigationService.Move(nodeToMove); // parentKey is null
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify the node's new parent is null (moved to content root)
-            Guid? newParentKey = await _navigationService.GetParentKeyAsync(nodeToMove);
+            Guid? newParentKey = _navigationService.GetParentKey(nodeToMove);
             Assert.IsNull(newParentKey);
         });
     }
@@ -750,35 +751,35 @@ public class NavigationServiceTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify the node's new parent is updated
-            Guid? parentKey = await _navigationService.GetParentKeyAsync(nodeToMove);
+            Guid? parentKey = _navigationService.GetParentKey(nodeToMove);
             Assert.IsNotNull(parentKey);
             Assert.AreEqual(targetParentKey, parentKey);
         });
     }
 
     [Test]
-    public async Task Moved_Node_Has_Updated_Parent()
+    public void Moved_Node_Has_Updated_Parent()
     {
         // Arrange
         Guid nodeToMove = Grandchild1;
         Guid targetParentKey = Child2;
-        Guid? oldParentKey = await _navigationService.GetParentKeyAsync(nodeToMove);
+        Guid? oldParentKey = _navigationService.GetParentKey(nodeToMove);
 
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify the node's new parent is updated
-            Guid? parentKey = await _navigationService.GetParentKeyAsync(nodeToMove);
+            Guid? parentKey = _navigationService.GetParentKey(nodeToMove);
             Assert.IsNotNull(parentKey);
             Assert.AreEqual(targetParentKey, parentKey);
 
@@ -788,49 +789,49 @@ public class NavigationServiceTests
     }
 
     [Test]
-    public async Task Moved_Node_Is_Removed_From_Its_Current_Parent()
+    public void Moved_Node_Is_Removed_From_Its_Current_Parent()
     {
         // Arrange
         Guid nodeToMove = Grandchild3;
         Guid targetParentKey = Child3;
-        Guid? oldParentKey = await _navigationService.GetParentKeyAsync(nodeToMove);
-        var oldParentChildrenCount = (await _navigationService.GetChildrenKeysAsync(oldParentKey.Value)).Count();
+        Guid? oldParentKey = _navigationService.GetParentKey(nodeToMove);
+        var oldParentChildrenCount = _navigationService.GetChildrenKeys(oldParentKey!.Value).Count();
 
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify the node is removed from its old parent's children list
-            IEnumerable<Guid> children = await _navigationService.GetChildrenKeysAsync(oldParentKey.Value);
+            List<Guid> children = _navigationService.GetChildrenKeys(oldParentKey.Value).ToList();
             CollectionAssert.DoesNotContain(children, nodeToMove);
-            Assert.AreEqual(oldParentChildrenCount - 1, children.Count());
+            Assert.AreEqual(oldParentChildrenCount - 1, children.Count);
         });
     }
 
     [Test]
-    public async Task Moved_Node_Is_Added_To_Its_New_Parent()
+    public void Moved_Node_Is_Added_To_Its_New_Parent()
     {
         // Arrange
         Guid nodeToMove = Grandchild2;
         Guid targetParentKey = Child2;
-        var targetParentChildrenCount = (await _navigationService.GetChildrenKeysAsync(targetParentKey)).Count();
+        var targetParentChildrenCount = _navigationService.GetChildrenKeys(targetParentKey).Count();
 
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify the node is added to its new parent's children list
-            IEnumerable<Guid> children = await _navigationService.GetChildrenKeysAsync(targetParentKey);
+            List<Guid> children = _navigationService.GetChildrenKeys(targetParentKey).ToList();
             CollectionAssert.Contains(children, nodeToMove);
-            Assert.AreEqual(targetParentChildrenCount + 1, children.Count());
+            Assert.AreEqual(targetParentChildrenCount + 1, children.Count);
         });
     }
 
@@ -844,12 +845,12 @@ public class NavigationServiceTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
             // Verify that the number of descendants remain the same after moving the node
-            var descendantsCountAfterMove = (await _navigationService.GetDescendantsKeysAsync(nodeToMove)).Count();
+            var descendantsCountAfterMove = _navigationService.GetDescendantsKeys(nodeToMove).Count();
             Assert.AreEqual(initialDescendantsCount, descendantsCountAfterMove);
         });
     }
@@ -858,21 +859,21 @@ public class NavigationServiceTests
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Child 3 to Grandchild 2
     [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 2 to Child 3
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "60E0E5C4-084E-4144-A560-7393BEAD2E96", 2)] // Grandchild 1 to Child 2
-    public async Task Number_Of_Target_Parent_Descendants_Updates_When_Moving_Node_With_Descendants(Guid nodeToMove, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
+    public void Number_Of_Target_Parent_Descendants_Updates_When_Moving_Node_With_Descendants(Guid nodeToMove, Guid targetParentKey, int initialDescendantsCountOfTargetParent)
     {
         // Arrange
         // Get the number of descendants of the node to move
-        var descendantsCountOfNodeToMove = (await _navigationService.GetDescendantsKeysAsync(nodeToMove)).Count();
+        var descendantsCountOfNodeToMove = _navigationService.GetDescendantsKeys(nodeToMove).Count();
 
         // Act
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.Multiple(async () =>
+        Assert.Multiple(() =>
         {
             Assert.IsTrue(result);
 
-            var updatedDescendantsCountOfTargetParent = (await _navigationService.GetDescendantsKeysAsync(targetParentKey)).Count();
+            var updatedDescendantsCountOfTargetParent = _navigationService.GetDescendantsKeys(targetParentKey).Count();
 
             // Verify the number of descendants of the target parent has increased by the number of descendants of the moved node plus the node itself
             Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToMove + 1, updatedDescendantsCountOfTargetParent);

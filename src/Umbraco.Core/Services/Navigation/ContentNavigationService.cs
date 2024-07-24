@@ -23,17 +23,17 @@ internal class ContentNavigationService : INavigationService
         _navigationStructure = _navigationRepository.GetContentNodesByObjectType(Constants.ObjectTypes.Document);
     }
 
-    public async Task<Guid?> GetParentKeyAsync(Guid childKey)
-        => _navigationStructure.TryGetValue(childKey, out var childNode) ?
+    public Guid? GetParentKey(Guid childKey)
+        => _navigationStructure.TryGetValue(childKey, out NavigationNode? childNode) ?
             childNode.Parent?.Key :
             null;
 
-    public async Task<IEnumerable<Guid>> GetChildrenKeysAsync(Guid parentKey)
-        => _navigationStructure.TryGetValue(parentKey, out var parentNode) ?
+    public IEnumerable<Guid> GetChildrenKeys(Guid parentKey)
+        => _navigationStructure.TryGetValue(parentKey, out NavigationNode? parentNode) ?
             parentNode.Children.Select(child => child.Key) :
             [];
 
-    public async Task<IEnumerable<Guid>> GetDescendantsKeysAsync(Guid parentKey)
+    public IEnumerable<Guid> GetDescendantsKeys(Guid parentKey)
     {
         var descendants = new List<Guid>();
 
@@ -45,11 +45,11 @@ internal class ContentNavigationService : INavigationService
         return descendants;
     }
 
-    public async Task<IEnumerable<Guid>> GetAncestorsKeysAsync(Guid childKey)
+    public IEnumerable<Guid> GetAncestorsKeys(Guid childKey)
     {
         var ancestors = new List<Guid>();
 
-        if (_navigationStructure.TryGetValue(childKey, out var childNode) is false)
+        if (_navigationStructure.TryGetValue(childKey, out NavigationNode? childNode) is false)
         {
             return ancestors;
         }
@@ -63,7 +63,7 @@ internal class ContentNavigationService : INavigationService
         return ancestors;
     }
 
-    public async Task<IEnumerable<Guid>> GetSiblingsKeysAsync(Guid key)
+    public IEnumerable<Guid> GetSiblingsKeys(Guid key)
     {
         var siblings = new List<Guid>();
 
@@ -82,7 +82,7 @@ internal class ContentNavigationService : INavigationService
             return siblings;
         }
 
-        IEnumerable<Guid> childrenKeys = await GetChildrenKeysAsync(node.Parent.Key);
+        IEnumerable<Guid> childrenKeys = GetChildrenKeys(node.Parent.Key);
 
         // Filter out the node itself to get its siblings
         siblings = childrenKeys.Where(childKey => childKey != key).ToList();
@@ -98,7 +98,7 @@ internal class ContentNavigationService : INavigationService
         }
 
         // Remove the node from its parent's children list
-        if (nodeToRemove.Parent is not null && _navigationStructure.TryGetValue(nodeToRemove.Parent.Key, out var parentNode))
+        if (nodeToRemove.Parent is not null && _navigationStructure.TryGetValue(nodeToRemove.Parent.Key, out NavigationNode? parentNode))
         {
             parentNode.Children.Remove(nodeToRemove);
         }
@@ -140,7 +140,7 @@ internal class ContentNavigationService : INavigationService
     {
         copiedNodeKey = Guid.Empty; // Default value
 
-        if (_navigationStructure.TryGetValue(sourceKey, out var sourceNode) is false)
+        if (_navigationStructure.TryGetValue(sourceKey, out NavigationNode? sourceNode) is false)
         {
             return false; // Source doesn't exist
         }
@@ -154,7 +154,7 @@ internal class ContentNavigationService : INavigationService
         var newNodesMap = new Dictionary<Guid, NavigationNode>();
         CopyNodeHierarchyRecursively(sourceNode, targetParentNode, newNodesMap, out copiedNodeKey);
 
-        foreach (var newNode in newNodesMap.Values)
+        foreach (NavigationNode newNode in newNodesMap.Values)
         {
             _navigationStructure[newNode.Key] = newNode;
         }
@@ -164,7 +164,7 @@ internal class ContentNavigationService : INavigationService
 
     public bool Move(Guid nodeKey, Guid? targetParentKey = null)
     {
-        if (_navigationStructure.TryGetValue(nodeKey, out var nodeToMove) is false)
+        if (_navigationStructure.TryGetValue(nodeKey, out NavigationNode? nodeToMove) is false)
         {
             return false; // Node doesn't exist
         }
