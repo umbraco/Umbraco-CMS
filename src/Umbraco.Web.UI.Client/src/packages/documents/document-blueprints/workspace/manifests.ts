@@ -3,7 +3,7 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
 } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestTypes,
 	ManifestWorkspace,
@@ -72,7 +72,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.DocumentBlueprint.Save',
 		name: 'Save Document Workspace Action',
 		weight: 80,
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',
