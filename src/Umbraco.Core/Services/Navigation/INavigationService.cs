@@ -12,7 +12,7 @@ public interface INavigationService
 
     bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys);
 
-    IEnumerable<Guid> GetSiblingsKeys(Guid key);
+    bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys);
 
     bool Remove(Guid key);
 

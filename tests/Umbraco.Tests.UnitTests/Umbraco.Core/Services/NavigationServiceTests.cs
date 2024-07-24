@@ -341,10 +341,14 @@ public class NavigationServiceTests
         var nonExistingKey = Guid.NewGuid();
 
         // Act
-        IEnumerable<Guid> result = _navigationService.GetSiblingsKeys(nonExistingKey);
+        var result = _navigationService.TryGetSiblingsKeys(nonExistingKey, out IEnumerable<Guid> siblingsKeys);
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(siblingsKeys);
+        });
     }
 
     [Test]
@@ -354,13 +358,15 @@ public class NavigationServiceTests
         Guid nodeKey = Child1;
 
         // Act
-        List<Guid> result = _navigationService.GetSiblingsKeys(nodeKey).ToList();
+        var result = _navigationService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> siblingsKeys);
+        List<Guid> siblingsList = siblingsKeys.ToList();
 
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(result);
-            Assert.IsFalse(result.Contains(nodeKey));
+            Assert.IsTrue(result);
+            Assert.IsNotEmpty(siblingsList);
+            Assert.IsFalse(siblingsList.Contains(nodeKey));
         });
     }
 
@@ -372,14 +378,15 @@ public class NavigationServiceTests
         _navigationService.Add(anotherRoot);
 
         // Act
-        List<Guid> result = _navigationService.GetSiblingsKeys(anotherRoot).ToList();
+        _navigationService.TryGetSiblingsKeys(anotherRoot, out IEnumerable<Guid> siblingsKeys);
+        List<Guid> siblingsList = siblingsKeys.ToList();
 
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(Root, result.First());
+            Assert.IsNotEmpty(siblingsList);
+            Assert.AreEqual(1, siblingsList.Count);
+            Assert.AreEqual(Root, siblingsList.First());
         });
     }
 
@@ -396,10 +403,14 @@ public class NavigationServiceTests
     public void Can_Get_Siblings_Of_Existing_Content_Key(Guid key, int siblingsCount)
     {
         // Act
-        IEnumerable<Guid> result = _navigationService.GetSiblingsKeys(key);
+        var result = _navigationService.TryGetSiblingsKeys(key, out IEnumerable<Guid> siblingsKeys);
 
         // Assert
-        Assert.AreEqual(siblingsCount, result.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.AreEqual(siblingsCount, siblingsKeys.Count());
+        });
     }
 
     [Test]
@@ -412,12 +423,13 @@ public class NavigationServiceTests
         Guid[] expectedSiblings = Array.ConvertAll(siblings, Guid.Parse);
 
         // Act
-        List<Guid> result = _navigationService.GetSiblingsKeys(childKey).ToList();
+        _navigationService.TryGetSiblingsKeys(childKey, out IEnumerable<Guid> siblingsKeys);
+        List<Guid> siblingsList = siblingsKeys.ToList();
 
         // Assert
         for (var i = 0; i < expectedSiblings.Length; i++)
         {
-            Assert.AreEqual(expectedSiblings[i], result.ElementAt(i));
+            Assert.AreEqual(expectedSiblings[i], siblingsList.ElementAt(i));
         }
     }
 

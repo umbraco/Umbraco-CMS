@@ -87,33 +87,33 @@ internal class ContentNavigationService : INavigationService
         return true;
     }
 
-    public IEnumerable<Guid> GetSiblingsKeys(Guid key)
+    public bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys)
     {
-        var siblings = new List<Guid>();
+        siblingsKeys = [];
 
         if (_navigationStructure.TryGetValue(key, out NavigationNode? node) is false)
         {
-            return siblings;
+            return false; // Node doesn't exist
         }
 
         if (node.Parent is null)
         {
-            // To find siblings of node at root, we need to iterate over all items and add those which Parent is null
-            siblings = _navigationStructure
+            // To find siblings of a node at root level, we need to iterate over all items and add those with null Parent
+            siblingsKeys = _navigationStructure
                 .Where(kv => kv.Value.Parent is null && kv.Key != key)
                 .Select(kv => kv.Key)
                 .ToList();
-
-            return siblings;
+            return true;
         }
 
-        if (TryGetChildrenKeys(node.Parent.Key, out IEnumerable<Guid> childrenKeys))
+        if (TryGetChildrenKeys(node.Parent.Key, out IEnumerable<Guid> childrenKeys) is false)
         {
-            // Filter out the node itself to get its siblings
-            siblings = childrenKeys.Where(childKey => childKey != key).ToList();
+            return false; // Couldn't retrieve children keys
         }
 
-        return siblings;
+        // Filter out the node itself to get its siblings
+        siblingsKeys = childrenKeys.Where(childKey => childKey != key).ToList();
+        return true;
     }
 
     public bool Remove(Guid key)
