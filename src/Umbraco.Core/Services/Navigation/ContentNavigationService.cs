@@ -38,15 +38,15 @@ internal class ContentNavigationService : INavigationService
 
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
     {
-        if (_navigationStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
+        if (_navigationStructure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
         {
-            childrenKeys = parentNode.Children.Select(child => child.Key);
-            return true;
+            // Parent doesn't exist
+            childrenKeys = [];
+            return false;
         }
 
-        // Parent doesn't exist
-        childrenKeys = [];
-        return false;
+        childrenKeys = parentNode.Children.Select(child => child.Key);
+        return true;
     }
 
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
