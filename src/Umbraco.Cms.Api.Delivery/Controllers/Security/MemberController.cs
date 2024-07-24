@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
@@ -12,6 +13,7 @@ using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -25,22 +27,47 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Security;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class MemberController : DeliveryApiControllerBase
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMemberSignInManager _memberSignInManager;
     private readonly IMemberManager _memberManager;
+    private readonly IMemberClientCredentialsManager _memberClientCredentialsManager;
     private readonly DeliveryApiSettings _deliveryApiSettings;
     private readonly ILogger<MemberController> _logger;
 
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     public MemberController(
         IHttpContextAccessor httpContextAccessor,
         IMemberSignInManager memberSignInManager,
         IMemberManager memberManager,
         IOptions<DeliveryApiSettings> deliveryApiSettings,
         ILogger<MemberController> logger)
+        : this(memberSignInManager, memberManager, StaticServiceProvider.Instance.GetRequiredService<IMemberClientCredentialsManager>(), deliveryApiSettings, logger)
     {
-        _httpContextAccessor = httpContextAccessor;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
+    public MemberController(
+        IHttpContextAccessor httpContextAccessor,
+        IMemberSignInManager memberSignInManager,
+        IMemberManager memberManager,
+        IMemberClientCredentialsManager memberClientCredentialsManager,
+        IOptions<DeliveryApiSettings> deliveryApiSettings,
+        ILogger<MemberController> logger)
+        : this(memberSignInManager, memberManager, memberClientCredentialsManager, deliveryApiSettings, logger)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public MemberController(
+        IMemberSignInManager memberSignInManager,
+        IMemberManager memberManager,
+        IMemberClientCredentialsManager memberClientCredentialsManager,
+        IOptions<DeliveryApiSettings> deliveryApiSettings,
+        ILogger<MemberController> logger)
+    {
         _memberSignInManager = memberSignInManager;
         _memberManager = memberManager;
+        _memberClientCredentialsManager = memberClientCredentialsManager;
         _logger = logger;
         _deliveryApiSettings = deliveryApiSettings.Value;
     }
@@ -49,16 +76,13 @@ public class MemberController : DeliveryApiControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
     {
-        // in principle this is not necessary for now, since the member application has been removed, thus making
-        // the member client ID invalid for the authentication code flow. However, if we ever add additional flows
-        // to the API, we should perform this check, so we might as well include it upfront.
-        if (_deliveryApiSettings.MemberAuthorizationIsEnabled() is false)
+        // the Authorize endpoint is not allowed unless authorization code flow is enabled.
+        if (_deliveryApiSettings.MemberAuthorization?.AuthorizationCodeFlow?.Enabled is not true)
         {
             return BadRequest("Member authorization is not allowed.");
         }
 
-        HttpContext context = _httpContextAccessor.GetRequiredHttpContext();
-        OpenIddictRequest? request = context.GetOpenIddictServerRequest();
+        OpenIddictRequest? request = HttpContext.GetOpenIddictServerRequest();
         if (request is null)
         {
             return BadRequest("Unable to obtain OpenID data from the current request.");
@@ -73,6 +97,37 @@ public class MemberController : DeliveryApiControllerBase
         return request.IdentityProvider.IsNullOrWhiteSpace()
             ? await AuthorizeInternal(request)
             : await AuthorizeExternal(request);
+    }
+
+    [HttpPost("token")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Token()
+    {
+        OpenIddictRequest? request = HttpContext.GetOpenIddictServerRequest();
+        if (request is null)
+        {
+            return BadRequest("Unable to obtain OpenID data from the current request.");
+        }
+
+        if ((request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType()) && _deliveryApiSettings.MemberAuthorization?.AuthorizationCodeFlow?.Enabled is true)
+        {
+            // attempt to authorize against the supplied the authorization code
+            AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+            return authenticateResult is { Succeeded: true, Principal: not null }
+                ? new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, authenticateResult.Principal)
+                : BadRequest("The supplied authorization was not be verified.");
+        }
+
+        if (request.IsClientCredentialsGrantType() && _deliveryApiSettings.MemberAuthorization?.ClientCredentialsFlow?.Enabled is true)
+        {
+            MemberIdentityUser? member = await _memberClientCredentialsManager.FindMemberAsync(request.ClientId!);
+            return member is not null
+                ? await SignInMember(member, request)
+                : BadRequest("Invalid client or client configuration.");
+        }
+
+        throw new InvalidOperationException("The requested grant type is not supported.");
     }
 
     [HttpGet("signout")]

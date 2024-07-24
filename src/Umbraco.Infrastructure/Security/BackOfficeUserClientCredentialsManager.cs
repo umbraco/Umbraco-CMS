@@ -2,15 +2,16 @@
 using Umbraco.Cms.Core.Security.OperationStatus;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
 
-public class BackOfficeUserClientCredentialsManager : IBackOfficeUserClientCredentialsManager
+public sealed class BackOfficeUserClientCredentialsManager : ClientCredentialsManagerBase, IBackOfficeUserClientCredentialsManager
 {
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IBackOfficeApplicationManager _backOfficeApplicationManager;
     private readonly IUserService _userService;
+
+    protected override string ClientIdPrefix => Constants.OAuthClientIds.BackOffice;
 
     public BackOfficeUserClientCredentialsManager(
         IBackOfficeUserManager backOfficeUserManager,
@@ -24,10 +25,7 @@ public class BackOfficeUserClientCredentialsManager : IBackOfficeUserClientCrede
 
     public async Task<Attempt<BackOfficeUserClientCredentialsOperationStatus>> SaveAsync(Guid userKey, string clientId, string clientSecret)
     {
-        if (IsReservedClientId(clientId))
-        {
-            return Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.ReservedClientId);
-        }
+        clientId = SafeClientId(clientId);
 
         if (await _userService.AddClientIdAsync(userKey, clientId) is false)
         {
@@ -41,10 +39,7 @@ public class BackOfficeUserClientCredentialsManager : IBackOfficeUserClientCrede
 
     public async Task<Attempt<BackOfficeUserClientCredentialsOperationStatus>> DeleteAsync(Guid userKey, string clientId)
     {
-        if (IsReservedClientId(clientId))
-        {
-            return Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.ReservedClientId);
-        }
+        clientId = SafeClientId(clientId);
 
         await _backOfficeApplicationManager.DeleteBackOfficeClientCredentialsApplicationAsync(clientId);
         await _userService.RemoveClientIdAsync(userKey, clientId);
@@ -54,7 +49,7 @@ public class BackOfficeUserClientCredentialsManager : IBackOfficeUserClientCrede
 
     public async Task<BackOfficeIdentityUser?> FindUserAsync(string clientId)
     {
-        IUser? user = await _userService.FindByClientIdAsync(clientId);
+        IUser? user = await _userService.FindByClientIdAsync(SafeClientId(clientId));
         if (user is null || user.IsApproved is false)
         {
             return null;
@@ -62,9 +57,4 @@ public class BackOfficeUserClientCredentialsManager : IBackOfficeUserClientCrede
 
         return await _backOfficeUserManager.FindByNameAsync(user.Username);
     }
-
-    private static bool IsReservedClientId(string clientId)
-        => clientId.InvariantEquals(Constants.OAuthClientIds.BackOffice)
-           || clientId.InvariantEquals(Constants.OAuthClientIds.Postman)
-           || clientId.InvariantEquals(Constants.OAuthClientIds.Swagger);
 }
