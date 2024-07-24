@@ -23,10 +23,17 @@ internal class ContentNavigationService : INavigationService
         _navigationStructure = _navigationRepository.GetContentNodesByObjectType(Constants.ObjectTypes.Document);
     }
 
-    public Guid? GetParentKey(Guid childKey)
-        => _navigationStructure.TryGetValue(childKey, out NavigationNode? childNode) ?
-            childNode.Parent?.Key :
-            null;
+    public bool TryGetParentKey(Guid childKey, out Guid? parentKey)
+    {
+        if (_navigationStructure.TryGetValue(childKey, out NavigationNode? childNode))
+        {
+            parentKey = childNode.Parent?.Key;
+            return true;
+        }
+
+        parentKey = null;
+        return false;
+    }
 
     public IEnumerable<Guid> GetChildrenKeys(Guid parentKey)
         => _navigationStructure.TryGetValue(parentKey, out NavigationNode? parentNode) ?

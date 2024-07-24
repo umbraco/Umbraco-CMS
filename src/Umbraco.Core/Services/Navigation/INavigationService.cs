@@ -4,7 +4,7 @@ public interface INavigationService
 {
     Task RebuildAsync();
 
-    Guid? GetParentKey(Guid childKey);
+    bool TryGetParentKey(Guid childKey, out Guid? parentKey);
 
     IEnumerable<Guid> GetChildrenKeys(Guid parentKey);
 
