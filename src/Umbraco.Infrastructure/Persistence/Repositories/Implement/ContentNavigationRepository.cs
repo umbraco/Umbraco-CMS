@@ -19,31 +19,24 @@ public class ContentNavigationRepository : INavigationRepository
 
     public Dictionary<Guid, NavigationNode> GetContentNodesByObjectType(Guid objectTypeKey)
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
-            .Select<NavigationDto>()
-            .From<NodeDto>()
-            .Where<NodeDto>(x => x.NodeObjectType == objectTypeKey && x.Trashed == false)
-            .OrderBy<NodeDto>(x => x.Path); // make sure that we get the parent items first
-
-        IEnumerable<NavigationDto> navigationDtos = AmbientScope?.Database.Fetch<NavigationDto>(sql) ?? Enumerable.Empty<NavigationDto>();
-
-        //var navigationStructure = NavigationFactory.BuildNavigationDictionary(navigationDtos);
-        var contentNavigationStructure = NavigationFactory.BuildNavigationDictionary(navigationDtos, dto => dto.Trashed is false);
-        //var recycleBinContentNavigationStructure = NavigationFactory.BuildNavigationDictionary(navigationDtos, dto => dto.Trashed);
-
-        return contentNavigationStructure;
+        IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, false);
+        return NavigationFactory.BuildNavigationDictionary(navigationDtos);
     }
 
     public Dictionary<Guid, NavigationNode> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
     {
+        IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, true);
+        return NavigationFactory.BuildNavigationDictionary(navigationDtos);
+    }
+
+    private IEnumerable<NavigationDto> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
+    {
         Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
             .Select<NavigationDto>()
             .From<NodeDto>()
-            .Where<NodeDto>(x => x.NodeObjectType == objectTypeKey && x.Trashed == true)
+            .Where<NodeDto>(x => x.NodeObjectType == objectTypeKey && x.Trashed == trashed)
             .OrderBy<NodeDto>(x => x.Path); // make sure that we get the parent items first
 
-        IEnumerable<NavigationDto> navigationDtos = AmbientScope?.Database.Fetch<NavigationDto>(sql) ?? Enumerable.Empty<NavigationDto>();
-
-        return NavigationFactory.BuildNavigationDictionary(navigationDtos);
+        return AmbientScope?.Database.Fetch<NavigationDto>(sql) ?? Enumerable.Empty<NavigationDto>();
     }
 }
