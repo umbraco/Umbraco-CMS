@@ -9,23 +9,15 @@ internal static class NavigationFactory
     ///     Builds a dictionary of NavigationNode objects from a given dataset.
     /// </summary>
     /// <param name="dataset">The dataset of <see cref="NavigationDto" /> objects used to build the navigation nodes dictionary.</param>
-    /// <param name="filterOutItems">
-    ///     An optional filter function that determines which items to include. If null, all items are included.
-    /// </param>
     /// <returns>A dictionary of <see cref="NavigationNode" /> objects with key corresponding to their unique guid.</returns>
-    public static Dictionary<Guid, NavigationNode> BuildNavigationDictionary(IEnumerable<NavigationDto> dataset, Func<NavigationDto, bool>? filterOutItems = null)
+    public static Dictionary<Guid, NavigationNode> BuildNavigationDictionary(IEnumerable<NavigationDto> dataset)
     {
         var nodesStructure = new Dictionary<Guid, NavigationNode>();
-        Dictionary<int, Guid> idToKeyMap = dataset.ToDictionary(x => x.Id, x => x.Key);
+        var datasetList = dataset.ToList();
+        var idToKeyMap = datasetList.ToDictionary(x => x.Id, x => x.Key);
 
-        foreach (NavigationDto dto in dataset)
+        foreach (NavigationDto dto in datasetList)
         {
-            // Filter items based on criteria
-            if (filterOutItems?.Invoke(dto) is false)
-            {
-                continue;
-            }
-
             var node = new NavigationNode(dto.Key);
             nodesStructure[dto.Key] = node;
 
