@@ -1,6 +1,5 @@
 import { UmbPropertyEditorUIImageCropsElement } from './property-editor-ui-image-crops.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
-//import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIImageCropsElement', () => {
 	let element: UmbPropertyEditorUIImageCropsElement;
@@ -12,13 +11,4 @@ describe('UmbPropertyEditorUIImageCropsElement', () => {
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIImageCropsElement);
 	});
-
-	/*
-	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
-		it('passes the a11y audit', async () => {
-			//TODO: This test is broken. It fails at forms because of missing labels even if you have them.
-			// await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
-		});
-	}
-	*/
 });
