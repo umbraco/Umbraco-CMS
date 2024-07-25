@@ -20,7 +20,6 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 	@query('#label')
 	private _labelInput!: HTMLInputElement;
 
-	//TODO MAKE TYPE
 	@property({ attribute: false })
 	value: UmbCrop[] = [];
 

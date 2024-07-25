@@ -40,7 +40,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 	nodeId?: string;
 
 	@property({ attribute: false })
-	dynamicRoot?: UmbContentPickerDynamicRoot | undefined;
+	dynamicRoot?: UmbContentPickerDynamicRoot;
 
 	@state()
 	_options: Array<Option> = [
