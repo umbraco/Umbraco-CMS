@@ -14,7 +14,8 @@
     {
       "id": "UseHttpsRedirect",
       "isVisible": true,
-      "persistenceScope": "templateGroup"
+      "persistenceScope": "templateGroup",
+      "defaultValue": "true"
     },
     {
       "id": "UseDeliveryApi",
@@ -79,7 +80,8 @@
     },
     {
       "id": "DevelopmentMode",
-      "isVisible": true
+      "isVisible": true,
+      "defaultValue": "IDEDevelopment"
     }
   ]
 }
