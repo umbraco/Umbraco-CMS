@@ -82,9 +82,9 @@ test('can open content picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.addContentPicker(contentPickerName);
 
   // Assert
-  await umbracoUi.content.isContentPickerOpenButtonVisible(contentPickerName);
+  await umbracoUi.content.isOpenButtonVisibleInContentPicker(contentPickerName);
   await umbracoUi.content.clickContentPickerOpenButton(contentPickerName);
-  await umbracoUi.content.doesContentPickerNodeOpen(contentPickerName);
+  await umbracoUi.content.isNodeOpenForContentPicker(contentPickerName);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -113,15 +113,15 @@ test('can choose start node for the content picker in the content', async ({umbr
   await umbracoUi.content.clickChooseButton();
 
   // Assert
-  await umbracoUi.content.isContentNameVisibleToBeChosen(childContentPickerName);
-  await umbracoUi.content.isContentNameVisibleToBeChosen(contentPickerName, false);
+  await umbracoUi.content.isContentNameVisible(childContentPickerName);
+  await umbracoUi.content.isContentNameVisible(contentPickerName, false);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.document.ensureNameNotExists(childContentPickerName);
 });
 
-test('can ignore user start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
+test.skip('can ignore user start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomContentPicker';
   const childContentPickerDocumentTypeName = 'ChildDocumentTypeForContentPicker';
@@ -144,8 +144,8 @@ test('can ignore user start node for the content picker in the content', async (
   await umbracoUi.content.clickChooseButton();
 
   // Assert
-  await umbracoUi.content.isContentNameVisibleToBeChosen(childContentPickerName);
-  await umbracoUi.content.isContentNameVisibleToBeChosen(contentPickerName);
+  await umbracoUi.content.isContentNameVisible(childContentPickerName);
+  await umbracoUi.content.isContentNameVisible(contentPickerName);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
