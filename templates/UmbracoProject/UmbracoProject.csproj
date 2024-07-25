@@ -21,7 +21,7 @@
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
 
-  <!--#if (ModelsBuilderMode == "InMemoryAuto" && DevelopmentMode != "IDEDevelopment") -->
+  <!--#if (ModelsBuilderMode == "InMemoryAuto" || (DevelopmentMode == "BackofficeDevelopment" && ModelsBuilderMode == "Default")) -->
   <PropertyGroup>
     <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
     <RazorCompileOnBuild>false</RazorCompileOnBuild>

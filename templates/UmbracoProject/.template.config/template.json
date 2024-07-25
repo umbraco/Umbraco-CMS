@@ -354,10 +354,13 @@
       "displayName": "Models builder mode",
       "datatype": "choice",
       "description": "Choose the models builder mode to use for the project. Is disabled when Development mode is set to IDE Development.",
-      "defaultValue": "InMemoryAuto",
+      "defaultValue": "Default",
       "replaces": "MODELS_MODE",
-      "isEnabled": "(DevelopmentMode == 'BackofficeDevelopment')",
       "choices": [
+        {
+          "choice": "Default",
+          "description": "Let DevelopmentMode determine the models builder mode."
+        },
         {
           "choice": "InMemoryAuto",
           "description": "Generate models in memory, automatically updating when a content type change, this means no need for app rebuild, however models are only available in views.",
