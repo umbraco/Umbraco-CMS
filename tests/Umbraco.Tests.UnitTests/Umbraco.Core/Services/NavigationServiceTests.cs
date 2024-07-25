@@ -452,6 +452,9 @@ public class NavigationServiceTests
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
     public void Removing_Node_Removes_Its_Descendants_As_Well(Guid keyOfNodeToRemove)
     {
+        // Arrange
+        _navigationService.TryGetDescendantsKeys(keyOfNodeToRemove, out IEnumerable<Guid> initialDescendantsKeys);
+
         // Act
         var result = _navigationService.Remove(keyOfNodeToRemove);
 
@@ -460,7 +463,16 @@ public class NavigationServiceTests
 
         _navigationService.TryGetDescendantsKeys(keyOfNodeToRemove, out IEnumerable<Guid> descendantsKeys);
 
-        Assert.AreEqual(0, descendantsKeys.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, descendantsKeys.Count());
+
+            foreach (Guid descendant in initialDescendantsKeys)
+            {
+                var descendantExists = _navigationService.TryGetParentKey(descendant, out _);
+                Assert.IsFalse(descendantExists);
+            }
+        });
     }
 
     [Test]
