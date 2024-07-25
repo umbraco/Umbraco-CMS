@@ -17,31 +17,29 @@ public class NavigationServiceTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IContentService ContentService => GetRequiredService<IContentService>();
-
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
     private INavigationService NavigationService => GetRequiredService<INavigationService>();
 
     private ContentType ContentType { get; set; }
 
-    private Content Root { get; set; }
+    private IContent Root { get; set; }
 
-    private Content Child1 { get; set; }
+    private IContent Child1 { get; set; }
 
-    private Content Grandchild1 { get; set; }
+    private IContent Grandchild1 { get; set; }
 
-    private Content Grandchild2 { get; set; }
+    private IContent Grandchild2 { get; set; }
 
-    private Content Child2 { get; set; }
+    private IContent Child2 { get; set; }
 
-    private Content Grandchild3 { get; set; }
+    private IContent Grandchild3 { get; set; }
 
-    private Content GreatGrandchild1 { get; set; }
+    private IContent GreatGrandchild1 { get; set; }
 
-    private Content Child3 { get; set; }
+    private IContent Child3 { get; set; }
 
-    private Content Grandchild4 { get; set; }
+    private IContent Grandchild4 { get; set; }
 
     [SetUp]
     public async Task Setup()
@@ -76,41 +74,41 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Content
-        Root = ContentBuilder.CreateSimpleContent(ContentType, "Root");
-        Root.Key = new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF");
-        ContentService.Save(Root, Constants.Security.SuperUserId);
+        var rootModel = CreateContentCreateModel("Root", new Guid("E48DD82A-7059-418E-9B82-CDD5205796CF"));
+        var rootCreateAttempt = await ContentEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey);
+        Root = rootCreateAttempt.Result.Content!;
 
-        Child1 = ContentBuilder.CreateSimpleContent(ContentType, "Child 1", Root.Id);
-        Child1.Key = new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE");
-        ContentService.Save(Child1, Constants.Security.SuperUserId);
+        var child1Model = CreateContentCreateModel("Child 1", new Guid("C6173927-0C59-4778-825D-D7B9F45D8DDE"), Root.Key);
+        var child1CreateAttempt = await ContentEditingService.CreateAsync(child1Model, Constants.Security.SuperUserKey);
+        Child1 = child1CreateAttempt.Result.Content!;
 
-        Grandchild1 = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild 1", Child1.Id);
-        Grandchild1.Key = new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573");
-        ContentService.Save(Grandchild1, Constants.Security.SuperUserId);
+        var grandchild1Model = CreateContentCreateModel("Grandchild 1", new Guid("E856AC03-C23E-4F63-9AA9-681B42A58573"), Child1.Key);
+        var grandchild1CreateAttempt = await ContentEditingService.CreateAsync(grandchild1Model, Constants.Security.SuperUserKey);
+        Grandchild1 = grandchild1CreateAttempt.Result.Content!;
 
-        Grandchild2 = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild 2", Child1.Id);
-        Grandchild2.Key = new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB");
-        ContentService.Save(Grandchild2, Constants.Security.SuperUserId);
+        var grandchild2Model = CreateContentCreateModel("Grandchild 2", new Guid("A1B1B217-B02F-4307-862C-A5E22DB729EB"), Child1.Key);
+        var grandchild2CreateAttempt = await ContentEditingService.CreateAsync(grandchild2Model, Constants.Security.SuperUserKey);
+        Grandchild2 = grandchild2CreateAttempt.Result.Content!;
 
-        Child2 = ContentBuilder.CreateSimpleContent(ContentType, "Child 2", Root.Id);
-        Child2.Key = new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96");
-        ContentService.Save(Child2, Constants.Security.SuperUserId);
+        var child2Model = CreateContentCreateModel("Child 2", new Guid("60E0E5C4-084E-4144-A560-7393BEAD2E96"), Root.Key);
+        var child2CreateAttempt = await ContentEditingService.CreateAsync(child2Model, Constants.Security.SuperUserKey);
+        Child2 = child2CreateAttempt.Result.Content!;
 
-        Grandchild3 = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild 3", Child2.Id);
-        Grandchild3.Key = new Guid("D63C1621-C74A-4106-8587-817DEE5FB732");
-        ContentService.Save(Grandchild3, Constants.Security.SuperUserId);
+        var grandchild3Model = CreateContentCreateModel("Grandchild 3", new Guid("D63C1621-C74A-4106-8587-817DEE5FB732"), Child2.Key);
+        var grandchild3CreateAttempt = await ContentEditingService.CreateAsync(grandchild3Model, Constants.Security.SuperUserKey);
+        Grandchild3 = grandchild3CreateAttempt.Result.Content!;
 
-        GreatGrandchild1 = ContentBuilder.CreateSimpleContent(ContentType, "Great-grandchild 1", Grandchild3.Id);
-        GreatGrandchild1.Key = new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7");
-        ContentService.Save(GreatGrandchild1, Constants.Security.SuperUserId);
+        var greatGrandchild1Model = CreateContentCreateModel("Great-grandchild 1", new Guid("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7"), Grandchild3.Key);
+        var greatGrandchild1CreateAttempt = await ContentEditingService.CreateAsync(greatGrandchild1Model, Constants.Security.SuperUserKey);
+        GreatGrandchild1 = greatGrandchild1CreateAttempt.Result.Content!;
 
-        Child3 = ContentBuilder.CreateSimpleContent(ContentType, "Child 3", Root.Id);
-        Child3.Key = new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF");
-        ContentService.Save(Child3, Constants.Security.SuperUserId);
+        var child3Model = CreateContentCreateModel("Child 3", new Guid("B606E3FF-E070-4D46-8CB9-D31352029FDF"), Root.Key);
+        var child3CreateAttempt = await ContentEditingService.CreateAsync(child3Model, Constants.Security.SuperUserKey);
+        Child3 = child3CreateAttempt.Result.Content!;
 
-        Grandchild4 = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild 4", Child3.Id);
-        Grandchild4.Key = new Guid("F381906C-223C-4466-80F7-B63B4EE073F8");
-        ContentService.Save(Grandchild4, Constants.Security.SuperUserId);
+        var grandchild4Model = CreateContentCreateModel("Grandchild 4", new Guid("F381906C-223C-4466-80F7-B63B4EE073F8"), Child3.Key);
+        var grandchild4CreateAttempt = await ContentEditingService.CreateAsync(grandchild4Model, Constants.Security.SuperUserKey);
+        Grandchild4 = grandchild4CreateAttempt.Result.Content!;
     }
 
     // protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -119,26 +117,29 @@ public class NavigationServiceTests : UmbracoIntegrationTest
     // }
 
     [Test]
-    public void Structure_Does_Not_Update_When_Scope_Is_Not_Completed()
+    public async Task Structure_Does_Not_Update_When_Scope_Is_Not_Completed()
     {
         // Arrange
-        Content notCreatedRoot = ContentBuilder.CreateSimpleContent(ContentType, "Root 2");
-        notCreatedRoot.Key = new Guid("516927E5-8574-497B-B45B-E27EFAB47DE4");
+        Guid notCreatedRootKey = new Guid("516927E5-8574-497B-B45B-E27EFAB47DE4");
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = ContentType.Key,
+            ParentKey = Constants.System.RootKey, // Create node at content root
+            InvariantName = "Root 2",
+            Key = notCreatedRootKey,
+        };
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            ContentService.Save(notCreatedRoot, Constants.Security.SuperUserId); // TODO: change to Content editing service
+            await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         }
 
         // Act
-        var result = NavigationService.TryGetSiblingsKeys(notCreatedRoot.Key, out IEnumerable<Guid> siblingsKeys);
+        var nodeExists = NavigationService.TryGetParentKey(notCreatedRootKey, out _);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(siblingsKeys);
-        });
+        Assert.IsFalse(nodeExists);
     }
 
     [Test]
@@ -152,7 +153,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         {
             ContentTypeKey = ContentType.Key,
             ParentKey = Constants.System.RootKey, // Create node at content root
-            InvariantName = "Test",
+            InvariantName = "Root 2",
         };
 
         // Act
@@ -408,4 +409,13 @@ public class NavigationServiceTests : UmbracoIntegrationTest
     //         Assert.AreEqual(targetParentKey, restoredItemParentKey);
     //     });
     // }
+
+    private ContentCreateModel CreateContentCreateModel(string name, Guid key, Guid? parentKey = null)
+        => new()
+        {
+            ContentTypeKey = ContentType.Key,
+            ParentKey = parentKey ?? Constants.System.RootKey,
+            InvariantName = name,
+            Key = key,
+        };
 }
