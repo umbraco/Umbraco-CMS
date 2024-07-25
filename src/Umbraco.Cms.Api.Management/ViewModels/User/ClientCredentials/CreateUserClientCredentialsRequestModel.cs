@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.User.ClientCredentials;
 
-public class CreateUserClientCredentialsRequestModel
+public sealed class CreateUserClientCredentialsRequestModel
 {
     public required string ClientId { get; set; }
 

@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Security.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.User.ClientCredentials;
 
 [ApiExplorerSettings(GroupName = "User")]
-public class ClientCredentialsUserControllerBase : UserControllerBase
+public abstract class ClientCredentialsUserControllerBase : UserControllerBase
 {
     protected IActionResult BackOfficeUserClientCredentialsOperationStatusResult(BackOfficeUserClientCredentialsOperationStatus status) =>
         OperationStatusResult(status, problemDetailsBuilder => status switch
@@ -22,5 +22,4 @@ public class ClientCredentialsUserControllerBase : UserControllerBase
                 .WithTitle("Unknown client credentials operation status.")
                 .Build()),
         });
-
 }
