@@ -2,6 +2,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
+/// <summary>
+///     Responsible for seeding the in-memory navigation structure at application's startup
+///     by rebuild the navigation structure.
+/// </summary>
 public class NavigationInitializationService : IHostedLifecycleService
 {
     private readonly INavigationService _navigationService;
