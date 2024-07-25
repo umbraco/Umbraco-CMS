@@ -7,44 +7,41 @@
       "datatype": "choice",
       "description": "Choose a starter kit to install.",
       "defaultValue": "None",
+      "replaces": "STARTER_KIT_NAME",
+      // The choice here should be the name of the starter kit package, since it will be used directly for package reference.
       "choices": [
         {
           "choice": "None",
           "description": "No starter kit."
         },
         {
-          "choice": "TheStarterKit",
-          "description": "The Umbraco starter kit."
+          "choice": "Umbraco.TheStarterKit",
+          "description": "The Umbraco starter kit.",
+          "displayName": "The Starter Kit"
         }
-//        ,{
-//          "choice": "Clean",
-//          "description": "Community made starter kit based on the Clean template."
-//        }
       ]
-    }
-  },
-  "postActions": [
-    {
-      "condition": "(StarterKit == 'TheStarterKit')",
-      "description": "Install the Umbraco starter kit",
-      "actionId": "B17581D1-C5C9-4489-8F0A-004BE667B814",
-      "continueOnError": false,
-      "args": {
-        "referenceType": "package",
-        "reference": "Umbraco.TheStarterKit",
-        "projectFileExtensions": ".csproj"
+    },
+    // Used to determine the version of the starter kit to install.
+    // there should be cases for Latest, LTS and Custom for every starterkit added above.
+    // This has the benefit that all maintenance of starter kits in template can be done from this file.
+    "StarterKitVersion": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "STARTER_KIT_VERSION",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(StarterKit == 'Umbraco.TheStarterKit' && (UmbracoRelease == 'Latest' || UmbracoRelease == 'Custom'))",
+            "value": "14.0.0"
+          },
+          {
+            "condition": "(StarterKit == 'Umbraco.TheStarterKit' && UmbracoRelease == 'LTS')",
+            "value": "13.0.0"
+          }
+        ]
       }
     }
-//    ,{
-//      "condition": "(StarterKit == 'Clean')",
-//      "description": "Install the Clean starter kit",
-//      "actionId": "B17581D1-C5C9-4489-8F0A-004BE667B814",
-//      "continueOnError": false,
-//      "args": {
-//        "referenceType": "package",
-//        "reference": "Clean",
-//        "projectFileExtensions": ".csproj"
-//      }
-//    }
-  ]
+  }
 }

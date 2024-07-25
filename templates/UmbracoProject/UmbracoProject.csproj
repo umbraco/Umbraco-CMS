@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <!--#if (StarterKit != "None") -->
+    <PackageReference Include="STARTER_KIT_NAME" Version="STARTER_KIT_VERSION"/>
+    <!--#endif -->
   </ItemGroup>
 
   <ItemGroup>
