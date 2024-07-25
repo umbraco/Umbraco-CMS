@@ -16,6 +16,7 @@ internal sealed class ContentCacheService : IContentCacheService
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
+    private readonly ICacheNodeFactory _cacheNodeFactory;
 
 
     public ContentCacheService(
@@ -23,13 +24,15 @@ internal sealed class ContentCacheService : IContentCacheService
         IIdKeyMap idKeyMap,
         ICoreScopeProvider scopeProvider,
         Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache,
-        IPublishedContentFactory publishedContentFactory)
+        IPublishedContentFactory publishedContentFactory,
+        ICacheNodeFactory cacheNodeFactory)
     {
         _nuCacheContentRepository = nuCacheContentRepository;
         _idKeyMap = idKeyMap;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
+        _cacheNodeFactory = cacheNodeFactory;
     }
 
     // TODO: Stop using IdKeyMap for these, but right now we both need key and id for caching..
@@ -108,7 +111,8 @@ internal sealed class ContentCacheService : IContentCacheService
     public async Task RefreshContentAsync(IContent content)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        await _hybridCache.RemoveAsync(content.Key.ToString());
+        var contentCacheNode = _cacheNodeFactory.ToContentCacheNode(content);
+        await _hybridCache.SetAsync(contentCacheNode.Key.ToString(), contentCacheNode);
         _nuCacheContentRepository.RefreshContent(content);
         scope.Complete();
     }
