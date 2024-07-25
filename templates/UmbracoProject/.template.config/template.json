@@ -78,6 +78,15 @@
       ],
       "isRequired": false
     },
+    "UmbracoVersion": {
+      "displayName": "Custom Version",
+      "description": "The selected custom version of Umbraco, only active if Custom is selected as version.",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "*",
+      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE",
+      "isEnabled": "(UmbracoRelease == 'Custom')"
+    },
     "FinalVersion" : {
       "type": "generated",
       "generator": "switch",
@@ -116,15 +125,6 @@
           }
         ]
       }
-    },
-    "UmbracoVersion": {
-      "displayName": "Custom Version",
-      "description": "The selected custom version of Umbraco, only active if Custom is selected as version.",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "*",
-      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE",
-      "isEnabled": "(UmbracoRelease == 'Custom')"
     },
     "UseHttpsRedirect": {
       "displayName": "Use HTTPS redirect",
