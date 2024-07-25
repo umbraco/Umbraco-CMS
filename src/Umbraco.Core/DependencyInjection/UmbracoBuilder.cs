@@ -39,6 +39,7 @@ using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.ImportExport;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -352,6 +353,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<CompiledPackageXmlParser>();
             Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
             Services.AddUnique<IPreviewService, PreviewService>();
+            Services.AddUnique<INavigationService, ContentNavigationService>();
 
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
@@ -398,7 +400,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Segments
             Services.AddUnique<ISegmentService, NoopSegmentService>();
-            
+
             // definition Import/export
             Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
