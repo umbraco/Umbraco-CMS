@@ -35,6 +35,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
         builder.Services.AddTransient<IMemberCacheService, MemberCacheService>();
         builder.Services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
+        builder.Services.AddTransient<ICacheNodeFactory, CacheNodeFactory>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
             IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();
@@ -57,5 +58,4 @@ public static class UmbracoBuilderExtensions
 
         return builder;
     }
-
 }
