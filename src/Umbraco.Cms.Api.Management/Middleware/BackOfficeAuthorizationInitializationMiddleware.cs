@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Middleware;
 
-public sealed class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
+public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
 {
     private bool _firstBackOfficeRequest; // this only works because this is a singleton
     private SemaphoreSlim _firstBackOfficeRequestLocker = new(1); // this only works because this is a singleton
