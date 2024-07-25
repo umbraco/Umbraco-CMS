@@ -499,11 +499,11 @@ public class NavigationServiceTests
         // Assert
         Assert.IsTrue(result);
 
-        var parentExists = _navigationService.TryGetParentKey(newNodeKey, out Guid? parentKey);
+        var nodeExists = _navigationService.TryGetParentKey(newNodeKey, out Guid? parentKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(parentExists);
+            Assert.IsTrue(nodeExists);
             Assert.IsNull(parentKey);
         });
     }
