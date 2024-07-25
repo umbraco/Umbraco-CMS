@@ -22,7 +22,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(contentPickerDocumentTypeName);
 });
 
-test('can create content with the content picker datatype', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the content picker datatype', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
