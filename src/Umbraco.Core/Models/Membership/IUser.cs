@@ -39,6 +39,14 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     /// </summary>
     string? Avatar { get; set; }
 
+    /// <summary>
+    ///     The type of user.
+    /// </summary>
+    /// <remarks>
+    ///     Cannot be changed after the user has been created.
+    /// </remarks>
+    UserType Type { get; set; }
+
     void RemoveGroup(string group);
 
     void ClearGroups();
