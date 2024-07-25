@@ -33,6 +33,8 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
+  // This wait is needed 
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.enterContentName(childContentName);
   await umbracoUi.content.clickSaveButton();
   
@@ -51,7 +53,6 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoApi.document.ensureNameNotExists(childContentName);
 });
 
-// TODO: Remove skip when the front-end is ready.
 test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childOfChildContentName = 'ChildOfChildContent';
