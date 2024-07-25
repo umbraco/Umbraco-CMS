@@ -1189,6 +1189,11 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
         }
 
+        if (user.Type != UserType.Default)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
+        }
+
         IUser? performingUser = await userStore.GetAsync(performingUserKey);
         if (performingUser is null)
         {

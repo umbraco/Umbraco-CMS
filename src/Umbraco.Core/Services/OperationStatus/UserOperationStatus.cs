@@ -40,4 +40,5 @@ public enum UserOperationStatus
     NotInInviteState,
     SelfPasswordResetNotAllowed,
     DuplicateId,
+    InvalidUserType,
 }
