@@ -40,7 +40,7 @@ internal class MediaCacheService : IMediaCacheService
             cancel => ValueTask.FromResult(_nuCacheContentRepository.GetMediaSource(idAttempt.Result)));
 
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode, preview);
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false)
@@ -56,7 +56,7 @@ internal class MediaCacheService : IMediaCacheService
             $"{keyAttempt.Result}", // Unique key to the cache entry
             cancel => ValueTask.FromResult(_nuCacheContentRepository.GetMediaSource(id)));
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode, preview);
     }
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)

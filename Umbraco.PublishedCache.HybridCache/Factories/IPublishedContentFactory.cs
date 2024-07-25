@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 internal interface IPublishedContentFactory
 {
     IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview);
-    IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode);
+    IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode, bool preview);
 
     IPublishedMember ToPublishedMember(IMember member);
 }

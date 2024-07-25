@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
 internal interface ICacheNodeFactory
 {
-    ContentCacheNode ToContentCacheNode(IContent content);
+    ContentCacheNode ToContentCacheNode(IContent content, bool preview);
 }

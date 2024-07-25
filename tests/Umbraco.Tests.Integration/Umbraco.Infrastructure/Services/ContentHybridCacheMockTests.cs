@@ -45,7 +45,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             false,
             new Dictionary<string, PropertyData[]>(),
             null);
-        _mockedNucacheRepository.Setup(r => r.GetContentSource(It.IsAny<int>())).Returns(
+        _mockedNucacheRepository.Setup(r => r.GetContentSource(It.IsAny<int>(), It.IsAny<bool>())).Returns(
             new ContentCacheNode()
             {
                 ContentTypeId = Textpage.ContentTypeId,
@@ -55,11 +55,11 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
                 Key = Textpage.Key,
                 SortOrder = 0,
                 Path = Textpage.Path,
-                Draft = contentData,
-                Published = null,
+                Data = contentData,
+                IsDraft = true,
             });
 
-        _mockedNucacheRepository.Setup(r => r.GetTypeContentSources(It.IsAny<IReadOnlyCollection<int>?>())).Returns(
+        _mockedNucacheRepository.Setup(r => r.GetContentByContentTypeId(It.IsAny<IReadOnlyCollection<int>?>())).Returns(
             new List<ContentCacheNode>()
             {
                 new()
@@ -71,8 +71,8 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
                     Key = Textpage.Key,
                     SortOrder = 0,
                     Path = Textpage.Path,
-                    Draft = contentData,
-                    Published = null,
+                    Data = contentData,
+                    IsDraft = true,
                 },
             });
 
@@ -92,21 +92,25 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Content_Is_Cached_By_Key()
     {
+        var hybridCache = GetRequiredService<HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
         var textPage = await _mockedCache.GetById(Textpage.Key, true);
         var textPage2 = await _mockedCache.GetById(Textpage.Key, true);
         AssertTextPage(textPage);
         AssertTextPage(textPage2);
-        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>()), Times.Exactly(1));
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     [Test]
     public async Task Content_Is_Cached_By_Id()
     {
+        var hybridCache = GetRequiredService<HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
         var textPage = await _mockedCache.GetById(Textpage.Id, true);
         var textPage2 = await _mockedCache.GetById(Textpage.Id, true);
         AssertTextPage(textPage);
         AssertTextPage(textPage2);
-        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>()), Times.Exactly(1));
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     [Test]
@@ -118,7 +122,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var textPage = await _mockedCache.GetById(Textpage.Id, true);
         AssertTextPage(textPage);
 
-        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>()), Times.Exactly(0));
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(0));
     }
 
     [Test]
@@ -130,7 +134,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var textPage = await _mockedCache.GetById(Textpage.Key, true);
         AssertTextPage(textPage);
 
-        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>()), Times.Exactly(0));
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(0));
     }
 
     private void AssertTextPage(IPublishedContent textPage)

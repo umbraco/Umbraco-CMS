@@ -15,21 +15,10 @@ internal class CacheNodeFactory : ICacheNodeFactory
         _urlSegmentProviders = urlSegmentProviders;
     }
 
-    public ContentCacheNode ToContentCacheNode(IContent content)
+    public ContentCacheNode ToContentCacheNode(IContent content, bool preview)
     {
-        ContentData? draftContentData = null;
-        ContentData? publishedContentData = null;
-        if (content.Edited)
-        {
-            draftContentData = GetContentData(content, false);
-        }
-
-        if (content.Published)
-        {
-            publishedContentData = GetContentData(content, true);
-        }
-
-        return new ContentCacheNode(draftContentData, publishedContentData)
+        ContentData contentData = GetContentData(content, !preview);
+        return new ContentCacheNode
         {
             Id = content.Id,
             Key = content.Key,
@@ -38,6 +27,8 @@ internal class CacheNodeFactory : ICacheNodeFactory
             CreateDate = content.CreateDate,
             CreatorId = content.CreatorId,
             ContentTypeId = content.ContentTypeId,
+            Data = contentData,
+            IsDraft = !preview,
         };
     }
 

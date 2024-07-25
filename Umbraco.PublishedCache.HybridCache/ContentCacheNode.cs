@@ -6,17 +6,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 [ImmutableObject(true)]
 internal sealed class ContentCacheNode
 {
-    public ContentCacheNode()
-    {
-
-    }
-
-    public ContentCacheNode(ContentData? draft, ContentData? published)
-    {
-        Draft = draft;
-        Published = published;
-    }
-
     public int Id { get; set; }
 
     public Guid Key { get; set; }
@@ -31,7 +20,7 @@ internal sealed class ContentCacheNode
 
     public int ContentTypeId { get; set; }
 
-    public ContentData? Draft { get; set; }
+    public bool IsDraft { get; set; }
 
-    public ContentData? Published { get; set; }
+    public ContentData? Data { get; set; }
 }

@@ -47,7 +47,7 @@ internal sealed class ContentCacheService : IContentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            $"{key}", // Unique key to the cache entry
+            GetCacheKey(key, preview), // Unique key to the cache entry
             cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(idAttempt.Result)));
 
         scope.Complete();
@@ -64,15 +64,15 @@ internal sealed class ContentCacheService : IContentCacheService
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            $"{keyAttempt.Result}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(id)));
+            GetCacheKey(keyAttempt.Result, preview), // Unique key to the cache entry
+            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(id, preview)));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
 
     public async Task SeedAsync(IReadOnlyCollection<int>? contentTypeIds)
     {
-        IEnumerable<ContentCacheNode> contentCacheNodes = _nuCacheContentRepository.GetTypeContentSources(contentTypeIds);
+        IEnumerable<ContentCacheNode> contentCacheNodes = _nuCacheContentRepository.GetContentByContentTypeId(contentTypeIds);
         foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
         {
             // Never expire seeded values
@@ -82,7 +82,7 @@ internal sealed class ContentCacheService : IContentCacheService
             };
 
             await _hybridCache.SetAsync(
-                $"{contentCacheNode.Key}",
+                GetCacheKey(contentCacheNode.Key, false),
                 contentCacheNode,
                 entryOptions);
         }
@@ -97,12 +97,12 @@ internal sealed class ContentCacheService : IContentCacheService
         }
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
-            $"{keyAttempt.Result}", // Unique key to the cache entry
+            GetCacheKey(keyAttempt.Result, preview), // Unique key to the cache entry
             cancel => ValueTask.FromResult<ContentCacheNode?>(null));
 
         if (contentCacheNode is null)
         {
-            await _hybridCache.RemoveAsync($"{keyAttempt.Result}");
+            await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, preview));
         }
 
         return contentCacheNode is not null;
@@ -111,11 +111,24 @@ internal sealed class ContentCacheService : IContentCacheService
     public async Task RefreshContentAsync(IContent content)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        var contentCacheNode = _cacheNodeFactory.ToContentCacheNode(content);
-        await _hybridCache.SetAsync(contentCacheNode.Key.ToString(), contentCacheNode);
+
+        // Always set draft node
+        // We have nodes seperate in the cache, cause 99% of the time, you are only using one
+        // and thus we won't get too much data when retrieving from the cache.
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        await _hybridCache.SetAsync(GetCacheKey(content.Key, true), draftCacheNode);
+
+        if (content.PublishedState == PublishedState.Publishing)
+        {
+            var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+            await _hybridCache.SetAsync(GetCacheKey(content.Key, false), publishedCacheNode);
+        }
+
         _nuCacheContentRepository.RefreshContent(content);
         scope.Complete();
     }
+
+    private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 
     public Task DeleteItemAsync(int id)
     {

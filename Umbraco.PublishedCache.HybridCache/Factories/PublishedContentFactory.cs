@@ -33,16 +33,16 @@ internal class PublishedContentFactory : IPublishedContentFactory
     {
         var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
-        contentNode.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published);
+        contentNode.SetContentTypeAndData(contentType, preview ? contentCacheNode.Data : null, preview ? null : contentCacheNode.Data);
 
         return preview ? GetModel(contentNode, contentNode.DraftModel) ?? GetPublishedContentAsDraft(GetModel(contentNode, contentNode.PublishedModel)) : GetModel(contentNode, contentNode.PublishedModel);
     }
 
-    public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
+    public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode, bool preview)
     {
         var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
-        contentNode.SetContentTypeAndData(contentType, contentCacheNode.Draft, contentCacheNode.Published);
+        contentNode.SetContentTypeAndData(contentType, preview ? contentCacheNode.Data : null, preview ? null : contentCacheNode.Data);
 
         return GetModel(contentNode, contentNode.PublishedModel);
     }

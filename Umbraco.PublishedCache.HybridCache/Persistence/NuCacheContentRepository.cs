@@ -110,8 +110,8 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
 
         // If contentTypeIds, mediaTypeIds and memberTypeIds are null, truncate table as all records will be deleted (as these 3 are the only types in the table).
         if (contentTypeIds != null && !contentTypeIds.Any()
-            && mediaTypeIds != null && !mediaTypeIds.Any()
-            && memberTypeIds != null && !memberTypeIds.Any())
+                                   && mediaTypeIds != null && !mediaTypeIds.Any()
+                                   && memberTypeIds != null && !memberTypeIds.Any())
         {
             if (Database.DatabaseType == DatabaseType.SqlServer2012)
             {
@@ -196,7 +196,7 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
-    public ContentCacheNode? GetContentSource(int id)
+    public ContentCacheNode? GetContentSource(int id, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -212,45 +212,10 @@ AND cmsContentNu.nodeId IS NULL
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-        return CreateContentNodeKit(dto, serializer);
+        return CreateContentNodeKit(dto, serializer, preview);
     }
 
-    public IEnumerable<ContentCacheNode> GetAllContentSources()
-    {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
-
-        foreach (ContentSourceDto row in dtos)
-        {
-            yield return CreateContentNodeKit(row, serializer);
-        }
-    }
-
-    public IEnumerable<ContentCacheNode> GetBranchContentSources(int id)
-    {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect(SqlContentSourcesSelectUmbracoNodeJoin)
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlWhereNodeIdX(SqlContext, id))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
-
-        foreach (ContentSourceDto row in dtos)
-        {
-            yield return CreateContentNodeKit(row, serializer);
-        }
-    }
-
-    public IEnumerable<ContentCacheNode> GetTypeContentSources(IEnumerable<int>? ids)
+    public IEnumerable<ContentCacheNode> GetContentByContentTypeId(IEnumerable<int>? ids)
     {
         if (!ids?.Any() ?? false)
         {
@@ -269,7 +234,7 @@ AND cmsContentNu.nodeId IS NULL
 
         foreach (ContentSourceDto row in dtos)
         {
-            yield return CreateContentNodeKit(row, serializer);
+            yield return CreateContentNodeKit(row, serializer, false);
         }
     }
 
@@ -388,7 +353,8 @@ AND cmsContentNu.nodeId IS NULL
     }
 
     // assumes content tree lock
-    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize,
+        IReadOnlyCollection<int>? contentTypeIds)
     {
         Guid contentObjectType = Constants.ObjectTypes.Document;
 
@@ -451,12 +417,12 @@ WHERE cmsContentNu.nodeId IN (
 
             Database.BulkInsertRecords(items);
             processed += count;
-        }
-        while (processed < total);
+        } while (processed < total);
     }
 
     // assumes media tree lock
-    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize,
+        IReadOnlyCollection<int>? contentTypeIds)
     {
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
@@ -504,12 +470,12 @@ WHERE cmsContentNu.nodeId IN (
             var items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
-        }
-        while (processed < total);
+        } while (processed < total);
     }
 
     // assumes member tree lock
-    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize,
+        IReadOnlyCollection<int>? contentTypeIds)
     {
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
@@ -556,8 +522,7 @@ WHERE cmsContentNu.nodeId IN (
             ContentNuDto[] items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
-        }
-        while (processed < total);
+        } while (processed < total);
     }
 
     private ContentNuDto GetDto(IContentBase content, bool published, IContentCacheDataSerializer serializer)
@@ -636,10 +601,7 @@ WHERE cmsContentNu.nodeId IN (
 
         var dto = new ContentNuDto
         {
-            NodeId = content.Id,
-            Published = published,
-            Data = serialized.StringData,
-            RawData = serialized.ByteData,
+            NodeId = content.Id, Published = published, Data = serialized.StringData, RawData = serialized.ByteData,
         };
 
         return dto;
@@ -698,9 +660,9 @@ WHERE cmsContentNu.nodeId IN (
             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
             .LeftJoin<ContentVersionDto>(
                 j =>
-                j.InnerJoin<DocumentVersionDto>("pdver")
-                    .On<ContentVersionDto, DocumentVersionDto>(
-                        (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
+                    j.InnerJoin<DocumentVersionDto>("pdver")
+                        .On<ContentVersionDto, DocumentVersionDto>(
+                            (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
                 "pcver")
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
             .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
@@ -720,7 +682,8 @@ WHERE cmsContentNu.nodeId IN (
                 builder.InnerJoin<NodeDto>("x")
                     .On<NodeDto, NodeDto>(
                         (left, right) => left.NodeId == right.NodeId ||
-                                         SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"),
+                                         SqlText<bool>(left.Path, right.Path,
+                                             (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"),
                         aliasRight: "x"));
 
         Sql<ISqlContext> sql = sqlTemplate.Sql();
@@ -807,11 +770,11 @@ WHERE cmsContentNu.nodeId IN (
             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
             .LeftJoin<ContentVersionDto>(
                 j =>
-                j.InnerJoin<DocumentVersionDto>("pdver")
-                    .On<ContentVersionDto, DocumentVersionDto>(
-                        (left, right) => left.Id == right.Id && right.Published,
-                        "pcver",
-                        "pdver"),
+                    j.InnerJoin<DocumentVersionDto>("pdver")
+                        .On<ContentVersionDto, DocumentVersionDto>(
+                            (left, right) => left.Id == right.Id && right.Published,
+                            "pcver",
+                            "pdver"),
                 "pcver")
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver");
 
@@ -883,12 +846,9 @@ WHERE cmsContentNu.nodeId IN (
         return sql;
     }
 
-    private ContentCacheNode CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
+    private ContentCacheNode CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
     {
-        ContentData? draftContentData = null;
-        ContentData? publishedContentData = null;
-
-        if (dto.Edited)
+        if (preview)
         {
             if (dto.EditData == null && dto.EditDataRaw == null)
             {
@@ -905,8 +865,9 @@ WHERE cmsContentNu.nodeId IN (
             else
             {
                 bool published = false;
-                ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
-                draftContentData = new ContentData(
+                ContentCacheDataModel? deserializedDraftContent =
+                    serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
+                var draftContentData = new ContentData(
                     dto.EditName,
                     null,
                     dto.VersionId,
@@ -914,43 +875,50 @@ WHERE cmsContentNu.nodeId IN (
                     dto.CreatorId,
                     -1,
                     published,
-                    deserializedContent?.PropertyData,
-                    deserializedContent?.CultureData);
-            }
-        }
+                    deserializedDraftContent?.PropertyData,
+                    deserializedDraftContent?.CultureData);
 
-        if (dto.Published)
-        {
-            if (dto.PubData == null && dto.PubDataRaw == null)
-            {
-                if (Debugger.IsAttached)
+                return new ContentCacheNode
                 {
-                    throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id +
-                                                        ", consider rebuilding.");
-                }
-
-                _logger.LogWarning(
-                    "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
-                    dto.Id);
-            }
-            else
-            {
-                var published = true;
-                ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
-                publishedContentData = new ContentData(
-                    dto.PubName,
-                    null,
-                    dto.VersionId,
-                    dto.PubVersionDate,
-                    dto.CreatorId,
-                    -1,
-                    published,
-                    deserializedContent?.PropertyData,
-                    deserializedContent?.CultureData);
+                    Id = dto.Id,
+                    Key = dto.Key,
+                    Path = dto.Path,
+                    SortOrder = dto.SortOrder,
+                    CreateDate = dto.CreateDate,
+                    CreatorId = dto.CreatorId,
+                    ContentTypeId = dto.ContentTypeId,
+                    Data = draftContentData,
+                    IsDraft = true,
+                };
             }
         }
 
-        return new ContentCacheNode(draftContentData, publishedContentData)
+        if (dto.PubData == null && dto.PubDataRaw == null)
+        {
+            if (Debugger.IsAttached)
+            {
+                throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id +
+                                                    ", consider rebuilding.");
+            }
+
+            _logger.LogWarning(
+                "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
+                dto.Id);
+        }
+
+        ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
+        var publishedContentData = new ContentData(
+            dto.PubName,
+            null,
+            dto.VersionId,
+            dto.PubVersionDate,
+            dto.CreatorId,
+            -1,
+            true,
+            deserializedContent?.PropertyData,
+            deserializedContent?.CultureData);
+
+        return new ContentCacheNode
         {
             Id = dto.Id,
             Key = dto.Key,
@@ -959,6 +927,8 @@ WHERE cmsContentNu.nodeId IN (
             CreateDate = dto.CreateDate,
             CreatorId = dto.CreatorId,
             ContentTypeId = dto.ContentTypeId,
+            Data = publishedContentData,
+            IsDraft = false,
         };
     }
 
@@ -982,7 +952,7 @@ WHERE cmsContentNu.nodeId IN (
             deserializedMedia?.PropertyData,
             deserializedMedia?.CultureData);
 
-        return new ContentCacheNode(null, publishedContentData)
+        return new ContentCacheNode
         {
             Id = dto.Id,
             Key = dto.Key,
@@ -991,6 +961,8 @@ WHERE cmsContentNu.nodeId IN (
             CreateDate = dto.CreateDate,
             CreatorId = dto.CreatorId,
             ContentTypeId = dto.ContentTypeId,
+            Data = publishedContentData,
+            IsDraft = false,
         };
     }
 

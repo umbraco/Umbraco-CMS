@@ -1,8 +1,10 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.Caching.Hybrid;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -80,9 +82,6 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Has_Content_By_Id_Returns_True_If_In_Cache()
     {
-        // Arrange
-        await PublishedContentHybridCache.GetById(Textpage.Id);
-
         // Act
         var hasContent = await PublishedContentHybridCache.HasById(Textpage.Id, true);
 
@@ -94,13 +93,15 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContent
     public async Task Has_Content_By_Id_Has_Content_After_Load()
     {
         // Arrange
-        var hasContent = await PublishedContentHybridCache.HasById(Textpage.Id, true);
-
+        ContentService.Publish(Textpage, Array.Empty<string>());
+        var hybridCache = GetRequiredService<HybridCache>();
+        await hybridCache.RemoveAsync(Textpage.Key.ToString());
+        var hasContent = await PublishedContentHybridCache.HasById(Textpage.Id);
         Assert.IsFalse(hasContent);
         await PublishedContentHybridCache.GetById(Textpage.Id);
 
         // Act
-        var hasContent2 = await PublishedContentHybridCache.HasById(Textpage.Id, true);
+        var hasContent2 = await PublishedContentHybridCache.HasById(Textpage.Id);
 
         // Assert
         Assert.IsTrue(hasContent2);
@@ -117,6 +118,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContent
 
         // Assert
         AssertTextPage(textPage);
+        Assert.IsFalse(textPage.IsPublished());
     }
 
     [Test]
@@ -130,6 +132,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContent
 
         // Assert
         AssertTextPage(textPage);
+        Assert.IsFalse(textPage.IsPublished());
     }
 
     [Test]
@@ -447,9 +450,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContent
             Assert.AreEqual(Textpage.Key, textPage.Key);
             Assert.AreEqual(Textpage.CreatorId, textPage.CreatorId);
             Assert.AreEqual(Textpage.CreateDate, textPage.CreateDate);
-            Assert.AreEqual(Textpage.Edited, !textPage.IsPublished());
             Assert.AreEqual(Textpage.Name, textPage.Name);
-            Assert.AreEqual(Textpage.Published, textPage.IsPublished());
         });
         AssertProperties(Textpage.Properties, textPage.Properties);
     }
