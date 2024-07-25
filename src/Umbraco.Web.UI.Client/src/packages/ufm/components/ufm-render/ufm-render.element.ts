@@ -28,7 +28,7 @@ UmbDomPurify.addHook('afterSanitizeAttributes', function (node) {
 	}
 });
 
-const UmbMarked = new Marked({
+export const UmbMarked = new Marked({
 	async: true,
 	gfm: true,
 	breaks: true,
