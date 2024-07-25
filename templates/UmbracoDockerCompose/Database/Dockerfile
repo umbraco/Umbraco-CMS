@@ -15,6 +15,7 @@ ENV MSSQL_LOG_DIR="/var/opt/mssql/log"
 EXPOSE 1433/tcp
 COPY setup.sql /
 COPY startup.sh /
+COPY healthcheck.sh /
 
 ENTRYPOINT [ "/bin/bash", "startup.sh" ]
 CMD [ "/opt/mssql/bin/sqlservr" ]
