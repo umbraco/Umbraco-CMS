@@ -18,7 +18,7 @@ console.log('\n-----------------------------------');
 console.log('Results:');
 console.log('-----------------------------------\n');
 
-const hasError = checkPathLength(PROJECT_DIR, MAX_PATH_LENGTH);
+const hasError = checkPathLength(PROJECT_DIR);
 
 if (hasError) {
 	console.log('\n-----------------------------------');
