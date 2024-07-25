@@ -40,11 +40,9 @@ public class AddTypeToUser : UnscopedMigrationBase
         scope.Complete();
     }
 
-    // TODO KJA: TEST THIS!
     private void MigrateSqlServer()
     {
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-        // TODO KJA: do we need to explicitly set the default value or is the DB updated for us here?
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
     }
 
@@ -92,7 +90,6 @@ public class AddTypeToUser : UnscopedMigrationBase
             CreateDate = x.CreateDate,
             UpdateDate = x.UpdateDate,
             Avatar = x.Avatar,
-            // TODO KJA: use enum integer value here!
             Type = 0
         });
 

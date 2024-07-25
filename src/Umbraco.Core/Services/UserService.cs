@@ -2488,9 +2488,8 @@ internal class UserService : RepositoryService, IUserService
             return false;
         }
 
-        // TODO KJA: ensure that this is an "API" user
         IUser? user = await GetAsync(userKey);
-        if (user is null)
+        if (user is null || user.Type != UserType.Api)
         {
             return false;
         }
@@ -2513,9 +2512,7 @@ internal class UserService : RepositoryService, IUserService
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         IUser? user = _userRepository.GetByClientId(clientId);
-
-        // TODO KJA: return null if this is not an "API" user
-        return Task.FromResult(user);
+        return Task.FromResult(user?.Type == UserType.Api ? user : null);
     }
 
     /// <summary>
