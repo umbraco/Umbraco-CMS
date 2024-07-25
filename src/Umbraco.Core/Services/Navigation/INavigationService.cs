@@ -18,7 +18,5 @@ public interface INavigationService
 
     bool Add(Guid key, Guid? parentKey = null);
 
-    bool Copy(Guid sourceKey, out Guid copiedNodeKey, Guid? targetParentKey = null);
-
     bool Move(Guid nodeKey, Guid? targetParentKey = null);
 }

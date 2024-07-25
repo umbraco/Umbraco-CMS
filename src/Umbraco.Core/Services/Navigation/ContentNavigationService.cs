@@ -162,32 +162,6 @@ internal class ContentNavigationService : INavigationService
         return true;
     }
 
-    public bool Copy(Guid sourceKey, out Guid copiedNodeKey, Guid? targetParentKey = null)
-    {
-        copiedNodeKey = Guid.Empty; // Default value
-
-        if (_navigationStructure.TryGetValue(sourceKey, out NavigationNode? sourceNode) is false)
-        {
-            return false; // Source doesn't exist
-        }
-
-        NavigationNode? targetParentNode = null;
-        if (targetParentKey.HasValue && _navigationStructure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
-        {
-            return false; // Target parent doesn't exist
-        }
-
-        var newNodesMap = new Dictionary<Guid, NavigationNode>();
-        CopyNodeHierarchyRecursively(sourceNode, targetParentNode, newNodesMap, out copiedNodeKey);
-
-        foreach (NavigationNode newNode in newNodesMap.Values)
-        {
-            _navigationStructure[newNode.Key] = newNode;
-        }
-
-        return true;
-    }
-
     public bool Move(Guid nodeKey, Guid? targetParentKey = null)
     {
         if (_navigationStructure.TryGetValue(nodeKey, out NavigationNode? nodeToMove) is false)
@@ -249,21 +223,6 @@ internal class ContentNavigationService : INavigationService
         foreach (NavigationNode child in originalNode.Children)
         {
             newNode.AddChild(child);
-        }
-    }
-
-    private void CopyNodeHierarchyRecursively(NavigationNode sourceNode, NavigationNode? newParent, Dictionary<Guid, NavigationNode> newNodesMap, out Guid topmostCopiedNodeKey)
-    {
-        topmostCopiedNodeKey = Guid.NewGuid(); // TODO: pass in the key or get it from the DB?
-        var newNode = new NavigationNode(topmostCopiedNodeKey);
-
-        newParent?.AddChild(newNode);
-
-        newNodesMap[topmostCopiedNodeKey] = newNode;
-
-        foreach (NavigationNode child in sourceNode.Children)
-        {
-            CopyNodeHierarchyRecursively(child, newNode, newNodesMap, out _);
         }
     }
 }
