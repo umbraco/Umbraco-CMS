@@ -16,13 +16,9 @@ export function ufm(plugins: Array<UfmPlugin> = []): MarkedExtension {
 			return {
 				name: alias,
 				level: 'inline',
-				start: (src: string) => {
-					const regex = new RegExp(`\\{${marker}`);
-					const match = src.match(regex);
-					return match ? match.index : -1;
-				},
-				tokenizer(src: string): Tokens.Generic | undefined {
-					const pattern = `^(?<!\\\\){{?${marker}((?:[a-zA-Z][\\w-]*|[\\{].*?[\\}]+|[\\[].*?[\\]])+)(?<!\\\\)}}?`;
+				start: (src: string) => src.indexOf(`{${marker}`),
+				tokenizer: (src: string) => {
+					const pattern = `^\\{${marker}([^}]*)\\}`;
 					const regex = new RegExp(pattern);
 					const match = src.match(regex);
 
