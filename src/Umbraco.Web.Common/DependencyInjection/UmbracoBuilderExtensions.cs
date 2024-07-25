@@ -30,6 +30,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
@@ -193,6 +194,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
         builder.Services.AddHostedService<QueuedHostedService>();
+        builder.Services.AddHostedService<NavigationInitializationService>();
 
         return builder;
     }
