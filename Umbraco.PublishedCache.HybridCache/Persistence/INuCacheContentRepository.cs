@@ -12,10 +12,7 @@ internal interface INuCacheContentRepository
 
     IEnumerable<ContentCacheNode> GetContentByContentTypeId(IEnumerable<int>? ids);
 
-    /// <summary>
-    ///     Refreshes the nucache database row for the <see cref="IContent" />
-    /// </summary>
-    void RefreshContent(IContent content);
+    void RefreshContent(ContentCacheNode contentCacheNode, PublishedState publishedState);
 
     /// <summary>
     ///     Refreshes the nucache database row for the <see cref="IMedia" />

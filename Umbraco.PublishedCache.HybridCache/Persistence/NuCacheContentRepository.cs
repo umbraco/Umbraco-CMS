@@ -61,23 +61,21 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
     public void DeleteContentItem(int id)
         => Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = id });
 
-    public void RefreshContent(IContent content)
+    public void RefreshContent(ContentCacheNode contentCacheNode, PublishedState publishedState)
     {
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
-        // always refresh the edited data
-        OnRepositoryRefreshed(serializer, content, false);
-
-        if (content.PublishedState == PublishedState.Unpublishing)
+        switch (publishedState)
         {
-            // if unpublishing, remove published data from table
-            Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = content.Id });
-        }
-        else if (content.PublishedState == PublishedState.Publishing)
-        {
-            // if publishing, refresh the published data
-            OnRepositoryRefreshed(serializer, content, true);
+            case PublishedState.Publishing:
+                OnRepositoryRefreshed(serializer, contentCacheNode, true);
+                break;
+            case PublishedState.Unpublishing:
+                Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = contentCacheNode.Id });
+                break;
+            default:
+                OnRepositoryRefreshed(serializer, contentCacheNode, false);
+                break;
         }
     }
 
@@ -334,11 +332,29 @@ AND cmsContentNu.nodeId IS NULL
         return CreateMediaNodeKit(dto, serializer);
     }
 
+    private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
+        // use a custom SQL to update row version on each update
+        // db.InsertOrUpdate(dto);
+        ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
+
+        Database.InsertOrUpdate(
+            dto,
+            "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
+            new
+            {
+                dataRaw = dto.RawData ?? Array.Empty<byte>(),
+                data = dto.Data,
+                id = dto.NodeId,
+                published = dto.Published,
+            });
+    }
+
     private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, IContentBase content, bool published)
     {
         // use a custom SQL to update row version on each update
         // db.InsertOrUpdate(dto);
-        ContentNuDto dto = GetDto(content, published, serializer);
+        ContentNuDto dto = GetDtoFromContent(content, published, serializer);
 
         Database.InsertOrUpdate(
             dto,
@@ -404,12 +420,12 @@ WHERE cmsContentNu.nodeId IN (
             foreach (IContent c in descendants)
             {
                 // always the edited version
-                items.Add(GetDto(c, false, serializer));
+                items.Add(GetDtoFromContent(c, false, serializer));
 
                 // and also the published version if it makes any sense
                 if (c.Published)
                 {
-                    items.Add(GetDto(c, true, serializer));
+                    items.Add(GetDtoFromContent(c, true, serializer));
                 }
 
                 count++;
@@ -467,7 +483,7 @@ WHERE cmsContentNu.nodeId IN (
             // the tree is locked, counting and comparing to total is safe
             IEnumerable<IMedia> descendants =
                 _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-            var items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
+            var items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
         } while (processed < total);
@@ -519,13 +535,35 @@ WHERE cmsContentNu.nodeId IN (
         {
             IEnumerable<IMember> descendants =
                 _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-            ContentNuDto[] items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
+            ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
         } while (processed < total);
     }
 
-    private ContentNuDto GetDto(IContentBase content, bool published, IContentCacheDataSerializer serializer)
+    private ContentNuDto GetDtoFromCacheNode(ContentCacheNode cacheNode, bool published, IContentCacheDataSerializer serializer)
+    {
+        // the dictionary that will be serialized
+        var contentCacheData = new ContentCacheDataModel
+        {
+            PropertyData = cacheNode.Data?.Properties,
+            CultureData = cacheNode.Data?.CultureInfos?.ToDictionary(),
+            UrlSegment = cacheNode.Data?.UrlSegment,
+        };
+
+        // TODO: We should probably fix all serialization to only take ContentTypeId, for now it takes an IReadOnlyContentBase
+        // but it is only the content type id that is needed.
+        ContentCacheDataSerializationResult serialized = serializer.Serialize(new ContentSourceDto { ContentTypeId = cacheNode.ContentTypeId, }, contentCacheData, published);
+
+        var dto = new ContentNuDto
+        {
+            NodeId = cacheNode.Id, Published = published, Data = serialized.StringData, RawData = serialized.ByteData,
+        };
+
+        return dto;
+    }
+
+    private ContentNuDto GetDtoFromContent(IContentBase content, bool published, IContentCacheDataSerializer serializer)
     {
         // should inject these in ctor
         // BUT for the time being we decide not to support ConvertDbToXml/String

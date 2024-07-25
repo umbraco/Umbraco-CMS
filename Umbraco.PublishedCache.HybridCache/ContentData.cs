@@ -5,7 +5,7 @@
 /// </summary>
 internal sealed class ContentData
 {
-    public ContentData(string? name, string? urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, IDictionary<string, PropertyData[]>? properties, IReadOnlyDictionary<string, CultureVariation>? cultureInfos)
+    public ContentData(string? name, string? urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, Dictionary<string, PropertyData[]>? properties, IReadOnlyDictionary<string, CultureVariation>? cultureInfos)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         UrlSegment = urlSegment;
@@ -32,7 +32,7 @@ internal sealed class ContentData
 
     public bool Published { get; }
 
-    public IDictionary<string, PropertyData[]> Properties { get; }
+    public Dictionary<string, PropertyData[]> Properties { get; }
 
     /// <summary>
     /// The collection of language Id to name for the content item

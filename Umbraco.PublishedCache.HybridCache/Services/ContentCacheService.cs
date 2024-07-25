@@ -117,14 +117,15 @@ internal sealed class ContentCacheService : IContentCacheService
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
         await _hybridCache.SetAsync(GetCacheKey(content.Key, true), draftCacheNode);
+        _nuCacheContentRepository.RefreshContent(draftCacheNode, content.PublishedState);
 
         if (content.PublishedState == PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
             await _hybridCache.SetAsync(GetCacheKey(content.Key, false), publishedCacheNode);
+            _nuCacheContentRepository.RefreshContent(publishedCacheNode, content.PublishedState);
         }
 
-        _nuCacheContentRepository.RefreshContent(content);
         scope.Complete();
     }
 
