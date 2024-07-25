@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -8,7 +9,7 @@ internal class ContentNavigationService : INavigationService
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
-    private Dictionary<Guid, NavigationNode> _navigationStructure = new();
+    private ConcurrentDictionary<Guid, NavigationNode> _navigationStructure = new();
 
     public ContentNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
     {
@@ -133,9 +134,7 @@ internal class ContentNavigationService : INavigationService
         RemoveDescendantsRecursively(nodeToRemove);
 
         // Remove the node itself
-        _navigationStructure.Remove(key);
-
-        return true;
+        return _navigationStructure.TryRemove(key, out _);
     }
 
     public bool Add(Guid key, Guid? parentKey = null)
@@ -214,7 +213,7 @@ internal class ContentNavigationService : INavigationService
         foreach (NavigationNode child in node.Children)
         {
             RemoveDescendantsRecursively(child);
-            _navigationStructure.Remove(child.Key);
+            _navigationStructure.TryRemove(child.Key, out _);
         }
     }
 

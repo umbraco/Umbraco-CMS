@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using NPoco;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -18,14 +19,14 @@ public class ContentNavigationRepository : INavigationRepository
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
     /// <inheritdoc />
-    public Dictionary<Guid, NavigationNode> GetContentNodesByObjectType(Guid objectTypeKey)
+    public ConcurrentDictionary<Guid, NavigationNode> GetContentNodesByObjectType(Guid objectTypeKey)
     {
         IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, false);
         return NavigationFactory.BuildNavigationDictionary(navigationDtos);
     }
 
     /// <inheritdoc />
-    public Dictionary<Guid, NavigationNode> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
+    public ConcurrentDictionary<Guid, NavigationNode> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
     {
         IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, true);
         return NavigationFactory.BuildNavigationDictionary(navigationDtos);
