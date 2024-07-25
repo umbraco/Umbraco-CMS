@@ -35,11 +35,11 @@ public sealed class HtmlLocalLinkParser
 
     public IEnumerable<Udi?> FindUdisFromLocalLinks(string text)
     {
-        foreach ((var intId, GuidUdi? udi, var tagValue) in FindLocalLinkIds(text))
+        foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
         {
-            if (udi is not null)
+            if (tagData.Udi is not null)
             {
-                yield return udi; // In v8, we only care abuot UDIs
+                yield return tagData.Udi; // In v8, we only care about UDIs
             }
         }
     }
@@ -80,38 +80,41 @@ public sealed class HtmlLocalLinkParser
             throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
         }
 
-        foreach ((var intId, GuidUdi? udi, var tagValue) in FindLocalLinkIds(text))
+        foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
         {
-            if (udi is not null)
+            if (tagData.Udi is not null)
             {
                 var newLink = "#";
-                if (udi?.EntityType == Constants.UdiEntityType.Document)
+                if (tagData.Udi?.EntityType == Constants.UdiEntityType.Document)
                 {
-                    newLink = _publishedUrlProvider.GetUrl(udi.Guid);
+                    newLink = _publishedUrlProvider.GetUrl(tagData.Udi.Guid);
                 }
-                else if (udi?.EntityType == Constants.UdiEntityType.Media)
+                else if (tagData.Udi?.EntityType == Constants.UdiEntityType.Media)
                 {
-                    newLink = _publishedUrlProvider.GetMediaUrl(udi.Guid);
-                }
-
-                if (newLink == null)
-                {
-                    newLink = "#";
+                    newLink = _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid);
                 }
 
-                text = text.Replace(tagValue, "href=\"" + newLink);
+
+                text = StripTypeAttributeFromTag(text, tagData.Udi!.EntityType);
+                text = text.Replace(tagData.TagHref, "href=\"" + newLink);
             }
-            else if (intId.HasValue)
+            else if (tagData.IntId.HasValue)
             {
-                var newLink = _publishedUrlProvider.GetUrl(intId.Value);
-                text = text.Replace(tagValue, "href=\"" + newLink);
+                var newLink = _publishedUrlProvider.GetUrl(tagData.IntId.Value);
+                text = text.Replace(tagData.TagHref, "href=\"" + newLink);
             }
         }
 
         return text;
     }
 
-    private IEnumerable<(int? intId, GuidUdi? udi, string tagValue)> FindLocalLinkIds(string text)
+    // under normal circumstances, the type attribute is preceded by a space
+    // to cover the rare occasion where it isn't, we first replace with a a space and then without.
+    private string StripTypeAttributeFromTag(string tag, string type) =>
+        tag.Replace($" type=\"{type}\"", string.Empty)
+            .Replace($"type=\"{type}\"", string.Empty);
+
+    private IEnumerable<LocalLinkTag> FindLocalLinkIds(string text)
     {
         MatchCollection localLinkTagMatches = LocalLinkTagPattern.Matches(text);
         foreach (Match linkTag in localLinkTagMatches)
@@ -126,18 +129,22 @@ public sealed class HtmlLocalLinkParser
                 continue;
             }
 
-            yield return (null, new GuidUdi(linkTag.Groups["type"].Value, guid), linkTag.Groups["locallink"].Value);
+            yield return new LocalLinkTag(
+                null,
+                new GuidUdi(linkTag.Groups["type"].Value, guid),
+                linkTag.Groups["locallink"].Value,
+                linkTag.Value);
         }
 
         // also return legacy results for values that have not been migrated
-        foreach ((int? intId, GuidUdi? udi, string tagValue) legacyResult in FindLegacyLocalLinkIds(text))
+        foreach (LocalLinkTag legacyResult in FindLegacyLocalLinkIds(text))
         {
             yield return legacyResult;
         }
     }
 
     // todo remove at some point?
-    private IEnumerable<(int? intId, GuidUdi? udi, string tagValue)> FindLegacyLocalLinkIds(string text)
+    private IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
         MatchCollection tags = LocalLinkPattern.Matches(text);
@@ -153,15 +160,41 @@ public sealed class HtmlLocalLinkParser
                     var guidUdi = udi as GuidUdi;
                     if (guidUdi is not null)
                     {
-                        yield return (null, guidUdi, tag.Value);
+                        yield return new LocalLinkTag(null, guidUdi, tag.Value, null);
                     }
                 }
 
                 if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
                 {
-                    yield return (intId, null, tag.Value);
+                    yield return new LocalLinkTag (intId, null, tag.Value, null);
                 }
             }
         }
+    }
+
+    private class LocalLinkTag
+    {
+        public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)
+        {
+            IntId = intId;
+            Udi = udi;
+            TagHref = tagHref;
+        }
+
+        public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref, string? fullTag)
+        {
+            IntId = intId;
+            Udi = udi;
+            TagHref = tagHref;
+            FullTag = fullTag;
+        }
+
+        public int? IntId { get; }
+
+        public GuidUdi? Udi { get; }
+
+        public string TagHref { get; }
+
+        public string? FullTag { get; }
     }
 }
