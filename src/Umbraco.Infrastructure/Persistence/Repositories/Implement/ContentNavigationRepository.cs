@@ -17,12 +17,14 @@ public class ContentNavigationRepository : INavigationRepository
 
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
+    /// <inheritdoc />
     public Dictionary<Guid, NavigationNode> GetContentNodesByObjectType(Guid objectTypeKey)
     {
         IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, false);
         return NavigationFactory.BuildNavigationDictionary(navigationDtos);
     }
 
+    /// <inheritdoc />
     public Dictionary<Guid, NavigationNode> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
     {
         IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, true);

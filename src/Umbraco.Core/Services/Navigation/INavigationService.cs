@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Services.Navigation;
 
+/// <summary>
+///     Manages navigation-related operations.
+/// </summary>
 public interface INavigationService
 {
     Task RebuildAsync();
