@@ -42,9 +42,6 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     /// <summary>
     ///     The type of user.
     /// </summary>
-    /// <remarks>
-    ///     Cannot be changed after the user has been created.
-    /// </remarks>
     UserType Type { get; set; }
 
     void RemoveGroup(string group);
