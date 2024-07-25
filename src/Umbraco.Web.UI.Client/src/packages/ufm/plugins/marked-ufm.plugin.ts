@@ -3,7 +3,11 @@ import type { MarkedExtension, Tokens } from '@umbraco-cms/backoffice/external/m
 export interface UfmPlugin {
 	alias: string;
 	marker: string;
-	render?: (token: Tokens.Generic) => string | undefined;
+	render?: (token: UfmToken) => string | undefined;
+}
+
+export interface UfmToken extends Tokens.Generic {
+	text?: string;
 }
 
 export function ufm(plugins: Array<UfmPlugin> = []): MarkedExtension {
