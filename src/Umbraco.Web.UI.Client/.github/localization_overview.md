@@ -75,7 +75,7 @@ Before you start:
 	- [ ] Section: Info
 - [ ] Relation Types
 - [ ] Log Viewer
-- [ ] Document Blueprints
+- [x] Document Blueprints
 - [ ] Languages
 - [ ] Extensions
 - [ ] Templates

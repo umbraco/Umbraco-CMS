@@ -328,7 +328,9 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Opret en ny indholdsskabelon fra <em>%0%</em>',
+		createBlueprintFrom: "Opret en ny indholdsskabelon fra '%0%'",
+		createBlueprintItemUnder: "Opret en ny indholdsskabelon under '%0%'",
+		createBlueprintFolderUnder: "Opret en ny mappe under '%0%'",
 		blankBlueprint: 'Blank',
 		selectBlueprint: 'Vælg en indholdsskabelon',
 		createdBlueprintHeading: 'Indholdsskabelon oprettet',
@@ -2109,7 +2111,7 @@ export default {
 		protectDescription: 'Opsæt offentlig adgang på %0%',
 		rightsDescription: 'Opsæt rettigheder på %0%',
 		sortDescription: 'Juster soterings rækkefølgen for %0%',
-		createblueprintDescription: 'Opret indholds skabelon baseret på %0%',
+		createblueprintDescription: 'Opret indholdsskabelon baseret på %0%',
 		openContextMenu: 'Åben kontext menu for',
 		currentLanguage: 'Aktivt sprog',
 		switchLanguage: 'Skift sprog til',
@@ -2237,7 +2239,7 @@ export default {
 		addCustomStylesheet: 'Tilføj stylesheet',
 		headlineEditorAppearance: 'Redigerings udseende',
 		headlineDataModels: 'Data modeller',
-		headlineCatalogueAppearance: 'katalog udseende',
+		headlineCatalogueAppearance: 'Katalog udseende',
 		labelBackgroundColor: 'Baggrunds farve',
 		labelIconColor: 'Ikon farve',
 		labelContentElementType: 'Indholds model',
@@ -2268,8 +2270,8 @@ export default {
 		headlineAdvanced: 'Avanceret',
 		forceHideContentEditor: 'Skjul indholdseditoren',
 		forceHideContentEditorHelp: 'Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet',
-		girdInlineEditing: 'Direkte redigering',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Direkte redigering',
+		gridInlineEditingHelp:
 			'Tilføjer direkte redigering a det første felt. Yderligere felter optræder kun i redigerings vinduet.',
 		blockHasChanges: 'Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?',
 		confirmCancelBlockCreationHeadline: 'Annuller oprettelse?',
@@ -2531,5 +2533,19 @@ export default {
 	routing: {
 		routeNotFoundTitle: 'Ikke fundet',
 		routeNotFoundDescription: 'Den side du leder efter kunne ikke findes. Kontroller adressen og prøv igen.',
+	},
+	codeEditor: {
+		label: 'Code editor',
+		languageConfigLabel: 'Sprog',
+		languageConfigDescription: 'Vælg sprog til syntax highlighting og IntelliSense.',
+		heightConfigLabel: 'Højde',
+		heightConfigDescription: 'Indstil højden på editorvinduet i pixels.',
+		lineNumbersConfigLabel: 'Linjenumre',
+		lineNumbersConfigDescription: 'Vis linjenumre i editorvinduet.',
+		minimapConfigLabel: 'Minimap',
+		minimapConfigDescription: 'Vis en minimap i editorvinduet.',
+		wordWrapConfigLabel: 'Ordbrydning',
+		wordWrapConfigDescription:
+			'Slå ordbrydning til eller fra, så tekst automatisk brydes ved vinduets kant i stedet for at skabe en horisontal scrollbar.',
 	},
 } as UmbLocalizationDictionary;

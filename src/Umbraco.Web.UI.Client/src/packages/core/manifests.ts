@@ -5,6 +5,7 @@ import { manifests as contentTypeManifests } from './content-type/manifests.js';
 import { manifests as cultureManifests } from './culture/manifests.js';
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as entityActionManifests } from './entity-action/manifests.js';
+import { manifests as entityBulkActionManifests } from './entity-bulk-action/manifests.js';
 import { manifests as extensionManifests } from './extension-registry/manifests.js';
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
@@ -38,6 +39,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...settingsManifests,
 	...modalManifests,
 	...entityActionManifests,
+	...entityBulkActionManifests,
 	...propertyActionManifests,
 	...serverFileSystemManifests,
 	...debugManifests,

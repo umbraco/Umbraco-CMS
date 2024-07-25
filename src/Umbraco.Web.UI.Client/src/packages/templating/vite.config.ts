@@ -11,7 +11,6 @@ export default defineConfig({
 	...getDefaultConfig({
 		dist,
 		entry: {
-			'code-editor/index': 'code-editor/index.ts',
 			'entry-point': 'entry-point.ts',
 			'partial-views/index': 'partial-views/index.ts',
 			'scripts/index': 'scripts/index.ts',

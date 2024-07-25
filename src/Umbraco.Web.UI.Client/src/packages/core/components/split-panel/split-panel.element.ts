@@ -8,6 +8,7 @@ import {
 	query,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
+import { clamp } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Custom element for a split panel with adjustable divider.
@@ -89,13 +90,9 @@ export class UmbSplitPanelElement extends LitElement {
 		}
 	}
 
-	#clamp(value: number, min: number, max: number) {
-		return Math.min(Math.max(value, min), max);
-	}
-
 	#setPosition(pos: number) {
 		const { width } = this.mainElement.getBoundingClientRect();
-		const localPos = this.#clamp(pos, 0, width);
+		const localPos = clamp(pos, 0, width);
 		const percentagePos = (localPos / width) * 100;
 		this.position = percentagePos + '%';
 	}
@@ -127,7 +124,7 @@ export class UmbSplitPanelElement extends LitElement {
 		const move = (event: PointerEvent) => {
 			const { clientX } = event;
 			const { left, width } = this.mainElement.getBoundingClientRect();
-			const localPos = this.#clamp(clientX - left, 0, width);
+			const localPos = clamp(clientX - left, 0, width);
 			const mappedPos = mapXAxisToSnap(localPos, width);
 
 			this.#lockedPanelWidth = this.lock === 'start' ? mappedPos : width - mappedPos;

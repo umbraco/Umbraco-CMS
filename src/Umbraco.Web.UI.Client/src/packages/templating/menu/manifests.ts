@@ -15,7 +15,7 @@ const menuSectionSidebarApp: ManifestTypes = {
 	name: 'Templating Section Sidebar Menu',
 	weight: 200,
 	meta: {
-		label: 'Templating',
+		label: '#treeHeaders_templatingGroup',
 		menu: 'Umb.Menu.Templating',
 	},
 	conditions: [

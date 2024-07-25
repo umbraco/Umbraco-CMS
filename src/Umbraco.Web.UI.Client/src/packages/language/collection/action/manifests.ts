@@ -8,7 +8,7 @@ export const createManifest: ManifestCollectionAction = {
 	alias: 'Umb.CollectionAction.Language.Create',
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 		href: 'section/settings/workspace/language/create',
 	},
 	conditions: [

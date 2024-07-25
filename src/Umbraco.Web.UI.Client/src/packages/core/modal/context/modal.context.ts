@@ -71,7 +71,7 @@ export class UmbModalContext<
 			args.data && defaultData
 				? (umbDeepMerge(args.data as UmbDeepPartialObject<ModalData>, defaultData) as ModalData)
 				: // otherwise pick one of them:
-					(args.data as ModalData) ?? defaultData,
+					((args.data as ModalData) ?? defaultData),
 		);
 
 		const initValue =

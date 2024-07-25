@@ -95,7 +95,7 @@ export default {
 		sort: 'Allow access to change the sort order for nodes',
 		translate: 'Allow access to translate a node',
 		update: 'Allow access to save a node',
-		createblueprint: 'Allow access to create a Content Template',
+		createblueprint: 'Allow access to create a Document Blueprint',
 		notify: 'Allow access to setup notifications for content nodes',
 	},
 	apps: {
@@ -343,14 +343,16 @@ export default {
 		selectAllVariants: 'Select all variants',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Create a new Content Template from <em>%0%</em>',
+		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
+		createBlueprintItemUnder: "Create a new item under '%0%'",
+		createBlueprintFolderUnder: "Create a new folder under '%0%'",
 		blankBlueprint: 'Blank',
-		selectBlueprint: 'Select a Content Template',
-		createdBlueprintHeading: 'Content Template created',
-		createdBlueprintMessage: "A Content Template was created from '%0%'",
-		duplicateBlueprintMessage: 'Another Content Template with the same name already exists',
+		selectBlueprint: 'Select a Document Blueprint',
+		createdBlueprintHeading: 'Document Blueprint created',
+		createdBlueprintMessage: "A Document Blueprint was created from '%0%'",
+		duplicateBlueprintMessage: 'Another Document Blueprint with the same name already exists',
 		blueprintDescription:
-			'A Content Template is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
+			'A Document Blueprint is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
 	},
 	media: {
 		clickToUpload: 'Click to upload',
@@ -393,7 +395,7 @@ export default {
 	create: {
 		chooseNode: 'Where do you want to create the new %0%',
 		createUnder: 'Create an item under',
-		createContentBlueprint: 'Select the Document Type you want to make a content template for',
+		createContentBlueprint: 'Select the Document Type you want to make a Document Blueprint for',
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
@@ -1389,7 +1391,7 @@ export default {
 		editContentPublishedFailedByParent: 'Content could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Content published',
 		editContentPublishedText: 'and visible on the website',
-		editBlueprintSavedHeader: 'Content Template saved',
+		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
 		editContentSavedHeader: 'Content saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
@@ -1836,7 +1838,7 @@ export default {
 	},
 	treeHeaders: {
 		content: 'Content',
-		contentBlueprints: 'Content Templates',
+		contentBlueprints: 'Document Blueprints',
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Recycle Bin',
@@ -1875,6 +1877,8 @@ export default {
 		settingsGroup: 'Settings',
 		templatingGroup: 'Templating',
 		thirdPartyGroup: 'Third Party',
+		structureGroup: 'Structure',
+		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
 	},
 	update: {
@@ -2234,7 +2238,7 @@ export default {
 		protectDescription: 'Setup access restrictions on %0%',
 		rightsDescription: 'Setup Permissions on %0%',
 		sortDescription: 'Change sort order for %0%',
-		createblueprintDescription: 'Create Content Template based on %0%',
+		createblueprintDescription: 'Create Document Blueprint based on %0%',
 		openContextMenu: 'Open context menu for',
 		currentLanguage: 'Current language',
 		switchLanguage: 'Switch language to',
@@ -2466,8 +2470,8 @@ export default {
 		headlineAdvanced: 'Advanced',
 		forceHideContentEditor: 'Hide content editor',
 		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay.',
-		girdInlineEditing: 'Inline editing',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Inline editing',
+		gridInlineEditingHelp:
 			'Enables inline editing for the first Property. Additional properties can be edited in the overlay.',
 		blockHasChanges: 'You have made changes to this content. Are you sure you want to discard them?',
 		confirmCancelBlockCreationHeadline: 'Discard creation?',
@@ -2548,15 +2552,15 @@ export default {
 		labelInlineMode: 'Display inline with text',
 	},
 	contentTemplatesDashboard: {
-		whatHeadline: 'What are Content Templates?',
+		whatHeadline: 'What are Document Blueprints?',
 		whatDescription:
-			'Content Templates are pre-defined content that can be selected when creating a new\n      content node.\n    ',
-		createHeadline: 'How do I create a Content Template?',
+			'Document Blueprints are pre-defined content that can be selected when creating a new\n      content node.\n    ',
+		createHeadline: 'How do I create a Document Blueprint?',
 		createDescription:
-			'\n            <p>There are two ways to create a Content Template:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Content Template" to create a new Content Template.</li>\n                <li>Right-click the Content Templates tree in the Settings section and select the Document Type you want to create a Content Template for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Content Template as a foundation for their new page.</p>\n        ',
-		manageHeadline: 'How do I manage Content Templates?',
+			'\n            <p>There are two ways to create a Document Blueprint:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Document Blueprint" to create a new Document Blueprint.</li>\n                <li>Right-click the Document Blueprints tree in the Settings section and select the Document Type you want to create a Document Blueprint for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Document Blueprint as a foundation for their new page.</p>\n        ',
+		manageHeadline: 'How do I manage Document Blueprints?',
 		manageDescription:
-			'You can edit and delete Content Templates from the "Content Templates" tree in the\n      Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete\n      it.\n    ',
+			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the\n      Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete\n      it.\n    ',
 	},
 	preview: {
 		endLabel: 'End',
@@ -2601,5 +2605,18 @@ export default {
 	routing: {
 		routeNotFoundTitle: 'Not found',
 		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
+	},
+	codeEditor: {
+		label: 'Code editor',
+		languageConfigLabel: 'Language',
+		languageConfigDescription: 'Select the language for syntax highlighting and IntelliSense.',
+		heightConfigLabel: 'Height',
+		heightConfigDescription: 'Set the height of the code editor in pixels.',
+		lineNumbersConfigLabel: 'Line numbers',
+		lineNumbersConfigDescription: 'Show line numbers in the code editor.',
+		minimapConfigLabel: 'Minimap',
+		minimapConfigDescription: 'Show a minimap in the code editor.',
+		wordWrapConfigLabel: 'Word wrap',
+		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 } as UmbLocalizationDictionary;

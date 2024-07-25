@@ -30,7 +30,7 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 	name: 'Content Sidebar Menu',
 	weight: 100,
 	meta: {
-		label: 'Content',
+		label: '#sections_content',
 		menu: UMB_CONTENT_MENU_ALIAS,
 		entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 	},

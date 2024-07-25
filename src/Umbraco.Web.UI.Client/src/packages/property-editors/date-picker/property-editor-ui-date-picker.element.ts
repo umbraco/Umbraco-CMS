@@ -1,6 +1,6 @@
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -42,13 +42,16 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	@property()
 	value?: string;
 
+	@state()
+	private _inputValue?: string;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
 		// Format string prevalue/config
 		const format = config.getValueByAlias<string>('format');
-		const hasTime = format?.includes('H') || format?.includes('m');
-		const hasSeconds = format?.includes('s');
+		const hasTime = (format?.includes('H') || format?.includes('m')) ?? false;
+		const hasSeconds = format?.includes('s') ?? false;
 		this._inputType = hasTime ? 'datetime-local' : 'date';
 
 		// Based on the type of format string change the UUI-input type
@@ -62,7 +65,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 		this._min = config.getValueByAlias('min');
 		this._max = config.getValueByAlias('max');
-		this._step = config.getValueByAlias('step') ?? hasSeconds ? 1 : undefined;
+		this._step = (config.getValueByAlias('step') ?? hasSeconds) ? 1 : undefined;
 
 		if (this.value) {
 			this.#formatValue(this.value);
@@ -70,33 +73,59 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputDateElement }) {
-		this.#formatValue(event.target.value.toString());
+		let value = event.target.value.toString();
+
+		if (!value) {
+			this.#syncValue(undefined);
+			return;
+		}
+
+		switch (this._inputType) {
+			case 'time':
+				value = `0001-01-01 ${value}`;
+				break;
+			case 'date':
+				value = `${value} 00:00:00`;
+				break;
+			case 'datetime-local':
+				value = value.replace('T', ' ');
+				break;
+		}
+
+		this.#syncValue(value);
 	}
 
 	/**
 	 * Formats the value depending on the input type.
 	 */
 	#formatValue(value: string) {
-		// Check that the value is a valid date
-		const valueToDate = new Date(value);
-		if (isNaN(valueToDate.getTime())) {
-			console.warn('[Umbraco.DatePicker] The value is not a valid date.', value);
+		this._inputValue = undefined;
+
+		if (isNaN(new Date(value).getTime())) {
+			console.warn(`[UmbDatePicker] Invalid date: ${value}`);
 			return;
 		}
 
-		// Replace the potential time demoninator 'T' with a whitespace for backwards compatibility
-		value = value.replace('T', ' ');
-
-		// If the inputType is 'date', we need to make sure the value doesn't have a time
-		if (this._inputType === 'date' && value.includes(' ')) {
-			value = value.split(' ')[0];
+		const dateSplit = value.split(' ');
+		if (dateSplit.length !== 2) {
+			console.warn(`[UmbDatePicker] Invalid date: ${value}`);
+			return;
 		}
 
-		// If the inputType is 'time', we need to remove the date part of the value
-		if (this._inputType === 'time' && value.includes(' ')) {
-			value = value.split(' ')[1];
+		switch (this._inputType) {
+			case 'time':
+				this._inputValue = dateSplit[1];
+				break;
+			case 'date':
+				this._inputValue = dateSplit[0];
+				break;
+			default:
+				this._inputValue = dateSplit.join('T');
+				break;
 		}
+	}
 
+	#syncValue(value?: string) {
 		const valueHasChanged = this.value !== value;
 		if (valueHasChanged) {
 			this.value = value;
@@ -107,7 +136,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	override render() {
 		return html`
 			<umb-input-date
-				value="${ifDefined(this.value)}"
+				.value=${this._inputValue}
 				.min=${this._min}
 				.max=${this._max}
 				.step=${this._step}
