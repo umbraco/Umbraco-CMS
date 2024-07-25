@@ -17,6 +17,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    // Testing with IContentEditingService as it calls IContentService underneath
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
     private INavigationService NavigationService => GetRequiredService<INavigationService>();
