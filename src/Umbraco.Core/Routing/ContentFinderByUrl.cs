@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -13,13 +14,15 @@ namespace Umbraco.Cms.Core.Routing;
 public class ContentFinderByUrl : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrl> _logger;
+    private readonly IDocumentUrlService _documentUrlService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
     /// </summary>
-    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor)
+    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor, IDocumentUrlService documentUrlService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _documentUrlService = documentUrlService;
         UmbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
     }
@@ -76,6 +79,7 @@ public class ContentFinderByUrl : IContentFinder
         {
             _logger.LogDebug("Test route {Route}", route);
         }
+        var documentKey = _documentUrlService.GetDocumentKeyByRouteAsync(route).GetAwaiter().GetResult(); //TODO proper async
 
         IPublishedContent? node =
             umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);

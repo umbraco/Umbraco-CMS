@@ -1,3 +1,4 @@
+
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
@@ -15,22 +16,23 @@ public class DocumentUrlDto
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]
     public int NodeId { get; set; }
 
-    [Index(IndexTypes.UniqueClustered, ForColumns = "published,languageId,segment", Name = "IX_" + TableName)]
+    [Index(IndexTypes.UniqueClustered, ForColumns = "uniqueId, languageId", Name = "IX_" + TableName)]
     [Column("uniqueId")]
     [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
     public Guid UniqueId { get; set; }
 
-    [Column("published")]
-    public bool Published { get; set; }
+    // [Column("published")]
+    // public bool Published { get; set; }
 
     [Column("languageId")]
     [ForeignKey(typeof(LanguageDto))]
     public int LanguageId { get; set; }
 
-    [Column("segment")]
-    [NullSetting(NullSetting = NullSettings.Null)]
-    [Length(PropertyDataDto.SegmentLength)]
-    public string Segment { get; set; } = string.Empty;
+    //
+    // [Column("segment")]
+    // [NullSetting(NullSetting = NullSettings.Null)]
+    // [Length(PropertyDataDto.SegmentLength)]
+    // public string Segment { get; set; } = string.Empty;
 
     [Column("urlSegment")]
     [NullSetting(NullSetting = NullSettings.NotNull)]

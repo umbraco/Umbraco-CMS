@@ -1,8 +1,12 @@
 using System.Globalization;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -28,10 +32,9 @@ public interface IDocumentUrlService
     /// </summary>
     /// <param name="documentKey">The key of the document.</param>
     /// <param name="culture">The culture code.</param>
-    /// <param name="segment">The segment.</param>
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
     /// <returns>The url of the document.</returns>
-    Task<string> GetUrlAsync(Guid documentKey, string culture, string segment, bool isDraft);
+    Task<string> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft);
 
     /// <summary>
     /// Creates or updates a url for a document key, culture and segment and draft information.
@@ -62,10 +65,13 @@ public interface IDocumentUrlService
     /// <param name="segment">The segment.</param>
     /// <param name="isDraft">Whether to delete the url of the draft or published document.</param>
     Task DeleteUrlAsync(Guid documentKey);
+
+    Task<Guid> GetDocumentKeyByRouteAsync(string route);
 }
 
 public class DocumentUrlService : IDocumentUrlService
 {
+    private readonly ILogger<DocumentUrlService> _logger;
     private readonly IDocumentUrlRepository _documentUrlRepository;
     private readonly IDocumentRepository _documentRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
@@ -75,8 +81,10 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IDomainService _domainService;
     private readonly ILanguageService _languageService;
+    private readonly IMemoryCache _memoryCache;
 
     public DocumentUrlService(
+        ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
         IDocumentRepository documentRepository,
         ICoreScopeProvider coreScopeProvider,
@@ -85,8 +93,10 @@ public class DocumentUrlService : IDocumentUrlService
         IContentService contentService,
         IShortStringHelper shortStringHelper,
         IDomainService domainService,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        IMemoryCache memoryCache)
     {
+        _logger = logger;
         _documentUrlRepository = documentUrlRepository;
         _documentRepository = documentRepository;
         _coreScopeProvider = coreScopeProvider;
@@ -96,6 +106,7 @@ public class DocumentUrlService : IDocumentUrlService
         _shortStringHelper = shortStringHelper;
         _domainService = domainService;
         _languageService = languageService;
+        _memoryCache = memoryCache;
     }
 
     public async Task RebuildAllUrlsAsync()
@@ -104,38 +115,84 @@ public class DocumentUrlService : IDocumentUrlService
         scope.ReadLock(Constants.Locks.ContentTree);
 
         //TODO we only need keys here and published cultures? or what for drafts?
-        IEnumerable<Guid> documentKeys = _documentRepository.GetMany(Array.Empty<Guid>()).Where(x=>x.Trashed is false).Select(x => x.Key);
+        var documents = _documentRepository.GetMany(Array.Empty<Guid>()).Where(x=>x.Trashed is false);
 
-        foreach (Guid key in documentKeys)
-        {
-            var url = await GetRouteAsync(key, false, null, null); //TODO use cultures
-        }
-
+        await CreateOrUpdateUrlSegmentsAsync(documents);
     }
 
     public Task<bool> ShouldRebuildUrlsAsync() => throw new NotImplementedException();
 
-    public Task<string> GetUrlAsync(Guid documentKey, string culture, string segment, bool isDraft) => throw new NotImplementedException();
+    public Task<string> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft)
+    {
+        //TODO handle draft?
+
+        _memoryCache.Get()
+        throw new NotImplementedException();
+    }
 
     public Task CreateOrUpdateUrlSegmentAsync(Guid documentKey, string culture, string segment, bool isDraft, string url) => throw new NotImplementedException();
-    public Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents)
+    public async Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents)
     {
-        var keys = new HashSet<Guid>();
-        var cultures = new HashSet<string>();
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        var publishedDocumentUrlSegments = new List<PublishedDocumentUrlSegment>();
+        var allCultures = documents.SelectMany(x => x.AvailableCultures ).Distinct();
+
+        var languages = await _languageService.GetMultipleAsync(allCultures);
+        var languageDictionary = languages.ToDictionary(x=>x.IsoCode);
+
         foreach (IContent document in documents)
         {
-            keys.Add(document.Key);
-            foreach (var culture in document.AvailableCultures)
+
+            if (document.AvailableCultures.Any())
             {
-                cultures.Add(culture);
+                foreach (var culture in document.AvailableCultures)
+                {
+                    var language = languageDictionary[culture];
 
-                var urlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture);
+                    var model = GenerateModel(document, culture, language);
 
+                    if (model is not null)
+                    {
+                        publishedDocumentUrlSegments.Add(model);
+                    }
+                }
+            }
+            else
+            {
+                var language = await _languageService.GetDefaultLanguageAsync();
+                var model = GenerateModel(document, null, language!);
+
+                if (model is not null)
+                {
+                    publishedDocumentUrlSegments.Add(model);
+                }
             }
         }
 
-        _documentUrlRepository.Save(keys, cultures);
 
+
+        _documentUrlRepository.Save(publishedDocumentUrlSegments);
+
+        scope.Complete();
+    }
+
+    private PublishedDocumentUrlSegment? GenerateModel(IContent document, string? culture, ILanguage language)
+    {
+        var urlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture);
+
+        if(urlSegment.IsNullOrWhiteSpace())
+        {
+            _logger.LogWarning("No url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+            return null;
+        }
+
+        var model = new PublishedDocumentUrlSegment()
+        {
+            DocumentKey = document.Key, LanguageId = language.Id, UrlSegment = urlSegment
+        };
+
+        return model;
     }
 
     public Task DeleteUrlAsync(Guid documentKey, string culture, string segment, bool isDraft) => throw new NotImplementedException();
