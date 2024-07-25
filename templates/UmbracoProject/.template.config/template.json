@@ -339,12 +339,12 @@
       "choices": [
         {
           "choice": "BackofficeDevelopment",
-          "description": "Enables backoffice development, allowing you to develop from within the backoffice.",
+          "description": "Enables backoffice development, allowing you to develop from within the backoffice, this is the default behaviour.",
           "displayName": "Backoffice Development"
         },
         {
           "choice": "IDEDevelopment",
-          "description": "Enables IDE development, this allows you to better develop from you IDE and enables perfomance improvements.",
+          "description": "Configures appsettings.Development.json to Development runtime mode and SourceCodeAuto models builder mode, and configures appsettings.json to Production runtime mode, Nothing models builder mode, and enables UseHttps",
           "displayName": "IDE Development"
         }
       ]
@@ -353,7 +353,7 @@
       "type": "parameter",
       "displayName": "Models builder mode",
       "datatype": "choice",
-      "description": "Choose the models builder mode to use for the project. Is disabled when Development mode is set to IDE Development.",
+      "description": "Choose the models builder mode to use for the project. When development mode is set to IDEDevelopment this only changes the models builder mode appsetttings.development.json",
       "defaultValue": "Default",
       "replaces": "MODELS_MODE",
       "choices": [
