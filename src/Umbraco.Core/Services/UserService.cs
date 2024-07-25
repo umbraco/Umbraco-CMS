@@ -2478,25 +2478,25 @@ internal class UserService : RepositoryService, IUserService
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
     }
 
-    public async Task<bool> AddClientIdAsync(Guid userKey, string clientId)
+    public async Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
         if (currentClientIds.Contains(clientId))
         {
-            return false;
+            return UserClientCredentialsOperationStatus.DuplicateClientId;
         }
 
         IUser? user = await GetAsync(userKey);
         if (user is null || user.Type != UserType.Api)
         {
-            return false;
+            return UserClientCredentialsOperationStatus.InvalidUser;
         }
 
         _userRepository.AddClientId(user.Id, clientId);
 
-        return true;
+        return UserClientCredentialsOperationStatus.Success;
     }
 
     public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)

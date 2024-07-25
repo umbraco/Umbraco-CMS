@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security.OperationStatus;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Core.Security;
@@ -26,10 +27,16 @@ public sealed class BackOfficeUserClientCredentialsManager : ClientCredentialsMa
     public async Task<Attempt<BackOfficeUserClientCredentialsOperationStatus>> SaveAsync(Guid userKey, string clientId, string clientSecret)
     {
         clientId = SafeClientId(clientId);
+        UserClientCredentialsOperationStatus result = await _userService.AddClientIdAsync(userKey, clientId);
 
-        if (await _userService.AddClientIdAsync(userKey, clientId) is false)
+        if (result != UserClientCredentialsOperationStatus.Success)
         {
-            return Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.DuplicateClientId);
+            return result switch
+            {
+                UserClientCredentialsOperationStatus.InvalidUser => Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.InvalidUser),
+                UserClientCredentialsOperationStatus.DuplicateClientId => Attempt.Fail(BackOfficeUserClientCredentialsOperationStatus.DuplicateClientId),
+                _ => throw new ArgumentOutOfRangeException($"Unsupported client ID operation status: {result}")
+            };
         }
 
         await _backOfficeApplicationManager.EnsureBackOfficeClientCredentialsApplicationAsync(clientId, clientSecret);

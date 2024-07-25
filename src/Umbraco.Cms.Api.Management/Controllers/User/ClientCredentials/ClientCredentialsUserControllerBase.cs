@@ -12,7 +12,7 @@ public class ClientCredentialsUserControllerBase : UserControllerBase
         {
             BackOfficeUserClientCredentialsOperationStatus.InvalidUser => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid user")
-                .WithDetail("The specified user does not belong to the specified client ID.")
+                .WithDetail("The specified user does not support this operation. Possibly caused by a mismatched client ID or an inapplicable user type.")
                 .Build()),
             BackOfficeUserClientCredentialsOperationStatus.DuplicateClientId => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate client ID")
