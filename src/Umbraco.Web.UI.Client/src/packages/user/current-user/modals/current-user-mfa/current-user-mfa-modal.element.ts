@@ -163,7 +163,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 			.catch(() => undefined);
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

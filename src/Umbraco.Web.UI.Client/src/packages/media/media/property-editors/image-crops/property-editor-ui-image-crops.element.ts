@@ -185,7 +185,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {

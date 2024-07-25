@@ -120,7 +120,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: flex;

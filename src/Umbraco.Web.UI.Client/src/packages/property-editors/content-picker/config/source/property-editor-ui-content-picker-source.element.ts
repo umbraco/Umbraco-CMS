@@ -9,7 +9,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // import of local component
-import './index.js';
+import './input-content-picker-source.element.js';
 
 /**
  * @element umb-property-editor-ui-content-picker-source

@@ -251,7 +251,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			look="placeholder"></uui-button>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			.add-button {
 				width: 100%;
