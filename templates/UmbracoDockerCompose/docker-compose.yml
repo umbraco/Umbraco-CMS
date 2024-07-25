@@ -15,12 +15,12 @@ services:
     healthcheck:
       # This healthcheck is to make sure that the database is up and running before the umbraco container starts.
       # It works by querying the database for the state of the umbracoDb database, ensuring it exists.
-      test: value=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -d master -Q "SELECT state_desc FROM sys.databases WHERE name = 'umbracoDb'" | awk 'NR==3'); if [ $value = "ONLINE" ]; then return 1; else return 0; fi
+      test: ./healthcheck.sh
       interval: 5m
       timeout: 5s
       retries: 3
-      start_period: 15s
-      start_interval: 5s
+      start_period: 15s # Bootstrap duration, for this duration failures does not count towards max retries.
+      start_interval: 5s # How long after the health check has started to run the healthcheck again.
 
   umbraco_image:
     image: umbraco_image

@@ -1,0 +1,1 @@
+value=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -d master -Q "SELECT state_desc FROM sys.databases WHERE name = 'umbracoDb'" | awk 'NR==3'); if [ $value = "ONLINE" ]; then return 0; else return 1; fi
