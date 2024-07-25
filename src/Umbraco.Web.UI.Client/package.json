@@ -138,6 +138,7 @@
 		"./src/packages/health-check",
 		"./src/packages/language",
 		"./src/packages/media",
+		"./src/packages/members",
 		"./src/packages/multi-url-picker",
 		"./src/packages/property-editors",
 		"./src/packages/tags",
