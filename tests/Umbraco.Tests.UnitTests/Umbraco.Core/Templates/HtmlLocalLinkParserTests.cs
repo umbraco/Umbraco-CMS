@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -13,7 +12,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 
@@ -111,10 +109,16 @@ public class HtmlLocalLinkParserTests
     // current
     [TestCase(
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
-        "<a type=\"document\" href=\"/my-test-url\" title=\"world\">world</a>")]
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
     [TestCase(
         "<a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
-        "<a type=\"media\" href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+        "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"type=\"document\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\"type=\"media\">world</a>",
+        "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
     // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",

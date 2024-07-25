@@ -60,6 +60,7 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                     link.SetAttributeValue("href", route.Path);
                     link.SetAttributeValue("data-start-item-path", route.StartItem.Path);
                     link.SetAttributeValue("data-start-item-id", route.StartItem.Id.ToString("D"));
+                    link.Attributes["type"]?.Remove();
                 },
                 url => link.SetAttributeValue("href", url),
                 () => link.Attributes.Remove("href"));
