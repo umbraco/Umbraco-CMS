@@ -1,5 +1,5 @@
 import { UMB_UFM_RENDER_CONTEXT } from '../components/ufm-render/index.js';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const elementName = 'ufm-label-value';
@@ -31,7 +31,7 @@ export class UmbUfmLabelValueElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._value ?? `{${this.alias}}`;
+		return this._value !== undefined ? this._value : nothing;
 	}
 }
 

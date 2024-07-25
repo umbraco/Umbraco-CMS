@@ -2,7 +2,9 @@
 
 This is the working repository of the upcoming new Backoffice to Umbraco CMS.
 
+[![Build and test](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/build_test.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/build_test.yml)
 [![Storybook](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=umbraco_Umbraco.CMS.Backoffice&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=umbraco_Umbraco.CMS.Backoffice)
 
 ## Installation instructions
 

@@ -1,8 +1,9 @@
+import type { UfmToken } from '../plugins/marked-ufm.plugin.js';
 import { UmbUfmComponentBase } from './ufm-component-base.js';
-import type { Tokens } from '@umbraco-cms/backoffice/external/marked';
 
 export class UmbUfmLocalizeComponent extends UmbUfmComponentBase {
-	render(token: Tokens.Generic) {
+	render(token: UfmToken) {
+		if (!token.text) return;
 		return `<umb-localize key="${token.text}"></umb-localize>`;
 	}
 }

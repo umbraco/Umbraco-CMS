@@ -1,10 +1,11 @@
+import type { UfmToken } from '../plugins/marked-ufm.plugin.js';
 import { UmbUfmComponentBase } from './ufm-component-base.js';
-import type { Tokens } from '@umbraco-cms/backoffice/external/marked';
 
 import './label-value.element.js';
 
 export class UmbUfmLabelValueComponent extends UmbUfmComponentBase {
-	render(token: Tokens.Generic) {
+	render(token: UfmToken) {
+		if (!token.text) return;
 		return `<ufm-label-value alias="${token.text}"></ufm-label-value>`;
 	}
 }
