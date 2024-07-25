@@ -55,17 +55,6 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         //    - Child 3
         //      - Grandchild 4
 
-        // TODO: DELETE
-        // Root - Guid.Parse("E48DD82A-7059-418E-9B82-CDD5205796CF"); // Root's key
-        //    - Child 1 - Guid.Parse("C6173927-0C59-4778-825D-D7B9F45D8DDE"); // Child 1's key
-        //      - Grandchild 1 - Guid.Parse("E856AC03-C23E-4F63-9AA9-681B42A58573"); // Grandchild 1's key
-        //      - Grandchild 2 - Guid.Parse("A1B1B217-B02F-4307-862C-A5E22DB729EB"); // Grandchild 2's key
-        //    - Child 2 - Guid.Parse("60E0E5C4-084E-4144-A560-7393BEAD2E96"); // Child 2's key
-        //      - Grandchild 3 - Guid.Parse("D63C1621-C74A-4106-8587-817DEE5FB732"); // Grandchild 3's key
-        //        - Great-grandchild 1 - Guid.Parse("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7"); // Great-grandchild 1's key
-        //    - Child 3 - Guid.Parse("B606E3FF-E070-4D46-8CB9-D31352029FDF"); // Child 3's key
-        //      - Grandchild 4 - Guid.Parse("F381906C-223C-4466-80F7-B63B4EE073F8"); // Grandchild 4's key
-
         // Doc Type
         ContentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page");
         ContentType.Key = new Guid("DD72B8A6-2CE3-47F0-887E-B695A1A5D086");
