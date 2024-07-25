@@ -1,4 +1,4 @@
-import { manifest as blockRteTypeManifest } from './block-configuration/manifests.js';
+import { manifest as blockRteTypeManifest } from './block/manifests.js';
 import { manifests as tinyMceManifest } from './tiny-mce/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
