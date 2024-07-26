@@ -455,6 +455,12 @@
     You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ]]></key>
     <key alias="xssProtectionCheckHeaderNotFound">
       <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
+    <key alias="contentSecurityPolicyCheckHeaderFound">
+      <![CDATA[The header <strong>Content-Security-Policy (CSP)</strong> was found. ]]>
+    </key>
+    <key alias="contentSecurityPolicyCheckHeaderNotFound">
+      <![CDATA[The <strong>Content-Security-Policy (CSP)</strong> header was not found. This header is important because it helps prevent cross-site scripting (XSS) attacks and other code injection vulnerabilities by specifying which content sources are trusted and allowed to be loaded by the browser. ]]>
+    </key>
     <key alias="excessiveHeadersFound">
       <![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.
