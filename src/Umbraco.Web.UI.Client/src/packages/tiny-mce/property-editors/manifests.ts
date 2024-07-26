@@ -1,4 +1,4 @@
-import { manifest as blockRteTypeManifest } from './block-configuration/manifests.js';
+import { manifest as blockRteTypeManifest } from './block/manifests.js';
 import { manifests as tinyMceManifest } from './tiny-mce/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -42,7 +42,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 		name: 'TinyMCE Max Image Size Property Editor UI',
-		js: () => import('./max-image-size/property-editor-ui-tiny-mce-maximagesize-configuration.element.js'),
+		js: () => import('./max-image-size/property-editor-ui-tiny-mce-maximagesize.element.js'),
 		meta: {
 			label: 'TinyMCE Max Image Size Configuration',
 			icon: 'icon-autofill',

@@ -5,13 +5,10 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
- * @element umb-property-editor-ui-tiny-mce-maximagesize-configuration
+ * @element umb-property-editor-ui-tiny-mce-maximagesize
  */
-@customElement('umb-property-editor-ui-tiny-mce-maximagesize-configuration')
-export class UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement
-	extends UmbLitElement
-	implements UmbPropertyEditorUiElement
-{
+@customElement('umb-property-editor-ui-tiny-mce-maximagesize')
+export class UmbPropertyEditorUITinyMceMaxImageSizeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Number })
 	value: number = 0;
 
@@ -34,10 +31,10 @@ export class UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement
 	}
 }
 
-export default UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement;
+export default UmbPropertyEditorUITinyMceMaxImageSizeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tiny-mce-maximagesize-configuration': UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement;
+		'umb-property-editor-ui-tiny-mce-maximagesize': UmbPropertyEditorUITinyMceMaxImageSizeElement;
 	}
 }

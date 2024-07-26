@@ -34,7 +34,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 	private _queryStepManifests: Array<ManifestDynamicRootQueryStep> = [];
 
 	@property({ attribute: false })
-	data?: UmbContentPickerDynamicRoot | undefined;
+	data?: UmbContentPickerDynamicRoot;
 
 	#dynamicRootOrigin?: { label: string; icon: string; description?: string };
 
@@ -82,7 +82,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		itemSelector: 'uui-ref-node',
 		containerSelector: '#query-steps',
 		onChange: ({ model }) => {
-			if (this.data && this.data.querySteps) {
+			if (this.data?.querySteps) {
 				const querySteps = model;
 				this.#updateDynamicRootQuerySteps(querySteps);
 				this.dispatchEvent(new UmbChangeEvent());
@@ -251,7 +251,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			look="placeholder"></uui-button>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			.add-button {
 				width: 100%;
