@@ -53,7 +53,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			.permission-toggle {

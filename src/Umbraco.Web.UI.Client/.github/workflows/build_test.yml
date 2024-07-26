@@ -36,6 +36,7 @@ jobs:
       - run: npm ci --no-audit --no-fund --prefer-offline
       - run: npm run lint:errors
       - run: npm run build:for:cms
+      - run: npm run check:paths
       - run: npm run generate:jsonschema:dist
 
   test:
