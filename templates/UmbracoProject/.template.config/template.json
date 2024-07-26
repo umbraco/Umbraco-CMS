@@ -72,7 +72,7 @@
         },
         {
           "choice": "Custom",
-          "description": "A custom version of Umbraco",
+          "description": "A custom version of Umbraco, this is used in conjunction with the obsoleted UmbracoVersion and will be removed in a future release",
           "displayName": "Custom"
         }
       ],
