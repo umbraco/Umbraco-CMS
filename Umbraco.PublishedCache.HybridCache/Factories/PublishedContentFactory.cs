@@ -38,11 +38,11 @@ internal class PublishedContentFactory : IPublishedContentFactory
         return preview ? GetModel(contentNode, contentNode.DraftModel) ?? GetPublishedContentAsDraft(GetModel(contentNode, contentNode.PublishedModel)) : GetModel(contentNode, contentNode.PublishedModel);
     }
 
-    public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode, bool preview)
+    public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
         var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
-        contentNode.SetContentTypeAndData(contentType, preview ? contentCacheNode.Data : null, preview ? null : contentCacheNode.Data);
+        contentNode.SetContentTypeAndData(contentType, null, contentCacheNode.Data);
 
         return GetModel(contentNode, contentNode.PublishedModel);
     }

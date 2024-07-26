@@ -5,11 +5,11 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 public interface IMediaCacheService
 {
-    Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false);
+    Task<IPublishedContent?> GetByKeyAsync(Guid key);
 
-    Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false);
+    Task<IPublishedContent?> GetByIdAsync(int id);
 
-    Task<bool> HasContentByIdAsync(int id, bool preview = false);
+    Task<bool> HasContentByIdAsync(int id);
 
     Task RefreshMediaAsync(IMedia media);
 
