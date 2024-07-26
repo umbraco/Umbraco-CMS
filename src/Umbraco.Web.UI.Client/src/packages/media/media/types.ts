@@ -30,3 +30,5 @@ export interface UmbMediaValueModel<ValueType = unknown> {
 }
 
 export interface UmbMediaVariantOptionModel extends UmbVariantOptionModel<UmbVariantModel> {}
+
+export type * from './property-editors/types.js';

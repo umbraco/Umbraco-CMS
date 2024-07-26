@@ -1,6 +1,6 @@
 import { UmbMediaUrlRepository } from '../../repository/index.js';
 import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
-import type { UmbCropModel } from '../../property-editors/index.js';
+import type { UmbCropModel } from '../../types.js';
 import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 import type {
