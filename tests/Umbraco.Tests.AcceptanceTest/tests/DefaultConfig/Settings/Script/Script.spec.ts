@@ -53,7 +53,7 @@ test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
 
 test('can update a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.script.create(scriptName, 'test');
+  await umbracoApi.script.create(scriptName, '');
   const updatedScriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
   await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
 
