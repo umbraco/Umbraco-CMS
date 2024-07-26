@@ -339,7 +339,7 @@ test('can add a description to a property in a document type', async ({umbracoAp
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
   await umbracoUi.documentType.enterPropertyEditorDescription(descriptionText);
-  await umbracoUi.documentType.clickUpdateButton();
+  await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
@@ -360,7 +360,7 @@ test('can set is mandatory for a property in a document type', {tag: '@smoke'}, 
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
   await umbracoUi.documentType.clickMandatorySlider();
-  await umbracoUi.documentType.clickUpdateButton();
+  await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
@@ -383,7 +383,7 @@ test('can enable validation for a property in a document type', async ({umbracoA
   await umbracoUi.documentType.selectValidationOption('');
   await umbracoUi.documentType.enterRegEx(regex);
   await umbracoUi.documentType.enterRegExMessage(regexMessage);
-  await umbracoUi.documentType.clickUpdateButton();
+  await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
@@ -403,7 +403,7 @@ test('can allow vary by culture for a property in a document type', {tag: '@smok
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
   await umbracoUi.documentType.clickVaryByCultureSlider();
-  await umbracoUi.documentType.clickUpdateButton();
+  await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
@@ -422,7 +422,7 @@ test('can set appearance to label on top for a property in a document type', asy
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
   await umbracoUi.documentType.clickLabelAboveButton();
-  await umbracoUi.documentType.clickUpdateButton();
+  await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
