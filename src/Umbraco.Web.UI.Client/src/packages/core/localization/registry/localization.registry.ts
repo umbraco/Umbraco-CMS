@@ -36,7 +36,7 @@ export class UmbLocalizationRegistry {
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
 		combineLatest([this.currentLanguage, extensionRegistry.byType('localization')]).subscribe(
 			async ([currentLanguage, extensions]) => {
-				const locale = new Intl.Locale(!!currentLanguage ? currentLanguage : UMB_DEFAULT_LOCALIZATION_CULTURE);
+				const locale = new Intl.Locale(currentLanguage ? currentLanguage : UMB_DEFAULT_LOCALIZATION_CULTURE);
 				const filteredExt = extensions.filter(
 					(ext) =>
 						ext.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
