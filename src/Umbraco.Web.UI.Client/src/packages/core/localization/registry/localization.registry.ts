@@ -1,7 +1,8 @@
 import {
-	UmbLocalizationSetBase,
-	UmbLocalizationDictionary,
-	UmbLocalizationFlatDictionary, UMB_DEFAULT_LOCALIZATION_CULTURE
+	type UmbLocalizationSetBase,
+	type UmbLocalizationDictionary,
+	type UmbLocalizationFlatDictionary,
+	UMB_DEFAULT_LOCALIZATION_CULTURE
 } from "@umbraco-cms/backoffice/localization-api";
 import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import type { ManifestLocalization, UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
