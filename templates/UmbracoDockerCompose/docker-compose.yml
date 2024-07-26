@@ -5,6 +5,7 @@ services:
       context: ./Database
     environment:
       SA_PASSWORD: ${DB_PASSWORD}
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
     ports:
       - "1433:1433"
       - "1434:1434"
