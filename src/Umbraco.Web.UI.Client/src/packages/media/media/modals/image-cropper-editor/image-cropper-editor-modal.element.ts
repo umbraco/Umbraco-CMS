@@ -79,10 +79,21 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const item = data?.[0];
 
 		if (!item?.url) return;
+
+		/**
+		 * Combine the crops from the property editor with the stored crops and ignore any invalid crops
+		 * (e.g. crops that have been removed from the property editor)
+		 * @remark If a crop is removed from the property editor, it will be ignored and not saved
+		 */
+		const crops: Array<UmbCropModel> = this._crops.map((crop) => {
+			const existingCrop = this.value.crops?.find((c) => c.alias === crop.alias);
+			return existingCrop ? { ...crop, ...existingCrop } : crop;
+		});
+
 		const value: UmbImageCropperPropertyEditorValue = {
 			...this.value,
 			src: item.url,
-			crops: this.value.crops?.length ? this.value.crops : this._crops,
+			crops,
 			focalPoint: this.value.focalPoint ?? { left: 0.5, top: 0.5 },
 		};
 		this._imageCropperValue = value;
