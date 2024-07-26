@@ -85,14 +85,6 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
         OnRepositoryRefreshed(serializer, contentCacheNode, false);
     }
 
-    public void RefreshMember(IMember member)
-    {
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Member);
-
-        OnRepositoryRefreshed(serializer, member, false);
-    }
-
     /// <inheritdoc/>
     public void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds = null,
@@ -253,106 +245,11 @@ AND cmsContentNu.nodeId IS NULL
         return CreateMediaNodeKit(dto, serializer);
     }
 
-    public IEnumerable<ContentCacheNode> GetAllMediaSources()
-    {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-
-        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
-
-        foreach (ContentSourceDto row in dtos)
-        {
-            yield return CreateMediaNodeKit(row, serializer);
-        }
-    }
-
-    public IEnumerable<ContentCacheNode> GetBranchMediaSources(int id)
-    {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect(SqlContentSourcesSelectUmbracoNodeJoin)
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .Append(SqlWhereNodeIdX(SqlContext, id))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-
-        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
-
-        foreach (ContentSourceDto row in dtos)
-        {
-            yield return CreateMediaNodeKit(row, serializer);
-        }
-    }
-
-    public IEnumerable<ContentCacheNode> GetTypeMediaSources(IEnumerable<int> ids)
-    {
-        if (!ids.Any())
-        {
-            yield break;
-        }
-
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-
-        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
-
-        foreach (ContentSourceDto row in dtos)
-        {
-            yield return CreateMediaNodeKit(row, serializer);
-        }
-    }
-
-    public ContentCacheNode GetMediaSource(IScope scope, int id)
-    {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .Append(SqlWhereNodeId(SqlContext, id))
-            .Append(SqlOrderByLevelIdSortOrder(scope.SqlContext));
-
-        ContentSourceDto? dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-
-        if (dto == null)
-        {
-            return new ContentCacheNode();
-        }
-
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-        return CreateMediaNodeKit(dto, serializer);
-    }
-
     private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
         // use a custom SQL to update row version on each update
         // db.InsertOrUpdate(dto);
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
-
-        Database.InsertOrUpdate(
-            dto,
-            "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
-            new
-            {
-                dataRaw = dto.RawData ?? Array.Empty<byte>(),
-                data = dto.Data,
-                id = dto.NodeId,
-                published = dto.Published,
-            });
-    }
-
-    private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, IContentBase content, bool published)
-    {
-        // use a custom SQL to update row version on each update
-        // db.InsertOrUpdate(dto);
-        ContentNuDto dto = GetDtoFromContent(content, published, serializer);
 
         Database.InsertOrUpdate(
             dto,

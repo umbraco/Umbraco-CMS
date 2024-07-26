@@ -23,11 +23,6 @@ internal interface INuCacheContentRepository
     void RefreshMedia(ContentCacheNode contentCacheNode);
 
     /// <summary>
-    ///     Refreshes the nucache database row for the given cache node />
-    /// </summary>
-    void RefreshMember(IMember content);
-
-    /// <summary>
     ///     Rebuilds the caches for content, media and/or members based on the content type ids specified
     /// </summary>
     /// <param name="contentTypeIds">
@@ -50,6 +45,4 @@ internal interface INuCacheContentRepository
     bool VerifyContentDbCache();
 
     bool VerifyMediaDbCache();
-
-    bool VerifyMemberDbCache();
 }
