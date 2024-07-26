@@ -66,33 +66,33 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: .\UmbracoProject\wwwroot\media
+      device: ./UmbracoProject/wwwroot/media
       o: bind
   umb_scripts:
     driver: local
     driver_opts:
       type: none
-      device: .\UmbracoProject\wwwroot\scripts
+      device: ./UmbracoProject/wwwroot/scripts
       o: bind
   umb_styles:
     driver: local
     driver_opts:
       type: none
-      device: .\UmbracoProject\wwwroot\css
+      device: ./UmbracoProject/wwwroot/css
       o: bind
   umb_logs:
   umb_views:
     driver: local
     driver_opts:
       type: none
-      device: .\UmbracoProject\Views
+      device: ./UmbracoProject/Views
       o: bind
   umb_data:
   umb_models:
     driver: local
     driver_opts:
       type: none
-      device: .\UmbracoProject\umbraco\models
+      device: ./UmbracoProject/umbraco/models
       o: bind
   umb_database:
 
