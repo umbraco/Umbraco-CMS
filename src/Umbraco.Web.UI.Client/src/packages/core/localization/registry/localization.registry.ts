@@ -1,8 +1,8 @@
-import type {
+import {
 	UmbLocalizationSetBase,
 	UmbLocalizationDictionary,
-	UmbLocalizationFlatDictionary,
-} from '@umbraco-cms/backoffice/localization-api';
+	UmbLocalizationFlatDictionary, UMB_DEFAULT_LOCALIZATION_CULTURE
+} from "@umbraco-cms/backoffice/localization-api";
 import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import type { ManifestLocalization, UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -36,7 +36,7 @@ export class UmbLocalizationRegistry {
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
 		combineLatest([this.currentLanguage, extensionRegistry.byType('localization')]).subscribe(
 			async ([currentLanguage, extensions]) => {
-				const locale = new Intl.Locale(currentLanguage);
+				const locale = new Intl.Locale(!!currentLanguage ? currentLanguage : UMB_DEFAULT_LOCALIZATION_CULTURE);
 				const filteredExt = extensions.filter(
 					(ext) =>
 						ext.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
