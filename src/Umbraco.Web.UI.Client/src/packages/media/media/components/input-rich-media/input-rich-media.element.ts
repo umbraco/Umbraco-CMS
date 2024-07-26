@@ -122,13 +122,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	@property({ type: Array })
-	public set preselectedCrops(value: Array<UmbCropModel>) {
-		this.#preselectedCrops = value;
-	}
-	public get preselectedCrops(): Array<UmbCropModel> {
-		return this.#preselectedCrops;
-	}
-	#preselectedCrops: Array<UmbCropModel> = [];
+	public preselectedCrops?: Array<UmbCropModel>;
 
 	@property({ type: Boolean })
 	public set focalPointEnabled(value: boolean) {
