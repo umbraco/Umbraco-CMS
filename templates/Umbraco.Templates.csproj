@@ -55,7 +55,6 @@
       </_TemplateJsonFiles>
     </ItemGroup>
     <Copy SourceFiles="@(_TemplateJsonFiles)" DestinationFiles="%(DestinationFile)" />
-    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
     <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.FinalVersion.parameters.cases.[0].value" Value="&quot;$(PackageVersion)&quot;" />
     <ItemGroup>
       <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">

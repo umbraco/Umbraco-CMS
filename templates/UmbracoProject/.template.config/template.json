@@ -69,29 +69,24 @@
           "choice": "LTS",
           "description": "The most recent long term supported version",
           "displayName": "Long Term Supported"
-        },
-        {
-          "choice": "Custom",
-          "description": "A custom version of Umbraco, this is used in conjunction with the obsoleted UmbracoVersion and will be removed in a future release",
-          "displayName": "Custom"
         }
       ],
       "isRequired": false
     },
     "UmbracoVersion": {
       "displayName": "Custom Version",
-      "description": "The selected custom version of Umbraco, only active if Custom is selected as version.",
+      "description": "The selected custom version of Umbraco, this is obsoleted, and will be removed in a future version of the template.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "*",
-      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE",
-      "isEnabled": "(UmbracoRelease == 'Custom')"
+      "defaultValue": "null",
+      "replaces": "CUSTOM_VERSION",
+      "isRequired": false
     },
     "FinalVersion" : {
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
-      "description": "The calculated version of Umbraco to use, this MUST be before UmbracoVersion, otherwise it will not be overwritten by UmbracoVersion",
+      "description": "The calculated version of Umbraco to use",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE",
       "parameters": {
         "evaluator": "C++",
