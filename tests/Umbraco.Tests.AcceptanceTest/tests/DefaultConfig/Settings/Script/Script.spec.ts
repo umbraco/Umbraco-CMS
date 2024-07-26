@@ -14,8 +14,10 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can create a empty script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // Act
+  // Arrange
   await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
+
+  // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
   await umbracoUi.script.clickCreateButton();
   await umbracoUi.script.clickNewJavascriptFileButton();
@@ -31,9 +33,9 @@ test('can create a empty script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const scriptContent = 'TestContent';
+  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
 
   // Act
-  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.script.clickActionsMenuAtRoot();
   await umbracoUi.script.clickCreateButton();
   await umbracoUi.script.clickNewJavascriptFileButton();
@@ -51,11 +53,11 @@ test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
 
 test('can update a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.script.create(scriptName, 'test');
+  await umbracoApi.script.create(scriptName, '');
   const updatedScriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
+  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
 
   // Act
-  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.script.openScriptAtRoot(scriptName);
   await umbracoUi.script.enterScriptContent(updatedScriptContent);
   await umbracoUi.script.clickSaveButton();
@@ -69,9 +71,9 @@ test('can update a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
 test('can delete a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.script.create(scriptName, '');
+  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
 
   // Act
-  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptName);
   await umbracoUi.script.clickDeleteAndConfirmButton();
@@ -87,9 +89,9 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
   const wrongScriptName = 'WrongTestScript.js';
   await umbracoApi.script.ensureNameNotExists(wrongScriptName);
   await umbracoApi.script.create(wrongScriptName, '');
+  await umbracoUi.script.goToScript(wrongScriptName);
 
   // Act
-  await umbracoUi.script.goToScript(wrongScriptName);
   await umbracoUi.script.clickActionsMenuForScript(wrongScriptName);
   await umbracoUi.script.rename(scriptName);
 
@@ -97,4 +99,20 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.isSuccessNotificationVisible();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
+});
+
+test('cannot create a script with an empty name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
+  
+  // Act
+  await umbracoUi.script.clickActionsMenuAtRoot();
+  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickNewJavascriptFileButton();
+  await umbracoUi.script.clickSaveButton();
+
+  // Assert
+  // TODO: Uncomment this when the front-end is ready. Currently there is no error displays.
+  //await umbracoUi.script.isErrorNotificationVisible();
+  expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
 });
