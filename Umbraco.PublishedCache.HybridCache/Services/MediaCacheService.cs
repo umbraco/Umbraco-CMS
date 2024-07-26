@@ -15,14 +15,16 @@ internal class MediaCacheService : IMediaCacheService
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
+    private readonly ICacheNodeFactory _cacheNodeFactory;
 
-    public MediaCacheService(INuCacheContentRepository nuCacheContentRepository, IIdKeyMap idKeyMap, ICoreScopeProvider scopeProvider, Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache, IPublishedContentFactory publishedContentFactory)
+    public MediaCacheService(INuCacheContentRepository nuCacheContentRepository, IIdKeyMap idKeyMap, ICoreScopeProvider scopeProvider, Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache, IPublishedContentFactory publishedContentFactory, ICacheNodeFactory cacheNodeFactory)
     {
         _nuCacheContentRepository = nuCacheContentRepository;
         _idKeyMap = idKeyMap;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
+        _cacheNodeFactory = cacheNodeFactory;
     }
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false)
@@ -83,8 +85,12 @@ internal class MediaCacheService : IMediaCacheService
     public async Task RefreshMediaAsync(IMedia media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        await _hybridCache.RemoveAsync(media.Key.ToString());
-        _nuCacheContentRepository.RefreshMedia(media);
+        // Always set draft node
+        // We have nodes seperate in the cache, cause 99% of the time, you are only using one
+        // and thus we won't get too much data when retrieving from the cache.
+        var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
+        await _hybridCache.SetAsync(GetCacheKey(media.Key, false), cacheNode);
+        _nuCacheContentRepository.RefreshMedia(cacheNode);
         scope.Complete();
     }
 
@@ -100,4 +106,6 @@ internal class MediaCacheService : IMediaCacheService
 
         scope.Complete();
     }
+
+    private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 }

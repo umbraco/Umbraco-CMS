@@ -32,7 +32,24 @@ internal class CacheNodeFactory : ICacheNodeFactory
         };
     }
 
-    private ContentData GetContentData(IContent content, bool published)
+    public ContentCacheNode ToContentCacheNode(IMedia media)
+    {
+        ContentData contentData = GetContentData(media, false);
+        return new ContentCacheNode
+        {
+            Id = media.Id,
+            Key = media.Key,
+            Path = media.Path,
+            SortOrder = media.SortOrder,
+            CreateDate = media.CreateDate,
+            CreatorId = media.CreatorId,
+            ContentTypeId = media.ContentTypeId,
+            Data = contentData,
+            IsDraft = false,
+        };
+    }
+
+    private ContentData GetContentData(IContentBase content, bool published)
     {
         var propertyData = new Dictionary<string, PropertyData[]>();
         foreach (IProperty prop in content.Properties)
@@ -67,7 +84,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
         // sanitize - names should be ok but ... never knows
         if (content.ContentType.VariesByCulture())
         {
-            ContentCultureInfosCollection? infos = content is { } document
+            ContentCultureInfosCollection? infos = content is IContent document
                 ? published
                     ? document.PublishCultureInfos
                     : document.CultureInfos

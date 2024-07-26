@@ -79,12 +79,10 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
         }
     }
 
-    public void RefreshMedia(IMedia media)
+    public void RefreshMedia(ContentCacheNode contentCacheNode)
     {
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-
-        OnRepositoryRefreshed(serializer, media, false);
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+        OnRepositoryRefreshed(serializer, contentCacheNode, false);
     }
 
     public void RefreshMember(IMember member)
