@@ -22,7 +22,7 @@ function addOrUpdateDictionary(
 }
 
 export class UmbLocalizationRegistry {
-	#currentLanguage = new UmbStringState(document.documentElement.lang ?? 'en-us');
+	#currentLanguage = new UmbStringState(document.documentElement.lang !== '' ? document.documentElement.lang : UMB_DEFAULT_LOCALIZATION_CULTURE);
 	readonly currentLanguage = this.#currentLanguage.asObservable();
 
 	#loadedExtAliases: Array<string> = [];
@@ -37,7 +37,7 @@ export class UmbLocalizationRegistry {
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
 		combineLatest([this.currentLanguage, extensionRegistry.byType('localization')]).subscribe(
 			async ([currentLanguage, extensions]) => {
-				const locale = new Intl.Locale(currentLanguage ? currentLanguage : UMB_DEFAULT_LOCALIZATION_CULTURE);
+				const locale = new Intl.Locale(currentLanguage);
 				const filteredExt = extensions.filter(
 					(ext) =>
 						ext.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
