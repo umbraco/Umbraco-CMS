@@ -11,22 +11,7 @@ export class UmbExampleModal extends UmbModalBaseElement {
 
 	@state()
   private _routes: UmbRoute[] = [
-      {
-          path: `/overview`,
-          component: () => import('./steps/example-modal-step1.element.js'),
-          setup: (component, info) => {
-          },
-      },
-      {
-          path: `/details`,
-          component: () => import('./steps/example-modal-step2.element.js'),
-          setup: (component, info) => {
-          },
-      },
-      {
-        path: '',
-        redirectTo: 'overview',
-      },
+
   ];
 
 	/**
@@ -37,6 +22,36 @@ export class UmbExampleModal extends UmbModalBaseElement {
 		console.log('modal element loaded');
 	}
 
+	override connectedCallback(): void {
+		super.connectedCallback();
+		this._routes = [{
+			path: `/overview`,
+			component: () => import('./steps/example-modal-step1.element.js'),
+			setup: (component, info) => {
+			},
+	},
+	{
+			path: `/details`,
+			component: () => import('./steps/example-modal-step2.element.js'),
+			setup: (component, info) => {
+			},
+	},
+	{
+		path: '',
+		redirectTo: 'overview',
+	},
+	{
+		path: '',
+		redirectTo: 'test',
+	}
+];
+
+	setTimeout(()=>{
+		//this._routes = [this._routes[0],this._routes[1],this._routes[2]]
+	},20);
+
+	}
+
 	override render() {
 		return html`
 			<div>
@@ -45,7 +60,7 @@ export class UmbExampleModal extends UmbModalBaseElement {
 				<umb-router-slot
           .routes=${this._routes}
           @init=${(event: UmbRouterSlotInitEvent) => {
-            console.log('modal routes init');
+            console.log('modal route init fired');
           }}
           @change=${(event: UmbRouterSlotChangeEvent) => {
             console.log('modal routes change');

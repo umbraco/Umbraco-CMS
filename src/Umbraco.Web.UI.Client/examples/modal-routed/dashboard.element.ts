@@ -51,7 +51,7 @@ export class UmbDashboardElement extends UmbElementMixin(LitElement) {
 				<umb-router-slot
           .routes=${this._routes}
           @init=${(event: UmbRouterSlotInitEvent) => {
-            console.log('modal routes init');
+            console.log('tab routes init');
           }}
           @change=${(event: UmbRouterSlotChangeEvent) => {
             console.log('modal routes change');
