@@ -135,6 +135,12 @@ public class IdentityMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
     private void Map(IMember source, MemberIdentityUser target)
     {
+        // LastLockoutDate is a DateTime object with UTC kind but the fact is it's not
+        if (source.LastLockoutDate.HasValue)
+        {
+            source.LastLockoutDate = new DateTime(source.LastLockoutDate.Value.Ticks, DateTimeKind.Local);
+        }
+
         target.Email = source.Email;
         target.UserName = source.Username;
         target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate?.ToUniversalTime();
