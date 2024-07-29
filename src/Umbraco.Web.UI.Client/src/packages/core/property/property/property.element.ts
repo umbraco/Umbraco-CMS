@@ -1,4 +1,5 @@
 import { UmbPropertyContext } from './property.context.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -19,6 +20,7 @@ import type {
 	UmbPropertyTypeValidationModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 /**
  *  @element umb-property
@@ -169,6 +171,12 @@ export class UmbPropertyElement extends UmbLitElement {
 	@state()
 	private _mandatory?: boolean;
 
+	#currentUserAllowedLanguages: string[] | undefined = [];
+	#variantId: UmbVariantId | undefined;
+
+	@state()
+	_readonly = false;
+
 	#propertyContext = new UmbPropertyContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
@@ -178,6 +186,13 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(context.languages, (languages) => {
+				this.#currentUserAllowedLanguages = languages;
+				this.#checkForWritePermission();
+			});
+		});
 
 		this.observe(
 			this.#propertyContext.alias,
@@ -226,6 +241,39 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			null,
 		);
+		this.observe(this.#propertyContext.variantId, (value) => {
+			this.#variantId = value;
+			this.#checkForWritePermission();
+		});
+	}
+
+	#checkForWritePermission() {
+		if (this.#variantId === undefined) {
+			this._readonly = false;
+			return;
+		}
+
+		if (this.#currentUserAllowedLanguages === undefined) {
+			this._readonly = false;
+			return;
+		}
+
+		const isInvariant = this.#variantId.culture === null;
+
+		// always allow editing invariant properties
+		if (isInvariant) {
+			this._readonly = false;
+			return;
+		}
+
+		// if the user has no allowed languages, set readonly
+		if (this.#currentUserAllowedLanguages?.length === 0) {
+			this._readonly = true;
+			return;
+		}
+
+		// if the user is not allowed to edit the current language, set readonly
+		this._readonly = this.#currentUserAllowedLanguages.includes(this.#variantId.culture!) === false;
 	}
 
 	private _onPropertyEditorChange = (e: CustomEvent): void => {
@@ -336,7 +384,9 @@ export class UmbPropertyElement extends UmbLitElement {
 				${this._variantDifference
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
 					: ''}
-				<div slot="editor">${this._element}</div>
+				<div id="editor" slot="editor">
+					${this._readonly ? html`<div id="overlay"></div>` : nothing} ${this._readonly} ${this._element}
+				</div>
 			</umb-property-layout>
 		`;
 	}
@@ -376,6 +426,21 @@ export class UmbPropertyElement extends UmbLitElement {
 
 			uui-tag {
 				margin-top: var(--uui-size-space-4);
+			}
+
+			#editor {
+				position: relative;
+			}
+
+			#overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: white;
+				opacity: 0.5;
+				z-index: 1;
 			}
 		`,
 	];
