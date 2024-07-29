@@ -1,7 +1,7 @@
 import { UmbInputMediaElement } from '../input-media/index.js';
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
+import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../types.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import type { UmbUploadableFileModel } from '../../dropzone/index.js';
 import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -122,13 +122,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	@property({ type: Array })
-	public set preselectedCrops(value: Array<UmbCropModel>) {
-		this.#preselectedCrops = value;
-	}
-	public get preselectedCrops(): Array<UmbCropModel> {
-		return this.#preselectedCrops;
-	}
-	#preselectedCrops: Array<UmbCropModel> = [];
+	public preselectedCrops?: Array<UmbCropModel>;
 
 	@property({ type: Boolean })
 	public set focalPointEnabled(value: boolean) {
