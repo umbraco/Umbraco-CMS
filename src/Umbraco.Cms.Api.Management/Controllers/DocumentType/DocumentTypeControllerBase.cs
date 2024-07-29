@@ -41,6 +41,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid property type alias")
                     .WithDetail("One or more property type aliases are invalid")
                     .Build()),
+                ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid property type alias")
+                    .WithDetail("The property type alias cannot be the same as the content type alias")
+                    .Build()),
                 ContentTypeOperationStatus.InvalidContainerName => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid container name")
                     .WithDetail("One or more container names are invalid")
@@ -81,6 +85,18 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 ContentTypeOperationStatus.NotAllowed => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Operation not permitted")
                     .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
+                    .Build()),
+                ContentTypeOperationStatus.CancelledByNotification => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Cancelled by notification")
+                    .WithDetail("The attempted operation was cancelled by a notification.")
+                    .Build()),
+                ContentTypeOperationStatus.NameCannotBeEmpty => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Name cannot be empty")
+                    .WithDetail("The name of the content type cannot be empty")
+                    .Build()),
+                ContentTypeOperationStatus.NameTooLong => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Name was too long")
+                    .WithDetail("Name cannot be more than 255 characters in length.")
                     .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });

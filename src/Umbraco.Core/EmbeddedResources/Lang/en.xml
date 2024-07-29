@@ -442,6 +442,29 @@
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
+    <key alias="clickJackingCheckHeaderFound">
+      <![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound">
+      <![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
+    <key alias="noSniffCheckHeaderFound">
+      <![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was found.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">
+      <![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was not found.]]></key>
+    <key alias="hSTSCheckHeaderFound">
+      <![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">
+      <![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost">
+      <![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found. <strong>This header should not be present on localhost.</strong>]]>
+    </key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
+      <![CDATA[The header <strong>Strict-Transport-Security</strong> was not found. This header should not be present on localhost.]]>
+    </key>
+    <key alias="xssProtectionCheckHeaderFound">
+      <![CDATA[The header <strong>X-XSS-Protection</strong> was found. <strong>It is recommended not to add this header to your website</strong>.<br />
+    You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound">
+      <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.
     </key>

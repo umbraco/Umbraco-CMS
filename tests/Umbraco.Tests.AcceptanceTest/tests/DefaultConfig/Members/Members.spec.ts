@@ -106,8 +106,8 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.clickChangePasswordButton();
-  await umbracoUi.member.enterNewPassword(updatedPassword);
-  await umbracoUi.member.enterConfirmPassword(updatedPassword);
+  await umbracoUi.member.enterPassword(updatedPassword);
+  await umbracoUi.member.enterConfirmNewPassword(updatedPassword);
   await umbracoUi.member.clickSaveButton();
 
   // Assert
@@ -173,9 +173,16 @@ test('can view member info', async ({umbracoApi, umbracoUi}) => {
   // Assert
   const memberData = await umbracoApi.member.get(memberId);
   await umbracoUi.member.doesMemberInfoHaveValue('Failed login attempts', memberData.failedPasswordAttempts.toString());
-  await umbracoUi.member.doesMemberInfoHaveValue('Last lockout date', memberData.lastLoginDate == null ? 'never' : memberData.lastLoginDate);
-  await umbracoUi.member.doesMemberInfoHaveValue('Last login', memberData.lastLoginDate == null ? 'never' : memberData.lastLoginDate);
-  await umbracoUi.member.doesMemberInfoHaveValue('Password changed', new Date(memberData.lastPasswordChangeDate).toLocaleString());
+  await umbracoUi.member.doesMemberInfoHaveValue('Last lockout date', memberData.lastLoginDate == null ? 'Never' : memberData.lastLoginDate);
+  await umbracoUi.member.doesMemberInfoHaveValue('Last login', memberData.lastLoginDate == null ? 'Never' : memberData.lastLoginDate);
+  await umbracoUi.member.doesMemberInfoHaveValue('Password changed', new Date(memberData.lastPasswordChangeDate).toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  }));
 });
 
 test('can enable approved', async ({umbracoApi, umbracoUi}) => {
@@ -210,4 +217,44 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.member.isSuccessNotificationVisible();
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
+});
+
+test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const invalidEmail = 'invalidemail';
+  await umbracoUi.member.goToSection(ConstantHelper.sections.members);
+
+  // Act
+  await umbracoUi.member.clickCreateButton();
+  await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.enterUsername(username);
+  await umbracoUi.member.enterEmail(invalidEmail);
+  await umbracoUi.member.enterPassword(password);
+  await umbracoUi.member.enterConfirmPassword(password);
+  await umbracoUi.member.clickDetailsTab();
+  await umbracoUi.member.enterComments(comment);
+  await umbracoUi.member.clickSaveButton();
+
+  // Assert
+  await umbracoUi.member.isErrorNotificationVisible();
+  expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
+});
+
+// TODO: Remove skip when the front-end is ready. Currently it is possible to update member with invalid email.
+test.skip('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const invalidEmail = 'invalidemail';
+  memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
+  memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+  await umbracoUi.member.goToSection(ConstantHelper.sections.members);
+
+  // Act
+  await umbracoUi.member.clickMemberLinkByName(memberName);
+  await umbracoUi.member.enterEmail(invalidEmail);
+  await umbracoUi.member.clickSaveButton();
+
+  // Assert
+  await umbracoUi.member.isErrorNotificationVisible();
+  const memberData = await umbracoApi.member.get(memberId);
+  expect(memberData.email).toBe(email);
 });

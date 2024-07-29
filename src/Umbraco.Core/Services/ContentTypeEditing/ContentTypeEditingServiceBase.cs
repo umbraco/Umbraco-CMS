@@ -198,6 +198,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return ContentTypeOperationStatus.InvalidAlias;
         }
 
+        // Validate content type alias is not in use.
+        if (model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)))
+        {
+            return ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias;
+        }
+
         // Validate properties for reserved aliases.
         if (ContainsReservedPropertyTypeAlias(model))
         {
@@ -408,8 +414,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // Since MyModel.Path would conflict with IPublishedContent.Path.
         ISet<string> reservedPropertyTypeNames = GetReservedFieldNames();
 
-        return model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
-                                                   || reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
+        return model.Properties.Any(propertyType => reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
     }
 
     private bool IsUnsafeAlias(string alias) => alias.IsNullOrWhiteSpace()
