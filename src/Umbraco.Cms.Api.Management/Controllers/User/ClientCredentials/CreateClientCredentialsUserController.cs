@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.User.ClientCredentials;
 using Umbraco.Cms.Core;
@@ -26,6 +27,8 @@ public class CreateClientCredentialsUserController : ClientCredentialsUserContro
     }
 
     [HttpPost("{id:guid}/client-credentials")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, Guid id, CreateUserClientCredentialsRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

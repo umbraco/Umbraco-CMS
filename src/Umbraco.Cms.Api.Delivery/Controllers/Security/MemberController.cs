@@ -109,6 +109,7 @@ public class MemberController : DeliveryApiControllerBase
             return BadRequest("Unable to obtain OpenID data from the current request.");
         }
 
+        // authorization code flow or refresh token flow?
         if ((request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType()) && _deliveryApiSettings.MemberAuthorization?.AuthorizationCodeFlow?.Enabled is true)
         {
             // attempt to authorize against the supplied the authorization code
@@ -119,8 +120,11 @@ public class MemberController : DeliveryApiControllerBase
                 : BadRequest("The supplied authorization was not be verified.");
         }
 
+        // client credentials flow?
         if (request.IsClientCredentialsGrantType() && _deliveryApiSettings.MemberAuthorization?.ClientCredentialsFlow?.Enabled is true)
         {
+            // if we get here, the client ID and secret are valid (verified by OpenIddict)
+
             MemberIdentityUser? member = await _memberClientCredentialsManager.FindMemberAsync(request.ClientId!);
             return member is not null
                 ? await SignInMember(member, request)

@@ -2488,7 +2488,7 @@ internal class UserService : RepositoryService, IUserService
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
-        if (currentClientIds.Contains(clientId))
+        if (currentClientIds.InvariantContains(clientId))
         {
             return UserClientCredentialsOperationStatus.DuplicateClientId;
         }

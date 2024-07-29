@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
@@ -25,7 +26,9 @@ public class DeleteClientCredentialsUserController : ClientCredentialsUserContro
     }
 
     [HttpDelete("{id:guid}/client-credentials/{clientId}")]
-    public async Task<IActionResult> Create(CancellationToken cancellationToken, Guid id, string clientId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id, string clientId)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
