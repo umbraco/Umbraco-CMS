@@ -10,8 +10,7 @@ import {
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -36,12 +35,8 @@ export class UmbStylesheetWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 
-	#isCodeEditorReady = new UmbBooleanState(false);
-	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS);
-		this.#loadCodeEditor();
 
 		this.routes.setRoutes([
 			{
@@ -74,15 +69,6 @@ export class UmbStylesheetWorkspaceContext
 	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
-	}
-
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
-		}
 	}
 
 	getEntityType(): string {

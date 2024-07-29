@@ -3,25 +3,39 @@ import type { UmbInputContentElement } from './components/input-content/index.js
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component
 import './components/input-content/index.js';
 
+type UmbContentPickerValueType = UmbInputContentElement['selection'];
+
+const elementName = 'umb-property-editor-ui-content-picker';
+
 /**
  * @element umb-property-editor-ui-content-picker
  */
-@customElement('umb-property-editor-ui-content-picker')
-export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement(elementName)
+export class UmbPropertyEditorUIContentPickerElement
+	extends UmbFormControlMixin<UmbContentPickerValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
+	implements UmbPropertyEditorUiElement
+{
 	@property({ type: Array })
-	value: UmbInputContentElement['items'] = [];
+	public override set value(value: UmbContentPickerValueType | undefined) {
+		this.#value = value;
+	}
+	public override get value(): UmbContentPickerValueType | undefined {
+		return this.#value;
+	}
+	#value?: UmbContentPickerValueType = [];
 
 	@state()
 	_type: UmbContentPickerSource['type'] = 'content';
@@ -30,7 +44,13 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	_min = 0;
 
 	@state()
+	_minMessage = '';
+
+	@state()
 	_max = Infinity;
+
+	@state()
+	_maxMessage = '';
 
 	@state()
 	_allowedContentTypeUniques?: string | null;
@@ -64,15 +84,28 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 			this.#dynamicRoot = startNode.dynamicRoot;
 		}
 
-		this._min = Number(config.getValueByAlias('minNumber')) || 0;
-		this._max = Number(config.getValueByAlias('maxNumber')) || Infinity;
+		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
+		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
 		this._showOpenButton = config.getValueByAlias('showOpenButton');
+
+		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
+		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
+
+		// NOTE: Run validation immediately, to notify if the value is outside of min/max range. [LK]
+		if (this._min > 0 || this._max < Infinity) {
+			this.checkValidity();
+		}
 	}
 
-	override connectedCallback() {
-		super.connectedCallback();
+	#parseInt(value: unknown, fallback: number): number {
+		const num = Number(value);
+		return !isNaN(num) && num > 0 ? num : fallback;
+	}
+
+	override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
 	}
 
@@ -96,7 +129,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
-		this.value = event.target.items;
+		this.value = event.target.selection;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -106,22 +139,26 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 				? { unique: this._rootUnique, entityType: this._rootEntityType }
 				: undefined;
 
-		return html`<umb-input-content
-			.items=${this.value}
-			.type=${this._type}
-			.min=${this._min}
-			.max=${this._max}
-			.startNode=${startNode}
-			.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
-			?showOpenButton=${this._showOpenButton}
-			@change=${this.#onChange}></umb-input-content>`;
+		return html`
+			<umb-input-content
+				.selection=${this.value ?? []}
+				.type=${this._type}
+				.min=${this._min}
+				.minMessage=${this._minMessage}
+				.max=${this._max}
+				.maxMessage=${this._maxMessage}
+				.startNode=${startNode}
+				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
+				?showOpenButton=${this._showOpenButton}
+				@change=${this.#onChange}></umb-input-content>
+		`;
 	}
 }
 
-export default UmbPropertyEditorUIContentPickerElement;
+export { UmbPropertyEditorUIContentPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-content-picker': UmbPropertyEditorUIContentPickerElement;
+		[elementName]: UmbPropertyEditorUIContentPickerElement;
 	}
 }

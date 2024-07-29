@@ -1,6 +1,6 @@
 import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UmbMemberGroupServerDataSource } from './member-group-detail.server.data-source.js';
-import { UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT } from './member-group-detail.store.js';
+import { UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT } from './member-group-detail.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 

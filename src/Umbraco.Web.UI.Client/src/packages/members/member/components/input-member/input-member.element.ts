@@ -9,7 +9,9 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-@customElement('umb-input-member')
+const elementName = 'umb-input-member';
+
+@customElement(elementName)
 export class UmbInputMemberElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
@@ -72,7 +74,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -123,24 +125,20 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.selection.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.selection.length > this.max,
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observeItems');
 	}
 
-	protected override getFormElement() {
-		return undefined;
-	}
-
-	#pickableFilter: (item: UmbMemberItemModel) => boolean = (item) => {
+	#pickableFilter = (item: UmbMemberItemModel): boolean => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
 			return this.allowedContentTypeIds.includes(item.memberType.unique);
 		}
@@ -154,7 +152,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		});
 	}
 
-	#removeItem(item: UmbMemberItemModel) {
+	#onRemove(item: UmbMemberItemModel) {
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
@@ -176,12 +174,14 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.selection.length >= this.max) return nothing;
-		return html`<uui-button
-			id="btn-add"
-			look="placeholder"
-			@click=${this.#openPicker}
-			label=${this.localize.term('general_choose')}></uui-button>`;
+		if (this.selection.length >= this.max) return nothing;
+		return html`
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}></uui-button>
+		`;
 	}
 
 	#renderItem(item: UmbMemberItemModel) {
@@ -190,7 +190,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 			<uui-ref-node name=${item.name} id=${item.unique}>
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
+					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -210,7 +210,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	static override styles = [
 		css`
 			#btn-add {
-				width: 100%;
+				display: block;
 			}
 
 			uui-ref-node[drag-placeholder] {
@@ -220,10 +220,10 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	];
 }
 
-export default UmbInputMemberElement;
+export { UmbInputMemberElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-member': UmbInputMemberElement;
+		[elementName]: UmbInputMemberElement;
 	}
 }

@@ -22,7 +22,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	}
 
 	override render() {
-		return html` <umb-input-member min="0" max="1" .value=${this.value} @change=${this.#onChange}></umb-input-member> `;
+		return html`<umb-input-member min="0" max="1" .value=${this.value} @change=${this.#onChange}></umb-input-member>`;
 	}
 }
 

@@ -1,14 +1,14 @@
-import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
 import { getQuerySnippet } from '../../utils/index.js';
+import type { UmbTemplatingInsertMenuElement } from '../../local-components/insert-menu/index.js';
 import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
-// import local components
+import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
 
 @customElement('umb-partial-view-workspace-editor')
@@ -18,9 +18,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _content?: string | null = '';
-
-	@state()
-	private _ready: boolean = false;
 
 	@state()
 	private _isNew?: boolean;
@@ -41,10 +38,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#workspaceContext.content, (content) => {
 				this._content = content;
-			});
-
-			this.observe(this.#workspaceContext.isCodeEditorReady, (isReady) => {
-				this._ready = isReady;
 			});
 
 			this.observe(this.#workspaceContext.isNew, (isNew) => {
@@ -83,45 +76,45 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			.catch(() => undefined);
 	}
 
-	#renderCodeEditor() {
-		return html`<umb-code-editor
-			language="razor"
-			id="content"
-			.code=${this._content ?? ''}
-			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
+	override render() {
+		if (this._isNew === undefined) return;
+		return html`
+			<umb-workspace-editor alias="Umb.Workspace.PartialView">
+				<div id="workspace-header" slot="header">
+					<uui-input
+						placeholder=${this.localize.term('placeholders_entername')}
+						.value=${this._name}
+						@input=${this.#onNameInput}
+						label=${this.localize.term('placeholders_entername')}
+						?readonly=${this._isNew === false}
+						${umbFocus()}></uui-input>
+				</div>
+				<uui-box>
+					<div slot="header" id="code-editor-menu-container">
+						<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
+						<uui-button
+							look="secondary"
+							id="query-builder-button"
+							label=${this.localize.term('template_queryBuilder')}
+							@click=${this.#openQueryBuilder}>
+							<uui-icon name="icon-wand"></uui-icon>
+							<umb-localize key="template_queryBuilder">Query builder</umb-localize>
+						</uui-button>
+					</div>
+					${this.#renderCodeEditor()}
+				</uui-box>
+			</umb-workspace-editor>
+		`;
 	}
 
-	override render() {
-		return this._isNew !== undefined
-			? html`<umb-workspace-editor alias="Umb.Workspace.PartialView">
-					<div id="workspace-header" slot="header">
-						<uui-input
-							placeholder="Enter name..."
-							.value=${this._name}
-							@input=${this.#onNameInput}
-							label="Partial view name"
-							?readonly=${this._isNew === false}
-							${umbFocus()}></uui-input>
-					</div>
-					<uui-box>
-						<div slot="header" id="code-editor-menu-container">
-							<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
-							<uui-button
-								look="secondary"
-								id="query-builder-button"
-								label="Query builder"
-								@click=${this.#openQueryBuilder}>
-								<uui-icon name="icon-wand"></uui-icon>Query builder
-							</uui-button>
-						</div>
-						${this._ready
-							? this.#renderCodeEditor()
-							: html`<div id="loader-container">
-									<uui-loader></uui-loader>
-								</div>`}
-					</uui-box>
-				</umb-workspace-editor>`
-			: nothing;
+	#renderCodeEditor() {
+		return html`
+			<umb-code-editor
+				id="content"
+				language="razor"
+				.code=${this._content ?? ''}
+				@input=${this.#onCodeEditorInput}></umb-code-editor>
+		`;
 	}
 
 	static override styles = [
@@ -130,12 +123,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
-			}
-
-			#loader-container {
-				display: grid;
-				place-items: center;
-				min-height: calc(100dvh - 360px);
 			}
 
 			umb-code-editor {

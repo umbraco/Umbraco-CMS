@@ -63,7 +63,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 
 		if (error) {
 			this.errorMessage =
-				error instanceof ApiError ? (error.body as any).detail : error.message ?? 'Unknown error, please try again';
+				error instanceof ApiError ? (error.body as any).detail : (error.message ?? 'Unknown error, please try again');
 		} else {
 			history.pushState(null, '', 'section/content');
 		}

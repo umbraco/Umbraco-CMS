@@ -27,5 +27,9 @@
 	"exportall.config.folderListener": [],
 	"exportall.config.relExclusion": [],
 	"conventionalCommits.scopes": ["partial views"],
-	"typescript.tsdk": "node_modules/typescript/lib"
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"sonarlint.connectedMode.project": {
+		"connectionId": "umbraco",
+		"projectKey": "umbraco_Umbraco.CMS.Backoffice"
+	}
 }

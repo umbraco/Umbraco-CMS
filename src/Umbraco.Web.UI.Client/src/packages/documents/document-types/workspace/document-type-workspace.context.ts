@@ -112,7 +112,7 @@ export class UmbDocumentTypeWorkspaceContext
 					>;
 					const parentEntityType = params.parentEntityType;
 					const parentUnique = params.parentUnique === 'null' ? null : params.parentUnique;
-					const presetAlias = params.presetAlias === 'null' ? null : params.presetAlias ?? null;
+					const presetAlias = params.presetAlias === 'null' ? null : (params.presetAlias ?? null);
 					if (parentUnique === undefined) {
 						throw new Error('ParentUnique url parameter is required to create a document type');
 					}

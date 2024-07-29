@@ -2219,8 +2219,8 @@ export default {
 		forceHideContentEditor: 'Sakrij uređivač sadržaja',
 		forceHideContentEditorHelp:
 			'Sakrijte dugme za uređivanje sadržaja i uređivač sadržaja iz preklapanja Block Editor.',
-		girdInlineEditing: 'Inline editovanje',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Inline editovanje',
+		gridInlineEditingHelp:
 			'Omogućava inline uređivanje za prvo svojstvo. Dodatna svojstva se mogu uređivati u prekrivaču.',
 		blockHasChanges: 'Izmijenili ste ovaj sadržaj. Jeste li sigurni da ih želite odbaciti?',
 		confirmCancelBlockCreationHeadline: 'Odbaciti kreiranje?',

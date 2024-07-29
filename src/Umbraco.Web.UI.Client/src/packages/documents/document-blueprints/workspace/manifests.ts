@@ -1,5 +1,9 @@
-import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+	UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
+	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
+} from '../entity.js';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestTypes,
 	ManifestWorkspace,
@@ -17,6 +21,26 @@ const workspace: ManifestWorkspace = {
 	api: () => import('./document-blueprint-workspace.context.js'),
 	meta: {
 		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+	},
+};
+
+const rootWorkspace: ManifestWorkspace = {
+	type: 'workspace',
+	alias: 'Umb.Workspace.DocumentBlueprint.Root',
+	name: 'Document Blueprint Root Workspace',
+	element: () => import('./document-blueprint-root-workspace.element.js'),
+	meta: {
+		entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
+	},
+};
+
+const folderWorkspace: ManifestWorkspace = {
+	type: 'workspace',
+	alias: 'Umb.Workspace.DocumentBlueprint.Folder',
+	name: 'Document Blueprint Folder Workspace',
+	element: () => import('./document-blueprint-root-workspace.element.js'),
+	meta: {
+		entityType: UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 	},
 };
 
@@ -48,7 +72,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.DocumentBlueprint.Save',
 		name: 'Save Document Workspace Action',
 		weight: 80,
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',
@@ -63,4 +87,10 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [
+	rootWorkspace,
+	folderWorkspace,
+	workspace,
+	...workspaceViews,
+	...workspaceActions,
+];

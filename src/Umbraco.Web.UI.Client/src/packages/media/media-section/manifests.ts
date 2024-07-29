@@ -31,7 +31,7 @@ const menuSectionSidebarApp: ManifestSectionSidebarApp = {
 	name: 'Media Section Sidebar Menu',
 	weight: 100,
 	meta: {
-		label: 'Media',
+		label: '#sections_media',
 		menu: UMB_MEDIA_MENU_ALIAS,
 		entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
 	},

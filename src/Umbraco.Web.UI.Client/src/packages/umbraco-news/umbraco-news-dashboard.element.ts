@@ -37,7 +37,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 						<uui-button
 							look="primary"
 							target="_blank"
-							href="https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our"
+							href="https://our.umbraco.com/?utm_source=core&amp;utm_medium=dashboard&amp;utm_content=image&amp;utm_campaign=our"
 							label=${this.localize.term('welcomeDashboard_ourUmbracoButton')}></uui-button>
 					</div>
 				</uui-box>

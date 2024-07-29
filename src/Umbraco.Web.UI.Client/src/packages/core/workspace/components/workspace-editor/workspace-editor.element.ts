@@ -14,7 +14,7 @@ import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from 
  * @slot name - Slot for name
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
- * @slot default - slot for main content
+ * @slot - slot for main content
  * @export
  * @class UmbWorkspaceEditor
  * @extends {UmbLitElement}

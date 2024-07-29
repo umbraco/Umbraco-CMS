@@ -17,13 +17,13 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CurrentUserMfaEnableProvider',
 		name: 'Current User MFA Enable Provider Modal',
-		js: () => import('./current-user-mfa-enable-provider/current-user-mfa-enable-provider-modal.element.js'),
+		js: () => import('./current-user-mfa-enable/current-user-mfa-enable-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.CurrentUserMfaDisableProvider',
 		name: 'Current User MFA Disable Provider Modal',
-		js: () => import('./current-user-mfa-disable-provider/current-user-mfa-disable-provider-modal.element.js'),
+		js: () => import('./current-user-mfa-disable/current-user-mfa-disable-modal.element.js'),
 	},
 ];
 

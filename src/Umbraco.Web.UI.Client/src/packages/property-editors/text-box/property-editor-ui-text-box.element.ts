@@ -1,13 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	css,
-	html,
-	customElement,
-	state,
-	ifDefined,
-	type PropertyValueMap,
-	property,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -54,12 +46,11 @@ export class UmbPropertyEditorUITextBoxElement
 		this._placeholder = config?.getValueByAlias('placeholder');
 	}
 
-	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
+	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
 
-	private onChange(e: Event) {
+	#onInput(e: InputEvent) {
 		const newValue = (e.target as HTMLInputElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
@@ -73,7 +64,7 @@ export class UmbPropertyEditorUITextBoxElement
 			placeholder=${ifDefined(this._placeholder)}
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
-			@input=${this.onChange}
+			@input=${this.#onInput}
 			?readonly=${this.readonly}></uui-input>`;
 	}
 

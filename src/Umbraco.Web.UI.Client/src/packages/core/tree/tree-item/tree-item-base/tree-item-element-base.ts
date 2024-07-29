@@ -109,6 +109,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	override render() {
+		const label = this.localize.string(this._item?.name ?? '');
 		return html`
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
@@ -120,7 +121,8 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
-				label="${ifDefined(this.localize.string(this._item?.name || ''))}"
+				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + label}
+				label=${label}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
 				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>

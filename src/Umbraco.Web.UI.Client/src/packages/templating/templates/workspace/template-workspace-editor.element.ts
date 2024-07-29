@@ -13,7 +13,7 @@ import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 
-// import local components
+import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
 
 @customElement('umb-template-workspace-editor')
@@ -28,9 +28,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _alias?: string | null = '';
-
-	@state()
-	private _ready?: boolean = false;
 
 	@state()
 	private _masterTemplateName?: string | null = null;
@@ -74,10 +71,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
 				this.#isNew = !!isNew;
-			});
-
-			this.observe(this.#templateWorkspaceContext.isCodeEditorReady, (isReady) => {
-				this._ready = isReady;
 			});
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue) => {
@@ -182,54 +175,54 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderCodeEditor() {
-		return html`<umb-code-editor
-			language="razor"
-			id="content"
-			.code=${this._content ?? ''}
-			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
-	}
-
 	override render() {
 		// TODO: add correct UI elements
-		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
-			<uui-input
-				placeholder=${this.localize.term('placeholders_entername')}
-				slot="header"
-				.value=${this._name}
-				@input=${this.#onNameInput}
-				label=${this.localize.term('template_template')}
-				${umbFocus()}>
-				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @input=${this.#onAliasInput}></uui-input-lock>
-			</uui-input>
+		return html`
+			<umb-workspace-editor alias="Umb.Workspace.Template">
+				<uui-input
+					placeholder=${this.localize.term('placeholders_entername')}
+					slot="header"
+					.value=${this._name}
+					@input=${this.#onNameInput}
+					label=${this.localize.term('template_template')}
+					${umbFocus()}>
+					<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @input=${this.#onAliasInput}></uui-input-lock>
+				</uui-input>
 
-			<uui-box>
-				<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
-				<div slot="header-actions">
-					<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
-					<uui-button
-						look="secondary"
-						id="query-builder-button"
-						label=${this.localize.term('template_queryBuilder')}
-						@click=${this.#openQueryBuilder}>
-						<uui-icon name="icon-wand"></uui-icon> ${this.localize.term('template_queryBuilder')}
-					</uui-button>
-					<uui-button
-						look="secondary"
-						id="sections-button"
-						label=${this.localize.term('template_insertSections')}
-						@click=${this.#openInsertSectionModal}>
-						<uui-icon name="icon-indent"></uui-icon> ${this.localize.term('template_insertSections')}
-					</uui-button>
-				</div>
+				<uui-box>
+					<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
+					<div slot="header-actions">
+						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
+						<uui-button
+							look="secondary"
+							id="query-builder-button"
+							label=${this.localize.term('template_queryBuilder')}
+							@click=${this.#openQueryBuilder}>
+							<uui-icon name="icon-wand"></uui-icon> ${this.localize.term('template_queryBuilder')}
+						</uui-button>
+						<uui-button
+							look="secondary"
+							id="sections-button"
+							label=${this.localize.term('template_insertSections')}
+							@click=${this.#openInsertSectionModal}>
+							<uui-icon name="icon-indent"></uui-icon> ${this.localize.term('template_insertSections')}
+						</uui-button>
+					</div>
 
-				${this._ready
-					? this.#renderCodeEditor()
-					: html`<div id="loader-container">
-							<uui-loader></uui-loader>
-						</div>`}
-			</uui-box>
-		</umb-workspace-editor>`;
+					${this.#renderCodeEditor()}
+				</uui-box>
+			</umb-workspace-editor>
+		`;
+	}
+
+	#renderCodeEditor() {
+		return html`
+			<umb-code-editor
+				id="content"
+				language="razor"
+				.code=${this._content ?? ''}
+				@input=${this.#onCodeEditorInput}></umb-code-editor>
+		`;
 	}
 
 	static override styles = [

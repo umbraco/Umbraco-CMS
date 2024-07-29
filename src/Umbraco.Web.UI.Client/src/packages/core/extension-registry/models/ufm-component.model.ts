@@ -1,8 +1,8 @@
 import type { ManifestApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { Tokens } from '@umbraco-cms/backoffice/external/marked';
+import type { UfmToken } from '@umbraco-cms/backoffice/ufm';
 
 export interface UmbUfmComponentApi extends UmbApi {
-	render(token: Tokens.Generic): string | undefined;
+	render(token: UfmToken): string | undefined;
 }
 
 export interface MetaUfmComponent {
