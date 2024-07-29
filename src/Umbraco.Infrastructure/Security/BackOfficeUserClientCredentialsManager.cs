@@ -64,4 +64,7 @@ public sealed class BackOfficeUserClientCredentialsManager : ClientCredentialsMa
 
         return await _backOfficeUserManager.FindByNameAsync(user.Username);
     }
+
+    public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
+        => await _userService.GetClientIdsAsync(userKey);
 }

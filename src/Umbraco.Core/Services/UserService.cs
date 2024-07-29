@@ -2520,6 +2520,14 @@ internal class UserService : RepositoryService, IUserService
         return Task.FromResult(user?.Type == UserType.Api ? user : null);
     }
 
+    public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.GetClientIds(userId);
+    }
+
     /// <summary>
     ///     This performs the calculations for inherited nodes based on this
     ///     http://issues.umbraco.org/issue/U4-10075#comment=67-40085

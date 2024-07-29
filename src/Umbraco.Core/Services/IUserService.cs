@@ -412,4 +412,6 @@ public interface IUserService : IMembershipUserService
     Task<bool> RemoveClientIdAsync(Guid userKey, string clientId);
 
     Task<IUser?> FindByClientIdAsync(string clientId);
+
+    Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey);
 }
