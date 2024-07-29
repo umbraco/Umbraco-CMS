@@ -16,10 +16,22 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
-	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
-	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
+	readonly avatarUrls = this.#currentUser.asObservablePart((user) => user?.avatarUrls);
+	readonly documentStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.documentStartNodeUniques);
+	readonly email = this.#currentUser.asObservablePart((user) => user?.email);
+	readonly fallbackPermissions = this.#currentUser.asObservablePart((user) => user?.fallbackPermissions);
+	readonly hasAccessToAllLanguages = this.#currentUser.asObservablePart((user) => user?.hasAccessToAllLanguages);
+	readonly hasAccessToSensitiveData = this.#currentUser.asObservablePart((user) => user?.hasAccessToSensitiveData);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
 	readonly hasMediaRootAccess = this.#currentUser.asObservablePart((user) => user?.hasMediaRootAccess);
+	readonly isAdmin = this.#currentUser.asObservablePart((user) => user?.isAdmin);
+	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
+	readonly languages = this.#currentUser.asObservablePart((user) => user?.languages);
+	readonly mediaStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.mediaStartNodeUniques);
+	readonly name = this.#currentUser.asObservablePart((user) => user?.name);
+	readonly permissions = this.#currentUser.asObservablePart((user) => user?.permissions);
+	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
+	readonly userName = this.#currentUser.asObservablePart((user) => user?.userName);
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
