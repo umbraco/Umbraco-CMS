@@ -88,5 +88,9 @@ public class UmbracoPlan : MigrationPlan
         // To 14.1.0
         To<V_14_1_0.MigrateRichTextConfiguration>("{FEF2DAF4-5408-4636-BB0E-B8798DF8F095}");
         To<V_14_1_0.MigrateOldRichTextSeedConfiguration>("{A385C5DF-48DC-46B4-A742-D5BB846483BC}");
+
+        // To 15.0.0
+        To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
+        To<V_15_0_0.AddTypeToUser>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
     }
 }
