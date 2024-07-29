@@ -52,13 +52,15 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         foreach (HtmlNode link in links)
         {
             ReplaceLocalLinks(
-                publishedSnapshot,
+                    publishedSnapshot,
                 link.GetAttributeValue("href", string.Empty),
+                link.GetAttributeValue("type", "unknown"),
                 route =>
                 {
                     link.SetAttributeValue("href", route.Path);
                     link.SetAttributeValue("data-start-item-path", route.StartItem.Path);
                     link.SetAttributeValue("data-start-item-id", route.StartItem.Id.ToString("D"));
+                    link.Attributes["type"]?.Remove();
                 },
                 url => link.SetAttributeValue("href", url),
                 () => link.Attributes.Remove("href"));

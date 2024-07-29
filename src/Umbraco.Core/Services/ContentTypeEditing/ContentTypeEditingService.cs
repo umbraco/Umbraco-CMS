@@ -60,7 +60,12 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         UpdateTemplates(contentType, model);
 
         // save content type
-        await SaveAsync(contentType, userKey);
+        Attempt<ContentTypeOperationStatus> creationAttempt = await _contentTypeService.CreateAsync(contentType, userKey);
+
+        if(creationAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(creationAttempt.Result, contentType);
+        }
 
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
@@ -85,9 +90,11 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         UpdateHistoryCleanup(contentType, model);
         UpdateTemplates(contentType, model);
 
-        await SaveAsync(contentType, userKey);
+        Attempt<ContentTypeOperationStatus> attempt = await _contentTypeService.UpdateAsync(contentType, userKey);
 
-        return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+        return attempt.Success
+            ? Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType)
+            : Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(attempt.Result, null);
     }
 
     public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
@@ -168,9 +175,6 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
             ? ContentTypeOperationStatus.Success
             : ContentTypeOperationStatus.InvalidElementFlagComparedToParent;
     }
-
-    private async Task SaveAsync(IContentType contentType, Guid userKey)
-        => await _contentTypeService.SaveAsync(contentType, userKey);
 
     protected override IContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new ContentType(shortStringHelper, parentId);

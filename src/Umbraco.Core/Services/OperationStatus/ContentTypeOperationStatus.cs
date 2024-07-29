@@ -5,6 +5,8 @@ public enum ContentTypeOperationStatus
     Success,
     DuplicateAlias,
     InvalidAlias,
+    NameCannotBeEmpty,
+    NameTooLong,
     InvalidPropertyTypeAlias,
     PropertyTypeAliasCannotEqualContentTypeAlias,
     DuplicatePropertyTypeAlias,
@@ -18,7 +20,8 @@ public enum ContentTypeOperationStatus
     DuplicateContainer,
     NotFound,
     NotAllowed,
+    CancelledByNotification,
     InvalidElementFlagDocumentHasContent,
     InvalidElementFlagElementIsUsedInPropertyEditorConfiguration,
-    InvalidElementFlagComparedToParent
+    InvalidElementFlagComparedToParent,
 }
