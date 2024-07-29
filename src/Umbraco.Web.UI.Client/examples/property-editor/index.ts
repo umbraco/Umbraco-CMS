@@ -19,6 +19,12 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 					},
 				],
+				defaultData: [
+					{
+						alias: 'customText',
+						value: 'Default value',
+					},
+				],
 			},
 		},
 	},
