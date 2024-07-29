@@ -27,3 +27,5 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 		await repository.changePassword(this.args.unique, data.newPassword);
 	}
 }
+
+export { UmbChangeUserPasswordEntityAction as api };

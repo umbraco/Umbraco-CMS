@@ -1504,7 +1504,7 @@ name: "icon-re-post",
 path: () => import("./icons/icon-re-post.js"),
 },{
 name: "icon-readonly",
-legacy: true,
+
 path: () => import("./icons/icon-readonly.js"),
 },{
 name: "icon-receipt-alt",

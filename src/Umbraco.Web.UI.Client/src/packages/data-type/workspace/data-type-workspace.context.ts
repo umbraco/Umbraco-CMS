@@ -139,7 +139,9 @@ export class UmbDataTypeWorkspaceContext
 				// if the property editor ui alias is not set, we use the default alias from the schema
 				if (propertyEditorUiAlias === null) {
 					await this.#observePropertyEditorSchemaAlias();
-					this.setPropertyEditorUiAlias(this.#propertyEditorSchemaConfigDefaultUIAlias!);
+					if (this.#propertyEditorSchemaConfigDefaultUIAlias !== null) {
+						this.setPropertyEditorUiAlias(this.#propertyEditorSchemaConfigDefaultUIAlias);
+					}
 				} else {
 					await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
 					this.setPropertyEditorSchemaAlias(this.#propertyEditorUISettingsSchemaAlias!);

@@ -33,3 +33,5 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
 		await disableUserRepository.disable([this.args.unique]);
 	}
 }
+
+export { UmbDisableUserEntityAction as api };

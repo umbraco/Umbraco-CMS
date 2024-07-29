@@ -48,7 +48,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	/**
 	 * Method to cancel navigation if changed.
 	 */
-	private _cancelNavigation ?:() => void;
+	private _cancelNavigation?: () => void;
 
 	/**
 	 * Listeners on the router.
@@ -208,7 +208,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 				if (this.isConnected) {
 					const newMatch = this.getRouteMatch();
 					// Check if this match matches the current match (aka. If the path has changed), if so we should navigate. [NL]
-					if(newMatch) {
+					if (newMatch) {
 						navigate = shouldNavigate(this.match, newMatch);
 					}
 				}
@@ -318,7 +318,6 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	 * Returns true if a navigation was made to a new page.
 	 */
 	protected async renderPath(path: string | PathFragment): Promise<boolean> {
-
 		// Notice: Since this is never called from any other place than one higher in this file(when writing this...), we could just retrieve the path and find a match by using this.getRouteMatch() [NL]
 		// Find the corresponding route.
 		const match = matchRoutes(this._routes, path);
@@ -336,7 +335,6 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 			// Only change route if its a new route.
 			const navigate = shouldNavigate(this.match, match);
 			if (navigate) {
-
 				// If another navigation is still begin resolved in this very moment, then we need to cancel that so it does not end up overriding this new navigation.[NL]
 				this._cancelNavigation?.();
 				// Listen for another push state event. If another push state event happens
@@ -412,7 +410,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 					// We have some routes that share the same component instance, those should not be removed and re-appended [NL]
 					const isTheSameComponent = this.firstChild === page;
 
-					if(!isTheSameComponent) {
+					if (!isTheSameComponent) {
 						// Remove the old page by clearing the slot
 						this.clearChildren();
 					}
@@ -421,7 +419,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 					// We do this to ensure that we can find the match in the connectedCallback of the page.
 					this._routeMatch = match;
 
-					if(!isTheSameComponent) {
+					if (!isTheSameComponent) {
 						if (page) {
 							// Append the new page
 							this.appendChild(page);

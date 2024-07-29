@@ -172,23 +172,23 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) => html`
-						<li>
-							<span>${column.header}:</span>
-							${when(
-								column.nameTemplate,
-								() => html`
-									<umb-ufm-render
-										inline
-										.markdown=${column.nameTemplate}
-										.value=${getPropertyValueByAlias(item, column.alias)}></umb-ufm-render>
-								`,
-								() => html`${getPropertyValueByAlias(item, column.alias)}`,
-							)}
-						</li>
-					`,
+					(column) => this.#renderProperty(item, column),
 				)}
 			</ul>
+		`;
+	}
+
+	#renderProperty(item: UmbDocumentCollectionItemModel, column: UmbCollectionColumnConfiguration) {
+		const value = getPropertyValueByAlias(item, column.alias);
+		return html`
+			<li>
+				<span>${column.header}:</span>
+				${when(
+					column.nameTemplate,
+					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
+					() => html`${value}`,
+				)}
+			</li>
 		`;
 	}
 

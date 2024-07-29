@@ -1,5 +1,5 @@
 import type { UmbMemberGroupDetailModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT } from './member-group-detail.store.context-token.js';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -21,7 +21,3 @@ export class UmbMemberGroupDetailStore extends UmbDetailStoreBase<UmbMemberGroup
 }
 
 export default UmbMemberGroupDetailStore;
-
-export const UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbMemberGroupDetailStore>(
-	'UmbMemberGroupDetailStore',
-);

@@ -1,6 +1,10 @@
 import type { UmbUserEntityType } from './entity.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { UserStateModel, type UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
+import {
+	type UserConfigurationResponseModel,
+	UserStateModel,
+	type UserTwoFactorProviderModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbUserStateEnum = UserStateModel;
 export const UmbUserStateEnum = UserStateModel;
@@ -32,3 +36,5 @@ export interface UmbUserStartNodesModel {
 }
 
 export type UmbUserMfaProviderModel = UserTwoFactorProviderModel;
+
+export type UmbUserConfigurationModel = UserConfigurationResponseModel;

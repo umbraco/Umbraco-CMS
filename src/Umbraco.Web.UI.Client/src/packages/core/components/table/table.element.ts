@@ -279,7 +279,7 @@ export class UmbTableElement extends LitElement {
 			const element = document.createElement('umb-ufm-render') as UmbUfmRenderElement;
 			element.inline = true;
 			element.markdown = column.labelTemplate;
-			element.value = value;
+			element.value = { value };
 			return element;
 		}
 

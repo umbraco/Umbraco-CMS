@@ -1098,7 +1098,7 @@
 		},
 		{
 			"name": "icon-home",
-			"file": "home.svg"
+			"file": "house.svg"
 		},
 		{
 			"name": "icon-hourglass",
@@ -1810,8 +1810,7 @@
 		},
 		{
 			"name": "icon-readonly",
-			"file": "ban.svg",
-			"legacy": true
+			"file": "pencil-off.svg"
 		},
 		{
 			"name": "icon-receipt-alt",

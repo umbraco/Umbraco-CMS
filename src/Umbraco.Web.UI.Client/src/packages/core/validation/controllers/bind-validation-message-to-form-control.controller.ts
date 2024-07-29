@@ -3,7 +3,7 @@ import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import type { UmbFormControlMixinInterface } from '../mixins/form-control.mixin.js';
 import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const ctrlSymbol = Symbol();
 const observeSymbol = Symbol();

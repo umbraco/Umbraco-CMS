@@ -30,8 +30,8 @@ export class UmbBlockGridEntryContext
 	implements UmbBlockGridScalableContext
 {
 	//
-	readonly columnSpan = this._layout.asObservablePart((x) => (x ? x.columnSpan ?? null : undefined));
-	readonly rowSpan = this._layout.asObservablePart((x) => (x ? x.rowSpan ?? null : undefined));
+	readonly columnSpan = this._layout.asObservablePart((x) => (x ? (x.columnSpan ?? null) : undefined));
+	readonly rowSpan = this._layout.asObservablePart((x) => (x ? (x.rowSpan ?? null) : undefined));
 	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);

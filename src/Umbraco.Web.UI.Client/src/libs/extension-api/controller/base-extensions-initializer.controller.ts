@@ -1,5 +1,4 @@
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	ManifestBase,
 	UmbBaseExtensionInitializer,
@@ -7,7 +6,6 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -35,7 +33,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	#permittedExts: Array<MyPermittedControllerType> = [];
-	#exposedPermittedExts: Array<MyPermittedControllerType> = [];
+	#exposedPermittedExts?: Array<MyPermittedControllerType>;
 	#changeDebounce?: number;
 
 	asPromise(): Promise<void> {
@@ -92,6 +90,12 @@ export abstract class UmbBaseExtensionsInitializer<
 			return;
 		}
 
+		// If we get no manifests and we have not exposed any extensions yet, then we should notify to let the listener know that we have our first response. [NL]
+		if (manifests.length === 0 && this.#exposedPermittedExts === undefined) {
+			this.#exposedPermittedExts = [];
+			this.#onChange?.(this.#exposedPermittedExts);
+		}
+
 		// Clean up extensions that are no longer.
 		this._extensions = this._extensions.filter((extension) => {
 			if (!manifests.find((manifest) => manifest.alias === extension.alias)) {
@@ -116,6 +120,7 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
 		let hasChanged = false;
+
 		// This might be called after this is destroyed, so we need to check if the _permittedExts is still available:
 		const existingIndex = this.#permittedExts?.indexOf(controller as unknown as MyPermittedControllerType);
 		if (isPermitted) {
@@ -151,7 +156,7 @@ export abstract class UmbBaseExtensionsInitializer<
 			// if so, look up the extension it overwrites, and remove it from the list. and check that for if it overwrites another extension and so on.
 			if (extCtrl.overwrites.length > 0) {
 				extCtrl.overwrites.forEach((overwrite) => {
-					this.#removeOverwrittenExtensions(this.#exposedPermittedExts, overwrite);
+					this.#removeOverwrittenExtensions(this.#exposedPermittedExts!, overwrite);
 				});
 			}
 		});
@@ -195,16 +200,16 @@ export abstract class UmbBaseExtensionsInitializer<
 		// The this.#extensionRegistry is an indication of wether this is already destroyed.
 		if (!this.#extensionRegistry) return;
 
-		const oldPermittedExtsLength = this.#exposedPermittedExts.length;
+		const oldPermittedExtsLength = this.#exposedPermittedExts?.length ?? 0;
 		(this._extensions as any) = undefined;
 		(this.#permittedExts as any) = undefined;
-		this.#exposedPermittedExts.length = 0;
+		this.#exposedPermittedExts = undefined;
 		if (this.#changeDebounce) {
 			cancelAnimationFrame(this.#changeDebounce);
 			this.#changeDebounce = undefined;
 		}
 		if (oldPermittedExtsLength > 0) {
-			this.#onChange?.(this.#exposedPermittedExts);
+			this.#onChange?.([]);
 		}
 		this.#promiseResolvers.length = 0;
 		this.#filter = undefined;

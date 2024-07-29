@@ -28,7 +28,7 @@ UmbDomPurify.addHook('afterSanitizeAttributes', function (node) {
 	}
 });
 
-const UmbMarked = new Marked({
+export const UmbMarked = new Marked({
 	async: true,
 	gfm: true,
 	breaks: true,
@@ -97,6 +97,7 @@ export class UmbUfmRenderElement extends UmbLitElement {
 		css`
 			* {
 				max-width: 100%;
+				word-wrap: break-word;
 			}
 
 			pre {

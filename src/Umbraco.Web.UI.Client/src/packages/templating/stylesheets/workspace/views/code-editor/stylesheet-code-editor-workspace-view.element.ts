@@ -5,13 +5,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
+import '@umbraco-cms/backoffice/code-editor';
+
 @customElement('umb-stylesheet-code-editor-workspace-view')
 export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _content?: string | null = '';
-
-	@state()
-	private _ready?: boolean = false;
 
 	#stylesheetWorkspaceContext?: UmbStylesheetWorkspaceContext;
 
@@ -24,10 +23,6 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 			this.observe(this.#stylesheetWorkspaceContext.content, (content) => {
 				this._content = content;
 			});
-
-			this.observe(this.#stylesheetWorkspaceContext.isCodeEditorReady, (isReady) => {
-				this._ready = isReady;
-			});
 		});
 	}
 
@@ -37,23 +32,21 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 		this.#stylesheetWorkspaceContext?.setContent(value);
 	}
 
-	#renderCodeEditor() {
-		return html`<umb-code-editor
-			language="css"
-			id="content"
-			.code=${this._content ?? ''}
-			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
-	}
-
 	override render() {
 		return html` <uui-box>
 			<div slot="header" id="code-editor-menu-container"></div>
-			${this._ready
-				? this.#renderCodeEditor()
-				: html`<div id="loader-container">
-						<uui-loader></uui-loader>
-					</div>`}
+			${this.#renderCodeEditor()}
 		</uui-box>`;
+	}
+
+	#renderCodeEditor() {
+		return html`
+			<umb-code-editor
+				id="content"
+				language="css"
+				.code=${this._content ?? ''}
+				@input=${this.#onCodeEditorInput}></umb-code-editor>
+		`;
 	}
 
 	static override styles = [
@@ -62,12 +55,6 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 			:host {
 				display: block;
 				width: 100%;
-			}
-
-			#loader-container {
-				display: grid;
-				place-items: center;
-				min-height: calc(100dvh - 300px);
 			}
 
 			umb-code-editor {

@@ -31,7 +31,7 @@ const menuSectionSidebarApp: ManifestSectionSidebarApp = {
 	name: 'Dictionary Sidebar Menu',
 	weight: 100,
 	meta: {
-		label: 'Dictionary',
+		label: '#sections_translation',
 		menu: UMB_DICTIONARY_MENU_ALIAS,
 		entityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
 	},

@@ -9,7 +9,7 @@ const menuItem: ManifestTypes = {
 	weight: 100,
 	meta: {
 		treeAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
-		label: 'Document Blueprints',
+		label: '#treeHeaders_contentBlueprints',
 		menus: ['Umb.Menu.StructureSettings'],
 	},
 };

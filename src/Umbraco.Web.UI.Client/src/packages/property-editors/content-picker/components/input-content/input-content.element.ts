@@ -2,66 +2,73 @@ import type { UmbContentPickerSource } from '../../types.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-content';
+
 @customElement(elementName)
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
-	protected override getFormElement() {
-		return undefined;
-	}
-
-	private _type: UmbContentPickerSource['type'] = 'content';
-	@property({ type: Object, attribute: false })
+	@property()
 	public set type(newType: UmbContentPickerSource['type']) {
-		const oldType = this._type;
-		if (newType?.toLowerCase() !== this._type) {
-			this._type = newType?.toLowerCase() as UmbContentPickerSource['type'];
+		const oldType = this.#type;
+		if (newType?.toLowerCase() !== this.#type) {
+			this.#type = newType?.toLowerCase() as UmbContentPickerSource['type'];
 			this.requestUpdate('type', oldType);
 		}
 	}
 	public get type(): UmbContentPickerSource['type'] {
-		return this._type;
+		return this.#type;
 	}
+	#type: UmbContentPickerSource['type'] = 'content';
 
 	@property({ type: Number })
 	min = 0;
 
+	@property({ type: String, attribute: 'min-message' })
+	minMessage = 'This field need more items';
+
 	@property({ type: Number })
 	max = 0;
+
+	@property({ type: String, attribute: 'max-message' })
+	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
-	private _allowedContentTypeIds: Array<string> = [];
 	@property()
 	public set allowedContentTypeIds(value: string) {
-		this._allowedContentTypeIds = value ? value.split(',') : [];
+		this.#allowedContentTypeIds = value ? value.split(',') : [];
 	}
 	public get allowedContentTypeIds(): string {
-		return this._allowedContentTypeIds.join(',');
+		return this.#allowedContentTypeIds.join(',');
 	}
+	#allowedContentTypeIds: Array<string> = [];
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
-	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
+	@property({ type: Array })
+	public set selection(values: Array<UmbReferenceByUniqueAndType>) {
+		this.#selection = values?.map((item) => item.unique) ?? [];
+	}
+	public get selection(): Array<UmbReferenceByUniqueAndType> {
+		return this.#selection.map((id) => ({ type: this.#entityTypeLookup[this.#type], unique: id }));
+	}
 
-	// TODO: to be consistent with other pickers, this should be named `selection` [NL]
+	/** @deprecated Please use `selection` instead. This property will be removed in Umbraco 15. */
 	@property({ type: Array })
 	public set items(items: Array<UmbReferenceByUniqueAndType>) {
-		this.#selection = items?.map((item) => item.unique) ?? [];
+		this.selection = items;
 	}
+	/** @deprecated Please use `selection` instead. This property will be removed in Umbraco 15. */
 	public get items(): Array<UmbReferenceByUniqueAndType> {
-		return this.#selection.map((id) => ({ type: this.#entityTypeLookup[this._type], unique: id }));
+		return this.selection;
 	}
 
 	@property({ type: String })
@@ -72,38 +79,22 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		return this.#selection.length > 0 ? this.#selection.join(',') : undefined;
 	}
 
+	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
+
 	#selection: Array<string> = [];
 
-	#onChange(event: CustomEvent) {
-		switch (this._type) {
-			case 'content':
-				{
-					const input = event.target as UmbInputDocumentElement;
-					this.#selection = input.selection;
-					this.value = input.selection.join(',');
-				}
-				break;
-			case 'media': {
-				const input = event.target as UmbInputMediaElement;
-				this.#selection = input.selection;
-				this.value = input.selection.join(',');
-				break;
-			}
-			case 'member': {
-				const input = event.target as UmbInputMemberElement;
-				this.#selection = input.selection;
-				this.value = input.selection.join(',');
-				break;
-			}
-			default:
-				break;
-		}
+	override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector(`umb-input-${this.#entityTypeLookup[this.#type]}`)!);
+	}
 
+	#onChange(event: CustomEvent & { target: { selection: string[] | undefined } }) {
+		this.#selection = event.target.selection ?? [];
+		this.value = this.#selection.join(',');
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
-		switch (this._type) {
+		switch (this.#type) {
 			case 'content':
 				return this.#renderDocumentPicker();
 			case 'media':
@@ -116,34 +107,46 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 
 	#renderDocumentPicker() {
-		return html`<umb-input-document
-			.selection=${this.#selection}
-			.startNode=${this.startNode}
-			.allowedContentTypeIds=${this._allowedContentTypeIds}
-			.min=${this.min}
-			.max=${this.max}
-			?showOpenButton=${this.showOpenButton}
-			@change=${this.#onChange}></umb-input-document>`;
+		return html`
+			<umb-input-document
+				.selection=${this.#selection}
+				.startNode=${this.startNode}
+				.allowedContentTypeIds=${this.#allowedContentTypeIds}
+				.min=${this.min}
+				.minMessage=${this.minMessage}
+				.max=${this.max}
+				.maxMessage=${this.maxMessage}
+				?showOpenButton=${this.showOpenButton}
+				@change=${this.#onChange}></umb-input-document>
+		`;
 	}
 
 	#renderMediaPicker() {
-		return html`<umb-input-media
-			.selection=${this.#selection}
-			.allowedContentTypeIds=${this._allowedContentTypeIds}
-			.min=${this.min}
-			.max=${this.max}
-			?showOpenButton=${this.showOpenButton}
-			@change=${this.#onChange}></umb-input-media>`;
+		return html`
+			<umb-input-media
+				.selection=${this.#selection}
+				.allowedContentTypeIds=${this.#allowedContentTypeIds}
+				.min=${this.min}
+				.minMessage=${this.minMessage}
+				.max=${this.max}
+				.maxMessage=${this.maxMessage}
+				?showOpenButton=${this.showOpenButton}
+				@change=${this.#onChange}></umb-input-media>
+		`;
 	}
 
 	#renderMemberPicker() {
-		return html`<umb-input-member
-			.selection=${this.#selection}
-			.allowedContentTypeIds=${this._allowedContentTypeIds}
-			.min=${this.min}
-			.max=${this.max}
-			?showOpenButton=${this.showOpenButton}
-			@change=${this.#onChange}></umb-input-member>`;
+		return html`
+			<umb-input-member
+				.selection=${this.#selection}
+				.allowedContentTypeIds=${this.#allowedContentTypeIds}
+				.min=${this.min}
+				.minMessage=${this.minMessage}
+				.max=${this.max}
+				.maxMessage=${this.maxMessage}
+				?showOpenButton=${this.showOpenButton}
+				@change=${this.#onChange}></umb-input-member>
+		`;
 	}
 
 	static override styles = [
@@ -156,7 +159,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	];
 }
 
-export default UmbInputContentElement;
+export { UmbInputContentElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

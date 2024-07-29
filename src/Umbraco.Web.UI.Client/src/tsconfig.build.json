@@ -5,9 +5,8 @@
 		"noEmit": false,
 		"outDir": "../dist-cms",
 		"rootDir": "./",
-		"composite": true,
 		"sourceMap": false,
-		"declaration": true,
+		"declaration": false,
 		"allowImportingTsExtensions": false
 	},
 	"include": ["./**/*.ts", "./**/*.json", "./**/*.js"],

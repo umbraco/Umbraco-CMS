@@ -99,6 +99,7 @@ export class UmbPickerInputContext<
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
+
 		this.#removeItem(unique);
 	}
 

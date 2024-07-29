@@ -1,4 +1,4 @@
-export default `<!-- @license lucide-static v0.379.0 - ISC -->
+export default `<!-- @license lucide-static v0.408.0 - ISC -->
 <svg
   class="lucide lucide-cloud-sun"
   xmlns="http://www.w3.org/2000/svg"

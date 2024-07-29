@@ -1,6 +1,6 @@
+import { UMB_ENABLE_USER_REPOSITORY_ALIAS } from './constants.js';
 import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_ENABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Enable';
 const enableRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_ENABLE_USER_REPOSITORY_ALIAS,

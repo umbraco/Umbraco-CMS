@@ -1,18 +1,17 @@
-import { UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
+import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
-import type { UmbMediaItemModel } from '../../repository/index.js';
 import type { UmbMediaCardItemModel, UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+
+import '@umbraco-cms/backoffice/imaging';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -23,12 +22,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 > {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
-	#imagingRepository = new UmbImagingRepository(this); // used to get image renditions
 
 	#dataType?: { unique: string };
-
-	@state()
-	private _filter: (item: UmbMediaCardItemModel) => boolean = () => true;
 
 	@state()
 	private _selectableFilter: (item: UmbMediaCardItemModel) => boolean = () => true;
@@ -63,7 +58,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 
-		if (this.data?.filter) this._filter = this.data?.filter;
 		if (this.data?.pickableFilter) this._selectableFilter = this.data?.pickableFilter;
 
 		if (this.data?.startNode) {
@@ -88,24 +82,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			take: 100,
 		});
 
-		this.#mediaItemsCurrentFolder = await this.#mapMediaUrls(data?.items ?? []);
+		this.#mediaItemsCurrentFolder = data?.items ?? [];
 		this.#filterMediaItems();
-	}
-
-	async #mapMediaUrls(items: Array<UmbMediaItemModel>): Promise<Array<UmbMediaCardItemModel>> {
-		if (!items.length) return [];
-
-		const { data } = await this.#imagingRepository.requestResizedItems(
-			items.map((item) => item.unique),
-			{ height: 400, width: 400, mode: ImageCropModeModel.MIN },
-		);
-
-		return items
-			.map((item): UmbMediaCardItemModel => {
-				const src = data?.find((media) => media.unique === item.unique)?.url;
-				return { ...item, src };
-			})
-			.filter((item) => this._filter(item));
 	}
 
 	#onOpen(item: UmbMediaCardItemModel) {
@@ -152,7 +130,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		}
 
 		// Map urls for search results as we are going to show for all folders (as long they aren't trashed).
-		this._mediaFilteredList = await this.#mapMediaUrls(data.filter((found) => found.isTrashed === false));
+		this._mediaFilteredList = data.filter((found) => found.isTrashed === false);
 	}
 
 	#debouncedSearch = debounce(() => {
@@ -240,9 +218,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${!disabled}>
-				${item.src
-					? html`<img src=${item.src} alt=${ifDefined(item.name)} />`
-					: html`<umb-icon .name=${item.mediaType.icon}></umb-icon>`}
+				<umb-imaging-thumbnail
+					unique=${item.unique}
+					alt=${item.name}
+					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
 			</uui-card-media>
 		`;
 	}

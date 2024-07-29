@@ -16,7 +16,6 @@ import {
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -138,10 +137,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
 					);
 				},
-			},
-			{
-				path: 'edit/null',
-				component: () => import('./document-blueprint-root-workspace.element.js'),
 			},
 			{
 				path: 'edit/:unique',

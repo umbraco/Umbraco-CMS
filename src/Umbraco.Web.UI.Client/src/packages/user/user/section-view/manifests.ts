@@ -1,4 +1,4 @@
-import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../user-section/manifests.js';
+import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../user-section/index.js';
 import type { ManifestSectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionsViews: Array<ManifestSectionView> = [

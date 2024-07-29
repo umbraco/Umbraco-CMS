@@ -1,11 +1,11 @@
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import type { UmbBlockWorkspaceData } from '../workspace/index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -166,7 +166,8 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentUdi: string) {
 		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
-
+	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setOneLayout(layoutData: BlockLayoutType, modalData?: UmbBlockWorkspaceData) {
 		this._layouts.appendOne(layoutData);
 	}
@@ -264,6 +265,8 @@ export abstract class UmbBlockManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
+		// TODO: [v15]: ignoring unused var here here to prevent a breaking change
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		modalData: ModalDataType,
 	) {
 		// Create content entry:

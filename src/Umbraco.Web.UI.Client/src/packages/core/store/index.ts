@@ -1,4 +1,5 @@
 export * from './store-base.js';
+export * from './store-object-base.js';
 export * from './store.interface.js';
 export * from './events/index.js';
 

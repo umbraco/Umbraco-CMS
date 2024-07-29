@@ -42,7 +42,7 @@ export class UmbUserGroupWorkspaceContext
 			{
 				path: 'create',
 				component: UmbUserGroupWorkspaceEditorElement,
-				setup: (component, info) => {
+				setup: () => {
 					this.create();
 
 					new UmbWorkspaceIsNewRedirectController(

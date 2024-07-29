@@ -1,7 +1,6 @@
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import type { UmbBlockManagerContext } from '../index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -16,6 +15,7 @@ import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -85,7 +85,7 @@ export abstract class UmbBlockEntryContext<
 	public readonly blockType = this._blockType.asObservable();
 	public readonly contentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
 	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
-		x ? x.settingsElementTypeKey ?? undefined : null,
+		x ? (x.settingsElementTypeKey ?? undefined) : null,
 	);
 
 	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
@@ -126,7 +126,7 @@ export abstract class UmbBlockEntryContext<
 	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
 	private readonly settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
-		x ? x.contentTypeKey ?? undefined : null,
+		x ? (x.contentTypeKey ?? undefined) : null,
 	);
 
 	abstract readonly showContentEdit: Observable<boolean>;
