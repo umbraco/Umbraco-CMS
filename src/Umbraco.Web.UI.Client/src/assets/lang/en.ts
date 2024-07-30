@@ -695,6 +695,7 @@ export default {
 		hasReferencesDeleteConsequence:
 			'Deleting <strong>%0%</strong> will delete the properties and their data from the following items',
 		acceptDeleteConsequence: 'I understand this action will delete the properties and data based on this Data Type',
+		noConfiguration: 'There is no configuration for this property editor.',
 	},
 	errorHandling: {
 		errorButDataWasSaved:
