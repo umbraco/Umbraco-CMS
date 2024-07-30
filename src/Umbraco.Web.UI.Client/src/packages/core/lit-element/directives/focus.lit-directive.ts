@@ -1,16 +1,5 @@
 import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-cms/backoffice/external/lit';
 
-function isDescendant(parent: any, child: any) {
-	let node = child.parentNode;
-	while (node != null) {
-		if (node == parent) {
-			return true;
-		}
-		node = node.host ? node.host : node.parentNode;
-	}
-	return false;
-}
-
 function hasFocus(current: any) {
 	if (current.shadowRoot) {
 		const node = current.shadowRoot.activeElement;
@@ -25,16 +14,16 @@ function hasFocus(current: any) {
  * The `focus` directive sets focus on the given element once its connected to the DOM.
  */
 class UmbFocusDirective extends AsyncDirective {
-	static _latestElement?: HTMLElement;
-	private _el?: HTMLElement;
+	static #next?: HTMLElement;
+	#el?: HTMLElement;
 
 	override render() {
 		return nothing;
 	}
 
 	override update(part: ElementPart) {
-		if (this._el !== part.element) {
-			UmbFocusDirective._latestElement = this._el = part.element as HTMLElement;
+		if (this.#el !== part.element) {
+			UmbFocusDirective.#next = this.#el = part.element as HTMLElement;
 			this.#setFocus();
 		}
 		return nothing;
@@ -50,19 +39,21 @@ class UmbFocusDirective extends AsyncDirective {
 	 * cause Lit does not re-render the element but also notice reconnect callback on the directive is not triggered either. [NL]
 	 */
 	#setFocus = () => {
-		if (this._el && this._el === UmbFocusDirective._latestElement) {
-			this._el.focus();
-			if (hasFocus(document.activeElement)) {
+		if (this.#el && this.#el === UmbFocusDirective.#next) {
+			this.#el.focus();
+			if (hasFocus(document.activeElement) !== this.#el) {
 				setTimeout(this.#setFocus, 100);
+			} else {
+				UmbFocusDirective.#next = undefined;
 			}
 		}
 	};
 
 	override disconnected() {
-		if (this._el === UmbFocusDirective._latestElement) {
-			UmbFocusDirective._latestElement = undefined;
+		if (this.#el === UmbFocusDirective.#next) {
+			UmbFocusDirective.#next = undefined;
 		}
-		this._el = undefined;
+		this.#el = undefined;
 	}
 
 	//override reconnected() {}
