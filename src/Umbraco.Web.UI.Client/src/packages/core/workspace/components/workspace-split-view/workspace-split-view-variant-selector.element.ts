@@ -209,10 +209,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	}
 
 	override render() {
+		// TODO: Localize [NL]
 		return html`
 			<uui-input
 				id="name-input"
-				label="Document name (TODO: Localize)"
+				label="Document name"
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				${umbFocus()}
