@@ -34,7 +34,6 @@ public class UseNvarcharInsteadOfNText : MigrationBase
 
     private void RawMigrateNtextColumn(string columnName, string tableName)
     {
-        var test = "sdfsf";
         var updateTypeSql = @$"
 ALTER TABLE {tableName}
 ALTER COLUMN {columnName} nvarchar(max)";
@@ -51,7 +50,7 @@ ALTER COLUMN {columnName} nvarchar(max)";
         }
 
         // since it's ntext to nvarchar(max) we should be able to just raw query this without having issues with fallback values on sql server
-        if (Database.DatabaseType != DatabaseType.SQLite && Database.DatabaseType != DatabaseType.SQLCe)
+        if (Database.DatabaseType != DatabaseType.SQLite)
         {
             RawMigrateNtextColumn(columnName, tableName);
             return;
