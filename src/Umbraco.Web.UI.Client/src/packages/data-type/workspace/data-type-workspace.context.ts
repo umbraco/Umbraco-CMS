@@ -30,6 +30,24 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 
 type EntityType = UmbDataTypeDetailModel;
+
+/**
+ * @class uUmbDataTypeWorkspaceContext
+ * @description - Context for handling data type workspace
+ * There is two overall code flows to be aware about:
+ *
+ * propertyEditorUiAlias is observed
+ * loads propertyEditorUi manifest
+ * then the propertyEditorSchemaAlias is set to what the UI is configured for.
+ *
+ * propertyEditorSchemaAlias is observed
+ * loads the propertyEditorSchema manifest
+ * if no UI is defined then the propertyEditorSchema manifest default ui is set for the propertyEditorUiAlias.
+ *
+ * This supports two cases:
+ * - when editing an existing data type that only has a schema alias set, then it gets the UI set.
+ * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
+ */
 export class UmbDataTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
@@ -137,7 +155,7 @@ export class UmbDataTypeWorkspaceContext
 				// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
 				if (propertyEditorUiAlias === undefined) return;
 
-				this.#observePropertyEditorUIConfig(propertyEditorUiAlias);
+				this.#observePropertyEditorUIManifest(propertyEditorUiAlias);
 			},
 			'editorUiAlias',
 		);
@@ -149,13 +167,13 @@ export class UmbDataTypeWorkspaceContext
 			(propertyEditorSchemaAlias) => {
 				this.#propertyEditorSchemaSettingsProperties = [];
 				this.#propertyEditorSchemaSettingsDefaultData = [];
-				this.#observePropertyEditorSchemaConfig(propertyEditorSchemaAlias);
+				this.#observePropertyEditorSchemaManifest(propertyEditorSchemaAlias);
 			},
 			'schemaAlias',
 		);
 	}
 
-	#observePropertyEditorSchemaConfig(propertyEditorSchemaAlias?: string) {
+	#observePropertyEditorSchemaManifest(propertyEditorSchemaAlias?: string) {
 		if (!propertyEditorSchemaAlias) {
 			this.removeUmbControllerByAlias('schema');
 			return;
@@ -182,7 +200,7 @@ export class UmbDataTypeWorkspaceContext
 		);
 	}
 
-	#observePropertyEditorUIConfig(propertyEditorUIAlias: string | null) {
+	#observePropertyEditorUIManifest(propertyEditorUIAlias: string | null) {
 		if (!propertyEditorUIAlias) {
 			this.removeUmbControllerByAlias('editorUi');
 			return;
