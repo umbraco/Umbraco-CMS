@@ -5,7 +5,7 @@ import {
 	UUIInputEvent,
 	type UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, query, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentVariantOptionModel, UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -40,7 +40,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	private _name?: string;
 
 	@state()
-	private _variantDisplayName = '';
+	private _activeVariant?: UmbDocumentVariantOptionModel;
 
 	@state()
 	private _variantSelectorOpen = false;
@@ -127,21 +127,16 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	async #observeCurrentVariant() {
 		if (!this.#datasetContext || !this.#splitViewContext) return;
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as unknown as UmbDocumentWorkspaceContext;
 		if (!workspaceContext) return;
 
 		const variantId = this.#datasetContext.getVariantId();
-		// Find the variant option matching this, to get the language name...
-
-		const culture = variantId.culture;
-		const segment = variantId.segment;
 
 		this.observe(
 			workspaceContext.variantOptions,
 			(options) => {
-				const option = options.find((option) => option.language.unique === culture);
-				const languageName = option?.language.name || '';
-				this._variantDisplayName = languageName + (segment ? ` — ${segment}` : '');
+				const option = options.find((option) => option.language.unique === variantId.culture);
+				this._activeVariant = option;
 			},
 			'_currentLanguage',
 		);
@@ -232,8 +227,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 									compact
 									slot="append"
 									popovertarget="variant-selector-popover"
-									title=${this._variantDisplayName}>
-									${this._variantDisplayName}
+									title=${ifDefined(this._activeVariant?.language.name)}>
+									${this._activeVariant?.language.name} ${this.#renderReadOnlyTag(this._activeVariant.culture)}
 									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
 								${this._activeVariants.length > 1
@@ -274,7 +269,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return html`
 			<li class="${this.#isVariantActive(variantOption.culture) ? 'selected' : ''}">
 				<button
-					class="variant-selector-switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''}"
+					class="variant-selector-switch-button ${this.#isCreateMode(variantOption)
+						? 'add-mode'
+						: ''} ${this.#isReadOnly(variantOption.culture) ? 'readonly-mode' : ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div>
@@ -295,9 +292,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		`;
 	}
 
+	#isReadOnly(culture: string | null) {
+		if (!culture) return false;
+		return this._readOnlyCultures.includes(culture);
+	}
+
 	#renderReadOnlyTag(culture: string | null) {
-		if (!culture) return nothing;
-		return this._readOnlyCultures.includes(culture) ? html`<uui-tag look="secondary">Read-only</uui-tag>` : nothing;
+		return this.#isReadOnly(culture) ? html`<uui-tag look="secondary">Read-only</uui-tag>` : nothing;
 	}
 
 	#renderSplitViewButton(variant: UmbDocumentVariantOptionModel) {
@@ -420,6 +421,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 				z-index: 1;
 			}
 
+			.variant-selector-switch-button .variant-name {
+				margin-bottom: var(--uui-size-space-1);
+			}
+
+			.variant-selector-switch-button.readonly-mode .variant-name {
+				margin-bottom: calc(var(--uui-size-space-1) * -1);
+			}
+
 			.add-icon {
 				font-size: 12px;
 				margin-right: 12px;
@@ -431,10 +440,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 				right: 0;
 				bottom: 1px;
 				display: none;
-			}
-
-			.variant-name {
-				margin-bottom: var(--uui-size-space-1);
 			}
 
 			.variant-publish-state {
