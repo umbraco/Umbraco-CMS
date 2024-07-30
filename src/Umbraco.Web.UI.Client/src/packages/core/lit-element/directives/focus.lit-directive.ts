@@ -1,13 +1,23 @@
 import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-cms/backoffice/external/lit';
-
-function hasFocus(current: any) {
+/**
+ *
+ * test if a element has focus
+ * this also returns true if the focused element is a child of the target.
+ * @param current
+ * @param target
+ * @returns bool
+ */
+function hasFocus(current: any, target: HTMLElement): boolean {
+	if (current === target) {
+		return true;
+	}
 	if (current.shadowRoot) {
 		const node = current.shadowRoot.activeElement;
 		if (node) {
-			return hasFocus(node);
+			return hasFocus(node, target);
 		}
 	}
-	return current;
+	return false;
 }
 
 /**
@@ -48,7 +58,7 @@ class UmbFocusDirective extends AsyncDirective {
 		// If this is the next element to focus, then try to focus it.
 		if (this.#el && this.#el === UmbFocusDirective.#next) {
 			this.#el.focus();
-			if (hasFocus(document.activeElement) !== this.#el) {
+			if (hasFocus(document.activeElement, this.#el) === false) {
 				this.#timeout = setTimeout(this.#setFocus, 100) as unknown as number;
 			} else {
 				UmbFocusDirective.#next = undefined;
