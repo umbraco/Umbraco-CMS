@@ -1,9 +1,7 @@
 import { UmbWebhookEventRepository } from '../../repository/event/webhook-event.repository.js';
 import type { UmbWebhookEventModel } from '../../types.js';
 import type { UmbWebhookPickerModalData, UmbWebhookPickerModalValue } from './webhook-events-modal.token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-
+import { customElement, html, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
@@ -67,32 +65,36 @@ export class UmbWebhookEventsModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline="Select events">
-			<uui-box>
-				${repeat(
-					this._events,
-					(item) => item.alias,
-					(item) => html`
-						<uui-menu-item
-							label=${item.eventName}
-							?disabled=${this.#getItemDisabled(item)}
-							selectable
-							@selected=${() => this.#selectionManager.select(item.alias)}
-							@deselected=${() => this.#selectionManager.deselect(item.alias)}
-							?selected=${this.value.events.includes(item)}></uui-menu-item>
-							<uui-icon slot="icon" name="icon-globe"></uui-icon>
-						</uui-menu-item>
-					`,
-				)}
-			</uui-box>
-			<div slot="actions">
-				<uui-button label="Close" @click=${this.#close}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
-			</div>
-		</umb-body-layout> `;
+		return html`
+			<umb-body-layout headline=${this.localize.term('webhooks_selectEvents')}>
+				<uui-box>
+					${repeat(
+						this._events,
+						(item) => item.alias,
+						(item) => html`
+							<uui-menu-item
+								label=${item.eventName}
+								?disabled=${this.#getItemDisabled(item)}
+								selectable
+								@selected=${() => this.#selectionManager.select(item.alias)}
+								@deselected=${() => this.#selectionManager.deselect(item.alias)}
+								?selected=${this.value.events.includes(item)}>
+								<uui-icon slot="icon" name="icon-globe"></uui-icon>
+							</uui-menu-item>
+						`,
+					)}
+				</uui-box>
+				<div slot="actions">
+					<uui-button label=${this.localize.term('general_cancel')} @click=${this.#close}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_submit')}
+						look="primary"
+						color="positive"
+						@click=${this.#submit}></uui-button>
+				</div>
+			</umb-body-layout>
+		`;
 	}
-
-	static override styles = [UmbTextStyles, css``];
 }
 
 export default UmbWebhookEventsModalElement;
