@@ -16,6 +16,7 @@ function hasFocus(current: any) {
 class UmbFocusDirective extends AsyncDirective {
 	static #next?: HTMLElement;
 	#el?: HTMLElement;
+	#timeout?: number;
 
 	override render() {
 		return nothing;
@@ -39,10 +40,16 @@ class UmbFocusDirective extends AsyncDirective {
 	 * cause Lit does not re-render the element but also notice reconnect callback on the directive is not triggered either. [NL]
 	 */
 	#setFocus = () => {
+		// Make sure we clear the timeout, so we don't get multiple timeouts running.
+		if (this.#timeout) {
+			clearTimeout(this.#timeout);
+			this.#timeout = undefined;
+		}
+		// If this is the next element to focus, then try to focus it.
 		if (this.#el && this.#el === UmbFocusDirective.#next) {
 			this.#el.focus();
 			if (hasFocus(document.activeElement) !== this.#el) {
-				setTimeout(this.#setFocus, 100);
+				this.#timeout = setTimeout(this.#setFocus, 100) as unknown as number;
 			} else {
 				UmbFocusDirective.#next = undefined;
 			}
