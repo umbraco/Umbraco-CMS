@@ -7,22 +7,12 @@ import {
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import type { UmbDocumentVariantOptionModel, UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
-
-type UmbDocumentVariantOption = {
-	culture: string | null;
-	segment: string | null;
-	title: string;
-	displayName: string;
-	state: DocumentVariantStateModel;
-};
-
-type UmbDocumentVariantOptions = Array<UmbDocumentVariantOption>;
 
 const elementName = 'umb-workspace-split-view-variant-selector';
 @customElement(elementName)
@@ -31,7 +21,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
-	private _variants: UmbDocumentVariantOptions = [];
+	private _variantOptions: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
 	private _readOnlyStates: Array<UmbVariantState> = [];
@@ -51,9 +41,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	@state()
 	private _variantDisplayName = '';
-
-	@state()
-	private _variantTitleName = '';
 
 	@state()
 	private _variantSelectorOpen = false;
@@ -88,23 +75,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	async #observeVariants(workspaceContext: UmbDocumentWorkspaceContext) {
 		this.observe(
 			workspaceContext.variantOptions,
-			(options) => {
-				this._variants = options.map<UmbDocumentVariantOption>((option) => {
-					const name = option.variant?.name ?? option.language.name;
-					const segment = option.segment;
-					return {
-						// Notice the option object has a unique property, but it's not used here. (Its equivalent to a UmbVariantId string) [NL]
-						culture: option.culture,
-						segment: segment ?? null,
-						title: name + (segment ? ` — ${segment}` : ''),
-						displayName: name + (segment ? ` — ${segment}` : ''),
-						state: option.variant?.state ?? DocumentVariantStateModel.NOT_CREATED,
-					};
-				});
-
+			(variantOptions) => {
+				this._variantOptions = variantOptions;
 				this.#something();
 			},
-			'_observeVariants',
+			'_observeVariantOptions',
 		);
 	}
 
@@ -158,10 +133,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 			workspaceContext.variantOptions,
 			(options) => {
 				const option = options.find((option) => option.language.unique === culture);
-				const languageName = option?.language.name;
-				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ` — ${segment}` : '');
-				this._variantTitleName =
-					(languageName ? `${languageName} ${culture ? `(${culture})` : ''}` : '') + (segment ? ` — ${segment}` : '');
+				const languageName = option?.language.name || '';
+				this._variantDisplayName = languageName + (segment ? ` — ${segment}` : '');
 			},
 			'_currentLanguage',
 		);
@@ -181,11 +154,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	#switchVariant(variant: UmbDocumentVariantOption) {
+	#switchVariant(variant: UmbDocumentVariantOptionModel) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
-	#openSplitView(variant: UmbDocumentVariantOption) {
+	#openSplitView(variant: UmbDocumentVariantOptionModel) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 
@@ -197,16 +170,16 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return culture !== null ? this._activeVariantsCultures.includes(culture) : true;
 	}
 
-	#isNotPublishedMode(culture: string | null, state: DocumentVariantStateModel) {
-		return state !== DocumentVariantStateModel.PUBLISHED && !this.#isVariantActive(culture);
+	#isCreateMode(variantOption: UmbDocumentVariantOptionModel) {
+		return !variantOption.variant && !this.#isVariantActive(variantOption.culture);
 	}
 
 	#hasVariants() {
-		return this._variants?.length > 1;
+		return this._variantOptions?.length > 1;
 	}
 
 	#something() {
-		this._something = this._variants
+		this._something = this._variantOptions
 			.filter((variant) => {
 				const isReadOnly = this._readOnlyStates.some((state) => {
 					return state.variantId.compare(variant);
@@ -240,7 +213,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return html`
 			<uui-input
 				id="name-input"
-				label="Document name (TODO: Localize)"
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				${umbFocus()}
@@ -253,7 +225,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 									compact
 									slot="append"
 									popovertarget="variant-selector-popover"
-									title=${this._variantTitleName}>
+									title=${this._variantDisplayName}>
 									${this._variantDisplayName}
 									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
@@ -279,7 +251,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 								<div id="variant-selector-dropdown">
 									<uui-scroll-container>
 										<ul>
-											${this._variants.map((variant) => this.#renderListItem(variant))}
+											${this._variantOptions.map((variant) => this.#renderListItem(variant))}
 										</ul>
 									</uui-scroll-container>
 								</div>
@@ -291,37 +263,39 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderListItem(variant: UmbDocumentVariantOption) {
+	#renderListItem(variantOption: UmbDocumentVariantOptionModel) {
 		return html`
-			<li class="${this.#isVariantActive(variant.culture) ? 'selected' : ''}">
+			<li class="${this.#isVariantActive(variantOption.culture) ? 'selected' : ''}">
 				<button
-					class="variant-selector-switch-button
-																	${this.#isNotPublishedMode(variant.culture, variant.state) ? 'add-mode' : ''}"
-					@click=${() => this.#switchVariant(variant)}>
-					${this.#isNotPublishedMode(variant.culture, variant.state)
-						? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
-						: nothing}
+					class="variant-selector-switch-button ${this.#isCreateMode(variantOption) ? 'add-mode' : ''}"
+					@click=${() => this.#switchVariant(variantOption)}>
+					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div>
-						${variant.title} ${variant.culture ? html` <i>(${variant.culture})</i>` : ''} ${variant.segment}
-						<div class="variant-selector-state">${variant.state}</div>
-						${this.#renderReadOnlyTag(variant.culture)}
+						<div>${variantOption.language.name} ${this.#renderReadOnlyTag(variantOption.culture)}</div>
+						<div class="variant-selector-state">
+							${variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED}
+						</div>
 					</div>
 				</button>
-				${this.#renderSplitViewButton(variant)}
+				${this.#renderSplitViewButton(variantOption)}
 			</li>
 		`;
 	}
 
 	#renderReadOnlyTag(culture: string | null) {
-		return this._something.includes(culture) ? html`<uui-tag>Read-only</uui-tag>` : nothing;
+		if (!culture) return nothing;
+		return this._something.includes(culture) ? html`<uui-tag look="secondary">Read-only</uui-tag>` : nothing;
 	}
 
-	#renderSplitViewButton(variant: UmbDocumentVariantOption) {
+	#renderSplitViewButton(variant: UmbDocumentVariantOptionModel) {
 		return html`
 			${this.#isVariantActive(variant.culture)
 				? nothing
 				: html`
-						<uui-button class="variant-selector-split-view" @click=${() => this.#openSplitView(variant)}>
+						<uui-button
+							label="Open Split view for ${variant.language.name}"
+							class="variant-selector-split-view"
+							@click=${() => this.#openSplitView(variant)}>
 							Split view
 						</uui-button>
 					`}
@@ -368,6 +342,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 			li {
 				position: relative;
 				margin-bottom: 1px;
+			}
+
+			li:hover .variant-selector-split-view {
+				display: flex;
 			}
 
 			li:nth-last-of-type(1) {
@@ -439,12 +417,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 				top: 0;
 				right: 0;
 				bottom: 1px;
+				display: none;
 			}
 
 			.variant-selector-state {
 				color: var(--uui-palette-malibu-dimmed);
 				font-size: 12px;
 				font-weight: normal;
+			}
+
+			uui-tag {
+				font-size: 12px;
 			}
 		`,
 	];
