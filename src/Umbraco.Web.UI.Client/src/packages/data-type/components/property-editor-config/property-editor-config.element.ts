@@ -53,8 +53,9 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 							property-editor-ui-alias=${property.propertyEditorUiAlias}
 							.config=${property.config}></umb-property>`,
 				)
-			: // TODO: Localize this [NL]
-				html`<div>No configuration</div>`;
+			: html`<umb-localize key="editdatatype_noConfiguration"
+					>There is no configuration for this property editor.</umb-localize
+				>`;
 	}
 
 	static override styles = [UmbTextStyles];

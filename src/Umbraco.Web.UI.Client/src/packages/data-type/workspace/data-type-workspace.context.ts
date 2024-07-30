@@ -32,7 +32,7 @@ import {
 type EntityType = UmbDataTypeDetailModel;
 
 /**
- * @class uUmbDataTypeWorkspaceContext
+ * @class UmbDataTypeWorkspaceContext
  * @description - Context for handling data type workspace
  * There is two overall code flows to be aware about:
  *
