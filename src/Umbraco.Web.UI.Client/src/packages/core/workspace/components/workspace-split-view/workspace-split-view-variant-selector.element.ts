@@ -48,6 +48,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	@state()
 	private _something: string[] = [];
 
+	#publishStateLocalizationMap = {
+		[DocumentVariantStateModel.DRAFT]: 'content_unpublished',
+		[DocumentVariantStateModel.PUBLISHED]: 'content_published',
+		[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 'content_publishedPendingChanges',
+		[DocumentVariantStateModel.NOT_CREATED]: 'content_notCreated',
+	};
+
 	constructor() {
 		super();
 
@@ -271,9 +278,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 					@click=${() => this.#switchVariant(variantOption)}>
 					${this.#isCreateMode(variantOption) ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div>
-						<div>${variantOption.language.name} ${this.#renderReadOnlyTag(variantOption.culture)}</div>
-						<div class="variant-selector-state">
-							${variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED}
+						<div class="variant-name">
+							${variantOption.language.name} ${this.#renderReadOnlyTag(variantOption.culture)}
+						</div>
+						<div class="variant-publish-state">
+							${this.localize.term(
+								this.#publishStateLocalizationMap[
+									variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED
+								],
+							)}
 						</div>
 					</div>
 				</button>
@@ -420,14 +433,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 				display: none;
 			}
 
-			.variant-selector-state {
+			.variant-name {
+				margin-bottom: var(--uui-size-space-1);
+			}
+
+			.variant-publish-state {
 				color: var(--uui-palette-malibu-dimmed);
 				font-size: 12px;
 				font-weight: normal;
-			}
-
-			uui-tag {
-				font-size: 12px;
 			}
 		`,
 	];
