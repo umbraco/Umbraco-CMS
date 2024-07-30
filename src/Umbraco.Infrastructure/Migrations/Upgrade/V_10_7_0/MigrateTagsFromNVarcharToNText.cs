@@ -25,6 +25,40 @@ public class MigrateTagsFromNVarcharToNText : MigrationBase
         Database.Execute(updateDbTypeForTagsQuery);
 
         // Then migrate the data from "varcharValue" column to "textValue"
+        if (Database.DatabaseType == DatabaseType.SQLite)
+        {
+            MigrateSqlLiteData();
+        }
+        else
+        {
+            MigrateSqlServerData();
+        }
+    }
+
+    private void MigrateSqlLiteData()
+    {
+        Sql<ISqlContext> tagsDataTypeIdQuery = Database.SqlContext.Sql()
+            .Select<DataTypeDto>(dt => dt.NodeId)
+            .From<DataTypeDto>()
+            .Where<DataTypeDto>(dt => dt.EditorAlias == Constants.PropertyEditors.Aliases.Tags);
+
+        Sql<ISqlContext> tagsPropertyTypeIdQuery = Database.SqlContext.Sql()
+            .Select<PropertyTypeDto>(pt => pt.Id)
+            .From<PropertyTypeDto>()
+            .WhereIn<PropertyTypeDto>(pt => pt.DataTypeId, tagsDataTypeIdQuery);
+
+        Sql<ISqlContext> updatePropertyDataColumnsQuery = Database.SqlContext.Sql()
+            .Update<PropertyDataDto>()
+            .Append("SET textValue = varcharValue, varcharValue = null")
+            .WhereIn<PropertyDataDto>(pd => pd.PropertyTypeId, tagsPropertyTypeIdQuery)
+            .Where<PropertyDataDto>(pd => pd.TextValue == null)
+            .Where<PropertyDataDto>(pd => pd.VarcharValue != null);
+
+        Database.Execute(updatePropertyDataColumnsQuery);
+    }
+
+    private void MigrateSqlServerData()
+    {
         Sql<ISqlContext> updateTagsValues = Database.SqlContext.Sql()
             .Update<PropertyDataDto>()
             .Append("SET textValue = COALESCE([textValue], [varCharValue]), varcharValue = null")
