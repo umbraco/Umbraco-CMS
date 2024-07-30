@@ -46,7 +46,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	private _variantSelectorOpen = false;
 
 	@state()
-	private _something: string[] = [];
+	private _readOnlyCultures: string[] = [];
 
 	#publishStateLocalizationMap = {
 		[DocumentVariantStateModel.DRAFT]: 'content_unpublished',
@@ -84,7 +84,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 			workspaceContext.variantOptions,
 			(variantOptions) => {
 				this._variantOptions = variantOptions;
-				this.#something();
+				this.#setReadOnlyCultures();
 			},
 			'_observeVariantOptions',
 		);
@@ -95,7 +95,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 			workspaceContext.readOnlyState.states,
 			(states) => {
 				this._readOnlyStates = states;
-				this.#something();
+				this.#setReadOnlyCultures();
 			},
 			'umbObserveReadOnlyStates',
 		);
@@ -185,8 +185,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return this._variantOptions?.length > 1;
 	}
 
-	#something() {
-		this._something = this._variantOptions
+	#setReadOnlyCultures() {
+		this._readOnlyCultures = this._variantOptions
 			.filter((variant) => {
 				const isReadOnly = this._readOnlyStates.some((state) => {
 					return state.variantId.compare(variant);
@@ -297,7 +297,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	#renderReadOnlyTag(culture: string | null) {
 		if (!culture) return nothing;
-		return this._something.includes(culture) ? html`<uui-tag look="secondary">Read-only</uui-tag>` : nothing;
+		return this._readOnlyCultures.includes(culture) ? html`<uui-tag look="secondary">Read-only</uui-tag>` : nothing;
 	}
 
 	#renderSplitViewButton(variant: UmbDocumentVariantOptionModel) {
