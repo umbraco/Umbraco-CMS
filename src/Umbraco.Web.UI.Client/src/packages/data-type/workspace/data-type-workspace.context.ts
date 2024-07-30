@@ -213,7 +213,7 @@ export class UmbDataTypeWorkspaceContext
 			// Append the UI settings properties to the schema properties, so they can override the schema properties:
 			this.#properties.append(this.#propertyEditorUISettingsProperties);
 
-			// If new or if the alias was changed then set default values.
+			// If new or if the alias was changed then set default values. This 'complexity' to prevent setting default data when initialized [NL]
 			const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
 			this.#lastPropertyEditorUIAlias = this.getPropertyEditorUiAlias();
 			if (
