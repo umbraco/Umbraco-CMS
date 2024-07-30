@@ -12,6 +12,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
 
 type UmbDocumentVariantOption = {
 	culture: string | null;
@@ -31,6 +32,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	@state()
 	private _variants: UmbDocumentVariantOptions = [];
+
+	@state()
+	private _readOnlyStates: Array<UmbVariantState> = [];
 
 	// TODO: Stop using document context specific ActiveVariant type.
 	@state()
@@ -54,15 +58,26 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	@state()
 	private _variantSelectorOpen = false;
 
+	@state()
+	private _something: string[] = [];
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
 			this.#splitViewContext = instance;
-			this.#observeVariants();
-			this.#observeActiveVariants();
+
+			// NOTICE: This is dirty (the TypeScript casting), we can only accept doing this so far because we currently only use the Variant Selector on Document Workspace. [NL]
+			// This would need a refactor to enable the code below to work with different ContentTypes. Main problem here is the state, which is not generic for them all. [NL]
+			const workspaceContext = this.#splitViewContext.getWorkspaceContext() as unknown as UmbDocumentWorkspaceContext;
+			if (!workspaceContext) throw new Error('Split View Workspace context not found');
+
+			this.#observeVariants(workspaceContext);
+			this.#observeActiveVariants(workspaceContext);
+			this.#observeReadOnlyStates(workspaceContext);
 			this.#observeCurrentVariant();
 		});
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
 			this.#datasetContext = instance;
 			this.#observeDatasetContext();
@@ -70,14 +85,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		});
 	}
 
-	async #observeVariants() {
-		if (!this.#splitViewContext) return;
-
-		// NOTICE: This is dirty (the TypeScript casting), we can only accept doing this so far because we currently only use the Variant Selector on Document Workspace. [NL]
-		// This would need a refactor to enable the code below to work with different ContentTypes. Main problem here is the state, which is not generic for them all. [NL]
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as UmbDocumentWorkspaceContext;
-		if (!workspaceContext) throw new Error('Split View Workspace context not found');
-
+	async #observeVariants(workspaceContext: UmbDocumentWorkspaceContext) {
 		this.observe(
 			workspaceContext.variantOptions,
 			(options) => {
@@ -93,27 +101,35 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 						state: option.variant?.state ?? DocumentVariantStateModel.NOT_CREATED,
 					};
 				});
+
+				this.#something();
 			},
 			'_observeVariants',
 		);
 	}
 
-	async #observeActiveVariants() {
-		if (!this.#splitViewContext) return;
+	async #observeReadOnlyStates(workspaceContext: UmbDocumentWorkspaceContext) {
+		this.observe(
+			workspaceContext.readOnlyState.states,
+			(states) => {
+				this._readOnlyStates = states;
+				this.#something();
+			},
+			'umbObserveReadOnlyStates',
+		);
+	}
 
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as UmbDocumentWorkspaceContext;
-		if (workspaceContext) {
-			this.observe(
-				workspaceContext.splitView.activeVariantsInfo,
-				(activeVariants) => {
-					if (activeVariants) {
-						this._activeVariants = activeVariants;
-						this._activeVariantsCultures = this._activeVariants.map((el) => el.culture ?? '') ?? [];
-					}
-				},
-				'_observeActiveVariants',
-			);
-		}
+	async #observeActiveVariants(workspaceContext: UmbDocumentWorkspaceContext) {
+		this.observe(
+			workspaceContext.splitView.activeVariantsInfo,
+			(activeVariants) => {
+				if (activeVariants) {
+					this._activeVariants = activeVariants;
+					this._activeVariantsCultures = this._activeVariants.map((el) => el.culture ?? '') ?? [];
+				}
+			},
+			'_observeActiveVariants',
+		);
 	}
 
 	async #observeDatasetContext() {
@@ -189,6 +205,18 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return this._variants?.length > 1;
 	}
 
+	#something() {
+		this._something = this._variants
+			.filter((variant) => {
+				const isReadOnly = this._readOnlyStates.some((state) => {
+					return state.variantId.compare(variant);
+				});
+
+				return isReadOnly;
+			})
+			.map((variant) => variant.culture);
+	}
+
 	#onPopoverToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -251,34 +279,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 								<div id="variant-selector-dropdown">
 									<uui-scroll-container>
 										<ul>
-											${this._variants.map(
-												(variant) => html`
-													<li class="${this.#isVariantActive(variant.culture) ? 'selected' : ''}">
-														<button
-															class="variant-selector-switch-button
-																	${this.#isNotPublishedMode(variant.culture, variant.state) ? 'add-mode' : ''}"
-															@click=${() => this.#switchVariant(variant)}>
-															${this.#isNotPublishedMode(variant.culture, variant.state)
-																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
-																: nothing}
-															<div>
-																${variant.title} ${variant.culture ? html` <i>(${variant.culture})</i>` : ''}
-																${variant.segment}
-																<div class="variant-selector-state">${variant.state}</div>
-															</div>
-														</button>
-														${this.#isVariantActive(variant.culture)
-															? nothing
-															: html`
-																	<uui-button
-																		class="variant-selector-split-view"
-																		@click=${() => this.#openSplitView(variant)}>
-																		Split view
-																	</uui-button>
-																`}
-													</li>
-												`,
-											)}
+											${this._variants.map((variant) => this.#renderListItem(variant))}
 										</ul>
 									</uui-scroll-container>
 								</div>
@@ -287,6 +288,43 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 					: nothing
 			}
 		</div>
+		`;
+	}
+
+	#renderListItem(variant: UmbDocumentVariantOption) {
+		return html`
+			<li class="${this.#isVariantActive(variant.culture) ? 'selected' : ''}">
+				<button
+					class="variant-selector-switch-button
+																	${this.#isNotPublishedMode(variant.culture, variant.state) ? 'add-mode' : ''}"
+					@click=${() => this.#switchVariant(variant)}>
+					${this.#isNotPublishedMode(variant.culture, variant.state)
+						? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
+						: nothing}
+					<div>
+						${variant.title} ${variant.culture ? html` <i>(${variant.culture})</i>` : ''} ${variant.segment}
+						<div class="variant-selector-state">${variant.state}</div>
+						${this.#renderReadOnlyTag(variant.culture)}
+					</div>
+				</button>
+				${this.#renderSplitViewButton(variant)}
+			</li>
+		`;
+	}
+
+	#renderReadOnlyTag(culture: string | null) {
+		return this._something.includes(culture) ? html`<uui-tag>Read-only</uui-tag>` : nothing;
+	}
+
+	#renderSplitViewButton(variant: UmbDocumentVariantOption) {
+		return html`
+			${this.#isVariantActive(variant.culture)
+				? nothing
+				: html`
+						<uui-button class="variant-selector-split-view" @click=${() => this.#openSplitView(variant)}>
+							Split view
+						</uui-button>
+					`}
 		`;
 	}
 
