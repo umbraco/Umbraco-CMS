@@ -285,6 +285,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 									variantOption.variant?.state || DocumentVariantStateModel.NOT_CREATED
 								],
 							)}
+							${variantOption.language.isDefault
+								? html`<span> - ${this.localize.term('general_default')}</span>`
+								: nothing}
 						</div>
 					</div>
 				</button>
