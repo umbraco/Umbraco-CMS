@@ -233,6 +233,7 @@ export class UmbPropertyElement extends UmbLitElement {
 
 		this.observe(this.#propertyContext.isReadOnly, (value) => {
 			this._isReadOnly = value;
+			this._element?.toggleAttribute('readonly', value);
 		});
 	}
 
@@ -324,6 +325,8 @@ export class UmbPropertyElement extends UmbLitElement {
 						this.#validationMessageBinder.value = this.#propertyContext.getValue();
 					}
 				}
+
+				this._element.toggleAttribute('readonly', this._isReadOnly);
 			}
 
 			this.requestUpdate('element', oldElement);
