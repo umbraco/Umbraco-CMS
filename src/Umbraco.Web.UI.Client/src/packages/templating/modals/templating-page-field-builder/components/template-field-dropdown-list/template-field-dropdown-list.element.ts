@@ -152,7 +152,7 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 			<uui-combobox id="preview">
 				<uui-combobox-list @change=${this.#onChange}>
 					<uui-combobox-list-option value="system">
-						<strong>${this.localize.term('formSettings_systemFields')}</strong>
+						<strong>${this.localize.term('template_systemFields')}</strong>
 					</uui-combobox-list-option>
 					<uui-combobox-list-option value="document-type" display-value=${this.localize.term('content_documentType')}>
 						<strong> ${this.localize.term('content_documentType')} </strong>
