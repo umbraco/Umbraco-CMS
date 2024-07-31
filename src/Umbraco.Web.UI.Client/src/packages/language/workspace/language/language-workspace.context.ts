@@ -1,6 +1,7 @@
 import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
+import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './manifests.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
@@ -27,7 +28,7 @@ export class UmbLanguageWorkspaceContext
 	readonly validationErrors = this.#validationErrors.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.Language');
+		super(host, UMB_LANGUAGE_WORKSPACE_ALIAS);
 
 		this.routes.setRoutes([
 			{

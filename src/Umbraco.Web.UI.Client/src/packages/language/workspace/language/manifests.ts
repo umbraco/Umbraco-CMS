@@ -6,10 +6,12 @@ import type {
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_LANGUAGE_WORKSPACE_ALIAS = 'Umb.Workspace.Language';
+
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
 	kind: 'routable',
-	alias: 'Umb.Workspace.Language',
+	alias: UMB_LANGUAGE_WORKSPACE_ALIAS,
 	name: 'Language Workspace',
 	api: () => import('./language-workspace.context.js'),
 	meta: {
