@@ -90,17 +90,18 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		await this.#init;
 		if (!this.#compositionRepository) return;
 
-		const isElement = this.data?.isElement;
-		const currentPropertyAliases = this.data?.currentPropertyAliases;
+		// Notice isElement is not available on all types that can be composed.
+		const isElement = this.data?.isElement ?? undefined;
+		const currentPropertyAliases = this.data?.currentPropertyAliases ?? [];
 
 		const { data } = await this.#compositionRepository.availableCompositions({
 			unique: this.#unique,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			// TODO: isElement is not available on all types that can be composed.
-			isElement: isElement ?? false,
+			isElement: isElement,
 			currentCompositeUniques: this._selection,
-			currentPropertyAliases: currentPropertyAliases ?? [],
+			currentPropertyAliases: currentPropertyAliases,
 		});
 
 		if (!data) return;
