@@ -13,6 +13,7 @@ import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
+import { sortVariants } from 'src/packages/documents/documents/utils.js';
 
 const elementName = 'umb-workspace-split-view-variant-selector';
 @customElement(elementName)
@@ -83,7 +84,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		this.observe(
 			workspaceContext.variantOptions,
 			(variantOptions) => {
-				this._variantOptions = variantOptions;
+				this._variantOptions = variantOptions.sort((a, b) => sortVariants(a, b));
 				this.#setReadOnlyCultures();
 			},
 			'_observeVariantOptions',
