@@ -171,7 +171,10 @@ export class UmbPropertyElement extends UmbLitElement {
 	private _mandatory?: boolean;
 
 	@state()
-	_isReadOnly = false;
+	private _supportsReadOnly: boolean = false;
+
+	@state()
+	private _isReadOnly = false;
 
 	#propertyContext = new UmbPropertyContext(this);
 
@@ -272,6 +275,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		}
 
 		const el = await createExtensionElement(manifest);
+		this._supportsReadOnly = manifest.meta.supportsReadOnly || false;
 
 		if (el) {
 			const oldElement = this._element;
@@ -347,9 +351,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				${this._variantDifference
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
 					: ''}
-				<div id="editor" slot="editor">
-					${this._isReadOnly ? html`<div id="overlay"></div>` : nothing}${this._element}
-				</div>
+				${this.#renderPropertyEditor()}
 			</umb-property-layout>
 		`;
 	}
@@ -362,6 +364,15 @@ export class UmbPropertyElement extends UmbLitElement {
 				id="action-menu"
 				.propertyEditorUiAlias=${this._propertyEditorUiAlias}>
 			</umb-property-action-menu>
+		`;
+	}
+
+	#renderPropertyEditor() {
+		return html`
+			<div id="editor" slot="editor">
+				${this._isReadOnly && this._supportsReadOnly === false ? html`<div id="overlay"></div>` : nothing}
+				${this._element}
+			</div>
 		`;
 	}
 
