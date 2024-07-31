@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.TextArea',
 			icon: 'icon-edit',
 			group: 'common',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{
