@@ -20,7 +20,6 @@ import type {
 	UmbPropertyTypeValidationModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 /**
  *  @element umb-property
@@ -171,11 +170,8 @@ export class UmbPropertyElement extends UmbLitElement {
 	@state()
 	private _mandatory?: boolean;
 
-	#currentUserAllowedLanguages: string[] | undefined = [];
-	#variantId: UmbVariantId | undefined;
-
 	@state()
-	_readonly = false;
+	_isReadOnly = false;
 
 	#propertyContext = new UmbPropertyContext(this);
 
@@ -186,13 +182,6 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
-				this.#currentUserAllowedLanguages = languages;
-				this.#checkForWritePermission();
-			});
-		});
 
 		this.observe(
 			this.#propertyContext.alias,
@@ -241,39 +230,10 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			null,
 		);
-		this.observe(this.#propertyContext.variantId, (value) => {
-			this.#variantId = value;
-			this.#checkForWritePermission();
+
+		this.observe(this.#propertyContext.isReadOnly, (value) => {
+			this._isReadOnly = value;
 		});
-	}
-
-	#checkForWritePermission() {
-		if (this.#variantId === undefined) {
-			this._readonly = false;
-			return;
-		}
-
-		if (this.#currentUserAllowedLanguages === undefined) {
-			this._readonly = false;
-			return;
-		}
-
-		const isInvariant = this.#variantId.culture === null;
-
-		// always allow editing invariant properties
-		if (isInvariant) {
-			this._readonly = false;
-			return;
-		}
-
-		// if the user has no allowed languages, set readonly
-		if (this.#currentUserAllowedLanguages?.length === 0) {
-			this._readonly = true;
-			return;
-		}
-
-		// if the user is not allowed to edit the current language, set readonly
-		this._readonly = this.#currentUserAllowedLanguages.includes(this.#variantId.culture!) === false;
 	}
 
 	private _onPropertyEditorChange = (e: CustomEvent): void => {
@@ -385,7 +345,7 @@ export class UmbPropertyElement extends UmbLitElement {
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
 					: ''}
 				<div id="editor" slot="editor">
-					${this._readonly ? html`<div id="overlay"></div>` : nothing} ${this._readonly} ${this._element}
+					${this._isReadOnly ? html`<div id="overlay"></div>` : nothing} ${this._isReadOnly} ${this._element}
 				</div>
 			</umb-property-layout>
 		`;
