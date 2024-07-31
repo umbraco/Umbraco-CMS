@@ -129,11 +129,13 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					${!this._references.length
-						? html`<uui-button
-								label=${this.localize.term('general_submit')}
-								look="primary"
-								color="positive"
-								@click=${this._submitModal}></uui-button>`
+						? html`
+								<uui-button
+									label=${this.localize.term('general_submit')}
+									look="primary"
+									color="positive"
+									@click=${this._submitModal}></uui-button>
+							`
 						: nothing}
 				</div>
 			</umb-body-layout>
@@ -141,7 +143,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderHasReference() {
-		return html` <umb-localize key="contentTypeEditor_compositionInUse">
+		return html`
+			<umb-localize key="contentTypeEditor_compositionInUse">
 				This Content Type is used in a composition, and therefore cannot be composed itself.
 			</umb-localize>
 			<h4>
@@ -154,19 +157,22 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				${repeat(
 					this._references,
 					(item) => item.unique,
-					(item) =>
-						html`<uui-ref-node-document-type
+					(item) => html`
+						<uui-ref-node-document-type
 							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
 							name=${this.localize.string(item.name)}>
 							<umb-icon slot="icon" name=${item.icon}></umb-icon>
-						</uui-ref-node-document-type>`,
+						</uui-ref-node-document-type>
+					`,
 				)}
-			</div>`;
+			</div>
+		`;
 	}
 
 	#renderAvailableCompositions() {
 		if (this._compatibleCompositions) {
-			return html`<umb-localize key="contentTypeEditor_compositionsDescription">
+			return html`
+				<umb-localize key="contentTypeEditor_compositionsDescription">
 					Inherit tabs and properties from an existing Document Type. New tabs will be<br />added to the current
 					Document Type or merged if a tab with an identical name exists.<br />
 				</umb-localize>
@@ -184,11 +190,14 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 								: nothing}
 							${this.#renderCompositionsItems(folder.compositions)}`,
 					)}
-				</div>`;
+				</div>
+			`;
 		} else {
-			return html`<umb-localize key="contentTypeEditor_noAvailableCompositions">
-				There are no Content Types available to use as a composition
-			</umb-localize>`;
+			return html`
+				<umb-localize key="contentTypeEditor_noAvailableCompositions">
+					There are no Content Types available to use as a composition
+				</umb-localize>
+			`;
 		}
 	}
 
@@ -204,7 +213,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					@deselected=${() => this.#onSelectionRemove(compositions.unique)}
 					?selected=${this._selection.find((unique) => unique === compositions.unique)}>
 					<umb-icon name=${compositions.icon} slot="icon"></umb-icon>
-				</uui-menu-item>`,
+				</uui-menu-item>
+			`,
 		);
 	}
 

@@ -89,7 +89,8 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderNotAllowed() {
-		return html`<umb-localize key="create_noMediaTypes">
+		return html`
+			<umb-localize key="create_noMediaTypes">
 				There are no allowed Media Types available for creating media here. You must enable these in
 				<strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the
 				<strong>Allowed child node types</strong> under <strong>Permissions</strong>. </umb-localize
@@ -99,15 +100,16 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 				look="secondary"
 				@click=${() => this._rejectModal()}
 				href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
-				label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>`;
+				label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>
+		`;
 	}
 
 	#renderAllowedMediaTypes() {
 		return repeat(
 			this._allowedMediaTypes,
 			(mediaType) => mediaType.unique,
-			(mediaType) =>
-				html`<uui-ref-node-document-type
+			(mediaType) => html`
+				<uui-ref-node-document-type
 					data-id=${ifDefined(mediaType.unique)}
 					.name=${this.localize.string(mediaType.name)}
 					.alias=${this.localize.string(mediaType.description ?? '')}
@@ -115,7 +117,8 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 					selectable
 					@selected=${() => this.#onNavigate(mediaType)}>
 					${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}
-				</uui-ref-node-document-type>`,
+				</uui-ref-node-document-type>
+			`,
 		);
 	}
 

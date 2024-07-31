@@ -416,14 +416,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<div id="actions">
 				${this._compositionRepositoryAlias
-					? html` <uui-button
-							look="outline"
-							label=${this.localize.term('contentTypeEditor_compositions')}
-							compact
-							@click=${this.#openCompositionModal}>
-							<uui-icon name="icon-merge"></uui-icon>
-							${this.localize.term('contentTypeEditor_compositions')}
-						</uui-button>`
+					? html`
+							<uui-button
+								look="outline"
+								label=${this.localize.term('contentTypeEditor_compositions')}
+								compact
+								@click=${this.#openCompositionModal}>
+								<uui-icon name="icon-merge"></uui-icon>
+								${this.localize.term('contentTypeEditor_compositions')}
+							</uui-button>
+						`
 					: ''}
 				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
 					<uui-icon name="icon-navigation"></uui-icon>

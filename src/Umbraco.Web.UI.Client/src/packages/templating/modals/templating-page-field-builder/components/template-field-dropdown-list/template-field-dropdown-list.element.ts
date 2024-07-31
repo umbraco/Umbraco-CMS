@@ -185,7 +185,8 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 							html`<uui-combobox-list-option value=${ifDefined(field.alias)}>${field.alias}</uui-combobox-list-option>`,
 					)}
 				</uui-combobox-list>
-			</uui-combobox>`;
+			</uui-combobox>
+		`;
 	}
 
 	static override styles = [
