@@ -4,6 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
+	UmbBooleanState,
 	UmbClassState,
 	UmbDeepState,
 	UmbObjectState,
@@ -46,6 +47,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	private _editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this._editor.asObservable();
+
+	#isReadOnly = new UmbBooleanState(false);
+	public readonly isReadOnly = this.#isReadOnly.asObservable();
 
 	setEditor(editor: UmbPropertyEditorUiElement | undefined) {
 		this._editor.setValue(editor ?? undefined);
@@ -105,6 +109,10 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 			},
 			'observeValue',
 		);
+
+		this.observe(this.#datasetContext.currentVariantCultureIsReadOnly, (value) => {
+			this.#isReadOnly.setValue(value);
+		});
 	}
 
 	private _generateVariantDifferenceString() {
@@ -260,6 +268,15 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	}
 
 	/**
+	 * Get the read only state of this property
+	 * @return {*}  {boolean}
+	 * @memberof UmbPropertyContext
+	 */
+	public getIsReadOnly(): boolean {
+		return this.#isReadOnly.getValue();
+	}
+
+	/**
 	 * Reset the value of this property.
 	 * @memberof UmbPropertyContext
 	 */
@@ -284,6 +301,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		this.#configValues.destroy();
 		this.#value.destroy();
 		this.#config.destroy();
+		this.#isReadOnly.destroy();
 		this.#datasetContext = undefined;
 	}
 }
