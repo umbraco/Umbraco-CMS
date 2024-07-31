@@ -349,7 +349,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				?invalid=${this._invalid}>
 				${this.#renderPropertyActionMenu()}
 				${this._variantDifference
-					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
+					? html`<div slot="description"><uui-tag look="secondary">${this._variantDifference}</uui-tag></div>`
 					: ''}
 				${this.#renderPropertyEditor()}
 			</umb-property-layout>
@@ -399,7 +399,9 @@ export class UmbPropertyElement extends UmbLitElement {
 			}
 
 			uui-tag {
-				margin-top: var(--uui-size-space-4);
+				margin-top: var(--uui-size-space-2);
+				margin-left: calc(var(--uui-size-space-1) * -1);
+				font-size: 11px;
 			}
 
 			#editor {
