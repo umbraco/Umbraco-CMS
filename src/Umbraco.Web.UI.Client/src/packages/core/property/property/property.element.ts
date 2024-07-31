@@ -349,7 +349,9 @@ export class UmbPropertyElement extends UmbLitElement {
 				?invalid=${this._invalid}>
 				${this.#renderPropertyActionMenu()}
 				${this._variantDifference
-					? html`<div slot="description"><uui-tag look="secondary">${this._variantDifference}</uui-tag></div>`
+					? html`<div id="variant-info" slot="description">
+							<uui-tag look="secondary">${this._variantDifference}</uui-tag>
+						</div> `
 					: ''}
 				${this.#renderPropertyEditor()}
 			</umb-property-layout>
@@ -398,10 +400,16 @@ export class UmbPropertyElement extends UmbLitElement {
 				opacity: 1;
 			}
 
-			uui-tag {
+			#variant-info {
+				opacity: 0;
+				transition: opacity 90ms;
 				margin-top: var(--uui-size-space-2);
 				margin-left: calc(var(--uui-size-space-1) * -1);
-				font-size: 11px;
+			}
+
+			#layout:focus-within #variant-info,
+			#layout:hover #variant-info {
+				opacity: 1;
 			}
 
 			#editor {
