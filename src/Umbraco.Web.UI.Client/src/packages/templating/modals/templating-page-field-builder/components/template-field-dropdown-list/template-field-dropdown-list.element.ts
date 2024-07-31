@@ -174,7 +174,8 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 
 	#renderAliasDropdown() {
 		if (this._type !== FieldType.SYSTEM && !this._unique) return;
-		return html`<strong>${this._uniqueName}</strong>
+		return html`
+			<strong>${this.localize.string(this._uniqueName ?? '')}</strong>
 			<uui-combobox id="value" value=${ifDefined(this.value?.alias)}>
 				<uui-combobox-list @change=${this.#onChangeValue}>
 					${repeat(

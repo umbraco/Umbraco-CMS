@@ -109,8 +109,8 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			(mediaType) =>
 				html`<uui-ref-node-document-type
 					data-id=${ifDefined(mediaType.unique)}
-					.name=${mediaType.name}
-					.alias=${mediaType.description ?? ''}
+					.name=${this.localize.string(mediaType.name)}
+					.alias=${this.localize.string(mediaType.description ?? '')}
 					select-only
 					selectable
 					@selected=${() => this.#onNavigate(mediaType)}>

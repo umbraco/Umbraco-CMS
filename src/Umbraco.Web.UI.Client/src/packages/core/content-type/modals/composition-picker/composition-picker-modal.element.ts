@@ -157,7 +157,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					(item) =>
 						html`<uui-ref-node-document-type
 							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
-							name=${item.name}>
+							name=${this.localize.string(item.name)}>
 							<umb-icon slot="icon" name=${item.icon}></umb-icon>
 						</uui-ref-node-document-type>`,
 				)}
@@ -196,9 +196,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		return repeat(
 			compositionsList,
 			(compositions) => compositions.unique,
-			(compositions) =>
-				html`<uui-menu-item
-					label=${compositions.name}
+			(compositions) => html`
+				<uui-menu-item
+					label=${this.localize.string(compositions.name)}
 					selectable
 					@selected=${() => this.#onSelectionAdd(compositions.unique)}
 					@deselected=${() => this.#onSelectionRemove(compositions.unique)}
