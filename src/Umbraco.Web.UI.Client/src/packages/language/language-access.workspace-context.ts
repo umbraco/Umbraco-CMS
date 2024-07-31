@@ -56,12 +56,12 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<unknown> {
 		const variantIds = disallowedLanguages?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
 
 		// create a list of states for the disallowed languages
-		const identifier = 'UMB_LANGUAGE_ACCESS_';
+		const identifier = 'UMB_CULTURE_';
 		const readOnlyStates = variantIds.map((variantId) => {
 			return {
 				unique: identifier + variantId.culture,
 				variantId,
-				message: 'You do not have access edit to this language',
+				message: 'You do not have permission to edit to this culture',
 			};
 		});
 

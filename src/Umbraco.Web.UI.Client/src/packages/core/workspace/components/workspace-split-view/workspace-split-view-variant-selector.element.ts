@@ -185,7 +185,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		this._readOnlyCultures = this._variantOptions
 			.filter((variant) => {
 				const isReadOnly = this._readOnlyStates.some((state) => {
-					return state.unique.startsWith('UMB_LANGUAGE_ACCESS_') && state.variantId.compare(variant);
+					return state.unique.startsWith('UMB_CULTURE_') && state.variantId.compare(variant);
 				});
 
 				return isReadOnly;
