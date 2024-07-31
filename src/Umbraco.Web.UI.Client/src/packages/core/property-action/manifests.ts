@@ -5,6 +5,8 @@ import type {
 	UmbBackofficeManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 
+import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
+
 export const propertyActionManifests: Array<ManifestPropertyActions> = [
 	{
 		type: 'propertyAction',
@@ -17,6 +19,11 @@ export const propertyActionManifests: Array<ManifestPropertyActions> = [
 			icon: 'icon-paste-in',
 			label: 'Copy',
 		},
+		conditions: [
+			{
+				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
+			},
+		],
 	},
 	{
 		type: 'propertyAction',
@@ -29,6 +36,11 @@ export const propertyActionManifests: Array<ManifestPropertyActions> = [
 			icon: 'icon-trash',
 			label: 'Clear',
 		},
+		conditions: [
+			{
+				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
+			},
+		],
 	},
 ];
 
