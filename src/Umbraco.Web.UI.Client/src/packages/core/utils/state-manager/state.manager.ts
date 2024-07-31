@@ -76,9 +76,3 @@ export class UmbReadOnlyVariantStateManager extends UmbStateManager<UmbVariantSt
 		super(host);
 	}
 }
-
-export class UmbDisabledStateManager extends UmbStateManager {
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-}
