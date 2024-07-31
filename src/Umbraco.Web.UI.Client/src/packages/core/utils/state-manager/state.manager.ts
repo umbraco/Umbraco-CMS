@@ -1,14 +1,9 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbState {
 	unique: string;
 	message: string;
-}
-
-export interface UmbVariantState extends UmbState {
-	variantId: UmbVariantId;
 }
 
 export class UmbStateManager<StateType extends UmbState = UmbState> {
@@ -62,17 +57,5 @@ export class UmbStateManager<StateType extends UmbState = UmbState> {
 	 */
 	clear() {
 		this._states.setValue([]);
-	}
-}
-
-export class UmbReadOnlyStateManager extends UmbStateManager<UmbState> {
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-}
-
-export class UmbReadOnlyVariantStateManager extends UmbStateManager<UmbVariantState> {
-	constructor(host: UmbControllerHost) {
-		super(host);
 	}
 }
