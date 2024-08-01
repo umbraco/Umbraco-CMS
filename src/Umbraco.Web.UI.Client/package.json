@@ -267,7 +267,7 @@
 		"storybook": "^7.6.17",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.10",
-		"typedoc": "^0.26.4",
+		"typedoc": "^0.26.5",
 		"typescript": "^5.5.3",
 		"typescript-eslint": "^7.16.1",
 		"typescript-json-schema": "^0.64.0",
