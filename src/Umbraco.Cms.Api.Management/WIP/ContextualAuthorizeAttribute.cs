@@ -9,34 +9,43 @@ using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.WIP;
 
+/// <summary>
+/// Authorizes a certain permission (read,write,browse,...) within a given context (umbraco, my-package,...)
+/// against the <see cref="IGranularPermission"> granular permissions</see> defined on all <see cref="IUserGroup">user groups</see> the <see cref="IUser">user</see> is part off.
+/// This is accomplished by validating the <see cref="ContextualPermissionHandler.ContextualPermissionsPolicyAlias">Contextual Permissions Policy</see> trough the <see cref="IAuthorizationService"/>
+/// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class ContextualAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
 {
-    public ContextualAuthorizeAttribute(string verb, string context)
+    public ContextualAuthorizeAttribute(string permission, string context)
     {
-        Verbs = verb.Yield();
+        Permissions = permission.Yield();
         Context = context;
-        VerbMatchingBehaviour = VerbMatchingBehaviour.All;
+        PermissionMatchingBehaviour = WIP.PermissionMatchingBehaviour.All;
     }
 
     public ContextualAuthorizeAttribute(
-        IEnumerable<string> verbs,
+        IEnumerable<string> permissions,
         string context,
-        VerbMatchingBehaviour verbMatchingBehaviour)
+        PermissionMatchingBehaviour permissionMatchingBehaviour)
     {
-        Verbs = verbs;
+        Permissions = permissions;
         Context = context;
-        VerbMatchingBehaviour = verbMatchingBehaviour;
+        PermissionMatchingBehaviour = permissionMatchingBehaviour;
     }
 
-    public IEnumerable<string> Verbs { get; }
-    public string Context { get; }
-    public VerbMatchingBehaviour VerbMatchingBehaviour { get; }
+    private IEnumerable<string> Permissions { get; }
+
+    private string Context { get; }
+
+    private PermissionMatchingBehaviour PermissionMatchingBehaviour { get; }
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
@@ -44,8 +53,8 @@ public class ContextualAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
 
         AuthorizationResult authorizationResult = await authorizationService.AuthorizeResourceAsync(
             context.HttpContext.User,
-            ContextualPermissionResource.WithSetup(Verbs, Context, VerbMatchingBehaviour),
-            ContextualPermissionHandler.ContextualPermissionsPolicy);
+            ContextualPermissionResource.WithSetup(Permissions, Context, PermissionMatchingBehaviour),
+            ContextualPermissionHandler.ContextualPermissionsPolicyAlias);
 
         if (authorizationResult.Succeeded is false)
         {
@@ -60,59 +69,69 @@ public class ContextualAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     }
 }
 
-// define a resource that can have values per invocation of a authorization requirement
+/// <summary>
+/// Used in combination with <see cref="ContextualPermissionRequirement"/> by <see cref="ContextualPermissionHandler"/>
+/// </summary>
 public class ContextualPermissionResource : IPermissionResource
 {
-    public static ContextualPermissionResource WithPermission(string verb, string context) =>
-        WithAllPermissions(verb.Yield(), context);
+    public static ContextualPermissionResource WithPermission(string permission, string context) =>
+        WithAllPermissions(permission.Yield(), context);
 
-    public static ContextualPermissionResource WithAnyPermissions(IEnumerable<string> verbs, string context) =>
-        new(verbs, context, VerbMatchingBehaviour.Any);
+    public static ContextualPermissionResource WithAnyPermissions(IEnumerable<string> permissions, string context) =>
+        new(permissions, context, PermissionMatchingBehaviour.Any);
 
-    public static ContextualPermissionResource WithAllPermissions(IEnumerable<string> verbs, string context) =>
-        new(verbs, context, VerbMatchingBehaviour.All);
+    public static ContextualPermissionResource WithAllPermissions(IEnumerable<string> permissions, string context) =>
+        new(permissions, context, PermissionMatchingBehaviour.All);
 
-    public static ContextualPermissionResource WithSetup(IEnumerable<string> verbs, string context,
-        VerbMatchingBehaviour verbMatchingBehaviour) =>
-        new(verbs, context, verbMatchingBehaviour);
+    public static ContextualPermissionResource WithSetup(
+        IEnumerable<string> permissions,
+        string context,
+        PermissionMatchingBehaviour permissionMatchingBehaviour) =>
+        new(permissions, context, permissionMatchingBehaviour);
 
-    private ContextualPermissionResource(IEnumerable<string> verbs, string context, VerbMatchingBehaviour behaviour)
+    private ContextualPermissionResource(
+        IEnumerable<string> permissions,
+        string context,
+        PermissionMatchingBehaviour behaviour)
     {
-        Verbs = verbs;
+        Permissions = permissions;
         Context = context;
-        VerbMatchingBehaviour = behaviour;
+        PermissionMatchingBehaviour = behaviour;
     }
 
-    public IEnumerable<string> Verbs { get; }
+    public IEnumerable<string> Permissions { get; }
+
     public string Context { get; }
-    public VerbMatchingBehaviour VerbMatchingBehaviour { get; }
+
+    public PermissionMatchingBehaviour PermissionMatchingBehaviour { get; }
 }
 
-public enum VerbMatchingBehaviour
+public enum PermissionMatchingBehaviour
 {
     Any,
     All
 }
 
-// define the requirement
+/// <summary>
+/// Used in combination with <see cref="ContextualPermissionResource"/> by <see cref="ContextualPermissionHandler"/>
+/// This requirement only has per request parameters, see <see cref="ContextualPermissionResource"/>
+/// </summary>
 public class ContextualPermissionRequirement : IAuthorizationRequirement
 {
-    // since we handle all our parameters on a case by case basis, we place them in the PermissionResource which will be filled by the atrribute
 }
 
-// define handlers that match the resource value to the requirement, the base class implicitly fails/passes the requirement based on the IsAuthorized method
+/// Authorizes a certain permission (read,write,browse,...) within a given context (umbraco, my-package,...)
+/// against the <see cref="IGranularPermission">granular permissions</see> defined on all <see cref="IUserGroup">user groups</see> the <see cref="IUser">user</see> is part off.
+/// Permission
 public class ContextualPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ContextualPermissionRequirement,
     ContextualPermissionResource>
 {
-    public const string ContextualPermissionsPolicy = "Our.Umbraco.ContextualPermissions";
+    public const string ContextualPermissionsPolicyAlias = "Umbraco.ContextualPermissions";
     private readonly IAuthorizationHelper _authorizationHelper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    // dependency injection is available here, so get whatever you need
-    public ContextualPermissionHandler(IAuthorizationHelper authorizationHelper, IHttpContextAccessor httpContextAccessor)
+    public ContextualPermissionHandler(IAuthorizationHelper authorizationHelper)
     {
         _authorizationHelper = authorizationHelper;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     protected override async Task<bool> IsAuthorized(
@@ -120,31 +139,30 @@ public class ContextualPermissionHandler : MustSatisfyRequirementAuthorizationHa
         ContextualPermissionRequirement requirement,
         ContextualPermissionResource resource)
     {
-        var user = _authorizationHelper.GetUmbracoUser(context.User);
+        IUser user = _authorizationHelper.GetUmbracoUser(context.User);
 
-        return resource.VerbMatchingBehaviour == VerbMatchingBehaviour.Any
-            ? resource.Verbs.Any(ContextualMatch)
-            : resource.Verbs.All(ContextualMatch);
+        return resource.PermissionMatchingBehaviour == PermissionMatchingBehaviour.Any
+            ? resource.Permissions.Any(ContextualMatch)
+            : resource.Permissions.All(ContextualMatch);
 
-        bool ContextualMatch(string v) =>
+        bool ContextualMatch(string permissionToCheck) =>
             user.Groups.SelectMany(g => g.GranularPermissions)
-                .Any(p => p.Context == resource.Context &&
-                          p.Permission.Equals(v, StringComparison.InvariantCultureIgnoreCase));
+                .Any(definedContextualPermission =>
+                    definedContextualPermission.Context.Equals(resource.Context, StringComparison.InvariantCultureIgnoreCase)
+                    && definedContextualPermission.Permission.Equals(permissionToCheck, StringComparison.InvariantCultureIgnoreCase));
     }
 }
 
-public class ContextPermissionComposer : IComposer
+public class ContextualPermissionPolicyComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IAuthorizationHandler, ContextualPermissionHandler>();
-        builder.Services.AddAuthorization((options) =>
-        {
-            options.AddPolicy(ContextualPermissionHandler.ContextualPermissionsPolicy, policy =>
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(ContextualPermissionHandler.ContextualPermissionsPolicyAlias, policy =>
             {
                 policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
                 policy.Requirements.Add(new ContextualPermissionRequirement());
             });
-        });
     }
 }
