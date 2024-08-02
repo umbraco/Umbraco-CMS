@@ -105,13 +105,10 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 	override render() {
 		return this._manifests && this._manifests.length > 0
 			? html` <div>
-					${repeat(
-						this._manifests,
-						(x) => x.alias,
-						(x) => html`
-							<umb-ref-manifest standalone @open=${() => this.#viewManifest(x)} .manifest=${x}></umb-ref-manifest>
-						`,
-					)}
+					<umb-ref-manifest
+						standalone
+						@open=${() => this.#viewManifest(this._manifests![0])}
+						.manifest=${this._manifests[0]}></umb-ref-manifest>
 				</div>`
 			: html`<uui-button
 					id="add-button"
