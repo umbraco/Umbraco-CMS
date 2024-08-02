@@ -189,6 +189,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Management"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.PublishedCache.HybridCache", "Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj", "{D577E76D-B4B7-4F29-9B47-C55A5F114CA0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.IntegrationBenchmarks", "tests\Umbraco.Tests.IntegrationBenchmarks\Umbraco.Tests.IntegrationBenchmarks.csproj", "{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -374,6 +376,12 @@ Global
 		{D577E76D-B4B7-4F29-9B47-C55A5F114CA0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D577E76D-B4B7-4F29-9B47-C55A5F114CA0}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{D577E76D-B4B7-4F29-9B47-C55A5F114CA0}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -393,6 +401,7 @@ Global
 		{25AECCB5-B187-4406-844B-91B8FF0FCB37} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
 		{EA628ABD-624E-4AF3-B548-6710D4D66531} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
 		{A13FF0A0-69FA-468A-9F79-565401D5C341} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{3CC2D8FF-A5ED-42D2-8B5F-1600087B6B2C} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}
