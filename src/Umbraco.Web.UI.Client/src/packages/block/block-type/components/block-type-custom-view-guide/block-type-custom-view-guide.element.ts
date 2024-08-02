@@ -1,10 +1,15 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, state, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { umbExtensionsRegistry, type ManifestBlockEditorCustomView } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UMB_MANIFEST_VIEWER_MODAL,
+	umbExtensionsRegistry,
+	type ManifestBlockEditorCustomView,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-block-type-custom-view-guide')
 export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
@@ -77,13 +82,20 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 		return true;
 	};
 
+	async #viewManifest(manifest: ManifestBlockEditorCustomView) {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager.open(this, UMB_MANIFEST_VIEWER_MODAL, { data: manifest });
+	}
+
 	override render() {
 		return this._manifests && this._manifests.length > 0
 			? html` <div>
 					${repeat(
 						this._manifests,
 						(x) => x.alias,
-						(x) => html` <umb-ref-manifest standalone .manifest=${x}></umb-ref-manifest> `,
+						(x) => html`
+							<umb-ref-manifest standalone @open=${() => this.#viewManifest(x)} .manifest=${x}></umb-ref-manifest>
+						`,
 					)}
 				</div>`
 			: html`No custom view matches the current block editor type and content type.`;

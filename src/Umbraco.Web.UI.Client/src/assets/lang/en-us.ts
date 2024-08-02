@@ -820,6 +820,7 @@ export default {
 		logout: 'Logout',
 		macro: 'Macro',
 		mandatory: 'Mandatory',
+		manifest: 'Manifest',
 		media: 'Media',
 		message: 'Message',
 		move: 'Move',

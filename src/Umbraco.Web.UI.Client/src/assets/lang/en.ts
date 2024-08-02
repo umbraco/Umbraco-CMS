@@ -831,6 +831,7 @@ export default {
 		logout: 'Logout',
 		macro: 'Macro',
 		mandatory: 'Mandatory',
+		manifest: 'Manifest',
 		message: 'Message',
 		move: 'Move',
 		name: 'Name',
