@@ -2470,6 +2470,7 @@ export default {
 		tabClipboard: 'Clipboard',
 		tabBlockSettings: 'Settings',
 		headlineAdvanced: 'Advanced',
+		headlineCustomView: 'Custom View',
 		forceHideContentEditor: 'Hide content editor',
 		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay.',
 		gridInlineEditing: 'Inline editing',
