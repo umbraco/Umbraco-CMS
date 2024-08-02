@@ -83,11 +83,7 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 					${repeat(
 						this._manifests,
 						(x) => x.alias,
-						(x) => html`
-							<uui-ref-node standalone name=${x.name} detail=${x.alias}>
-								<umb-icon slot="icon" name=${'icon-flowerpot'}></umb-icon
-							></uui-ref-node>
-						`,
+						(x) => html` <umb-ref-manifest standalone .manifest=${x}></umb-ref-manifest> `,
 					)}
 				</div>`
 			: html`No custom view matches the current block editor type and content type.`;
