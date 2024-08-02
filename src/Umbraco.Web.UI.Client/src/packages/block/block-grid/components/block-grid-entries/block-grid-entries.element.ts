@@ -291,7 +291,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
 			return html`<uui-button-group>
 				<uui-button
-					id="add-button"
 					look="placeholder"
 					label=${this._singleBlockTypeName
 						? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])

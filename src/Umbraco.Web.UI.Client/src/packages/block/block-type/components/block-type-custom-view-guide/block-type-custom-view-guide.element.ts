@@ -1,5 +1,5 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, state, property, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, property, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
 	UMB_MANIFEST_VIEWER_MODAL,
@@ -13,6 +13,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-block-type-custom-view-guide')
 export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
+	#contentTypeName?: string;
 	#contentTypeAlias?: string;
 	#blockEditorType?: string;
 
@@ -42,6 +43,7 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 					this.observe(
 						asObservable(),
 						(model) => {
+							this.#contentTypeName = model?.name;
 							this.#contentTypeAlias = model?.alias;
 							this.#loadManifests();
 						},
@@ -54,7 +56,6 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 	}
 
 	#loadManifests() {
-		console.log('this.#blockEditorType', this.#blockEditorType, 'this.#contentTypeAlias', this.#contentTypeAlias);
 		if (!this.#blockEditorType || !this.#contentTypeAlias) return;
 		new UmbExtensionsManifestInitializer(
 			this,
@@ -87,6 +88,20 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 		modalManager.open(this, UMB_MANIFEST_VIEWER_MODAL, { data: manifest });
 	}
 
+	async #generateManifest() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+
+		const manifest = {
+			type: 'blockEditorCustomView',
+			alias: 'Local.blockEditorCustomView.' + this.#contentTypeAlias,
+			name: 'Block Editor Custom View for ' + this.#contentTypeName,
+			element: '[replace with path to your web component js file...]',
+			forContentTypeAlias: this.#contentTypeAlias,
+			forBlockEditor: this.#blockEditorType,
+		};
+		modalManager.open(this, UMB_MANIFEST_VIEWER_MODAL, { data: manifest });
+	}
+
 	override render() {
 		return this._manifests && this._manifests.length > 0
 			? html` <div>
@@ -98,8 +113,23 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 						`,
 					)}
 				</div>`
-			: html`No custom view matches the current block editor type and content type.`;
+			: html`<uui-button
+					id="add-button"
+					look="placeholder"
+					label="Generate manifest for this Block Type"
+					type="button"
+					color="default"
+					@click=${() => this.#generateManifest()}></uui-button>`;
 	}
+
+	static override styles = [
+		css`
+			#add-button {
+				text-align: center;
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbBlockTypeCustomViewGuideElement;

@@ -144,7 +144,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>
-					<uui-button id="add-button" look="placeholder" label=${'Add area'} @click=${this.#addNewArea}></uui-button>`
+					<uui-button look="placeholder" label=${'Add area'} @click=${this.#addNewArea}></uui-button>`
 			: '';
 	}
 }
