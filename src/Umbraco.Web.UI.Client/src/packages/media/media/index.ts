@@ -14,3 +14,5 @@ export { UMB_MEDIA_PICKER_MODAL } from './modals/media-picker/index.js';
 
 export type { UmbMediaTreeItemModel } from './tree/index.js';
 export { UmbMediaAuditLogRepository } from './audit-log/index.js';
+
+export type * from './types.js';
