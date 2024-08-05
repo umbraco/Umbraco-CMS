@@ -43,12 +43,6 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
-        // We've gotten this data from the database, so the mapping should not fail
-        if (languageIsoCodesMappingAttempt.Success is false)
-        {
-            throw new InvalidOperationException($"Unknown language ID in User Group: {userGroup.Name}");
-        }
-
         return new UserGroupResponseModel
         {
             Id = userGroup.Key,
@@ -76,12 +70,6 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
-
-        // We've gotten this data from the database, so the mapping should not fail
-        if (languageIsoCodesMappingAttempt.Success is false)
-        {
-            throw new InvalidOperationException($"Unknown language ID in User Group: {userGroup.Name}");
-        }
 
         return new UserGroupResponseModel
         {
@@ -217,9 +205,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             .Select(x => x.IsoCode)
             .ToArray();
 
-        return isoCodes.Length == ids.Count()
-            ? Attempt.SucceedWithStatus<IEnumerable<string>, UserGroupOperationStatus>(UserGroupOperationStatus.Success, isoCodes)
-            : Attempt.FailWithStatus<IEnumerable<string>, UserGroupOperationStatus>(UserGroupOperationStatus.LanguageNotFound, isoCodes);
+        // if a language id does not exist, it simply not returned.
+        // We do this so we don't have to clean up user group data when deleting languages and to make it easier to restore accidentally removed languages
+        return Attempt.SucceedWithStatus<IEnumerable<string>, UserGroupOperationStatus>(
+            UserGroupOperationStatus.Success, isoCodes);
     }
 
     private async Task<Attempt<IEnumerable<int>, UserGroupOperationStatus>> MapLanguageIsoCodesToIdsAsync(IEnumerable<string> isoCodes)
