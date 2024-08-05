@@ -3,7 +3,9 @@ import { html, customElement, LitElement, property, css } from '@umbraco-cms/bac
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbBlockDataType, UmbBlockEditorCustomViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
+// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('example-block-custom-view')
+// eslint-disable-next-line local-rules/umb-class-prefix
 export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implements UmbBlockEditorCustomViewElement {
 	//
 	@property({ attribute: false })
