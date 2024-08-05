@@ -1,7 +1,7 @@
 import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
-import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
