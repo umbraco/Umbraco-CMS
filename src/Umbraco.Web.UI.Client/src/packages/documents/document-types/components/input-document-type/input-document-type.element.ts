@@ -37,7 +37,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	 * @attr
 	 * @default false
 	 */
-	@property({ attribute: false })
+	@property({ type: Boolean })
 	elementTypesOnly: boolean = false;
 
 	/**
@@ -46,7 +46,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	 * @attr
 	 * @default false
 	 */
-	@property({ attribute: false })
+	@property({ type: Boolean })
 	documentTypesOnly: boolean = false;
 
 	/**
