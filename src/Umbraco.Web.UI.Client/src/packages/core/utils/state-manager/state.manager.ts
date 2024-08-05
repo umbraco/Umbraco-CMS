@@ -22,7 +22,9 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 */
 	addState(state: StateType) {
 		if (!state.unique) throw new Error('State must have a unique property');
-		// TODO: check if unique is already in the array
+		if (this._states.getValue().find((x) => x.unique === state.unique)) {
+			throw new Error('State with unique already exists');
+		}
 		this._states.setValue([...this._states.getValue(), state]);
 	}
 
