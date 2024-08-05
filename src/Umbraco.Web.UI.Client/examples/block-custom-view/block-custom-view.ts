@@ -15,7 +15,7 @@ export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implemen
 		return html`
 			<div class="uui-text">
 				<h5 class="uui-text">My Custom View</h5>
-				<p>Headline: ${this.content.headline}</p>
+				<p>Headline: ${this.content?.headline}</p>
 			</div>
 		`;
 	}
