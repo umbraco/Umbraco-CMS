@@ -1,3 +1,4 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -6,12 +7,12 @@ export interface UmbState {
 	message: string;
 }
 
-export class UmbStateManager<StateType extends UmbState = UmbState> {
+export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbControllerBase {
 	protected _states = new UmbArrayState<StateType>([], (x) => x.unique);
 	public states = this._states.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		//super(host);
+		super(host);
 	}
 
 	/**
