@@ -112,7 +112,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 		this.setIsNew(true);
 		this.#data.setValue(data);
-		return { data };
 	}
 
 	getData() {
