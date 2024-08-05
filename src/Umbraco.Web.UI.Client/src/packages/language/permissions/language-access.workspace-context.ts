@@ -1,3 +1,4 @@
+import { UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT } from './language-access.workspace-context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
@@ -5,14 +6,14 @@ import type { UmbVariantOptionModel, UmbVariantModel } from '@umbraco-cms/backof
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
-export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<unknown> {
+export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguageAccessWorkspaceContext> {
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
 	#variantOptions?: UmbVariantOptionModel<UmbVariantModel>[];
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'UmbLanguageAccessWorkspaceContext');
+		super(host, UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT);
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;

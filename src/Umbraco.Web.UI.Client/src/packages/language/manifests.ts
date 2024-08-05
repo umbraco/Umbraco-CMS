@@ -21,7 +21,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'workspaceContext',
 		name: 'Document Language Access Workspace Context',
 		alias: 'Umb.WorkspaceContext.DocumentLanguageAccess',
-		api: () => import('./language-access.workspace-context.js'),
+		api: () => import('./permissions/language-access.workspace-context.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
