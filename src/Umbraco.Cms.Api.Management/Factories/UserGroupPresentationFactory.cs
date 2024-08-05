@@ -1,11 +1,12 @@
-﻿using Umbraco.Cms.Api.Management.Mapping;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Api.Management.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
-using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
@@ -20,17 +21,30 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ILanguageService _languageService;
     private readonly IPermissionPresentationFactory _permissionPresentationFactory;
+    private readonly ILogger<UserGroupPresentationFactory> _logger;
 
+    [Obsolete("Use the constructor with ILogger<UserGroupPresentationFactory> instead.")]
     public UserGroupPresentationFactory(
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
         ILanguageService languageService,
         IPermissionPresentationFactory permissionPresentationFactory)
+    : this(entityService, shortStringHelper, languageService, permissionPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<ILogger<UserGroupPresentationFactory>>())
+    {
+    }
+
+    public UserGroupPresentationFactory(
+        IEntityService entityService,
+        IShortStringHelper shortStringHelper,
+        ILanguageService languageService,
+        IPermissionPresentationFactory permissionPresentationFactory,
+        ILogger<UserGroupPresentationFactory> logger)
     {
         _entityService = entityService;
         _shortStringHelper = shortStringHelper;
         _languageService = languageService;
         _permissionPresentationFactory = permissionPresentationFactory;
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -42,6 +56,11 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         var mediaRootAccess = mediaStartNodeKey is null && userGroup.StartMediaId == Constants.System.Root;
 
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
+
+        if (languageIsoCodesMappingAttempt.Success is false)
+        {
+            _logger.LogDebug("Unknown language ID in User Group: {0}", userGroup.Name);
+        }
 
         return new UserGroupResponseModel
         {
@@ -70,6 +89,11 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
+
+        if (languageIsoCodesMappingAttempt.Success is false)
+        {
+            _logger.LogDebug("Unknown language ID in User Group: {0}", userGroup.Name);
+        }
 
         return new UserGroupResponseModel
         {
