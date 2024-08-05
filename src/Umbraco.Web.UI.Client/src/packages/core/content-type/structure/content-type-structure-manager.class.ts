@@ -42,10 +42,13 @@ export class UmbContentTypeStructureManager<
 	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
 		x.find((y) => y.unique === this.#ownerContentTypeUnique),
 	);
-
-	private readonly _contentTypeContainers = this.#contentTypes.asObservablePart((x) =>
-		x.flatMap((x) => x.containers ?? []),
+	readonly ownerContentTypeCompositions = this.#contentTypes.asObservablePart(
+		(x) => x.find((y) => y.unique === this.#ownerContentTypeUnique)?.compositions,
 	);
+
+	readonly #contentTypeContainers = this.#contentTypes.asObservablePart(() => {
+		return this.#contentTypes.getValue().flatMap((x) => x.containers ?? []);
+	});
 	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
 	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));
 
@@ -61,12 +64,12 @@ export class UmbContentTypeStructureManager<
 		super(host);
 		this.#repository = typeRepository;
 
-		this.observe(this.contentTypes, (contentTypes) => {
-			contentTypes.forEach((contentType) => {
-				this._loadContentTypeCompositions(contentType);
-			});
+		// Observe owner content type compositions, as we only allow one level of compositions at this moment. [NL]
+		// But, we could support more, we would just need to flatMap all compositions and make sure the entries are unique and then base the observation on that. [NL]
+		this.observe(this.ownerContentTypeCompositions, (ownerContentTypeCompositions) => {
+			this._loadContentTypeCompositions(ownerContentTypeCompositions);
 		});
-		this.observe(this._contentTypeContainers, (contentTypeContainers) => {
+		this.observe(this.#contentTypeContainers, (contentTypeContainers) => {
 			this.#containers.setValue(contentTypeContainers);
 		});
 	}
@@ -136,8 +139,24 @@ export class UmbContentTypeStructureManager<
 		this._observeContentType(data);
 	}
 
-	private async _loadContentTypeCompositions(contentType: T) {
-		contentType.compositions?.forEach((composition) => {
+	private async _loadContentTypeCompositions(ownerContentTypeCompositions: T['compositions'] | undefined) {
+		if (!ownerContentTypeCompositions) {
+			// Owner content type was undefined, so we can not load compositions. But at this point we neither offload existing compositions, this is most likely not a case that needs to be handled.
+			return;
+		}
+
+		const ownerUnique = this.getOwnerContentTypeUnique();
+		// Remove content types that does not exist as compositions anymore:
+		this.#contentTypes.getValue().forEach((x) => {
+			if (
+				x.unique !== ownerUnique &&
+				!ownerContentTypeCompositions.find((comp) => comp.contentType.unique === x.unique)
+			) {
+				this.#contentTypeObservers.find((y) => y.controllerAlias === 'observeContentType_' + x.unique)?.destroy();
+				this.#contentTypes.removeOne(x.unique);
+			}
+		});
+		ownerContentTypeCompositions.forEach((composition) => {
 			this._ensureType(composition.contentType.unique);
 		});
 	}
@@ -164,23 +183,19 @@ export class UmbContentTypeStructureManager<
 
 		// Notice we do not store the content type in the store here, cause it will happen shortly after when the observations gets its first initial callback. [NL]
 
-		// Load inherited and composed types:
-		//this._loadContentTypeCompositions(data);// Should not be necessary as this will be done when appended to the contentTypes state. [NL]
-
 		const ctrl = this.observe(
 			// Then lets start observation of the content type:
 			await this.#repository.byUnique(data.unique),
 			(docType) => {
 				if (docType) {
-					// TODO: Handle if there was changes made to the owner document type in this context. [NL]
-					/*
-					possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones). [NL]
-					 */
 					this.#contentTypes.appendOne(docType);
+				} else {
+					// Remove the content type from the store, if it does not exist anymore.
+					this.#contentTypes.removeOne(data.unique);
 				}
-				// TODO: Do we need to handle the undefined case? [NL]
 			},
 			'observeContentType_' + data.unique,
+			// Controller Alias is used to stop observation when no longer needed. [NL]
 		);
 
 		this.#contentTypeObservers.push(ctrl);

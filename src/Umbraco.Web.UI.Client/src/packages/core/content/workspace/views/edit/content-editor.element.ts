@@ -138,7 +138,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 								(tab) => {
 									const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 									return html`<uui-tab label=${tab.name ?? 'Unnamed'} .active=${path === this._activePath} href=${path}
-										>${tab.name}</uui-tab
+										>${this.localize.string(tab.name)}</uui-tab
 									>`;
 								},
 							)}

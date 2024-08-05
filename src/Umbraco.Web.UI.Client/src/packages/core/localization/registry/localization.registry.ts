@@ -1,8 +1,9 @@
-import type {
-	UmbLocalizationSetBase,
-	UmbLocalizationDictionary,
-	UmbLocalizationFlatDictionary,
-} from '@umbraco-cms/backoffice/localization-api';
+import {
+	type UmbLocalizationSetBase,
+	type UmbLocalizationDictionary,
+	type UmbLocalizationFlatDictionary,
+	UMB_DEFAULT_LOCALIZATION_CULTURE
+} from "@umbraco-cms/backoffice/localization-api";
 import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import type { ManifestLocalization, UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -21,7 +22,7 @@ function addOrUpdateDictionary(
 }
 
 export class UmbLocalizationRegistry {
-	#currentLanguage = new UmbStringState(document.documentElement.lang ?? 'en-us');
+	#currentLanguage = new UmbStringState(document.documentElement.lang !== '' ? document.documentElement.lang : UMB_DEFAULT_LOCALIZATION_CULTURE);
 	readonly currentLanguage = this.#currentLanguage.asObservable();
 
 	#loadedExtAliases: Array<string> = [];
