@@ -1,6 +1,5 @@
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -28,17 +27,20 @@ public class ContextualAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     {
         Permissions = permission.Yield();
         Context = context;
-        PermissionMatchingBehaviour = WIP.PermissionMatchingBehaviour.All;
+        PermissionMatchingBehaviour = PermissionMatchingBehaviour.All;
+        PermissionScopeMatchingBehaviour = PermissionScopeMatchingBehaviour.Any;
     }
 
     public ContextualAuthorizeAttribute(
         IEnumerable<string> permissions,
         string context,
-        PermissionMatchingBehaviour permissionMatchingBehaviour)
+        PermissionMatchingBehaviour permissionMatchingBehaviour,
+        PermissionScopeMatchingBehaviour permissionScopeMatchingBehaviour)
     {
         Permissions = permissions;
         Context = context;
         PermissionMatchingBehaviour = permissionMatchingBehaviour;
+        PermissionScopeMatchingBehaviour = permissionScopeMatchingBehaviour;
     }
 
     private IEnumerable<string> Permissions { get; }
@@ -47,13 +49,15 @@ public class ContextualAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
 
     private PermissionMatchingBehaviour PermissionMatchingBehaviour { get; }
 
+    private PermissionScopeMatchingBehaviour PermissionScopeMatchingBehaviour { get; }
+
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var authorizationService = context.HttpContext.RequestServices.GetRequiredService<IAuthorizationService>();
 
         AuthorizationResult authorizationResult = await authorizationService.AuthorizeResourceAsync(
             context.HttpContext.User,
-            ContextualPermissionResource.WithSetup(Permissions, Context, PermissionMatchingBehaviour),
+            ContextualPermissionResource.WithSetup(Permissions, Context, PermissionMatchingBehaviour, PermissionScopeMatchingBehaviour),
             ContextualPermissionHandler.ContextualPermissionsPolicyAlias);
 
         if (authorizationResult.Succeeded is false)
@@ -77,26 +81,38 @@ public class ContextualPermissionResource : IPermissionResource
     public static ContextualPermissionResource WithPermission(string permission, string context) =>
         WithAllPermissions(permission.Yield(), context);
 
+    public static ContextualPermissionResource WithContextWidePermission(string permission, string context) =>
+        WithAllContextWidePermissions(permission.Yield(), context);
+
+    public static ContextualPermissionResource WithAnyContextWidePermissions(IEnumerable<string> permissions, string context) =>
+        new(permissions, context, PermissionMatchingBehaviour.Any, PermissionScopeMatchingBehaviour.ContextWideOnly);
+
+    public static ContextualPermissionResource WithAllContextWidePermissions(IEnumerable<string> permissions, string context) =>
+        new(permissions, context, PermissionMatchingBehaviour.All, PermissionScopeMatchingBehaviour.ContextWideOnly);
+
     public static ContextualPermissionResource WithAnyPermissions(IEnumerable<string> permissions, string context) =>
-        new(permissions, context, PermissionMatchingBehaviour.Any);
+        new(permissions, context, PermissionMatchingBehaviour.Any, PermissionScopeMatchingBehaviour.Any);
 
     public static ContextualPermissionResource WithAllPermissions(IEnumerable<string> permissions, string context) =>
-        new(permissions, context, PermissionMatchingBehaviour.All);
+        new(permissions, context, PermissionMatchingBehaviour.All, PermissionScopeMatchingBehaviour.Any);
 
     public static ContextualPermissionResource WithSetup(
         IEnumerable<string> permissions,
         string context,
-        PermissionMatchingBehaviour permissionMatchingBehaviour) =>
-        new(permissions, context, permissionMatchingBehaviour);
+        PermissionMatchingBehaviour permissionMatchingBehaviour,
+        PermissionScopeMatchingBehaviour permissionScopeMatchingBehaviour) =>
+        new(permissions, context, permissionMatchingBehaviour, permissionScopeMatchingBehaviour);
 
     private ContextualPermissionResource(
         IEnumerable<string> permissions,
         string context,
-        PermissionMatchingBehaviour behaviour)
+        PermissionMatchingBehaviour permissionMatchingBehaviour,
+        PermissionScopeMatchingBehaviour permissionScopeMatchingBehaviour)
     {
         Permissions = permissions;
         Context = context;
-        PermissionMatchingBehaviour = behaviour;
+        PermissionMatchingBehaviour = permissionMatchingBehaviour;
+        PermissionScopeMatchingBehaviour = permissionScopeMatchingBehaviour;
     }
 
     public IEnumerable<string> Permissions { get; }
@@ -104,12 +120,27 @@ public class ContextualPermissionResource : IPermissionResource
     public string Context { get; }
 
     public PermissionMatchingBehaviour PermissionMatchingBehaviour { get; }
+
+    public PermissionScopeMatchingBehaviour PermissionScopeMatchingBehaviour { get; }
 }
 
 public enum PermissionMatchingBehaviour
 {
     Any,
-    All
+    All,
+}
+
+public enum PermissionScopeMatchingBehaviour
+{
+    /// <summary>
+    /// Both context wide and granular
+    /// </summary>
+    Any,
+
+    /// <summary>
+    /// Only Context wide
+    /// </summary>
+    ContextWideOnly,
 }
 
 /// <summary>
@@ -122,7 +153,7 @@ public class ContextualPermissionRequirement : IAuthorizationRequirement
 
 /// Authorizes a certain permission (read,write,browse,...) within a given context (umbraco, my-package,...)
 /// against the <see cref="IGranularPermission">granular permissions</see> defined on all <see cref="IUserGroup">user groups</see> the <see cref="IUser">user</see> is part off.
-/// Permission
+/// Permissions and Context are checked on a InvariantCultureIgnoreCase basis.
 public class ContextualPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ContextualPermissionRequirement,
     ContextualPermissionResource>
 {
@@ -148,7 +179,9 @@ public class ContextualPermissionHandler : MustSatisfyRequirementAuthorizationHa
         bool ContextualMatch(string permissionToCheck) =>
             user.Groups.SelectMany(g => g.GranularPermissions)
                 .Any(definedContextualPermission =>
-                    definedContextualPermission.Context.Equals(resource.Context, StringComparison.InvariantCultureIgnoreCase)
+                    (resource.PermissionScopeMatchingBehaviour == PermissionScopeMatchingBehaviour.Any
+                        || (resource.PermissionScopeMatchingBehaviour == PermissionScopeMatchingBehaviour.ContextWideOnly && definedContextualPermission.Key is null))
+                    && definedContextualPermission.Context.Equals(resource.Context, StringComparison.InvariantCultureIgnoreCase)
                     && definedContextualPermission.Permission.Equals(permissionToCheck, StringComparison.InvariantCultureIgnoreCase));
     }
 }
