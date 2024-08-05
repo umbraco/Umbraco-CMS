@@ -222,7 +222,7 @@
 		"@hey-api/openapi-ts": "^0.48.3",
 		"@mdx-js/react": "^3.0.1",
 		"@open-wc/testing": "^4.0.0",
-		"@playwright/test": "^1.45.2",
+		"@playwright/test": "^1.45.3",
 		"@rollup/plugin-commonjs": "^26.0.1",
 		"@rollup/plugin-json": "^6.1.0",
 		"@rollup/plugin-node-resolve": "^15.2.3",
