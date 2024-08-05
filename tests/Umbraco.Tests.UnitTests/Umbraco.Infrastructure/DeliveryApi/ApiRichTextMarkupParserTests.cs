@@ -81,7 +81,7 @@ public class ApiRichTextMarkupParserTests
     }
 
     [Test]
-    public void Can_Parse_Legacy_LocalImages()
+    public void Can_Parse_Inline_LocalImages()
     {
         var key1 = Guid.Parse("395bdc0e8f4d4ad4af7f3a3f6265651e");
         var data1 = new MockData()
