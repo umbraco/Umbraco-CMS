@@ -1,5 +1,5 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, state, property, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
 	UMB_MANIFEST_VIEWER_MODAL,
