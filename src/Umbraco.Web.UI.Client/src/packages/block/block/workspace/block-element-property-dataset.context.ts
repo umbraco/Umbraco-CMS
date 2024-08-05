@@ -6,9 +6,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase implements UmbPropertyDatasetContext {
 	#elementManager: UmbBlockElementManager;
+
+	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
+	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
 
 	// default data:
 
@@ -36,16 +40,33 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * Gets the value of a property.
+	 * @template ReturnType
+	 * @param {string} propertyAlias
+	 * @return {*}
+	 * @memberof UmbBlockElementPropertyDatasetContext
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return await this.#elementManager.propertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * Sets the value of a property.
+	 * @param {string} propertyAlias
+	 * @param {unknown} value
+	 * @return {*}
+	 * @memberof UmbBlockElementPropertyDatasetContext
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this.#elementManager.setPropertyValue(propertyAlias, value);
+	}
+
+	/**
+	 * Gets the read-only state of the current variant culture.
+	 * @return {*}  {boolean}
+	 * @memberof UmbBlockGridInlinePropertyDatasetContext
+	 */
+	getCurrentVariantCultureIsReadOnly(): boolean {
+		return this.#currentVariantCultureIsReadOnly.getValue();
 	}
 }
