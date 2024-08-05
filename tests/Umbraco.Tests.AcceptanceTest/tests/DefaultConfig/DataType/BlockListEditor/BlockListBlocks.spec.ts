@@ -32,7 +32,7 @@ test('can add a label to a block', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 });
 
 test('can update a label for a block', async ({umbracoApi, umbracoUi}) => {
@@ -42,7 +42,7 @@ test('can update a label for a block', async ({umbracoApi, umbracoUi}) => {
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, labelText);
-  expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -53,7 +53,7 @@ test('can update a label for a block', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, newLabelText)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, newLabelText)).toBeTruthy();
 });
 
 test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
@@ -62,6 +62,8 @@ test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, labelText);
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
+
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -71,7 +73,7 @@ test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, "")).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, "")).toBeTruthy();
 });
 
 test('can update overlay size for a block', async ({umbracoApi, umbracoUi}) => {
@@ -147,7 +149,7 @@ test('can add a settings model to a block', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
 });
 
 test('can remove a settings model from a block', async ({umbracoApi, umbracoUi}) => {
@@ -157,7 +159,7 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
   const secondElementName = 'SecondElementTest';
   const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(blockListEditorName, contentElementTypeId, settingsElementTypeId);
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -169,7 +171,7 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
 });
 
 test('can add a background color to a block', async ({umbracoApi, umbracoUi}) => {
@@ -405,7 +407,7 @@ test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.clickBlockHideContentEditorButton();
+  await umbracoUi.dataType.clickBlockListHideContentEditorButton();
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -415,7 +417,7 @@ test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
 });
 
-test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
+test('can disable hide content editor in a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -426,7 +428,7 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.clickBlockHideContentEditorButton();
+  await umbracoUi.dataType.clickBlockListHideContentEditorButton();
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
