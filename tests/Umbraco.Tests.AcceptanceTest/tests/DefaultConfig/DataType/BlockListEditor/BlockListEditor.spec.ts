@@ -135,7 +135,7 @@ test('can remove a block from a block list editor', async ({umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeFalsy();
 
   // Clean
-  await umbracoApi.documentType.ensureNameNotExists(elementTypeName)
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
 test('can add a min and max amount to a block list editor', async ({umbracoApi, umbracoUi}) => {
@@ -304,5 +304,3 @@ test('can remove a property editor width', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, "")).toBeTruthy();
 });
-
-// Image media picker tests

@@ -417,7 +417,7 @@ test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
 });
 
-test('can disable hide content editor in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
