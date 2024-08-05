@@ -1,3 +1,4 @@
+import { UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type {
 	ManifestWorkspaces,
@@ -29,6 +30,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
+			compositionRepositoryAlias: UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
