@@ -1,7 +1,8 @@
+import { UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/index.js';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
+	ManifestWorkspaceViews,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
@@ -19,7 +20,7 @@ const workspace: ManifestWorkspaces = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceViews> = [
 	{
 		type: 'workspaceView',
 		kind: 'contentTypeDesignEditor',
@@ -29,6 +30,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-member-dashed-line',
+			compositionRepositoryAlias: UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

@@ -6,11 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
-import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 
@@ -61,7 +57,17 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL)
 			.addAdditionalPath('block-grid-area-type')
 			.onSetup(() => {
-				return { data: { entityType: 'block-grid-area-type', preset: {} }, modal: { size: 'large' } };
+				if (!this._areaGridColumns) return false;
+				const halfGridColumns = this._areaGridColumns * 0.5;
+				const columnSpan = halfGridColumns === Math.round(halfGridColumns) ? halfGridColumns : this._areaGridColumns;
+
+				return {
+					data: {
+						entityType: 'block-grid-area-type',
+						preset: { columnSpan, alias: this.#generateUniqueAreaAlias('area') },
+					},
+					modal: { size: 'large' },
+				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._workspacePath = routeBuilder({});
@@ -104,29 +110,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		return alias;
 	}
 
-	#addNewArea() {
-		if (!this._areaGridColumns) return;
-		const halfGridColumns = this._areaGridColumns * 0.5;
-		const columnSpan = halfGridColumns === Math.round(halfGridColumns) ? halfGridColumns : this._areaGridColumns;
-
-		this._value = [
-			...this._value,
-			{
-				key: UmbId.new(),
-				alias: this.#generateUniqueAreaAlias('area'),
-				columnSpan: columnSpan,
-				rowSpan: 1,
-				minAllowed: 0,
-				maxAllowed: undefined,
-				specifiedAllowance: [],
-			},
-		];
-		this.requestUpdate('_value');
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-
-		//TODO: open area edit workspace
-	}
-
 	override render() {
 		return this._areaGridColumns
 			? html`${this._styleElement}
@@ -144,7 +127,11 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>
-					<uui-button id="add-button" look="placeholder" label=${'Add area'} @click=${this.#addNewArea}></uui-button>`
+					<uui-button
+						id="add-button"
+						look="placeholder"
+						label=${'Add area'}
+						href=${this._workspacePath + 'create'}></uui-button>`
 			: '';
 	}
 }

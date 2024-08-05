@@ -215,6 +215,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return html`
 			<uui-input
 				id="name-input"
+				label=${this.localize.term('placeholders_entername')}
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				${umbFocus()}
