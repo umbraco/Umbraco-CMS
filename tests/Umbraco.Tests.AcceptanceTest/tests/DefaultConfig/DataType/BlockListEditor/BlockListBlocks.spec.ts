@@ -64,7 +64,6 @@ test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, labelText);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 
-
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
@@ -306,7 +305,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
 
 test('can add a custom stylesheet to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const stylesheetName = 'TestStylesheet.css'
+  const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
@@ -323,7 +322,7 @@ test('can add a custom stylesheet to a block', async ({umbracoApi, umbracoUi}) =
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath)
+  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
 
@@ -333,7 +332,7 @@ test('can add a custom stylesheet to a block', async ({umbracoApi, umbracoUi}) =
 
 test('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const stylesheetName = 'TestStylesheet.css'
+  const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
   const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
   const secondStylesheetName = 'SecondStylesheet.css';
@@ -371,7 +370,7 @@ test('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi
 
 test('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const stylesheetName = 'TestStylesheet.css'
+  const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
   const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
