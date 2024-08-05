@@ -189,7 +189,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 				return isReadOnly;
 			})
-			.map((variant) => variant.culture);
+			.map((variant) => variant.culture)
+			.filter((item) => item !== null) as string[];
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
@@ -229,7 +230,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 									slot="append"
 									popovertarget="variant-selector-popover"
 									title=${ifDefined(this._activeVariant?.language.name)}>
-									${this._activeVariant?.language.name} ${this.#renderReadOnlyTag(this._activeVariant.culture)}
+									${this._activeVariant?.language.name} ${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
 								${this._activeVariants.length > 1
@@ -301,7 +302,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return this._readOnlyCultures.includes(culture);
 	}
 
-	#renderReadOnlyTag(culture: string | null) {
+	#renderReadOnlyTag(culture?: string | null) {
+		if (!culture) return nothing;
 		return this.#isReadOnly(culture) ? html`<uui-tag look="secondary">Read-only</uui-tag>` : nothing;
 	}
 
