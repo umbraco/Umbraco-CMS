@@ -22,14 +22,14 @@ const getVariantStateOrderValue = (variant?: UmbDocumentVariantOptionModel['vari
 
 export const sortVariants = (a: VariantType, b: VariantType) => {
 	const compareDefault = (a: VariantType, b: VariantType) =>
-		(a.language && a.language.isDefault ? -1 : 1) - (b.language && b.language.isDefault ? -1 : 1);
+		(a.language?.isDefault ? -1 : 1) - (b.language?.isDefault ? -1 : 1);
 
 	// Make sure mandatory variants goes on top, unless they are published, cause then they already goes to the top and then we want to mix them with other published variants.
 	const compareMandatory = (a: VariantType, b: VariantType) =>
 		a.variant?.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES ||
 		a.variant?.state === DocumentVariantStateModel.PUBLISHED
 			? 0
-			: (a.language && a.language.isMandatory ? -1 : 1) - (b.language && b.language.isMandatory ? -1 : 1);
+			: (a.language?.isMandatory ? -1 : 1) - (b.language?.isMandatory ? -1 : 1);
 	const compareState = (a: VariantType, b: VariantType) =>
 		getVariantStateOrderValue(a.variant) - getVariantStateOrderValue(b.variant);
 
