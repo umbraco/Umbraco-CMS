@@ -18,3 +18,5 @@ export class UmbCultureRepository extends UmbControllerBase implements UmbApi {
 
 	override destroy() {}
 }
+
+export { UmbCultureRepository as api };
