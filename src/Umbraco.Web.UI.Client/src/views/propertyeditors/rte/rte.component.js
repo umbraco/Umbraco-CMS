@@ -341,10 +341,14 @@
       // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
       function onServerValueChanged(newVal, oldVal) {
 
+
           ensurePropertyValue(newVal);
 
+          // updating the modelObject with the new value cause a angular compile issue.
+          // But I'm not sure it's needed, as this does not trigger the RTE
           if(modelObject) {
             modelObject.update(vm.model.value.blocks, $scope);
+            vm.tinyMceEditor.fire('updateBlocks');
           }
           onLoaded();
       }

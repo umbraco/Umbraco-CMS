@@ -18,7 +18,8 @@
       }
 
       function onInit() {
-        $element[0]._isInitializedUmbBlock = true;
+
+        // We might call onInit multiple times(via the update method), so parsing the latest values is needed no matter if it has been initialized before.
         $scope.block = $element[0].$block;
         $scope.api = $element[0].$api;
         $scope.index = $element[0].$index;
@@ -26,6 +27,13 @@
         $scope.segment = $element[0].$segment || null;
         $scope.parentForm = $element[0].$parentForm;
         $scope.valFormManager = $element[0].$valFormManager;
+
+        if($element[0]._isInitializedUmbBlock === true) {
+          return;
+        }
+        $element[0]._isInitializedUmbBlock = true;
+        $element[0].update = onInit;
+
 
         const stylesheet = $scope.block.config.stylesheet;
 
