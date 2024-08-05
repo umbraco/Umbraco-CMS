@@ -32,7 +32,8 @@ export const sortVariants = (a: VariantType, b: VariantType) => {
 			: (a.language && a.language.isMandatory ? -1 : 1) - (b.language && b.language.isMandatory ? -1 : 1);
 	const compareState = (a: VariantType, b: VariantType) =>
 		getVariantStateOrderValue(a.variant) - getVariantStateOrderValue(b.variant);
-	const compareName = (a: VariantType, b: VariantType) => a.variant?.name.localeCompare(b.variant?.name || '');
+
+	const compareName = (a: VariantType, b: VariantType) => a.variant?.name.localeCompare(b.variant?.name || '') || 99;
 
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
 };
