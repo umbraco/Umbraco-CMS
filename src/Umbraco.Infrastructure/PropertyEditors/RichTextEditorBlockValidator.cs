@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -14,10 +15,10 @@ internal class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBl
     public RichTextEditorBlockValidator(
         IPropertyValidationService propertyValidationService,
         BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> blockEditorValues,
-        IContentTypeService contentTypeService,
+        IBlockEditorElementTypeCache elementTypeCache,
         IJsonSerializer jsonSerializer,
         ILogger logger)
-        : base(propertyValidationService, contentTypeService)
+        : base(propertyValidationService, elementTypeCache)
     {
         _blockEditorValues = blockEditorValues;
         _jsonSerializer = jsonSerializer;
