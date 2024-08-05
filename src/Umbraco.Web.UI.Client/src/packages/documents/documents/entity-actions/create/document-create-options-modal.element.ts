@@ -119,7 +119,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_create')}>
 				${when(
-					this._availableBlueprints.length === 0 && this.#documentTypeUnique,
+					this._availableBlueprints.length && this.#documentTypeUnique,
 					() => this.#renderBlueprints(),
 					() => this.#renderDocumentTypes(),
 				)}

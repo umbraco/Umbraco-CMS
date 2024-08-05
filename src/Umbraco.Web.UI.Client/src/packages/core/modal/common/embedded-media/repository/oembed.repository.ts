@@ -18,3 +18,5 @@ export class UmbOEmbedRepository extends UmbControllerBase implements UmbApi {
 		return { error };
 	}
 }
+
+export { UmbOEmbedRepository as api };

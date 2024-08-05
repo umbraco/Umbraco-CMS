@@ -12,7 +12,7 @@ import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validati
  */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
-	// TODO: Make this element generic, so its not bound to DATA-TYPEs. This will require moving some functionality of Data-Type-Context to this. and this might need to self provide a variant Context for its inner property editor UIs.
+	// TODO: Make this element generic, so its not bound to DATA-TYPEs. This will require moving some functionality of Data-Type-Context to this. and this might need to self provide a variant Context for its inner property editor UIs. [NL]
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -53,7 +53,9 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 							property-editor-ui-alias=${property.propertyEditorUiAlias}
 							.config=${property.config}></umb-property>`,
 				)
-			: html`<div>No configuration</div>`;
+			: html`<umb-localize key="editdatatype_noConfiguration"
+					>There is no configuration for this property editor.</umb-localize
+				>`;
 	}
 
 	static override styles = [UmbTextStyles];
