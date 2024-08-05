@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockListEditorName);
 });
 
-test('can add a label to a block', async ({umbracoApi, umbracoUi}) => {
+test('can add a label to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const labelText = 'ThisIsALabel';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -131,7 +131,7 @@ test.skip('can remove a content model from a block', async ({page, umbracoApi, u
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
 });
 
-test('can add a settings model to a block', async ({umbracoApi, umbracoUi}) => {
+test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -193,7 +193,7 @@ test('can add a background color to a block', async ({umbracoApi, umbracoUi}) =>
   expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
 });
 
-test('can update a background color for a block', async ({umbracoApi, umbracoUi}) => {
+test('can update a background color for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = 'red';
   const newBackgroundColor = 'blue';
@@ -238,7 +238,7 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
   expect(blockData.values[0].value[0].backgroundColor).toEqual("");
 });
 
-test('can add a icon color to a block', async ({umbracoApi, umbracoUi}) => {
+test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = 'red';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -303,7 +303,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(blockData.values[0].value[0].iconColor).toEqual("");
 });
 
-test('can add a custom stylesheet to a block', async ({umbracoApi, umbracoUi}) => {
+test('can add a custom stylesheet to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -397,7 +397,7 @@ test('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoU
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
-test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
+test('can enable hide content editor in a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);

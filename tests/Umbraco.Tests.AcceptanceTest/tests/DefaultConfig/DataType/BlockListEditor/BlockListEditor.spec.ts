@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockListEditorName);
 });
 
-test('can create a block list editor', async ({umbracoApi, umbracoUi}) => {
+test('can create a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const blockListLocatorName = 'Block List';
   const blockListEditorAlias = 'Umbraco.BlockList';
@@ -39,7 +39,7 @@ test('can create a block list editor', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.editorUiAlias).toBe(blockListEditorUiAlias);
 });
 
-test('can rename a block list editor', async ({umbracoApi, umbracoUi}) => {
+test('can rename a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongName = 'BlockGridEditorTest';
   await umbracoApi.dataType.createEmptyBlockListDataType(wrongName);
@@ -55,7 +55,7 @@ test('can rename a block list editor', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesNameExist(wrongName)).toBeFalsy();
 });
 
-test('can delete a block list editor', async ({umbracoApi, umbracoUi}) => {
+test('can delete a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const blockListId = await umbracoApi.dataType.createEmptyBlockListDataType(blockListEditorName);
 
@@ -71,7 +71,7 @@ test('can delete a block list editor', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isTreeItemVisible(blockListEditorName, false);
 });
 
-test('can add a block to a block list editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a block to a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, 'testGroup', dataTypeName, textStringData.id);
@@ -118,7 +118,7 @@ test('can add multiple blocks to a block list editor', async ({umbracoApi, umbra
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-test('can remove a block from a block list editor', async ({umbracoApi, umbracoUi}) => {
+test('can remove a block from a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -138,7 +138,7 @@ test('can remove a block from a block list editor', async ({umbracoApi, umbracoU
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can add a min and max amount to a block list editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a min and max amount to a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createEmptyBlockListDataType(blockListEditorName);
 
@@ -173,7 +173,7 @@ test('max can not be less than min', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values[0].value.max).toBe(2);
 });
 
-test('can enable single block mode', async ({umbracoApi, umbracoUi}) => {
+test('can enable single block mode', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockListDataTypeWithSingleBlockMode(blockListEditorName, false);
 
@@ -201,7 +201,7 @@ test('can disable single block mode', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.isSingleBlockModeEnabledForBlockList(blockListEditorName, false)).toBeTruthy();
 });
 
-test('can enable live editing mode', async ({umbracoApi, umbracoUi}) => {
+test('can enable live editing mode', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockListDataTypeWithLiveEditingMode(blockListEditorName, false);
 
@@ -229,7 +229,7 @@ test('can disable live editing mode', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockListEditorName, false)).toBeTruthy();
 });
 
-test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
+test('can enable inline editing mode', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockListDataTypeWithInlineEditingMode(blockListEditorName, false);
 
@@ -257,7 +257,7 @@ test('can disable inline editing mode', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.isInlineEditingModeEnabledForBlockList(blockListEditorName, false)).toBeTruthy();
 });
 
-test('can add a property editor width', async ({umbracoApi, umbracoUi}) => {
+test('can add a property editor width', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyWidth = '50%';
   await umbracoApi.dataType.createEmptyBlockListDataType(blockListEditorName);
