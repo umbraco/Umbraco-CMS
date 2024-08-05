@@ -12,6 +12,7 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
 	#languageCollectionRepository: UmbLanguageCollectionRepository;
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	moreThanOneLanguage = this.#languages.asObservablePart((x) => x.length > 1);
 
 	#appLanguage = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	appLanguage = this.#appLanguage.asObservable();
