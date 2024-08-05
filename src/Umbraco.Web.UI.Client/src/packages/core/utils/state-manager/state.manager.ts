@@ -21,6 +21,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	addState(state: StateType) {
+		if (!state.unique) throw new Error('State must have a unique property');
 		// TODO: check if unique is already in the array
 		this._states.setValue([...this._states.getValue(), state]);
 	}
@@ -31,7 +32,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	 * @memberof UmbStateManager
 	 */
 	addStates(states: StateType[]) {
-		this._states.setValue([...this._states.getValue(), ...states]);
+		states.forEach((state) => this.addState(state));
 	}
 
 	/**
