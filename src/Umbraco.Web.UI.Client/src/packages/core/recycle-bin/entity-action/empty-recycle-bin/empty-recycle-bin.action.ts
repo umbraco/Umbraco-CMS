@@ -12,7 +12,7 @@ import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/e
  * Entity action for emptying the recycle bin.
  * @export
  * @class UmbEmptyRecycleBinEntityAction
- * @extends {UmbEntityActionBase<MetaEntityActionEmptyRecycleBinKind>}
+ * @augments {UmbEntityActionBase<MetaEntityActionEmptyRecycleBinKind>}
  */
 export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEntityActionEmptyRecycleBinKind> {
 	/**

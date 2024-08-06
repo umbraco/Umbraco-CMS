@@ -22,7 +22,9 @@ export class UmbUserSetGroupsServerDataSource {
 	/**
 	 * Set groups for users
 	 * @param {Array<string>} id
-	 * @return {*}
+	 * @param userIds
+	 * @param userGroupIds
+	 * @returns {*}
 	 * @memberof UmbUserSetGroupsServerDataSource
 	 */
 	async setGroups(userIds: string[], userGroupIds: string[]) {

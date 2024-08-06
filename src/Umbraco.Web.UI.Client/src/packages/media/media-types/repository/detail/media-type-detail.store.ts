@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * @export
  * @class UmbMediaTypeStore
- * @extends {UmbDetailStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Media Types
  */
 export class UmbMediaTypeDetailStore extends UmbDetailStoreBase<UmbMediaTypeDetailModel> {

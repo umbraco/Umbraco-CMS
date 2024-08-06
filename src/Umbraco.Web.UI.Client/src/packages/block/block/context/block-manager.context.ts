@@ -12,6 +12,11 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
+/**
+ *
+ * @param entityType
+ * @param guid
+ */
 function buildUdi(entityType: string, guid: string) {
 	return `umb://${entityType}/${guid.replace(/-/g, '')}`;
 }

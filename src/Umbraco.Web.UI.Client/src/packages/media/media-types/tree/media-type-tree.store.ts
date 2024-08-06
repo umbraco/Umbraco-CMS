@@ -5,7 +5,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 /**
  * @export
  * @class UmbMediaTypeTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Tree Data Store for Media Types
  */
 export class UmbMediaTypeTreeStore extends UmbUniqueTreeStore {

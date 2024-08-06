@@ -1,5 +1,9 @@
 import type { CssLoaderExports, CssLoaderProperty } from '../types/utils.js';
 
+/**
+ *
+ * @param property
+ */
 export async function loadManifestPlainCss<CssType extends string>(
 	property: CssLoaderProperty<CssType>,
 ): Promise<CssType | undefined> {

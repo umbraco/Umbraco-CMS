@@ -21,6 +21,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 /**
  * Handles the resize event
+ * @param e
  */
 // TODO: This does somehow not belong as a utility method as it is very specific to this implementation. [NL]
 async function onResize(
@@ -114,6 +115,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * need the editor instance as a ctor argument. If we load them in the editor
 	 * setup method, the asynchronous nature means the editor is loaded before
 	 * the plugins are ready and so are not associated with the editor.
+	 * @param manifests
 	 */
 	async #loadPlugins(manifests: Array<ManifestTinyMcePlugin>) {
 		const promises = [];
@@ -265,7 +267,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	/**
 	 * Gets the language to use for TinyMCE
-	 **/
+	 */
 	#getLanguage() {
 		const localeId = this.localize.lang();
 		//try matching the language using full locale format

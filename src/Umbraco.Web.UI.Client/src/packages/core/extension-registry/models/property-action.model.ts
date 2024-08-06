@@ -23,7 +23,6 @@ export interface ManifestPropertyActionDefaultKind<
 export interface MetaPropertyActionDefaultKind extends MetaPropertyAction {
 	/**
 	 * An icon to represent the action to be performed
-	 *
 	 * @examples [
 	 *   "icon-box",
 	 *   "icon-grid"
@@ -33,7 +32,6 @@ export interface MetaPropertyActionDefaultKind extends MetaPropertyAction {
 
 	/**
 	 * The friendly name of the action to perform
-	 *
 	 * @examples [
 	 *   "Create",
 	 *   "Create Content Template"

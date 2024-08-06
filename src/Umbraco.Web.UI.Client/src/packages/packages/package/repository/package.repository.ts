@@ -96,6 +96,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Request the root items from the Data Source
+	 * @param store
 	 * @memberOf UmbPackageRepository
 	 */
 	async requestRootItems(store: UmbPackageStore) {
@@ -145,6 +146,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Request the package migrations from the Data Source
+	 * @param store
 	 * @memberOf UmbPackageRepository
 	 */
 	async requestPackageMigrations(store: UmbPackageStore) {

@@ -6,7 +6,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbUserItemStore
- * @extends {UmbItemStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for user items
  */
 

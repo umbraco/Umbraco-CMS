@@ -6,7 +6,7 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbPartialViewDetailStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Partial View detail
  */
 export class UmbPartialViewDetailStore extends UmbDetailStoreBase<UmbPartialViewDetailModel> {

@@ -7,6 +7,10 @@ import type {
 	ElementLoaderExports,
 } from '../types/utils.js';
 
+/**
+ *
+ * @param property
+ */
 export async function loadManifestApi<ApiType extends UmbApi>(
 	property: ApiLoaderProperty<ApiType> | ElementAndApiLoaderProperty<any, ApiType>,
 ): Promise<ClassConstructor<ApiType> | undefined> {

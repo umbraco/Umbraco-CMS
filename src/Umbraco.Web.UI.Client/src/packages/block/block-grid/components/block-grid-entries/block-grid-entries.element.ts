@@ -20,6 +20,7 @@ import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
+ * @param args
  */
 function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>) {
 	// If this has areas, we do not want to move, unless we are at the edge

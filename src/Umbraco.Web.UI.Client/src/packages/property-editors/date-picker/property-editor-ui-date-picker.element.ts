@@ -22,7 +22,6 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
  * data editor with one exception: the "T" character in "datetime-local". To be backwards compatible, we are
  * replacing the T character with a whitespace, which also happens to work just fine
  * with the "datetime-local" type.
- *
  * @element umb-property-editor-ui-date-picker
  */
 @customElement('umb-property-editor-ui-date-picker')
@@ -97,6 +96,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 	/**
 	 * Formats the value depending on the input type.
+	 * @param value
 	 */
 	#formatValue(value: string) {
 		this._inputValue = undefined;

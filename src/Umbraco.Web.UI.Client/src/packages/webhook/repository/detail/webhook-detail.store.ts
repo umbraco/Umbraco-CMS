@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * @export
  * @class UmbWebhookDetailStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Webhook Details
  */
 export class UmbWebhookDetailStore extends UmbDetailStoreBase<UmbWebhookDetailModel> {

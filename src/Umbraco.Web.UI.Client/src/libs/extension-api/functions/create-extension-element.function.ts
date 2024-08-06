@@ -1,6 +1,11 @@
 import type { ManifestElement, ManifestElementAndApi } from '../types/base.types.js';
 import { loadManifestElement } from './load-manifest-element.function.js';
 
+/**
+ *
+ * @param manifest
+ * @param fallbackElement
+ */
 export async function createExtensionElement<ElementType extends HTMLElement>(
 	manifest: ManifestElement<ElementType> | ManifestElementAndApi<any>,
 	fallbackElement?: string,

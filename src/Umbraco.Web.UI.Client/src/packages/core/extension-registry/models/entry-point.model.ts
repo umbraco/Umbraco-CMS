@@ -5,7 +5,6 @@ import type { ManifestPlainJs, UmbEntryPointModule } from '@umbraco-cms/backoffi
  *
  * This type of extension gives full control and will simply load the specified JS file.
  * You could have custom logic to decide which extensions to load/register by using extensionRegistry.
- *
  * @deprecated Use `ManifestBackofficeEntryPoint` instead.
  */
 export interface ManifestEntryPoint extends ManifestPlainJs<UmbEntryPointModule> {

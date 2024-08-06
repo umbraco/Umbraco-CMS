@@ -5,7 +5,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 /**
  * @export
  * @class UmbDocumentRecycleBinTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Tree Data Store for Document Recycle Bin Tree Items
  */
 export class UmbDocumentRecycleBinTreeStore extends UmbUniqueTreeStore {
