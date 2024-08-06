@@ -571,6 +571,7 @@ export class UmbDocumentWorkspaceContext
 
 	async #performSaveOrCreate(saveData: UmbDocumentDetailModel): Promise<void> {
 		if (this.getIsNew()) {
+			// Create:
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
 
@@ -591,6 +592,7 @@ export class UmbDocumentWorkspaceContext
 			});
 			eventContext.dispatchEvent(event);
 		} else {
+			// Save:
 			const { data, error } = await this.repository.save(saveData);
 			if (!data || error) {
 				console.error('Error saving document', error);
