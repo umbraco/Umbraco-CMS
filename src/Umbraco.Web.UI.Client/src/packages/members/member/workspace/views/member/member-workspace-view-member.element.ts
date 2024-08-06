@@ -72,7 +72,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	#renderPasswordInput() {
 		if (this._isNew) {
 			return html`
-				<umb-property-layout label="Password">
+				<umb-property-layout label=${this.localize.term('user_password')} mandatory>
 					<uui-input
 						slot="editor"
 						name="newPassword"
@@ -81,7 +81,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						@input=${() => this.#onPasswordUpdate()}></uui-input>
 				</umb-property-layout>
 
-				<umb-property-layout label="Confirm password">
+				<umb-property-layout label="Confirm password" mandatory>
 					<uui-input
 						slot="editor"
 						name="confirmPassword"
@@ -99,7 +99,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					this._showChangePasswordForm,
 					() => html`
 						<div slot="editor">
-							<umb-property-layout label=${this.localize.term('user_newPassword')}>
+							<umb-property-layout label=${this.localize.term('user_newPassword')} mandatory>
 								<uui-input
 									slot="editor"
 									name="newPassword"
@@ -107,7 +107,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 									type="password"
 									@input=${() => this.#onPasswordUpdate()}></uui-input>
 							</umb-property-layout>
-							<umb-property-layout label=${this.localize.term('user_confirmNewPassword')}>
+							<umb-property-layout label=${this.localize.term('user_confirmNewPassword')} mandatory>
 								<uui-input
 									slot="editor"
 									name="confirmPassword"
@@ -137,7 +137,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		if (!this._workspaceContext) return;
 		return html` <div id="left-column">
 			<uui-box>
-				<umb-property-layout label="${this.localize.term('general_username')}">
+				<umb-property-layout label=${this.localize.term('general_username')} mandatory>
 					<uui-input
 						slot="editor"
 						name="login"
@@ -146,7 +146,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
 				</umb-property-layout>
 
-				<umb-property-layout label="${this.localize.term('general_email')}">
+				<umb-property-layout label=${this.localize.term('general_email')} mandatory>
 					<uui-input
 						slot="editor"
 						name="email"
