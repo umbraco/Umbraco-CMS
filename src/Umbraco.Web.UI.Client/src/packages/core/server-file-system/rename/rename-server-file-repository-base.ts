@@ -25,7 +25,7 @@ export abstract class UmbRenameServerFileRepositoryBase<
 	 * Rename
 	 * @param {string} unique
 	 * @param {string} name
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRenameServerFileRepositoryBase
 	 */
 	async rename(unique: string, name: string) {

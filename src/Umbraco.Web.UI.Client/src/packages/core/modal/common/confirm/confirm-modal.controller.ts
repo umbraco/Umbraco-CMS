@@ -26,6 +26,11 @@ export class UmbConfirmModalController extends UmbControllerBase {
 	}
 }
 
+/**
+ *
+ * @param host
+ * @param args
+ */
 export function umbConfirmModal(host: UmbControllerHost, args: UmbConfirmModalArgs) {
 	return new UmbConfirmModalController(host).open(args);
 }

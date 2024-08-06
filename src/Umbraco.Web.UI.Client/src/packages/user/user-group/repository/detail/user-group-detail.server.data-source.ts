@@ -31,7 +31,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Creates a new User Group scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateUserGroupRequestModel }
+	 * @returns { CreateUserGroupRequestModel }
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async createScaffold() {
@@ -60,7 +60,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Fetches a User Group with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async read(unique: string) {
@@ -98,7 +98,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Inserts a new User Group on the server
 	 * @param {UmbUserGroupDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async create(model: UmbUserGroupDetailModel) {
@@ -137,7 +137,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Updates a UserGroup on the server
 	 * @param {UmbUserGroupDetailModel} UserGroup
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async update(model: UmbUserGroupDetailModel) {
@@ -177,7 +177,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Deletes a User Group on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async delete(unique: string) {

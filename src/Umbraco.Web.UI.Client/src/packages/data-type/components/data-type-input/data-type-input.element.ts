@@ -30,7 +30,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -53,7 +53,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {

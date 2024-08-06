@@ -31,8 +31,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	/**
 	 * @description Allowed file extensions. Allow all if empty.
-	 * @type {Array<String>}
-	 * @default undefined
+	 * @type {Array<string>}
+	 * @default
 	 */
 	@property({ type: Array })
 	set allowedFileExtensions(value: Array<string>) {
@@ -124,6 +124,9 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			${this.#renderButtonRemove()}
 		`;
 
+		/**
+		 *
+		 */
 		function getElementTemplate() {
 			switch (extension) {
 				case 'audio':

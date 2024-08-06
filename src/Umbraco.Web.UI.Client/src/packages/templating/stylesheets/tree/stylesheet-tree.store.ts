@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * @export
  * @class UmbStylesheetTreeStore
- * @extends {UmbUniqueTreeStore}
+ * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Stylesheets
  */
 export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {

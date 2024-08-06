@@ -24,7 +24,7 @@ export class UmbServerConnection {
 
 	/**
 	 * Gets the URL of the server.
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbServerConnection
 	 */
 	getUrl() {
@@ -33,7 +33,7 @@ export class UmbServerConnection {
 
 	/**
 	 * Gets the status of the server.
-	 * @return {string}
+	 * @returns {string}
 	 * @memberof UmbServerConnection
 	 */
 	getStatus() {
@@ -43,7 +43,7 @@ export class UmbServerConnection {
 
 	/**
 	 * Checks if the server is connected.
-	 * @return {boolean}
+	 * @returns {boolean}
 	 * @memberof UmbServerConnection
 	 */
 	getIsConnected() {

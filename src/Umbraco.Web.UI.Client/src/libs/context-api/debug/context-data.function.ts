@@ -1,7 +1,6 @@
 /* eslint-disable no-case-declarations */
 /**
  * Change the collection of Contexts into a simplified array of data
- *
  * @param contexts This is a map of the collected contexts from umb-debug
  * @returns An array of simplified context data
  */
@@ -16,7 +15,6 @@ export function contextData(contexts: Map<any, any>): Array<UmbDebugContextData>
 
 /**
  * Used to find the methods and properties of a context
- *
  * @param contextInstance The instance of the context
  * @returns A simplied object contain the properties and methods of the context
  */
@@ -82,8 +80,8 @@ function contextItemData(contextInstance: any): UmbDebugContextItemData {
 
 /**
  * Gets a list of methods from a class
- *
  * @param class The class to get the methods from
+ * @param klass
  * @returns An array of method names as strings
  */
 function getClassMethodNames(klass: any) {
@@ -104,7 +102,6 @@ function getClassMethodNames(klass: any) {
 export interface UmbDebugContextData {
 	/**
 	 * The alias of the context
-	 *
 	 * @type {string}
 	 * @memberof UmbDebugContextData
 	 */
@@ -112,7 +109,6 @@ export interface UmbDebugContextData {
 
 	/**
 	 * The type of the context such as object or string
-	 *
 	 * @type {("string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function")}
 	 * @memberof UmbDebugContextData
 	 */
@@ -120,7 +116,6 @@ export interface UmbDebugContextData {
 
 	/**
 	 * Data about the context that includes method and property names
-	 *
 	 * @type {UmbDebugContextItemData}
 	 * @memberof UmbDebugContextData
 	 */
@@ -137,7 +132,6 @@ export interface UmbDebugContextItemData {
 export interface UmbDebugContextItemPropertyData {
 	/**
 	 * The name of the property
-	 *
 	 * @type {string}
 	 * @memberof UmbDebugContextItemPropertyData
 	 */
@@ -145,7 +139,6 @@ export interface UmbDebugContextItemPropertyData {
 
 	/**
 	 * The type of the property's value such as string or number
-	 *
 	 * @type {("string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function")}
 	 * @memberof UmbDebugContextItemPropertyData
 	 */
@@ -153,7 +146,6 @@ export interface UmbDebugContextItemPropertyData {
 
 	/**
 	 * Simple types such as string or number can have their value displayed stored inside the property
-	 *
 	 * @type {("string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function")}
 	 * @memberof UmbDebugContextItemPropertyData
 	 */

@@ -32,7 +32,6 @@ export interface ManifestWorkspaceActionMenuItemDefaultKind<
 export interface MetaWorkspaceActionMenuItemDefaultKind extends MetaWorkspaceActionMenuItem {
 	/**
 	 * An icon to represent the action to be performed
-	 *
 	 * @examples [
 	 *   "icon-box",
 	 *   "icon-grid"
@@ -42,7 +41,6 @@ export interface MetaWorkspaceActionMenuItemDefaultKind extends MetaWorkspaceAct
 
 	/**
 	 * The friendly name of the action to perform
-	 *
 	 * @examples [
 	 *   "Create",
 	 *   "Create Content Template"

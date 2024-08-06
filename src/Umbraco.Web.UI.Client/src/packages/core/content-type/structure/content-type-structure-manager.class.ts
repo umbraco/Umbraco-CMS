@@ -77,6 +77,7 @@ export class UmbContentTypeStructureManager<
 	/**
 	 * loadType will load the ContentType and all inherited and composed ContentTypes.
 	 * This will give us all the structure for properties and containers.
+	 * @param unique
 	 */
 	public async loadType(unique?: string) {
 		this._reset();
@@ -121,6 +122,7 @@ export class UmbContentTypeStructureManager<
 
 	/**
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
+	 * @param parentUnique
 	 * @returns boolean
 	 */
 	public async create(parentUnique: string | null) {

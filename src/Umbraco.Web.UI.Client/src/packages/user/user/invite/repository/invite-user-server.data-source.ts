@@ -15,6 +15,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Creates an instance of UmbInviteUserServerDataSource.
+	 * @param host
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -27,7 +27,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Fetches a Script folder from the server
 	 * @param {string} unique
-	 * @return {UmbDataSourceResponse<UmbFolderModel>}
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -59,7 +59,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Creates a Script folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {UmbDataSourceResponse<UmbFolderModel>}
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -92,7 +92,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Deletes a Script folder on the server
 	 * @param {string} unique
-	 * @return {UmbDataSourceErrorResponse}
+	 * @returns {UmbDataSourceErrorResponse}
 	 * @memberof UmbScriptServerDataSource
 	 */
 	async delete(unique: string) {

@@ -1,7 +1,10 @@
 /**
  * @export
- * @method partialUpdateFrozenArray
+ * @function partialUpdateFrozenArray
  * @param {Observable<T>} source - RxJS Subject to use for this Observable.
+ * @param data
+ * @param partialEntry
+ * @param findMethod
  * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
  * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
  * @description - Creates a RxJS Observable from RxJS Subject.

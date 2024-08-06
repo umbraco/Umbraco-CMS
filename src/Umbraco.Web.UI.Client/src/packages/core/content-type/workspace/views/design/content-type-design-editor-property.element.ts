@@ -40,7 +40,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	 * Property, the data object for the property.
 	 * @type {UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined}
 	 * @attr
-	 * @default undefined
+	 * @default
 	 */
 	@property({ type: Object })
 	public get property(): UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined {

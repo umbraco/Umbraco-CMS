@@ -24,7 +24,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Fetches a Media Type folder from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -52,7 +52,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Creates a Media Type folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -82,7 +82,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Updates a Media Type folder on the server
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async update(args: UmbUpdateFolderModel) {
@@ -107,7 +107,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Deletes a Media Type folder on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async delete(unique: string) {

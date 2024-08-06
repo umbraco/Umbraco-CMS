@@ -28,10 +28,9 @@ interface CircleWithCommands extends Circle {
 //TODO: maybe move to UI Library
 /**
  * This is a donut chart component that can be used to display data in a circular way.
- *
  * @export
  * @class UmbDonutChartElement
- * @extends {LitElement}
+ * @augments {LitElement}
  */
 @customElement('umb-donut-chart')
 export class UmbDonutChartElement extends LitElement {
@@ -41,7 +40,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * Circle radius in pixels
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number })
@@ -49,7 +47,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * The circle thickness in pixels
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number, attribute: 'border-size' })
@@ -57,7 +54,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * The size of SVG element in pixels
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number, attribute: 'svg-size' })
@@ -65,7 +61,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * Description of the graph, added for accessibility purposes
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property()
@@ -73,7 +68,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	/**
 	 * Hides the box that appears oh hover with the details of the slice
-	 *
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Boolean })

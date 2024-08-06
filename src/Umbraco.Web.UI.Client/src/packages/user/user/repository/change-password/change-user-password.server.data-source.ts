@@ -23,7 +23,7 @@ export class UmbChangeUserPasswordServerDataSource {
 	 * Change the password of a user
 	 * @param {string} id
 	 * @param {string} newPassword
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
 	async changePassword(id: string, newPassword: string) {

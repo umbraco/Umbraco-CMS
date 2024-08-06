@@ -8,7 +8,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  * Repository for the Media audit log
  * @export
  * @class UmbMediaAuditLogRepository
- * @extends {UmbRepositoryBase}
+ * @augments {UmbRepositoryBase}
  */
 export class UmbMediaAuditLogRepository
 	extends UmbRepositoryBase
@@ -29,7 +29,7 @@ export class UmbMediaAuditLogRepository
 	/**
 	 * Request the audit log for a Media
 	 * @param {UmbAuditLogRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaAuditLogRepository
 	 */
 	async requestAuditLog(args: UmbAuditLogRequestArgs) {

@@ -36,7 +36,6 @@ export interface MetaDashboardCollection {
 export interface ConditionsDashboardCollection {
 	/**
 	 * An array of section aliases that the dashboard collection should be available in
-	 *
 	 * @uniqueItems true
 	 * @examples [
 	 *  "Umb.Section.Content",

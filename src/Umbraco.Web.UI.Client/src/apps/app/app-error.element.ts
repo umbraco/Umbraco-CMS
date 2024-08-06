@@ -10,7 +10,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 export class UmbAppErrorElement extends UmbLitElement {
 	/**
 	 * The headline to display
-	 *
 	 * @attr
 	 */
 	@property()
@@ -18,7 +17,6 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 	/**
 	 * The error message to display
-	 *
 	 * @attr
 	 */
 	@property()
@@ -26,7 +24,6 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 	/**
 	 * The error to display
-	 *
 	 * @attr
 	 */
 	@property()
@@ -34,7 +31,6 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 	/**
 	 * Hide the back button
-	 *
 	 * @attr
 	 */
 	@property({ type: Boolean, attribute: 'hide-back-button' })

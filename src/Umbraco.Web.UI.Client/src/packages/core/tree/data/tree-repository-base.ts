@@ -18,7 +18,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
  * @export
  * @abstract
  * @class UmbTreeRepositoryBase
- * @extends {UmbRepositoryBase}
+ * @augments {UmbRepositoryBase}
  * @implements {UmbTreeRepository}
  * @implements {UmbApi}
  * @template TreeItemType
@@ -68,14 +68,14 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Request the tree root item
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: ProblemDetails }>;
 
 	/**
 	 * Requests root items of a tree
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
@@ -93,7 +93,7 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests tree items of a given parent
 	 * @param {(string | null)} parentUnique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemsOf(args: TreeChildrenOfRequestArgsType) {
@@ -114,7 +114,7 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests ancestors of a given item
 	 * @param {UmbTreeAncestorsOfRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemAncestors(args: TreeAncestorsOfRequestArgsType) {
@@ -129,7 +129,7 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Returns a promise with an observable of tree root items
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async rootTreeItems() {
@@ -140,7 +140,7 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Returns a promise with an observable of children items of a given parent
 	 * @param {(string | null)} parentUnique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async treeItemsOf(parentUnique: string | null) {
