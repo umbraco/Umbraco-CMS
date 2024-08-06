@@ -8,9 +8,30 @@ export interface UmbState {
 }
 
 export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbControllerBase {
+	/**
+	 * Observable that emits all states in the state manager
+	 * @memberof UmbStateManager
+	 */
 	protected _states = new UmbArrayState<StateType>([], (x) => x.unique);
 	public states = this._states.asObservable();
 
+	/**
+	 * Observable that emits true if there are any states in the state manager
+	 * @memberof UmbStateManager
+	 */
+	public isOn = this._states.asObservablePart((x) => x.length > 0);
+
+	/**
+	 * Observable that emits true if there are no states in the state manager
+	 * @memberof UmbStateManager
+	 */
+	public isOff = this._states.asObservablePart((x) => x.length === 0);
+
+	/**
+	 * Creates an instance of UmbStateManager.
+	 * @param {UmbControllerHost} host
+	 * @memberof UmbStateManager
+	 */
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
