@@ -137,7 +137,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 	#renderItem(item: UmbUniqueItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node-document-type name=${item.name}>
+			<uui-ref-node-document-type name=${this.localize.string(item.name)}>
 				${when(item.icon, () => html`<umb-icon slot="icon" name=${item.icon!}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button

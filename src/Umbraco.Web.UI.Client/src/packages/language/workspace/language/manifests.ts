@@ -1,3 +1,4 @@
+import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './constants.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
@@ -9,7 +10,7 @@ import type {
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
 	kind: 'routable',
-	alias: 'Umb.Workspace.Language',
+	alias: UMB_LANGUAGE_WORKSPACE_ALIAS,
 	name: 'Language Workspace',
 	api: () => import('./language-workspace.context.js'),
 	meta: {
