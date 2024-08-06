@@ -46,7 +46,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 					(property) => property.alias,
 					(property) =>
 						html`<umb-property
-							.dataPath="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
+							data-path="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
 							label=${property.label}
 							description=${ifDefined(property.description)}
 							alias=${property.alias}
