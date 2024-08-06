@@ -131,6 +131,10 @@ export function UmbFormControlMixin<
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
+				// Concept: maybe needed? Set all inner form controls to be 'touched' as well. [NL]
+				/*this.#formCtrlElements.forEach((el) => {
+					(el as any).pristine = value;
+				});*/
 				this.#dispatchValidationState();
 			}
 		}
