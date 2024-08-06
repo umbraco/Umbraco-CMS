@@ -31,10 +31,6 @@ export class UmbExampleModal extends UmbModalBaseElement {
 				path: '',
 				redirectTo: 'overview',
 			},
-			{
-				path: '',
-				redirectTo: 'test',
-			},
 		];
 
 		setTimeout(() => {
