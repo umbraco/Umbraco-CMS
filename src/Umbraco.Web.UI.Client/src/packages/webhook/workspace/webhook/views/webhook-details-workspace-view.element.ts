@@ -90,7 +90,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 						slot="editor"
 						@change=${this.#onTypesChange}
 						.selection=${this._webhook?.contentTypes ?? []}
-						?documentTypesOnly=${true}></umb-input-document-type>
+						.documentTypesOnly=${true}></umb-input-document-type>
 				`;
 			case 'Media':
 				return html`
