@@ -5,6 +5,10 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+/**
+ *
+ * @param indexName
+ */
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {
 		if (index.name) return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
@@ -12,6 +16,9 @@ export function getIndexByName(indexName: string) {
 	});
 }
 
+/**
+ *
+ */
 export function getSearchResultsMockData(): SearchResultResponseModel[] {
 	return searchResultMockData;
 }

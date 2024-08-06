@@ -53,7 +53,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -76,7 +76,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -204,7 +204,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 		if (!item.unique) return;
 		const href = `${this._editPath}edit/${item.unique}`;
 		return html`
-			<uui-ref-node-document-type name=${item.name} id=${item.unique}>
+			<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${item.unique}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>

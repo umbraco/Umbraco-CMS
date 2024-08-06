@@ -17,8 +17,8 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique=null]
-	 * @return {*}
+	 * @param {string | null} [parentUnique]
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
@@ -30,7 +30,7 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 	/**
 	 * Saves the given data
 	 * @param {DetailModelType} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async validateSave(model: DetailModelType) {

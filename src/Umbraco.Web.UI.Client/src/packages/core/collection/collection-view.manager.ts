@@ -53,7 +53,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 	/**
 	 * Returns the current view.
-	 * @return {ManifestCollectionView}
+	 * @returns {ManifestCollectionView}
 	 * @memberof UmbCollectionContext
 	 */
 	public getCurrentView() {

@@ -25,7 +25,7 @@ export class UmbDocumentTypeSearchServerDataSource implements UmbSearchDataSourc
 
 	/**
 	 * Get a list of versions for a data
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeSearchServerDataSource
 	 */
 	async search(args: UmbSearchRequestArgs) {

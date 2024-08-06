@@ -76,7 +76,7 @@ export class UmbNotificationHandler {
 	}
 
 	/**
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbNotificationHandler
 	 */
 	public onClose(): Promise<any> {

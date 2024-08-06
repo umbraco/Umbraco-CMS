@@ -143,6 +143,7 @@
 		"./src/packages/property-editors",
 		"./src/packages/tags",
 		"./src/packages/templating",
+		"./src/packages/tiny-mce",
 		"./src/packages/umbraco-news",
 		"./src/packages/user",
 		"./src/packages/webhook"
@@ -246,6 +247,7 @@
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-import": "^2.29.1",
+		"eslint-plugin-jsdoc": "^48.11.0",
 		"eslint-plugin-lit": "^1.14.0",
 		"eslint-plugin-local-rules": "^3.0.2",
 		"eslint-plugin-prettier": "^5.1.3",

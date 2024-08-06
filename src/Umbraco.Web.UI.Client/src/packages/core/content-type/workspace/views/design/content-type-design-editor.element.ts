@@ -37,7 +37,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			this._tabs = model;
 		},
 		onEnd: ({ item }) => {
-			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			/**
+			 * Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
@@ -416,14 +417,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<div id="actions">
 				${this._compositionRepositoryAlias
-					? html` <uui-button
-							look="outline"
-							label=${this.localize.term('contentTypeEditor_compositions')}
-							compact
-							@click=${this.#openCompositionModal}>
-							<uui-icon name="icon-merge"></uui-icon>
-							${this.localize.term('contentTypeEditor_compositions')}
-						</uui-button>`
+					? html`
+							<uui-button
+								look="outline"
+								label=${this.localize.term('contentTypeEditor_compositions')}
+								compact
+								@click=${this.#openCompositionModal}>
+								<uui-icon name="icon-merge"></uui-icon>
+								${this.localize.term('contentTypeEditor_compositions')}
+							</uui-button>
+						`
 					: ''}
 				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
 					<uui-icon name="icon-navigation"></uui-icon>

@@ -31,7 +31,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Creates a new Data Type scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateDataTypeRequestModel }
+	 * @returns { CreateDataTypeRequestModel }
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDataTypeDetailModel> = {}) {
@@ -51,7 +51,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Fetches a Data Type with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -79,7 +79,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Inserts a new Data Type on the server
 	 * @param {UmbDataTypeDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async create(model: UmbDataTypeDetailModel, parentUnique: string | null = null) {
@@ -115,7 +115,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Updates a DataType on the server
 	 * @param {UmbDataTypeDetailModel} DataType
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async update(model: UmbDataTypeDetailModel) {
@@ -149,7 +149,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Deletes a Data Type on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async delete(unique: string) {

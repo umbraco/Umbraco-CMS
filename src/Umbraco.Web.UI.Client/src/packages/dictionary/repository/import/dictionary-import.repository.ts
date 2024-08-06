@@ -17,7 +17,7 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 	 * @description - Import a dictionary
 	 * @param {string} temporaryFileUnique
 	 * @param {string} [parentUnique]
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryImportRepository
 	 */
 	async requestImport(temporaryFileUnique: string, parentUnique: string | null) {

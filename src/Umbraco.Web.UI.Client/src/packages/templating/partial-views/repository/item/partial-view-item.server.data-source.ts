@@ -28,7 +28,7 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

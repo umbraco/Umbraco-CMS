@@ -3,6 +3,11 @@ import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
 export { UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS, UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './manifests.js';
 
+/**
+ *
+ * @param item
+ * @param alias
+ */
 export function getPropertyValueByAlias(item: UmbDocumentCollectionItemModel, alias: string) {
 	switch (alias) {
 		case 'contentTypeAlias':

@@ -13,7 +13,7 @@ export class UmbDictionaryExportServerDataSource {
 	 * @description - Export a Dictionary, optionally including child items.
 	 * @param {string} unique
 	 * @param {boolean} includeChildren
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryExportServerDataSource
 	 */
 	async export(unique: string, includeChildren: boolean) {

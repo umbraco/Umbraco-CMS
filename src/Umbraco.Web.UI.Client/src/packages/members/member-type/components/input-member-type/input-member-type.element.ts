@@ -13,7 +13,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -36,7 +36,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -137,7 +137,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 	#renderItem(item: UmbUniqueItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node-document-type name=${item.name}>
+			<uui-ref-node-document-type name=${this.localize.string(item.name)}>
 				${when(item.icon, () => html`<umb-icon slot="icon" name=${item.icon!}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button

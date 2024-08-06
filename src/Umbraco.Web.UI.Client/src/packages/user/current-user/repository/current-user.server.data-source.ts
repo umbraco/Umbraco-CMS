@@ -22,7 +22,7 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Get the current user
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
@@ -86,6 +86,9 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Enable an MFA provider
+	 * @param providerName
+	 * @param code
+	 * @param secret
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
@@ -101,6 +104,8 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Disable an MFA provider
+	 * @param providerName
+	 * @param code
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
 		const { error } = await tryExecute(UserService.deleteUserCurrent2FaByProviderName({ providerName, code }));

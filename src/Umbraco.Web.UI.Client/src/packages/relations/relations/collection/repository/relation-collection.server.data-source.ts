@@ -27,7 +27,7 @@ export class UmbRelationCollectionServerDataSource implements UmbCollectionDataS
 	/**
 	 * Gets the relation collection filtered by the given filter.
 	 * @param {UmbRelationCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRelationCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbRelationCollectionFilterModel) {

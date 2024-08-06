@@ -22,7 +22,7 @@ export class UmbDocumentReferenceServerDataSource {
 	/**
 	 * Fetches the item for the given unique from the server
 	 * @param {string} id
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentReferenceServerDataSource
 	 */
 	async getReferencedBy(id: string, skip = 0, take = 20) {

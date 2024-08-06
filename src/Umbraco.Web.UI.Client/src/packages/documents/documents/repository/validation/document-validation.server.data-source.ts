@@ -30,7 +30,7 @@ export class UmbDocumentValidationServerDataSource {
 	/**
 	 * Validate a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @return {*}
+	 * @returns {*}
 	 */
 	async validateCreate(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Document is missing');
@@ -58,7 +58,7 @@ export class UmbDocumentValidationServerDataSource {
 	/**
 	 * Validate a existing Document
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @return {*}
+	 * @returns {*}
 	 */
 	async validateUpdate(model: UmbDocumentDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');

@@ -24,7 +24,6 @@ import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/c
 const LocalizationControllerAlias = Symbol();
 /**
  * The UmbLocalizeController enables localization for your element.
- *
  * @see UmbLocalizeElement
  * @example
  * ```ts
@@ -108,7 +107,11 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return { locale, language, region, primary, secondary };
 	}
 
-	/** Outputs a translated term. */
+	/**
+	 * Outputs a translated term.
+	 * @param key
+	 * @param {...any} args
+	 */
 	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
 		if (!this.#usedKeys.includes(key)) {
 			this.#usedKeys.push(key);
@@ -145,19 +148,32 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return term;
 	}
 
-	/** Outputs a localized date in the specified format. */
+	/**
+	 * Outputs a localized date in the specified format.
+	 * @param dateToFormat
+	 * @param options
+	 */
 	date(dateToFormat: Date | string, options?: Intl.DateTimeFormatOptions): string {
 		dateToFormat = new Date(dateToFormat);
 		return new Intl.DateTimeFormat(this.lang(), options).format(dateToFormat);
 	}
 
-	/** Outputs a localized number in the specified format. */
+	/**
+	 * Outputs a localized number in the specified format.
+	 * @param numberToFormat
+	 * @param options
+	 */
 	number(numberToFormat: number | string, options?: Intl.NumberFormatOptions): string {
 		numberToFormat = Number(numberToFormat);
 		return isNaN(numberToFormat) ? '' : new Intl.NumberFormat(this.lang(), options).format(numberToFormat);
 	}
 
-	/** Outputs a localized time in relative format. */
+	/**
+	 * Outputs a localized time in relative format.
+	 * @param value
+	 * @param unit
+	 * @param options
+	 */
 	relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions): string {
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
 	}

@@ -15,7 +15,6 @@ export class UmbModalToken<
 > {
 	/**
 	 * Get the data type of the token's data.
-	 *
 	 * @public
 	 * @type      {ModalDataType}
 	 * @memberOf  UmbModalToken
@@ -26,7 +25,6 @@ export class UmbModalToken<
 
 	/**
 	 * Get the value type of the token
-	 *
 	 * @public
 	 * @type      {ModalValueType}
 	 * @memberOf  UmbModalToken
@@ -50,7 +48,6 @@ export class UmbModalToken<
 	/**
 	 * This method must always return the unique alias of the token since that
 	 * will be used to look up the token in the injector.
-	 *
 	 * @returns the unique alias of the token
 	 */
 	toString(): string {

@@ -7,7 +7,7 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
  * Provides the entity context
  * @export
  * @class UmbEntityContext
- * @extends {UmbContextBase<UmbEntityContext>}
+ * @augments {UmbContextBase<UmbEntityContext>}
  */
 export class UmbEntityContext extends UmbContextBase<UmbEntityContext> {
 	#entityType = new UmbStringState<string | undefined>(undefined);

@@ -252,7 +252,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				<uui-ref-node-document-type
 					standalone
 					href=${editDocumentTypePath + 'edit/' + this._documentTypeUnique}
-					name=${ifDefined(this._documentTypeName)}>
+					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
 					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
 				</uui-ref-node-document-type>
 			</div>

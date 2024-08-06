@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * A repository for generating and assigning a new password for a user
  * @export
  * @class UmbNewUserPasswordRepository
- * @extends {UmbUserRepositoryBase}
+ * @augments {UmbUserRepositoryBase}
  */
 export class UmbNewUserPasswordRepository extends UmbUserRepositoryBase {
 	dataSource: UmbNewUserPasswordServerDataSource;
@@ -24,7 +24,7 @@ export class UmbNewUserPasswordRepository extends UmbUserRepositoryBase {
 	/**
 	 * Request a new password for a user
 	 * @param {string} userUnique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbNewUserPasswordRepository
 	 */
 	async requestNewPassword(userUnique: string) {

@@ -27,7 +27,7 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 	/**
 	 * Gets the relation type collection filtered by the given filter.
 	 * @param {UmbRelationTypeCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRelationTypeCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbRelationTypeCollectionFilterModel) {

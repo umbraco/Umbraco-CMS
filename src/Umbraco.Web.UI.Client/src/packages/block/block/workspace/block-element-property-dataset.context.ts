@@ -37,6 +37,7 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 
 	/**
 	 * TODO: Write proper JSDocs here.
+	 * @param propertyAlias
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return await this.#elementManager.propertyValueByAlias<ReturnType>(propertyAlias);
@@ -44,6 +45,8 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 
 	/**
 	 * TODO: Write proper JSDocs here.
+	 * @param propertyAlias
+	 * @param value
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this.#elementManager.setPropertyValue(propertyAlias, value);

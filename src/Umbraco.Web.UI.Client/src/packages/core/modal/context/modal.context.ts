@@ -100,6 +100,7 @@ export class UmbModalContext<
 
 	/**
 	 * Closes this modal
+	 * @param reason
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -130,6 +131,7 @@ export class UmbModalContext<
 
 	/**
 	 * Sets the current value of this modal.
+	 * @param value
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -139,6 +141,7 @@ export class UmbModalContext<
 
 	/**
 	 * Updates the current value of this modal.
+	 * @param partialValue
 	 * @public
 	 * @memberof UmbModalContext
 	 */

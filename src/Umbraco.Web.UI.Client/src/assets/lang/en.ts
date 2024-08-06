@@ -1563,6 +1563,7 @@ export default {
 		ascending: 'ascending',
 		descending: 'descending',
 		template: 'Template',
+		systemFields: 'System fields',
 	},
 	grid: {
 		media: 'Image',
