@@ -1,5 +1,4 @@
 import { UmbPropertyContext } from './property.context.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
