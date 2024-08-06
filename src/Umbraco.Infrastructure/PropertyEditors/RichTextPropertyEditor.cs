@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -171,7 +172,7 @@ public class RichTextPropertyEditor : DataEditor
         private readonly IHtmlMacroParameterParser _macroParameterParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IContentTypeService _contentTypeService;
+        private readonly IBlockEditorElementTypeCache _elementTypeCache;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
 
         public RichTextPropertyValueEditor(
@@ -189,7 +190,7 @@ public class RichTextPropertyEditor : DataEditor
             IIOHelper ioHelper,
             IHtmlSanitizer htmlSanitizer,
             IHtmlMacroParameterParser macroParameterParser,
-            IContentTypeService contentTypeService,
+            IBlockEditorElementTypeCache elementTypeCache,
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
             : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
@@ -200,11 +201,11 @@ public class RichTextPropertyEditor : DataEditor
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
             _macroParameterParser = macroParameterParser;
-            _contentTypeService = contentTypeService;
+            _elementTypeCache = elementTypeCache;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
-            Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), contentTypeService, jsonSerializer, logger));
+            Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), elementTypeCache, jsonSerializer, logger));
         }
 
         /// <inheritdoc />
@@ -392,6 +393,6 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         private BlockEditorValues CreateBlockEditorValues()
-            => new(new RichTextEditorBlockDataConverter(), _contentTypeService, _logger);
+            => new(new RichTextEditorBlockDataConverter(), _elementTypeCache, _logger);
     }
 }

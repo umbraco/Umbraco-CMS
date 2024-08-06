@@ -1487,6 +1487,14 @@ public class ContentService : RepositoryService, IContentService
                 notificationState);
             if (publishResult.Success)
             {
+                // raise Publishing notification
+                if (scope.Notifications.PublishCancelable(
+                        new ContentPublishingNotification(content, eventMessages).WithState(notificationState)))
+                {
+                    _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
+                }
+
                 // note: StrategyPublish flips the PublishedState to Publishing!
                 publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, eventMessages);
 
@@ -3065,14 +3073,6 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState)
     {
-        // raise Publishing notification
-        if (scope.Notifications.PublishCancelable(
-                new ContentPublishingNotification(content, evtMsgs).WithState(notificationState)))
-        {
-            _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-        }
-
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // If it's null it's invariant

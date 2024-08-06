@@ -2035,7 +2035,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="webhookKey">Webhook key</key>
     <key alias="retryCount">Retry count</key>
     <key alias="toggleDebug">Toggle debug mode for more information.</key>
-    <key alias="statusNotOk">Not OK status code</key>    
+    <key alias="statusNotOk">Not OK status code</key>
     <key alias="urlDescription">The url to call when the webhook is triggered.</key>
     <key alias="eventDescription">The events for which the webhook should be triggered.</key>
     <key alias="contentTypeDescription">Only trigger the webhook for a specific content type.</key>
@@ -3096,7 +3096,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
           We will send:
           <ul>
             <li>Anonymized site ID, Umbraco version, and packages installed.</li>
-            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Property Types, Compositions, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, Webhooks, rich text datatypes, blocks used in rich text datatypes, and Property Editors in use.</li>
             <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
             <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>
           </ul>

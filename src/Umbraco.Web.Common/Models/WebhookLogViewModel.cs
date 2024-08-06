@@ -14,6 +14,9 @@ public class WebhookLogViewModel
     [DataMember(Name = "statusCode")]
     public string StatusCode { get; set; } = string.Empty;
 
+    [DataMember(Name = "isSuccessStatusCode")]
+    public bool IsSuccessStatusCode { get; set; }
+
     [DataMember(Name = "date")]
     public DateTime Date { get; set; }
 

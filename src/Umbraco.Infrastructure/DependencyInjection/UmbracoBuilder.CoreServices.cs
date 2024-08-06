@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -234,6 +235,8 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddDeliveryApiCoreServices();
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
+
+        builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
 
         return builder;
     }

@@ -17,18 +17,24 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 public class ReportSiteJob : IRecurringBackgroundJob
 {
 
-    public TimeSpan Period { get => TimeSpan.FromDays(1); }
-    public TimeSpan Delay { get => TimeSpan.FromMinutes(5); }
-    public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
+    public TimeSpan Period => TimeSpan.FromDays(1);
+
+    public TimeSpan Delay => TimeSpan.FromMinutes(5);
+
+    public ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
 
     // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
-
+    public event EventHandler PeriodChanged
+    {
+        add { } remove { }
+    }
 
     private static HttpClient _httpClient = new();
+
     private readonly ILogger<ReportSiteJob> _logger;
+
     private readonly ITelemetryService _telemetryService;
-    
+
 
     public ReportSiteJob(
         ILogger<ReportSiteJob> logger,
@@ -43,9 +49,8 @@ public class ReportSiteJob : IRecurringBackgroundJob
     /// Runs the background task to send the anonymous ID
     /// to telemetry service
     /// </summary>
-    public  async Task RunJobAsync()
+    public async Task RunJobAsync()
     {
-
         if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
         {
             _logger.LogWarning("No telemetry marker found");

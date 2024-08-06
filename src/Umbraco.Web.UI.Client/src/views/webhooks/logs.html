@@ -3,7 +3,6 @@
     <thead>
       <tr>
         <th></th>
-        <th><localize key="webhooks_webhookKey">Webhook key</localize></th>
         <th><localize key="general_date">Date</localize></th>
         <th><localize key="webhooks_url">Url</localize></th>
         <th><localize key="webhooks_event">Event</localize></th>
@@ -14,13 +13,13 @@
       <tr ng-repeat="log in vm.logs track by log.key" ng-click="vm.openLogOverlay(log)" style="cursor: pointer;">
         <td style="width: 20px;">
           <umb-checkmark
-            ng-if="vm.isChecked(log)"
-            checked="vm.isChecked(log)"
-            size="m">
+            ng-if="log.isSuccessStatusCode"
+            checked="true"
+            size="m"
+            title="{{ log.statusCode }}">
           </umb-checkmark>
-          <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="!vm.isChecked(log)"></umb-icon>
+          <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="!log.isSuccessStatusCode" title="{{ log.statusCode }}"></umb-icon>
         </td>
-        <td>{{ log.webhookKey }}</td>
         <td>{{ log.formattedLogDate }}</td>
         <td>{{ log.url }}</td>
         <td>{{ log.eventAlias }}</td>
@@ -28,4 +27,16 @@
       </tr>
     </tbody>
   </table>
+
+  <umb-empty-state ng-hide="vm.logs.length" position="center">
+    <localize key="content_listViewNoItems">There are no items show in the list.</localize>
+  </umb-empty-state>
+
+  <umb-pagination
+    page-number="vm.pagination.pageNumber"
+    total-pages="vm.pagination.totalPages"
+    on-next="vm.nextPage"
+    on-prev="vm.previousPage"
+    on-go-to-page="vm.goToPage">
+  </umb-pagination>
 </div>

@@ -5,9 +5,13 @@
 
     const vm = this;
 
+    vm.pagination = {
+      pageNumber: 1,
+      pageSize: 25
+    };
+
     vm.logs = [];
     vm.openLogOverlay = openLogOverlay;
-    vm.isChecked = isChecked;
 
     function init() {
       vm.loading = true;
@@ -22,9 +26,14 @@
     }
 
     function loadLogs() {
-      return webhooksResource.getLogs()
+      const take = vm.pagination.pageSize;
+      const skip = (vm.pagination.pageNumber - 1) * take;
+
+      return webhooksResource.getLogs(skip, take)
         .then(data => {
           vm.logs = data.items;
+          vm.pagination.totalPages = Math.ceil(data.totalItems/vm.pagination.pageSize);
+
           vm.logs.forEach(log => {
             formatDatesToLocal(log);
           });
@@ -54,9 +63,16 @@
       editorService.open(dialog);
     }
 
-    function isChecked(log) {
-      return log.statusCode === "OK (200)";
-    }
+    vm.previousPage = () => vm.goToPage(vm.pagination.pageNumber - 1);
+    vm.nextPage = () => vm.goToPage(vm.pagination.pageNumber + 1);
+
+    vm.goToPage = (pageNumber) => {
+      vm.pagination.pageNumber = pageNumber;
+      vm.loading = true;
+      loadLogs().then(() => {
+        vm.loading = false;
+      });
+    };
 
     init();
   }

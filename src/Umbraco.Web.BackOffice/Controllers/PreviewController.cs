@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -152,8 +153,7 @@ public class PreviewController : Controller
         // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
         _cookieManager.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
-        if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
-            && redir.StartsWith("//") == false
+        if (WebPath.IsWellFormedWebPath(redir, UriKind.Relative)
             && Uri.TryCreate(redir, UriKind.Relative, out Uri? url))
         {
             return Redirect(url.ToString());
