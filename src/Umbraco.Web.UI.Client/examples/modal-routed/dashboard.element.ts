@@ -1,12 +1,7 @@
 import { css, html, LitElement, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import type {
-	UmbModalRouteRegistrationController,
-	UmbRoute,
-	UmbRouterSlotChangeEvent,
-	UmbRouterSlotInitEvent,
-} from '@umbraco-cms/backoffice/router';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-dashboard')
 export class UmbDashboardElement extends UmbElementMixin(LitElement) {
