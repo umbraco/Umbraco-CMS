@@ -32,10 +32,6 @@ export class UmbExampleModal extends UmbModalBaseElement {
 				redirectTo: 'overview',
 			},
 		];
-
-		setTimeout(() => {
-			//this._routes = [this._routes[0],this._routes[1],this._routes[2]]
-		}, 20);
 	}
 
 	override render() {
