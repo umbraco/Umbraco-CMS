@@ -5,7 +5,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 @customElement('umb-example-modal-step2')
 export class UmbExampleModalStep2 extends UmbModalBaseElement {
 	override render() {
-		return html` <div>example modal step1</div> `;
+		return html` <div>example modal step2</div> `;
 	}
 
 	static override styles = [UmbTextStyles];

@@ -1,4 +1,4 @@
-import { ManifestDashboard, ManifestModal, ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 // const section : ManifestSection = {
 // 	type: "section",
@@ -10,7 +10,7 @@ import { ManifestDashboard, ManifestModal, ManifestSection } from '@umbraco-cms/
 // 	}
 // }
 
-let dashboard : ManifestDashboard = {
+const dashboard: ManifestDashboard = {
 	type: 'dashboard',
 	name: 'Example Modal Dashboard',
 	alias: 'example.dashboard.dataset',
@@ -22,7 +22,7 @@ let dashboard : ManifestDashboard = {
 	},
 };
 
-let dashboard2 : ManifestDashboard = {
+const dashboard2: ManifestDashboard = {
 	type: 'dashboard',
 	name: 'Example Modal Dashboard2',
 	alias: 'example.dashboard.dataset2',
@@ -34,15 +34,11 @@ let dashboard2 : ManifestDashboard = {
 	},
 };
 
-const modal : ManifestModal = {
-  type: 'modal',
-  name: 'Example Modal',
-  alias: 'example.routed.modal',
-  element : () => import('./modal/example-modal.element.js'),
+const modal: ManifestModal = {
+	type: 'modal',
+	name: 'Example Modal',
+	alias: 'example.routed.modal',
+	element: () => import('./modal/example-modal.element.js'),
 };
 
-export const manifests = [
-	dashboard,
-	dashboard2,
-	modal
-];
+export const manifests = [dashboard, dashboard2, modal];

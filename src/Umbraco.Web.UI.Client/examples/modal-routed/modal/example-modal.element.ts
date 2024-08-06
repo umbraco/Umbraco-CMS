@@ -20,11 +20,11 @@ export class UmbExampleModal extends UmbModalBaseElement {
 		super.connectedCallback();
 		this._routes = [
 			{
-				path: `/overview`,
+				path: `overview`,
 				component: () => import('./steps/example-modal-step1.element.js'),
 			},
 			{
-				path: `/details`,
+				path: `details`,
 				component: () => import('./steps/example-modal-step2.element.js'),
 			},
 			{

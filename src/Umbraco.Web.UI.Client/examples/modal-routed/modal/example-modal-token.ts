@@ -8,7 +8,6 @@ export const EXAMPLE_ROUTED_MODAL = new UmbModalToken<Data, RetData>(
 	{
 		modal: {
 			type: 'dialog',
-			size: 'full',
 		},
 	},
 );
