@@ -27,10 +27,11 @@ export class UmbExampleModal extends UmbModalBaseElement {
 				path: `details`,
 				component: () => import('./steps/example-modal-step2.element.js'),
 			},
-			{
+			// NL: There is a problem with this one, but there is more problems as the modal does not close when navigating the browser history.
+			/*{
 				path: '',
 				redirectTo: 'overview',
-			},
+			},*/
 		];
 	}
 
