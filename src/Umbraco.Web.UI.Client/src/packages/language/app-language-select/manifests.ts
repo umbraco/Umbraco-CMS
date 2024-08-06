@@ -12,6 +12,9 @@ const entityActions: Array<ManifestSectionSidebarApp> = [
 				alias: 'Umb.Condition.SectionAlias',
 				match: 'Umb.Section.Content',
 			},
+			{
+				alias: 'Umb.Condition.MultipleAppLanguages',
+			},
 		],
 	},
 ];
