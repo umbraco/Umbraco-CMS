@@ -14,7 +14,7 @@ export default [
 	...tseslint.configs.recommended,
 	wcPlugin.configs['flat/recommended'],
 	litPlugin.configs['flat/recommended'],
-	jsdoc.configs['flat/recommended-typescript'],
+	jsdoc.configs['flat/recommended'], // We use the non typescript version to allow types to be defined in the jsdoc comments. This will allow js docs as an alternative to typescript types.
 	localRules.configs.all,
 	eslintPluginPrettierRecommended,
 
