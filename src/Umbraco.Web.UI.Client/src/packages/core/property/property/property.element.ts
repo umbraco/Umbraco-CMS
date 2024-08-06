@@ -133,7 +133,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @attr
 	 * @default ''
 	 */
-	@property({ type: String, attribute: false })
+	@property({ type: String, attribute: 'data-path' })
 	public set dataPath(dataPath: string | undefined) {
 		this.#dataPath = dataPath;
 		new UmbObserveValidationStateController(this, dataPath, (invalid) => {

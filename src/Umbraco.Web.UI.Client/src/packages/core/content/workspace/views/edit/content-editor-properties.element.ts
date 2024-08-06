@@ -74,7 +74,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 					(property, index) =>
 						html`<umb-property-type-based-property
 							class="property"
-							.dataPath=${this._dataPaths![index]}
+							data-path=${this._dataPaths![index]}
 							.property=${property}></umb-property-type-based-property> `,
 				)
 			: '';
