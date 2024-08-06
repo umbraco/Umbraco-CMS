@@ -1,17 +1,16 @@
-import type { UmbInputWebhookHeadersElement } from '../../../components/input-webhook-headers.element.js';
 import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '../webhook-workspace.context-token.js';
+import type { UmbInputWebhookHeadersElement } from '../../../components/input-webhook-headers.element.js';
 import type { UmbInputWebhookEventsElement } from '../../../components/input-webhook-events.element.js';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import '@umbraco-cms/backoffice/culture';
-import type { UmbWebhookDetailModel } from '@umbraco-cms/backoffice/webhook';
-
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
+import type { UmbWebhookDetailModel } from '@umbraco-cms/backoffice/webhook';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
+import '@umbraco-cms/backoffice/culture';
 import '../../../components/input-webhook-headers.element.js';
 import '../../../components/input-webhook-events.element.js';
 
@@ -43,9 +42,9 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		});
 	}
 
-	#onEventsChange(event: UmbChangeEvent) {
-		const events = (event.target as UmbInputWebhookEventsElement).events;
-		if (events[0].eventType !== this.contentType) {
+	#onEventsChange(event: UmbChangeEvent & { target: UmbInputWebhookEventsElement }) {
+		const events = event.target.events ?? [];
+		if (events.length && events[0].eventType !== this.contentType) {
 			this.#webhookWorkspaceContext?.setTypes([]);
 		}
 		this.#webhookWorkspaceContext?.setEvents(events);
@@ -75,7 +74,9 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		if (this.contentType !== 'Content' && this.contentType !== 'Media') return nothing;
 
 		return html`
-			<umb-property-layout label="Content Type" description="Only trigger the webhook for a specific content type.">
+			<umb-property-layout
+				label=${this.localize.term('webhooks_contentType')}
+				description=${this.localize.term('webhooks_contentTypeDescription')}>
 				${this.#renderContentTypePickerEditor()}
 			</umb-property-layout>
 		`;
@@ -84,17 +85,20 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 	#renderContentTypePickerEditor() {
 		switch (this.contentType) {
 			case 'Content':
-				return html`<umb-input-document-type
-					@change=${this.#onTypesChange}
-					.selection=${this._webhook?.contentTypes ?? []}
-					slot="editor"
-					?elementTypesOnly=${true}></umb-input-document-type>`;
+				return html`
+					<umb-input-document-type
+						slot="editor"
+						@change=${this.#onTypesChange}
+						.selection=${this._webhook?.contentTypes ?? []}
+						.documentTypesOnly=${true}></umb-input-document-type>
+				`;
 			case 'Media':
-				return html`<umb-input-media-type
-					@change=${this.#onTypesChange}
-					.selection=${this._webhook?.contentTypes ?? []}
-					slot="editor"
-					?elementTypesOnly=${true}></umb-input-media-type>`;
+				return html`
+					<umb-input-media-type
+						slot="editor"
+						@change=${this.#onTypesChange}
+						.selection=${this._webhook?.contentTypes ?? []}></umb-input-media-type>
+				`;
 			default:
 				return nothing;
 		}
@@ -105,20 +109,28 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 
 		return html`
 			<uui-box>
-				<umb-property-layout label="Url" description="The url to call when the webhook is triggered.">
+				<umb-property-layout
+					label=${this.localize.term('webhooks_url')}
+					description=${this.localize.term('webhooks_urlDescription')}>
 					<uui-input @input=${this.#onUrlChange} .value=${this._webhook.url} slot="editor"></uui-input>
 				</umb-property-layout>
-				<umb-property-layout label="Events" description="The events for which the webhook should be triggered.">
+				<umb-property-layout
+					label=${this.localize.term('webhooks_events')}
+					description=${this.localize.term('webhooks_eventDescription')}>
 					<umb-input-webhook-events
 						@change=${this.#onEventsChange}
 						.events=${this._webhook.events ?? []}
 						slot="editor"></umb-input-webhook-events>
 				</umb-property-layout>
 				${this.#renderContentTypePicker()}
-				<umb-property-layout label="Enabled" description="Is the webhook enabled?">
-					<uui-toggle slot="editor" .checked=${this._webhook.enabled} @input=${this.#onEnabledChange}></uui-toggle>
+				<umb-property-layout
+					label=${this.localize.term('webhooks_enabled')}
+					description=${this.localize.term('webhooks_enabledDescription')}>
+					<uui-toggle slot="editor" .checked=${this._webhook.enabled} @change=${this.#onEnabledChange}></uui-toggle>
 				</umb-property-layout>
-				<umb-property-layout label="Headers" description="Custom headers to include in the webhook request.">
+				<umb-property-layout
+					label=${this.localize.term('webhooks_headers')}
+					description=${this.localize.term('webhooks_headersDescription')}>
 					<umb-input-webhook-headers
 						@change=${this.#onHeadersChange}
 						.headers=${this._webhook.headers}

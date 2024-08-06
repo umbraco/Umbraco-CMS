@@ -695,6 +695,7 @@ export default {
 		hasReferencesDeleteConsequence:
 			'Deleting <strong>%0%</strong> will delete the properties and their data from the following items',
 		acceptDeleteConsequence: 'I understand this action will delete the properties and data based on this Data Type',
+		noConfiguration: 'There is no configuration for this property editor.',
 	},
 	errorHandling: {
 		errorButDataWasSaved:
@@ -1561,6 +1562,7 @@ export default {
 		ascending: 'ascending',
 		descending: 'descending',
 		template: 'Template',
+		systemFields: 'System fields',
 	},
 	grid: {
 		media: 'Image',
@@ -1734,11 +1736,11 @@ export default {
 		enabled: 'Enabled',
 		events: 'Events',
 		event: 'Event',
-		url: 'Url',
+		url: 'URL',
 		types: 'Types',
 		webhookKey: 'Webhook key',
 		retryCount: 'Retry count',
-		urlDescription: 'The url to call when the webhook is triggered.',
+		urlDescription: 'The URL to call when the webhook is triggered.',
 		eventDescription: 'The events for which the webhook should be triggered.',
 		contentTypeDescription: 'Only trigger the webhook for a specific content type.',
 		enabledDescription: 'Is the webhook enabled?',
@@ -1746,6 +1748,7 @@ export default {
 		contentType: 'Content Type',
 		headers: 'Headers',
 		selectEventFirst: 'Please select an event first.',
+		selectEvents: 'Select events',
 	},
 	languages: {
 		addLanguage: 'Add language',
