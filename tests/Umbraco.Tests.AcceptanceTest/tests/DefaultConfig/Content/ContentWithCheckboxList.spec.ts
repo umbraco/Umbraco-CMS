@@ -56,7 +56,7 @@ test('can publish content with the checkbox list data type', async ({umbracoApi,
   expect(contentData.values).toEqual([]);
 });
 
-test('can create content with the custom approved color data type', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the custom checkbox list data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomCheckboxList';
   const optionValues = ['testOption1', 'testOption2'];
