@@ -17,9 +17,13 @@ export class UmbMenuAliasCondition extends UmbConditionBase<MenuAliasConditionCo
 		super(host, args);
 
 		this.consumeContext(UMB_MENU_CONTEXT, (context) => {
-			this.observe(context.alias, (MenuAlias) => {
-				this.permitted = MenuAlias === this.config.match;
-			});
+			this.observe(
+				context.alias,
+				(MenuAlias) => {
+					this.permitted = MenuAlias === this.config.match;
+				},
+				'observeAlias',
+			);
 		});
 	}
 }
