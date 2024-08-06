@@ -76,7 +76,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					<uui-input
 						slot="editor"
 						name="newPassword"
-						label="New password"
+						label=${this.localize.term('user_passwordEnterNew')}
 						type="password"
 						@input=${() => this.#onPasswordUpdate()}></uui-input>
 				</umb-property-layout>
@@ -89,6 +89,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						type="password"
 						@input=${() => this.#onPasswordUpdate()}></uui-input>
 				</umb-property-layout>
+
 				${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
 			`;
 		}
@@ -122,12 +123,13 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 								@click=${this.#onNewPasswordCancel}></uui-button>
 						</div>
 					`,
-					() =>
-						html`<uui-button
+					() => html`
+						<uui-button
 							slot="editor"
 							label=${this.localize.term('general_changePassword')}
 							look="secondary"
-							@click=${() => (this._showChangePasswordForm = true)}></uui-button>`,
+							@click=${() => (this._showChangePasswordForm = true)}></uui-button>
+					`,
 				)}
 			</umb-property-layout>
 		`;
@@ -135,62 +137,69 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 	#renderLeftColumn() {
 		if (!this._workspaceContext) return;
-		return html` <div id="left-column">
-			<uui-box>
-				<umb-property-layout label=${this.localize.term('general_username')} mandatory>
-					<uui-input
-						slot="editor"
-						name="login"
-						label="${this.localize.term('general_username')}"
-						value=${this._workspaceContext.username}
-						@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
-				</umb-property-layout>
 
-				<umb-property-layout label=${this.localize.term('general_email')} mandatory>
-					<uui-input
-						slot="editor"
-						name="email"
-						label="${this.localize.term('general_email')}"
-						@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}
-						value=${this._workspaceContext.email}></uui-input>
-				</umb-property-layout>
+		return html`
+			<div id="left-column">
+				<uui-box>
+					<umb-property-layout label=${this.localize.term('general_username')} mandatory>
+						<uui-input
+							slot="editor"
+							name="login"
+							label=${this.localize.term('general_username')}
+							value=${this._workspaceContext.username}
+							required
+							required-message=${this.localize.term('user_loginnameRequired')}
+							@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
+					</umb-property-layout>
 
-				${this.#renderPasswordInput()}
+					<umb-property-layout label=${this.localize.term('general_email')} mandatory>
+						<uui-input
+							slot="editor"
+							name="email"
+							label=${this.localize.term('general_email')}
+							value=${this._workspaceContext.email}
+							required
+							required-message=${this.localize.term('user_emailRequired')}
+							@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}></uui-input>
+					</umb-property-layout>
 
-				<umb-property-layout label=${this.localize.term('content_membergroup')}>
-					<umb-input-member-group
-						slot="editor"
-						@change=${this.#onGroupsUpdated}
-						.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
-				</umb-property-layout>
+					${this.#renderPasswordInput()}
 
-				<umb-property-layout label=${this.localize.term('user_stateApproved')}>
-					<uui-toggle
-						slot="editor"
-						.checked=${this._workspaceContext.isApproved}
-						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
-					</uui-toggle>
-				</umb-property-layout>
+					<umb-property-layout label=${this.localize.term('content_membergroup')}>
+						<umb-input-member-group
+							slot="editor"
+							@change=${this.#onGroupsUpdated}
+							.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
+					</umb-property-layout>
 
-				<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
-					<uui-toggle
-						?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
-						slot="editor"
-						.checked=${this._workspaceContext.isLockedOut}
-						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
-					</uui-toggle>
-				</umb-property-layout>
+					<umb-property-layout label=${this.localize.term('user_stateApproved')}>
+						<uui-toggle
+							slot="editor"
+							.checked=${this._workspaceContext.isApproved}
+							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
+						</uui-toggle>
+					</umb-property-layout>
 
-				<umb-property-layout label=${this.localize.term('member_2fa')}>
-					<uui-toggle
-						?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
-						slot="editor"
-						.checked=${this._workspaceContext.isTwoFactorEnabled}
-						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>
-					</uui-toggle>
-				</umb-property-layout>
-			</uui-box>
-		</div>`;
+					<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
+						<uui-toggle
+							slot="editor"
+							?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
+							.checked=${this._workspaceContext.isLockedOut}
+							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
+						</uui-toggle>
+					</umb-property-layout>
+
+					<umb-property-layout label=${this.localize.term('member_2fa')}>
+						<uui-toggle
+							slot="editor"
+							?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
+							.checked=${this._workspaceContext.isTwoFactorEnabled}
+							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>
+						</uui-toggle>
+					</umb-property-layout>
+				</uui-box>
+			</div>
+		`;
 	}
 
 	#renderRightColumn() {
@@ -200,11 +209,11 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			<div id="right-column">
 				<uui-box>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_failedPasswordAttempts">Failed login attempts</umb-localize>
+						<strong><umb-localize key="user_failedPasswordAttempts">Failed login attempts</umb-localize></strong>
 						<span>${this._workspaceContext.failedPasswordAttempts}</span>
 					</div>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_lastLockoutDate">Last lockout date</umb-localize>
+						<strong><umb-localize key="user_lastLockoutDate">Last lockout date</umb-localize></strong>
 						<span>
 							${this._workspaceContext.lastLockOutDate
 								? this.localize.date(this._workspaceContext.lastLockOutDate, TimeFormatOptions)
@@ -212,7 +221,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						</span>
 					</div>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_lastLogin">Last login</umb-localize>
+						<strong><umb-localize key="user_lastLogin">Last login</umb-localize></strong>
 						<span>
 							${this._workspaceContext.lastLoginDate
 								? this.localize.date(this._workspaceContext.lastLoginDate, TimeFormatOptions)
@@ -220,7 +229,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						</span>
 					</div>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_passwordChangedGeneric">Password changed</umb-localize>
+						<strong><umb-localize key="user_passwordChangedGeneric">Password changed</umb-localize></strong>
 						<span>
 							${this._workspaceContext.lastPasswordChangeDate
 								? this.localize.date(this._workspaceContext.lastPasswordChangeDate, TimeFormatOptions)
@@ -237,13 +246,11 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	}
 
 	override render() {
-		if (!this._workspaceContext) {
-			return html`<div>Not found</div>`;
-		}
-
-		return html` <umb-body-layout header-fit-height>
-			<div id="main">${this.#renderLeftColumn()} ${this.#renderRightColumn()}</div>
-		</umb-body-layout>`;
+		return html`
+			<umb-body-layout header-fit-height>
+				<div id="main">${this.#renderLeftColumn()} ${this.#renderRightColumn()}</div>
+			</umb-body-layout>
+		`;
 	}
 
 	static override styles = [
@@ -289,11 +296,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				flex-direction: column;
 				gap: var(--uui-size-space-1);
 			}
+
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
-			}
-			.general-item .headline {
-				font-weight: bold;
 			}
 		`,
 	];
