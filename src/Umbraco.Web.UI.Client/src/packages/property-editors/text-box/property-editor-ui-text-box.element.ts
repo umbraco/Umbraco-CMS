@@ -50,6 +50,10 @@ export class UmbPropertyEditorUITextBoxElement
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
 
+	override focus() {
+		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
+	}
+
 	#onInput(e: InputEvent) {
 		const newValue = (e.target as HTMLInputElement).value;
 		if (newValue === this.value) return;
