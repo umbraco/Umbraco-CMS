@@ -604,8 +604,8 @@ export class UmbDocumentWorkspaceContext
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
 				entityType: this.getEntityType(),
+				unique: this.getUnique()!,
 			});
 
 			eventContext.dispatchEvent(event);
