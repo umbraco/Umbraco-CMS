@@ -1,7 +1,7 @@
 import type { UmbValidationMessageTranslator } from '../translators/validation-message-translator.interface.js';
 import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { UmbDataPathPropertyValueFilter } from '../utils/data-path-property-value-filter.function.js';
-import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
+import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import { UMB_SERVER_MODEL_VALIDATION_CONTEXT } from './server-model-validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -76,8 +76,6 @@ export class UmbServerModelValidationContext
 				});
 			}
 			// Check if there are missing properties:
-			console.log('send data:', this.#data);
-			console.log('error response:', errorBody);
 			if (errorBody?.missingProperties) {
 				// Retrieve the variants of he send data, as those are the once we will declare as missing properties:
 				errorBody.missingProperties.forEach((alias) => {

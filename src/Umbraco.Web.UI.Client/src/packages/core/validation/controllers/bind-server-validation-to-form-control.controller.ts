@@ -30,7 +30,6 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			// If not valid lets see if we should remove server validation [NL]
 			if (!jsonStringComparison(this.#value, value)) {
 				this.#value = value;
-				console.log('remove messages');
 				// Only remove server validations from validation context [NL]
 				this.#messages.forEach((message) => {
 					if (message.type === 'server') {
@@ -51,7 +50,6 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 				context.messages.messagesOfTypeAndPath('server', dataPath),
 				(messages) => {
 					this.#messages = messages;
-					console.log('messages', messages);
 					this.#isValid = messages.length === 0;
 					if (!this.#isValid) {
 						this.#setup();

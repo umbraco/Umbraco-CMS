@@ -1,4 +1,4 @@
-import type { UmbServerModelValidationContext } from '../context/server-model-validation.context.js';
+import type { UmbServerModelValidationContext } from '../controllers/server-model-validation.context.js';
 import { UmbDataPathPropertyValueFilter } from '../utils/data-path-property-value-filter.function.js';
 import type { UmbValidationMessageTranslator } from './validation-message-translator.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
