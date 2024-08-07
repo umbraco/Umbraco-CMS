@@ -1,0 +1,263 @@
+﻿import { ConstantHelper, test, AliasHelper } from '@umbraco/playwright-testhelpers';
+import {expect} from "@playwright/test";
+
+const dataTypeName = 'Multi URL Picker';
+const contentName = 'TestContent';
+const documentTypeName = 'TestDocumentTypeForContent';
+
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoUi.goToBackOffice();
+});
+
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+});
+
+test('can create content with the document link', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  // Create a document to link
+  const dtForLinkedDocumentName = 'TestDocumentType';
+  const dtForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(dtForLinkedDocumentName);
+  const linkedDocumentName = 'LinkedDocument';
+  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, dtForLinkedDocumentId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('document');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-document');
+  expect(contentData.values[0].value[0].target).toBeNull();
+  expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
+  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing document to link
+  //expect(contentData.values[0].value[0].name).toEqual(linkedDocumentId);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(dtForLinkedDocumentName);
+  await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
+});
+
+test('can publish content with the document link', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  // Create a document to link
+  const dtForLinkedDocumentName = 'TestDocumentType';
+  const dtForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(dtForLinkedDocumentName);
+  const linkedDocumentName = 'ContentToPick';
+  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, dtForLinkedDocumentId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('document');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-document');
+  expect(contentData.values[0].value[0].target).toBeNull();
+  expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
+  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing document to link
+  //expect(contentData.values[0].value[0].name).toEqual(linkedDocumentId);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(dtForLinkedDocumentName);
+  await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
+});
+
+test('can create content with the external link', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const link = 'https://docs.umbraco.com';
+  const linkTitle = 'Umbraco Documentation';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.enterLink(link);
+  await umbracoUi.content.enterLinkTitle(linkTitle);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('external');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-link');
+  expect(contentData.values[0].value[0].name).toEqual(linkTitle);
+  expect(contentData.values[0].value[0].url).toEqual(link);
+});
+
+test('can create content with the media link', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  // Create a media to pick
+  const mediaFileName = 'TestMediaFileForContent';
+  const mediaTypeName = 'Image';
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
+  const mediaFileId = await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.selectLinkByName(mediaFileName);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('media');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-picture');
+  expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
+  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing media to link
+  //expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
+});
+
+test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const link = 'https://docs.umbraco.com';
+  const linkTitle = 'Umbraco Documentation';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  // Create a media to pick
+  const mediaFileName = 'TestMediaFileForContent';
+  const mediaTypeName = 'Image';
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
+  const mediaFileId = await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  // Add media link
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.selectLinkByName(mediaFileName);
+  await umbracoUi.content.clickSubmitButton();
+  // Add external link
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.enterLink(link);
+  await umbracoUi.content.enterLinkTitle(linkTitle);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(2);
+  // Verify the information of the first URL picker
+  expect(contentData.values[0].value[0].type).toEqual('media');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-picture');
+  expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
+  // Uncomment this when the front-end is ready. Currently the link title is not auto filled after choosing media to link
+  //expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+  // Verify the information of the second URL picker
+  expect(contentData.values[0].value[1].type).toEqual('external');
+  expect(contentData.values[0].value[1].icon).toEqual('icon-link');
+  expect(contentData.values[0].value[1].name).toEqual(linkTitle);
+  expect(contentData.values[0].value[1].url).toEqual(link);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
+});
+
+test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const link = 'https://docs.umbraco.com';
+  const linkTitle = 'Umbraco Documentation';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
+
+  // Act
+  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.removeUrlPickerByName(linkTitle);
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
+});
+
+test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const link = 'https://docs.umbraco.com';
+  const linkTitle = 'Umbraco Documentation';
+  const updatedLinkTitle = 'Updated Umbraco Documentation';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
+
+  // Act
+  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.clickEditUrlPickerButtonByName(linkTitle);
+  await umbracoUi.content.enterLinkTitle(updatedLinkTitle);
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('external');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-link');
+  expect(contentData.values[0].value[0].name).toEqual(updatedLinkTitle);
+  expect(contentData.values[0].value[0].url).toEqual(link);
+});
