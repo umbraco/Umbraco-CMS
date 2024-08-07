@@ -39,25 +39,6 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		}
 	}
 
-	/*#onValidatorChange = (e: Event) => {
-		const target = e.target as unknown as UmbValidator | undefined;
-		if (!target) {
-			console.error('Validator did not exist.');
-			return;
-		}
-		const dataPath = target.dataPath;
-		if (!dataPath) {
-			console.error('Validator did not exist or did not provide a data-path.');
-			return;
-		}
-
-		if (target.isValid) {
-			this.messages.removeMessagesByTypeAndPath('client', dataPath);
-		} else {
-			this.messages.addMessages('client', dataPath, target.getMessages());
-		}
-	};*/
-
 	/**
 	 *
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
