@@ -23,6 +23,7 @@ export class UmbFormattingController extends UmbControllerBase {
 
 	/**
 	 * A method to localize the string input then transform any markdown to santized HTML.
+	 * @param input
 	 * @deprecated - Use the `<umb-ufm-render>` component instead. This method will be removed in Umbraco 15.
 	 */
 	public transform(input?: string): string {

@@ -24,7 +24,8 @@ export class UmbMoveDataTypeServerDataSource implements UmbMoveDataSource {
 	 * Move an item for the given id to the target unique
 	 * @param {string} unique
 	 * @param {(string | null)} targetUnique
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbMoveDataTypeServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {

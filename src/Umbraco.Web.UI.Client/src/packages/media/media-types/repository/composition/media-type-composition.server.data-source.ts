@@ -34,7 +34,7 @@ export class UmbMediaTypeCompositionServerDataSource
 	/**
 	 * Fetches the compatible compositions for a Media type from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
@@ -56,7 +56,8 @@ export class UmbMediaTypeCompositionServerDataSource
 	/**
 	 * Updates the compositions for a media type on the server
 	 * @param {MediaTypeCompositionRequestModel} requestBody
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbMediaTypeAvailableCompositionRequestModel) {

@@ -8,7 +8,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  * Repository for the document audit log
  * @export
  * @class UmbDocumentAuditLogRepository
- * @extends {UmbRepositoryBase}
+ * @augments {UmbRepositoryBase}
  */
 export class UmbDocumentAuditLogRepository
 	extends UmbRepositoryBase
@@ -29,7 +29,7 @@ export class UmbDocumentAuditLogRepository
 	/**
 	 * Request the audit log for a document
 	 * @param {UmbAuditLogRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentAuditLogRepository
 	 */
 	async requestAuditLog(args: UmbAuditLogRequestArgs) {

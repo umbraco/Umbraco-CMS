@@ -73,7 +73,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @param {UmbTreeRootItemsRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getRootItems(args: TreeRootItemsRequestArgsType) {
@@ -90,7 +90,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	/**
 	 * Fetches the children of a given parent unique from the server
 	 * @param {UmbTreeChildrenOfRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getChildrenOf(args: TreeChildrenOfRequestArgsType) {
@@ -109,7 +109,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	/**
 	 * Fetches the ancestors of a given item from the server
 	 * @param {UmbTreeAncestorsOfRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getAncestorsOf(args: TreeAncestorsOfRequestArgsType) {

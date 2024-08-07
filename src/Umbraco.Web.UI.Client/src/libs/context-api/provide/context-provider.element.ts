@@ -5,7 +5,6 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 
 /**
  * Provides a value to the context down the DOM tree.
- *
  * @remarks This element is a wrapper around the `provideContext` function.
  * @slot - The context will be available to all descendants given in the default slot.
  * @throws {Error} If the key property is not set.

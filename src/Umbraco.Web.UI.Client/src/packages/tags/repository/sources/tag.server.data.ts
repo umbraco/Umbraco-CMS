@@ -22,7 +22,7 @@ export class UmbTagServerDataSource {
 
 	/**
 	 * Get a list of tags on the server
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbTagServerDataSource
 	 */
 	async getCollection({

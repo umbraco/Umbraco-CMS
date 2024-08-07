@@ -24,7 +24,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Fetches a Document Blueprint folder from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -52,7 +52,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Creates a Document Blueprint folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -82,7 +82,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Updates a Document Blueprint folder on the server
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async update(args: UmbUpdateFolderModel) {
@@ -107,7 +107,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Deletes a Document Blueprint folder on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async delete(unique: string) {

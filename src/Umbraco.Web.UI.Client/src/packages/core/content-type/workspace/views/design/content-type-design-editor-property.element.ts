@@ -1,19 +1,18 @@
 import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
-import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
 import type {
 	UmbContentTypeModel,
 	UmbContentTypePropertyStructureHelper,
 	UmbPropertyTypeModel,
 	UmbPropertyTypeScaffoldModel,
 } from '@umbraco-cms/backoffice/content-type';
-import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
+import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -22,10 +21,9 @@ import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/back
  */
 @customElement('umb-content-type-design-editor-property')
 export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
-	//
+	#context = new UmbPropertyTypeContext(this);
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#dataTypeUnique?: string;
-	#context = new UmbPropertyTypeContext(this);
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -42,7 +40,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	 * Property, the data object for the property.
 	 * @type {UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined}
 	 * @attr
-	 * @default undefined
+	 * @default
 	 */
 	@property({ type: Object })
 	public get property(): UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined {
@@ -115,8 +113,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
 	}
 
-	#onToggleAliasLock() {
+	#onToggleAliasLock(event: CustomEvent) {
 		this._aliasLocked = !this._aliasLocked;
+		if (!this._aliasLocked) {
+			(event.target as UUIInputElement)?.focus();
+		}
 	}
 
 	async #setDataType(dataTypeUnique: string | undefined) {
@@ -138,12 +139,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		// TODO: Do proper localization here: [NL]
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
-			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
-				this._property.name ?? this._property.id,
-			]}>
-					Are you sure you want to delete the property <strong>${this._property.name ?? this._property.id}</strong>
-				</umb-localize>
-				</div>`,
+			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[this._property.name ?? this._property.id]}>Are you sure you want to delete the property <strong>${this._property.name ?? this._property.id}</strong></umb-localize></div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
 		});
@@ -151,24 +147,22 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._propertyStructureHelper?.removeProperty(this._property.id);
 	}
 
-	#onNameChanged(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
+	#onAliasChanged(event: UUIInputEvent) {
+		this.#singleValueUpdate('alias', event.target.value.toString());
+	}
 
-			if (typeof target?.value === 'string') {
-				const oldName = this.property?.name ?? '';
-				const oldAlias = this.property?.alias ?? '';
-				const newName = event.target.value.toString();
-				if (this._aliasLocked) {
-					const expectedOldAlias = generateAlias(oldName ?? '');
-					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
-					if (expectedOldAlias === oldAlias) {
-						this.#singleValueUpdate('alias', generateAlias(newName ?? ''));
-					}
-				}
-				this.#singleValueUpdate('name', newName);
+	#onNameChanged(event: UUIInputEvent) {
+		const oldName = this.property?.name ?? '';
+		const oldAlias = this.property?.alias ?? '';
+		const newName = event.target.value.toString();
+		if (this._aliasLocked) {
+			const expectedOldAlias = generateAlias(oldName ?? '');
+			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
+			if (expectedOldAlias === oldAlias) {
+				this.#singleValueUpdate('alias', generateAlias(newName ?? ''));
 			}
 		}
+		this.#singleValueUpdate('name', newName);
 	}
 
 	override render() {
@@ -271,24 +265,19 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 
 	renderPropertyAlias() {
-		return this.property
-			? html`<uui-input
-					name="alias"
-					id="alias-input"
-					label="alias"
-					placeholder=${this.localize.term('placeholders_alias')}
-					.value=${this.property.alias}
-					?disabled=${this._aliasLocked}
-					@input=${(e: CustomEvent) => {
-						if (e.target) this.#singleValueUpdate('alias', (e.target as HTMLInputElement).value);
-					}}>
-					<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
-					<!-- TODO: validation for bad characters -->
-					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-						<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
-					</div>
-				</uui-input>`
-			: '';
+		if (!this.property) return;
+		return html`
+			<uui-input-lock
+				name="alias"
+				id="alias-input"
+				label=${this.localize.term('placeholders_enterAlias')}
+				placeholder=${this.localize.term('placeholders_enterAlias')}
+				.value=${this.property.alias}
+				?locked=${this._aliasLocked}
+				@input=${this.#onAliasChanged}
+				@lock-change=${this.#onToggleAliasLock}>
+			</uui-input-lock>
+		`;
 	}
 
 	renderPropertyTags() {
@@ -423,16 +412,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				--uui-input-border-color: transparent;
 			}
 
-			#alias-lock {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-			}
-			#alias-lock uui-icon {
-				margin-bottom: 2px;
-				/* margin: 0; */
-			}
 			#description-input {
 				--uui-textarea-border-color: transparent;
 				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */

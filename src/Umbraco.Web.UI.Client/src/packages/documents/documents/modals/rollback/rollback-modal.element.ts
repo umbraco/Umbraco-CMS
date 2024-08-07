@@ -246,6 +246,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			diffs.push({ alias: item.alias, diff });
 		});
 
+		/**
+		 *
+		 * @param str
+		 */
 		function trimQuotes(str: string): string {
 			return str.replace(/^['"]|['"]$/g, '');
 		}

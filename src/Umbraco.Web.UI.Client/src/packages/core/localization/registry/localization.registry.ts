@@ -2,8 +2,8 @@ import {
 	type UmbLocalizationSetBase,
 	type UmbLocalizationDictionary,
 	type UmbLocalizationFlatDictionary,
-	UMB_DEFAULT_LOCALIZATION_CULTURE
-} from "@umbraco-cms/backoffice/localization-api";
+	UMB_DEFAULT_LOCALIZATION_CULTURE,
+} from '@umbraco-cms/backoffice/localization-api';
 import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import type { ManifestLocalization, UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -11,6 +11,12 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 
+/**
+ *
+ * @param innerDictionary
+ * @param dictionaryName
+ * @param dictionary
+ */
 function addOrUpdateDictionary(
 	innerDictionary: UmbLocalizationFlatDictionary,
 	dictionaryName: string,
@@ -22,7 +28,9 @@ function addOrUpdateDictionary(
 }
 
 export class UmbLocalizationRegistry {
-	#currentLanguage = new UmbStringState(document.documentElement.lang !== '' ? document.documentElement.lang : UMB_DEFAULT_LOCALIZATION_CULTURE);
+	#currentLanguage = new UmbStringState(
+		document.documentElement.lang !== '' ? document.documentElement.lang : UMB_DEFAULT_LOCALIZATION_CULTURE,
+	);
 	readonly currentLanguage = this.#currentLanguage.asObservable();
 
 	#loadedExtAliases: Array<string> = [];

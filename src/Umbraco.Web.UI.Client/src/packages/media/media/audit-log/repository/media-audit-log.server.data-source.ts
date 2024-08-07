@@ -26,7 +26,7 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 	/**
 	 * Get the audit log for a Media
 	 * @param {UmbAuditLogRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaAuditLogServerDataSource
 	 */
 	async getAuditLog(args: UmbAuditLogRequestArgs) {

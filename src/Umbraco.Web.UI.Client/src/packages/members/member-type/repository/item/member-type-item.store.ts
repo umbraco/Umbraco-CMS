@@ -6,7 +6,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbMemberTypeItemStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Member Type items
  */
 

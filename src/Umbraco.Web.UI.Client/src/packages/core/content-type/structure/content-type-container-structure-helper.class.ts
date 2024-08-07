@@ -236,6 +236,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	/**
 	 * Returns true if the container is an owner container.
+	 * @param containerId
 	 */
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;

@@ -109,7 +109,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	/**
 	 * @type {Array<UmbLinkPickerLink>}
-	 * @default []
+	 * @default
 	 */
 	@property({ attribute: false })
 	set urls(data: Array<UmbLinkPickerLink>) {
