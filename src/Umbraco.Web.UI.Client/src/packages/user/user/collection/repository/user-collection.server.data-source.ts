@@ -33,7 +33,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	/**
 	 * Gets the user collection filtered by the given filter.
 	 * @param {UmbUserCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {

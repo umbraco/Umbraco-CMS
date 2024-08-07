@@ -7,7 +7,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * This Controller manages a single Extension and its Element.
  * When the extension is permitted to be used, its Element will be instantiated and available for the consumer.
- *
  * @example
  * ```ts
  * const controller = new UmbExtensionElementController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the element: ", ctrl.component) }));

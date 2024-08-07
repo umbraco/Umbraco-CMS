@@ -2,7 +2,7 @@ import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @export
- * @method observeMultiple
+ * @function observeMultiple
  * @param {Array<Observable<T>>} sources - an Array of Observables to use for this combined observation.
  * @description - combines multiple Observables into a single Observable that can be observed.
  * @returns {Observable<Array<T>>} - Returns a new Observable that combines the Observables into a single Observable with the values of the given Observables in an Array with the same order as the Array of Observables.

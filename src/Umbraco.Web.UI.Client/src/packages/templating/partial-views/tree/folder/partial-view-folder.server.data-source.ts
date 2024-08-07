@@ -27,7 +27,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 	/**
 	 * Fetches a Partial View folder from the server
 	 * @param {string} unique
-	 * @return {UmbDataSourceResponse<UmbFolderModel>}
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -59,7 +59,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 	/**
 	 * Creates a Partial View folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {UmbDataSourceResponse<UmbFolderModel>}
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -92,7 +92,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 	/**
 	 * Deletes a Partial View folder on the server
 	 * @param {string} unique
-	 * @return {UmbDataSourceErrorResponse}
+	 * @returns {UmbDataSourceErrorResponse}
 	 * @memberof UmbPartialViewServerDataSource
 	 */
 	async delete(unique: string) {

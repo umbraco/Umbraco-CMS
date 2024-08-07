@@ -31,21 +31,21 @@ export interface UmbTreeDataSource<
 > {
 	/**
 	 * Gets the root items of the tree.
-	 * @return {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
+	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
 	getRootItems(args: TreeRootItemsRequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the children of the given parent item.
-	 * @return {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>}
+	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>}
 	 * @memberof UmbTreeDataSource
 	 */
 	getChildrenOf(args: TreeChildrenOfRequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the ancestors of the given item.
-	 * @return {*}  {Promise<UmbDataSourceResponse<Array<TreeItemType>>}
+	 * @returns {*}  {Promise<UmbDataSourceResponse<Array<TreeItemType>>}
 	 * @memberof UmbTreeDataSource
 	 */
 	getAncestorsOf(args: TreeAncestorsOfRequestArgsType): Promise<UmbDataSourceResponse<Array<TreeItemType>>>;

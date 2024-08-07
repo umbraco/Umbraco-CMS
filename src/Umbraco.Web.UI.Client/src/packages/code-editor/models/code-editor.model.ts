@@ -203,35 +203,30 @@ export interface CodeEditorConstructorOptions {
 export interface CodeEditorSearchOptions {
 	/**
 	 *   Limit the searching to only search inside the editable range of the model.
-	 *
 	 * @type {boolean}
 	 * @memberof CodeEditorSearchOptions
 	 */
 	searchOnlyEditableRange?: boolean;
 	/**
 	 * Used to indicate that searchString is a regular expression.
-	 *
 	 * @type {boolean}
 	 * @memberof CodeEditorSearchOptions
 	 */
 	isRegex?: boolean;
 	/**
 	 * Force the matching to match lower/upper case exactly.
-	 *
 	 * @type {boolean}
 	 * @memberof CodeEditorSearchOptions
 	 */
 	matchCase?: boolean;
 	/**
 	 * Force the matching to match entire words only. Pass null otherwise.
-	 *
 	 * @type {string}
 	 * @memberof CodeEditorSearchOptions
 	 */
 	wordSeparators?: string | null;
 	/**
 	 * The result will contain the captured groups.
-	 *
 	 * @type {boolean}
 	 * @memberof CodeEditorSearchOptions
 	 */

@@ -1,7 +1,7 @@
 /**
  * Returns a hash code from a string
- * @param  {String} str - The string to hash.
- * @return {Number} - A 32bit integer
+ * @param  {string} str - The string to hash.
+ * @returns {number} - A 32bit integer
  */
 export function simpleHashCode(str: string) {
 	let hash = 0,

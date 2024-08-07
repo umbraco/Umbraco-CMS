@@ -19,7 +19,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	 * Uploads an avatar for the user with the given id
 	 * @param {string} userUnique
 	 * @param {File} file
-	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @returns {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
 	async uploadAvatar(userUnique: string, file: File) {
@@ -50,7 +50,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	/**
 	 * Removes the avatar for the user with the given id
 	 * @param {string} userUnique
-	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @returns {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
 	async deleteAvatar(userUnique: string) {

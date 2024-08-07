@@ -7,6 +7,9 @@ import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
 /**
  * Sizes an image in the editor
+ * @param editor
+ * @param imageDomElement
+ * @param imgUrl
  */
 export async function sizeImageInEditor(editor: Editor, imageDomElement: HTMLElement, imgUrl?: string) {
 	const size = editor.dom.getSize(imageDomElement);
@@ -34,6 +37,9 @@ export async function sizeImageInEditor(editor: Editor, imageDomElement: HTMLEle
 
 /**
  * Scales an image to the max size
+ * @param maxSize
+ * @param width
+ * @param height
  */
 export function scaleToMaxSize(maxSize: number, width: number, height: number) {
 	const retval = { width, height };
@@ -67,6 +73,8 @@ export function scaleToMaxSize(maxSize: number, width: number, height: number) {
 
 /**
  * Uploads blob images to the server
+ * @param editor
+ * @param newContent
  */
 export async function uploadBlobImages(editor: Editor, newContent?: string) {
 	const content = newContent ?? editor.getContent();

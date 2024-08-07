@@ -8,7 +8,7 @@ import { map } from '@umbraco-cms/backoffice/external/rxjs';
 /**
  *  @element umb-user-group-ref
  *  @description - Component for displaying a reference to a User Group
- *  @extends UUIRefNodeElement
+ *  @augments UUIRefNodeElement
  */
 @customElement('umb-user-group-ref')
 export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {

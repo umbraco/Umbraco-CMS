@@ -8,7 +8,7 @@ export const UMB_TAG_STORE_CONTEXT = new UmbContextToken<UmbTagStore>('UmbTagSto
 /**
  * @export
  * @class UmbTagStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Template Details
  */
 export class UmbTagStore extends UmbStoreBase {
@@ -26,6 +26,7 @@ export class UmbTagStore extends UmbStoreBase {
 	/**
 	 * Append a tag to the store
 	 * @param {TagResponseModel} TAG
+	 * @param tag
 	 * @memberof UmbTagStore
 	 */
 	override append(tag: TagResponseModel) {
@@ -35,6 +36,7 @@ export class UmbTagStore extends UmbStoreBase {
 	/**
 	 * Append a tag to the store
 	 * @param {id} TagResponseModel id.
+	 * @param id
 	 * @memberof UmbTagStore
 	 */
 	byId(id: TagResponseModel['id']) {

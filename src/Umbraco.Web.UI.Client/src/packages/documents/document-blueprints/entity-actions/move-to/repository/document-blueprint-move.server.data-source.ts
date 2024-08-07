@@ -24,7 +24,8 @@ export class UmbMoveDocumentBlueprintServerDataSource implements UmbMoveDataSour
 	 * Move an item for the given id to the target unique
 	 * @param {string} unique
 	 * @param {(string | null)} targetUnique
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbMoveDocumentBlueprintServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {

@@ -6,7 +6,7 @@ export class UmbStylesheetRuleManager {
 	/**
 	 * Extracts umbraco rules from a stylesheet content
 	 * @param {string} stylesheetContent
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbStylesheetRuleManager
 	 */
 	extractRules(stylesheetContent: string): Array<UmbStylesheetRule> {
@@ -26,7 +26,7 @@ export class UmbStylesheetRuleManager {
 	 * Inserts umbraco rules into stylesheet content
 	 * @param {string} stylesheetContent
 	 * @param {UmbStylesheetRule[]} rules
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbStylesheetRuleManager
 	 */
 	insertRules(stylesheetContent: string, rules: Array<any>): string {

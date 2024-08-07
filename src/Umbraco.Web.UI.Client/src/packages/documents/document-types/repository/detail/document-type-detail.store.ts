@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * @export
  * @class UmbDocumentTypeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeDetailStore extends UmbDetailStoreBase<UmbDocumentTypeDetailModel> {

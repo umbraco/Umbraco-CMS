@@ -133,7 +133,7 @@ export abstract class UmbBlockEntryContext<
 
 	/**
 	 * Set the contentUdi of this entry.
-	 * @method setContentUdi
+	 * @function setContentUdi
 	 * @param {string} contentUdi the entry content UDI.
 	 * @returns {void}
 	 */
@@ -144,7 +144,7 @@ export abstract class UmbBlockEntryContext<
 
 	/**
 	 * Get the current value of this Blocks label.
-	 * @method getLabel
+	 * @function getLabel
 	 * @returns {string}
 	 */
 	getLabel() {

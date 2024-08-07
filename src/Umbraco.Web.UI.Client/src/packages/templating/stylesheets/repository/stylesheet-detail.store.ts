@@ -6,7 +6,7 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbStylesheetDetailStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for stylesheet detail
  */
 export class UmbStylesheetDetailStore extends UmbDetailStoreBase<UmbStylesheetDetailModel> {
