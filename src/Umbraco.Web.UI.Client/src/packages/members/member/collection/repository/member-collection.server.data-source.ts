@@ -29,7 +29,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	/**
 	 * Gets the member collection filtered by the given filter.
 	 * @param {UmbMemberCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbMemberCollectionFilterModel) {

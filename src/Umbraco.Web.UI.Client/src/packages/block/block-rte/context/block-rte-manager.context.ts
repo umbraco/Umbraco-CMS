@@ -80,7 +80,10 @@ export class UmbBlockRteManagerContext<
 		return true;
 	}
 
-	/** @internal */
+	/**
+	 * @param contentUdi
+	 * @internal
+	 */
 	public deleteLayoutElement(contentUdi: string) {
 		if (!this.#editor) return;
 

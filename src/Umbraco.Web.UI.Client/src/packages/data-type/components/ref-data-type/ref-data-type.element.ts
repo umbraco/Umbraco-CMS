@@ -7,7 +7,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 /**
  *  @element umb-ref-data-type
  *  @description - Component for displaying a reference to a Data Type
- *  @extends UUIRefNodeElement
+ *  @augments UUIRefNodeElement
  */
 @customElement('umb-ref-data-type')
 export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
@@ -65,9 +65,11 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this.propertyEditorUiAlias),
 			async (manifestPropertyEditorUi) => {
 				const icon = manifestPropertyEditorUi?.meta.icon;
-				/** [LI] We have the icon name now, but because this element extends from uui-ref-node, it wants the icon via the icon slot.
+				/**
+				 * [LI] We have the icon name now, but because this element extends from uui-ref-node, it wants the icon via the icon slot.
 				 * From what I can see, this is not possible via this file, but this is the file that have the datatype data....
-				 * Instead, overwriting the fallbackIcon property which requires a SVG... */
+				 * Instead, overwriting the fallbackIcon property which requires a SVG...
+				 */
 				if (icon) {
 					this.#requestIconSVG(icon);
 				}

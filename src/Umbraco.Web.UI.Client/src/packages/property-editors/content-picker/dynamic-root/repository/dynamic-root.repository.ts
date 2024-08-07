@@ -10,7 +10,7 @@ const GUID_EMPTY: string = '00000000-0000-0000-0000-000000000000';
  * UmbContentPickerDynamicRootRepository
  * @export
  * @class UmbContentPickerDynamicRootRepository
- * @extends {UmbControllerBase}
+ * @augments {UmbControllerBase}
  */
 export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 	#dataSource: UmbContentPickerDynamicRootServerDataSource;
@@ -26,7 +26,7 @@ export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 	 * @param {UmbContentPickerDynamicRoot} query
 	 * @param {string} entityUnique
 	 * @param {string} [parentUnique]
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbContentPickerDynamicRootRepository
 	 */
 	async requestRoot(query: UmbContentPickerDynamicRoot, entityUnique: string, parentUnique?: string) {

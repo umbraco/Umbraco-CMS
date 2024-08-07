@@ -124,7 +124,7 @@ export abstract class UmbTreeItemContextBase<
 	// TODO: Be aware that this method, could be removed and we can use the getter method instead [NL]
 	/**
 	 * Returns the manifest.
-	 * @return {ManifestCollection}
+	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
 	 */
 	public getManifest() {

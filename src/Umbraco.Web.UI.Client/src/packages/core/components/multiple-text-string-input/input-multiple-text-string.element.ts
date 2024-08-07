@@ -71,7 +71,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 	 * Disables the input
 	 * @type {boolean}
 	 * @attr
-	 * @default false
+	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
 	public set disabled(value) {
@@ -89,7 +89,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 	 * Makes the input readonly
 	 * @type {boolean}
 	 * @attr
-	 * @default false
+	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
 	public set readonly(value) {

@@ -8,7 +8,7 @@ import { UmbBasicState } from './basic-state.js';
 /**
  * @export
  * @class UmbDeepState
- * @extends {BehaviorSubject<T>}
+ * @augments {BehaviorSubject<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  */
@@ -22,7 +22,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	}
 
 	/**
-	 * @method createObservablePart
+	 * @function createObservablePart
 	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
 	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
 	 * @returns {Observable<R>}
@@ -36,7 +36,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	}
 
 	/**
-	 * @method setValue
+	 * @function setValue
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 */
@@ -55,7 +55,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	}
 
 	/**
-	 * @method mute
+	 * @function mute
 	 * @description - Set mute for this state.
 	 */
 	mute() {
@@ -64,7 +64,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	}
 
 	/**
-	 * @method unmute
+	 * @function unmute
 	 * @description - Unset the mute of this state.
 	 */
 	unmute() {
@@ -77,7 +77,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	}
 
 	/**
-	 * @method isMuted
+	 * @function isMuted
 	 * @description - Check if the state is muted.
 	 * @returns {boolean} - Returns true if the state is muted.
 	 */
@@ -86,7 +86,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	}
 
 	/**
-	 * @method getMutePromise
+	 * @function getMutePromise
 	 * @description - Get a promise which resolves when the mute is unset.
 	 * @returns {Promise<void>}
 	 */

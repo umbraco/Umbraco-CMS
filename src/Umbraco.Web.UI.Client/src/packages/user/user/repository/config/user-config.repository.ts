@@ -44,6 +44,7 @@ export class UmbUserConfigRepository extends UmbRepositoryBase implements UmbApi
 
 	/**
 	 * Subscribe to a part of the user configuration.
+	 * @param part
 	 */
 	part<Part extends keyof UmbUserConfigurationModel>(part: Part): Observable<UmbUserConfigurationModel[Part]> {
 		if (!this.#dataStore) {

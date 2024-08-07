@@ -28,7 +28,7 @@ export class UmbRelationTypeDetailRepository
 	/**
 	 * Requests the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async requestByUnique(unique: string) {
@@ -47,7 +47,7 @@ export class UmbRelationTypeDetailRepository
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async byUnique(unique: string) {

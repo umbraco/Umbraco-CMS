@@ -139,7 +139,7 @@
 		},
 		{
 			"name": "icon-bar-chart",
-			"file": "bar-chart-2.svg"
+			"file": "chart-no-axes-column.svg"
 		},
 		{
 			"name": "icon-barcode",
@@ -147,7 +147,7 @@
 		},
 		{
 			"name": "icon-bars",
-			"file": "bar-chart.svg"
+			"file": "chart-no-axes-column-increasing.svg"
 		},
 		{
 			"name": "icon-battery-full",
@@ -376,11 +376,11 @@
 		},
 		{
 			"name": "icon-chart-curve",
-			"file": "area-chart.svg"
+			"file": "chart-no-axes-combined.svg"
 		},
 		{
 			"name": "icon-chart",
-			"file": "line-chart.svg"
+			"file": "chart-line.svg"
 		},
 		{
 			"name": "icon-chat-active",
@@ -653,7 +653,7 @@
 		},
 		{
 			"name": "icon-defrag",
-			"file": "scatter-chart.svg"
+			"file": "chart-scatter.svg"
 		},
 		{
 			"name": "icon-delete-key",
@@ -1664,7 +1664,7 @@
 		},
 		{
 			"name": "icon-pie-chart",
-			"file": "pie-chart.svg"
+			"file": "chart-pie.svg"
 		},
 		{
 			"name": "icon-piggy-bank",
@@ -2447,6 +2447,10 @@
 		{
 			"name": "icon-database",
 			"file": "database.svg"
+		},
+		{
+			"name": "icon-umb-manifest",
+			"file": "puzzle.svg"
 		}
 	],
 	"simpleIcons": [

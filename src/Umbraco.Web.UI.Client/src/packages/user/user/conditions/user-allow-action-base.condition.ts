@@ -43,7 +43,7 @@ export abstract class UmbUserActionConditionBase
 	/**
 	 * Check if the current user is the same as the user being edited
 	 * @protected
-	 * @return {Promise<boolean>}
+	 * @returns {Promise<boolean>}
 	 * @memberof UmbUserActionConditionBase
 	 */
 	protected async isCurrentUser() {

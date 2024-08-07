@@ -124,7 +124,7 @@ export class UmbDefaultTreeContext<
 	// TODO: getManifest, could be refactored to use the getter method [NL]
 	/**
 	 * Returns the manifest.
-	 * @return {ManifestTree}
+	 * @returns {ManifestTree}
 	 * @memberof UmbDefaultTreeContext
 	 */
 	public getManifest() {
@@ -228,7 +228,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the hideTreeRoot config
-	 * @return {boolean}
+	 * @returns {boolean}
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getHideTreeRoot() {
@@ -249,7 +249,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the startNode config
-	 * @return {UmbTreeStartNode}
+	 * @returns {UmbTreeStartNode}
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getStartNode() {
@@ -270,7 +270,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the foldersOnly config
-	 * @return {boolean}
+	 * @returns {boolean}
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getFoldersOnly() {
@@ -279,6 +279,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Updates the requestArgs config and reloads the tree.
+	 * @param args
 	 */
 	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
 		this.#additionalRequestArgs.setValue({ ...this.#additionalRequestArgs.getValue(), ...args });

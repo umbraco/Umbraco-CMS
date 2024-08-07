@@ -1,3 +1,7 @@
+/**
+ *
+ * @param udi
+ */
 export function getGuid(udi: string) {
 	if (!udi.startsWith('umb://')) throw new Error('udi does not start with umb://');
 

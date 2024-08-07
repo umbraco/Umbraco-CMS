@@ -32,7 +32,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Creates a new Media Type scaffold
 	 * @param {Partial<UmbMediaTypeDetailModel>} [preset]
-	 * @return { CreateMediaTypeRequestModel }
+	 * @returns { CreateMediaTypeRequestModel }
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMediaTypeDetailModel> = {}) {
@@ -61,7 +61,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Fetches a Media Type with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -130,7 +130,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Inserts a new Media Type on the server
 	 * @param {UmbMediaTypeDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
@@ -197,7 +197,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Updates a MediaType on the server
 	 * @param {UmbMediaTypeDetailModel} MediaType
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async update(model: UmbMediaTypeDetailModel) {
@@ -262,7 +262,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Deletes a Media Type on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async delete(unique: string) {

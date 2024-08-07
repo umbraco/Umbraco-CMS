@@ -26,7 +26,7 @@ export class UmbDictionaryCollectionServerDataSource implements UmbCollectionDat
 	/**
 	 * Gets the dictionary collection filtered by the given filter.
 	 * @param {UmbDictionaryCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbDictionaryCollectionFilterModel) {

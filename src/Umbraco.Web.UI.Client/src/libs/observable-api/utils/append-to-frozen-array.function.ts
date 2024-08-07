@@ -1,7 +1,8 @@
 /**
  * @export
- * @method appendToFrozenArray
+ * @function appendToFrozenArray
  * @param {Array<T>} source - An Array which is frozen and should be updated.
+ * @param data
  * @param {T} entry - A new entry to append to the array.
  * @param {(entry: T) => unknown} getUniqueMethod - Method to retrieve a value of an entry that is unique to it. This enables the method to replace existing value if it matches the unique value.
  * @returns {Array<T>} - Returns a new array with the new entry appended.

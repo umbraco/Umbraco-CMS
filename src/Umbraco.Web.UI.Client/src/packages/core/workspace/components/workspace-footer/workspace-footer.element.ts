@@ -8,6 +8,10 @@ import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { ManifestWorkspaceAction, MetaWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
 
+/**
+ *
+ * @param manifest
+ */
 function ExtensionApiArgsMethod(
 	manifest: ManifestWorkspaceAction<MetaWorkspaceAction>,
 ): [UmbWorkspaceActionArgs<MetaWorkspaceAction>] {
@@ -21,7 +25,7 @@ function ExtensionApiArgsMethod(
  * @slot actions - Slot for workspace actions
  * @export
  * @class UmbWorkspaceFooterLayout
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-footer')

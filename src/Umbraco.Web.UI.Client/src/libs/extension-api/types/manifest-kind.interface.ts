@@ -6,7 +6,6 @@ export interface ManifestKind<ManifestTypes> {
 	/**
 	 * Provide pre defined properties for the extension manifest.
 	 * Define the `type`-property and other properties you like to preset for implementations of this kind.
-	 *
 	 * @example {
 	 *	type: 'section',
 	 * 	weight: 123,
