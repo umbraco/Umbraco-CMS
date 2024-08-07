@@ -7,9 +7,9 @@ using Umbraco.Cms.Core.Services.Navigation;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
 [TestFixture]
-public class NavigationServiceTests
+public class ContentNavigationServiceBaseTests
 {
-    private INavigationService _navigationService;
+    private TestContentNavigationService _navigationService;
 
     private Guid Root { get; set; }
 
@@ -42,7 +42,7 @@ public class NavigationServiceTests
         //    - Child 3
         //      - Grandchild 4
 
-        _navigationService = new ContentNavigationService(
+        _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
             Mock.Of<INavigationRepository>());
 
