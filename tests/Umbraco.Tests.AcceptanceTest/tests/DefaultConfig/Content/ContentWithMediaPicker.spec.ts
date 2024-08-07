@@ -69,6 +69,7 @@ test('can publish content with the media picker data type', async ({umbracoApi, 
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value[0].mediaKey).toEqual(mediaFileId);
   expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(mediaTypeName);
