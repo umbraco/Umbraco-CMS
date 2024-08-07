@@ -19,21 +19,19 @@ export class UmbVariantValuesValidationMessageTranslator
 
 	translate(path: string) {
 		if (path.indexOf('$.values[') !== 0) {
-			// No translation anyway.
 			return;
 		}
 		const pathEnd = path.indexOf(']');
 		if (pathEnd === -1) {
-			// No translation anyway.
 			return;
 		}
 		// retrieve the number from the message values index: [NL]
 		const index = parseInt(path.substring(9, pathEnd));
 
 		if (isNaN(index)) {
-			// No translation anyway.
 			return;
 		}
+
 		// Get the data from the validation request, the context holds that for us: [NL]
 		const data = this.#context.getData();
 
