@@ -234,7 +234,7 @@ internal abstract class ContentNavigationServiceBase
     protected async Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
     {
         // This is only relevant for items in the content and media trees
-        if (readLock != -Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
+        if (readLock != Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
         {
             return;
         }
