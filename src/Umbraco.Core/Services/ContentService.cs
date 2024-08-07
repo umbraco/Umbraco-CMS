@@ -34,7 +34,8 @@ public class ContentService : RepositoryService, IContentService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly INavigationService _navigationService;
+    private readonly IDocumentNavigationService _documentNavigationService;
+    private readonly IDocumentRecycleBinNavigationService _documentRecycleBinNavigationService;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -53,7 +54,8 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        INavigationService navigationService)
+        IDocumentNavigationService documentNavigationService,
+        IDocumentRecycleBinNavigationService documentRecycleBinNavigationService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -66,11 +68,12 @@ public class ContentService : RepositoryService, IContentService
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
-        _navigationService = navigationService;
+        _documentNavigationService = documentNavigationService;
+        _documentRecycleBinNavigationService = documentRecycleBinNavigationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-    [Obsolete("Use constructor that takes INavigationService as a parameter, scheduled for removal in V16")]
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -99,7 +102,8 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<INavigationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentRecycleBinNavigationService>())
     {
     }
 
@@ -131,7 +135,8 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            StaticServiceProvider.Instance.GetRequiredService<INavigationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentRecycleBinNavigationService>())
     {
     }
 
@@ -1075,7 +1080,7 @@ public class ContentService : RepositoryService, IContentService
             // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.Save-with-contentSchedule",
-                () => _navigationService.Add(content.Key, GetParent(content)?.Key));
+                () => _documentNavigationService.Add(content.Key, GetParent(content)?.Key));
 
             if (contentSchedule != null)
             {
@@ -1144,7 +1149,7 @@ public class ContentService : RepositoryService, IContentService
                 // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.ContentService.Save",
-                    () => _navigationService.Add(content.Key, GetParent(content)?.Key));
+                    () => _documentNavigationService.Add(content.Key, GetParent(content)?.Key));
             }
 
             scope.Notifications.Publish(
@@ -2346,7 +2351,7 @@ public class ContentService : RepositoryService, IContentService
             // Updates in-memory navigation structure
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.DeleteLocked",
-                () => _navigationService.Remove(content.Key));
+                () => _documentNavigationService.Remove(content.Key));
         }
     }
 
@@ -2630,7 +2635,7 @@ public class ContentService : RepositoryService, IContentService
             // Updates in-memory navigation structure
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked",
-                () => _navigationService.Move(content.Key, parent?.Key));
+                () => _documentNavigationService.Move(content.Key, parent?.Key));
         }
     }
 
@@ -2846,7 +2851,7 @@ public class ContentService : RepositoryService, IContentService
                     {
                         foreach (Tuple<Guid, Guid?> update in navigationUpdates)
                         {
-                            _navigationService.Add(update.Item1, update.Item2);
+                            _documentNavigationService.Add(update.Item1, update.Item2);
                         }
                     });
             }
