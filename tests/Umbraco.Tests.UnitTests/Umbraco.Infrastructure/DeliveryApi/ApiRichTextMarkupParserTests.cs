@@ -72,8 +72,8 @@ public class ApiRichTextMarkupParserTests
 <p>and to the <a type=""document"" href=""/{localLink:cc143afe-4cbf-46e5-b399-c9f451384373}"" title=""other page"">other page</a></p>";
 
         var expectedOutput =
-            @"<p>Rich text outside of the blocks with a link to <a type=""document"" href=""/self/"" title=""itself"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"">itself</a><br><br></p>
-<p>and to the <a type=""document"" href=""/other/"" title=""other page"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"">other page</a></p>";
+            @"<p>Rich text outside of the blocks with a link to <a href=""/self/"" title=""itself"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"">itself</a><br><br></p>
+<p>and to the <a href=""/other/"" title=""other page"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"">other page</a></p>";
 
         var parsedHtml = parser.Parse(html);
 
@@ -81,7 +81,7 @@ public class ApiRichTextMarkupParserTests
     }
 
     [Test]
-    public void Can_Parse_Legacy_LocalImages()
+    public void Can_Parse_Inline_LocalImages()
     {
         var key1 = Guid.Parse("395bdc0e8f4d4ad4af7f3a3f6265651e");
         var data1 = new MockData()
