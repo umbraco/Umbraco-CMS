@@ -37,14 +37,12 @@ export class UmbWorkspaceAliasCondition
 export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceAlias'> & {
 	/**
 	 * Define the workspace that this extension should be available in
-	 *
 	 * @example
 	 * "Umb.Workspace.Document"
 	 */
 	match?: string;
 	/**
 	 * Define one or more workspaces that this extension should be available in
-	 *
 	 * @example
 	 * ["Umb.Workspace.Document", "Umb.Workspace.Media"]
 	 */

@@ -6,6 +6,10 @@ import type {
 	ElementLoaderProperty,
 } from '../types/utils.js';
 
+/**
+ *
+ * @param property
+ */
 export async function loadManifestElement<ElementType extends HTMLElement>(
 	property: ElementLoaderProperty<ElementType> | ElementAndApiLoaderProperty<ElementType>,
 ): Promise<ClassConstructor<ElementType> | undefined> {

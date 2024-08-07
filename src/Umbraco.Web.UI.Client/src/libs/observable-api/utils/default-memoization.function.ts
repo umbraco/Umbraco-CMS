@@ -2,7 +2,7 @@ import { jsonStringComparison } from './json-string-comparison.function.js';
 
 /**
  * @export
- * @method defaultMemoization
+ * @function defaultMemoization
  * @param {any} previousValue - The previous value to compare.
  * @param {any} currentValue - The current value to compare.
  * @returns {boolean} - Returns true if the values are identical.

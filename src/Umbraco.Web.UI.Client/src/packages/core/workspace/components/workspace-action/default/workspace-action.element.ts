@@ -185,6 +185,10 @@ declare global {
 	}
 }
 
+/**
+ *
+ * @param manifest
+ */
 function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
 	return [{ meta: manifest.meta }];
 }

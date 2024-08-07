@@ -1,7 +1,10 @@
+import { UMB_BLOCK_GRID } from '../../types.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+// Getting umb-block-type-custom-view-guide element
+import '@umbraco-cms/backoffice/block-type';
 
 @customElement('umb-block-grid-type-workspace-view-advanced')
 export class UmbBlockGridTypeWorkspaceViewAdvancedElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -20,6 +23,13 @@ export class UmbBlockGridTypeWorkspaceViewAdvancedElement extends UmbLitElement 
 					label=${this.localize.term('blockEditor_forceHideContentEditor')}
 					alias="hideContentEditor"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
+			</uui-box>
+			<uui-box headline=${this.localize.term('blockEditor_headlineCustomView')}>
+				<umb-property-layout label=${this.localize.term('blockEditor_labelCustomView')}>
+					<umb-block-type-custom-view-guide
+						slot="editor"
+						block-editor-type=${UMB_BLOCK_GRID}></umb-block-type-custom-view-guide>
+				</umb-property-layout>
 			</uui-box>
 			<uui-box headline=${this.localize.term('blockEditor_headlineCatalogueAppearance')}>
 				<umb-property

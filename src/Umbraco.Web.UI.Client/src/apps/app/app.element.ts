@@ -25,7 +25,6 @@ import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils'
 export class UmbAppElement extends UmbLitElement {
 	/**
 	 * The base URL of the configured Umbraco server.
-	 *
 	 * @attr
 	 * @remarks This is the base URL of the Umbraco server, not the base URL of the backoffice.
 	 */
@@ -39,7 +38,6 @@ export class UmbAppElement extends UmbLitElement {
 
 	/**
 	 * The base path of the backoffice.
-	 *
 	 * @attr
 	 */
 	@property({ type: String })

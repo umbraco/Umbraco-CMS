@@ -34,7 +34,7 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	 * @param {UmbControllerHost} host - The host that the modal should be attached to, this is usually the controller/element that is opening the modal. This additionally acts as the modal origin for the context api.
 	 * @param {(string | UmbModalToken)} modalAlias - The alias or token of the modal to open
 	 * @param {UmbModalContextClassArgs} args - The arguments for this setup.
-	 * @return {*}  {UmbModalHandler}
+	 * @returns {*}  {UmbModalHandler}
 	 * @memberof UmbModalManagerContext
 	 */
 	public open<

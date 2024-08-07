@@ -1,18 +1,19 @@
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '../../../index.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
-import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-property-type-workspace-view-settings')
 export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#context?: typeof UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT.TYPE;
 
-	@state() private _customValidationOptions: Array<Option> = [
+	@state()
+	private _customValidationOptions: Array<Option> = [
 		{
 			name: this.localize.term('validation_validateNothing'),
 			value: '!NOVALIDATION!',
@@ -171,65 +172,61 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	}
 
 	override render() {
-		return this._data
-			? html`
-					<uui-box class="uui-text">
-						<div class="container">
-							<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
-							<uui-input
-								id="name-input"
-								name="name"
-								label=${this.localize.term('placeholders_entername')}
-								@input=${this.#onNameChange}
-								.value=${this._data?.name}
-								placeholder=${this.localize.term('placeholders_entername')}
-								${umbFocus()}>
-								<!-- TODO: validation for bad characters -->
-							</uui-input>
-							<uui-input
-								id="alias-input"
-								name="alias"
-								@input=${this.#onAliasChange}
-								.value=${this._data?.alias}
-								label=${this.localize.term('placeholders_enterAlias')}
-								placeholder=${this.localize.term('placeholders_enterAlias')}
-								?disabled=${this._aliasLocked}>
-								<!-- TODO: validation for bad characters -->
-								<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-									<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
-								</div>
-							</uui-input>
-							<uui-textarea
-								id="description-input"
-								name="description"
-								@input=${this.#onDescriptionChange}
-								label=${this.localize.term('placeholders_enterDescription')}
-								placeholder=${this.localize.term('placeholders_enterDescription')}
-								.value=${this._data?.description}></uui-textarea>
-						</div>
-						<umb-data-type-flow-input
-							.value=${this._data?.dataType?.unique ?? ''}
-							@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
-						<hr />
-						<div class="container">
-							<b><umb-localize key="validation_validation">Validation</umb-localize></b>
-							${this.#renderMandatory()}
-							<p style="margin-bottom: 0">
-								<umb-localize key="validation_customValidation">Custom validation</umb-localize>
-							</p>
-							${this.#renderCustomValidation()}
-						</div>
-						<hr />
-						${this.#renderVariationControls()}
-						<div class="container">
-							<b style="margin-bottom: var(--uui-size-space-3)">
-								<umb-localize key="contentTypeEditor_displaySettingsHeadline">Appearance</umb-localize>
-							</b>
-							<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
-						</div>
-					</uui-box>
-				`
-			: '';
+		if (!this._data) return;
+		return html`
+			<uui-box class="uui-text">
+				<div class="container">
+					<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
+					<uui-input
+						id="name-input"
+						name="name"
+						label=${this.localize.term('placeholders_entername')}
+						placeholder=${this.localize.term('placeholders_entername')}
+						.value=${this._data?.name}
+						@input=${this.#onNameChange}
+						${umbFocus()}>
+						<!-- TODO: validation for bad characters -->
+					</uui-input>
+					<uui-input-lock
+						id="alias-input"
+						name="alias"
+						label=${this.localize.term('placeholders_enterAlias')}
+						placeholder=${this.localize.term('placeholders_enterAlias')}
+						.value=${this._data?.alias}
+						?locked=${this._aliasLocked}
+						@input=${this.#onAliasChange}
+						@lock-change=${this.#onToggleAliasLock}>
+					</uui-input-lock>
+					<uui-textarea
+						id="description-input"
+						name="description"
+						@input=${this.#onDescriptionChange}
+						label=${this.localize.term('placeholders_enterDescription')}
+						placeholder=${this.localize.term('placeholders_enterDescription')}
+						.value=${this._data?.description}></uui-textarea>
+				</div>
+				<umb-data-type-flow-input
+					.value=${this._data?.dataType?.unique ?? ''}
+					@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
+				<hr />
+				<div class="container">
+					<b><umb-localize key="validation_validation">Validation</umb-localize></b>
+					${this.#renderMandatory()}
+					<p style="margin-bottom: 0">
+						<umb-localize key="validation_customValidation">Custom validation</umb-localize>
+					</p>
+					${this.#renderCustomValidation()}
+				</div>
+				<hr />
+				${this.#renderVariationControls()}
+				<div class="container">
+					<b style="margin-bottom: var(--uui-size-space-3)">
+						<umb-localize key="contentTypeEditor_displaySettingsHeadline">Appearance</umb-localize>
+					</b>
+					<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
+				</div>
+			</uui-box>
+		`;
 	}
 
 	#renderAlignLeftIcon() {
@@ -357,16 +354,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				--uui-input-border-color: transparent;
 			}
 
-			#alias-lock {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-			}
-			#alias-lock uui-icon {
-				margin-bottom: 2px;
-				/* margin: 0; */
-			}
 			#description-input {
 				--uui-textarea-border-color: transparent;
 				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */

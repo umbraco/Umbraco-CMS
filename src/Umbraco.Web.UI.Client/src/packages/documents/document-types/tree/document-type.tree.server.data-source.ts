@@ -18,7 +18,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * A data source for the Document Type tree that fetches data from the server
  * @export
  * @class UmbDocumentTypeTreeServerDataSource
- * @extends {UmbTreeServerDataSourceBase}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbDocumentTypeTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	DocumentTypeTreeItemResponseModel,

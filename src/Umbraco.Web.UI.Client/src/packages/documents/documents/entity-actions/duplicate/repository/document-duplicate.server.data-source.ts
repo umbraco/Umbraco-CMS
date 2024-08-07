@@ -23,7 +23,7 @@ export class UmbDuplicateDocumentServerDataSource {
 	/**
 	 * Duplicate an item for the given id to the destination unique
 	 * @param {UmbDuplicateDocumentRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDuplicateDocumentServerDataSource
 	 */
 	async duplicate(args: UmbDuplicateDocumentRequestArgs) {

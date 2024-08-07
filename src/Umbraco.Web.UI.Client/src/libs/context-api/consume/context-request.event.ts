@@ -18,7 +18,7 @@ export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
 /**
  * @export
  * @class UmbContextRequestEventImplementation
- * @extends {Event}
+ * @augments {Event}
  * @implements {UmbContextRequestEvent}
  */
 export class UmbContextRequestEventImplementation<ResultType = unknown>

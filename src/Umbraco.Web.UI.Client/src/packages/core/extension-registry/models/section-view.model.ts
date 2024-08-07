@@ -18,7 +18,6 @@ export interface MetaSectionView {
 	/**
 	 * This is the URL path part for this view. This is used for navigating or deep linking directly to the view
 	 * https://yoursite.com/section/settings/view/my-view-path
-	 *
 	 * @example my-view-path
 	 * @examples [
 	 *  "my-view-path"

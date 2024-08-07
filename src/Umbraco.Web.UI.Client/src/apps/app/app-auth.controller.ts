@@ -60,6 +60,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	/**
 	 * Starts the authorization flow.
 	 * It will check which providers are available and either redirect directly to the provider or show a provider selection screen.
+	 * @param userLoginState
 	 */
 	async makeAuthorizationRequest(userLoginState: UmbUserLoginState = 'loggingIn'): Promise<boolean> {
 		if (!this.#authContext) {

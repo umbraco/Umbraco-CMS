@@ -25,7 +25,7 @@ export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, 
 
 	/**
 	 * @param {string} dataTypeId
-	 * @default []
+	 * @default
 	 */
 	@property({ type: String, attribute: false })
 	override set value(dataTypeId: string) {

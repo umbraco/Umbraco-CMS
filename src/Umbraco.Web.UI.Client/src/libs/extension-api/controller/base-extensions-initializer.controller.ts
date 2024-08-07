@@ -14,7 +14,6 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
 /**
  * This abstract Controller holds the core to manage a multiple Extensions.
  * When one or more extensions are permitted to be used, then the extender of this class can instantiate the relevant single extension initiator relevant for this type.
- *
  * @export
  * @abstract
  * @class UmbBaseExtensionsInitializer

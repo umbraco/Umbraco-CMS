@@ -32,7 +32,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Creates a new Member Type scaffold
 	 * @param {Partial<UmbMemberTypeDetailModel>} [preset]
-	 * @return { CreateMemberTypeRequestModel }
+	 * @returns { CreateMemberTypeRequestModel }
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMemberTypeDetailModel> = {}) {
@@ -61,7 +61,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Fetches a Member Type with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -125,7 +125,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Inserts a new Member Type on the server
 	 * @param {UmbMemberTypeDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async create(model: UmbMemberTypeDetailModel) {
@@ -185,7 +185,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Updates a MemberType on the server
 	 * @param {UmbMemberTypeDetailModel} MemberType
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async update(model: UmbMemberTypeDetailModel) {
@@ -245,7 +245,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Deletes a Member Type on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async delete(unique: string) {

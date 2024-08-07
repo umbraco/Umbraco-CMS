@@ -30,7 +30,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Creates a new Document scaffold
-	 * @return { UmbDocumentBlueprintDetailModel }
+	 * @returns { UmbDocumentBlueprintDetailModel }
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDocumentBlueprintDetailModel> = {}) {
@@ -71,7 +71,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Fetches a Document with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async read(unique: string) {
@@ -121,7 +121,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentBlueprintDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async create(model: UmbDocumentBlueprintDetailModel, parentUnique: string | null = null) {
@@ -154,7 +154,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Updates a Document on the server
 	 * @param {UmbDocumentBlueprintDetailModel} Document
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async update(model: UmbDocumentBlueprintDetailModel) {
@@ -184,7 +184,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Deletes a Document on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async delete(unique: string) {

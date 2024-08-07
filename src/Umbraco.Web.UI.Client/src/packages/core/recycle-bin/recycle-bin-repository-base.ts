@@ -17,7 +17,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  * @export
  * @abstract
  * @class UmbRecycleBinRepositoryBase
- * @extends {UmbRepositoryBase}
+ * @augments {UmbRepositoryBase}
  * @implements {UmbRecycleBinRepository}
  */
 export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase implements UmbRecycleBinRepository {
@@ -37,7 +37,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	/**
 	 * Requests to trash an item.
 	 * @param {UmbRecycleBinTrashRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestTrash(args: UmbRecycleBinTrashRequestArgs) {
@@ -55,7 +55,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	/**
 	 * Requests to restore an item.
 	 * @param {UmbRecycleBinRestoreRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestRestore(args: UmbRecycleBinRestoreRequestArgs) {
@@ -72,7 +72,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Requests to empty the recycle bin.
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestEmpty() {
@@ -90,7 +90,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	/**
 	 * Requests the original parent of an item.
 	 * @param {UmbRecycleBinOriginalParentRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {

@@ -4,7 +4,7 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 /**
  *  @element umb-stylesheet-rule-ref
  *  @description - Component for displaying a reference to a stylesheet rule
- *  @extends UUIRefNodeElement
+ *  @augments UUIRefNodeElement
  */
 @customElement('umb-stylesheet-rule-ref')
 export class UmbStylesheetRuleRefElement extends UUIRefNodeElement {

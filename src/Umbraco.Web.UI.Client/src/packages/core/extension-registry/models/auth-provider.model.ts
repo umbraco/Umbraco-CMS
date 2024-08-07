@@ -4,7 +4,6 @@ import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffic
 /**
  * Represents an authentication provider that can be used to authenticate users.
  * The provider needs to be registered in the API that the authorization request is sent to in order to be used.
- *
  * @see {forProviderName} for the provider name that this provider is for.
  */
 export interface ManifestAuthProvider extends ManifestElement {

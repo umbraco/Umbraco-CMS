@@ -20,7 +20,6 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	private _loggers: LoggerResponseModel[] = [];
 	/**
 	 * The name of the logger to get the level for. Defaults to 'Global'.
-	 *
 	 * @memberof UmbLogViewerLogLevelOverviewElement
 	 */
 	@property()

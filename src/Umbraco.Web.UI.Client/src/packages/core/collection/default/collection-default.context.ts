@@ -197,7 +197,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Requests the collection from the repository.
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbCollectionContext
 	 */
 	public async requestCollection() {
@@ -300,7 +300,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Returns the manifest for the collection.
-	 * @return {ManifestCollection}
+	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use get the `.manifest` property instead.
 	 */

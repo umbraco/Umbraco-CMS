@@ -1,7 +1,8 @@
 /**
  * @export
- * @method pushToUniqueArray
+ * @function pushToUniqueArray
  * @param {T[]} data - An array of objects.
+ * @param index
  * @param {T} entry - The object to insert or replace with.
  * @param {getUniqueMethod: (entry: T) => unknown} [getUniqueMethod] - Method to get the unique value of an entry.
  * @description - Append or replaces an item of an Array.
