@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -13,14 +14,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class NavigationServiceTests : UmbracoIntegrationTest
+public class DocumentNavigationServiceTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     // Testing with IContentEditingService as it calls IContentService underneath
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
-    private INavigationService NavigationService => GetRequiredService<INavigationService>();
+    private IDocumentNavigationService DocumentNavigationService => GetRequiredService<IDocumentNavigationService>();
+
+    private IDocumentRecycleBinNavigationService DocumentRecycleBinNavigationService => GetRequiredService<IDocumentRecycleBinNavigationService>();
 
     private ContentType ContentType { get; set; }
 
@@ -126,7 +129,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         }
 
         // Act
-        var nodeExists = NavigationService.TryGetParentKey(notCreatedRootKey, out _);
+        var nodeExists = DocumentNavigationService.TryGetParentKey(notCreatedRootKey, out _);
 
         // Assert
         Assert.IsFalse(nodeExists);
@@ -136,7 +139,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
     public async Task Structure_Updates_When_Creating_Content()
     {
         // Arrange
-        NavigationService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> initialSiblingsKeys);
+        DocumentNavigationService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> initialSiblingsKeys);
         var initialRootNodeSiblingsCount = initialSiblingsKeys.Count();
 
         var createModel = new ContentCreateModel
@@ -151,7 +154,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         Guid createdItemKey = createAttempt.Result.Content!.Key;
 
         // Verify that the structure has updated by checking the siblings list of the Root once again
-        NavigationService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> updatedSiblingsKeys);
+        DocumentNavigationService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> updatedSiblingsKeys);
         List<Guid> siblingsList = updatedSiblingsKeys.ToList();
 
         // Assert
@@ -170,11 +173,11 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         Guid nodeToUpdate = Root.Key;
 
         // Capture initial state
-        NavigationService.TryGetParentKey(nodeToUpdate, out Guid? initialParentKey);
-        NavigationService.TryGetChildrenKeys(nodeToUpdate, out IEnumerable<Guid> initialChildrenKeys);
-        NavigationService.TryGetDescendantsKeys(nodeToUpdate, out IEnumerable<Guid> initialDescendantsKeys);
-        NavigationService.TryGetAncestorsKeys(nodeToUpdate, out IEnumerable<Guid> initialAncestorsKeys);
-        NavigationService.TryGetSiblingsKeys(nodeToUpdate, out IEnumerable<Guid> initialSiblingsKeys);
+        DocumentNavigationService.TryGetParentKey(nodeToUpdate, out Guid? initialParentKey);
+        DocumentNavigationService.TryGetChildrenKeys(nodeToUpdate, out IEnumerable<Guid> initialChildrenKeys);
+        DocumentNavigationService.TryGetDescendantsKeys(nodeToUpdate, out IEnumerable<Guid> initialDescendantsKeys);
+        DocumentNavigationService.TryGetAncestorsKeys(nodeToUpdate, out IEnumerable<Guid> initialAncestorsKeys);
+        DocumentNavigationService.TryGetSiblingsKeys(nodeToUpdate, out IEnumerable<Guid> initialSiblingsKeys);
 
         var updateModel = new ContentUpdateModel
         {
@@ -186,17 +189,17 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         Guid updatedItemKey = updateAttempt.Result.Content!.Key;
 
         // Capture updated state
-        var parentExists = NavigationService.TryGetParentKey(updatedItemKey, out Guid? updatedParentKey);
-        NavigationService.TryGetChildrenKeys(updatedItemKey, out IEnumerable<Guid> childrenKeysAfterUpdate);
-        NavigationService.TryGetDescendantsKeys(updatedItemKey, out IEnumerable<Guid> descendantsKeysAfterUpdate);
-        NavigationService.TryGetAncestorsKeys(updatedItemKey, out IEnumerable<Guid> ancestorsKeysAfterUpdate);
-        NavigationService.TryGetSiblingsKeys(updatedItemKey, out IEnumerable<Guid> siblingsKeysAfterUpdate);
+        var nodeExists = DocumentNavigationService.TryGetParentKey(updatedItemKey, out Guid? updatedParentKey);
+        DocumentNavigationService.TryGetChildrenKeys(updatedItemKey, out IEnumerable<Guid> childrenKeysAfterUpdate);
+        DocumentNavigationService.TryGetDescendantsKeys(updatedItemKey, out IEnumerable<Guid> descendantsKeysAfterUpdate);
+        DocumentNavigationService.TryGetAncestorsKeys(updatedItemKey, out IEnumerable<Guid> ancestorsKeysAfterUpdate);
+        DocumentNavigationService.TryGetSiblingsKeys(updatedItemKey, out IEnumerable<Guid> siblingsKeysAfterUpdate);
 
         // Assert
         Assert.Multiple(() =>
         {
             // Verify that the item is still present in the navigation structure
-            Assert.IsTrue(parentExists);
+            Assert.IsTrue(nodeExists);
 
             Assert.AreEqual(nodeToUpdate, updatedItemKey);
 
@@ -263,13 +266,13 @@ public class NavigationServiceTests : UmbracoIntegrationTest
     public async Task Structure_Updates_When_Moving_Content(Guid nodeToMove, Guid? targetParentKey)
     {
         // Arrange
-        NavigationService.TryGetParentKey(nodeToMove, out Guid? originalParentKey);
+        DocumentNavigationService.TryGetParentKey(nodeToMove, out Guid? originalParentKey);
 
         // Act
         var moveAttempt = await ContentEditingService.MoveAsync(nodeToMove, targetParentKey, Constants.Security.SuperUserKey);
 
         // Verify the node's new parent is updated
-        NavigationService.TryGetParentKey(moveAttempt.Result!.Key, out Guid? updatedParentKey);
+        DocumentNavigationService.TryGetParentKey(moveAttempt.Result!.Key, out Guid? updatedParentKey);
 
         // Assert
         Assert.Multiple(() =>
@@ -299,7 +302,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
     public async Task Structure_Updates_When_Copying_Content(Guid nodeToCopy, Guid? targetParentKey)
     {
         // Arrange
-        NavigationService.TryGetParentKey(nodeToCopy, out Guid? sourceParentKey);
+        DocumentNavigationService.TryGetParentKey(nodeToCopy, out Guid? sourceParentKey);
 
         // Act
         var copyAttempt = await ContentEditingService.CopyAsync(nodeToCopy, targetParentKey, false, false, Constants.Security.SuperUserKey);
@@ -308,7 +311,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.AreNotEqual(nodeToCopy, copiedItemKey);
 
-        NavigationService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
+        DocumentNavigationService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
 
         Assert.Multiple(() =>
         {
@@ -334,14 +337,14 @@ public class NavigationServiceTests : UmbracoIntegrationTest
     public async Task Structure_Updates_When_Deleting_Content(Guid nodeToDelete)
     {
         // Arrange
-        NavigationService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);
+        DocumentNavigationService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);
 
         // Act
         var deleteAttempt = await ContentEditingService.DeleteAsync(nodeToDelete, Constants.Security.SuperUserKey);
         Guid deletedItemKey = deleteAttempt.Result.Key;
 
         // Assert
-        var nodeExists = NavigationService.TryGetDescendantsKeys(deletedItemKey, out _);
+        var nodeExists = DocumentNavigationService.TryGetDescendantsKeys(deletedItemKey, out _);
         //var nodeExistsInRecycleBin = NavigationService.TryGetDescendantsKeys(nodeToDelete, out _); // TODO: use recycle bin str.
 
         Assert.Multiple(() =>
@@ -352,7 +355,7 @@ public class NavigationServiceTests : UmbracoIntegrationTest
 
             foreach (Guid descendant in initialDescendantsKeys)
             {
-                var descendantExists = NavigationService.TryGetParentKey(descendant, out _);
+                var descendantExists = DocumentNavigationService.TryGetParentKey(descendant, out _);
                 Assert.IsFalse(descendantExists);
 
                 // var descendantExistsInRecycleBin = NavigationService.TryGetParentKey(descendant, out _); // TODO: use recycle bin str.
