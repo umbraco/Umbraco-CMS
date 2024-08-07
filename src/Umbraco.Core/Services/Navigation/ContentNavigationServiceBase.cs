@@ -5,24 +5,19 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
-internal class ContentNavigationService : INavigationService
+internal abstract class ContentNavigationServiceBase
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
     private ConcurrentDictionary<Guid, NavigationNode> _navigationStructure = new();
 
-    public ContentNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
+    protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
     {
         _coreScopeProvider = coreScopeProvider;
         _navigationRepository = navigationRepository;
     }
 
-    public async Task RebuildAsync()
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(Constants.Locks.ContentTree);
-        _navigationStructure = _navigationRepository.GetContentNodesByObjectType(Constants.ObjectTypes.Document);
-    }
+    public abstract Task RebuildAsync();
 
     public bool TryGetParentKey(Guid childKey, out Guid? parentKey)
     {
@@ -176,7 +171,7 @@ internal class ContentNavigationService : INavigationService
         NavigationNode? targetParentNode = null;
         if (targetParentKey.HasValue && _navigationStructure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
         {
-                return false; // Target parent doesn't exist
+            return false; // Target parent doesn't exist
         }
 
         // Remove the node from its current parent's children list
@@ -197,6 +192,29 @@ internal class ContentNavigationService : INavigationService
         _navigationStructure[nodeToMove.Key] = newNode;
 
         return true;
+    }
+
+    /// <summary>
+    ///     Rebuilds the navigation structure based on the specified object type key and whether the items are trashed.
+    ///     Only relevant for items in the content and media trees (which have readLock values of -333 or -334).
+    /// </summary>
+    /// <param name="readLock">The read lock value, should be -333 or -334 for content and media trees.</param>
+    /// <param name="objectTypeKey">The key of the object type to rebuild.</param>
+    /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
+    protected async Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
+    {
+        // This is only relevant for items in the content and media trees
+        if (readLock != -Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
+        {
+            return;
+        }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(readLock);
+
+        _navigationStructure = trashed
+            ? _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey)
+            : _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
     }
 
     private void GetDescendantsRecursively(NavigationNode node, List<Guid> descendants)
