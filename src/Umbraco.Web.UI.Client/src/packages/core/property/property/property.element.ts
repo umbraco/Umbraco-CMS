@@ -33,7 +33,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * Label. Name of the property
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String })
 	public set label(label: string | undefined) {
@@ -47,7 +47,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * Description: render a description underneath the label.
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String })
 	public set description(description: string | undefined) {
@@ -73,7 +73,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String })
 	public set alias(alias: string) {
@@ -88,7 +88,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
 	public set propertyEditorUiAlias(value: string | undefined) {
@@ -105,7 +105,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: Array, attribute: false })
 	public set config(value: UmbPropertyEditorConfig | undefined) {
@@ -131,7 +131,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String, attribute: false })
 	public set dataPath(dataPath: string | undefined) {

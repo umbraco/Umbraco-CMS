@@ -73,12 +73,13 @@ export class UmbBlockGridManagerContext<
 	/**
 	 * Inserts a layout entry into an area of a layout entry.
 	 * @param layoutEntry The layout entry to insert.
+	 * @param insert
 	 * @param entries The layout entries to search within.
 	 * @param parentUnique The parentUnique to search for.
+	 * @param parentId
 	 * @param areaKey The areaKey to insert the layout entry into.
 	 * @param index The index to insert the layout entry at.
 	 * @returns a updated layout entries array if the insert was successful.
-	 *
 	 * @remarks
 	 * This method is recursive and will search for the parentUnique in the layout entries.
 	 * If the parentUnique is found, the layout entry will be inserted into the items of the area that matches the areaKey.

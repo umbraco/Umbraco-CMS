@@ -28,7 +28,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbStylesheetItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

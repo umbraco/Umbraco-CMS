@@ -32,7 +32,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Creates a new Document Type scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateDocumentTypeRequestModel }
+	 * @returns { CreateDocumentTypeRequestModel }
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDocumentTypeDetailModel> = {}) {
@@ -68,7 +68,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Fetches a Media Type with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -135,7 +135,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Inserts a new Media Type on the server
 	 * @param {UmbDocumentTypeDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async create(model: UmbDocumentTypeDetailModel, parentUnique: string | null = null) {
@@ -205,7 +205,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Updates a DocumentType on the server
 	 * @param {UmbDocumentTypeDetailModel} DocumentType
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async update(model: UmbDocumentTypeDetailModel) {
@@ -281,7 +281,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Deletes a Media Type on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async delete(unique: string) {

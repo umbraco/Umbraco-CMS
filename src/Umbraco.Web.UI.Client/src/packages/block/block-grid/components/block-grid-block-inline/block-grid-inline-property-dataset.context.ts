@@ -43,7 +43,7 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	 * Gets the value of a property.
 	 * @template ReturnType
 	 * @param {string} propertyAlias
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbBlockGridInlinePropertyDatasetContext
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
@@ -55,7 +55,7 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	 * Sets the value of a property.
 	 * @param {string} propertyAlias
 	 * @param {unknown} value
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbBlockGridInlinePropertyDatasetContext
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
@@ -65,7 +65,7 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 
 	/**
 	 * Gets the read-only state of the current variant culture.
-	 * @return {*}  {boolean}
+	 * @returns {*}  {boolean}
 	 * @memberof UmbBlockGridInlinePropertyDatasetContext
 	 */
 	getCurrentVariantCultureIsReadOnly(): boolean {

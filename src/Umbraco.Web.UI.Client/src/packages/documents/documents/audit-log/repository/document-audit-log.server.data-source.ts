@@ -26,7 +26,7 @@ export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSourc
 	/**
 	 * Get the audit log for a document
 	 * @param {UmbAuditLogRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentAuditLogServerDataSource
 	 */
 	async getAuditLog(args: UmbAuditLogRequestArgs) {

@@ -58,7 +58,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 
 	/**
 	 * Get current user
-	 * @return {*}  {UmbCurrentUser}
+	 * @returns {*}  {UmbCurrentUser}
 	 * @memberof UmbUserData
 	 */
 	getCurrentUser(): CurrentUserResponseModel {

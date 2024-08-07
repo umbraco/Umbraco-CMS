@@ -37,7 +37,7 @@ export class UmbMemberTypeCompositionServerDataSource
 	/**
 	 * Fetches the compatible compositions for a document type from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
@@ -59,7 +59,8 @@ export class UmbMemberTypeCompositionServerDataSource
 	/**
 	 * Updates the compositions for a document type on the server
 	 * @param {MemberTypeCompositionRequestModel} requestBody
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbMemberTypeAvailableCompositionRequestModel) {

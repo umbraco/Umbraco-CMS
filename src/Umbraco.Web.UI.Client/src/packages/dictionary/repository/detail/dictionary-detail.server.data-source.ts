@@ -30,7 +30,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Creates a new Dictionary scaffold
-	 * @return { CreateDictionaryRequestModel }
+	 * @returns { CreateDictionaryRequestModel }
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async createScaffold() {
@@ -47,7 +47,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Fetches a Dictionary with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async read(unique: string) {
@@ -73,7 +73,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Inserts a new Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async create(model: UmbDictionaryDetailModel, parentUnique: string | null) {
@@ -104,7 +104,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Updates a Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} Dictionary
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async update(model: UmbDictionaryDetailModel) {
@@ -134,7 +134,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Deletes a Dictionary on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async delete(unique: string) {

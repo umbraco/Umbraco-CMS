@@ -23,7 +23,7 @@ export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateToData
 	/**
 	 * Duplicate an item for the given unique to the destination unique
 	 * @param {UmbDuplicateToRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDuplicateMediaTypeServerDataSource
 	 */
 	async duplicateTo(args: UmbDuplicateToRequestArgs) {

@@ -49,6 +49,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 
 	/**
 	 * TODO: Write proper JSDocs here.
+	 * @param propertyAlias
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return await this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias);
@@ -56,6 +57,8 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 
 	/**
 	 * TODO: Write proper JSDocs here.
+	 * @param propertyAlias
+	 * @param value
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this.#workspace.setPropertyValue(propertyAlias, value);

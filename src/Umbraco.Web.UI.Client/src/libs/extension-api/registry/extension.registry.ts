@@ -4,6 +4,11 @@ import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
+/**
+ *
+ * @param previousValue
+ * @param currentValue
+ */
 function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: Array<T>,
 	currentValue: Array<T>,
@@ -19,6 +24,11 @@ function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	return true;
 }
 
+/**
+ *
+ * @param previousValue
+ * @param currentValue
+ */
 function extensionAndKindMatchArrayMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
 >(previousValue: Array<T>, currentValue: Array<T>): boolean {
@@ -45,6 +55,11 @@ function extensionAndKindMatchArrayMemoization<
 	return true;
 }
 
+/**
+ *
+ * @param previousValue
+ * @param currentValue
+ */
 function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: T | undefined,
 	currentValue: T | undefined,
@@ -55,6 +70,11 @@ function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	return previousValue === currentValue;
 }
 
+/**
+ *
+ * @param previousValue
+ * @param currentValue
+ */
 function extensionAndKindMatchSingleMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
 >(previousValue: T | undefined, currentValue: T | undefined): boolean {

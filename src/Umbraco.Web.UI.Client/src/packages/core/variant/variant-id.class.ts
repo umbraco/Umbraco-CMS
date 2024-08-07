@@ -3,6 +3,10 @@ export type UmbObjectWithVariantProperties = {
 	segment: string | null;
 };
 
+/**
+ *
+ * @param variant
+ */
 export function variantPropertiesObjectToString(variant: UmbObjectWithVariantProperties): string {
 	// Currently a direct copy of the toString method of variantId.
 	return (variant.culture || UMB_INVARIANT_CULTURE) + (variant.segment ? `_${variant.segment}` : '');

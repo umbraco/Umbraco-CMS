@@ -15,7 +15,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * @slot default - slot for inserting additional things into this slot.
  * @export
  * @class UmbExtensionSlot
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 
 // TODO: Fire change event.
@@ -36,7 +36,6 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 * <umb-extension-with-api-slot type="my-extension-type"></umb-extension-with-api-slot>
 	 * or multiple:
 	 * <umb-extension-with-api-slot .type=${['my-extension-type','another-extension-type']}></umb-extension-with-api-slot>
-	 *
 	 */
 	@property({ type: String })
 	public get type(): string | string[] | undefined {
@@ -56,7 +55,6 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 * @memberof UmbExtensionSlot
 	 * @example
 	 * <umb-extension-with-api-slot type="my-extension-type" .filter=${(ext) => ext.meta.anyPropToFilter === 'foo'}></umb-extension-with-api-slot>
-	 *
 	 */
 	@property({ type: Object, attribute: false })
 	public get filter(): (manifest: any) => boolean {

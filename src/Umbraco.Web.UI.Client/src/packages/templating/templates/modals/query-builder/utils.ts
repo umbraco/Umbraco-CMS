@@ -13,6 +13,11 @@ type TemplateOperatorModel = TemplateQueryOperatorModel & { localizeKey?: string
 type TemplatePropertyModel = TemplateQueryPropertyPresentationModel & { localizeKey?: string };
 type TemplateSortModel = TemplateQueryExecuteSortModel & { localizeKey?: string };
 
+/**
+ *
+ * @param operators
+ * @param currentPropertyType
+ */
 export function localizeOperators(
 	operators: Array<TemplateQueryOperatorModel>,
 	currentPropertyType: TemplateQueryPropertyTypeModel | null,
@@ -29,6 +34,10 @@ export function localizeOperators(
 	}
 }
 
+/**
+ *
+ * @param propertyTypes
+ */
 export function localizePropertyType(propertyTypes?: Array<TemplateQueryPropertyPresentationModel>) {
 	if (!propertyTypes) return;
 	return propertyTypes.map((propertyType): TemplatePropertyModel => {
@@ -47,6 +56,10 @@ export function localizePropertyType(propertyTypes?: Array<TemplateQueryProperty
 	});
 }
 
+/**
+ *
+ * @param sort
+ */
 export function localizeSort(sort?: TemplateQueryExecuteSortModel | null): TemplateSortModel | undefined {
 	if (!sort?.direction) return undefined;
 	switch (sort.direction) {
@@ -61,6 +74,10 @@ export function localizeSort(sort?: TemplateQueryExecuteSortModel | null): Templ
 
 // Following code is for localization of operators (checks on property type);
 
+/**
+ *
+ * @param operators
+ */
 function isString(operators: Array<TemplateQueryOperatorModel>): Array<TemplateOperatorModel> {
 	return operators.map((operator): TemplateOperatorModel => {
 		switch (operator.operator) {
@@ -78,6 +95,10 @@ function isString(operators: Array<TemplateQueryOperatorModel>): Array<TemplateO
 	});
 }
 
+/**
+ *
+ * @param operators
+ */
 function isInteger(operators: Array<TemplateQueryOperatorModel>): Array<TemplateOperatorModel> {
 	return operators.map((operator): TemplateOperatorModel => {
 		switch (operator.operator) {
@@ -99,6 +120,10 @@ function isInteger(operators: Array<TemplateQueryOperatorModel>): Array<Template
 	});
 }
 
+/**
+ *
+ * @param operators
+ */
 function isDateTime(operators: Array<TemplateQueryOperatorModel>): Array<TemplateOperatorModel> {
 	return operators.map((operator): TemplateOperatorModel => {
 		switch (operator.operator) {

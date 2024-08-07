@@ -25,7 +25,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 
 	/**
 	 * Creates a scaffold for a folder
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbFolderRepositoryBase
 	 */
 	async createScaffold() {
@@ -40,7 +40,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 	/**
 	 * Creates a folder
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbFolderRepositoryBase
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -63,7 +63,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 	/**
 	 * Request a folder
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbFolderRepositoryBase
 	 */
 	async request(unique: string) {
@@ -75,7 +75,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 	/**
 	 * Updates a folder
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbFolderRepositoryBase
 	 */
 	async update(args: UmbUpdateFolderModel) {
@@ -96,7 +96,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 	/**
 	 * Deletes a folder
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbFolderRepositoryBase
 	 */
 	async delete(unique: string) {

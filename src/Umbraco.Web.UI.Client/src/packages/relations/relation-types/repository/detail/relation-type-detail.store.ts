@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * @export
  * @class UmbRelationTypeDetailStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for RelationType Details
  */
 export class UmbRelationTypeDetailStore extends UmbDetailStoreBase<UmbRelationTypeDetailModel> {

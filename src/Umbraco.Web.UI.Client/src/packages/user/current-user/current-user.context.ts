@@ -66,7 +66,6 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 
 	/**
 	 * Checks if a user is the current user.
-	 *
 	 * @param userUnique The user id to check
 	 * @returns True if the user is the current user, otherwise false
 	 */

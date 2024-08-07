@@ -84,8 +84,8 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 
 /**
  * The mixin allows a custom element to participate in HTML forms.
- *
- * @param {Object} superClass - superclass to be extended.
+ * @param {object} superClass - superclass to be extended.
+ * @param defaultValue
  * @mixin
  */
 export function UmbFormControlMixin<
@@ -106,7 +106,7 @@ export function UmbFormControlMixin<
 		 * Value of this form control.
 		 * @type {string}
 		 * @attr value
-		 * @default ''
+		 * @default
 		 */
 		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
 		get value(): ValueType | DefaultValueType {
@@ -125,7 +125,7 @@ export function UmbFormControlMixin<
 		 * Determines wether the form control has been touched or interacted with, this determines wether the validation-status of this form control should be made visible.
 		 * @type {boolean}
 		 * @attr
-		 * @default true
+		 * @default
 		 */
 		@property({ type: Boolean, reflect: true })
 		public set pristine(value: boolean) {
@@ -158,7 +158,7 @@ export function UmbFormControlMixin<
 		/**
 		 * Get internal form element.
 		 * This has to be implemented to provide a FormControl Element of choice for the given context. The element is used as anchor for validation-messages.
-		 * @method getFormElement
+		 * @function getFormElement
 		 * @returns {HTMLElement | undefined | null}
 		 */
 		protected getFormElement(): HTMLElement | undefined | null {
@@ -167,7 +167,7 @@ export function UmbFormControlMixin<
 
 		/**
 		 * Focus first element that is invalid.
-		 * @method focusFirstInvalidElement
+		 * @function focusFirstInvalidElement
 		 * @returns {HTMLElement | undefined}
 		 */
 		focusFirstInvalidElement() {
@@ -196,14 +196,13 @@ export function UmbFormControlMixin<
 		/**
 		 * Add validation, to validate this Form Control.
 		 * See https://developer.mozilla.org/en-US/docs/Web/API/ValidityState for available Validator FlagTypes.
-		 *
 		 * @example
 		 * this.addValidator(
 		 *  'tooLong',
 		 *  () => 'This input contains too many characters',
 		 *  () => this._value.length > 10
 		 * );
-		 * @method addValidator
+		 * @function addValidator
 		 * @param {FlagTypes} flagKey the type of validation.
 		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
 		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
@@ -224,7 +223,7 @@ export function UmbFormControlMixin<
 
 		/**
 		 * Remove validation from this form control.
-		 * @method removeValidator
+		 * @function removeValidator
 		 * @param {UmbFormControlValidatorConfig} validator - The specific validation configuration to remove.
 		 */
 		removeValidator(validator: UmbFormControlValidatorConfig) {
@@ -235,7 +234,7 @@ export function UmbFormControlMixin<
 		}
 
 		/**
-		 * @method addFormControlElement
+		 * @function addFormControlElement
 		 * @description Important notice if adding a native form control then ensure that its value and thereby validity is updated when value is changed from the outside.
 		 * @param element {UmbNativeFormControlElement} - element to validate and include as part of this form association.
 		 */
@@ -258,7 +257,7 @@ export function UmbFormControlMixin<
 		private _customValidityObject?: UmbFormControlValidatorConfig;
 
 		/**
-		 * @method setCustomValidity
+		 * @function setCustomValidity
 		 * @description Set custom validity state, set to empty string to remove the custom message.
 		 * @param message {string} - The message to be shown
 		 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity|HTMLObjectElement:setCustomValidity}
@@ -280,7 +279,7 @@ export function UmbFormControlMixin<
 		}
 
 		/**
-		 * @method _runValidators
+		 * @function _runValidators
 		 * @description Run all validators and set the validityState of this form control.
 		 * Run this method when you want to re-run all validators.
 		 * This can be relevant if you have a validators that is using values that is not triggering the Lit Updated Callback.

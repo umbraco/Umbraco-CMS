@@ -6,6 +6,13 @@ import { loadManifestElement } from './load-manifest-element.function.js';
 import type { UmbApiConstructorArgumentsMethodType } from './types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
+/**
+ *
+ * @param manifest
+ * @param constructorArgs
+ * @param fallbackElement
+ * @param fallbackApi
+ */
 export async function createExtensionElementWithApi<
 	ElementType extends UmbControllerHostElement,
 	ApiType extends UmbApi = UmbApi,
