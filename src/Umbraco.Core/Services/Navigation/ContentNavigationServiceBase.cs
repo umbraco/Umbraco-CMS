@@ -112,6 +112,36 @@ internal abstract class ContentNavigationServiceBase
         return true;
     }
 
+    public NavigationNode? GetNavigationNode(Guid key)
+        => _navigationStructure.GetValueOrDefault(key);
+
+    public bool AddNavigationNode(NavigationNode node, Guid? parentKey = null)
+    {
+        if (_navigationStructure.ContainsKey(node.Key))
+        {
+            return false; // Node with this key already exists
+        }
+
+        NavigationNode? parentNode = null;
+        if (parentKey.HasValue)
+        {
+            if (_navigationStructure.TryGetValue(parentKey.Value, out parentNode) is false)
+            {
+                return false; // Parent node doesn't exist
+            }
+        }
+
+        var newNodesMap = new Dictionary<Guid, NavigationNode>();
+        CopyNodeHierarchyRecursively(node, parentNode, newNodesMap);
+
+        foreach (NavigationNode newNode in newNodesMap.Values)
+        {
+            _navigationStructure[newNode.Key] = newNode;
+        }
+
+        return true;
+    }
+
     public bool Remove(Guid key)
     {
         if (_navigationStructure.TryGetValue(key, out NavigationNode? nodeToRemove) is false)
@@ -240,6 +270,22 @@ internal abstract class ContentNavigationServiceBase
         foreach (NavigationNode child in originalNode.Children)
         {
             newNode.AddChild(child);
+        }
+    }
+
+    private void CopyNodeHierarchyRecursively(NavigationNode sourceNode, NavigationNode? newParent, Dictionary<Guid, NavigationNode> newNodesMap)
+    {
+        // Create a new node with the same key, to update the parent
+        var newNode = new NavigationNode(sourceNode.Key);
+
+        // Set the new parent for the node (if parent node is null - the node is added to root)
+        newParent?.AddChild(newNode);
+
+        newNodesMap[sourceNode.Key] = newNode;
+
+        foreach (NavigationNode child in sourceNode.Children)
+        {
+            CopyNodeHierarchyRecursively(child, newNode, newNodesMap);
         }
     }
 }
