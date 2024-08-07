@@ -1,8 +1,6 @@
 import { UmbModalToken } from './modal-token.js';
 
-export interface UmbPropertyEditorUIPickerModalData {
-	submitLabel?: string;
-}
+export interface UmbPropertyEditorUIPickerModalData {}
 
 export type UmbPropertyEditorUIPickerModalValue = {
 	selection: Array<string>;

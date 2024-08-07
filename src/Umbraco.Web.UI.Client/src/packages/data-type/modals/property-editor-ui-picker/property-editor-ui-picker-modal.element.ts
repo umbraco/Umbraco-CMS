@@ -24,14 +24,8 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
-	@state()
-	private _submitLabel = 'Select';
-
 	override connectedCallback(): void {
 		super.connectedCallback();
-
-		// TODO: We never parse on a submit label, so this seem weird as we don't enable this of other places.
-		//this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 
 		this.#usePropertyEditorUIs();
 	}
@@ -54,11 +48,8 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		this.#select(propertyEditorUi.alias);
-	}
-
-	#select(alias: string) {
-		this.value = { selection: [alias] };
+		this.value = { selection: [propertyEditorUi.alias] };
+		this._submitModal();
 	}
 
 	#handleFilterInput(event: UUIInputEvent) {
@@ -87,12 +78,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline=${this.localize.term('propertyEditorPicker_openPropertyEditorPicker')}>
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
-					<uui-button
-						label="${this._submitLabel}"
-						look="primary"
-						color="positive"
-						@click=${this._submitModal}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
