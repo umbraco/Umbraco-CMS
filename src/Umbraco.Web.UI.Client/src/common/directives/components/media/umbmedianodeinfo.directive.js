@@ -138,9 +138,10 @@
 
             scope.openSVG = () => {
                 var popup = window.open('', '_blank');
-                var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '"/>' +
-                    '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
-                
+                var html = '<!DOCTYPE html><body style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(135deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(135deg, transparent 75%, #ccc 75%); background-size:30px 30px; background-position:0 0, 15px 0, 15px -15px, 0px 15px;">'
+                  +'<img src="' + scope.nodeUrl + '"/>'
+                  +'<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
+
                 popup.document.open();
                 popup.document.write(html);
                 popup.document.close();
