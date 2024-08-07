@@ -14,7 +14,6 @@ export interface MetaCollectionView {
 
 	/**
 	 * An icon to represent the collection view
-	 *
 	 * @examples [
 	 *   "icon-box",
 	 *   "icon-grid"
@@ -34,7 +33,6 @@ export interface MetaCollectionView {
 export interface ConditionsCollectionView {
 	/**
 	 * Type of entity this collection view should be available for
-	 *
 	 * @examples ["media"]
 	 */
 	entityType: string;

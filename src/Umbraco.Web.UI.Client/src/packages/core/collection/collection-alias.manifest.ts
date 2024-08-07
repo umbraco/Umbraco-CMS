@@ -3,7 +3,6 @@ import type { ManifestCondition, UmbConditionConfigBase } from '@umbraco-cms/bac
 export type CollectionAliasConditionConfig = UmbConditionConfigBase<typeof UMB_COLLECTION_ALIAS_CONDITION> & {
 	/**
 	 * The collection that this extension should be available in
-	 *
 	 * @example
 	 * "Umb.Collection.User"
 	 */

@@ -74,7 +74,7 @@ export class UmbContentPropertyDatasetContext<
 	}
 
 	/**
-	 * @method propertyVariantId
+	 * @function propertyVariantId
 	 * @param {string} propertyAlias
 	 * @returns {Promise<Observable<UmbVariantId | undefined> | undefined>}
 	 * @description Get an Observable for the variant id of this property.
@@ -86,7 +86,7 @@ export class UmbContentPropertyDatasetContext<
 	}
 
 	/**
-	 * @method propertyValueByAlias
+	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
 	 * @description Get an Observable for the value of this property.
@@ -111,7 +111,7 @@ export class UmbContentPropertyDatasetContext<
 	}
 
 	/**
-	 * @method setPropertyValueByVariant
+	 * @function setPropertyValueByVariant
 	 * @param {string} propertyAlias
 	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @param {UmbVariantId} propertyVariantId - The variant id for the value to be set for.
@@ -127,7 +127,7 @@ export class UmbContentPropertyDatasetContext<
 	}
 
 	/**
-	 * @method setPropertyValue
+	 * @function setPropertyValue
 	 * @param {string} propertyAlias
 	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @returns {Promise<void>}

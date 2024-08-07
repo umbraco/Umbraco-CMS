@@ -128,7 +128,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 						)}
 					</div>
 					<uui-button
-						id="add-button"
 						look="placeholder"
 						label=${'Add area'}
 						href=${this._workspacePath + 'create'}></uui-button>`

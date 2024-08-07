@@ -24,7 +24,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Fetches a Document Type folder from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -52,7 +52,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Creates a Document Type folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -82,7 +82,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Updates a Document Type folder on the server
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async update(args: UmbUpdateFolderModel) {
@@ -107,7 +107,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Deletes a Document Type folder on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async delete(unique: string) {

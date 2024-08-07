@@ -5,7 +5,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 /**
  *  @element umb-ref-property-editor-ui
  *  @description - Component for displaying a reference to a Property Editor UI
- *  @extends UUIRefNodeElement
+ *  @augments UUIRefNodeElement
  */
 @customElement('umb-ref-property-editor-ui')
 export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {

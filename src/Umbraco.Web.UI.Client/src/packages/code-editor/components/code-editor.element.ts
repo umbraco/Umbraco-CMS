@@ -28,12 +28,10 @@ const elementName = 'umb-code-editor';
  * A custom element that renders a code editor. Code editor is based on the Monaco Editor library.
  * The element will listen to the theme context and update the theme accordingly.
  * Parts of the monaco Api is exposed through the `editor` property. You can access the monaco editor instance through `editor.monacoEditor`.
- *
  * @element umb-code-editor
- *
  * @export
  * @class UmbCodeEditorElement
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  * @implements {UmbCodeEditorHost}
  * @fires input - Fired when the value of the editor changes.
  * @fires change - Fired when the entire model of editor is replaced.
@@ -56,7 +54,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Theme of the editor. Default is light. Element will listen to the theme context and update the theme accordingly.
-	 *
 	 * @type {CodeEditorTheme}
 	 * @memberof UmbCodeEditorElement
 	 */
@@ -65,7 +62,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Language of the editor. Default is javascript.
-	 *
 	 * @type {CodeEditorLanguage}
 	 * @memberof UmbCodeEditorElement
 	 */
@@ -74,7 +70,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Label of the editor. Default is 'Code Editor'.
-	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property()
@@ -85,7 +80,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Value of the editor. Default is empty string.
-	 *
 	 * @readonly
 	 * @memberof UmbCodeEditorElement
 	 */
@@ -105,7 +99,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Whether the editor is readonly.
-	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property({ type: Boolean, attribute: 'readonly' })
@@ -113,7 +106,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Whether to show line numbers.
-	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property({ type: Boolean, attribute: 'disable-line-numbers' })
@@ -121,7 +113,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Whether to show minimap.
-	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property({ type: Boolean, attribute: 'disable-minimap' })
@@ -129,7 +120,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Whether to enable word wrap. Default is false.
-	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property({ type: Boolean, attribute: 'word-wrap' })
@@ -137,7 +127,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Whether to enable folding. Default is true.
-	 *
 	 * @memberof UmbCodeEditorElement
 	 */
 	@property({ type: Boolean, attribute: 'disable-folding' })
@@ -221,7 +210,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Inserts text at the current cursor position.
-	 *
 	 * @param {string} text
 	 * @memberof UmbCodeEditorElement
 	 */
@@ -231,9 +219,8 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Finds all occurrence of the given string or matches the given regular expression.
-	 *
 	 * @param {string} text
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbCodeEditorElement
 	 */
 	find(text: string, searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{}) {

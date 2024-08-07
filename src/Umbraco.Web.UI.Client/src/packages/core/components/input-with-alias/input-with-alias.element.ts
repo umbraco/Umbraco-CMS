@@ -1,9 +1,10 @@
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { type UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-with-alias')
 export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof UmbLitElement>(UmbLitElement) {
@@ -64,8 +65,11 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 	}
 
-	#onToggleAliasLock() {
+	#onToggleAliasLock(event: CustomEvent) {
 		this._aliasLocked = !this._aliasLocked;
+		if (!this._aliasLocked) {
+			(event.target as UUIInputElement)?.focus();
+		}
 	}
 
 	override render() {
@@ -79,26 +83,18 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				label=${nameLabel}
 				.value=${this.value}
 				@input=${this.#onNameChange}>
-				<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
-				<uui-input
+				<uui-input-lock
 					auto-width
 					name="alias"
 					slot="append"
 					label=${aliasLabel}
-					.value=${this.alias}
 					placeholder=${aliasLabel}
-					?disabled=${this._aliasLocked && !this.aliasReadonly}
+					.value=${this.alias}
+					?locked=${this._aliasLocked && !this.aliasReadonly}
 					?readonly=${this.aliasReadonly}
-					@input=${this.#onAliasChange}>
-					<!-- TODO: validation for bad characters -->
-					${this.aliasReadonly
-						? nothing
-						: html`
-								<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-									<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
-								</div>
-							`}
-				</uui-input>
+					@input=${this.#onAliasChange}
+					@lock-change=${this.#onToggleAliasLock}>
+				</uui-input-lock>
 			</uui-input>
 		`;
 	}
@@ -120,21 +116,10 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		:host(:invalid:not([pristine])) > uui-input {
 			border-color: var(--uui-color-danger);
 		}
-
-		#alias-lock {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-		}
-
-		#alias-lock uui-icon {
-			margin-bottom: 2px;
-		}
 	`;
 }
 
-export default UmbInputWithAliasElement;
+export { UmbInputWithAliasElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

@@ -13,8 +13,8 @@ export class UmbDictionaryExportRepository extends UmbRepositoryBase {
 	/**
 	 * @description - Export a Dictionary, optionally including child items.
 	 * @param {string} unique
-	 * @param {boolean} [includeChildren=false]
-	 * @return {*}
+	 * @param {boolean} [includeChildren]
+	 * @returns {*}
 	 * @memberof UmbDictionaryExportRepository
 	 */
 	async requestExport(unique: string, includeChildren = false) {

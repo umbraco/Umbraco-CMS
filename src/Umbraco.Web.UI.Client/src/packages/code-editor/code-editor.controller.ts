@@ -23,8 +23,6 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  * By using monaco library directly you can access the entire monaco API along with code completions, actions etc. This class creates some level of abstraction over the monaco editor. It only provides basic functionality, that should be enough for most of the use cases and should be possible to implement with any code editor library.
  *
  * Current issues: [shadow DOM related issues](https://github.com/microsoft/monaco-editor/labels/editor-shadow-dom) #3217  currently fixed by a hack , [razor syntax highlight](https://github.com/microsoft/monaco-editor/issues/1997)
- *
- *
  * @export
  * @class UmbCodeEditor
  */
@@ -35,7 +33,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * The monaco editor object. This is the actual monaco editor object. It is exposed for advanced usage, but mind the fact that editor might be swapped in the future for a different library, so use on your own responsibility. For more information see [monaco editor API](https://microsoft.github.io/monaco-editor/docs.html#interfaces/editor.IStandaloneCodeEditor.html).
-	 *
 	 * @readonly
 	 * @memberof UmbCodeEditor
 	 */
@@ -47,7 +44,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * The options used to create the editor.
-	 *
 	 * @readonly
 	 * @type {CodeEditorConstructorOptions}
 	 * @memberof UmbCodeEditor
@@ -70,7 +66,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Provides the current position of the cursor.
-	 *
 	 * @readonly
 	 * @memberof UmbCodeEditor
 	 */
@@ -82,7 +77,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Provides positions of all the secondary cursors.
-	 *
 	 * @readonly
 	 * @memberof UmbCodeEditor
 	 */
@@ -92,7 +86,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Provides the current value of the editor.
-	 *
 	 * @memberof UmbCodeEditor
 	 */
 	get value() {
@@ -112,7 +105,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Provides the current model of the editor. For advanced usage. Bare in mind that in case of the monaco library being swapped in the future, this might not be available. For more information see [monaco editor model API](https://microsoft.github.io/monaco-editor/docs.html#interfaces/editor.ITextModel.html).
-	 *
 	 * @readonly
 	 * @memberof UmbCodeEditor
 	 */
@@ -179,7 +171,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Updates the options of the editor. This is useful for updating the options after the editor has been created.
-	 *
 	 * @param {CodeEditorConstructorOptions} newOptions
 	 * @memberof UmbCodeEditor
 	 */
@@ -201,8 +192,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Provides the current selections of the editor.
-	 *
-	 * @return {*}  {UmbCodeEditorSelection[]}
+	 * @returns {*}  {UmbCodeEditorSelection[]}
 	 * @memberof UmbCodeEditor
 	 */
 	getSelections(): UmbCodeEditorSelection[] {
@@ -211,8 +201,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Provides the current positions of the cursor or multiple cursors.
-	 *
-	 * @return {*}  {(UmbCodeEditorCursorPosition | null)}
+	 * @returns {*}  {(UmbCodeEditorCursorPosition | null)}
 	 * @memberof UmbCodeEditor
 	 */
 	getPositions(): UmbCodeEditorCursorPosition | null {
@@ -221,7 +210,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Inserts text at the current cursor position or multiple cursor positions.
-	 *
 	 * @param {string} text
 	 * @memberof UmbCodeEditor
 	 */
@@ -237,10 +225,9 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Looks for a string or matching strings in the editor and returns the ranges of the found strings. Can use regex, case sensitive and more. If you want regex set the isRegex to true in the options.
-	 *
 	 * @param {string} searchString
-	 * @param {CodeEditorSearchOptions} [searchOptions=<CodeEditorSearchOptions>{}]
-	 * @return {*}  {UmbCodeEditorRange[]}
+	 * @param {CodeEditorSearchOptions} [searchOptions]
+	 * @returns {*}  {UmbCodeEditorRange[]}
 	 * @memberof UmbCodeEditor
 	 */
 	find(
@@ -277,9 +264,8 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Returns the value of the editor for a given range.
-	 *
 	 * @param {UmbCodeEditorRange} range
-	 * @return {*}  {string}
+	 * @returns {*}  {string}
 	 * @memberof UmbCodeEditor
 	 */
 	getValueInRange(range: UmbCodeEditorRange): string {
@@ -288,7 +274,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Inserts text at a given position.
-	 *
 	 * @param {string} text
 	 * @param {UmbCodeEditorCursorPosition} position
 	 * @memberof UmbCodeEditor
@@ -310,7 +295,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Selects a range of text in the editor.
-	 *
 	 * @param {UmbCodeEditorRange} range
 	 * @memberof UmbCodeEditor
 	 */
@@ -321,7 +305,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Changes the theme of the editor.
-	 *
 	 * @template T
 	 * @param {(CodeEditorTheme | T)} theme
 	 * @memberof UmbCodeEditor
@@ -333,7 +316,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Runs callback on change of model content. (for example when typing)
-	 *
 	 * @param {() => void} callback
 	 * @memberof UmbCodeEditor
 	 */
@@ -346,7 +328,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 
 	/**
 	 * Runs callback on change of model (when the entire model is replaced	)
-	 *
 	 * @param {() => void} callback
 	 * @memberof UmbCodeEditor
 	 */
@@ -358,7 +339,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Runs callback on change of cursor position. Gives as parameter the new position.
-	 *
 	 * @param {((e: UmbCodeEditorCursorPositionChangedEvent | undefined) => void)} callback
 	 * @memberof UmbCodeEditor
 	 */
@@ -370,7 +350,6 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Runs callback on change of cursor selection. Gives as parameter the new selection.
-	 *
 	 * @param {((e: UmbCodeEditorCursorSelectionChangedEvent | undefined) => void)} callback
 	 * @memberof UmbCodeEditor
 	 */

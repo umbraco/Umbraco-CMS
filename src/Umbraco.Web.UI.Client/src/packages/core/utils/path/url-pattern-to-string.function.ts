@@ -2,6 +2,11 @@ export type UrlParametersRecord = Record<string, string | number | { toString: (
 
 const PARAM_IDENTIFIER = /:([^/]+)/g;
 
+/**
+ *
+ * @param pattern
+ * @param params
+ */
 export function umbUrlPatternToString(pattern: string, params: UrlParametersRecord | null): string {
 	return params
 		? pattern.replace(PARAM_IDENTIFIER, (_substring: string, ...args: string[]) => {

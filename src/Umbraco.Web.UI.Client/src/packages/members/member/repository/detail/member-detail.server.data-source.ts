@@ -28,7 +28,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Creates a new Member scaffold
 	 * @param {Partial<UmbMemberDetailModel>} [preset]
-	 * @return { CreateMemberRequestModel }
+	 * @returns { CreateMemberRequestModel }
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMemberDetailModel> = {}) {
@@ -67,7 +67,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Fetches a Member with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async read(unique: string) {
@@ -121,7 +121,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Inserts a new Member on the server
 	 * @param {UmbMemberDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async create(model: UmbMemberDetailModel) {
@@ -157,7 +157,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Updates a Member on the server
 	 * @param {UmbMemberDetailModel} Member
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async update(model: UmbMemberDetailModel) {
@@ -195,7 +195,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	/**
 	 * Deletes a Member on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async delete(unique: string) {

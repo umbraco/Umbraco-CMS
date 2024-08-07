@@ -7,7 +7,7 @@ import { UmbActionBase } from '@umbraco-cms/backoffice/action';
  * @export
  * @abstract
  * @class UmbPropertyActionBase
- * @extends {UmbActionBase}
+ * @augments {UmbActionBase}
  * @implements {UmbPropertyAction}
  */
 export abstract class UmbPropertyActionBase<ArgsMetaType = never>
