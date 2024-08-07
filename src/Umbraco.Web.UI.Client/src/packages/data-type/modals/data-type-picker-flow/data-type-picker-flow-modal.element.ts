@@ -32,7 +32,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
-		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
 
 	@state()
@@ -40,9 +39,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
-
-	@state()
-	private _submitLabel = 'Select';
 
 	@state()
 	private _currentPage = 1;

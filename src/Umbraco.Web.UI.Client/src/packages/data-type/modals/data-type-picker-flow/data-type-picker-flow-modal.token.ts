@@ -1,8 +1,6 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDataTypePickerFlowModalData {
-	submitLabel?: string;
-}
+export interface UmbDataTypePickerFlowModalData {}
 
 export type UmbDataTypePickerFlowModalValue = {
 	selection: Array<string>;
