@@ -1,11 +1,8 @@
+import { UMB_MANIFEST_VIEWER_MODAL } from '../../../modals/manifest-viewer/index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, state, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import {
-	UMB_MANIFEST_VIEWER_MODAL,
-	umbExtensionsRegistry,
-	type ManifestBlockEditorCustomView,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry, type ManifestBlockEditorCustomView } from '@umbraco-cms/backoffice/extension-registry';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
