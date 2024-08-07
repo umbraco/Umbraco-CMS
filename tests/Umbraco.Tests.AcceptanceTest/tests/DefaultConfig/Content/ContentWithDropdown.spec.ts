@@ -55,6 +55,7 @@ for (const dataTypeName of dataTypeNames) {
       await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
       expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
       const contentData = await umbracoApi.document.getByName(contentName);
+        expect(contentData.variants[0].state).toBe('Published');
       expect(contentData.values).toEqual([]);
     });
     
