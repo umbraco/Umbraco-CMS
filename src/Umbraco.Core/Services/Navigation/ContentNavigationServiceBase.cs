@@ -127,7 +127,7 @@ internal class ContentNavigationService : INavigationService
         // Remove the node from its parent's children list
         if (nodeToRemove.Parent is not null && _navigationStructure.TryGetValue(nodeToRemove.Parent.Key, out NavigationNode? parentNode))
         {
-            parentNode.Children.Remove(nodeToRemove);
+            parentNode.RemoveChild(nodeToRemove);
         }
 
         // Recursively remove all descendants
@@ -182,7 +182,7 @@ internal class ContentNavigationService : INavigationService
         // Remove the node from its current parent's children list
         if (nodeToMove.Parent is not null && _navigationStructure.TryGetValue(nodeToMove.Parent.Key, out var currentParentNode))
         {
-            currentParentNode.Children.Remove(nodeToMove);
+            currentParentNode.RemoveChild(nodeToMove);
         }
 
         // Create a new node with the same key, to update the parent

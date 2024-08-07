@@ -2,22 +2,28 @@ namespace Umbraco.Cms.Core.Models.Navigation;
 
 public class NavigationNode
 {
+    private List<NavigationNode> _children;
+
     public Guid Key { get; private set; }
 
     public NavigationNode? Parent { get; private set; }
 
-    public List<NavigationNode> Children { get; private set; }
-
+    public IEnumerable<NavigationNode> Children => _children.AsEnumerable();
 
     public NavigationNode(Guid key)
     {
         Key = key;
-        Children = new List<NavigationNode>();
+        _children = new List<NavigationNode>();
     }
 
     public void AddChild(NavigationNode child)
     {
         child.Parent = this;
-        Children.Add(child);
+        _children.Add(child);
+    }
+
+    public void RemoveChild(NavigationNode child)
+    {
+        _children.Remove(child);
     }
 }
