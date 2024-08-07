@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can save content with a image media picker', async ({page, umbracoApi, umbracoUi}) => {
+test('can save content with a image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
@@ -39,7 +39,7 @@ test('can save content with a image media picker', async ({page, umbracoApi, umb
   expect(contentData.variants[0].state).toBe(expectedState);
 });
 
-test('can publish content with a image media picker', async ({page, umbracoApi, umbracoUi}) => {
+test('can publish content with a image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
@@ -59,7 +59,7 @@ test('can publish content with a image media picker', async ({page, umbracoApi, 
   expect(contentData.variants[0].state).toBe(expectedState);
 });
 
-test('can add an image to the image media picker', async ({page, umbracoApi, umbracoUi}) => {
+test('can add an image to the image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
 
@@ -84,7 +84,7 @@ test('can add an image to the image media picker', async ({page, umbracoApi, umb
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('can remove an image from the image media picker', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove an image from the image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -152,7 +152,7 @@ test.skip('image count can not be more that max amount set in image media picker
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can add an image from the image media picker with a start node', async ({page, umbracoApi, umbracoUi}) => {
+test('can add an image from the image media picker with a start node', async ({umbracoApi, umbracoUi}) => {
   const mediaFolderName = 'TestFolder';
   await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
@@ -181,37 +181,67 @@ test('can add an image from the image media picker with a start node', async ({p
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can add an image from the image media picker with focal point enabled', async ({page, umbracoApi, umbracoUi}) => {
+test('can add an image from the image media picker with focal point enabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
   await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0,1, true);
   const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
   await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId);
-
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickExactLinkWithName(mediaName);
-  await page.pause()
-  await umbracoUi.content.clickResetFocalPointButton();
+  await umbracoUi.content.setFocalPoint(40, 20);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
-  expect(await umbracoApi.document.doesImageMediaPickerContainImageWithFocalPoint(contentName, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.5, top: 0.5})).toBeTruthy();
+  expect(await umbracoApi.document.doesImageMediaPickerContainImageWithFocalPoint(contentName, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.4, top: 0.2})).toBeTruthy();
 });
 
-test('can add an image from the image media picker with a image crop', async ({page, umbracoApi, umbracoUi}) => {
+test('can reset focal point in a image from the image media picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0,1, true);
+  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.4, top: 0.2});
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickExactLinkWithName(mediaName);
+  await umbracoUi.content.clickResetFocalPointButton()
+  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesImageMediaPickerContainImageWithFocalPoint(contentName, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0, top: 0})).toBeTruthy();
 });
 
-test('can add an image from the image media picker with ignore user start nodes', async ({page, umbracoApi, umbracoUi}) => {
+// The crop is not being selected
+test.skip('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const cropLabel = 'TestCrop';
+  const cropWidth = 100;
+  const cropHeight = 100;
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataTypeWithCrop(customDataTypeName, cropLabel, cropWidth, cropHeight);
+  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
 });
-
-
-
