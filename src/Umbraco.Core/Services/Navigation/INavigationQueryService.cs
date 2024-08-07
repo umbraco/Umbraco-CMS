@@ -1,12 +1,11 @@
 namespace Umbraco.Cms.Core.Services.Navigation;
 
 /// <summary>
-///     Manages navigation-related operations.
+///     Placeholder for sharing logic between the document, document recycle bin, media and media recycle bin services
+///     for querying the navigation structure.
 /// </summary>
-public interface INavigationService
+public interface INavigationQueryService
 {
-    Task RebuildAsync();
-
     bool TryGetParentKey(Guid childKey, out Guid? parentKey);
 
     bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
@@ -16,10 +15,4 @@ public interface INavigationService
     bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys);
 
     bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys);
-
-    bool Remove(Guid key);
-
-    bool Add(Guid key, Guid? parentKey = null);
-
-    bool Move(Guid nodeKey, Guid? targetParentKey = null);
 }
