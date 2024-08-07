@@ -7,7 +7,7 @@ import { UmbActionBase } from '@umbraco-cms/backoffice/action';
  * @export
  * @abstract
  * @class UmbWorkspaceActionMenuItemBase
- * @extends {UmbActionBase}
+ * @augments {UmbActionBase}
  * @implements {UmbWorkspaceActionMenuItem}
  * @template RepositoryType
  */

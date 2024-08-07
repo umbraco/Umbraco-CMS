@@ -175,11 +175,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 						</umb-block-list-entry> `,
 			)}
 			<uui-button-group>
-				<uui-button
-					id="add-button"
-					look="placeholder"
-					label=${this._createButtonLabel}
-					href=${createPath ?? ''}></uui-button>
+				<uui-button look="placeholder" label=${this._createButtonLabel} href=${createPath ?? ''}></uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"

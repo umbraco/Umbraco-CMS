@@ -23,7 +23,7 @@ export class UmbDuplicateDocumentTypeServerDataSource implements UmbDuplicateToD
 	/**
 	 * Duplicate an item for the given id to the destination unique
 	 * @param {UmbDuplicateToRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDuplicateDocumentTypeServerDataSource
 	 */
 	async duplicateTo(args: UmbDuplicateToRequestArgs) {

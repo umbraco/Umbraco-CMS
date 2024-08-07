@@ -5,6 +5,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
+/**
+ *
+ * @param value
+ */
 function getNumberOrUndefined(value: string) {
 	const num = parseInt(value, 10);
 	return isNaN(num) ? undefined : num;

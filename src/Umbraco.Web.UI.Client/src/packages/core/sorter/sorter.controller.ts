@@ -5,6 +5,11 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
 
+/**
+ *
+ * @param el
+ * @param includeSelf
+ */
 function getParentScrollElement(el: Element, includeSelf: boolean) {
 	if (!el || !el.getBoundingClientRect) return null;
 
@@ -38,20 +43,38 @@ function getParentScrollElement(el: Element, includeSelf: boolean) {
 	return null;
 }
 
+/**
+ *
+ * @param element
+ * @param ignorerSelectors
+ */
 function setupIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
 	ignorerSelectors.split(',').forEach(function (criteria) {
 		element.querySelectorAll(criteria.trim()).forEach(setupPreventEvent);
 	});
 }
+/**
+ *
+ * @param element
+ * @param ignorerSelectors
+ */
 function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) {
 	ignorerSelectors.split(',').forEach(function (criteria: string) {
 		element.querySelectorAll(criteria.trim()).forEach(destroyPreventEvent);
 	});
 }
+/**
+ *
+ * @param element
+ */
 function setupPreventEvent(element: Element) {
 	(element as HTMLElement).draggable = false;
 	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
+/**
+ *
+ * @param element
+ */
 function destroyPreventEvent(element: Element) {
 	(element as HTMLElement).draggable = false;
 	//element.removeAttribute('draggable');
@@ -76,7 +99,7 @@ type UniqueType = string | symbol | number;
 
 /**
  * Internal type, which is adjusted to become the public one.
- * @internal */
+  @internal */
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	/**
 	 * Define how to retrive the unique identifier of an element. If this method returns undefined, the move will be cancelled.

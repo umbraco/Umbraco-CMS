@@ -6,7 +6,7 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbScriptDetailStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for scripts
  */
 export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailModel> {

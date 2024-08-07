@@ -28,7 +28,7 @@ export class UmbScriptItemServerDataSource implements UmbItemDataSource<UmbScrip
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbScriptItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

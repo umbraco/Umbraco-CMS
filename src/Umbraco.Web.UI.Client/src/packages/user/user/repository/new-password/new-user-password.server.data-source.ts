@@ -22,7 +22,7 @@ export class UmbNewUserPasswordServerDataSource {
 	/**
 	 * Generate a new password for a user
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbNewUserPasswordServerDataSource
 	 */
 	async newPassword(unique: string) {

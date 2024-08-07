@@ -23,7 +23,7 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 
 	/**
 	 * Get a list of cultures on the server
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async getCollection({ skip, take }: { skip: number; take: number }) {

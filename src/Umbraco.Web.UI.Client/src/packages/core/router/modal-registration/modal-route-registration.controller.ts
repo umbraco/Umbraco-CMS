@@ -78,6 +78,7 @@ export class UmbModalRouteRegistrationController<
 	 * Creates an instance of UmbModalRouteRegistrationController.
 	 * @param {UmbControllerHost} host - The host element of the modal, this determine the ownership of the modal and the origin of it.
 	 * @param {UmbModalToken} alias - The alias of the modal, this is used to identify the modal.
+	 * @param ctrlAlias
 	 * @memberof UmbModalRouteRegistrationController
 	 */
 	constructor(

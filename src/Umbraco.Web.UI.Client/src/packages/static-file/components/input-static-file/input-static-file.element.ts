@@ -16,7 +16,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	 * This is a minimum amount of selected files in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -39,7 +39,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	 * This is a maximum amount of selected files in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {

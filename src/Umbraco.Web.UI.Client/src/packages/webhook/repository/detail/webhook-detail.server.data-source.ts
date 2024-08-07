@@ -31,7 +31,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	/**
 	 * Creates a new Webhook scaffold
 	 * @param {Partial<UmbWebhookDetailModel>} [preset]
-	 * @return { CreateWebhookRequestModel }
+	 * @returns { CreateWebhookRequestModel }
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbWebhookDetailModel> = {}) {
@@ -52,7 +52,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	/**
 	 * Fetches a Webhook with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async read(unique: string) {
@@ -81,7 +81,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	/**
 	 * Inserts a new Webhook on the server
 	 * @param {UmbWebhookDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async create(model: UmbWebhookDetailModel) {
@@ -114,7 +114,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	/**
 	 * Updates a Webhook on the server
 	 * @param {UmbWebhookDetailModel} Webhook
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async update(model: UmbWebhookDetailModel) {
@@ -147,7 +147,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	/**
 	 * Deletes a Webhook on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async delete(unique: string) {

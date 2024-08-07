@@ -7,10 +7,8 @@
  * https://creativecommons.org/licenses/by-sa/4.0/
  * Modifications are licensed under the MIT License.
  * Copyright © 2024 Umbraco HQ.
- *
  * @param {string} str - The camelCased string to convert.
  * @returns {string} - The converted human-readable label.
- *
  * @example
  * const label = fromCamelCase('workspaceActionMenuItem');
  * // label: 'Workspace Action Menu Item'

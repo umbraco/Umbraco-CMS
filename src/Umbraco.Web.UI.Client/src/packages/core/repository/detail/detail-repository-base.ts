@@ -44,7 +44,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Creates a scaffold
 	 * @param {Partial<DetailModelType>} [preset]
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async createScaffold(preset?: Partial<DetailModelType>) {
@@ -54,7 +54,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Requests the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async requestByUnique(unique: string) {
@@ -73,8 +73,8 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique=null]
-	 * @return {*}
+	 * @param {string | null} [parentUnique]
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async create(model: DetailModelType, parentUnique: string | null) {
@@ -97,7 +97,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Saves the given data
 	 * @param {DetailModelType} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async save(model: DetailModelType) {
@@ -121,7 +121,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Deletes the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async delete(unique: string) {
@@ -144,7 +144,7 @@ export abstract class UmbDetailRepositoryBase<
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async byUnique(unique: string) {

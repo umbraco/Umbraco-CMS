@@ -2099,6 +2099,10 @@ name: "icon-database",
 
 path: () => import("./icons/icon-database.js"),
 },{
+name: "icon-umb-manifest",
+
+path: () => import("./icons/icon-umb-manifest.js"),
+},{
 name: "icon-facebook",
 
 path: () => import("./icons/icon-facebook.js"),
