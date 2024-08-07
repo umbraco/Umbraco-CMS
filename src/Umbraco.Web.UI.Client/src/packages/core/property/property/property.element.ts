@@ -5,7 +5,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UmbBindValidationMessageToFormControl,
+	UmbBindServerValidationToFormControl,
 	UmbFormControlValidator,
 	UmbObserveValidationStateController,
 } from '@umbraco-cms/backoffice/validation';
@@ -172,7 +172,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	#propertyContext = new UmbPropertyContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
-	#validationMessageBinder?: UmbBindValidationMessageToFormControl;
+	#validationMessageBinder?: UmbBindServerValidationToFormControl;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 
@@ -308,7 +308,7 @@ export class UmbPropertyElement extends UmbLitElement {
 					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, this.#dataPath);
 					// We trust blindly that the dataPath is available at this stage. [NL]
 					if (this.#dataPath) {
-						this.#validationMessageBinder = new UmbBindValidationMessageToFormControl(
+						this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
 							this,
 							this._element as any,
 							this.#dataPath,
