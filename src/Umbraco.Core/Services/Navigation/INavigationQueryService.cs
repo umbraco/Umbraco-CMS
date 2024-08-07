@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Services.Navigation;
 
 /// <summary>
-///     Placeholder for sharing logic between the document, document recycle bin, media and media recycle bin services
+///     Placeholder for sharing logic between the document, document recycle bin, media and media recycle bin navigation services
 ///     for querying the navigation structure.
 /// </summary>
 public interface INavigationQueryService
