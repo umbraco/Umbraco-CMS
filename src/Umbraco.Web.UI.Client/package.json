@@ -137,6 +137,7 @@
 		"./src/packages/documents",
 		"./src/packages/health-check",
 		"./src/packages/language",
+		"./src/packages/markdown-editor",
 		"./src/packages/log-viewer",
 		"./src/packages/media",
 		"./src/packages/members",
