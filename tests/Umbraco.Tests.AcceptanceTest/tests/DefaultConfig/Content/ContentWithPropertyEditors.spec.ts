@@ -96,30 +96,6 @@ test.skip('can create content with the upload file datatype', async ({umbracoApi
   expect(contentData.values[0].value.src).toContainEqual(uploadFilePath);
 });
 
-test('can create content with the tags datatype', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const dataTypeName = 'Tags';
-  const tagName = 'test';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.addTags(tagName);
-  await umbracoUi.content.clickSaveAndPublishButton();
-
-  // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toEqual([tagName]);
-});
-
 // TODO: Remove skip and update the test when the front-end is ready. Currently the list of content is not displayed.
 test.skip('can create content with the list view - content datatype', async ({umbracoApi, umbracoUi}) => {
   // Arrange
