@@ -69,6 +69,7 @@ export class UmbPropertyEditorUITextBoxElement
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
 			@input=${this.#onInput}
+			?required=${this.readonly}
 			?readonly=${this.readonly}></uui-input>`;
 	}
 

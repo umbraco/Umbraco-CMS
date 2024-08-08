@@ -220,9 +220,12 @@ export class UmbPropertyElement extends UmbLitElement {
 		);
 
 		this.observe(
-			this.#propertyContext.validation,
-			(validation) => {
-				this._mandatory = validation?.mandatory;
+			this.#propertyContext.validationMandatory,
+			(mandatory) => {
+				this._mandatory = mandatory;
+				if (this._element) {
+					this._element.mandatory = mandatory;
+				}
 			},
 			null,
 		);
@@ -281,6 +284,8 @@ export class UmbPropertyElement extends UmbLitElement {
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+				// No need to observe mandatory, as we already do so and set it on the _element if present: [NL]
+				this._element.mandatory = this._mandatory;
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(
@@ -299,6 +304,15 @@ export class UmbPropertyElement extends UmbLitElement {
 					(config) => {
 						if (config) {
 							this._element!.config = config;
+						}
+					},
+					null,
+				);
+				this.#configObserver = this.observe(
+					this.#propertyContext.validationMandatoryMessage,
+					(mandatoryMessage) => {
+						if (mandatoryMessage) {
+							this._element!.mandatoryMessage = mandatoryMessage ?? undefined;
 						}
 					},
 					null,

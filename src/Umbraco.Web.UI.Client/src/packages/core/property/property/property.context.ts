@@ -43,6 +43,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	#validation = new UmbObjectState<UmbPropertyTypeValidationModel | undefined>(undefined);
 	public readonly validation = this.#validation.asObservable();
+	public readonly validationMandatory = this.#validation.asObservablePart((x) => x?.mandatory);
+	public readonly validationMandatoryMessage = this.#validation.asObservablePart((x) => x?.mandatoryMessage);
 
 	private _editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this._editor.asObservable();
