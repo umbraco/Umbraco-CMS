@@ -221,7 +221,8 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
-
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  
   // Act
   await umbracoUi.content.openContent(contentName);
   await umbracoUi.content.removeUrlPickerByName(linkTitle);
@@ -242,7 +243,8 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
-
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  
   // Act
   await umbracoUi.content.openContent(contentName);
   await umbracoUi.content.clickEditUrlPickerButtonByName(linkTitle);
