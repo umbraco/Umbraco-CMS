@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * @export
  * @class UmbDataTypeTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Tree Data Store for Data Types
  */
 export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {

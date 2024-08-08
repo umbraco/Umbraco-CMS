@@ -282,6 +282,7 @@ export class UmbDocumentWorkspaceContext
 
 		this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
 		this.#entityContext.setUnique(data.unique);
+		this.#isTrashedContext.setIsTrashed(data.isTrashed);
 		this.setIsNew(true);
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);

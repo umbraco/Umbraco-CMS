@@ -197,7 +197,6 @@ export class UmbAuthFlow {
 	/**
 	 * Make an authorization request to the server using the specified identity provider.
 	 * This method will redirect the user to the authorization endpoint of the server.
-	 *
 	 * @param identityProvider The identity provider to use for the authorization request.
 	 * @param usernameHint (Optional) The username to use for the authorization request. It will be provided to the OpenID server as a hint.
 	 */
@@ -234,7 +233,6 @@ export class UmbAuthFlow {
 	/**
 	 * This method will check if the user is logged in by validating if there is a token stored.
 	 * If no token is stored, it will return false.
-	 *
 	 * @returns true if the user is logged in, false otherwise.
 	 */
 	isAuthorized(): boolean {
@@ -307,7 +305,6 @@ export class UmbAuthFlow {
 	/**
 	 * This method will check if the token needs to be refreshed and if so, it will refresh it and return the new access token.
 	 * If the token does not need to be refreshed, it will return the current access token.
-	 *
 	 * @returns The access token for the user.
 	 */
 	async performWithFreshTokens(): Promise<string> {
@@ -357,6 +354,8 @@ export class UmbAuthFlow {
 
 	/**
 	 * This method will unlink the current user from the specified provider.
+	 * @param loginProvider
+	 * @param providerKey
 	 */
 	async unlinkLogin(loginProvider: string, providerKey: string): Promise<boolean> {
 		const token = await this.performWithFreshTokens();
@@ -389,6 +388,8 @@ export class UmbAuthFlow {
 
 	/**
 	 * This method will make a token request to the server using the authorization code.
+	 * @param code
+	 * @param codeVerifier
 	 */
 	async #makeTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
 		const extras: StringMap = {};
@@ -430,6 +431,7 @@ export class UmbAuthFlow {
 	/**
 	 * This method will make a token request to the server using the refresh token.
 	 * If the request fails, it will sign the user out (clear the token state).
+	 * @param request
 	 */
 	async #performTokenRequest(request: TokenRequest): Promise<boolean> {
 		try {

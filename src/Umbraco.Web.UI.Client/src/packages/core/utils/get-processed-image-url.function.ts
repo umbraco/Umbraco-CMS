@@ -2,6 +2,8 @@
 
 /**
  * Returns the URL of the processed image
+ * @param imagePath
+ * @param options
  */
 export async function getProcessedImageUrl(imagePath: string, options: any) {
 	if (!options) {

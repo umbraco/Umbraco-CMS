@@ -69,6 +69,7 @@ export abstract class UmbModalBaseElement<
 
 	/**
 	 * Rejects the modal
+	 * @param reason
 	 * @protected
 	 * @memberof UmbModalBaseElement
 	 */

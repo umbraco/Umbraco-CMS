@@ -6,7 +6,6 @@ import { css, customElement, html, property, state, when, LitElement } from '@um
 /**
  *  A simple styled box for showing code-based error messages or blocks od code.
  *  @slot the full message
- *
  */
 @customElement('umb-code-block')
 export class UmbCodeBlockElement extends LitElement {

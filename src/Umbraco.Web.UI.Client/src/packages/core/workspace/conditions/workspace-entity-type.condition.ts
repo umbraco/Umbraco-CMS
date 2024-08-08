@@ -23,7 +23,6 @@ export class UmbWorkspaceEntityTypeCondition
 export type WorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceEntityType'> & {
 	/**
 	 * Define the workspace that this extension should be available in
-	 *
 	 * @example
 	 * "Document"
 	 */

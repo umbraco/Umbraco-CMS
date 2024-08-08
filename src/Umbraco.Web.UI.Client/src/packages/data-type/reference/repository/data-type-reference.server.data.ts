@@ -22,7 +22,7 @@ export class UmbDataTypeReferenceServerDataSource {
 	/**
 	 * Fetches the item for the given unique from the server
 	 * @param {string} id
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeReferenceServerDataSource
 	 */
 	async getReferencedBy(id: string) {

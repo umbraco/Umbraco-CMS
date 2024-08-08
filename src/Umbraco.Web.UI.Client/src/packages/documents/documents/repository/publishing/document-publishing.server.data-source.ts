@@ -32,7 +32,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Publish one or more variants of a Document
 	 * @param {string} unique
 	 * @param {Array<UmbVariantId>} variantIds
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
@@ -59,7 +59,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Unpublish one or more variants of a Document
 	 * @param {string} unique
 	 * @param {Array<UmbVariantId>} variantIds
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async unpublish(unique: string, variantIds: Array<UmbVariantId>) {

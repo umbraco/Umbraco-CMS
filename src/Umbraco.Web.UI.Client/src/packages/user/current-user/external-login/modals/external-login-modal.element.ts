@@ -99,6 +99,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
+	 * @param item
 	 */
 	#renderProvider(item: UmbExternalLoginProviderOption) {
 		return html`

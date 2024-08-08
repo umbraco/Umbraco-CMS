@@ -4,7 +4,7 @@ export class UmbServerFilePathUniqueSerializer {
 	/**
 	 * Converts a server file path to a unique URL friendly string that can be used in the client
 	 * @param {string} serverFilePath
-	 * @return {*}  {(string | null)}
+	 * @returns {*}  {(string | null)}
 	 * @memberof UmbServerFilePathSerializer
 	 */
 	toUnique(serverFilePath: string): string {
@@ -15,7 +15,7 @@ export class UmbServerFilePathUniqueSerializer {
 	/**
 	 * Converts a unique URL friendly string to a server path
 	 * @param {string} serverFilePathUnique
-	 * @return {*}  {(string | null)}
+	 * @returns {*}  {(string | null)}
 	 * @memberof UmbServerFilePathSerializer
 	 */
 	toServerPath(serverFilePathUnique: string | null): string | null {

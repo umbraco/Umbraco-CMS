@@ -5,7 +5,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 /**
  * @export
  * @class UmbScriptTreeStore
- * @extends {UmbUniqueTreeStore}
+ * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Scripts
  */
 export class UmbScriptTreeStore extends UmbUniqueTreeStore {

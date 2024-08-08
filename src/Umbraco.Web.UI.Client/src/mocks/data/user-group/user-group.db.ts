@@ -34,7 +34,7 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	/**
 	 * Returns a list of permissions for the given user group ids
 	 * @param {string[]} userGroupIds
-	 * @return {*}  {string[]}
+	 * @returns {*}  {string[]}
 	 * @memberof UmbUserGroupData
 	 */
 	getPermissions(

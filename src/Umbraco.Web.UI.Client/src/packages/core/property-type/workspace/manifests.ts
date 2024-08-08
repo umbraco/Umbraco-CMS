@@ -6,7 +6,7 @@ export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'workspace',
 		kind: 'routable',
-		name: 'Block Workspace',
+		name: 'Property Type Workspace',
 		alias: UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 		api: () => import('./property-type-workspace.context.js'),
 		meta: {
@@ -16,7 +16,7 @@ export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.PropertyType.Settings',
-		name: 'Block Workspace Content View',
+		name: 'Property Type Settings Workspace View',
 		js: () => import('./views/settings/property-workspace-view-settings.element.js'),
 		weight: 1000,
 		meta: {

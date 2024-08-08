@@ -6,7 +6,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbDictionaryItemStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Dictionary items
  */
 

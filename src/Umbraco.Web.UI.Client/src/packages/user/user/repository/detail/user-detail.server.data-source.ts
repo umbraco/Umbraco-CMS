@@ -28,7 +28,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Creates a new User scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateUserRequestModel }
+	 * @returns { CreateUserRequestModel }
 	 * @memberof UmbUserServerDataSource
 	 */
 	async createScaffold() {
@@ -61,7 +61,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Fetches a User with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async read(unique: string) {
@@ -115,7 +115,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Inserts a new User on the server
 	 * @param {UmbUserDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async create(model: UmbUserDetailModel) {
@@ -150,7 +150,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Updates a User on the server
 	 * @param {UmbUserDetailModel} User
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async update(model: UmbUserDetailModel) {
@@ -199,7 +199,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Deletes a User on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async delete(unique: string) {
@@ -216,7 +216,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Calculates the start nodes for the User
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */
 	async calculateStartNodes(unique: string) {

@@ -13,7 +13,7 @@ export interface UmbContextProvideEvent extends Event {
 /**
  * @export
  * @class UmbContextProvideEventImplementation
- * @extends {Event}
+ * @augments {Event}
  * @implements {UmbContextProvideEvent}
  */
 export class UmbContextProvideEventImplementation extends Event implements UmbContextProvideEvent {
@@ -40,7 +40,7 @@ export interface UmbContextUnprovidedEvent extends Event {
 /**
  * @export
  * @class UmbContextUnprovidedEventImplementation
- * @extends {Event}
+ * @augments {Event}
  * @implements {UmbContextUnprovidedEvent}
  */
 /*

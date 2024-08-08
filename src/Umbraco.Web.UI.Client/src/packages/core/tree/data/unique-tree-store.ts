@@ -8,7 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * @export
  * @class UmbUniqueTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Entity Tree Store
  */
 export class UmbUniqueTreeStore extends UmbStoreBase<UmbTreeItemModel> implements UmbTreeStore<UmbTreeItemModel> {
@@ -25,7 +25,7 @@ export class UmbUniqueTreeStore extends UmbStoreBase<UmbTreeItemModel> implement
 	/**
 	 * Returns an observable to observe the children of a given parent
 	 * @param {(string | null)} parentUnique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUniqueTreeStore
 	 */
 	childrenOf(parentUnique: string | null) {

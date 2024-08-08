@@ -14,7 +14,7 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	/**
 	 * Requests the items for the given uniques
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async requestItems(uniques: Array<string>) {
@@ -33,7 +33,7 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	/**
 	 * Returns a promise with an observable of the items for the given uniques
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async items(uniques: Array<string>) {
