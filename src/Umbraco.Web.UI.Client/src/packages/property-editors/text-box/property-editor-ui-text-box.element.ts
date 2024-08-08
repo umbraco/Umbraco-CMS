@@ -7,7 +7,7 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 type UuiInputTypeType = typeof UUIInputElement.prototype.type;
 
@@ -31,6 +31,8 @@ export class UmbPropertyEditorUITextBoxElement
 	 */
 	@property({ type: Boolean })
 	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	#defaultType: UuiInputTypeType = 'text';
 
@@ -77,6 +79,7 @@ export class UmbPropertyEditorUITextBoxElement
 			maxlength=${ifDefined(this._maxChars)}
 			@input=${this.#onInput}
 			?required=${this.mandatory}
+			.requiredMessage=${this.mandatoryMessage}
 			?readonly=${this.readonly}></uui-input>`;
 	}
 
