@@ -3,4 +3,4 @@ export {
 	UMB_STATIC_FILE_TREE_REPOSITORY_ALIAS,
 	UMB_STATIC_FILE_TREE_STORE_ALIAS,
 	UMB_STATIC_FILE_TREE_ALIAS,
-} from './manifests.js';
+} from './constants.js';
