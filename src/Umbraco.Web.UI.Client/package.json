@@ -145,6 +145,7 @@
 		"./src/packages/property-editors",
 		"./src/packages/search",
 		"./src/packages/tags",
+		"./src/packages/telemetry",
 		"./src/packages/templating",
 		"./src/packages/tiny-mce",
 		"./src/packages/umbraco-news",
