@@ -53,6 +53,7 @@ test('can publish content with the radiobox data type', async ({umbracoApi, umbr
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
   expect(contentData.values).toEqual([]);
 });
 
@@ -60,7 +61,7 @@ test('can create content with the custom radiobox data type', async ({umbracoApi
   // Arrange
   const customDataTypeName = 'CustomRadiobox';
   const optionValues = ['testOption1', 'testOption2'];
-  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);
+  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -69,15 +70,15 @@ test('can create content with the custom radiobox data type', async ({umbracoApi
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([optionValues[0]]);
+  expect(contentData.values[0].value).toEqual(optionValues[0]);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
