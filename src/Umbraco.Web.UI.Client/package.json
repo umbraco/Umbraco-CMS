@@ -142,6 +142,7 @@
 		"./src/packages/members",
 		"./src/packages/models-builder",
 		"./src/packages/multi-url-picker",
+		"./src/packages/packages",
 		"./src/packages/property-editors",
 		"./src/packages/search",
 		"./src/packages/tags",
