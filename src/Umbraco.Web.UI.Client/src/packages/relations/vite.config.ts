@@ -8,5 +8,13 @@ const dist = '../../../dist-cms/packages/relations';
 rmSync(dist, { recursive: true, force: true });
 
 export default defineConfig({
-	...getDefaultConfig({ dist }),
+	...getDefaultConfig({
+		dist,
+		entry: {
+			'relation-types/index': 'relation-types/index.ts',
+			'relations/index': 'relations/index.ts',
+			manifests: 'manifests.ts',
+			'umbraco-package': 'umbraco-package.ts',
+		},
+	}),
 });
