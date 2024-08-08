@@ -145,6 +145,7 @@
 		"./src/packages/packages",
 		"./src/packages/property-editors",
 		"./src/packages/search",
+		"./src/packages/static-file",
 		"./src/packages/tags",
 		"./src/packages/templating",
 		"./src/packages/tiny-mce",

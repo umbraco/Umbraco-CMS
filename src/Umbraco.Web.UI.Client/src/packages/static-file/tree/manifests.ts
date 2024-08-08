@@ -3,6 +3,12 @@ import {
 	UMB_STATIC_FILE_FOLDER_ENTITY_TYPE,
 	UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
 } from '../entity.js';
+import {
+	UMB_STATIC_FILE_TREE_ALIAS,
+	UMB_STATIC_FILE_TREE_ITEM_ALIAS,
+	UMB_STATIC_FILE_TREE_REPOSITORY_ALIAS,
+	UMB_STATIC_FILE_TREE_STORE_ALIAS,
+} from './constants.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -10,11 +16,6 @@ import type {
 	ManifestTreeItem,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_STATIC_FILE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.StaticFile.Tree';
-export const UMB_STATIC_FILE_TREE_STORE_ALIAS = 'Umb.Store.StaticFile.Tree';
-export const UMB_STATIC_FILE_TREE_ALIAS = 'Umb.Tree.StaticFile';
-export const UMB_STATIC_FILE_TREE_ITEM_ALIAS = 'Umb.TreeItem.StaticFile';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
