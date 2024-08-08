@@ -81,7 +81,9 @@ export class UmbServerModelValidationContext
 			// Check if there are missing properties:
 			if (errorBody?.missingProperties) {
 				// Retrieve the variants of he send data, as those are the once we will declare as missing properties:
-				errorBody.missingProperties.forEach((alias) => {
+				// Temporary fix for missing properties, as we currently get one for each variant, but we do not know which variant it is for: [NL]
+				const uniqueMissingProperties = [...new Set(errorBody.missingProperties)];
+				uniqueMissingProperties.forEach((alias) => {
 					this.#data.variants.forEach((variant: any) => {
 						const path = `$.values[${UmbDataPathPropertyValueFilter({
 							alias: alias,
