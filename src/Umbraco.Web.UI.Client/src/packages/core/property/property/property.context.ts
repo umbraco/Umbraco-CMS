@@ -74,17 +74,29 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 			this._observeProperty();
 		});
 
-		this.observe(this.alias, () => {
-			this._observeProperty();
-		});
+		this.observe(
+			this.alias,
+			() => {
+				this._observeProperty();
+			},
+			null,
+		);
 
-		this.observe(this.configValues, (configValues) => {
-			this.#config.setValue(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
-		});
+		this.observe(
+			this.configValues,
+			(configValues) => {
+				this.#config.setValue(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
+			},
+			null,
+		);
 
-		this.observe(this.variantId, () => {
-			this._generateVariantDifferenceString();
-		});
+		this.observe(
+			this.variantId,
+			() => {
+				this._generateVariantDifferenceString();
+			},
+			null,
+		);
 	}
 
 	private async _observeProperty(): Promise<void> {
