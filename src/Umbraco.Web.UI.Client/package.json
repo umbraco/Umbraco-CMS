@@ -147,6 +147,7 @@
 		"./src/packages/tags",
 		"./src/packages/templating",
 		"./src/packages/tiny-mce",
+		"./src/packages/ufm",
 		"./src/packages/umbraco-news",
 		"./src/packages/user",
 		"./src/packages/webhook"
