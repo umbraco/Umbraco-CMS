@@ -55,6 +55,20 @@ export class UmbPropertyEditorUITextBoxElement
 		this._placeholder = config?.getValueByAlias('placeholder');
 	}
 
+	constructor() {
+		super();
+		this.addValidator(
+			'tooShort',
+			() => 'custom too short msg',
+			() => String(this.value).length < 10,
+		);
+		this.addValidator(
+			'valueMissing',
+			() => 'custom valueMissing msg',
+			() => this.value === undefined && this.value === '',
+		);
+	}
+
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
