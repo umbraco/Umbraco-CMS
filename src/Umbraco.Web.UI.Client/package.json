@@ -144,6 +144,7 @@
 		"./src/packages/multi-url-picker",
 		"./src/packages/packages",
 		"./src/packages/property-editors",
+		"./src/packages/relations",
 		"./src/packages/search",
 		"./src/packages/static-file",
 		"./src/packages/tags",
