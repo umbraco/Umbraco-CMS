@@ -32,6 +32,7 @@ const CORE_PACKAGES = [
 	import('../../packages/settings/umbraco-package.js'),
 	import('../../packages/static-file/umbraco-package.js'),
 	import('../../packages/tags/umbraco-package.js'),
+	import('../../packages/telemetry/umbraco-package.js'),
 	import('../../packages/templating/umbraco-package.js'),
 	import('../../packages/tiny-mce/umbraco-package.js'),
 	import('../../packages/ufm/umbraco-package.js'),

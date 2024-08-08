@@ -149,6 +149,7 @@
 		"./src/packages/search",
 		"./src/packages/static-file",
 		"./src/packages/tags",
+		"./src/packages/telemetry",
 		"./src/packages/templating",
 		"./src/packages/tiny-mce",
 		"./src/packages/ufm",
