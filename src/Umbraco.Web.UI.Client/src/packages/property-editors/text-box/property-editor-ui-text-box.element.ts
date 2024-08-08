@@ -25,6 +25,13 @@ export class UmbPropertyEditorUITextBoxElement
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
 	#defaultType: UuiInputTypeType = 'text';
 
 	@state()
@@ -69,7 +76,7 @@ export class UmbPropertyEditorUITextBoxElement
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
 			@input=${this.#onInput}
-			?required=${this.readonly}
+			?required=${this.mandatory}
 			?readonly=${this.readonly}></uui-input>`;
 	}
 
