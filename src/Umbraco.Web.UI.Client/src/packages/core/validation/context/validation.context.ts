@@ -27,6 +27,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 			this.validate();
 		}
 	}
+
 	removeValidator(validator: UmbValidator): void {
 		const index = this.#validators.indexOf(validator);
 		if (index !== -1) {
