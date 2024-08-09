@@ -20,6 +20,7 @@ internal abstract class ContentNavigationServiceBase
 
     public abstract Task RebuildAsync();
 
+    // TODO: Maybe do base for querying and another for managing
     public bool TryGetParentKey(Guid childKey, out Guid? parentKey)
         => TryGetParentKeyFromStructure(_navigationStructure, childKey, out parentKey);
 
@@ -32,6 +33,7 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
         => TryGetAncestorsKeysFromStructure(_navigationStructure, childKey, out ancestorsKeys);
 
+    // TODO: add siblings and self where "and self" to be a param that you set and you filter out the result based on that
     public bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_navigationStructure, key, out siblingsKeys);
 
@@ -318,6 +320,20 @@ internal abstract class ContentNavigationServiceBase
         {
             RemoveDescendantsRecursively(child);
             _recycleBinNavigationStructure.TryRemove(child.Key, out _);
+        }
+    }
+
+    private void RestoreNodeAndDescendantsRecursively(NavigationNode node)
+    {
+        foreach (NavigationNode child in node.Children)
+        {
+            RestoreNodeAndDescendantsRecursively(child);
+
+            // Only remove the child from the recycle bin structure if it was successfully added to the main one
+            if (_navigationStructure.TryAdd(child.Key, child))
+            {
+                _recycleBinNavigationStructure.TryRemove(child.Key, out _);
+            }
         }
     }
 }
