@@ -50,36 +50,6 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetSiblingsKeysInBin(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_recycleBinNavigationStructure, key, out siblingsKeys);
 
-    public NavigationNode? GetNavigationNode(Guid key)
-        => _navigationStructure.GetValueOrDefault(key);
-
-    public bool AddNavigationNode(NavigationNode node, Guid? parentKey = null)
-    {
-        if (_navigationStructure.ContainsKey(node.Key))
-        {
-            return false; // Node with this key already exists
-        }
-
-        NavigationNode? parentNode = null;
-        if (parentKey.HasValue)
-        {
-            if (_navigationStructure.TryGetValue(parentKey.Value, out parentNode) is false)
-            {
-                return false; // Parent node doesn't exist
-            }
-        }
-
-        var newNodesMap = new Dictionary<Guid, NavigationNode>();
-        CopyNodeHierarchyRecursively(node, parentNode, newNodesMap);
-
-        foreach (NavigationNode newNode in newNodesMap.Values)
-        {
-            _navigationStructure[newNode.Key] = newNode;
-        }
-
-        return true;
-    }
-
     public bool Remove(Guid key)
     {
         if (TryRemoveNodeFromParentInStructure(_navigationStructure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
