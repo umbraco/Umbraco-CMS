@@ -23,8 +23,6 @@ public class DocumentNavigationServiceTests : UmbracoIntegrationTest
 
     private IDocumentNavigationService DocumentNavigationService => GetRequiredService<IDocumentNavigationService>();
 
-    private IDocumentRecycleBinNavigationService DocumentRecycleBinNavigationService => GetRequiredService<IDocumentRecycleBinNavigationService>();
-
     private ContentType ContentType { get; set; }
 
     private IContent Root { get; set; }
@@ -110,6 +108,7 @@ public class DocumentNavigationServiceTests : UmbracoIntegrationTest
     // }
 
     [Test]
+    // TODO: Test that you can rebuild bin structure as well
     public async Task Structure_Can_Rebuild()
     {
         // Arrange
