@@ -35,7 +35,6 @@ public class ContentService : RepositoryService, IContentService
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IDocumentNavigationService _documentNavigationService;
-    private readonly IDocumentRecycleBinNavigationService _documentRecycleBinNavigationService;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -54,8 +53,7 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        IDocumentNavigationService documentNavigationService,
-        IDocumentRecycleBinNavigationService documentRecycleBinNavigationService)
+        IDocumentNavigationService documentNavigationService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -69,7 +67,6 @@ public class ContentService : RepositoryService, IContentService
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
         _documentNavigationService = documentNavigationService;
-        _documentRecycleBinNavigationService = documentRecycleBinNavigationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
@@ -102,8 +99,7 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentRecycleBinNavigationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>())
     {
     }
 
@@ -135,8 +131,7 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentRecycleBinNavigationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>())
     {
     }
 
