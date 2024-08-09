@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice/static-file",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

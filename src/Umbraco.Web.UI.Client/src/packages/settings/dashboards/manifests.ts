@@ -37,23 +37,6 @@ const dashboards: Array<ManifestDashboard> = [
 			},
 		],
 	},
-	{
-		type: 'dashboard',
-		alias: 'Umb.Dashboard.Telemetry',
-		name: 'Telemetry',
-		element: () => import('./telemetry/dashboard-telemetry.element.js'),
-		weight: 100,
-		meta: {
-			label: 'Telemetry Data',
-			pathname: 'telemetry',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.SectionAlias',
-				match: sectionAlias,
-			},
-		],
-	},
 ];
 
 export const manifests: Array<ManifestTypes> = [...dashboards];
