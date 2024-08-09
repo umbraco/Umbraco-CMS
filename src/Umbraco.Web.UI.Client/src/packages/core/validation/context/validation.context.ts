@@ -132,9 +132,9 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 			this.#parent.removeValidator(this);
 		}
 		this.#parent = undefined;
-		this.messages.destroy();
-		(this.messages as any) = undefined;
 		this.#destroyValidators();
+		this.messages?.destroy();
+		(this.messages as any) = undefined;
 		super.destroy();
 	}
 }
