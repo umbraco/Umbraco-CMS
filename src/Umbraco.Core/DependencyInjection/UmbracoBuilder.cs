@@ -354,9 +354,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
             Services.AddUnique<IPreviewService, PreviewService>();
             Services.AddUnique<IDocumentNavigationService, DocumentNavigationService>();
-            Services.AddUnique<IDocumentRecycleBinNavigationService, DocumentRecycleBinNavigationService>();
             Services.AddUnique<IMediaNavigationService, MediaNavigationService>();
-            Services.AddUnique<IMediaRecycleBinNavigationService, MediaRecycleBinNavigationService>();
 
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
