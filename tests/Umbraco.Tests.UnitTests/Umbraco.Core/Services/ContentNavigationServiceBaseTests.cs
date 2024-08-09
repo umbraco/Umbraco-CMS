@@ -449,6 +449,33 @@ public class ContentNavigationServiceBaseTests
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573")] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
+    public void Can_Remove_Node(Guid keyOfNodeToRemove)
+    {
+        // Act
+        var result = _navigationService.Remove(keyOfNodeToRemove);
+
+        // Assert
+        Assert.IsTrue(result);
+
+        var nodeExists = _navigationService.TryGetParentKey(keyOfNodeToRemove, out Guid? parentKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(nodeExists);
+            Assert.IsNull(parentKey);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
     public void Removing_Node_Removes_Its_Descendants_As_Well(Guid keyOfNodeToRemove)
     {
@@ -471,6 +498,61 @@ public class ContentNavigationServiceBaseTests
             {
                 var descendantExists = _navigationService.TryGetParentKey(descendant, out _);
                 Assert.IsFalse(descendantExists);
+            }
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573")] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
+    public void Removing_Node_Adds_It_To_Recycle_Bin_Root(Guid keyOfNodeToRemove)
+    {
+        // Act
+        _navigationService.Remove(keyOfNodeToRemove);
+
+        // Assert
+        var nodeExistsInBin = _navigationService.TryGetParentKeyInBin(keyOfNodeToRemove, out Guid? parentKeyInBin);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(nodeExistsInBin);
+            Assert.IsNull(parentKeyInBin);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
+    public void Removing_Node_Adds_Its_Descendants_To_Recycle_Bin_As_Well(Guid keyOfNodeToRemove)
+    {
+        // Arrange
+        _navigationService.TryGetDescendantsKeys(keyOfNodeToRemove, out IEnumerable<Guid> initialDescendantsKeys);
+        List<Guid> initialDescendantsList = initialDescendantsKeys.ToList();
+
+        // Act
+        _navigationService.Remove(keyOfNodeToRemove);
+
+        // Assert
+        var nodeExistsInBin = _navigationService.TryGetDescendantsKeysInBin(keyOfNodeToRemove, out IEnumerable<Guid> descendantsKeysInBin);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(nodeExistsInBin);
+            CollectionAssert.AreEqual(initialDescendantsList, descendantsKeysInBin);
+
+            foreach (Guid descendant in initialDescendantsList)
+            {
+                _navigationService.TryGetParentKeyInBin(descendant, out Guid? parentKeyInBin);
+                Assert.IsNotNull(parentKeyInBin); // The descendant kept its initial parent
             }
         });
     }
