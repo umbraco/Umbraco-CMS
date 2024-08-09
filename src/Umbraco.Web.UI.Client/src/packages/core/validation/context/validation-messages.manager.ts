@@ -1,4 +1,4 @@
-import type { UmbValidationMessageTranslator } from '../translators/validation-message-translator.interface.js';
+import type { UmbValidationMessageTranslator } from '../translators/validation-message-path-translator.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';

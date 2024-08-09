@@ -1,4 +1,4 @@
-import type { UmbValidationMessageTranslator } from '../translators/validation-message-translator.interface.js';
+import type { UmbValidationMessageTranslator } from '../translators/validation-message-path-translator.interface.js';
 import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { UmbDataPathPropertyValueFilter } from '../utils/data-path-property-value-filter.function.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
