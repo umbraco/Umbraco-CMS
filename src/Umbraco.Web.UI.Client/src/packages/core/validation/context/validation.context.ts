@@ -42,6 +42,14 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 			// Question is do we want sub messages to be added to the parent? or do we want to keep them separate?.
 			// How about removing sub messages, a sub message could come from the server/parent. so who decides to remove it? I would say it still should be the property editor.
 			// So maybe only remove if they exist upward, but not append upward? Maybe only append upward one for the basePath, and then if we have one message when getting spun up, we can run validation and if validation is good we remove the base-path from the parent.
+
+			// Whats the value of having them local?
+			// It makes it more complex,
+			// It makes it harder to debug
+			// But it makes it easier to remove translators as they get taken out. But maybe this is handled by the controller pattern?
+			// The amount of translator instances will still be the same, as we then end up with multiple validation contexts and therefor just more things, not necessary less.
+
+			// We may still do so, but only for Workspaces.
 		}).skipHost();
 	}
 
@@ -120,7 +128,10 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	}
 
 	override destroy(): void {
-		this.removeFromParent();
+		if (this.#parent) {
+			this.#parent.removeValidator(this);
+		}
+		this.#parent = undefined;
 		this.messages.destroy();
 		(this.messages as any) = undefined;
 		this.#destroyValidators();
