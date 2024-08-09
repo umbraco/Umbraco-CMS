@@ -35,6 +35,17 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 			this.messages.clear();
 
+			// TODO: Observe for messages that gets removed, so they can be removed from parent as well?
+
+			this.observe(
+				parent.messages.messagesOfPathAndDescendant(dataPath),
+				(msgs) => {
+					//this.messages.appendMessages(msgs);
+					// Set all these messages to our own messages, and observe them specifically?
+				},
+				'observeParentMessages',
+			);
+
 			// observe parent messages that fits with the path?.
 			// — Transfer message, without the base path?
 
