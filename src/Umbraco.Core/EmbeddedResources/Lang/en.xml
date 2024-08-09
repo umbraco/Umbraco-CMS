@@ -471,7 +471,7 @@
       <![CDATA[The header <strong>Content-Security-Policy (CSP)</strong> was found. ]]>
     </key>
     <key alias="contentSecurityPolicyCheckHeaderNotFound">
-      <![CDATA[The <strong>Content-Security-Policy (CSP)</strong> header was not found. This header is important because it helps prevent cross-site scripting (XSS) attacks and other code injection vulnerabilities by specifying which content sources are trusted and allowed to be loaded by the browser. ]]>
+      <![CDATA[The header <strong>Content-Security-Policy</strong> (CSP) used to prevent cross-site scripting (XSS) attacks and other code injection vulnerabilities was not found.]]>
     </key>
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.
