@@ -1,6 +1,5 @@
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -549,7 +548,7 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    public void Cannot_Move_When_Target_Parent_Does_Not_Exist()
+    public void Cannot_Move_Node_When_Target_Parent_Does_Not_Exist()
     {
         // Arrange
         Guid nodeToMove = Child1;
