@@ -79,7 +79,10 @@ public class ContentFinderByUrl : IContentFinder
         {
             _logger.LogDebug("Test route {Route}", route);
         }
-        var documentKey = _documentUrlService.GetDocumentKeyByRouteAsync(route).GetAwaiter().GetResult(); //TODO proper async
+
+
+        // TODO find better way to strip the id from the route
+        var documentKey = _documentUrlService.GetDocumentKeyByRouteAsync(docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length), docreq.Culture, docreq.Domain?.ContentId).GetAwaiter().GetResult(); //TODO proper async
 
         IPublishedContent? node =
             umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);

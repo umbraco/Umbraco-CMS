@@ -98,6 +98,21 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         Database.InsertBulk(toInsert.Values);
     }
 
+    public IEnumerable<PublishedDocumentUrlSegment> GetAll()
+    {
+        List<DocumentUrlDto>? dtos = Database.Fetch<DocumentUrlDto>(Database.SqlContext.Sql().Select<DocumentUrlDto>().From<DocumentUrlDto>());
+
+        return dtos.Select(BuildModel);
+    }
+
+    private PublishedDocumentUrlSegment BuildModel(DocumentUrlDto dto) =>
+        new()
+        {
+            UrlSegment = dto.UrlSegment,
+            DocumentKey = dto.UniqueId,
+            LanguageId = dto.LanguageId,
+        };
+
     private DocumentUrlDto BuildDto(PublishedDocumentUrlSegment model)
     {
         return new DocumentUrlDto()

@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -9,6 +11,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -17,6 +20,9 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IDocumentUrlService
 {
+
+    Task InitAsync(CancellationToken cancellationToken);
+
     /// <summary>
     /// Rebuilds all urls for all documents in all combinations.
     /// </summary>
@@ -34,7 +40,7 @@ public interface IDocumentUrlService
     /// <param name="culture">The culture code.</param>
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
     /// <returns>The url of the document.</returns>
-    Task<string> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft);
+    Task<string?> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft);
 
     /// <summary>
     /// Creates or updates a url for a document key, culture and segment and draft information.
@@ -66,7 +72,45 @@ public interface IDocumentUrlService
     /// <param name="isDraft">Whether to delete the url of the draft or published document.</param>
     Task DeleteUrlAsync(Guid documentKey);
 
-    Task<Guid> GetDocumentKeyByRouteAsync(string route);
+    Task<Guid?> GetDocumentKeyByRouteAsync(string route, string? culture, int? documentStartNodeId);
+}
+
+public class DocumentUrlServiceInitializer : IHostedService
+{
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly IRuntimeState _runtimeState;
+
+    public DocumentUrlServiceInitializer(IDocumentUrlService documentUrlService, IRuntimeState runtimeState)
+    {
+        _documentUrlService = documentUrlService;
+        _runtimeState = runtimeState;
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        if (_runtimeState.Level <= RuntimeLevel.Install)
+        {
+            return;
+        }
+
+        await _documentUrlService.InitAsync(cancellationToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StartingAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StartedAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
 }
 
 public class DocumentUrlService : IDocumentUrlService
@@ -82,6 +126,9 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IDomainService _domainService;
     private readonly ILanguageService _languageService;
     private readonly IMemoryCache _memoryCache;
+
+    private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
+    private bool _isInitialized = false;
 
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
@@ -109,6 +156,33 @@ public class DocumentUrlService : IDocumentUrlService
         _memoryCache = memoryCache;
     }
 
+    public async Task InitAsync(CancellationToken cancellationToken)
+    {
+        var scope = _coreScopeProvider.CreateCoreScope();
+        IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments = _documentUrlRepository.GetAll();
+
+        var languages = await _languageService.GetAllAsync();
+        var languageIdToIsoCode = languages.ToDictionary(x => x.Id, x => x.IsoCode);
+        foreach (PublishedDocumentUrlSegment publishedDocumentUrlSegment in publishedDocumentUrlSegments)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+
+            if (languageIdToIsoCode.TryGetValue(publishedDocumentUrlSegment.LanguageId, out var isoCode))
+            {
+                var cacheKey = CreateCacheKey(publishedDocumentUrlSegment.DocumentKey, isoCode, false/*TODO*/);
+                if (_cache.TryAdd(cacheKey, publishedDocumentUrlSegment) is false)
+                {
+                    throw new InvalidOperationException("Could not initialize the document url cache.");
+                }
+            }
+        }
+        _isInitialized = true;
+        scope.Complete();
+    }
+
     public async Task RebuildAllUrlsAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
@@ -122,12 +196,23 @@ public class DocumentUrlService : IDocumentUrlService
 
     public Task<bool> ShouldRebuildUrlsAsync() => throw new NotImplementedException();
 
-    public Task<string> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft)
+    public Task<string?> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft)
     {
+        ThrowIfNotInitialized();
+        var cacheKey = CreateCacheKey(documentKey, culture, isDraft);
         //TODO handle draft?
 
-        _memoryCache.Get()
-        throw new NotImplementedException();
+        _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegment? urlSegment);
+
+        return Task.FromResult(urlSegment?.UrlSegment);
+    }
+
+    private void ThrowIfNotInitialized()
+    {
+        if (_isInitialized is false)
+        {
+            throw new InvalidOperationException("The service needs to be initialized before it can be used.");
+        }
     }
 
     public Task CreateOrUpdateUrlSegmentAsync(Guid documentKey, string culture, string segment, bool isDraft, string url) => throw new NotImplementedException();
@@ -198,6 +283,136 @@ public class DocumentUrlService : IDocumentUrlService
     public Task DeleteUrlAsync(Guid documentKey, string culture, string segment, bool isDraft) => throw new NotImplementedException();
 
     public Task DeleteUrlAsync(Guid documentKey) => throw new NotImplementedException();
+    public async Task<Guid?> GetDocumentKeyByRouteAsync(string route, string? culture, int? documentStartNodeId)
+    {
+        var urlSegments = route.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
+
+        // We need to translate legacy int ids to guid keys.
+        var runnerKey = GetStartNodeKey(documentStartNodeId);
+        var hideTopLevelNodeFromPath = _globalSettings.HideTopLevelNodeFromPath;
+
+        if ((!_globalSettings.ForceCombineUrlPathLeftToRight
+             && CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft))
+        {
+            urlSegments = urlSegments.Reverse().ToArray();
+        }
+
+
+
+        // If a domain is assigned to this route, we need to follow the url segments
+        if (runnerKey.HasValue)
+        {
+            // If there is url segments it means the domain root has been requested
+            if (urlSegments.Length == 0)
+            {
+                return runnerKey.Value;
+            }
+
+            //Otherwise we have to follow the parts
+            foreach (var urlSegment in urlSegments)
+            {
+                //Get the children of the runnerKey and find the child (if any) with the correct url segment
+                var childKeys = GetChildKeys(runnerKey.Value);
+
+                runnerKey = await GetChildWithUrlSegmentAsync(childKeys, urlSegment, culture);
+
+                if (runnerKey is null)
+                {
+                    break;
+                }
+            }
+
+            return runnerKey;
+
+        }
+        // If there is no parts, it means it is a root (and no assigned domain)
+        else if(urlSegments.Length == 0)
+        {
+
+
+            // if we do not hide the top level and no domain was found, it maens there is no content.
+            // TODO we can remove this to keep consistency witht the old routing, but it seems incorrect to allow that.
+            if (hideTopLevelNodeFromPath is false)
+            {
+                return null;
+            }
+
+            return GetTopMostRootKey();
+        }
+
+
+
+
+
+
+
+        foreach (var routePart in urlSegments)
+        {
+
+
+          //  runnerKey = ..
+        }
+
+
+
+
+        // TODO route is weird, it can be a documentId before a path.
+
+        return Guid.Empty;
+        //if(an)
+    }
+
+    private async Task<Guid?> GetChildWithUrlSegmentAsync(IEnumerable<Guid> childKeys, string urlSegment, string? culture)
+    {
+        foreach (Guid childKey in childKeys)
+        {
+            var childUrlSegment =
+                await GetUrlSegmentAsync(childKey, culture! /*TODO figure out if this really is nullable */, false /*TODO figure out about this*/);
+
+            if (string.Equals(childUrlSegment, urlSegment))
+            {
+                return childKey;
+            }
+        }
+
+        return null;
+    }
+
+    // TODO replace with a navigational service when available
+    private IEnumerable<Guid> GetChildKeys(Guid documentKey)
+    {
+
+        var id = _contentService.GetById(documentKey)?.Id;
+
+        if (id.HasValue is false)
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        return _contentService.GetPagedChildren(id.Value, 0, int.MaxValue, out _).Select(x => x.Key);
+    }
+
+    private Guid? GetTopMostRootKey()
+    {
+        // TODO replace with a navigational service when available
+        return _contentService.GetRootContent().FirstOrDefault()?.Key;
+    }
+
+    private string CreateCacheKey(Guid documentKey, string culture, bool isDraft)
+    {
+        return $"{documentKey}|{culture}|{isDraft}";
+    }
+
+    private Guid? GetStartNodeKey(int? documentStartNodeId)
+    {
+        if (documentStartNodeId is null)
+        {
+            return null;
+        }
+
+        // TODO find performand whey to do this
+        return _contentService.GetById(documentStartNodeId.Value)?.Key;
+    }
 
     private async Task<Route?> GetRouteAsync(Guid documentKey, bool isDraft, string? culture, string? segment)
         {

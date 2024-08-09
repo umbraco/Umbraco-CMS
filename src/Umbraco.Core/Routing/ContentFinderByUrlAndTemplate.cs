@@ -39,8 +39,9 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
         IFileService fileService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
-        : base(logger, umbracoContextAccessor)
+        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+        IDocumentUrlService documentUrlService)
+        : base(logger, umbracoContextAccessor, documentUrlService)
     {
         _logger = logger;
         _fileService = fileService;

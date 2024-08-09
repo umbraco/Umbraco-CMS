@@ -5,4 +5,5 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 public interface IDocumentUrlRepository
 {
     void Save(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments);
+    IEnumerable<PublishedDocumentUrlSegment> GetAll();
 }

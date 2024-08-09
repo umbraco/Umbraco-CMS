@@ -74,4 +74,24 @@ public class WebPath
 
         return Uri.IsWellFormedUriString(webPath, uriKind);
     }
+
+    public static string? GetRelativePath(string relativeOrAbsoluteWebPath)
+    {
+
+        // Important we check for relative before absolute as relative paths can be valid absolute paths on linux
+        if (Uri.TryCreate(relativeOrAbsoluteWebPath, UriKind.Relative, out Uri? relative))
+        {
+            if (relative.OriginalString.StartsWith("//") is false)
+            {
+                return relative.OriginalString;
+            }
+        }
+
+        if (Uri.TryCreate(relativeOrAbsoluteWebPath, UriKind.Absolute, out Uri? absolute))
+        {
+            return absolute.PathAndQuery;
+        }
+
+        return null;
+    }
 }
