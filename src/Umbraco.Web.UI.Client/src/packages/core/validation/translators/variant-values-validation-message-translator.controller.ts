@@ -1,23 +1,33 @@
-import type { UmbServerModelValidationContext } from '../controllers/server-model-validation.context.js';
 import { UmbDataPathPropertyValueFilter } from '../utils/data-path-property-value-filter.function.js';
 import type { UmbValidationMessageTranslator } from './validation-message-translator.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_SERVER_MODEL_VALIDATION_CONTEXT } from '../index.js';
 
 export class UmbVariantValuesValidationMessageTranslator
 	extends UmbControllerBase
 	implements UmbValidationMessageTranslator
 {
 	//
-	#context: UmbServerModelValidationContext;
+	#context?: typeof UMB_SERVER_MODEL_VALIDATION_CONTEXT.TYPE;
 
-	constructor(host: UmbControllerHost, context: UmbServerModelValidationContext) {
+	constructor(host: UmbControllerHost) {
 		super(host);
-		context.addTranslator(this);
-		this.#context = context;
+
+		this.consumeContext(UMB_SERVER_MODEL_VALIDATION_CONTEXT, (context) => {
+			this.#context = context;
+			context.addTranslator(this);
+		});
+	}
+
+	override hostDisconnected(): void {
+		this.#context?.removeTranslator(this);
+		this.#context = undefined;
+		super.hostDisconnected();
 	}
 
 	translate(path: string) {
+		if (!this.#context) return;
 		if (path.indexOf('$.values[') !== 0) {
 			// We do not handle this path.
 			return false;
@@ -43,8 +53,10 @@ export class UmbVariantValuesValidationMessageTranslator
 		return '$.values[' + UmbDataPathPropertyValueFilter(specificValue) + path.substring(path.indexOf(']'));
 	}
 
+	//hostDisconnected is called when a controller is begin destroyed, so this destroy method is not needed.
+	/*
 	override destroy(): void {
 		super.destroy();
 		this.#context.removeTranslator(this);
-	}
+	}*/
 }
