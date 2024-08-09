@@ -320,28 +320,4 @@ internal abstract class ContentNavigationServiceBase
             _recycleBinNavigationStructure.TryRemove(child.Key, out _);
         }
     }
-
-    private void CopyChildren(NavigationNode originalNode, NavigationNode newNode)
-    {
-        foreach (NavigationNode child in originalNode.Children)
-        {
-            newNode.AddChild(child);
-        }
-    }
-
-    private void CopyNodeHierarchyRecursively(NavigationNode sourceNode, NavigationNode? newParent, Dictionary<Guid, NavigationNode> newNodesMap)
-    {
-        // Create a new node with the same key, to update the parent
-        var newNode = new NavigationNode(sourceNode.Key);
-
-        // Set the new parent for the node (if parent node is null - the node is added to root)
-        newParent?.AddChild(newNode);
-
-        newNodesMap[sourceNode.Key] = newNode;
-
-        foreach (NavigationNode child in sourceNode.Children)
-        {
-            CopyNodeHierarchyRecursively(child, newNode, newNodesMap);
-        }
-    }
 }

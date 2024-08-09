@@ -25,5 +25,6 @@ public class NavigationNode
     public void RemoveChild(NavigationNode child)
     {
         _children.Remove(child);
+        child.Parent = null;
     }
 }
