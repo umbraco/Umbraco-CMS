@@ -1,4 +1,5 @@
 ﻿using NPoco;
+using StackExchange.Profiling.Internal;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
@@ -135,8 +136,23 @@ public class AlignUpgradedDatabase : MigrationBase
         // apparently the content version table used to be prefixed with cms and not umbraco
         // We don't have a fluid way to rename the default constraint so we have to use raw SQL
         // This should be okay though since we are only running this migration on SQL Server
+        Sql<ISqlContext> constraintNameQuery = Database.SqlContext.Sql(@"
+SELECT obj_Constraint.NAME AS 'constraintName'
+    FROM   sys.objects obj_table
+        JOIN sys.objects obj_Constraint
+            ON obj_table.object_id = obj_Constraint.parent_object_id
+        JOIN sys.sysconstraints constraints
+             ON constraints.constid = obj_Constraint.object_id
+        JOIN sys.columns columns
+             ON columns.object_id = obj_table.object_id
+            AND columns.column_id = constraints.colid
+    WHERE obj_table.NAME = 'umbracoContentVersion'
+	AND columns.NAME = 'VersionDate'
+	AND obj_Constraint.type = 'D'
+");
+        var currentConstraintName = Database.ExecuteScalar<string>(constraintNameQuery);
         Sql<ISqlContext> renameConstraintQuery = Database.SqlContext.Sql(
-            "EXEC sp_rename N'DF_cmsContentVersion_VersionDate', N'DF_umbracoContentVersion_versionDate', N'OBJECT'");
+            $"EXEC sp_rename N'{currentConstraintName}', N'DF_umbracoContentVersion_versionDate', N'OBJECT'");
         Database.Execute(renameConstraintQuery);
     }
 
