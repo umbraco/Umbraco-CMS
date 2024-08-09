@@ -43,6 +43,7 @@ export interface UmbFormControlValidatorConfig {
 	flagKey: FlagTypes;
 	getMessageMethod: () => string;
 	checkMethod: () => boolean;
+	weight: number;
 }
 
 export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
@@ -232,13 +233,11 @@ export function UmbFormControlMixin<
 				flagKey: flagKey,
 				getMessageMethod: getMessageMethod,
 				checkMethod: checkMethod,
+				weight: WeightedErrorFlagTypes.indexOf(flagKey),
 			} satisfies UmbFormControlValidatorConfig;
 			this.#validators.push(validator);
 			// Sort validators based on the WeightedErrorFlagTypes order. [NL]
-			this.#validators.sort((a, b) => {
-				// This could easily be extended with a weight set on the validator object itself. [NL]
-				return WeightedErrorFlagTypes.indexOf(a.flagKey) - WeightedErrorFlagTypes.indexOf(b.flagKey);
-			});
+			this.#validators.sort((a, b) => (a.weight > b.weight ? 1 : b.weight > a.weight ? -1 : 0));
 			return validator;
 		}
 
@@ -323,7 +322,7 @@ export function UmbFormControlMixin<
 				return false;
 			});
 
-			if (message) {
+			if (!message) {
 				// Loop through inner native form controls to adapt their validityState. [NL]
 				this.#formCtrlElements.some((formCtrlEl) => {
 					let key: keyof ValidityState;

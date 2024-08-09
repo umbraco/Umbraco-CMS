@@ -57,6 +57,7 @@ export class UmbPropertyEditorUITextBoxElement
 
 	constructor() {
 		super();
+		// Test validators:
 		this.addValidator(
 			'tooShort',
 			() => 'custom too short msg',
@@ -65,7 +66,10 @@ export class UmbPropertyEditorUITextBoxElement
 		this.addValidator(
 			'valueMissing',
 			() => 'custom valueMissing msg',
-			() => this.value === undefined && this.value === '',
+			() => {
+				console.log('valueMissing', this.value);
+				return this.value === undefined || this.value === '';
+			},
 		);
 	}
 
