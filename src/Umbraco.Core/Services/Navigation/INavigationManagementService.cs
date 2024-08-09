@@ -1,5 +1,3 @@
-using Umbraco.Cms.Core.Models.Navigation;
-
 namespace Umbraco.Cms.Core.Services.Navigation;
 
 /// <summary>
@@ -14,7 +12,5 @@ public interface INavigationManagementService : IRecycleBinNavigationManagementS
 
     bool Add(Guid key, Guid? parentKey = null);
 
-    NavigationNode? GetNavigationNode(Guid key);
-
-    bool AddNavigationNode(NavigationNode node, Guid? parentKey = null);
+    bool Move(Guid key, Guid? targetParentKey = null);
 }
