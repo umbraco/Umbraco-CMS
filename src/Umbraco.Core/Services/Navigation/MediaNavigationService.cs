@@ -12,4 +12,7 @@ internal sealed class MediaNavigationService : ContentNavigationServiceBase, IMe
 
     public override async Task RebuildAsync()
         => await HandleRebuildAsync(Constants.Locks.MediaTree, Constants.ObjectTypes.Media, false);
+
+    public async Task RebuildBinAsync()
+        => await HandleRebuildAsync(Constants.Locks.MediaTree, Constants.ObjectTypes.Media, true);
 }
