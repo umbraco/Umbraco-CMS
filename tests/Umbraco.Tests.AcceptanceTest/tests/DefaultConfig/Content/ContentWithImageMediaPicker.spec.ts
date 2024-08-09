@@ -62,7 +62,6 @@ test('can publish content with a image media picker', async ({umbracoApi, umbrac
 test('can add an image to the image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
-
   await umbracoApi.media.ensureNameNotExists(mediaName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
@@ -158,8 +157,8 @@ test('can add an image from the image media picker with a start node', async ({u
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
-  const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName, imageFolderId);
-  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0,1, false, false , imageFolderId);
+  const imageId = await umbracoApi.media.createDefaultMediaWithImageAndParentId(mediaName, imageFolderId);
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataTypeWithStartNodeId(customDataTypeName, imageFolderId);
   const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentId);
   await umbracoUi.goToBackOffice();
