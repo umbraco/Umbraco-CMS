@@ -129,7 +129,7 @@ export class UmbValidationMessagesManager {
 		}
 	}
 
-	reset(): void {
+	clear(): void {
 		this.#messages.setValue([]);
 	}
 
