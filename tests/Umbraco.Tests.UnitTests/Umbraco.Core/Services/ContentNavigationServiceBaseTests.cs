@@ -835,180 +835,149 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    public void Cannot_Get_Node_From_Non_Existing_Content_Key()
+    public void Cannot_Restore_Node_When_Target_Parent_Does_Not_Exist()
     {
         // Arrange
-        var nonExistingKey = Guid.NewGuid();
+        Guid nodeToRestore = Grandchild1;
+        var nonExistentTargetParentKey = Guid.NewGuid();
+        _navigationService.Remove(nodeToRestore);
 
         // Act
-        NavigationNode? result = _navigationService.GetNavigationNode(nonExistingKey);
+        var result = _navigationService.RestoreFromBin(nodeToRestore, nonExistentTargetParentKey);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public void Cannot_Restore_Node_That_Does_Not_Exist()
+    {
+        // Arrange
+        Guid notDeletedNodeKey = Grandchild4;
+        Guid targetParentKey = Child3;
+
+        // Act
+        var result = _navigationService.RestoreFromBin(notDeletedNodeKey, targetParentKey);
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", null)] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", "E48DD82A-7059-418E-9B82-CDD5205796CF")] // Child 1
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Grandchild 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", "C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Grandchild 2
+    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "E48DD82A-7059-418E-9B82-CDD5205796CF")] // Child 2
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Grandchild 3
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", "D63C1621-C74A-4106-8587-817DEE5FB732")] // Great-grandchild 1
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "E48DD82A-7059-418E-9B82-CDD5205796CF")] // Child 3
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", "B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Grandchild 4
+    public void Can_Restore_Node_To_Existing_Target_Parent(Guid nodeToRestore, Guid? targetParentKey)
+    {
+        // Arrange
+        _navigationService.Remove(nodeToRestore);
+
+        // Act
+        var result = _navigationService.RestoreFromBin(nodeToRestore, targetParentKey);
+
+        // Assert
+        Assert.IsTrue(result);
+
+        // Verify the node's new parent is updated
+        _navigationService.TryGetParentKey(nodeToRestore, out Guid? parentKeyAfterRestore);
+
+        Assert.Multiple(() =>
+        {
+            if (targetParentKey is null)
+            {
+                Assert.IsNull(parentKeyAfterRestore);
+            }
+            else
+            {
+                Assert.IsNotNull(parentKeyAfterRestore);
+            }
+
+            Assert.AreEqual(targetParentKey, parentKeyAfterRestore);
+        });
+    }
+
+    [Test]
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Grandchild 1 to Child 1
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", "60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Great-grandchild 1 to Child 2
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "E48DD82A-7059-418E-9B82-CDD5205796CF")] // Child 3 to Root
+    public void Restored_Node_Is_Added_To_Its_Target_Parent(Guid nodeToRestore, Guid targetParentKey)
+    {
+        // Arrange
+        _navigationService.Remove(nodeToRestore);
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> targetParentChildrenKeys);
+        var targetParentChildrenCount = targetParentChildrenKeys.Count();
+
+        // Act
+        var result = _navigationService.RestoreFromBin(nodeToRestore, targetParentKey);
+
+        // Assert
+        Assert.IsTrue(result);
+
+        // Verify the node is added to its target parent's children list
+        _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
+        List<Guid> childrenList = childrenKeys.ToList();
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.Contains(childrenList, nodeToRestore);
+            Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
+        });
     }
 
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
-    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
-    public void Can_Get_Node_From_Existing_Content_Key(Guid key)
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    [TestCase("D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 3
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
+    public void Restored_Node_And_Its_Descendants_Are_Removed_From_Bin(Guid nodeToRestore)
     {
         // Arrange
-        Guid nodeKey = Root;
+        _navigationService.Remove(nodeToRestore);
+        _navigationService.TryGetDescendantsKeysInBin(nodeToRestore, out IEnumerable<Guid> descendantsKeysInBin);
 
         // Act
-        NavigationNode result = _navigationService.GetNavigationNode(nodeKey);
+        _navigationService.RestoreFromBin(nodeToRestore);
 
         // Assert
-        Assert.IsNotNull(result);
-    }
-
-    [Test]
-    public void Cannot_Add_Navigation_Node_When_Parent_Does_Not_Exist()
-    {
-        // Arrange
-        var newNodeKey = Guid.NewGuid();
-        var newNavigationNode = new NavigationNode(newNodeKey);
-        var nonExistentParentKey = Guid.NewGuid();
-
-        // Act
-        var result = _navigationService.AddNavigationNode(newNavigationNode, nonExistentParentKey);
-
-        // Assert
-        Assert.IsFalse(result);
-    }
-
-    [Test]
-    public void Cannot_Add_Navigation_Node_When_Node_With_The_Same_Key_Already_Exists()
-    {
-        // Arrange
-        NavigationNode existingNode = _navigationService.GetNavigationNode(Child1);
-
-        // Act
-        var result = _navigationService.AddNavigationNode(existingNode);
-
-        // Assert
-        Assert.IsFalse(result);
-    }
-
-    [Test]
-    public void Can_Add_Navigation_Node_To_Content_Root()
-    {
-        // Arrange
-        var newNodeKey = Guid.NewGuid();
-        var newNavigationNode = new NavigationNode(newNodeKey);
-
-        // Act
-        var result = _navigationService.AddNavigationNode(newNavigationNode); // parentKey is null
-
-        // Assert
-        Assert.IsTrue(result);
-
-        var nodeExists = _navigationService.TryGetParentKey(newNodeKey, out Guid? parentKey);
+        var nodeExistsInBin = _navigationService.TryGetParentKeyInBin(nodeToRestore, out Guid? parentKeyInBinAfterRestore);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(nodeExists);
-            Assert.IsNull(parentKey);
+            Assert.IsFalse(nodeExistsInBin);
+            Assert.IsNull(parentKeyInBinAfterRestore);
+
+            foreach (Guid descendant in descendantsKeysInBin)
+            {
+                var descendantExistsInBin = _navigationService.TryGetParentKeyInBin(descendant, out _);
+                Assert.IsFalse(descendantExistsInBin);
+            }
         });
     }
 
     [Test]
-    public void Can_Add_Navigation_Node_With_Children_To_Content_Root()
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", null, 8)] // Root to content root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 2)] // Child 1 to Great-grandchild 1
+    [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8", "60E0E5C4-084E-4144-A560-7393BEAD2E96", 0)] // Grandchild 4 to Child 2
+    public void Restored_Node_Has_The_Same_Amount_Of_Descendants(Guid nodeToRestore, Guid? targetParentKey, int initialDescendantsCount)
     {
         // Arrange
-        var newNodeKey = Guid.NewGuid();
-        var child1Key = Guid.NewGuid();
-        var child2Key = Guid.NewGuid();
-
-        var newNavigationNode = new NavigationNode(newNodeKey);
-        var child1 = new NavigationNode(child1Key);
-        var child2 = new NavigationNode(child2Key);
-
-        newNavigationNode.AddChild(child1);
-        newNavigationNode.AddChild(child2);
+        _navigationService.Remove(nodeToRestore);
 
         // Act
-        var result = _navigationService.AddNavigationNode(newNavigationNode); // parentKey is null
+        _navigationService.RestoreFromBin(nodeToRestore, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        // Verify that the number of descendants remain the same after restoring the node
+        _navigationService.TryGetDescendantsKeys(nodeToRestore, out IEnumerable<Guid> restoredDescendantsKeys);
+        var descendantsCountAfterRestore = restoredDescendantsKeys.Count();
 
-        var child1Exists = _navigationService.TryGetParentKey(child1Key, out Guid? child1ParentKey);
-        var child2Exists = _navigationService.TryGetParentKey(child2Key, out Guid? child2ParentKey);
-
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(child1Exists);
-            Assert.AreEqual(newNodeKey, child1ParentKey);
-
-            Assert.IsTrue(child2Exists);
-            Assert.AreEqual(newNodeKey, child2ParentKey);
-        });
-    }
-
-    [Test]
-    public void Can_Add_Navigation_Node_With_Descendants_To_Content_Root()
-    {
-        // Arrange
-        var newNodeKey = Guid.NewGuid();
-        var child1Key = Guid.NewGuid();
-        var child2Key = Guid.NewGuid();
-        var grandchild1Key = Guid.NewGuid();
-        var grandchild2Key = Guid.NewGuid();
-
-        var newNavigationNode = new NavigationNode(newNodeKey);
-        var child1 = new NavigationNode(child1Key);
-        var child2 = new NavigationNode(child2Key);
-        var grandchild1 = new NavigationNode(grandchild1Key);
-        var grandchild2 = new NavigationNode(grandchild2Key);
-
-        child1.AddChild(grandchild1);
-        child2.AddChild(grandchild2);
-
-        newNavigationNode.AddChild(child1);
-        newNavigationNode.AddChild(child2);
-
-        // Act
-        var result = _navigationService.AddNavigationNode(newNavigationNode); // parentKey is null
-
-        // Assert
-        Assert.IsTrue(result);
-
-        _navigationService.TryGetDescendantsKeys(newNodeKey, out IEnumerable<Guid> descendantsKeys);
-
-        // Assert
-        Assert.AreEqual(4, descendantsKeys.Count());
-    }
-
-    [Test]
-    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "B606E3FF-E070-4D46-8CB9-D31352029FDF", 0, 1)] // Grandchild 1 to Child 3
-    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", "A1B1B217-B02F-4307-862C-A5E22DB729EB", 2, 0)] // Child 2 to Grandchild 2
-    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "C6173927-0C59-4778-825D-D7B9F45D8DDE", 1, 2)] // Child 3 to Child 1
-    public void Can_Add_Navigation_Node_To_Parent(Guid nodeKeyToAdd, Guid targetParentKey, int descendantsCountOfNodeToAdd, int initialDescendantsCountOfTargetParent)
-    {
-        // Arrange
-        // Retrieve the node to add before removing it from the navigation structure
-        var nodeToAdd = _navigationService.GetNavigationNode(nodeKeyToAdd);
-
-        // Remove the node to ensure we can re-add it
-        _navigationService.Remove(nodeKeyToAdd);
-
-        // Act
-        var result = _navigationService.AddNavigationNode(nodeToAdd, targetParentKey);
-
-        // Assert
-        Assert.IsTrue(result);
-
-        _navigationService.TryGetDescendantsKeys(nodeKeyToAdd, out IEnumerable<Guid> addedNodeDescendantsKeys);
-        _navigationService.TryGetDescendantsKeys(targetParentKey, out IEnumerable<Guid> updatedTargetParentDescendantsKeys);
-
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(descendantsCountOfNodeToAdd, addedNodeDescendantsKeys.Count());
-
-            // Verify the number of descendants of the target parent has increased by the number of descendants of the added node plus the node itself
-            Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToAdd + 1, updatedTargetParentDescendantsKeys.Count());
-        });
+        Assert.AreEqual(initialDescendantsCount, descendantsCountAfterRestore);
     }
 }
 
