@@ -35,34 +35,34 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 			this.messages.clear();
 
-			// TODO: Observe for messages that gets removed, so they can be removed from parent as well?
+			// TODO: Observe for local messages that gets removed, so they can be removed from parent as well?
+			// TODO: Observe for parent messages that gets removed, so they can be removed from local as well?
 
 			this.observe(
 				parent.messages.messagesOfPathAndDescendant(dataPath),
 				(msgs) => {
 					//this.messages.appendMessages(msgs);
-					// Set all these messages to our own messages, and observe them specifically?
+					msgs.forEach((msg) => {
+						// TODO: Subtract the base path from the path, so it becomes local to this context:
+						this.messages.addMessage(msg.type, msg.path, msg.message);
+					});
+
+					// observe if one of the parent got removed?
 				},
 				'observeParentMessages',
 			);
 
-			// observe parent messages that fits with the path?.
-			// — Transfer message, without the base path?
+			// observe if one of the locals got removed.
+			// It can maybe be done with one set of known/gotten parent messages, that then can be used to detect which are removed. Maybe from both sides.
 
-			// observe our messages and make sure to propagate them? or observe our messages, if we have one, set one message to the parent with out base path. Or parse all?.
-			// Maybe it has to actively be add or remove...
-
-			// Question is do we want sub messages to be added to the parent? or do we want to keep them separate?.
-			// How about removing sub messages, a sub message could come from the server/parent. so who decides to remove it? I would say it still should be the property editor.
-			// So maybe only remove if they exist upward, but not append upward? Maybe only append upward one for the basePath, and then if we have one message when getting spun up, we can run validation and if validation is good we remove the base-path from the parent.
-
-			// Whats the value of having them local?
-			// It makes it more complex,
-			// It makes it harder to debug
-			// But it makes it easier to remove translators as they get taken out. But maybe this is handled by the controller pattern?
-			// The amount of translator instances will still be the same, as we then end up with multiple validation contexts and therefor just more things, not necessary less.
-
-			// We may still do so, but only for Workspaces.
+			// Benefits for workspaces:
+			// — The workspace can be validated locally, and then the messages can propagate to parent context. (Do we even want that?)
+			// — The workspace can easier know about its validation state
+			// — Its the only way the sub-workspace can be validated without triggering the whole validation.
+			// - The workspace can inherit messages from parent context... — which is good for Blocks
+			// - The workspace can have its own server messages, that is propagated to parent context.
+			// - The workspace can inherit server messages from parent context... — server validation of a block, that is part of the parent workspace.
+			// - Remove parent messages if they go away again if they gets remove here.
 		}).skipHost();
 	}
 
