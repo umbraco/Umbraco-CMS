@@ -28,6 +28,8 @@ public class NavigationInitializationService : IHostedLifecycleService
     public async Task StartingAsync(CancellationToken cancellationToken)
     {
         await _documentNavigationService.RebuildAsync();
+        await _documentNavigationService.RebuildBinAsync();
+
         await _documentRecycleBinNavigationService.RebuildAsync();
         await _mediaNavigationService.RebuildAsync();
         await _mediaRecycleBinNavigationService.RebuildAsync();
