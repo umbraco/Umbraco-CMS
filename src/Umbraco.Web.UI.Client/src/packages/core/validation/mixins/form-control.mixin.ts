@@ -27,15 +27,15 @@ type FlagTypes =
 
 const WeightedErrorFlagTypes = [
 	'customError',
+	'valueMissing',
 	'badInput',
+	'typeMismatch',
 	'patternMismatch',
 	'rangeOverflow',
 	'rangeUnderflow',
 	'stepMismatch',
 	'tooLong',
 	'tooShort',
-	'typeMismatch',
-	'valueMissing',
 ];
 
 // Acceptable as an internal interface/type, BUT if exposed externally this should be turned into a public interface in a separate file.
