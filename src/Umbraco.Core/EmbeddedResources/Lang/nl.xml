@@ -279,6 +279,22 @@
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
+    <key alias="clickJackingCheckHeaderFound">
+      <![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is aanwezig!]]></key>
+    <key alias="clickJackingCheckHeaderNotFound">
+      <![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is NIET aanwezig.]]></key>
+    <key alias="noSniffCheckHeaderFound">
+      <![CDATA[De header of meta-tag <strong>X-Content-Type-Options</strong> die beveiligt tegen MIME sniffing kwetsbaarheden is gevonden.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">
+      <![CDATA[De header of meta-tag <strong>X-Content-Type-Options</strong> die beveiligt tegen MIME sniffing kwetsbaarheden is niet gevonden.]]></key>
+    <key alias="hSTSCheckHeaderFound">
+      <![CDATA[De <strong>Strict-Transport-Security</strong> header, ook bekend als de HSTS-header, is gevonden.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">
+      <![CDATA[De <strong>Strict-Transport-Security</strong>header is niet gevonden.]]></key>
+    <key alias="xssProtectionCheckHeaderFound">
+      <![CDATA[De header <strong>X-XSS-Protection</strong> is gevonden.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound">
+      <![CDATA[De header <strong>X-XSS-Protection</strong> is niet gevonden.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[De volgende headers die informatie tonen over de gebruikte website technologieën zijn aangetroffen: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Er zijn geen headers gevonden die informatie vrijgeven over de gebruikte
       website technologie!

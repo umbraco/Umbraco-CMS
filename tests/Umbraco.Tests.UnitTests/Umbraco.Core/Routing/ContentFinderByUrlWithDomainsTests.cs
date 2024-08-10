@@ -207,7 +207,7 @@ public class ContentFinderByUrlWithDomainsTests : UrlRoutingTestBase
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
         // must lookup domain else lookup by URL fails
-        publishedRouter.FindDomain(frequest);
+        publishedRouter.FindAndSetDomain(frequest);
 
         var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
         var result = await lookup.TryFindContent(frequest);
@@ -245,7 +245,7 @@ public class ContentFinderByUrlWithDomainsTests : UrlRoutingTestBase
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
         // must lookup domain else lookup by URL fails
-        publishedRouter.FindDomain(frequest);
+        publishedRouter.FindAndSetDomain(frequest);
         Assert.AreEqual(expectedCulture, frequest.Culture);
 
         var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);

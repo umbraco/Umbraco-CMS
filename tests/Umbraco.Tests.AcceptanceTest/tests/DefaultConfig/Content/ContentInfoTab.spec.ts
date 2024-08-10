@@ -18,8 +18,11 @@ test.afterEach(async ({umbracoApi}) => {
 test('can see correct information when published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const notPublishContentLink = 'This document is published but is not in the cache';
-  documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const dataTypeName = 'Textstring';
+  const contentText = 'This is test content text';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -47,8 +50,7 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.doesCreatedDateHaveText(expectedCreatedDate);
 });
 
-// TODO: Remove skip when the frond-end is ready. Currently the document type is not opened after clicking to the button
-test.skip('can open document type', async ({umbracoApi, umbracoUi}) => {
+test('can open document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -57,7 +59,6 @@ test.skip('can open document type', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.openContent(contentName);
-  await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickDocumentTypeByName(documentTypeName);
 
   // Assert
@@ -76,7 +77,6 @@ test('can open template', async ({umbracoApi, umbracoUi}) => {
   
   // Act
   await umbracoUi.content.openContent(contentName);
-  await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickTemplateByName(templateName);
 
   // Assert
@@ -101,7 +101,6 @@ test('can change template', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.openContent(contentName);
-  await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.changeTemplate(firstTemplateName, secondTemplateName);
   await umbracoUi.content.clickSaveButton();
 
@@ -129,7 +128,6 @@ test('cannot change to a template that is not allowed in the document type', asy
 
   // Act
   await umbracoUi.content.openContent(contentName);
-  await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickEditTemplateByName(firstTemplateName);
 
   // Assert

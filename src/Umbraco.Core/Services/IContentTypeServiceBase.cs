@@ -67,15 +67,30 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
 
     bool HasChildren(Guid id);
 
+    [Obsolete("Please use the respective Create or Update instead")]
     void Save(TItem? item, int userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use the respective Create or Update instead")]
     Task SaveAsync(TItem item, Guid performingUserKey)
     {
         Save(item);
         return Task.CompletedTask;
     }
 
+    [Obsolete("Please use the respective Create or Update instead")]
     void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
+
+    Task<Attempt<ContentTypeOperationStatus>> CreateAsync(TItem item, Guid performingUserKey)
+    {
+        Save(item);
+        return Task.FromResult(Attempt.Succeed(ContentTypeOperationStatus.Success));
+    }
+
+    Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(TItem item, Guid performingUserKey)
+    {
+        Save(item);
+        return Task.FromResult(Attempt.Succeed(ContentTypeOperationStatus.Success));
+    }
 
     void Delete(TItem item, int userId = Constants.Security.SuperUserId);
 

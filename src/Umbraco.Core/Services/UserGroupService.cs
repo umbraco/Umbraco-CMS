@@ -314,8 +314,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         // Since this is a brand new creation we don't have to be worried about what users were added and removed
         // simply put all members that are requested to be in the group will be "added"
         var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd, Array.Empty<IUser>());
-        var savingUserGroupWithUsersNotification =
-            new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
+        var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
         {
             scope.Complete();
@@ -323,6 +322,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, usersToAdd.Select(x => x.Id).ToArray());
+
+        scope.Notifications.Publish(
+            new UserGroupSavedNotification(userGroup, eventMessages).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(
+            new UserGroupWithUsersSavedNotification(userGroupWithUsers, eventMessages).WithStateFrom(savingUserGroupWithUsersNotification));
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
@@ -385,9 +389,23 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
+        // We need to fire this notification - both for backwards compat, and to ensure caches across all servers.
+        // Since we are not adding or removing any users, we'll just fire the notification with empty collections
+        // for "added" and "removed" users.
+        var userGroupWithUsers = new UserGroupWithUsers(userGroup, [], []);
+        var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
+        }
+
         _userGroupRepository.Save(userGroup);
+
         scope.Notifications.Publish(
             new UserGroupSavedNotification(userGroup, eventMessages).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(
+            new UserGroupWithUsersSavedNotification(userGroupWithUsers, eventMessages).WithStateFrom(savingUserGroupWithUsersNotification));
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);

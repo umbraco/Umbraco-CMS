@@ -101,8 +101,9 @@ public sealed class JsonObjectConverter : JsonConverter<object>
             JsonTokenType.Number when reader.TryGetInt32(out int i) => i,
             JsonTokenType.Number when reader.TryGetInt64(out long l) => l,
             JsonTokenType.Number => reader.GetDouble(),
+            JsonTokenType.String when reader.TryGetDateTimeOffset(out DateTimeOffset datetime) => datetime,
             JsonTokenType.String when reader.TryGetDateTime(out DateTime datetime) => datetime,
-            JsonTokenType.String => reader.GetString()!,
+            JsonTokenType.String => reader.GetString(),
             _ => JsonDocument.ParseValue(ref reader).RootElement.Clone()
         };
     }

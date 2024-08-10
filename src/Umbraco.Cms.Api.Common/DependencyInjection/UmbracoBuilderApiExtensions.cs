@@ -11,7 +11,7 @@ public static class UmbracoBuilderApiExtensions
 {
     public static IUmbracoBuilder AddUmbracoApiOpenApiUI(this IUmbracoBuilder builder)
     {
-        if (builder.Services.Any(x => x.ImplementationType == typeof(OperationIdSelector)))
+        if (builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(OperationIdSelector)))
         {
             return builder;
         }

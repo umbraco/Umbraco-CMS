@@ -11,7 +11,6 @@
     <ContentTargetFolders>.</ContentTargetFolders>
     <NoWarn>NU5128</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">
       <Link>UmbracoProject\Program.cs</Link>
@@ -32,13 +31,7 @@
       <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
       <PackagePath>UmbracoProject\Views</PackagePath>
     </Content>
-    <Content Include="..\src\Umbraco.Web.UI\wwwroot\favicon.ico">
-      <Link>UmbracoProject\wwwroot\favicon.ico</Link>
-      <PackagePath>UmbracoProject\wwwroot</PackagePath>
-    </Content>
   </ItemGroup>
-
-
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />

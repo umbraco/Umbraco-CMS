@@ -106,8 +106,8 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.clickChangePasswordButton();
-  await umbracoUi.member.enterNewPassword(updatedPassword);
-  await umbracoUi.member.enterConfirmPassword(updatedPassword);
+  await umbracoUi.member.enterPassword(updatedPassword);
+  await umbracoUi.member.enterConfirmNewPassword(updatedPassword);
   await umbracoUi.member.clickSaveButton();
 
   // Assert
@@ -173,9 +173,16 @@ test('can view member info', async ({umbracoApi, umbracoUi}) => {
   // Assert
   const memberData = await umbracoApi.member.get(memberId);
   await umbracoUi.member.doesMemberInfoHaveValue('Failed login attempts', memberData.failedPasswordAttempts.toString());
-  await umbracoUi.member.doesMemberInfoHaveValue('Last lockout date', memberData.lastLoginDate == null ? 'never' : memberData.lastLoginDate);
-  await umbracoUi.member.doesMemberInfoHaveValue('Last login', memberData.lastLoginDate == null ? 'never' : memberData.lastLoginDate);
-  await umbracoUi.member.doesMemberInfoHaveValue('Password changed', new Date(memberData.lastPasswordChangeDate).toLocaleString());
+  await umbracoUi.member.doesMemberInfoHaveValue('Last lockout date', memberData.lastLoginDate == null ? 'Never' : memberData.lastLoginDate);
+  await umbracoUi.member.doesMemberInfoHaveValue('Last login', memberData.lastLoginDate == null ? 'Never' : memberData.lastLoginDate);
+  await umbracoUi.member.doesMemberInfoHaveValue('Password changed', new Date(memberData.lastPasswordChangeDate).toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  }));
 });
 
 test('can enable approved', async ({umbracoApi, umbracoUi}) => {

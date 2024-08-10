@@ -371,3 +371,17 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
+
+test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.template.clickActionsMenuAtRoot();
+  await umbracoUi.template.clickCreateButton();
+  await umbracoUi.template.clickSaveButton();
+
+  // Assert
+  await umbracoUi.template.isErrorNotificationVisible();
+  expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
+});

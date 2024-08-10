@@ -137,6 +137,8 @@
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd已找到。]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd沒有找到。]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[在標頭中有找到揭露網站技術的資訊：<strong>%0%</strong>。]]></key>
     <key alias="excessiveHeadersNotFound">在標頭中沒有找到揭露網站技術的資訊。</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP設定正確，而且服務正常運作。</key>

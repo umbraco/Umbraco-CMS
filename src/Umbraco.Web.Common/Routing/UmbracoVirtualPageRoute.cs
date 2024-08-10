@@ -155,6 +155,7 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
 
         IPublishedRequestBuilder requestBuilder = await _publishedRouter.CreateRequestAsync(cleanedUrl);
         requestBuilder.SetPublishedContent(publishedContent);
+        _publishedRouter.RouteDomain(requestBuilder);
 
         return requestBuilder.Build();
     }

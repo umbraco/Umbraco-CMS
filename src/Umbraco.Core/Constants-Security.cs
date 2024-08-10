@@ -93,12 +93,15 @@ public static partial class Constants
 
         public const string MemberExternalAuthenticationTypePrefix = "UmbracoMembers.";
 
+        [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
         public const string StartContentNodeIdClaimType =
             "http://umbraco.org/2015/02/identity/claims/backoffice/startcontentnode";
 
+        [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
         public const string StartMediaNodeIdClaimType =
             "http://umbraco.org/2015/02/identity/claims/backoffice/startmedianode";
 
+        [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
         public const string AllowedApplicationsClaimType =
             "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
 

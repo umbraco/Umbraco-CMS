@@ -98,7 +98,7 @@ test('can add a description to property in a media type', {tag: '@smoke'}, async
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
   await umbracoUi.mediaType.enterPropertyEditorDescription(descriptionText);
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
@@ -118,7 +118,7 @@ test('can set a property as mandatory in a media type', {tag: '@smoke'}, async (
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
   await umbracoUi.mediaType.clickMandatorySlider();
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
@@ -140,7 +140,7 @@ test('can set up validation for a property in a media type', async ({umbracoApi,
   await umbracoUi.mediaType.selectValidationOption('');
   await umbracoUi.mediaType.enterRegEx(regex);
   await umbracoUi.mediaType.enterRegExMessage(regexMessage);
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
@@ -159,7 +159,7 @@ test('can set appearance as label on top for property in a media type', async ({
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
   await umbracoUi.mediaType.clickLabelAboveButton();
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert

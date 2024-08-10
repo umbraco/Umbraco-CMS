@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Security.Principal;
 using Umbraco.Cms.Core.Models.Membership;
@@ -20,8 +21,14 @@ internal sealed class AuthorizationHelper : IAuthorizationHelper
 
     /// <inheritdoc/>
     public IUser GetUmbracoUser(IPrincipal currentUser)
+        => TryGetUmbracoUser(currentUser, out IUser? user)
+            ? user
+            : throw new InvalidOperationException($"Could not obtain an {nameof(IUser)} instance from {nameof(IPrincipal)}");
+
+    /// <inheritdoc/>
+    public bool TryGetUmbracoUser(IPrincipal currentUser, [NotNullWhen(true)] out IUser? user)
     {
-        IUser? user = null;
+        user = null;
         ClaimsIdentity? umbIdentity = currentUser.GetUmbracoIdentity();
         Guid? currentUserKey = umbIdentity?.GetUserKey();
 
@@ -38,12 +45,6 @@ internal sealed class AuthorizationHelper : IAuthorizationHelper
             user = _userService.GetAsync(currentUserKey.Value).GetAwaiter().GetResult();
         }
 
-        if (user is null)
-        {
-            throw new InvalidOperationException(
-                $"Could not obtain an {nameof(IUser)} instance from {nameof(IPrincipal)}");
-        }
-
-        return user;
+        return user is not null;
     }
 }

@@ -63,15 +63,14 @@ variables:
   DOTNET_GENERATE_ASPNET_CERTIFICATE: false
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  npm_config_cache: $(Pipeline.Workspace)/.npm_client
+  NODE_OPTIONS: --max_old_space_size=16384
 
 stages:
   ###############################################
   ## Build
   ###############################################
   - stage: Build
-    variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_client
-      NODE_OPTIONS: --max_old_space_size=16384
     jobs:
       - job: A
         displayName: Build Umbraco CMS
@@ -80,18 +79,11 @@ stages:
         steps:
           - checkout: self
             submodules: true
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            retryCountOnTaskFailure: 3
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
             inputs:
-              versionSpec: $(nodeVersion)
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            displayName: Run npm ci (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.Client
-          - script: npm run generate:api-local
-            displayName: Generate API models (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.Client
-            enabled: false
+              useGlobalJson: true
+          - template: templates/backoffice-install.yml
           - script: npm run build:for:cms
             displayName: Run build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.Client
@@ -101,10 +93,6 @@ stages:
           - script: npm run build
             displayName: Run npm build (Login)
             workingDirectory: src/Umbraco.Web.UI.Login
-          - task: UseDotNet@2
-            displayName: Use .NET SDK from global.json
-            inputs:
-              useGlobalJson: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -127,18 +115,25 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
+
+      - job: B
+        displayName: Build Bellissima Package
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            submodules: true
+          - template: templates/backoffice-install.yml
+          - script: npm run build:for:npm
+            displayName: Run build:for:npm
+            workingDirectory: src/Umbraco.Web.UI.Client
           - bash: |
-              echo "##[command]Running npm version"
-              echo "##[debug]Version: $PACKAGE_VERSION"
               echo "##[command]Running npm pack"
               echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
-              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
               mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
-            displayName: Prepare Bellissima npm package
-            env:
-              PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
+            displayName: Run npm pack
             workingDirectory: src/Umbraco.Web.UI.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Bellissima npm artifact
@@ -208,28 +203,11 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         variables:
-          npm_config_cache: $(Pipeline.Workspace)/.npm_client
-          NODE_OPTIONS: --max_old_space_size=16384
           BASE_PATH: /v$(umbracoMajorVersion)/ui
         steps:
           - checkout: self
             submodules: true
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            retryCountOnTaskFailure: 3
-            inputs:
-              versionSpec: $(nodeVersion)
-          - task: Cache@2
-            displayName: Cache node_modules
-            inputs:
-              key: '"npm_client" | "$(Agent.OS)"| $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
-              restoreKeys: |
-                "npm_client" | "$(Agent.OS)"
-                "npm_client"
-              path: $(npm_config_cache)
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
+          - template: templates/backoffice-install.yml
           - script: npm run storybook:build
             displayName: Build Storybook
             env:
@@ -239,16 +217,30 @@ stages:
             displayName: Replace BASE_PATH on assets
             workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
           - task: ArchiveFiles@2
-            displayName: Archive js Docs
+            displayName: Archive Storybook
             inputs:
               rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
               includeRootFolder: false
               archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
-            displayName: Publish js Docs
+            displayName: Publish Storybook
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
               artifact: ui-docs
+          - script: npm run generate:ui-api-docs
+            displayName: Generate API Docs
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client
+          - task: ArchiveFiles@2
+            displayName: Archive UI API Docs
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/ui-api
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
+          - task: PublishPipelineArtifact@1
+            displayName: Publish UI API Docs
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
+              artifact: ui-api-docs
 
   ###############################################
   ## Test
@@ -528,7 +520,7 @@ stages:
           - ${{ if eq(parameters.isNightly, true) }}:
               pwsh: npm run test --ignore-certificate-errors
             ${{ else }}:
-              pwsh: npm run smokeTest --ignore-certificate-errors           
+              pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -868,7 +860,7 @@ stages:
               BlobPrefix: v$(umbracoMajorVersion)/csharp
               CleanTargetBeforeCopy: true
       - job:
-        displayName: Upload js Docs
+        displayName: Upload Storybook
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -881,7 +873,7 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-docs
           - task: AzureFileCopy@4
-            displayName: 'Copy UI Docs to blob storage'
+            displayName: 'Copy Storybook to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/ui-docs/*'
               azureSubscription: umbraco-storage
@@ -889,4 +881,27 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/ui
+              CleanTargetBeforeCopy: true
+      - job:
+        displayName: Upload UI API Docs
+        steps:
+          - checkout: none
+          - task: DownloadPipelineArtifact@2
+            displayName: Download artifact
+            inputs:
+              artifact: ui-api-docs
+              path: $(Build.SourcesDirectory)
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: $(Build.SourcesDirectory)/ui-api-docs.zip
+              destinationFolder: $(Build.ArtifactStagingDirectory)/ui-api-docs
+          - task: AzureFileCopy@4
+            displayName: 'Copy UI API Docs to blob storage'
+            inputs:
+              SourcePath: '$(Build.ArtifactStagingDirectory)/ui-api-docs/*'
+              azureSubscription: umbraco-storage
+              Destination: AzureBlob
+              storage: umbracoapidocs
+              ContainerName: '$web'
+              BlobPrefix: v$(umbracoMajorVersion)/ui-api
               CleanTargetBeforeCopy: true

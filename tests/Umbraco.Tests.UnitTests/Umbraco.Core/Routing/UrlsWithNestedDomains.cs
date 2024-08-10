@@ -62,7 +62,7 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
         var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
-        publishedRouter.FindDomain(frequest);
+        publishedRouter.FindAndSetDomain(frequest);
         Assert.IsTrue(frequest.HasDomain());
 
         // check that it's been routed

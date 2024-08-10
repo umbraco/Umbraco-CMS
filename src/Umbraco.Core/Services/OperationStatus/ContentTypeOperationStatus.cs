@@ -5,6 +5,8 @@ public enum ContentTypeOperationStatus
     Success,
     DuplicateAlias,
     InvalidAlias,
+    NameCannotBeEmpty,
+    NameTooLong,
     InvalidPropertyTypeAlias,
     PropertyTypeAliasCannotEqualContentTypeAlias,
     DuplicatePropertyTypeAlias,
@@ -17,5 +19,6 @@ public enum ContentTypeOperationStatus
     MissingContainer,
     DuplicateContainer,
     NotFound,
-    NotAllowed
+    NotAllowed,
+    CancelledByNotification,
 }

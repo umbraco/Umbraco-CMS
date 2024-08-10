@@ -91,6 +91,14 @@
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Заголовок або мета-тег <strong>X-Frame-Options</strong>, що використовується для управління можливістю розміщувати сайт у IFRAME на іншому сайті, знайдено.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Заголовок або мета-тег <strong>X-Frame-Options</strong>, що використовується для управління можливістю розміщувати сайт у IFRAME на іншому сайті, не знайдено.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[Заголовок або мета-тег <strong>X-Content-Type-Options</strong>, що використовується для захисту від MIME-уязвимостей, знайдено.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[Заголовок або мета-тег <strong>X-Content-Type-Options</strong>, що використовується для захисту від MIME-уязвимостей, не знайдено.]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong>, відомий також як HSTS-header, знайдено.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong> не знайдено.]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> знайдено.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> не знайдено.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Виявлено наступні заголовки, що дозволяють з'ясувати базову технологію сайту: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Заголовки, які дають змогу з'ясувати базову технологію сайту, не виявлено.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Параметри надсилання електронної пошти (SMTP) налаштовані коректно, сервіс працює як очікується.</key>

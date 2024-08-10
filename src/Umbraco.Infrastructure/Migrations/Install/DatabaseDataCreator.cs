@@ -1934,7 +1934,7 @@ internal class DatabaseDataCreator
                     EditorUiAlias = "Umb.PropertyEditorUi.TinyMCE",
                     DbType = "Ntext",
                     Configuration =
-                        "{\"toolbar\":[\"ace\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
+                        "{\"toolbar\":[\"sourcecode\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
                 });
         }
 

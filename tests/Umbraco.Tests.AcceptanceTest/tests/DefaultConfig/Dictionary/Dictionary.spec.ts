@@ -15,64 +15,64 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.clickCreateLink();
-  await umbracoUi.translation.enterDictionaryName(dictionaryName);
-  await umbracoUi.translation.clickSaveButton();
+  await umbracoUi.dictionary.clickCreateLink();
+  await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
+  await umbracoUi.dictionary.clickSaveButton();
 
   // Assert
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
-  await umbracoUi.translation.isSuccessNotificationVisible();
-  await umbracoUi.translation.clickLeftArrowButton();
+  await umbracoUi.dictionary.isSuccessNotificationVisible();
+  await umbracoUi.dictionary.clickLeftArrowButton();
   // Verify the dictionary item displays in the tree and in the list
-  await umbracoUi.translation.isDictionaryTreeItemVisible(dictionaryName);
-  expect(await umbracoUi.translation.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
+  await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
+  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
 });
 
 test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.translation.deleteDictionary();
+  await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
+  await umbracoUi.dictionary.deleteDictionary();
 
   // Assert
-  await umbracoUi.translation.isSuccessNotificationVisible();
+  await umbracoUi.dictionary.isSuccessNotificationVisible();
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeFalsy();
   // Verify the dictionary item does not display in the tree
-  await umbracoUi.translation.isDictionaryTreeItemVisible(dictionaryName, false);
+  await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName, false);
   // TODO: Uncomment this when the front-end is ready. Currently the dictionary list is not updated immediately.
   // Verify the dictionary item does not display in the list
-  //expect(await umbracoUi.translation.doesDictionaryListHaveText(dictionaryName)).toBeFalsy();
+  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeFalsy();
 });
 
 test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
   let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.clickActionsMenuForDictionary(parentDictionaryName);
-  await umbracoUi.translation.clickCreateDictionaryItemButton();
-  await umbracoUi.translation.enterDictionaryName(dictionaryName);
-  await umbracoUi.translation.clickSaveButton();
+  await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
+  await umbracoUi.dictionary.clickCreateDictionaryItemButton();
+  await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
+  await umbracoUi.dictionary.clickSaveButton();
 
   // Assert
-  await umbracoUi.translation.isSuccessNotificationVisible();
+  await umbracoUi.dictionary.isSuccessNotificationVisible();
   const dictionaryChildren = await umbracoApi.dictionary.getChildren(parentDictionaryId);
   expect(dictionaryChildren[0].name).toEqual(dictionaryName);
-  await umbracoUi.translation.clickLeftArrowButton();
+  await umbracoUi.dictionary.clickLeftArrowButton();
   // Verify the new dictionary item displays in the list
-  expect(await umbracoUi.translation.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
+  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
   // Verify the new dictionary item displays in the tree
-  await umbracoUi.translation.reloadTree(parentDictionaryName);
-  await umbracoUi.translation.isDictionaryTreeItemVisible(dictionaryName);
+  await umbracoUi.dictionary.reloadTree(parentDictionaryName);
+  await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
 
   // Clean
   await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
@@ -82,12 +82,12 @@ test('can export a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   const dictionaryId = await umbracoApi.dictionary.create(dictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.translation.clickExportMenu();
-  const exportData = await umbracoUi.translation.exportDictionary(false);
+  await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
+  await umbracoUi.dictionary.clickExportMenu();
+  const exportData = await umbracoUi.dictionary.exportDictionary(false);
 
   // Assert
   expect(exportData).toEqual(dictionaryId + '.udt');
@@ -98,12 +98,12 @@ test('can export a dictionary item with descendants', {tag: '@smoke'}, async ({u
   await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
   let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
   await umbracoApi.dictionary.create(dictionaryName, [], parentDictionaryId);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.clickActionsMenuForDictionary(parentDictionaryName);
-  await umbracoUi.translation.clickExportMenu();
-  const exportData = await umbracoUi.translation.exportDictionary(true);
+  await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
+  await umbracoUi.dictionary.clickExportMenu();
+  const exportData = await umbracoUi.dictionary.exportDictionary(true);
 
   // Assert
   expect(exportData).toEqual(parentDictionaryId + '.udt');
@@ -119,20 +119,20 @@ test('can import a dictionary item', async ({umbracoApi, umbracoUi}) => {
   const importDictionaryName = 'TestImportDictionary';
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.translation.clickImportMenu();
-  await umbracoUi.translation.importDictionary(udtFilePath);
+  await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
+  await umbracoUi.dictionary.clickImportMenu();
+  await umbracoUi.dictionary.importDictionary(udtFilePath);
 
   // Assert
   // Verify the imported dictionary item displays in the tree
-  await umbracoUi.translation.reloadTree(dictionaryName);
-  await umbracoUi.translation.isDictionaryTreeItemVisible(importDictionaryName);
+  await umbracoUi.dictionary.reloadTree(dictionaryName);
+  await umbracoUi.dictionary.isDictionaryTreeItemVisible(importDictionaryName);
   // TODO: Uncomment this when the front-end is ready. Currently the dictionary list is not updated immediately.
   // Verify the imported dictionary item displays in the list
-  //expect(await umbracoUi.translation.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
+  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
 });
 
 test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -143,23 +143,23 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
   const importChildDictionaryName = 'TestImportChild';
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.translation.clickImportMenu();
-  await umbracoUi.translation.importDictionary(udtFilePath);
+  await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
+  await umbracoUi.dictionary.clickImportMenu();
+  await umbracoUi.dictionary.importDictionary(udtFilePath);
 
   // Assert
   // Verify the imported dictionary items display in the tree
-  await umbracoUi.translation.reloadTree(dictionaryName);
-  await umbracoUi.translation.isDictionaryTreeItemVisible(importParentDictionaryName);
-  await umbracoUi.translation.reloadTree(importParentDictionaryName);
-  await umbracoUi.translation.isDictionaryTreeItemVisible(importChildDictionaryName);
+  await umbracoUi.dictionary.reloadTree(dictionaryName);
+  await umbracoUi.dictionary.isDictionaryTreeItemVisible(importParentDictionaryName);
+  await umbracoUi.dictionary.reloadTree(importParentDictionaryName);
+  await umbracoUi.dictionary.isDictionaryTreeItemVisible(importChildDictionaryName);
   // TODO: Uncomment this when the front-end is ready. Currently the dictionary list is not updated immediately.
   // Verify the imported dictionary items display in the list
-  //expect(await umbracoUi.translation.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
-  //expect(await umbracoUi.translation.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();
+  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
+  //expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();
 });
 
 // Skip this test as the search function is removed
@@ -167,13 +167,13 @@ test.skip('can search a dictionary item in list when have results', async ({umbr
   // Arrange
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.enterSearchKeywordAndPressEnter(dictionaryName);
+  await umbracoUi.dictionary.enterSearchKeywordAndPressEnter(dictionaryName);
 
   // Assert
-  expect(await umbracoUi.translation.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
+  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
 });
 
 // Skip this test as the search function is removed
@@ -182,11 +182,11 @@ test.skip('can search a dictionary item in list when have no results', async ({u
   const emptySearchResultMessage = 'No Dictionary items to choose from';
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
-  await umbracoUi.translation.goToSection(ConstantHelper.sections.translation);
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
   // Act
-  await umbracoUi.translation.enterSearchKeywordAndPressEnter('xyz');
+  await umbracoUi.dictionary.enterSearchKeywordAndPressEnter('xyz');
 
   // Assert
-  await umbracoUi.translation.isSearchResultMessageDisplayEmpty(emptySearchResultMessage);
+  await umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage);
 });

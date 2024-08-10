@@ -140,6 +140,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{20CE9C97
 	ProjectSection(SolutionItems) = preProject
 		build\azure-pipelines.yml = build\azure-pipelines.yml
 		build\nightly-build-trigger.yml = build\nightly-build-trigger.yml
+		build\templates\backoffice-install.yml = build\templates\backoffice-install.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "csharp-docs", "csharp-docs", "{F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44}"

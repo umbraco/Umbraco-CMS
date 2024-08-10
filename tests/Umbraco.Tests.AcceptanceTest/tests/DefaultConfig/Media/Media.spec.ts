@@ -69,7 +69,7 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.clickCreateMediaItemButton();
     await umbracoUi.media.clickMediaTypeWithNameButton(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
-    await umbracoUi.media.changeFileTypeWithFileChooser('./fixtures/mediaLibrary/' + mediaFileType.filePath);
+    await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
     await umbracoUi.media.clickSaveButton();
 
     // Assert

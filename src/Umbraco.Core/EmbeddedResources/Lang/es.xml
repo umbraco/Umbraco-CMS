@@ -285,6 +285,8 @@
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[El header or meta-tag <strong>X-Frame-Options</strong> usado para controlar si un sitio puede ser IFRAMEd por otra fue encontrado.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[El header or meta-tag <strong>X-Frame-Options</strong> usado para controlar si un sitio puede ser IFRAMEd por otra no se ha encontrado.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No se ha encontrado ninguna cabecera que revele información sobre la tecnología del sitio.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Los valores SMTP están configurados correctamente y el servicio opera con normalidad.</key>

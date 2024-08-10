@@ -409,6 +409,27 @@
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
+    <key alias="clickJackingCheckHeaderFound">
+      <![CDATA[Zaglavlje ili meta-tag <strong>X-Frame-Options</strong> koji se koristi za kontrolu da li neko mjesto može biti IFRAMED od strane drugog je pronađen.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound">
+      <![CDATA[Zaglavlje ili meta-tag <strong>X-Frame-Options</strong> koji se koristi za kontrolu da li neko mjesto može biti IFRAMED od strane drugog nije pronađen.]]></key>
+    <key alias="noSniffCheckHeaderFound">
+      <![CDATA[Zaglavlje ili meta-tag <strong>X-Content-Type-Options</strong> koji se koristi za zaštitu od ranjivosti MIME sniffinga je pronađen.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">
+      <![CDATA[Zaglavlje ili meta-tag <strong>X-Content-Type-Options</strong> koji se koristi za zaštitu od ranjivosti MIME sniffinga nije pronađen.]]></key>
+    <key alias="hSTSCheckHeaderFound">
+      <![CDATA[Zaglavlje <strong>Strict-Transport-Security</strong>, takođe poznat kao HSTS-header, je pronađen.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">
+      <![CDATA[Zaglavlje <strong>Strict-Transport-Security</strong> nije pronađeno.]]></key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost">
+      <![CDATA[Zaglavlje <strong>Strict-Transport-Security</strong>, takođe poznat kao HSTS-header, je pronađen. <strong>Ovo zaglavlje ne bi trebalo biti prisutno na lokalnom hostu.</strong>]]>
+    </key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
+      <![CDATA[Zaglavlje <strong>Strict-Transport-Security</strong> nije pronađeno. Ovo zaglavlje ne bi trebalo biti prisutno na lokalnom hostu.]]>
+    </key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Zaglavlje <strong>X-XSS-Protection</strong> je pronađeno.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound">
+      <![CDATA[Zaglavlje <strong>X-XSS-Protection</strong> nije pronađeno.]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Pronađena su sljedeća zaglavlja koja otkrivaju informacije o tehnologiji web stranice: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Nisu pronađena zaglavlja koja otkrivaju informacije o tehnologiji web stranice.
     </key>

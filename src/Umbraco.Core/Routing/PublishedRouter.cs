@@ -108,7 +108,7 @@ public class PublishedRouter : IPublishedRouter
         // find domain
         if (builder.Domain == null)
         {
-            FindDomain(builder);
+            FindAndSetDomain(builder);
         }
 
         await RouteRequestInternalAsync(builder);
@@ -185,7 +185,7 @@ public class PublishedRouter : IPublishedRouter
 
     private async Task<IPublishedRequest> TryRouteRequest(IPublishedRequestBuilder request)
     {
-        FindDomain(request);
+        FindAndSetDomain(request);
 
         if (request.IsRedirect())
         {
@@ -270,18 +270,31 @@ public class PublishedRouter : IPublishedRouter
         // to find out the appropriate template
     }
 
-    /// <summary>
-    ///     Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
-    /// </summary>
-    /// <returns>A value indicating whether a domain was found.</returns>
-    internal bool FindDomain(IPublishedRequestBuilder request)
+    /// <inheritdoc />
+    public bool RouteDomain(IPublishedRequestBuilder request)
+    {
+        var found = FindAndSetDomain(request);
+        HandleWildcardDomains(request);
+        SetVariationContext(request.Culture);
+        return found;
+    }
+
+    /// <inheritdoc />
+    public bool UpdateVariationContext(Uri uri)
+    {
+        DomainAndUri? domain = FindDomain(uri, out _);
+        SetVariationContext(domain?.Culture);
+        return domain?.Culture is not null;
+    }
+
+    private DomainAndUri? FindDomain(Uri uri, out string? defaultCulture)
     {
         const string tracePrefix = "FindDomain: ";
 
         // note - we are not handling schemes nor ports here.
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
+            _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, uri);
         }
 
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
@@ -315,10 +328,20 @@ public class PublishedRouter : IPublishedRouter
 
         domains = domains?.Where(IsPublishedContentDomain).ToList();
 
-        var defaultCulture = domainsCache?.DefaultCulture;
+        defaultCulture = domainsCache?.DefaultCulture;
 
+        return DomainUtilities.SelectDomain(domains, uri, defaultCulture: defaultCulture);
+    }
+
+    /// <summary>
+    ///     Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
+    /// </summary>
+    /// <returns>A value indicating whether a domain was found.</returns>
+    internal bool FindAndSetDomain(IPublishedRequestBuilder request)
+    {
+        const string tracePrefix = "FindDomain: ";
         // try to find a domain matching the current request
-        DomainAndUri? domainAndUri = DomainUtilities.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
+        DomainAndUri? domainAndUri = FindDomain(request.Uri, out var defaultCulture);
 
         // handle domain - always has a contentId and a culture
         if (domainAndUri != null)
