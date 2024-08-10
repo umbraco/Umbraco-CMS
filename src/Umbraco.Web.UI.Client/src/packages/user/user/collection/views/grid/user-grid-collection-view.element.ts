@@ -148,10 +148,13 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		if (!user.lastLoginDate) {
 			return html`<div class="user-login-time">${`${user.name} ${this.localize.term('user_noLogin')}`}</div>`;
 		}
+		const lastLoggedinLocalTime: Date = new Date(user.lastLoginDate);
+		const formattedTime = lastLoggedinLocalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 		return html`<div class="user-login-time">
 			<umb-localize key="user_lastLogin"></umb-localize><br />
 			${this.localize.date(user.lastLoginDate)}
+			${formattedTime}
 		</div>`;
 	}
 
