@@ -79,6 +79,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#debouncedSearch = debounce(this.#search, 300);
 
 	async #search() {
+		if (!this._searchQuery) return;
 		const { data } = await this.#searchProvider.search({ query: this._searchQuery });
 		this._searchResult = data?.items ?? [];
 		this._searching = false;
