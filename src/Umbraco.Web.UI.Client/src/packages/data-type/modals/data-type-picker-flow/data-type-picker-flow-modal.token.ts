@@ -1,6 +1,9 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDataTypePickerFlowModalData {}
+export interface UmbDataTypePickerFlowModalData {
+	/** @deprecated This property will be removed in Umbraco 15. */
+	submitLabel?: string;
+}
 
 export type UmbDataTypePickerFlowModalValue = {
 	selection: Array<string>;

@@ -1,6 +1,9 @@
 import { UmbModalToken } from './modal-token.js';
 
-export interface UmbPropertyEditorUIPickerModalData {}
+export interface UmbPropertyEditorUIPickerModalData {
+	/** @deprecated This property will be removed in Umbraco 15. */
+	submitLabel?: string;
+}
 
 export type UmbPropertyEditorUIPickerModalValue = {
 	selection: Array<string>;
