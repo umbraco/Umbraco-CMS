@@ -31,7 +31,7 @@ public interface IAuthorizationHelper
             user = GetUmbracoUser(currentUser);
             return true;
         }
-        catch (InvalidOperationException)
+        catch
         {
             user = null;
             return false;
