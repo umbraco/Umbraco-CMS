@@ -139,6 +139,10 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderSearchResult() {
+		if (this._searchQuery && this._searching === false && this._searchResult.length === 0) {
+			return this.#renderEmptySearchResult();
+		}
+
 		return html`
 			${repeat(
 				this._searchResult,
@@ -146,6 +150,10 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				(item) => this.#renderMemberItem(item),
 			)}
 		`;
+	}
+
+	#renderEmptySearchResult() {
+		return html`<small>No result for <strong>"${this._searchQuery}"</strong>.</small>`;
 	}
 
 	#renderMemberItem(item: UmbMemberItemModel | UmbMemberDetailModel) {
