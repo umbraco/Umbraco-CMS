@@ -1,8 +1,15 @@
 import type { UmbValidator } from '../interfaces/validator.interface.js';
-import { UmbValidationMessagesManager } from './validation-messages.manager.js';
+import { UmbValidationMessage, UmbValidationMessagesManager } from './validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+function ReplaceStartOfString(path: string, startFrom: string, startTo: string): string {
+	if (path.startsWith(startFrom + '.')) {
+		return startTo + path.slice(startFrom.length);
+	}
+	return path;
+}
 
 export class UmbValidationContext extends UmbContextBase<UmbValidationContext> implements UmbValidator {
 	#validators: Array<UmbValidator> = [];
@@ -10,6 +17,8 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	#isValid: boolean = false;
 
 	#parent?: UmbValidationContext;
+	#parentMessages?: Array<UmbValidationMessage>;
+	#localMessages?: Array<UmbValidationMessage>;
 	#baseDataPath?: string;
 
 	public readonly messages = new UmbValidationMessagesManager();
@@ -42,14 +51,48 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 				parent.messages.messagesOfPathAndDescendant(dataPath),
 				(msgs) => {
 					//this.messages.appendMessages(msgs);
+					if (this.#parentMessages) {
+						// Remove the local messages that does not exist in the parent anymore:
+						const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+						toRemove.forEach((msg) => {
+							this.messages.removeMessageByKey(msg.key);
+						});
+					}
+					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
 						// TODO: Subtract the base path from the path, so it becomes local to this context:
-						this.messages.addMessage(msg.type, msg.path, msg.message);
+						const path = ReplaceStartOfString(msg.path, '$', this.#baseDataPath!);
+						//console.log('up path', path);
+						// Notice, the local message uses the same key. [NL]
+						this.messages.addMessage(msg.type, path, msg.message, msg.key);
 					});
-
-					// observe if one of the parent got removed?
 				},
 				'observeParentMessages',
+			);
+
+			this.observe(
+				this.messages.messages,
+				(msgs) => {
+					if (!this.#parent) return;
+					//this.messages.appendMessages(msgs);
+					if (this.#localMessages) {
+						// Remove the parent messages that does not exist locally anymore:
+						const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+						toRemove.forEach((msg) => {
+							this.#parent!.messages.removeMessageByKey(msg.key);
+						});
+					}
+					this.#localMessages = msgs;
+					msgs.forEach((msg) => {
+						// TODO: Prefix the base path from our base path, so it fits in the parent context:
+						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
+						const path = ReplaceStartOfString(msg.path, this.#baseDataPath!, '$');
+						console.log('down path', path);
+						// Notice, the parent message uses the same key. [NL]
+						this.#parent!.messages.addMessage(msg.type, path, msg.message, msg.key);
+					});
+				},
+				'observeLocalMessages',
 			);
 
 			// observe if one of the locals got removed.

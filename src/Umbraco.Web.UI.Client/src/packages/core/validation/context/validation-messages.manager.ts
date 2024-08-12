@@ -13,6 +13,7 @@ export interface UmbValidationMessage {
 
 export class UmbValidationMessagesManager {
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
+	messages = this.#messages.asObservable();
 
 	constructor() {
 		this.#messages.asObservable().subscribe((x) => console.log('all messages:', x));
@@ -71,9 +72,9 @@ export class UmbValidationMessagesManager {
 			);
 	}
 
-	addMessage(type: UmbValidationMessageType, path: string, message: string): void {
+	addMessage(type: UmbValidationMessageType, path: string, message: string, key: string = UmbId.new()): void {
 		path = this.#translatePath(path) ?? path;
-		this.#messages.appendOne({ type, key: UmbId.new(), path, message });
+		this.#messages.appendOne({ type, key, path, message });
 	}
 
 	addMessages(type: UmbValidationMessageType, path: string, messages: Array<string>): void {
