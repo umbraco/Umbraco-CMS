@@ -18,7 +18,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
-	public readonly validation = new UmbValidationContext(this);
+	//public readonly validation = new UmbValidationContext(this);
+	#validationContexts: Array<UmbValidationContext> = [];
 
 	#submitPromise: Promise<void> | undefined;
 	#submitResolve: (() => void) | undefined;
@@ -49,7 +50,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	protected resetState() {
-		this.validation.reset();
+		//this.validation.reset();
+		this.#validationContexts.forEach((context) => context.reset());
 		this.#isNew.setValue(undefined);
 	}
 
@@ -65,8 +67,9 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
 	 * @returns Promise that resolves to void when the validation is complete.
 	 */
-	async validate(): Promise<void> {
-		return this.validation.validate();
+	async validate(): Promise<Array<void>> {
+		//return this.validation.validate();
+		return Promise.all(this.#validationContexts.map((context) => context.validate()));
 	}
 
 	async requestSubmit(): Promise<void> {
@@ -123,7 +126,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#resolveSubmit();
 
 		// Calling reset on the validation context here. [NL]
-		this.validation.reset();
+		// TODO: Consider if we really ant this, cause on save, we do not want to reset this... [NL] (Also adapt to concept of multiple validation contexts)
+		//this.validation.reset();
 	};
 
 	//abstract getIsDirty(): Promise<boolean>;
