@@ -149,7 +149,7 @@ public sealed class RelateOnTrashNotificationHandler :
                         new Relation(originalParentId, item.Entity.Id, relationType);
                     _relationService.Save(relation);
                     _auditService.Add(
-                        AuditType.Delete,
+                        AuditType.Move,
                         item.Entity.CreatorId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Media.GetName(),
