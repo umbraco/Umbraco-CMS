@@ -1,9 +1,12 @@
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbValidator } from '../interfaces/validator.interface.js';
-import { UmbValidationMessage, UmbValidationMessagesManager } from './validation-messages.manager.js';
+import { type UmbValidationMessage, UmbValidationMessagesManager } from './validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbValidationMessageTranslator } from '../translators/index.js';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { GetValueByJsonPath } from '../utils/json-path.function.js';
 
 function ReplaceStartOfString(path: string, startFrom: string, startTo: string): string {
 	if (path.startsWith(startFrom + '.')) {
@@ -15,6 +18,19 @@ function ReplaceStartOfString(path: string, startFrom: string, startTo: string):
 export class UmbValidationContext extends UmbControllerBase implements UmbValidator {
 	// The current provider controller, that is providing this context:
 	#providerCtrl?: UmbContextProviderController<UmbValidationContext, UmbValidationContext, UmbValidationContext>;
+
+	// Local version of the data send to the server, only use-case is for translation.
+	#translationData = new UmbObjectState<any>(undefined);
+	translationDataOf(path: string): any {
+		console.log('GetValueByJsonPath', path);
+		return this.#translationData.asObservablePart((data) => GetValueByJsonPath(data, path));
+	}
+	setTranslationData(data: any): void {
+		this.#translationData.setValue(data);
+	}
+	getTranslationData(): any {
+		return this.#translationData.getValue();
+	}
 
 	#validators: Array<UmbValidator> = [];
 	#validationMode: boolean = false;
@@ -28,7 +44,16 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 	public readonly messages = new UmbValidationMessagesManager();
 
 	constructor(host: UmbControllerHost) {
+		// This is overridden to avoid setting a controllerAlias, this might make sense, but currently i want to leave it out. [NL]
 		super(host);
+	}
+
+	async addTranslator(translator: UmbValidationMessageTranslator) {
+		this.messages.addTranslator(translator);
+	}
+
+	async removeTranslator(translator: UmbValidationMessageTranslator) {
+		this.messages.removeTranslator(translator);
 	}
 
 	/**
@@ -62,6 +87,12 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 
 			this.messages.clear();
 
+			console.log('observe path', dataPath);
+			this.observe(parent.translationDataOf(dataPath), (data) => {
+				console.log('got data', data);
+				this.setTranslationData(data);
+			});
+
 			this.observe(
 				parent.messages.messagesOfPathAndDescendant(dataPath),
 				(msgs) => {
@@ -76,8 +107,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
 						// TODO: Subtract the base path from the path, so it becomes local to this context:
-						const path = ReplaceStartOfString(msg.path, '$', this.#baseDataPath!);
-						//console.log('up path', path);
+						const path = ReplaceStartOfString(msg.path, this.#baseDataPath!, '$');
 						// Notice, the local message uses the same key. [NL]
 						this.messages.addMessage(msg.type, path, msg.message, msg.key);
 					});
@@ -101,8 +131,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 					msgs.forEach((msg) => {
 						// TODO: Prefix the base path from our base path, so it fits in the parent context:
 						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
-						const path = ReplaceStartOfString(msg.path, this.#baseDataPath!, '$');
-						console.log('down path', path);
+						const path = ReplaceStartOfString(msg.path, '$', this.#baseDataPath!);
 						// Notice, the parent message uses the same key. [NL]
 						this.#parent!.messages.addMessage(msg.type, path, msg.message, msg.key);
 					});

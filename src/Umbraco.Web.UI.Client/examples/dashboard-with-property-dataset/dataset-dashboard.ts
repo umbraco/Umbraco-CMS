@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UmbPropertyValueData, type UmbPropertyDatasetElement } from '@umbraco-cms/backoffice/property';
+import { type UmbPropertyValueData, type UmbPropertyDatasetElement } from '@umbraco-cms/backoffice/property';
 
 @customElement('example-dataset-dashboard')
 export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {

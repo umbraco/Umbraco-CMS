@@ -1,4 +1,3 @@
-import type { UmbValidationMessageTranslator } from '../translators/validation-message-path-translator.interface.js';
 import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { UmbDataPathPropertyValueFilter } from '../utils/data-path-property-value-filter.function.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
@@ -23,8 +22,6 @@ export class UmbServerModelValidationContext
 	extends UmbContextBase<UmbServerModelValidationContext>
 	implements UmbValidator
 {
-	#init: Promise<typeof UMB_VALIDATION_CONTEXT.TYPE>;
-
 	#validatePromise?: Promise<void>;
 	#validatePromiseResolve?: () => void;
 
@@ -38,7 +35,7 @@ export class UmbServerModelValidationContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SERVER_MODEL_VALIDATION_CONTEXT);
-		this.#init = this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
+		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
 			if (this.#context) {
 				this.#context.removeValidator(this);
 			}
@@ -64,11 +61,15 @@ export class UmbServerModelValidationContext
 		const { error } = await requestPromise;
 
 		this.#isValid = error ? false : true;
-
-		if (!this.#isValid) {
+		if (this.#isValid) {
+			// Send data to context for translation:
+			this.#context?.setTranslationData(undefined);
+		} else {
 			if (!this.#context) {
 				throw new Error('No context available for translation.');
 			}
+			// Send data to context for translation:
+			this.#context.setTranslationData(data);
 
 			// We are missing some typing here, but we will just go wild with 'as any': [NL]
 			const errorBody = (error as any).body as ValidateErrorResponseBodyModel;
@@ -100,16 +101,6 @@ export class UmbServerModelValidationContext
 
 		this.#validatePromiseResolve?.();
 		this.#validatePromiseResolve = undefined;
-	}
-
-	async addTranslator(translator: UmbValidationMessageTranslator) {
-		await this.#init;
-		this.#context!.messages.addTranslator(translator);
-	}
-
-	async removeTranslator(translator: UmbValidationMessageTranslator) {
-		await this.#init;
-		this.#context!.messages.removeTranslator(translator);
 	}
 
 	get isValid(): boolean {

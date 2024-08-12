@@ -22,7 +22,7 @@ export class UmbVariantValuesValidationPathTranslator extends UmbValidationPathT
 		}
 
 		// Get the data from the validation request, the context holds that for us: [NL]
-		const data = this._context.getData();
+		const data = this._context.getTranslationData();
 
 		const specificValue = data.values[index];
 		// replace the values[ number ] with JSON-Path filter values[@.(...)], continues by the rest of the path:

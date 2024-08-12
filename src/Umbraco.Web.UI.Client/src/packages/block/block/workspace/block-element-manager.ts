@@ -27,11 +27,14 @@ export class UmbBlockElementManager extends UmbControllerBase {
 
 	readonly validation = new UmbValidationContext(this);
 
-	constructor(host: UmbControllerHost) {
+	constructor(host: UmbControllerHost, dataPathPropertyName: string) {
 		// TODO: Get Workspace Alias via Manifest.
 		super(host);
 
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
+		this.observe(this.unique, (udi) =>
+			this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.udi = '${udi}')]`),
+		);
 	}
 
 	reset() {

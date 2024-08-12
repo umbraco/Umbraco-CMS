@@ -15,7 +15,10 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbVariantValuesValidationPathTranslator, type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import {
+	UmbBlockElementDataValidationPathTranslator,
+	type UmbBlockLayoutBaseModel,
+} from '@umbraco-cms/backoffice/block';
 
 import '../../components/block-list-entry/index.js';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -46,7 +49,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		},
 	});
 
-	#contentDataPathTranslator?: UmbVariantValuesValidationPathTranslator;
+	#validationContext = new UmbValidationContext(this).provide();
+	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
@@ -121,7 +125,6 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 	#managerContext = new UmbBlockListManagerContext(this);
 	#entriesContext = new UmbBlockListEntriesContext(this);
-	#validationContext = new UmbValidationContext(this);
 
 	constructor() {
 		super();
@@ -138,11 +141,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
 
-						this.#contentDataPathTranslator = new UmbVariantValuesValidationPathTranslator(
-							this,
-							dataPath,
-							'contentData',
-						);
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
 					}
 				},
 				'observeDataPath',

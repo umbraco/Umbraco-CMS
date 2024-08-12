@@ -47,9 +47,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
 	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
 
-	readonly content = new UmbBlockElementManager(this);
+	readonly content = new UmbBlockElementManager(this, 'contentData');
 
-	readonly settings = new UmbBlockElementManager(this);
+	readonly settings = new UmbBlockElementManager(this, 'settingsData');
 
 	// TODO: Get the name of the contentElementType..
 	#label = new UmbStringState<string | undefined>(undefined);
