@@ -3,6 +3,7 @@ import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { UmbValidationMessage, UmbValidationMessagesManager } from './validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 function ReplaceStartOfString(path: string, startFrom: string, startTo: string): string {
 	if (path.startsWith(startFrom + '.')) {
@@ -25,6 +26,10 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 	#baseDataPath?: string;
 
 	public readonly messages = new UmbValidationMessagesManager();
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+	}
 
 	/**
 	 * Provides the validation context to the current host, if not already provided to a different host.

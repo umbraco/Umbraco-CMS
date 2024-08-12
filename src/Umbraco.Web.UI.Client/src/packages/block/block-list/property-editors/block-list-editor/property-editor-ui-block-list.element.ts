@@ -15,9 +15,11 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import { UmbVariantValuesValidationPathTranslator, type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 
 import '../../components/block-list-entry/index.js';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -43,6 +45,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this.#entriesContext.setLayouts(model);
 		},
 	});
+
+	#contentDataPathTranslator?: UmbVariantValuesValidationPathTranslator;
 
 	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
@@ -117,9 +121,33 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 	#managerContext = new UmbBlockListManagerContext(this);
 	#entriesContext = new UmbBlockListEntriesContext(this);
+	#validationContext = new UmbValidationContext(this);
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context.dataPath,
+				(dataPath) => {
+					//
+					// TODO: Make translator for settings.
+
+					this.#contentDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#contentDataPathTranslator = new UmbVariantValuesValidationPathTranslator(
+							this,
+							dataPath,
+							'contentData',
+						);
+					}
+				},
+				'observeDataPath',
+			);
+		});
 
 		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
 			this._layouts = layouts;
