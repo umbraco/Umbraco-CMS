@@ -135,15 +135,14 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String, attribute: 'data-path' })
 	public set dataPath(dataPath: string | undefined) {
-		this.#dataPath = dataPath;
+		this.#propertyContext.setDataPath(dataPath);
 		new UmbObserveValidationStateController(this, dataPath, (invalid) => {
 			this._invalid = invalid;
 		});
 	}
 	public get dataPath(): string | undefined {
-		return this.#dataPath;
+		return this.#propertyContext.getDataPath();
 	}
-	#dataPath?: string;
 
 	@state()
 	private _variantDifference?: string;
@@ -319,13 +318,14 @@ export class UmbPropertyElement extends UmbLitElement {
 				);
 
 				if ('checkValidity' in this._element) {
-					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, this.#dataPath);
+					const dataPath = this.dataPath;
+					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
 					// We trust blindly that the dataPath is available at this stage. [NL]
-					if (this.#dataPath) {
+					if (dataPath) {
 						this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
 							this,
 							this._element as any,
-							this.#dataPath,
+							dataPath,
 						);
 						this.#validationMessageBinder.value = this.#propertyContext.getValue();
 					}

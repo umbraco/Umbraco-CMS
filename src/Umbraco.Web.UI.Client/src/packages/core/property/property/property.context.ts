@@ -43,8 +43,12 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 	#validation = new UmbObjectState<UmbPropertyTypeValidationModel | undefined>(undefined);
 	public readonly validation = this.#validation.asObservable();
+
 	public readonly validationMandatory = this.#validation.asObservablePart((x) => x?.mandatory);
 	public readonly validationMandatoryMessage = this.#validation.asObservablePart((x) => x?.mandatoryMessage);
+
+	#dataPath = new UmbStringState(undefined);
+	public readonly dataPath = this.#dataPath.asObservable();
 
 	#editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this.#editor.asObservable();
@@ -204,6 +208,13 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	}
 	public getValidation(): UmbPropertyTypeValidationModel | undefined {
 		return this.#validation.getValue();
+	}
+
+	public setDataPath(dataPath: string | undefined): void {
+		this.#dataPath.setValue(dataPath);
+	}
+	public getDataPath(): string | undefined {
+		return this.#dataPath.getValue();
 	}
 
 	public resetValue(): void {
