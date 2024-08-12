@@ -54,6 +54,7 @@ import {
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbServerModelValidationContext,
+	UmbValidationContext,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
@@ -161,6 +162,8 @@ export class UmbDocumentWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
+
+		this.addValidationContext(new UmbValidationContext(this));
 
 		new UmbVariantValuesValidationPathTranslator(this);
 

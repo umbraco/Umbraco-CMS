@@ -28,6 +28,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -98,6 +99,8 @@ export class UmbDataTypeWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
+
+		this.addValidationContext(new UmbValidationContext(this));
 
 		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();

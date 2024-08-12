@@ -7,7 +7,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import type { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
@@ -20,6 +20,9 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	//public readonly validation = new UmbValidationContext(this);
 	#validationContexts: Array<UmbValidationContext> = [];
+	addValidationContext(context: UmbValidationContext) {
+		this.#validationContexts.push(context);
+	}
 
 	#submitPromise: Promise<void> | undefined;
 	#submitResolve: (() => void) | undefined;
