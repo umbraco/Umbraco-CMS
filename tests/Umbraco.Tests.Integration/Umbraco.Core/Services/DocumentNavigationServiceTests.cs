@@ -258,49 +258,51 @@ public class DocumentNavigationServiceTests : UmbracoIntegrationTest
     // TODO: test that item exists in recycle bin str. and it is removed from content str;
     // TODO: also check that initial siblings count's decreased,
     // TODO: and that descendants are still the same (i.e. they've also been moved to recycle bin)
-    // [Test]
-    // public async Task Structure_Updates_When_Moving_Content_To_Recycle_Bin() // TODO: Missing implementation
-    // {
-    //     // Arrange
-    //     Guid nodeToMoveToRecycleBin = Child3.Key;
-    //     NavigationService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? originalParentKey);
-    //
-    //     // Act
-    //     await ContentEditingService.MoveToRecycleBinAsync(nodeToMoveToRecycleBin, Constants.Security.SuperUserKey);
-    //     var nodeExists = NavigationService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? updatedParentKey); // Verify that the item is no longer in the content structure
-    //     var nodeExistsInRecycleBin = NavigationService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? updatedParentKey); // TODO: use recycle bin str.
-    //
-    //     // Assert
-    //     Assert.Multiple(() =>
-    //     {
-    //         Assert.IsFalse(nodeExists);
-    //         Assert.IsTrue(nodeExistsInRecycleBin);
-    //         Assert.AreNotEqual(originalParentKey, updatedParentKey);
-    //         Assert.IsNull(updatedParentKey); // Verify the node's parent is now located at the root of the recycle bin (null)
-    //     });
-    // }
+    [Test]
+    public async Task Structure_Updates_When_Moving_Content_To_Recycle_Bin()
+    {
+        // Arrange
+        Guid nodeToMoveToRecycleBin = Child3.Key;
+        DocumentNavigationService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? originalParentKey);
+
+        // Act
+        await ContentEditingService.MoveToRecycleBinAsync(nodeToMoveToRecycleBin, Constants.Security.SuperUserKey);
+
+        // Assert
+        var nodeExists = DocumentNavigationService.TryGetParentKey(nodeToMoveToRecycleBin, out _); // Verify that the item is no longer in the document structure
+        var nodeExistsInRecycleBin = DocumentNavigationService.TryGetParentKeyInBin(nodeToMoveToRecycleBin, out Guid? updatedParentKeyInRecycleBin);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(nodeExists);
+            Assert.IsTrue(nodeExistsInRecycleBin);
+            Assert.AreNotEqual(originalParentKey, updatedParentKeyInRecycleBin);
+            Assert.IsNull(updatedParentKeyInRecycleBin); // Verify the node's parent is now located at the root of the recycle bin (null)
+        });
+    }
 
     // TODO: check that the descendants have also been removed from both structures - navigation and trash
-    // [Test]
-    // public async Task Structure_Updates_When_Deleting_From_Recycle_Bin() // TODO: Missing implementation
-    // {
-    //     // Arrange
-    //     Guid nodeToDelete = Child1.Key;
-    //     Guid nodeInRecycleBin = Grandchild4.Key;
-    //
-    //     // Move nodes to recycle bin
-    //     await ContentEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
-    //     await ContentEditingService.MoveToRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
-    //     NavigationService.TryGetSiblingsKeys(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys); // TODO: call trashed items str.
-    //
-    //     // Act
-    //     await ContentEditingService.DeleteFromRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
-    //     NavigationService.TryGetSiblingsKeys(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys); // TODO: call trashed items str.
-    //
-    //     // Assert
-    //     // Verify siblings count has decreased by one
-    //     Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
-    // }
+    [Test]
+    public async Task Structure_Updates_When_Deleting_From_Recycle_Bin()
+    {
+        // Arrange
+        Guid nodeToDelete = Child1.Key;
+        Guid nodeInRecycleBin = Grandchild4.Key;
+
+        // Move nodes to recycle bin
+        await ContentEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
+        await ContentEditingService.MoveToRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
+        DocumentNavigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
+
+        // Act
+        await ContentEditingService.DeleteFromRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
+
+        // Assert
+        DocumentNavigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
+
+        // Verify siblings count has decreased by one
+        Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
+    }
 
     [Test]
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Grandchild 1 to Child 2
@@ -374,6 +376,7 @@ public class DocumentNavigationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    // TODO: Test that the descendants of the node have also been removed from both structures
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
@@ -383,68 +386,73 @@ public class DocumentNavigationServiceTests : UmbracoIntegrationTest
         DocumentNavigationService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);
 
         // Act
+        // Deletes the item whether it is in the recycle bin or not
         var deleteAttempt = await ContentEditingService.DeleteAsync(nodeToDelete, Constants.Security.SuperUserKey);
         Guid deletedItemKey = deleteAttempt.Result.Key;
 
         // Assert
         var nodeExists = DocumentNavigationService.TryGetDescendantsKeys(deletedItemKey, out _);
-        //var nodeExistsInRecycleBin = NavigationService.TryGetDescendantsKeys(nodeToDelete, out _); // TODO: use recycle bin str.
+        var nodeExistsInRecycleBin = DocumentNavigationService.TryGetDescendantsKeysInBin(nodeToDelete, out _);
 
         Assert.Multiple(() =>
         {
             Assert.AreEqual(nodeToDelete, deletedItemKey);
             Assert.IsFalse(nodeExists);
-            //Assert.IsFalse(nodeExistsInRecycleBin);
+            Assert.IsFalse(nodeExistsInRecycleBin);
 
             foreach (Guid descendant in initialDescendantsKeys)
             {
                 var descendantExists = DocumentNavigationService.TryGetParentKey(descendant, out _);
                 Assert.IsFalse(descendantExists);
 
-                // var descendantExistsInRecycleBin = NavigationService.TryGetParentKey(descendant, out _); // TODO: use recycle bin str.
-                // Assert.IsFalse(descendantExistsInRecycleBin);
+                var descendantExistsInRecycleBin = DocumentNavigationService.TryGetParentKeyInBin(descendant, out _);
+                Assert.IsFalse(descendantExistsInRecycleBin);
             }
         });
     }
 
-    // [Test]
-    // public async Task Structure_Updates_When_Restoring_Content(Guid nodeToRestore, Guid? targetParentKey) // todo: test with target parent null
-    // {
-    //     // Arrange
-    //     Guid nodeInRecycleBin = GreatGrandchild1.Key;
-    //
-    //     // Move nodes to recycle bin
-    //     await ContentEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
-    //     await ContentEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
-    //     NavigationService.TryGetParentKey(nodeToRestore, out Guid? initialParentKey);
-    //     NavigationService.TryGetSiblingsKeys(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys); // TODO: call trashed items str.
-    //
-    //     // Act
-    //     var restoreAttempt = await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey);
-    //     Guid restoredItemKey = restoreAttempt.Result.Key;
-    //
-    //     // Assert
-    //     NavigationService.TryGetParentKey(restoredItemKey, out Guid? restoredItemParentKey);
-    //     NavigationService.TryGetSiblingsKeys(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys); // TODO: call trashed items str.
-    //
-    //     Assert.Multiple(() =>
-    //     {
-    //         // Verify siblings count has decreased by one
-    //         Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
-    //
-    //         if (targetParentKey is null)
-    //         {
-    //             Assert.IsNull(restoredItemParentKey);
-    //         }
-    //         else
-    //         {
-    //             Assert.IsNotNull(restoredItemParentKey);
-    //         }
-    //
-    //         Assert.AreNotEqual(initialParentKey, restoredItemParentKey);
-    //         Assert.AreEqual(targetParentKey, restoredItemParentKey);
-    //     });
-    // }
+    [Test]
+    // TODO: test that descendants are also restored in the right place
+    [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Grandchild 1 to Child 1
+    [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", "D63C1621-C74A-4106-8587-817DEE5FB732")] // Grandchild 2 to Grandchild 3
+    [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", null)] // Child 3 to content root
+    public async Task Structure_Updates_When_Restoring_Content(Guid nodeToRestore, Guid? targetParentKey)
+    {
+        // Arrange
+        Guid nodeInRecycleBin = GreatGrandchild1.Key;
+
+        // Move nodes to recycle bin
+        await ContentEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
+        await ContentEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
+        DocumentNavigationService.TryGetParentKeyInBin(nodeToRestore, out Guid? initialParentKey);
+        DocumentNavigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
+
+        // Act
+        var restoreAttempt = await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey);
+        Guid restoredItemKey = restoreAttempt.Result.Key;
+
+        // Assert
+        DocumentNavigationService.TryGetParentKey(restoredItemKey, out Guid? restoredItemParentKey);
+        DocumentNavigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
+
+        Assert.Multiple(() =>
+        {
+            // Verify siblings count has decreased by one
+            Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
+
+            if (targetParentKey is null)
+            {
+                Assert.IsNull(restoredItemParentKey);
+            }
+            else
+            {
+                Assert.IsNotNull(restoredItemParentKey);
+                Assert.AreNotEqual(initialParentKey, restoredItemParentKey);
+            }
+
+            Assert.AreEqual(targetParentKey, restoredItemParentKey);
+        });
+    }
 
     private ContentCreateModel CreateContentCreateModel(string name, Guid key, Guid? parentKey = null)
         => new()
