@@ -27,11 +27,11 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesLinkHaveText(notPublishContentLink);
   await umbracoUi.content.clickSaveAndPublishButton();
-  
+
   // Assert
   const contentData = await umbracoApi.document.get(contentId);
   // TODO: Uncomment this when front-end is ready. Currently the link is not updated immediately after publishing
@@ -58,7 +58,7 @@ test('can open document type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickDocumentTypeByName(documentTypeName);
 
   // Assert
@@ -74,9 +74,9 @@ test('can open template', async ({umbracoApi, umbracoUi}) => {
   contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, templateId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickTemplateByName(templateName);
 
   // Assert
@@ -100,7 +100,7 @@ test('can change template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.changeTemplate(firstTemplateName, secondTemplateName);
   await umbracoUi.content.clickSaveButton();
 
@@ -127,7 +127,7 @@ test('cannot change to a template that is not allowed in the document type', asy
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickEditTemplateByName(firstTemplateName);
 
   // Assert
