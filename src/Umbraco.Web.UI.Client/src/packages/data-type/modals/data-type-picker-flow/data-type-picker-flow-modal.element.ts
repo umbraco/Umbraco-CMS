@@ -198,7 +198,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				.filter((dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery))
 				.sort((a, b) => a.name.localeCompare(b.name));
 
-			// TODO: groupBy is not known by TS yet
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
 			const grouped = Object.groupBy(filteredDataTypes, (dataType: UmbDataTypeItemModel) =>
@@ -206,7 +205,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			);
 
 			this._groupedDataTypes = Object.keys(grouped)
-				.sort()
+				.sort((a, b) => a.localeCompare(b))
 				.map((key) => ({ key, items: grouped[key] }));
 		} else {
 			this._groupedDataTypes = [];
@@ -220,7 +219,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 						propertyEditorUI.alias.toLowerCase().includes(this.#currentFilterQuery),
 				);
 
-		// TODO: groupBy is not known by TS yet
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const grouped = Object.groupBy(filteredUIs, (propertyEditorUi: ManifestPropertyEditorUi) =>
@@ -228,7 +226,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		);
 
 		this._groupedPropertyEditorUIs = Object.keys(grouped)
-			.sort()
+			.sort((a, b) => a.localeCompare(b))
 			.map((key) => ({ key, items: grouped[key] }));
 	}
 
