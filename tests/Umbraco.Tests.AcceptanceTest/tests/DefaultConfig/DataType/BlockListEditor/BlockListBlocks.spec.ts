@@ -173,9 +173,9 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
 });
 
-test('can add a background color to a block', async ({umbracoApi, umbracoUi}) => {
+test('can add a background color to a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  const backgroundColor = 'red';
+  const backgroundColor = '#ff0000';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
@@ -183,7 +183,7 @@ test('can add a background color to a block', async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.enterBlockBackgroundColor(backgroundColor);
+  await umbracoUi.dataType.selectBlockBackgroundColor(backgroundColor);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -195,8 +195,8 @@ test('can add a background color to a block', async ({umbracoApi, umbracoUi}) =>
 
 test('can update a background color for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const backgroundColor = 'red';
-  const newBackgroundColor = 'blue';
+  const backgroundColor = '#ff0000';
+  const newBackgroundColor = '#ff4444';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, backgroundColor);
@@ -206,7 +206,7 @@ test('can update a background color for a block', {tag: '@smoke'}, async ({umbra
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.enterBlockBackgroundColor(newBackgroundColor);
+  await umbracoUi.dataType.selectBlockBackgroundColor(newBackgroundColor);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -218,7 +218,7 @@ test('can update a background color for a block', {tag: '@smoke'}, async ({umbra
 
 test('can delete a background color from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const backgroundColor = 'red';
+  const backgroundColor = '#ff0000';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, backgroundColor);
@@ -228,7 +228,7 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.enterBlockBackgroundColor("");
+  await umbracoUi.dataType.selectBlockBackgroundColor("");
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -240,7 +240,7 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
 
 test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const iconColor = 'red';
+  const iconColor = '#ff0000';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
@@ -248,7 +248,7 @@ test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umb
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.enterBlockIconColor(iconColor);
+  await umbracoUi.dataType.selectBlockIconColor(iconColor);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -260,8 +260,8 @@ test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umb
 
 test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const iconColor = 'red';
-  const newIconColor = 'blue';
+  const iconColor = '#ff0000';
+  const newIconColor = '#ff4444';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, "", iconColor);
@@ -271,7 +271,7 @@ test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.enterBlockIconColor(newIconColor);
+  await umbracoUi.dataType.selectBlockIconColor(newIconColor);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -283,7 +283,7 @@ test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
 
 test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const iconColor = 'red';
+  const iconColor = '#ff0000';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, "", iconColor);
@@ -293,7 +293,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.enterBlockIconColor("");
+  await umbracoUi.dataType.selectBlockIconColor("");
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -303,7 +303,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(blockData.values[0].value[0].iconColor).toEqual("");
 });
 
-test('can add a custom stylesheet to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can add a custom stylesheet to a block', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -315,6 +315,7 @@ test('can add a custom stylesheet to a block', {tag: '@smoke'}, async ({umbracoA
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await page.pause()
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(stylesheetName);
   await umbracoUi.dataType.clickSubmitButton();
@@ -397,7 +398,7 @@ test('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoU
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
-test('can enable hide content editor in a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -435,4 +436,9 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.isSuccessNotificationVisible();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(false);
+});
+
+test('can add a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+
+await page.pause()
 });
