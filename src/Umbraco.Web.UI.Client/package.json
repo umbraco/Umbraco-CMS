@@ -171,7 +171,6 @@
 		"check:paths": "node ./devops/build/check-path-length.js dist-cms 120",
 		"check:circular": "madge --circular --warning --extensions ts ./src",
 		"compile": "tsc",
-		"postinstall": "npm run generate:tsconfig",
 		"dev": "vite",
 		"dev:server": "VITE_UMBRACO_USE_MSW=off vite",
 		"dev:mock": "VITE_UMBRACO_USE_MSW=on vite",
