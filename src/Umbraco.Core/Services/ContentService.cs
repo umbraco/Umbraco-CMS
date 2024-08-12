@@ -2339,14 +2339,22 @@ public class ContentService : RepositoryService, IContentService
 
         if (content.Trashed)
         {
-            // TODO: call trashed navigation delete
+            // Updates in-memory navigation structure for recycle bin items
+            UpdateInMemoryNavigationStructure(
+                "Umbraco.Cms.Core.Services.ContentService.DeleteLocked-trashed",
+                () => _documentNavigationService.RemoveFromBin(content.Key));
         }
         else
         {
-            // Updates in-memory navigation structure
+            // Updates in-memory navigation structure for both documents and recycle bin items
+            // as the item needs to be deleted whether it is in the recycle bin or not
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.DeleteLocked",
-                () => _documentNavigationService.Remove(content.Key));
+                () =>
+                {
+                    _documentNavigationService.Remove(content.Key);
+                    _documentNavigationService.RemoveFromBin(content.Key);
+                });
         }
     }
 
@@ -2572,6 +2580,8 @@ public class ContentService : RepositoryService, IContentService
     // trash indicates whether we are trashing, un-trashing, or not changing anything
     private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
     {
+        // Needed to update the in-memory navigation structure
+        var cameFromRecycleBin = content.ParentId == Constants.System.RecycleBinContent;
         content.WriterId = userId;
         content.ParentId = parentId;
 
@@ -2623,14 +2633,29 @@ public class ContentService : RepositoryService, IContentService
 
         if (parentId == Constants.System.RecycleBinContent)
         {
-            // TODO: call trashed navigation move
+            // Updates in-memory navigation structure for both document items and recycle bin items
+            // as we are moving to recycle bin
+            UpdateInMemoryNavigationStructure(
+                "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-to-recycle-bin",
+                () => _documentNavigationService.Remove(content.Key));
         }
         else
         {
-            // Updates in-memory navigation structure
-            UpdateInMemoryNavigationStructure(
-                "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked",
-                () => _documentNavigationService.Move(content.Key, parent?.Key));
+            if (cameFromRecycleBin)
+            {
+                // Updates in-memory navigation structure for both document items and recycle bin items
+                // as we are restoring from recycle bin
+                UpdateInMemoryNavigationStructure(
+                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-restore",
+                    () => _documentNavigationService.RestoreFromBin(content.Key, parent?.Key));
+            }
+            else
+            {
+                // Updates in-memory navigation structure
+                UpdateInMemoryNavigationStructure(
+                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked",
+                    () => _documentNavigationService.Move(content.Key, parent?.Key));
+            }
         }
     }
 
