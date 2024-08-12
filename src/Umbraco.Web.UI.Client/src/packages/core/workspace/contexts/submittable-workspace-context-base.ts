@@ -61,6 +61,14 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#isNew.setValue(isNew);
 	}
 
+	/**
+	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
+	 * @returns Promise that resolves to void when the validation is complete.
+	 */
+	async validate(): Promise<void> {
+		return this.validation.validate();
+	}
+
 	async requestSubmit(): Promise<void> {
 		return this.validateAndSubmit(
 			() => this.submit(),
@@ -76,7 +84,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this.validation.validate().then(
+		this.validate().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},

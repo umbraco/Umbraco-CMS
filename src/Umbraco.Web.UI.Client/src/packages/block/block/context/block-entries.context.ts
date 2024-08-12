@@ -27,6 +27,8 @@ export abstract class UmbBlockEntriesContext<
 	protected _workspacePath = new UmbStringState(undefined);
 	workspacePath = this._workspacePath.asObservable();
 
+	protected _dataPath?: string;
+
 	public abstract readonly canCreate: Observable<boolean>;
 
 	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentUdi);
@@ -46,6 +48,10 @@ export abstract class UmbBlockEntriesContext<
 	async getManager() {
 		await this._retrieveManager;
 		return this._manager!;
+	}
+
+	setDataPath(path: string) {
+		this._dataPath = path;
 	}
 
 	protected abstract _gotBlockManager(): void;

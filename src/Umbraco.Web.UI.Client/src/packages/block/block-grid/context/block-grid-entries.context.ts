@@ -131,7 +131,7 @@ export class UmbBlockGridEntriesContext
 					data: {
 						entityType: 'block',
 						preset: {},
-						originData: { areaKey: this.#areaKey, parentUnique: this.#parentUnique },
+						originData: { areaKey: this.#areaKey, parentUnique: this.#parentUnique, baseDataPath: this._dataPath },
 					},
 					modal: { size: 'medium' },
 				};

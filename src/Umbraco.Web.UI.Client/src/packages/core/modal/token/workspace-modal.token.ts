@@ -2,6 +2,7 @@ import { UmbModalToken } from './modal-token.js';
 export interface UmbWorkspaceModalData<DataModelType = unknown> {
 	entityType: string;
 	preset: Partial<DataModelType>;
+	baseDataPath?: string;
 }
 
 // TODO: It would be good with a WorkspaceValueBaseType, to avoid the  hardcoded type for unique here:

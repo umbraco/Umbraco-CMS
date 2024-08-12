@@ -46,7 +46,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			.addUniquePaths(['propertyAlias', 'variantId'])
 			.addAdditionalPath('block')
 			.onSetup(() => {
-				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
+				return { data: { entityType: 'block', preset: {}, baseDataPath: this._dataPath }, modal: { size: 'medium' } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newPath = routeBuilder({});
