@@ -102,11 +102,6 @@ public class DocumentNavigationServiceTests : UmbracoIntegrationTest
         Grandchild4 = grandchild4CreateAttempt.Result.Content!;
     }
 
-    // protected override void CustomTestSetup(IUmbracoBuilder builder)
-    // {
-    //     builder.Services.AddHostedService<NavigationInitializationService>();
-    // }
-
     [Test]
     // TODO: Test that you can rebuild bin structure as well
     public async Task Structure_Can_Rebuild()
