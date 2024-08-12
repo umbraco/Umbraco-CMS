@@ -44,9 +44,6 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 			this.messages.clear();
 
-			// TODO: Observe for local messages that gets removed, so they can be removed from parent as well?
-			// TODO: Observe for parent messages that gets removed, so they can be removed from local as well?
-
 			this.observe(
 				parent.messages.messagesOfPathAndDescendant(dataPath),
 				(msgs) => {
