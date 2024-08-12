@@ -7,8 +7,9 @@
      * @param {any} fileManager
      * @param {any} mediaHelper
      * @param {any} angularHelper
+     * @param {any} $location
      */
-    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper) {
+    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper, $location) {
 
         //NOTE: this component supports multiple files, though currently the uploader does not but perhaps sometime in the future
         // we'd want it to, so i'll leave the multiple file support in place
@@ -19,6 +20,7 @@
         vm.$onChanges = onChanges;
         vm.$postLink = postLink;
         vm.clear = clearFiles;
+        vm.openSVG = openSVG;
 
         /** Clears the file collections when content is saving (if we need to clear) or after saved */
         function clearFiles() {
@@ -305,6 +307,16 @@
             angularHelper.safeApply($scope);
         }
 
+        /** Opens an SVG file in a new window as an image file, to prevent any potential XSS exploits. */
+        function openSVG(file) {
+            var popup = window.open('', '_blank');
+            var html = '<!DOCTYPE html><body><img src="' + file.fileSrc + '"/>' +
+                '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
+
+            popup.document.open();
+            popup.document.write(html);
+            popup.document.close();
+        }
     };
 
     var umbPropertyFileUploadComponent = {
