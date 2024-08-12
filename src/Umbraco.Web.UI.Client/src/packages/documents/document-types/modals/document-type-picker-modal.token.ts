@@ -1,4 +1,5 @@
 import { UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_DOCUMENT_TYPE_SEARCH_PROVIDER_ALIAS } from '../search/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeTreeItemModel } from '@umbraco-cms/backoffice/document-type';
 import {
@@ -24,6 +25,9 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 	},
 	data: {
 		treeAlias: 'Umb.Tree.DocumentType',
+		search: {
+			providerAlias: UMB_DOCUMENT_TYPE_SEARCH_PROVIDER_ALIAS,
+		},
 		createAction: {
 			label: '#content_createEmpty',
 			modalData: {
