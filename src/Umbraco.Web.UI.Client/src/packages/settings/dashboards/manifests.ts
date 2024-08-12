@@ -20,23 +20,6 @@ const dashboards: Array<ManifestDashboard> = [
 			},
 		],
 	},
-	{
-		type: 'dashboard',
-		alias: 'Umb.Dashboard.Profiling',
-		name: 'Profiling',
-		element: () => import('./performance-profiling/dashboard-performance-profiling.element.js'),
-		weight: 101,
-		meta: {
-			label: '#dashboardTabs_settingsProfiler',
-			pathname: 'profiling',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.SectionAlias',
-				match: sectionAlias,
-			},
-		],
-	},
 ];
 
 export const manifests: Array<ManifestTypes> = [...dashboards];
