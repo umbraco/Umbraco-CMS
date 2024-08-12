@@ -37,6 +37,18 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
+	constructor() {
+		super();
+		this.observe(
+			this.#selectionManager.selection,
+			(selection) => {
+				this.updateValue({ selection });
+				this.requestUpdate();
+			},
+			'umbSelectionObserver',
+		);
+	}
+
 	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
 		this._members = data?.items ?? [];
@@ -72,15 +84,6 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		this._searching = false;
 	}
 
-	#submit() {
-		this.value = { selection: this.#selectionManager.getSelection() };
-		this.modalContext?.submit();
-	}
-
-	#close() {
-		this.modalContext?.reject();
-	}
-
 	#onSearchClear() {
 		this._searchQuery = '';
 		this._searchResult = [];
@@ -91,12 +94,14 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			<uui-box> ${this.#renderSearch()} ${this.#renderItems()} </uui-box>
 
 			<div slot="actions">
-				<uui-button label=${this.localize.term('general_cancel')} @click=${this.#close}></uui-button>
+				<uui-button
+					label=${this.localize.term('general_cancel')}
+					@click=${() => this.modalContext?.reject()}></uui-button>
 				<uui-button
 					label=${this.localize.term('general_submit')}
 					look="primary"
 					color="positive"
-					@click=${this.#submit}></uui-button>
+					@click=${() => this.modalContext?.submit()}></uui-button>
 			</div>
 		</umb-body-layout> `;
 	}
