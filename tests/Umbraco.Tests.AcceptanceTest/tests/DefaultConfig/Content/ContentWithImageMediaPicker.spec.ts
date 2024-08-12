@@ -9,6 +9,7 @@ const groupName = 'TestGroup';
 const mediaName = 'TestImage';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -107,7 +108,7 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-// I get no error notification
+// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
 test.skip('image count can not be less that min amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -128,11 +129,11 @@ test.skip('image count can not be less that min amount set in image media picker
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// I get no error notification
+// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
 test.skip('image count can not be more that max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0,0);
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 0);
   const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentId);
   await umbracoUi.goToBackOffice();
@@ -153,8 +154,8 @@ test.skip('image count can not be more that max amount set in image media picker
 
 test('can add an image from the image media picker with a start node', async ({umbracoApi, umbracoUi}) => {
   const mediaFolderName = 'TestFolder';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImageAndParentId(mediaName, imageFolderId);
@@ -175,8 +176,8 @@ test('can add an image from the image media picker with a start node', async ({u
   expect(await umbracoApi.document.doesImageMediaPickerContainImage(contentName, AliasHelper.toAlias(customDataTypeName), imageId)).toBeTruthy();
 
   // Clean
-  await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
@@ -185,22 +186,28 @@ test('can add an image from the image media picker with focal point enabled', as
   await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
-  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0,1, true);
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 1, true);
   const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
   await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId);
+  const widthPercentage = 40;
+  const heightPercentage = 20;
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickExactLinkWithName(mediaName);
-  await umbracoUi.content.setFocalPoint(40, 20);
+  await umbracoUi.content.setFocalPoint(widthPercentage, heightPercentage);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesImageMediaPickerContainImageWithFocalPoint(contentName, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.4, top: 0.2})).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can reset focal point in a image from the image media picker', async ({umbracoApi, umbracoUi}) => {
@@ -208,7 +215,7 @@ test('can reset focal point in a image from the image media picker', async ({umb
   await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
-  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0,1, true);
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 1, true);
   const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
   await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.4, top: 0.2});
   await umbracoUi.goToBackOffice();
@@ -217,16 +224,20 @@ test('can reset focal point in a image from the image media picker', async ({umb
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickExactLinkWithName(mediaName);
-  await umbracoUi.content.clickResetFocalPointButton()
+  await umbracoUi.content.clickResetFocalPointButton();
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesImageMediaPickerContainImageWithFocalPoint(contentName, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0, top: 0})).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// The crop is not being selected
+// TODO: Remove skip when the front-end is ready as currently the crop is not being selected.
 test.skip('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const cropLabel = 'TestCrop';
