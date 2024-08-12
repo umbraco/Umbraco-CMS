@@ -34,6 +34,7 @@ export default defineConfig({
 			'modal/index': './modal/index.ts',
 			'models/index': './models/index.ts',
 			'notification/index': './notification/index.ts',
+			'object-type/index': './object-type/index.ts',
 			'picker-input/index': './picker-input/index.ts',
 			'property-action/index': './property-action/index.ts',
 			'property-editor/index': './property-editor/index.ts',
