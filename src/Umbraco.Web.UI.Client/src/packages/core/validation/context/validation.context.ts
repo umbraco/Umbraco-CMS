@@ -1,8 +1,8 @@
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { UmbValidationMessage, UmbValidationMessagesManager } from './validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 function ReplaceStartOfString(path: string, startFrom: string, startTo: string): string {
 	if (path.startsWith(startFrom + '.')) {
@@ -11,7 +11,10 @@ function ReplaceStartOfString(path: string, startFrom: string, startTo: string):
 	return path;
 }
 
-export class UmbValidationContext extends UmbContextBase<UmbValidationContext> implements UmbValidator {
+export class UmbValidationContext extends UmbControllerBase implements UmbValidator {
+	// The current provider controller, that is providing this context:
+	#providerCtrl?: UmbContextProviderController<UmbValidationContext, UmbValidationContext, UmbValidationContext>;
+
 	#validators: Array<UmbValidator> = [];
 	#validationMode: boolean = false;
 	#isValid: boolean = false;
@@ -23,8 +26,18 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 	public readonly messages = new UmbValidationMessagesManager();
 
-	constructor(host: UmbControllerHost) {
-		super(host, UMB_VALIDATION_CONTEXT);
+	/**
+	 * Provides the validation context to the current host, if not already provided to a different host.
+	 * @returns instance {UmbValidationContext} - Returns it self.
+	 */
+	provide(): UmbValidationContext {
+		if (this.#providerCtrl) return this;
+		this.provideContext(UMB_VALIDATION_CONTEXT, this);
+		return this;
+	}
+	provideAt(controllerHost: UmbClassInterface): void {
+		this.#providerCtrl?.destroy();
+		this.#providerCtrl = controllerHost.provideContext(UMB_VALIDATION_CONTEXT, this);
 	}
 
 	setDataPath(dataPath: string): void {

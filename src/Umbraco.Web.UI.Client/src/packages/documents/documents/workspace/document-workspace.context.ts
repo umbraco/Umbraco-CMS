@@ -163,7 +163,7 @@ export class UmbDocumentWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
-		this.addValidationContext(new UmbValidationContext(this));
+		this.addValidationContext(new UmbValidationContext(this).provide());
 
 		new UmbVariantValuesValidationPathTranslator(this);
 

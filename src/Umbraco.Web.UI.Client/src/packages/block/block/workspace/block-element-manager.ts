@@ -4,8 +4,9 @@ import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockElementManager extends UmbControllerBase {
 	//
@@ -23,6 +24,8 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		this,
 		new UmbDocumentTypeDetailRepository(this),
 	);
+
+	readonly validation = new UmbValidationContext(this);
 
 	constructor(host: UmbControllerHost) {
 		// TODO: Get Workspace Alias via Manifest.
@@ -97,6 +100,13 @@ export class UmbBlockElementManager extends UmbControllerBase {
 
 	public createPropertyDatasetContext(host: UmbControllerHost) {
 		return new UmbBlockElementPropertyDatasetContext(host, this);
+	}
+
+	public setup(host: UmbClassInterface) {
+		this.createPropertyDatasetContext(host);
+
+		// Provide Validation Context for this view:
+		this.validation.provideAt(host);
 	}
 
 	public override destroy(): void {

@@ -60,6 +60,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		const manifest = workspaceArgs.manifest;
 		this.#entityType = manifest.meta?.entityType;
 
+		this.addValidationContext(this.content.validation);
+		this.addValidationContext(this.settings.validation);
+
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
 			context.onSubmit().catch(this.#modalRejected);

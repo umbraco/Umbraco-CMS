@@ -82,9 +82,12 @@ export class UmbValidationMessagesManager {
 		this.#messages.append(messages.map((message) => ({ type, key: UmbId.new(), path, message })));
 	}
 
-	/*appendMessages(messages: Array<UmbValidationMessage>): void {
-		this.#messages.append(messages);
-	}*/
+	/*
+	appendMessage(msg: UmbValidationMessage): void {
+		const path = this.#translatePath(msg.path) ?? msg.path;
+		this.#messages.appendOne({ ...msg, path });
+	}
+		*/
 
 	removeMessageByKey(key: string): void {
 		this.#messages.removeOne(key);

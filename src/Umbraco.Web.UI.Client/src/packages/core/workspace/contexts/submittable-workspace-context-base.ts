@@ -20,6 +20,11 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	//public readonly validation = new UmbValidationContext(this);
 	#validationContexts: Array<UmbValidationContext> = [];
+
+	/**
+	 * Appends a validation context to the workspace.
+	 * @param context
+	 */
 	addValidationContext(context: UmbValidationContext) {
 		this.#validationContexts.push(context);
 	}
