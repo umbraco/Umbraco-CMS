@@ -1,6 +1,5 @@
+import { UMB_PACKAGE_REPOSITORY_ALIAS, UMB_PACKAGE_STORE_ALIAS } from './constants.js';
 import type { ManifestStore, ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_PACKAGE_REPOSITORY_ALIAS = 'Umb.Repository.Package';
 
 const repository: ManifestRepository = {
 	type: 'repository',
@@ -8,8 +7,6 @@ const repository: ManifestRepository = {
 	name: 'Package Repository',
 	api: () => import('./package.repository.js'),
 };
-
-export const UMB_PACKAGE_STORE_ALIAS = 'Umb.Store.Package';
 
 const store: ManifestStore = {
 	type: 'store',
