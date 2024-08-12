@@ -90,6 +90,10 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_1_0.MigrateOldRichTextSeedConfiguration>("{A385C5DF-48DC-46B4-A742-D5BB846483BC}");
 
         // To 15.0.0
+        To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
+        To<V_15_0_0.AddTypeToUser>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
+
+        // To 15.0.0
         To<V_15_0_0.ConvertBlockListEditorProperties>("{6C04B137-0097-4938-8C6A-276DF1A0ECA8}");
         To<V_15_0_0.ConvertBlockGridEditorProperties>("{9D3CE7D4-4884-41D4-98E8-302EB6CB0CF6}");
         To<V_15_0_0.ConvertRichTextEditorProperties>("{37875E80-5CDD-42FF-A21A-7D4E3E23E0ED}");
