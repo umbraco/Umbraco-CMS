@@ -667,6 +667,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2ClientId} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key)",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key",
@@ -1166,6 +1167,39 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // map references
         PerformGetReferencedDtos(pagedResult.Items);
         return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
+    }
+
+    public IEnumerable<string> GetAllClientIds()
+        => Database.Fetch<string>(SqlContext.Sql()
+            .Select<User2ClientIdDto>(d => d.ClientId)
+            .From<User2ClientIdDto>());
+
+    public IEnumerable<string> GetClientIds(int id)
+        => Database.Fetch<string>(SqlContext.Sql()
+            .Select<User2ClientIdDto>(d => d.ClientId)
+            .From<User2ClientIdDto>()
+            .Where<User2ClientIdDto>(d => d.UserId == id));
+
+    public void AddClientId(int id, string clientId)
+        => Database.Insert(new User2ClientIdDto { UserId = id, ClientId = clientId });
+
+    public bool RemoveClientId(int id, string clientId)
+        => Database.Delete<User2ClientIdDto>(SqlContext.Sql()
+            .Where<User2ClientIdDto>(d => d.UserId == id && d.ClientId == clientId)) > 0;
+
+    public IUser? GetByClientId(string clientId)
+    {
+        var userId = Database.ExecuteScalar<int>(
+            SqlContext.Sql()
+                .Select<User2ClientIdDto>(d => d.UserId)
+                .From<User2ClientIdDto>()
+                .Where<User2ClientIdDto>(d => d.ClientId == clientId));
+        if (userId == 0)
+        {
+            return null;
+        }
+
+        return Get(userId);
     }
 
     private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)

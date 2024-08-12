@@ -1,14 +1,15 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
-// TODO KJA: only convert RTEs with blocks? Depends on UDI conversion or not.
-public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
+public class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
 {
     protected override IEnumerable<string> PropertyEditorAliases
         => new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.RichText };
@@ -49,6 +50,10 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
         : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService)
     {
     }
+
+    protected override bool IsCandidateForMigration(IPropertyType propertyType, IDataType dataType)
+        => dataType.ConfigurationObject is RichTextConfiguration richTextConfiguration
+           && richTextConfiguration.Blocks?.Any() is true;
 
     [GeneratedRegex("<umb-rte-block.*(?<attribute>data-content-udi)=\"(?<udi>.[^\"]*)\".*<\\/umb-rte-block")]
     private static partial Regex BlockRegex();

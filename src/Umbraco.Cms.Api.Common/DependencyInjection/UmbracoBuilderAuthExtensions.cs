@@ -54,10 +54,14 @@ public static class UmbracoBuilderAuthExtensions
                     .RequireProofKeyForCodeExchange()
                     .AllowRefreshTokenFlow();
 
+                // Enable the client credentials flow.
+                options.AllowClientCredentialsFlow();
+
                 // Register the ASP.NET Core host and configure for custom authentication endpoint.
                 options
                     .UseAspNetCore()
                     .EnableAuthorizationEndpointPassthrough()
+                    .EnableTokenEndpointPassthrough()
                     .EnableLogoutEndpointPassthrough();
 
                 // Enable reference tokens

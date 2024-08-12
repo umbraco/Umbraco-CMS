@@ -95,6 +95,12 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 IDataType dataType = _dataTypeService.GetAsync(propertyType.DataTypeKey).GetAwaiter().GetResult()
                                      ?? throw new InvalidOperationException("The data type could not be fetched.");
 
+                if (IsCandidateForMigration(propertyType, dataType) is false)
+                {
+                    _logger.LogInformation("  - skipped property type migration because it was not a applicable.");
+                    continue;
+                }
+
                 IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
                                                ?? throw new InvalidOperationException("The data type value editor could not be fetched.");
 
@@ -252,4 +258,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
         return success;
     }
+
+    protected virtual bool IsCandidateForMigration(IPropertyType propertyType, IDataType dataType)
+        => true;
 }

@@ -50,6 +50,37 @@ public partial class UserServiceCrudTests
         Assert.IsNotNull(createdUser);
         Assert.AreEqual(username, createdUser.Username);
         Assert.AreEqual(email, createdUser.Email);
+        Assert.AreEqual(UserType.Default, createdUser.Type);
+    }
+
+    [TestCase(UserType.Default)]
+    [TestCase(UserType.Api)]
+    public async Task Can_Create_All_User_Types(UserType type)
+    {
+        var securitySettings = new SecuritySettings();
+        var userService = CreateUserService(securitySettings);
+
+        var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var creationModel = new UserCreateModel
+        {
+            UserName = "api@local",
+            Email = "api@local",
+            Name = "API user",
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key },
+            Type = type
+        };
+
+        var result = await userService.CreateAsync(Constants.Security.SuperUserKey, creationModel, true);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(UserOperationStatus.Success, result.Status);
+        var createdUser = result.Result.CreatedUser;
+        Assert.IsNotNull(createdUser);
+        Assert.AreEqual(type, createdUser.Type);
+
+        var user = await userService.GetAsync(createdUser.Key);
+        Assert.NotNull(user);
+        Assert.AreEqual(type, user.Type);
     }
 
     [Test]

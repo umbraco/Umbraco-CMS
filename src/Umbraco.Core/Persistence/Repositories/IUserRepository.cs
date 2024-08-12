@@ -150,4 +150,14 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     int ClearLoginSessions(TimeSpan timespan);
 
     void ClearLoginSession(Guid sessionId);
+
+    IEnumerable<string> GetAllClientIds();
+
+    IEnumerable<string> GetClientIds(int id);
+
+    void AddClientId(int id, string clientId);
+
+    bool RemoveClientId(int id, string clientId);
+
+    IUser? GetByClientId(string clientId);
 }
