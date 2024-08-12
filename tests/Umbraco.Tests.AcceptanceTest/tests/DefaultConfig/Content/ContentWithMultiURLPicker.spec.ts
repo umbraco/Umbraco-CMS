@@ -4,6 +4,8 @@ import {expect} from "@playwright/test";
 const dataTypeName = 'Multi URL Picker';
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
+const link = 'https://docs.umbraco.com';
+const linkTitle = 'Umbraco Documentation';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -16,15 +18,15 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the document link', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   // Create a document to link
-  const dtForLinkedDocumentName = 'TestDocumentType';
-  const dtForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(dtForLinkedDocumentName);
+  const documentTypeForLinkedDocumentName = 'TestDocumentType';
+  const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'LinkedDocument';
-  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, dtForLinkedDocumentId);
+  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -51,7 +53,7 @@ test('can create content with the document link', async ({umbracoApi, umbracoUi}
   //expect(contentData.values[0].value[0].name).toEqual(linkedDocumentId);
 
   // Clean
-  await umbracoApi.documentType.ensureNameNotExists(dtForLinkedDocumentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName );
   await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });
 
@@ -60,10 +62,10 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   // Create a document to link
-  const dtForLinkedDocumentName = 'TestDocumentType';
-  const dtForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(dtForLinkedDocumentName);
+  const documentTypeForLinkedDocumentName = 'TestDocumentType';
+  const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'ContentToPick';
-  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, dtForLinkedDocumentId);
+  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -91,16 +93,14 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   //expect(contentData.values[0].value[0].name).toEqual(linkedDocumentId);
 
   // Clean
-  await umbracoApi.documentType.ensureNameNotExists(dtForLinkedDocumentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
   await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });
 
 test('can create content with the external link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const link = 'https://docs.umbraco.com';
-  const linkTitle = 'Umbraco Documentation';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -165,8 +165,6 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
 
 test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const link = 'https://docs.umbraco.com';
-  const linkTitle = 'Umbraco Documentation';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   // Create a media to pick
@@ -216,8 +214,6 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
 
 test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const link = 'https://docs.umbraco.com';
-  const linkTitle = 'Umbraco Documentation';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
@@ -237,8 +233,6 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
 
 test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const link = 'https://docs.umbraco.com';
-  const linkTitle = 'Umbraco Documentation';
   const updatedLinkTitle = 'Updated Umbraco Documentation';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
