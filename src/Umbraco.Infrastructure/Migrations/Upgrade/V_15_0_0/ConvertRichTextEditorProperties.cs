@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
-public class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
+public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
 {
     protected override IEnumerable<string> PropertyEditorAliases
         => new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.RichText };
