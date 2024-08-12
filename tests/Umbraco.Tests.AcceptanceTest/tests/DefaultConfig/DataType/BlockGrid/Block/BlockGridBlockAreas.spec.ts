@@ -48,6 +48,7 @@ test('can add an area for a block', async ({page, umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAreasTab();
   await umbracoUi.dataType.addAreaButton();
+  await umbracoUi.dataType.clickAreaSubmitButton();
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -56,7 +57,8 @@ test('can add an area for a block', async ({page, umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-test('can resize an area for a block', async ({page, umbracoApi, umbracoUi}) => {
+// TODO: unskip, issues selecing locator
+test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -67,7 +69,6 @@ test('can resize an area for a block', async ({page, umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAreasTab();
-  await page.pause();
 });
 
 test('can update alias an area for a block', async ({page, umbracoApi, umbracoUi}) => {
@@ -126,6 +127,7 @@ test('can add multiple areas for a block', async ({page, umbracoApi, umbracoUi})
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAreasTab();
   await umbracoUi.dataType.addAreaButton();
+  await umbracoUi.dataType.clickAreaSubmitButton();
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 

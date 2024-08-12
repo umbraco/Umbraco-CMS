@@ -288,6 +288,8 @@ test('can enable live editing mode in a block grid editor', async ({page, umbrac
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  // This wait is currently necessary, sometimes there are issues when clicking the liveEdtingMode button
+  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.dataType.clickLiveEditingMode();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -302,6 +304,8 @@ test('can disable live editing mode in a block grid editor', async ({page, umbra
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  // This wait is currently necessary, sometimes there are issues when clicking the liveEdtingMode button
+  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.dataType.clickLiveEditingMode();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -385,14 +389,14 @@ test('can update grid columns in a block grid editor', async ({page, umbracoApi,
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockGridDataTypeContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockGridContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
 });
 
 // TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
 test.skip('can add a stylesheet a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
 });
 
-test.skip('can delete a stylesheet in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a stylesheet in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
 });
 
 

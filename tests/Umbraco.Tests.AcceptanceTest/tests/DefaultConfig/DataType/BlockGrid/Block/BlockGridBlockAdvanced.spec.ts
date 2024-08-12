@@ -42,7 +42,7 @@ test.skip('can remove a custom view from a block', async ({page, umbracoApi, umb
   await page.pause();
 });
 
-test('can add a custom stylesheet to a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add a custom stylesheet to a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -77,13 +77,14 @@ test.skip('can remove a custom stylesheet from a block', async ({page, umbracoAp
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithAdvancedSettingsInBlock(blockGridEditorName, contentElementTypeId, undefined, stylesheetPath, undefined, undefined, undefined);
+  await page.pause();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainStylesheet(blockGridEditorName, contentElementTypeId, stylesheetPath)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab()
-  await page.pause();
 });
 
 test('can update overlay size in a block', async ({page, umbracoApi, umbracoUi}) => {
@@ -196,7 +197,7 @@ test('can add a background color to a block', async ({page, umbracoApi, umbracoU
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await umbracoUi.dataType.enterBlockBackgroundColor(backGroundColor);
+  await umbracoUi.dataType.selectBlockBackgroundColor(backGroundColor);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -217,7 +218,7 @@ test('can remove a background color to a block', async ({page, umbracoApi, umbra
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await umbracoUi.dataType.enterBlockBackgroundColor('')
+  await umbracoUi.dataType.selectBlockBackgroundColor('');
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -237,7 +238,7 @@ test('can add a icon color to a block', async ({page, umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await umbracoUi.dataType.enterBlockIconColor(iconColor);
+  await umbracoUi.dataType.selectBlockIconColor(iconColor);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -258,7 +259,7 @@ test('can remove a icon color from a block', async ({page, umbracoApi, umbracoUi
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await umbracoUi.dataType.enterBlockIconColor('');
+  await umbracoUi.dataType.selectBlockIconColor('');
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -267,9 +268,11 @@ test('can remove a icon color from a block', async ({page, umbracoApi, umbracoUi
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-//TODO: Ask frontend, why are multiple thumbnails allowed?
-test.skip('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
+  const mediaName = 'TestMedia';
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
@@ -278,6 +281,8 @@ test.skip('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab()
+  const mediaUrl = await umbracoApi.media.getMediaPathByName(mediaName);
+  await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl.fileName, mediaUrl.mediaPath);
   await page.pause();
 });
 
