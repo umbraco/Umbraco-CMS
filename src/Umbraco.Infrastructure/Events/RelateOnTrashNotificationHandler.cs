@@ -105,7 +105,7 @@ public sealed class RelateOnTrashNotificationHandler :
                     _relationService.Save(relation);
 
                     _auditService.Add(
-                        AuditType.Move,
+                        AuditType.Delete,
                         _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Document.GetName(),
@@ -165,7 +165,7 @@ public sealed class RelateOnTrashNotificationHandler :
                         new Relation(originalParentId, item.Entity.Id, relationType);
                     _relationService.Save(relation);
                     _auditService.Add(
-                        AuditType.Move,
+                        AuditType.Delete,
                         _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Media.GetName(),
