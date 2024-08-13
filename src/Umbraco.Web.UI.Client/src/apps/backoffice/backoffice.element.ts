@@ -28,6 +28,7 @@ const CORE_PACKAGES = [
 	import('../../packages/packages/umbraco-package.js'),
 	import('../../packages/performance-profiling/umbraco-package.js'),
 	import('../../packages/property-editors/umbraco-package.js'),
+	import('../../packages/publish-cache/umbraco-package.js'),
 	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/search/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
