@@ -43,7 +43,7 @@ public sealed class RelateOnTrashNotificationHandler :
         IEntityService entityService,
         ILocalizedTextService textService,
         IAuditService auditService,
-        ICoreScopeProvider scopeProvider,
+        IScopeProvider scopeProvider,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _relationService = relationService;
@@ -105,8 +105,8 @@ public sealed class RelateOnTrashNotificationHandler :
                     _relationService.Save(relation);
 
                     _auditService.Add(
-                        AuditType.Delete,
-                        item.Entity.WriterId,
+                        AuditType.Move,
+                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Document.GetName(),
                         string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id, originalParentId));
