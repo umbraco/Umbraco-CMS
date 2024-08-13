@@ -16,16 +16,16 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IContentTypeService _contentTypeService;
-    private readonly IElementSwitchValidationService _elementSwitchValidationService;
+    private readonly IElementSwitchValidator _elementSwitchValidator;
 
     public WarnDocumentTypeElementSwitchNotificationHandler(
         IEventMessagesFactory eventMessagesFactory,
         IContentTypeService contentTypeService,
-        IElementSwitchValidationService elementSwitchValidationService)
+        IElementSwitchValidator elementSwitchValidator)
     {
         _eventMessagesFactory = eventMessagesFactory;
         _contentTypeService = contentTypeService;
-        _elementSwitchValidationService = elementSwitchValidationService;
+        _elementSwitchValidator = elementSwitchValidator;
     }
 
     // To figure out whether a warning should be generated, we need both the state before and after saving
@@ -75,7 +75,7 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
     private async Task WarnIfAncestorsAreMisaligned(IContentType contentType, EventMessages eventMessages)
     {
-        if (await _elementSwitchValidationService.AncestorsAreNotMisalignedAsync(contentType) == false)
+        if (await _elementSwitchValidator.AncestorsAreAlignedAsync(contentType) == false)
         {
             // todo update this message when the format has been agreed upon on with the client
             eventMessages.Add(new EventMessage(
@@ -87,7 +87,7 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
     private async Task WarnIfDescendantsAreMisaligned(IContentType contentType, EventMessages eventMessages)
     {
-        if (await _elementSwitchValidationService.DescendantsAreNotMisalignedAsync(contentType) == false)
+        if (await _elementSwitchValidator.DescendantsAreAlignedAsync(contentType) == false)
         {
             // todo update this message when the format has been agreed upon on with the client
             eventMessages.Add(new EventMessage(

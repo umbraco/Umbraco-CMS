@@ -2,11 +2,13 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-public interface IElementSwitchValidationService
+public interface IElementSwitchValidator
 {
-    Task<bool> AncestorsAreNotMisalignedAsync(IContentType contentType);
+    Task<bool> AncestorsAreAlignedAsync(IContentType contentType);
 
-    Task<bool> DescendantsAreNotMisalignedAsync(IContentType contentType);
+    Task<bool> DescendantsAreAlignedAsync(IContentType contentType);
+
     Task<bool> ElementToDocumentNotUsedInBlockStructuresAsync(IContentTypeBase contentType);
+
     Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType);
 }

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
 {
     private readonly ITemplateService _templateService;
-    private readonly IElementSwitchValidationService _elementSwitchValidationService;
+    private readonly IElementSwitchValidator _elementSwitchValidator;
     private readonly IContentTypeService _contentTypeService;
 
     public ContentTypeEditingService(
@@ -24,12 +24,12 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        IElementSwitchValidationService elementSwitchValidationService)
+        IElementSwitchValidator elementSwitchValidator)
         : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
-        _elementSwitchValidationService = elementSwitchValidationService;
+        _elementSwitchValidator = elementSwitchValidator;
     }
 
     [Obsolete("Use the constructor that is not marked obsolete, will be removed in v16")]
@@ -43,7 +43,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
-        _elementSwitchValidationService = StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidationService>();
+        _elementSwitchValidator = StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidator>();
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
@@ -147,12 +147,12 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         // => check whether the element was used in a block structure prior to updating
         if (model.IsElement is false)
         {
-            return await _elementSwitchValidationService.ElementToDocumentNotUsedInBlockStructuresAsync(contentType)
+            return await _elementSwitchValidator.ElementToDocumentNotUsedInBlockStructuresAsync(contentType)
                 ? ContentTypeOperationStatus.Success
                 : ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration;
         }
 
-        return await _elementSwitchValidationService.DocumentToElementHasNoContentAsync(contentType)
+        return await _elementSwitchValidator.DocumentToElementHasNoContentAsync(contentType)
             ? ContentTypeOperationStatus.Success
             : ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent;
     }

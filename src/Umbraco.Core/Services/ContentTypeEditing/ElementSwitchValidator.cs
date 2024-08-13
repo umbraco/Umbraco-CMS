@@ -4,13 +4,13 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-public class ElementSwitchValidationService : IElementSwitchValidationService
+public class ElementSwitchValidator : IElementSwitchValidator
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataTypeService _dataTypeService;
 
-    public ElementSwitchValidationService(
+    public ElementSwitchValidator(
         IContentTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService)
@@ -20,7 +20,7 @@ public class ElementSwitchValidationService : IElementSwitchValidationService
         _dataTypeService = dataTypeService;
     }
 
-    public async Task<bool> AncestorsAreNotMisalignedAsync(IContentType contentType)
+    public async Task<bool> AncestorsAreAlignedAsync(IContentType contentType)
     {
         var ancestorIds = contentType.AncestorIds();
         if (ancestorIds.Length == 0)
@@ -32,7 +32,7 @@ public class ElementSwitchValidationService : IElementSwitchValidationService
             .Any(ancestor => ancestor.IsElement != contentType.IsElement) == false);
     }
 
-    public async Task<bool> DescendantsAreNotMisalignedAsync(IContentType contentType)
+    public async Task<bool> DescendantsAreAlignedAsync(IContentType contentType)
     {
         IEnumerable<IContentType> descendants = _contentTypeService.GetDescendants(contentType.Id, false);
 
