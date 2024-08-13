@@ -14,10 +14,10 @@ export function UmbDataPathPropertyValueFilter(
 	// write a array of strings for each property, where alias must be present and culture and segment are optional
 	const filters: Array<string> = [`@.alias = '${value.alias}'`];
 	if (value.culture) {
-		filters.push(`@.culture == '${value.culture}'`);
+		filters.push(`@.culture = '${value.culture}'`);
 	}
 	if (value.segment) {
-		filters.push(`@.segment == '${value.segment}'`);
+		filters.push(`@.segment = '${value.segment}'`);
 	}
 	return `?(${filters.join(' && ')})`;
 }
