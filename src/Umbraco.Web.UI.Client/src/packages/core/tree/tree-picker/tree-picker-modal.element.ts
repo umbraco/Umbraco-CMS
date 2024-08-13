@@ -213,11 +213,13 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 						: html`<uui-icon name="search"></uui-icon>`}
 				</div>
 
-				<div slot="append">
-					<uui-button type="button" @click=${this.#onSearchClear} compact>
-						<uui-icon name="icon-delete"></uui-icon>
-					</uui-button>
-				</div>
+				${this._searchQuery
+					? html`
+							<uui-button slot="append" type="button" @click=${this.#onSearchClear} compact>
+								<uui-icon name="icon-delete" @click=${this.#onSearchClear}></uui-icon>
+							</uui-button>
+						`
+					: nothing}
 			</uui-input>
 			<div id="search-divider"></div>
 			${this.#renderSearchResult()}
