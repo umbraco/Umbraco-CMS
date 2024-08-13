@@ -401,8 +401,9 @@
                   // If we are in the document type editor, we need to use -20 as the current page id.
                   // If we are in the content editor, we need to use the current page id or parent id if the current page is new.
                   // We can recognize a content editor context by checking if the current editor state has a contentTypeKey.
+                  // If no current is represented, we will use null.
                   const currentEditorState = editorState.getCurrent();
-                  const currentPageId = currentEditorState.contentTypeKey ? currentEditorState.id || currentEditorState.parentId || -20 : -20;
+                  const currentPageId = currentEditorState ? currentEditorState.contentTypeKey ? currentEditorState.id || currentEditorState.parentId || -20 : -20 : null;
 
                   // Load all scaffolds for the block types.
                   // The currentPageId is used to determine the access level for the current user.
