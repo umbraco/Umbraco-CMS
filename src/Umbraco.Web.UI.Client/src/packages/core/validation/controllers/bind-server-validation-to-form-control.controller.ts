@@ -1,7 +1,7 @@
 import type { UmbValidationMessage } from '../context/validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import type { UmbFormControlMixinInterface } from '../mixins/form-control.mixin.js';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { defaultMemoization } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -28,7 +28,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			this.#value = value;
 		} else {
 			// If not valid lets see if we should remove server validation [NL]
-			if (!jsonStringComparison(this.#value, value)) {
+			if (!defaultMemoization(this.#value, value)) {
 				this.#value = value;
 				// Only remove server validations from validation context [NL]
 				this.#messages.forEach((message) => {
