@@ -57,38 +57,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		// Same here [NL]
 		this._selectionConfiguration.multiple = this.data?.multiple ?? false;
 
-		// TODO: If data.enableCreate is true, we should add a button to create a new item. [NL]
-		// Does the tree know enough about this, for us to be able to create a new item? [NL]
-		// I think we need to be able to get entityType and a parentId?, or do we only allow creation in the root? and then create via entity actions? [NL]
-		// To remove the hardcoded URLs for workspaces of entity types, we could make an create event from the tree, which either this or the sidebar impl. will pick up and react to. [NL]
-		// Or maybe the tree item context base can handle this? [NL]
-		// Maybe its a general item context problem to be solved. [NL]
-		const createAction = this.data?.createAction;
-		if (createAction) {
-			this._createLabel = createAction.label;
-			new UmbModalRouteRegistrationController(
-				this,
-				(createAction.modalToken as typeof UMB_WORKSPACE_MODAL) ?? UMB_WORKSPACE_MODAL,
-			)
-				.onSetup(() => {
-					return { data: createAction.modalData };
-				})
-				.onSubmit((value) => {
-					if (value) {
-						this.value = { selection: [value.unique] };
-						this._submitModal();
-					} else {
-						this._rejectModal();
-					}
-				})
-				.observeRouteBuilder((routeBuilder) => {
-					const oldPath = this._createPath;
-					this._createPath =
-						routeBuilder({}) + createAction.extendWithPathPattern.generateLocal(createAction.extendWithPathParams);
-					this.requestUpdate('_createPath', oldPath);
-				});
-		}
-
+		this.#initCreateAction();
 		this.#initSearch();
 	}
 
@@ -153,6 +122,41 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	#onSearchClear() {
 		this._searchQuery = '';
 		this._searchResult = [];
+	}
+
+	// Create action
+	#initCreateAction() {
+		// TODO: If data.enableCreate is true, we should add a button to create a new item. [NL]
+		// Does the tree know enough about this, for us to be able to create a new item? [NL]
+		// I think we need to be able to get entityType and a parentId?, or do we only allow creation in the root? and then create via entity actions? [NL]
+		// To remove the hardcoded URLs for workspaces of entity types, we could make an create event from the tree, which either this or the sidebar impl. will pick up and react to. [NL]
+		// Or maybe the tree item context base can handle this? [NL]
+		// Maybe its a general item context problem to be solved. [NL]
+		const createAction = this.data?.createAction;
+		if (createAction) {
+			this._createLabel = createAction.label;
+			new UmbModalRouteRegistrationController(
+				this,
+				(createAction.modalToken as typeof UMB_WORKSPACE_MODAL) ?? UMB_WORKSPACE_MODAL,
+			)
+				.onSetup(() => {
+					return { data: createAction.modalData };
+				})
+				.onSubmit((value) => {
+					if (value) {
+						this.value = { selection: [value.unique] };
+						this._submitModal();
+					} else {
+						this._rejectModal();
+					}
+				})
+				.observeRouteBuilder((routeBuilder) => {
+					const oldPath = this._createPath;
+					this._createPath =
+						routeBuilder({}) + createAction.extendWithPathPattern.generateLocal(createAction.extendWithPathParams);
+					this.requestUpdate('_createPath', oldPath);
+				});
+		}
 	}
 
 	override render() {
