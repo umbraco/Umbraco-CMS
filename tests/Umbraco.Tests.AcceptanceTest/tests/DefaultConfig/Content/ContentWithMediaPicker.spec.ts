@@ -12,21 +12,13 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
-<<<<<<< HEAD
-  mediaFileId = await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
-=======
   mediaFileId = await umbracoApi.media.createDefaultMediaFile(mediaFileName);
->>>>>>> v14/dev
   await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
-<<<<<<< HEAD
-  await umbracoApi.document.ensureNameNotExists(contentName); 
-=======
   await umbracoApi.document.ensureNameNotExists(contentName);
->>>>>>> v14/dev
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -41,10 +33,6 @@ test('can create content with the media picker data type', {tag: '@smoke'}, asyn
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-<<<<<<< HEAD
-  await umbracoUi.content.clickChooseMediaPickerButton();
-=======
->>>>>>> v14/dev
   await umbracoUi.content.selectMediaByName(mediaFileName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
@@ -94,16 +82,12 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-<<<<<<< HEAD
-  await umbracoUi.content.openContent(contentName);
-=======
   await umbracoUi.content.goToContentWithName(contentName);
->>>>>>> v14/dev
   await umbracoUi.content.removeMediaPickerByName(mediaFileName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -117,11 +101,7 @@ test('can limit the media picker in the content by setting the start node', asyn
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
   await umbracoApi.media.ensureNameNotExists(childMediaName);
-<<<<<<< HEAD
-  await umbracoApi.media.createDefaultMedia(childMediaName, mediaTypeName, mediaFolderId);
-=======
   await umbracoApi.media.createDefaultMediaFileAndParentId(childMediaName, mediaFolderId);
->>>>>>> v14/dev
   const customDataTypeId = await umbracoApi.dataType.createMediaPickerDataTypeWithStartNodeId(customDataTypeName, mediaFolderId);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

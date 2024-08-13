@@ -15,26 +15,16 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
-<<<<<<< HEAD
-  firstMediaFileId = await umbracoApi.media.createDefaultMedia(firstMediaFileName, firstMediaTypeName);
-  await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
-  secondMediaFileId = await umbracoApi.media.createDefaultMedia(secondMediaFileName, secondMediaTypeName);
-=======
   firstMediaFileId = await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
   await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
   secondMediaFileId = await umbracoApi.media.createDefaultMediaWithImage(secondMediaFileName);
->>>>>>> v14/dev
   await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
   await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
-<<<<<<< HEAD
-  await umbracoApi.document.ensureNameNotExists(contentName); 
-=======
   await umbracoApi.document.ensureNameNotExists(contentName);
->>>>>>> v14/dev
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -49,19 +39,14 @@ test('can create content with multiple media picker data type', async ({umbracoA
   await umbracoUi.content.clickCreateButton();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-<<<<<<< HEAD
-  await umbracoUi.content.clickChooseMediaPickerButton();
-  await umbracoUi.content.selectMediaByName(firstMediaFileName);
-=======
   await umbracoUi.content.selectMediaByName(firstMediaFileName);
   await umbracoUi.content.clickSubmitButton();
->>>>>>> v14/dev
   await umbracoUi.content.selectMediaByName(secondMediaFileName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -109,16 +94,12 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-<<<<<<< HEAD
-  await umbracoUi.content.openContent(contentName);
-=======
   await umbracoUi.content.goToContentWithName(contentName);
->>>>>>> v14/dev
   await umbracoUi.content.removeMediaPickerByName(firstMediaFileName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));

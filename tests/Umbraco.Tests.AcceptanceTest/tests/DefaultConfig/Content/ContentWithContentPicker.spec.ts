@@ -38,7 +38,7 @@ test('can create content with the content picker datatype', {tag: '@smoke'}, asy
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toEqual(contentPickerId);
