@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 using ILogger = Serilog.ILogger;
@@ -26,6 +25,7 @@ internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
 
     public override bool CanHandleLargeLogs => false;
 
+    [Obsolete("Use ILogViewerService.CanViewLogsAsync instead. Scheduled for removal in Umbraco 15.")]
     public override bool CheckCanOpenLogs(LogTimePeriod logTimePeriod)
     {
         // Log Directory
@@ -120,7 +120,7 @@ internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
         {
             return reader.TryRead(out evt);
         }
-        catch (JsonReaderException ex)
+        catch (Exception ex)
         {
             // As we are reading/streaming one line at a time in the JSON file
             // Thus we can not report the line number, as it will always be 1

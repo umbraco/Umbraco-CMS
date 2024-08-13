@@ -1,10 +1,6 @@
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -69,36 +65,6 @@ internal class NotFoundHandlerHelper
             }
 
             return null;
-        }
-
-        if (errorPage.ContentXPath.IsNullOrWhiteSpace() == false)
-        {
-            try
-            {
-                // we have an xpath statement to execute
-                var xpathResult = UmbracoXPathPathSyntaxParser.ParseXPathQuery(
-                    errorPage.ContentXPath!,
-                    domainContentId,
-                    null,
-                    nodeid =>
-                    {
-                        IEntitySlim? ent = entityService.Get(nodeid);
-                        return ent?.Path.Split(',').Reverse();
-                    },
-                    i => publishedContentQuery.Content(i) != null);
-
-                // now we'll try to execute the expression
-                IPublishedContent? nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
-                if (nodeResult != null)
-                {
-                    return nodeResult.Id;
-                }
-            }
-            catch (Exception ex)
-            {
-                StaticApplicationLogging.Logger.LogError(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
-                return null;
-            }
         }
 
         return null;

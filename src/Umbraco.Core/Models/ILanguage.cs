@@ -47,20 +47,6 @@ public interface ILanguage : IEntity, IRememberBeingDirty
     bool IsMandatory { get; set; }
 
     /// <summary>
-    ///     Gets or sets the identifier of a fallback language.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The fallback language can be used in multi-lingual scenarios, to help
-    ///         define fallback strategies when a value does not exist for a requested language.
-    ///     </para>
-    /// </remarks>
-    [Obsolete("This will be replaced by fallback language ISO code in V14.")]
-    [DataMember]
-    int? FallbackLanguageId { get; set; }
-
-
-    /// <summary>
     ///     Gets or sets the ISO code of a fallback language.
     /// </summary>
     /// <remarks>
@@ -70,9 +56,5 @@ public interface ILanguage : IEntity, IRememberBeingDirty
     ///     </para>
     /// </remarks>
     [DataMember]
-    string? FallbackIsoCode
-    {
-        get => null;
-        set { }
-    }
+    public string? FallbackIsoCode { get; set; }
 }

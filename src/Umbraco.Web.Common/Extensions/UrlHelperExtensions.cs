@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -22,28 +21,6 @@ namespace Umbraco.Extensions;
 
 public static class UrlHelperExtensions
 {
-    /// <summary>
-    /// Gets the Umbraco backoffice URL (if Umbraco is installed).
-    /// </summary>
-    /// <param name="urlHelper">The URL helper.</param>
-    /// <returns>
-    /// The Umbraco backoffice URL.
-    /// </returns>
-    public static string? GetUmbracoBackOfficeUrl(this IUrlHelper urlHelper)
-        => urlHelper.Action("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
-
-    /// <summary>
-    ///     Return the back office url if the back office is installed
-    /// </summary>
-    /// <param name="url"></param>
-    /// <returns></returns>
-    /// <remarks>
-    /// This method contained a bug that would result in always returning "/".
-    /// </remarks>
-    [Obsolete("Use the GetUmbracoBackOfficeUrl extension method instead. This method will be removed in Umbraco 13.")]
-    public static string? GetBackOfficeUrl(this IUrlHelper url)
-        => "/";
-
     /// <summary>
     ///     Return the Url for a Web Api service
     /// </summary>
@@ -53,6 +30,7 @@ public static class UrlHelperExtensions
     /// <param name="actionName"></param>
     /// <param name="id"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -61,6 +39,7 @@ public static class UrlHelperExtensions
         where T : UmbracoApiController =>
         url.GetUmbracoApiService(umbracoApiControllerTypeCollection, actionName, typeof(T), id);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -92,6 +71,7 @@ public static class UrlHelperExtensions
     /// <param name="apiControllerType"></param>
     /// <param name="id"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -211,6 +191,7 @@ public static class UrlHelperExtensions
     /// <param name="umbracoApiControllerTypeCollection"></param>
     /// <param name="actionName"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -218,6 +199,7 @@ public static class UrlHelperExtensions
         where T : UmbracoApiController =>
         url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, actionName)?.TrimEnd(actionName);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -244,19 +226,18 @@ public static class UrlHelperExtensions
         string controllerName,
         RouteValueDictionary routeVals,
         IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion,
-        IRuntimeMinifier runtimeMinifier)
+        IUmbracoVersion umbracoVersion)
     {
         var applicationJs = url.Action(actionName, controllerName, routeVals);
         applicationJs = applicationJs + "?umb__rnd=" +
-                        GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
+                        GetCacheBustHash(hostingEnvironment, umbracoVersion);
         return applicationJs;
     }
 
     /// <summary>
     /// </summary>
     /// <returns></returns>
-    public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IRuntimeMinifier runtimeMinifier)
+    public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion)
     {
         // make a hash of umbraco and client dependency version
         // in case the user bypasses the installer and just bumps the web.config or client dependency config
@@ -268,7 +249,7 @@ public static class UrlHelperExtensions
         }
 
         var version = umbracoVersion.SemanticVersion.ToSemanticString();
-        return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
+        return $"{version}".GenerateHash();
     }
 
     public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)

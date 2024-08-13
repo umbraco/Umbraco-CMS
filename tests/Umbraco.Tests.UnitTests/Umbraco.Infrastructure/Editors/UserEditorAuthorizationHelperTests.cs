@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -116,7 +117,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var currentUser = Mock.Of<IUser>(user => user.Groups == new[]
         {
-            new ReadOnlyUserGroup(1, Guid.NewGuid(),  "CurrentUser", "icon-user", null, null, groupAlias, new int[0], new string[0], new string[0], true),
+            new ReadOnlyUserGroup(1, Guid.NewGuid(), "CurrentUser", "icon-user", null, null, groupAlias, new int[0], new string[0], new HashSet<string>(), new HashSet<IGranularPermission>(), true),
         });
         IUser savingUser = null; // This means it is a new created user
 

@@ -1,22 +1,25 @@
-import { CSSResultGroup, LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { CSSResultGroup, css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
 @customElement('umb-error-layout')
-export default class UmbErrorLayoutElement extends LitElement {
+export default class UmbErrorLayoutElement extends UmbLitElement {
   @property({ type: String })
   header = '';
 
   @property({ type: String })
   message = '';
 
+  @property({ type: Boolean, attribute: 'no-back-link' })
+  noBackLink = false;
+
   render() {
     return html`
       <header id="header">
-        <h1>${this.header}</h1>
+        <h1>${this.header?.length ? this.header : html`<umb-localize key="auth_friendlyGreeting">Hi there</umb-localize>`}</h1>
         <span>${this.message}</span>
       </header>
       <slot></slot>
-      <umb-back-to-login-button></umb-back-to-login-button>
+      ${!this.noBackLink ? html`<umb-back-to-login-button></umb-back-to-login-button>`: ''}
     `;
   }
 

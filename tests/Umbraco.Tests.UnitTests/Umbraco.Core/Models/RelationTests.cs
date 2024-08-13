@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -51,7 +51,7 @@ public class RelationTests
     {
         var relation = BuildRelation();
 
-        var json = JsonConvert.SerializeObject(relation);
+        var json = JsonSerializer.Serialize(relation);
         Debug.Print(json);
     }
 

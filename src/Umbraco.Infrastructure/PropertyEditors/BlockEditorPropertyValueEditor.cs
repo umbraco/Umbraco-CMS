@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -14,13 +13,15 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValueEditorBase
+public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockValuePropertyValueEditorBase<TValue, TLayout>
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
-    private BlockEditorValues? _blockEditorValues;
+    private readonly IJsonSerializer _jsonSerializer;
+    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
-    private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
 
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -28,7 +29,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeConfigurationCache dataTypeConfigurationCache,
         ILocalizedTextService textService,
-        ILogger<BlockEditorPropertyValueEditor> logger,
+        ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> logger,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
@@ -37,10 +38,10 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
         _propertyEditors = propertyEditors;
         _dataValueReferenceFactories = dataValueReferenceFactories;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
-        _logger = logger;
+        _jsonSerializer = jsonSerializer;
     }
 
-    protected BlockEditorValues BlockEditorValues
+    protected BlockEditorValues<TValue, TLayout> BlockEditorValues
     {
         get => _blockEditorValues ?? throw new NullReferenceException($"The property {nameof(BlockEditorValues)} must be initialized at value editor construction");
         set => _blockEditorValues = value;
@@ -88,7 +89,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
+        BlockEditorData<TValue, TLayout>? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
         if (blockEditorData is null)
         {
             yield break;
@@ -115,12 +116,12 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     {
         var val = property.GetValue(culture, segment);
 
-        BlockEditorData? blockEditorData;
+        BlockEditorData<TValue, TLayout>? blockEditorData;
         try
         {
             blockEditorData = BlockEditorValues.DeserializeAndClean(val);
         }
-        catch (JsonSerializationException)
+        catch
         {
             // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
             return string.Empty;
@@ -150,12 +151,12 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
             return null;
         }
 
-        BlockEditorData? blockEditorData;
+        BlockEditorData<TValue, TLayout>? blockEditorData;
         try
         {
             blockEditorData = BlockEditorValues.DeserializeAndClean(editorValue.Value);
         }
-        catch (JsonSerializationException)
+        catch
         {
             // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
             return string.Empty;
@@ -169,6 +170,6 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
         MapBlockValueFromEditor(blockEditorData.BlockValue);
 
         // return json
-        return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
+        return _jsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 }

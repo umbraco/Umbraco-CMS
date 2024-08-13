@@ -18,6 +18,7 @@ public class ClaimsPrincipalExtensionsTests
         var backOfficeIdentity = new ClaimsIdentity();
         backOfficeIdentity.AddRequiredClaims(
             Constants.Security.SuperUserIdAsString,
+            Constants.Security.SuperUserKey,
             "test",
             "test",
             Enumerable.Empty<int>(),
@@ -55,6 +56,7 @@ public class ClaimsPrincipalExtensionsTests
         var backOfficeIdentity = new ClaimsIdentity();
         backOfficeIdentity.AddRequiredClaims(
             Constants.Security.SuperUserIdAsString,
+            Constants.Security.SuperUserKey,
             "test",
             "test",
             Enumerable.Empty<int>(),

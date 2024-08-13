@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,6 +16,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -25,7 +25,6 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -44,31 +43,10 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
     private IFileService FileService => GetRequiredService<IFileService>();
 
     [Test]
-    public void Can_Export_Macro()
+    public async Task Can_Export_DictionaryItems()
     {
         // Arrange
-        var macroService = GetRequiredService<IMacroService>();
-        var macro = new MacroBuilder()
-            .WithAlias("test1")
-            .WithName("Test")
-            .Build();
-        macroService.Save(macro);
-
-        // Act
-        var element = Serializer.Serialize(macro);
-
-        // Assert
-        Assert.That(element, Is.Not.Null);
-        Assert.That(element.Element("name").Value, Is.EqualTo("Test"));
-        Assert.That(element.Element("alias").Value, Is.EqualTo("test1"));
-        Debug.Print(element.ToString());
-    }
-
-    [Test]
-    public void Can_Export_DictionaryItems()
-    {
-        // Arrange
-        CreateDictionaryData();
+        await CreateDictionaryData();
         var localizationService = GetRequiredService<ILocalizationService>();
         var dictionaryItem = localizationService.GetDictionaryItemByKey("Parent");
 
@@ -83,21 +61,21 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Export_Languages()
+    public async Task Can_Export_Languages()
     {
         // Arrange
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .WithCultureName("Norwegian Bokmål (Norway)")
             .Build();
-        localizationService.Save(languageNbNo);
+        await languageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
 
         var languageEnGb = new LanguageBuilder()
             .WithCultureInfo("en-GB")
             .Build();
-        localizationService.Save(languageEnGb);
+        await languageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
 
         var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
         var languageItemsElement = newPackageXml.Elements("Languages").First();
@@ -177,14 +155,12 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             scheme,
             loggerFactory.CreateLogger<MediaFileManager>(),
             ShortStringHelper,
-            Services,
-            Options.Create(new ContentSettings()));
+            Services);
 
         var ignored = new FileUploadPropertyEditor(
             DataValueEditorFactory,
             mediaFileManager,
             Mock.Of<IOptionsMonitor<ContentSettings>>(x => x.CurrentValue == contentSettings),
-            TextService,
             Services.GetRequiredService<UploadAutoFillProperties>(),
             ContentService,
             IOHelper);
@@ -290,38 +266,45 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         });
     }
 
-    private void CreateDictionaryData()
+    private async Task CreateDictionaryData()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
 
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .WithCultureName("Norwegian")
             .Build();
-        localizationService.Save(languageNbNo);
+        await languageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
 
         var languageEnGb = new LanguageBuilder()
             .WithCultureInfo("en-GB")
             .Build();
-        localizationService.Save(languageEnGb);
+        await languageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
 
-        var parentItem = new DictionaryItem("Parent") { Key = Guid.Parse("28f2e02a-8c66-4fcd-85e3-8524d551c0d3") };
+        var parentKey = Guid.Parse("28f2e02a-8c66-4fcd-85e3-8524d551c0d3");
+        var parentItem = new DictionaryItem("Parent") { Key = parentKey };
         var parentTranslations = new List<IDictionaryTranslation>
         {
             new DictionaryTranslation(languageNbNo, "ForelderVerdi"),
             new DictionaryTranslation(languageEnGb, "ParentValue")
         };
         parentItem.Translations = parentTranslations;
-        localizationService.Save(parentItem);
+        var result = await dictionaryItemService.CreateAsync(parentItem, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(parentKey, result.Result.Key);
 
+        var childKey = Guid.Parse("e7dba0a9-d517-4ba4-8e18-2764d392c611");
         var childItem =
-            new DictionaryItem(parentItem.Key, "Child") { Key = Guid.Parse("e7dba0a9-d517-4ba4-8e18-2764d392c611") };
+            new DictionaryItem(parentItem.Key, "Child") { Key = childKey };
         var childTranslations = new List<IDictionaryTranslation>
         {
             new DictionaryTranslation(languageNbNo, "BarnVerdi"),
             new DictionaryTranslation(languageEnGb, "ChildValue")
         };
         childItem.Translations = childTranslations;
-        localizationService.Save(childItem);
+        result = await dictionaryItemService.CreateAsync(childItem, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(childKey, result.Result.Key);
     }
 }

@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<InMemoryModelFactory> _logger;
         private readonly FileSystemWatcher? _watcher;
-        private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
+        private readonly Lazy<UmbracoServices> _umbracoServices; // TODO: this is because of circular refs :(
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;

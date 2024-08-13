@@ -5,9 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
@@ -19,6 +21,7 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
+using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -129,8 +132,15 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
         // We register this service because we need it for IRuntimeState, if we don't this breaks 900 tests
         services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
+        services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
 
         services.AddLogger(webHostEnvironment, Configuration);
+
+        // Register a keyed service to verify that all calls to ServiceDescriptor.ImplementationType
+        // are guarded by checking IsKeyedService first.
+        // Failure to check this when accessing a keyed service descriptor's ImplementationType property
+        // throws a InvalidOperationException.
+        services.AddKeyedSingleton<object>("key");
 
         // Add it!
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
@@ -146,7 +156,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         builder.AddConfiguration()
             .AddUmbracoCore()
             .AddWebComponents()
-            .AddRuntimeMinifier()
             .AddBackOfficeAuthentication()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
@@ -159,8 +168,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         {
             // TODO: Should these just be called from within AddUmbracoCore/AddWebComponents?
             builder
-                .AddCoreMappingProfiles()
-                .AddWebMappingProfiles();
+                .AddCoreMappingProfiles();
         }
 
         services.AddSignalR();
@@ -195,6 +203,16 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         if (GlobalSetupTeardown.TestConfiguration is not null)
         {
             configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
+        }
+    }
+
+    protected void DeleteAllTemplateViewFiles()
+    {
+        var fileSystems = GetRequiredService<FileSystems>();
+        var viewFileSystem = fileSystems.MvcViewsFileSystem!;
+        foreach (var file in viewFileSystem.GetFiles(string.Empty).ToArray())
+        {
+            viewFileSystem.DeleteFile(file);
         }
     }
 }

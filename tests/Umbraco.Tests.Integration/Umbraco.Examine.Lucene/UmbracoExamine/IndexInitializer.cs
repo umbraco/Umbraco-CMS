@@ -156,7 +156,8 @@ public class IndexInitializer
             _mediaUrlGenerators,
             GetMockUserService(),
             _shortStringHelper,
-            _contentSettings);
+            _contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>());
         var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
         return mediaIndexDataSource;
     }

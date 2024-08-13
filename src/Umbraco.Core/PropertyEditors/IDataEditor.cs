@@ -17,29 +17,6 @@ public interface IDataEditor : IDiscoverable
     bool SupportsReadOnly => false;
 
     /// <summary>
-    ///     Gets the type of the editor.
-    /// </summary>
-    /// <remarks>An editor can be a property value editor, or a parameter editor.</remarks>
-    EditorType Type { get; }
-
-    /// <summary>
-    ///     Gets the name of the editor.
-    /// </summary>
-    string Name { get; }
-
-    /// <summary>
-    ///     Gets the icon of the editor.
-    /// </summary>
-    /// <remarks>Can be used to display editors when presenting them.</remarks>
-    string Icon { get; }
-
-    /// <summary>
-    ///     Gets the group of the editor.
-    /// </summary>
-    /// <remarks>Can be used to organize editors when presenting them.</remarks>
-    string Group { get; }
-
-    /// <summary>
     ///     Gets a value indicating whether the editor is deprecated.
     /// </summary>
     /// <remarks>Deprecated editors are supported but not proposed in the UI.</remarks>
@@ -63,7 +40,7 @@ public interface IDataEditor : IDiscoverable
     /// <summary>
     ///     Gets a configured value editor.
     /// </summary>
-    IDataValueEditor GetValueEditor(object? configuration);
+    IDataValueEditor GetValueEditor(object? configurationObject);
 
     /// <summary>
     ///     Gets an editor to edit the value editor configuration.

@@ -1,17 +1,16 @@
 using System.Data.Common;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -76,40 +75,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _databaseProviderMetadata = databaseProviderMetadata;
             _aggregator = aggregator;
-        }
-
-        [Obsolete("Use constructor that takes IEventAggregator, this will be removed in V13.")]
-        public DatabaseBuilder(
-            ICoreScopeProvider scopeProvider,
-            IScopeAccessor scopeAccessor,
-            IUmbracoDatabaseFactory databaseFactory,
-            IRuntimeState runtimeState,
-            ILoggerFactory loggerFactory,
-            IKeyValueService keyValueService,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IConfigManipulator configManipulator,
-            IOptionsMonitor<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IMigrationPlanExecutor migrationPlanExecutor,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
-            : this(
-                scopeProvider,
-                scopeAccessor,
-                databaseFactory,
-                runtimeState,
-                loggerFactory,
-                keyValueService,
-                dbProviderFactoryCreator,
-                configManipulator,
-                globalSettings,
-                connectionStrings,
-                migrationPlanExecutor,
-                databaseSchemaCreatorFactory,
-                databaseProviderMetadata,
-                StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>()
-            )
-        {
         }
 
         #region Status
@@ -219,7 +184,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 });
 
                 // Update configuration and wait for change
-                _configManipulator.SaveConnectionString(connectionString, providerName);
+                _configManipulator.SaveConnectionStringAsync(connectionString, providerName).GetAwaiter().GetResult();
                 if (!isChanged.WaitOne(10_000))
                 {
                     throw new InstallException("Didn't retrieve updated connection string within 10 seconds, try manual configuration instead.");
@@ -229,6 +194,36 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
 
             return true;
+        }
+
+        public Task<Attempt<InstallOperationStatus>> ValidateDatabaseConnectionAsync(DatabaseModel databaseSettings)
+        {
+            IDatabaseProviderMetadata? providerMeta = _databaseProviderMetadata.FirstOrDefault(x => x.Id == databaseSettings.DatabaseProviderMetadataId);
+
+            if (providerMeta is null)
+            {
+                return Task.FromResult(Attempt.Fail(InstallOperationStatus.UnknownDatabaseProvider));
+            }
+
+            var connectionString = providerMeta.GenerateConnectionString(databaseSettings);
+            var providerName = databaseSettings.ProviderName ?? providerMeta.ProviderName;
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                return Task.FromResult(Attempt.Fail(InstallOperationStatus.MissingConnectionString));
+            }
+
+            if (string.IsNullOrEmpty(providerName))
+            {
+                return Task.FromResult(Attempt.Fail(InstallOperationStatus.MissingProviderName));
+            }
+
+            if (providerMeta.RequiresConnectionTest && CanConnect(connectionString, providerName) is false)
+            {
+                return Task.FromResult(Attempt.Fail(InstallOperationStatus.DatabaseConnectionFailed));
+            }
+
+            return Task.FromResult(Attempt.Succeed(InstallOperationStatus.Success));
         }
 
         private void Configure(bool installMissingDatabase)
@@ -352,6 +347,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
+        public Result? UpgradeSchemaAndData(UmbracoPlan plan) => UpgradeSchemaAndData((MigrationPlan)plan);
+
         /// <summary>
         /// Upgrades the database schema and data by running migrations.
         /// </summary>
@@ -360,7 +357,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result? UpgradeSchemaAndData(UmbracoPlan plan)
+        public Result? UpgradeSchemaAndData(MigrationPlan plan)
         {
             try
             {

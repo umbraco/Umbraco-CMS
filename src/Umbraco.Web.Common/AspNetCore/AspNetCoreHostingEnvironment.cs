@@ -25,16 +25,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     private string? _applicationId;
     private string? _localTempPath;
 
-    [Obsolete("Please use an alternative constructor.")]
-    public AspNetCoreHostingEnvironment(
-        IServiceProvider serviceProvider,
-        IOptionsMonitor<HostingSettings> hostingSettings,
-        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
-        IWebHostEnvironment webHostEnvironment)
-        : this(hostingSettings, webRoutingSettings, webHostEnvironment, serviceProvider.GetService<IApplicationDiscriminator>()!)
-    {
-    }
-
     public AspNetCoreHostingEnvironment(
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
@@ -70,10 +60,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
             ApplicationMainUrl = new Uri(_webRoutingSettings.CurrentValue.UmbracoApplicationUrl);
         }
     }
-
-    // Scheduled for removal in v12
-    [Obsolete("This will never have a value")]
-    public Version? IISVersion { get; }
 
     /// <inheritdoc />
     public bool IsHosted { get; } = true;
@@ -175,7 +161,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
 
     public void EnsureApplicationMainUrl(Uri? currentApplicationUrl)
     {
-        // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
+        // TODO: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
         // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
         // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
 

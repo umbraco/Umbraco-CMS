@@ -22,12 +22,11 @@ public static partial class Constants
             public static class LiveEnvironment
             {
                 public const string CompilationDebugCheck = "https://umbra.co/healthchecks-compilation-debug";
+                public const string RuntimeModeCheck = "https://docs.umbraco.com/umbraco-cms/fundamentals/setup/server-setup/runtime-modes";
             }
 
             public static class Configuration
             {
-                public const string MacroErrorsCheck = "https://umbra.co/healthchecks-macro-errors";
-
                 public const string TrySkipIisCustomErrorsCheck =
                     "https://umbra.co/healthchecks-skip-iis-custom-errors";
 

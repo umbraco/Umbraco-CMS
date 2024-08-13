@@ -49,11 +49,6 @@ public class TypeFinder : ITypeFinder
     private string[]? _assembliesAcceptingLoadExceptions;
     private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
 
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V14.")]
-    public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig? typeFinderConfig = null)
-        : this(logger, assemblyProvider, null, typeFinderConfig)
-    { }
-
     public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, string[]? additionalExlusionAssemblies, ITypeFinderConfig? typeFinderConfig = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

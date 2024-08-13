@@ -111,6 +111,7 @@ public class UmbracoBackOfficeIdentityTests
 
         claimsIdentity.AddRequiredClaims(
             "1234",
+            Guid.NewGuid(),
             "testing",
             "hello world",
             new[] { 654 },
@@ -120,7 +121,7 @@ public class UmbracoBackOfficeIdentityTests
             new[] { "content", "media" },
             new[] { "admin" });
 
-        Assert.AreEqual(12, claimsIdentity.Claims.Count());
+        Assert.AreEqual(13, claimsIdentity.Claims.Count());
         Assert.IsNull(claimsIdentity.Actor);
     }
 }

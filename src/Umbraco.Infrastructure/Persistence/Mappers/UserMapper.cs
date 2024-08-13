@@ -14,6 +14,7 @@ public sealed class UserMapper : BaseMapper
 
     protected override void DefineMaps()
     {
+        DefineMap<User, UserDto>(nameof(User.Key), nameof(UserDto.Key));
         DefineMap<User, UserDto>(nameof(User.Id), nameof(UserDto.Id));
         DefineMap<User, UserDto>(nameof(User.Email), nameof(UserDto.Email));
         DefineMap<User, UserDto>(nameof(User.Username), nameof(UserDto.Login));

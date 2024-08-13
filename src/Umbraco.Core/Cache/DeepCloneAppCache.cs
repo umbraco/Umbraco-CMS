@@ -65,7 +65,7 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
             .Select(CheckCloneableAndTracksChanges);
 
     /// <inheritdoc />
-    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
+    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false)
     {
         var cached = InnerCache.Get(
             key,
@@ -81,15 +81,14 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
             // clone / reset to go into the cache
         },
             timeout,
-            isSliding,
-            dependentFiles);
+            isSliding);
 
         // clone / reset to go into the cache
         return CheckCloneableAndTracksChanges(cached);
     }
 
     /// <inheritdoc />
-    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null) =>
+    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false) =>
         InnerCache.Insert(
             key,
             () =>
@@ -102,8 +101,7 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
             return value == null ? null : CheckCloneableAndTracksChanges(value);
         },
             timeout,
-            isSliding,
-            dependentFiles);
+            isSliding);
 
     /// <inheritdoc />
     public void Clear() => InnerCache.Clear();

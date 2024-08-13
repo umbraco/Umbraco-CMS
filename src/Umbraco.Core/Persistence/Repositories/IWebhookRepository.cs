@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -20,30 +20,40 @@ public interface IWebhookRepository
     Task<IWebhook> CreateAsync(IWebhook webhook);
 
     /// <summary>
-    ///     Gets a webhook by key
+    ///     Gets a webhook by key.
     /// </summary>
     /// <param name="key">The key of the webhook which will be retrieved.</param>
     /// <returns>The <see cref="IWebhook" /> webhook with the given key.</returns>
     Task<IWebhook?> GetAsync(Guid key);
 
     /// <summary>
-    ///     Gets a webhook by key
+    ///     Gets webhooks by keys.
+    /// </summary>
+    /// <param name="keys">The alias of an event, which is referenced by a webhook.</param>
+    /// <returns>
+    ///     A paged model of <see cref="IWebhook" />.
+    /// </returns>
+    Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys) =>
+        throw new NotImplementedException();
+
+    /// <summary>
+    ///     Gets a webhook by key.
     /// </summary>
     /// <param name="alias">The alias of an event, which is referenced by a webhook.</param>
     /// <returns>
-    ///     A paged model of <see cref="IWebhook" />
+    ///     A paged model of <see cref="IWebhook" />.
     /// </returns>
     Task<PagedModel<IWebhook>> GetByAliasAsync(string alias);
 
     /// <summary>
-    ///     Gets a webhook by key
+    ///     Gets a webhook by key.
     /// </summary>
     /// <param name="webhook">The webhook to be deleted.</param>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
     Task DeleteAsync(IWebhook webhook);
 
     /// <summary>
-    ///     Updates a given webhook
+    ///     Updates a given webhook.
     /// </summary>
     /// <param name="webhook">The webhook to be updated.</param>
     /// <returns>The updated <see cref="IWebhook" /> webhook.</returns>

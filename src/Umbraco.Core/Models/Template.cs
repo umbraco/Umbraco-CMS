@@ -64,6 +64,8 @@ public class Template : File, ITemplate
     /// </summary>
     public bool IsMasterTemplate { get; set; }
 
+    // FIXME: moving forward the master template is calculated from the actual template content; figure out how to get rid of this method, or at least *only* use it from TemplateService
+    [Obsolete("MasterTemplate is now calculated from the content. This will be removed in Umbraco 15.")]
     public void SetMasterTemplate(ITemplate? masterTemplate)
     {
         if (masterTemplate == null)

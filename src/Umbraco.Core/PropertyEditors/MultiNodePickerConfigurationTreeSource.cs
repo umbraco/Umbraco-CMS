@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -8,17 +9,20 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class MultiNodePickerConfigurationTreeSource
 {
+    [JsonPropertyName("type")]
     [DataMember(Name = "type")]
     public string? ObjectType { get; set; }
 
+    [JsonPropertyName("query")]
     [DataMember(Name = "query")]
     public string? StartNodeQuery { get; set; }
 
     [DataMember(Name = "dynamicRoot")]
     public DynamicRoot? DynamicRoot { get; set; }
 
+    [JsonPropertyName("id")]
     [DataMember(Name = "id")]
-    public Udi? StartNodeId { get; set; }
+    public Guid? StartNodeId { get; set; }
 }
 
 [DataContract]

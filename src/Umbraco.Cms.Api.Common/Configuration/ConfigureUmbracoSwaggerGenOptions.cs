@@ -12,16 +12,22 @@ namespace Umbraco.Cms.Api.Common.Configuration;
 
 public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
-    private readonly IOptions<ApiVersioningOptions> _apiVersioningOptions;
     private readonly IOperationIdSelector _operationIdSelector;
     private readonly ISchemaIdSelector _schemaIdSelector;
 
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
     public ConfigureUmbracoSwaggerGenOptions(
         IOptions<ApiVersioningOptions> apiVersioningOptions,
         IOperationIdSelector operationIdSelector,
         ISchemaIdSelector schemaIdSelector)
+        : this(operationIdSelector, schemaIdSelector)
     {
-        _apiVersioningOptions = apiVersioningOptions;
+    }
+
+    public ConfigureUmbracoSwaggerGenOptions(
+        IOperationIdSelector operationIdSelector,
+        ISchemaIdSelector schemaIdSelector)
+    {
         _operationIdSelector = operationIdSelector;
         _schemaIdSelector = schemaIdSelector;
     }
@@ -34,10 +40,10 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
             {
                 Title = "Default API",
                 Version = "Latest",
-                Description = "All endpoints not defined under specific APIs"
+                Description = "All endpoints not defined under specific APIs",
             });
 
-        swaggerGenOptions.CustomOperationIds(description => _operationIdSelector.OperationId(description, _apiVersioningOptions.Value));
+        swaggerGenOptions.CustomOperationIds(description => _operationIdSelector.OperationId(description));
         swaggerGenOptions.DocInclusionPredicate((name, api) =>
         {
             if (string.IsNullOrWhiteSpace(api.GroupName))

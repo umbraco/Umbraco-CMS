@@ -19,6 +19,7 @@ public sealed class UserGroupMapper : BaseMapper
     protected override void DefineMaps()
     {
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Id), nameof(UserGroupDto.Id));
+        DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Key), nameof(UserGroupDto.Key));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Alias), nameof(UserGroupDto.Alias));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Name), nameof(UserGroupDto.Name));
         DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Icon), nameof(UserGroupDto.Icon));

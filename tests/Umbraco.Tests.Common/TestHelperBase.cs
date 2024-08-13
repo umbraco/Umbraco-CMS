@@ -48,7 +48,7 @@ public abstract class TestHelperBase
     protected TestHelperBase(Assembly entryAssembly)
     {
         MainDom = new SimpleMainDom();
-        _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance));
+        _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance), null);
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ public abstract class TestHelperBase
         }
     }
 
-    public IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
+    public IJsonSerializer JsonSerializer { get; } = new SystemTextJsonSerializer();
 
     public IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
 
@@ -246,6 +246,6 @@ public abstract class TestHelperBase
     {
         hostingEnv ??= GetHostingEnvironment();
         return new LoggingConfiguration(
-            Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco", "logs"));
+            Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco", "Logs"));
     }
 }

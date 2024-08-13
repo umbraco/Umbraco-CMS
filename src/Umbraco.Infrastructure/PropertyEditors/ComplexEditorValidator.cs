@@ -34,8 +34,8 @@ public abstract class ComplexEditorValidator : IValueValidator
 
         if (rowResults.Count > 0)
         {
-            var result = new ComplexEditorValidationResult();
-            foreach (ComplexEditorElementTypeValidationResult rowResult in rowResults)
+            var result = new NestedValidationResults();
+            foreach (NestedValidationResults rowResult in rowResults)
             {
                 result.ValidationResults.Add(rowResult);
             }
@@ -51,23 +51,22 @@ public abstract class ComplexEditorValidator : IValueValidator
     /// <summary>
     ///     Return a nested validation result per row (Element Type)
     /// </summary>
-    protected IEnumerable<ComplexEditorElementTypeValidationResult> GetNestedValidationResults(
+    protected IEnumerable<NestedValidationResults> GetNestedValidationResults(
         IEnumerable<ElementTypeValidationModel> elements)
     {
         foreach (ElementTypeValidationModel row in elements)
         {
-            var elementTypeValidationResult =
-                new ComplexEditorElementTypeValidationResult(row.ElementTypeAlias, row.Id);
+            var elementTypeValidationResult = new NestedValidationResults();
 
             foreach (PropertyTypeValidationModel prop in row.PropertyTypeValidation)
             {
-                var propValidationResult = new ComplexEditorPropertyTypeValidationResult(prop.PropertyType.Alias);
+                var propValidationResult = new NestedJsonPathValidationResults(prop.JsonPath);
 
                 foreach (ValidationResult validationResult in _propertyValidationService.ValidatePropertyValue(
                              prop.PropertyType, prop.PostedValue))
                 {
                     // add the result to the property results
-                    propValidationResult.AddValidationResult(validationResult);
+                    propValidationResult.ValidationResults.Add(validationResult);
                 }
 
                 // add the property results to the element type results
@@ -86,15 +85,18 @@ public abstract class ComplexEditorValidator : IValueValidator
 
     public class PropertyTypeValidationModel
     {
-        public PropertyTypeValidationModel(IPropertyType propertyType, object? postedValue)
+        public PropertyTypeValidationModel(IPropertyType propertyType, object? postedValue, string jsonPath)
         {
             PostedValue = postedValue;
             PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
+            JsonPath = jsonPath;
         }
 
         public object? PostedValue { get; }
 
         public IPropertyType PropertyType { get; }
+
+        public string JsonPath { get; }
     }
 
     public class ElementTypeValidationModel

@@ -37,19 +37,15 @@ public static partial class Constants
 
         public const string TempFileUploads = TempData + "/FileUploads";
 
-        public const string TempImageUploads = TempFileUploads + "/rte";
-
         public const string Install = "~/install";
 
         public const string AppPlugins = "/App_Plugins";
 
-        public const string PluginIcons = "/backoffice/icons";
+        public const string BackOfficePath = "/umbraco/backoffice";
 
         public const string MvcViews = "~/Views";
 
         public const string PartialViews = MvcViews + "/Partials/";
-
-        public const string MacroPartials = MvcViews + "/MacroPartials/";
 
         public const string Packages = Data + "/packages";
 
@@ -62,8 +58,5 @@ public static partial class Constants
         /// </summary>
         [Obsolete("Use LoggingSettings.GetLoggingDirectory() instead, will be removed in Umbraco 13.")]
         public const string LogFiles = Umbraco + "/Logs";
-
-        [Obsolete("Use PluginIcons instead")]
-        public static string AppPluginIcons => "/Backoffice/Icons";
     }
 }

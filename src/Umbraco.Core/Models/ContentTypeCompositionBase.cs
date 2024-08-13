@@ -104,6 +104,7 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         }
     }
 
+
     /// <inheritdoc />
     public IEnumerable<IPropertyType> GetOriginalComposedPropertyTypes() => GetRawComposedPropertyTypes();
 
@@ -151,6 +152,19 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         }
 
         return false;
+    }
+
+    /// <inheritdoc />
+    public bool RemoveContentType(Guid key)
+    {
+        // Kinda hacky, but no reason to dupe all the code
+        var aliasToRemove = ContentTypeComposition.FirstOrDefault(x => x.Key == key)?.Alias;
+        if (aliasToRemove is null)
+        {
+            return false;
+        }
+
+        return RemoveContentType(aliasToRemove);
     }
 
     /// <summary>
@@ -273,6 +287,13 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         => ContentTypeComposition
             .Select(x => x.Id)
             .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> CompositionKeys()
+        => ContentTypeComposition
+            .Select(x => x.Key)
+            .Union(ContentTypeComposition.SelectMany(x => x.CompositionKeys()));
+
 
     protected override void PerformDeepClone(object clone)
     {

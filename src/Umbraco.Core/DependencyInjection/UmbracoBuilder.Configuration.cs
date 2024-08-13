@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
-    internal static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
+    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
         UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
@@ -45,11 +45,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
 
         // Register configuration sections.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
-            .AddUmbracoOptions<ActiveDirectorySettings>()
             .AddUmbracoOptions<IndexCreatorSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
@@ -67,20 +67,17 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<HostingSettings>()
             .AddUmbracoOptions<ImagingSettings>()
             .AddUmbracoOptions<IndexingSettings>()
-            .AddUmbracoOptions<KeepAliveSettings>()
             .AddUmbracoOptions<LoggingSettings>()
             .AddUmbracoOptions<MemberPasswordConfigurationSettings>()
             .AddUmbracoOptions<NuCacheSettings>()
             .AddUmbracoOptions<RequestHandlerSettings>()
             .AddUmbracoOptions<RuntimeSettings>()
             .AddUmbracoOptions<SecuritySettings>()
-            .AddUmbracoOptions<TourSettings>()
             .AddUmbracoOptions<TypeFinderSettings>()
             .AddUmbracoOptions<UserPasswordConfigurationSettings>()
             .AddUmbracoOptions<WebRoutingSettings>()
             .AddUmbracoOptions<UmbracoPluginSettings>()
             .AddUmbracoOptions<UnattendedSettings>()
-            .AddUmbracoOptions<RichTextEditorSettings>()
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<RuntimeMinificationSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
@@ -121,32 +118,6 @@ public static partial class UmbracoBuilderExtensions
             }
         });
 
-        // TODO: Remove this in V13
-        // This is to avoid a breaking change in ContentSettings, if the old AllowedFileUploads has a value, and the new
-        // AllowedFileUploadExtensions does not, copy the value over, if the new has a value, use that instead.
-        builder.Services.Configure<ContentSettings>(settings =>
-        {
-            // We have to use Config.GetSection().Get<string[]>, as the GetSection.GetValue<string[]> simply cannot retrieve a string array
-            var allowedUploadedFileExtensionsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.AllowedUploadedFileExtensions)}").Get<string[]>();
-            var allowedUploadFilesValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.AllowedUploadFiles)}").Get<string[]>();
-
-            if (allowedUploadedFileExtensionsValue is null && allowedUploadFilesValue is not null)
-            {
-                settings.AllowedUploadedFileExtensions = allowedUploadFilesValue;
-            }
-        });
-
-        // TODO: Remove this in V13
-        builder.Services.Configure<ContentSettings>(settings =>
-        {
-            var disallowedUploadedFileExtensionsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.DisallowedUploadedFileExtensions)}").Get<string[]>();
-            var disallowedUploadFilesValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.DisallowedUploadFiles)}").Get<string[]>();
-
-            if (disallowedUploadedFileExtensionsValue is null && disallowedUploadFilesValue is not null)
-            {
-                settings.DisallowedUploadedFileExtensions = disallowedUploadFilesValue;
-            }
-        });
         return builder;
     }
 }

@@ -253,7 +253,8 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     {
         TUser? user = await FindByNameAsync(username);
 
-        if (user is null)
+
+        if (user is null || user.IsApproved is false)
         {
             return false;
         }

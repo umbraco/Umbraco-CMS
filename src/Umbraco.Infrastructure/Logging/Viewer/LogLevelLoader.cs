@@ -14,6 +14,7 @@ public class LogLevelLoader : ILogLevelLoader
     /// <summary>
     ///     Get the Serilog level values of the global minimum and the UmbracoFile one from the config file.
     /// </summary>
+    [Obsolete("Use ILogViewerService.GetLogLevelsFromSinks instead. Scheduled for removal in Umbraco 15.")]
     public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevelsFromSinks()
     {
         var configuredLogLevels = new Dictionary<string, LogEventLevel?>
@@ -27,6 +28,7 @@ public class LogLevelLoader : ILogLevelLoader
     /// <summary>
     ///     Get the Serilog minimum-level value from the config file.
     /// </summary>
+    [Obsolete("Use ILogViewerService.GetGlobalMinLogLevel instead. Scheduled for removal in Umbraco 15.")]
     public LogEventLevel? GetGlobalMinLogLevel()
     {
         LogEventLevel? logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.IsEnabled)

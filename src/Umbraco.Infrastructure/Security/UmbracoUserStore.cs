@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
@@ -31,6 +32,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
+    [Obsolete("Use TryConvertIdentityIdToInt instead. Scheduled for removal in V15.")]
     protected static int UserIdToInt(string? userId)
     {
         if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
@@ -45,6 +47,34 @@ public abstract class UmbracoUserStore<TUser, TRole>
         }
 
         throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
+    }
+
+    protected abstract Task<int> ResolveEntityIdFromIdentityId(string? identityId);
+
+    protected static bool TryConvertIdentityIdToInt(string? userId, out int intId)
+    {
+        // The userId can in this case be one of three things
+        // 1. An int - this means that the user logged in normally, this is fine, we parse it and return it.
+        // 2. A fake Guid - this means that the user logged in using an external login provider, but we haven't migrated the users to have a key yet, so we need to convert it to an int.
+        // 3. A Guid - this means that the user logged in using an external login provider, so we have to resolve the user by key.
+
+        if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+        {
+            intId = result;
+            return true;
+        }
+
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            if (key.IsFakeGuid())
+            {
+                intId = key.ToInt();
+                return true;
+            }
+        }
+
+        intId = default;
+        return false;
     }
 
     protected static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));

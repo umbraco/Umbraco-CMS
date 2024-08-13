@@ -91,8 +91,7 @@ internal class DefaultCultureDictionary : ICultureDictionary
                 return string.Empty;
             }
 
-            IDictionaryTranslation? byLang =
-                found.Translations.FirstOrDefault(x => x.Language?.Equals(Language) ?? false);
+            IDictionaryTranslation? byLang = found.Translations.FirstOrDefault(IsCurrentLanguage);
             if (byLang == null)
             {
                 return string.Empty;
@@ -130,7 +129,7 @@ internal class DefaultCultureDictionary : ICultureDictionary
 
         foreach (IDictionaryItem dictionaryItem in children)
         {
-            IDictionaryTranslation? byLang = dictionaryItem.Translations.FirstOrDefault(x => x.Language?.Equals(Language) ?? false);
+            IDictionaryTranslation? byLang = dictionaryItem.Translations.FirstOrDefault(IsCurrentLanguage);
             if (byLang != null && dictionaryItem.ItemKey is not null && byLang.Value is not null)
             {
                 result.Add(dictionaryItem.ItemKey, byLang.Value);
@@ -139,4 +138,6 @@ internal class DefaultCultureDictionary : ICultureDictionary
 
         return result;
     }
+
+    private bool IsCurrentLanguage(IDictionaryTranslation translation) => translation.LanguageIsoCode.Equals(Language?.IsoCode);
 }

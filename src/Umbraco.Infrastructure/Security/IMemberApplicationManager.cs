@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Security;
+namespace Umbraco.Cms.Infrastructure.Security;
 
 public interface IMemberApplicationManager
 {

@@ -1,66 +1,55 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
-    "Multinode Treepicker",
-    "contentpicker",
     ValueType = ValueTypes.Text,
-    Group = Constants.PropertyEditors.Groups.Pickers,
-    Icon = "icon-page-add",
     ValueEditorIsReusable = true)]
 public class MultiNodeTreePickerPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
 
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public MultiNodeTreePickerPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
-
-    public MultiNodeTreePickerPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
+    public MultiNodeTreePickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new MultiNodePickerConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new MultiNodePickerConfigurationEditor(_ioHelper);
 
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute!);
 
+    /// <remarks>
+    /// At first glance, the fromEditor and toEditor methods might seem strange.
+    /// This is because we wanted to stop the leaking of UDI's to the frontend while not having to do database migrations
+    /// so we opted to, for now, translate the udi string in the database into a structured format unique to the client
+    /// This way, for now, no migration is needed and no changes outside of the editor logic needs to be touched to stop the leaking.
+    /// </remarks>
     public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
         public MultiNodeTreePickerPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _jsonSerializer = jsonSerializer;
         }
 
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -75,6 +64,43 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                     yield return new UmbracoEntityReference(udi);
                 }
             }
+        }
+
+
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+            => editorValue.Value is JsonArray jsonArray
+                ? EntityReferencesToUdis(_jsonSerializer.Deserialize<IEnumerable<EditorEntityReference>>(jsonArray.ToJsonString()) ?? Enumerable.Empty<EditorEntityReference>())
+                : null;
+
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            var value = property.GetValue(culture, segment);
+            return value is string stringValue
+            ? UdisToEntityReferences(stringValue.Split(Constants.CharArrays.Comma)).ToArray()
+            : null;
+        }
+
+        private IEnumerable<EditorEntityReference> UdisToEntityReferences(IEnumerable<string> stringUdis)
+        {
+            foreach (var stringUdi in stringUdis)
+            {
+                if (UdiParser.TryParse(stringUdi, out GuidUdi? guidUdi) is false)
+                {
+                    continue;
+                }
+
+                yield return new EditorEntityReference() { Type = guidUdi.EntityType, Unique = guidUdi.Guid };
+            }
+        }
+
+        private string EntityReferencesToUdis(IEnumerable<EditorEntityReference> nodeReferences)
+            => string.Join(",", nodeReferences.Select(entityReference => Udi.Create(entityReference.Type, entityReference.Unique).ToString()));
+
+        public class EditorEntityReference
+        {
+            public required string Type { get; set; }
+
+            public required Guid Unique { get; set; }
         }
     }
 }

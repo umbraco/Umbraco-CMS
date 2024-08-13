@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Core.Models;
 public class Language : EntityBase, ILanguage
 {
     private string _cultureName;
-    private int? _fallbackLanguageId;
     private string? _fallbackLanguageIsoCode;
     private bool _isDefaultVariantLanguage;
     private string _isoCode;
@@ -71,14 +70,6 @@ public class Language : EntityBase, ILanguage
     {
         get => _mandatory;
         set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(IsMandatory));
-    }
-
-    /// <inheritdoc />
-    [Obsolete("This will be replaced by fallback language ISO code in V14.")]
-    public int? FallbackLanguageId
-    {
-        get => _fallbackLanguageId;
-        set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageId, nameof(FallbackLanguageId));
     }
 
     /// <inheritdoc />

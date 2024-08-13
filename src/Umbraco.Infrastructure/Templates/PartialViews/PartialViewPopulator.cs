@@ -32,7 +32,7 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
             IPartialView? existingView = _fileService.GetPartialView(fileSystemPath);
             if (existingView is null)
             {
-                var view = new PartialView(PartialViewType.PartialView, fileSystemPath)
+                var view = new PartialView(fileSystemPath)
                 {
                     Content = GetTextFromStream(content)
                 };

@@ -17,6 +17,10 @@ parameters:
     displayName: Deploy to NuGet
     type: boolean
     default: false
+  - name: npmDeploy
+    displayName: Deploy to Npm
+    type: boolean
+    default: false
   - name: buildApiDocs
     displayName: Build API docs
     type: boolean
@@ -59,60 +63,36 @@ variables:
   DOTNET_GENERATE_ASPNET_CERTIFICATE: false
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  npm_config_cache: $(Pipeline.Workspace)/.npm_client
+  NODE_OPTIONS: --max_old_space_size=16384
 
 stages:
   ###############################################
   ## Build
   ###############################################
   - stage: Build
-    variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_client
     jobs:
       - job: A
         displayName: Build Umbraco CMS
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            retryCountOnTaskFailure: 3
-            inputs:
-              versionSpec: $(nodeVersion)
-          - task: Cache@2
-            displayName: Cache node_modules
-            inputs:
-              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
-              restoreKeys: |
-                "npm_client" | "$(Agent.OS)"
-                "npm_client"
-              path: $(npm_config_cache)
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci (Backoffice)
-          - task: gulp@0
-            displayName: Run gulp build (Backoffice)
-            inputs:
-              gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
-              targets: coreBuild
-              workingDirectory: src/Umbraco.Web.UI.Client
-          - task: npm@1
-            displayName: Run npm ci (Login)
-            inputs:
-              command: custom
-              workingDir: src/Umbraco.Web.UI.Login
-              verbose: false
-              customCommand: ci
-          - task: npm@1
-            displayName: Run npm build (Login)
-            inputs:
-              command: custom
-              workingDir: src/Umbraco.Web.UI.Login
-              verbose: false
-              customCommand: run build
+          - checkout: self
+            submodules: true
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
+          - template: templates/backoffice-install.yml
+          - script: npm run build:for:cms
+            displayName: Run build (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            displayName: Run npm ci (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - script: npm run build
+            displayName: Run npm build (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -135,6 +115,31 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
+
+      - job: B
+        displayName: Build Bellissima Package
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            submodules: true
+          - template: templates/backoffice-install.yml
+          - script: npm run build:for:npm
+            displayName: Run build:for:npm
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - bash: |
+              echo "##[command]Running npm pack"
+              echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
+              mkdir $(Build.ArtifactStagingDirectory)/npm
+              npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
+              mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
+            displayName: Run npm pack
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Bellissima npm artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/npm
+              artifactName: npm
 
   - stage: Build_Docs
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
@@ -197,36 +202,45 @@ stages:
         displayName: Build js API Reference
         pool:
           vmImage: 'ubuntu-latest'
+        variables:
+          BASE_PATH: /v$(umbracoMajorVersion)/ui
         steps:
-          - task: NodeTool@0
-            displayName: Use Node.js 10.15.x
-            retryCountOnTaskFailure: 3
-            inputs:
-              versionSpec: 10.15.x # Won't work with higher versions
-          - script: |
-              npm ci --no-fund --no-audit --prefer-offline
-              npx gulp docs
-
-              major="$(umbracoMajorVersion)"
-              echo "major version: $major"
-
-              baseUrl="https://apidocs.umbraco.com/v$major/ui/"
-              echo "baseUrl: $baseUrl"
-
-              sed -i "s|baseUrl = .*|baseUrl = '$baseUrl',|" api/index.html
-            displayName: Generate js Docs
-            workingDirectory:  $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs
+          - checkout: self
+            submodules: true
+          - template: templates/backoffice-install.yml
+          - script: npm run storybook:build
+            displayName: Build Storybook
+            env:
+              VITE_BASE_PATH: $(BASE_PATH)/
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client
+          - script: sed -i "s|/umbraco/backoffice|$(BASE_PATH)/umbraco/backoffice|" assets/*.js
+            displayName: Replace BASE_PATH on assets
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
           - task: ArchiveFiles@2
-            displayName: Archive js Docs
+            displayName: Archive Storybook
             inputs:
-              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
               includeRootFolder: false
               archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
-            displayName: Publish js Docs
+            displayName: Publish Storybook
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
               artifact: ui-docs
+          - script: npm run generate:ui-api-docs
+            displayName: Generate API Docs
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client
+          - task: ArchiveFiles@2
+            displayName: Archive UI API Docs
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/ui-api
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
+          - task: PublishPipelineArtifact@1
+            displayName: Publish UI API Docs
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
+              artifact: ui-api-docs
 
   ###############################################
   ## Test
@@ -318,8 +332,9 @@ stages:
 
       # Integration Tests (SQL Server)
       - job:
-        timeoutInMinutes: 120
-        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}})
+        timeoutInMinutes: 180
+        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}}) # Outcommented due to timeouts
+        condition: eq(${{parameters.sqlServerIntegrationTests}}, True)
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
@@ -443,7 +458,8 @@ stages:
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)" | Out-File .env
+              URL=$(ASPNETCORE_URLS)
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -501,7 +517,10 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run test --ignore-certificate-errors
+          - ${{ if eq(parameters.isNightly, true) }}:
+              pwsh: npm run test --ignore-certificate-errors
+            ${{ else }}:
+              pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -537,7 +556,8 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}})
+        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}}) # Outcommented due to timeouts
+        condition: eq(${{parameters.sqlServerAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
@@ -640,7 +660,10 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run test --ignore-certificate-errors
+          - ${{ if eq(parameters.isNightly, true) }}:
+              pwsh: npm run test --ignore-certificate-errors
+            ${{ else }}:
+              pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -691,7 +714,7 @@ stages:
     dependsOn:
       - Unit
       - Integration
-      # - E2E # TODO: Enable when stable.
+#      - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
@@ -713,6 +736,41 @@ stages:
                 publishFeedCredentials: 'MyGet - Umbraco Nightly'
               ${{ else }}:
                 publishFeedCredentials: 'MyGet - Pre-releases'
+      - job:
+        displayName: Push to pre-release feed (npm)
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm
+          - bash: |
+              # Check if we are on a nightly build
+              if [ $isNightly = "False" ]; then
+                  echo "##[debug]Prerelease build detected"
+                  registry="https://www.myget.org/F/umbracoprereleases/npm/"
+              else
+                  echo "##[debug]Nightly build detected"
+                  registry="https://www.myget.org/F/umbraconightly/npm/"
+              fi
+              echo "@umbraco-cms:registry=$registry" >> .npmrc
+            env:
+              isNightly: ${{parameters.isNightly}}
+            workingDirectory: $(Pipeline.Workspace)/npm
+            displayName: Add scoped registry to .npmrc
+          - task: npmAuthenticate@0
+            displayName: Authenticate with npm (MyGet)
+            inputs:
+              workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
+              customEndpoint: 'MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly'
+          - bash: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              # Find the first .tgz file in the current directory and publish it
+              files=( ./*.tgz )
+              npm publish "${files[0]}"
+            displayName: Push to npm (MyGet)
+            workingDirectory: $(Pipeline.Workspace)/npm
+
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
@@ -737,12 +795,42 @@ stages:
               nuGetFeedType: 'external'
               publishFeedCredentials: 'NuGet - Umbraco.*'
 
+  - stage: Deploy_Npm
+    displayName: Npm release
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+    dependsOn:
+      - Deploy_NuGet
+    jobs:
+      - job: Publish
+        displayName: Push to NPM
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm
+          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
+            workingDirectory: $(Pipeline.Workspace)/npm
+            displayName: Add scoped registry to .npmrc
+          - task: npmAuthenticate@0
+            displayName: Authenticate with npm
+            inputs:
+              workingFile: $(Pipeline.Workspace)/npm/.npmrc
+              customEndpoint: 'NPM - Umbraco Backoffice'
+          - script: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              # Find the first .tgz file in the current directory and publish it
+              files=( ./*.tgz )
+              npm publish "${files[0]}"
+            displayName: Push to npm
+            workingDirectory: $(Pipeline.Workspace)/npm
+
   - stage: Upload_API_Docs
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
-    displayName: Upload API Documention
+    displayName: Upload API Documentation
     dependsOn:
       - Build
       - Deploy_NuGet
@@ -770,8 +858,9 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/csharp
+              CleanTargetBeforeCopy: true
       - job:
-        displayName: Upload js Docs
+        displayName: Upload Storybook
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -784,7 +873,7 @@ stages:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-docs
           - task: AzureFileCopy@4
-            displayName: 'Copy UI Docs to blob storage'
+            displayName: 'Copy Storybook to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/ui-docs/*'
               azureSubscription: umbraco-storage
@@ -792,3 +881,27 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/ui
+              CleanTargetBeforeCopy: true
+      - job:
+        displayName: Upload UI API Docs
+        steps:
+          - checkout: none
+          - task: DownloadPipelineArtifact@2
+            displayName: Download artifact
+            inputs:
+              artifact: ui-api-docs
+              path: $(Build.SourcesDirectory)
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: $(Build.SourcesDirectory)/ui-api-docs.zip
+              destinationFolder: $(Build.ArtifactStagingDirectory)/ui-api-docs
+          - task: AzureFileCopy@4
+            displayName: 'Copy UI API Docs to blob storage'
+            inputs:
+              SourcePath: '$(Build.ArtifactStagingDirectory)/ui-api-docs/*'
+              azureSubscription: umbraco-storage
+              Destination: AzureBlob
+              storage: umbracoapidocs
+              ContainerName: '$web'
+              BlobPrefix: v$(umbracoMajorVersion)/ui-api
+              CleanTargetBeforeCopy: true

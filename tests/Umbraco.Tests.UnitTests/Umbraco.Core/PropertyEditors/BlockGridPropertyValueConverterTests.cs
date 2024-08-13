@@ -29,6 +29,144 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(typeof(BlockGridModel), valueType);
     }
 
+    [Test]
+    public void Convert_Valid_Json()
+    {
+        var editor = CreateConverter();
+        var config = ConfigForSingle(SettingKey1);
+        var propertyType = GetPropertyType(config);
+        var publishedElement = Mock.Of<IPublishedElement>();
+
+        var json = @"
+{
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockGrid + @""": [
+            {
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D"",
+                ""settingsUdi"": ""umb://element/2D3529EDB47B4B109F6D4B802DD5DFE2"",
+                ""rowSpan"": 1,
+                ""columnSpan"": 12,
+                ""areas"": []
+            }
+        ]
+    },
+    ""contentData"": [
+        {
+            ""contentTypeKey"": """ + ContentKey1 + @""",
+            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+        }
+    ],
+    ""settingsData"": [
+        {
+            ""contentTypeKey"": """ + SettingKey1 + @""",
+            ""udi"": ""umb://element/2D3529EDB47B4B109F6D4B802DD5DFE2""
+        }
+    ]
+}";
+        var converted =
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
+                BlockGridModel;
+
+        Assert.IsNotNull(converted);
+        Assert.AreEqual(1, converted.Count);
+        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].Content.Key);
+        Assert.AreEqual(UdiParser.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), converted[0].ContentUdi);
+        Assert.AreEqual(ContentAlias1, converted[0].Content.ContentType.Alias);
+        Assert.AreEqual(Guid.Parse("2D3529ED-B47B-4B10-9F6D-4B802DD5DFE2"), converted[0].Settings.Key);
+        Assert.AreEqual(UdiParser.Parse("umb://element/2D3529EDB47B4B109F6D4B802DD5DFE2"), converted[0].SettingsUdi);
+        Assert.AreEqual(SettingAlias1, converted[0].Settings.ContentType.Alias);
+    }
+
+    [Test]
+    public void Can_Convert_Without_Settings()
+    {
+        var editor = CreateConverter();
+        var config = ConfigForSingle();
+        var propertyType = GetPropertyType(config);
+        var publishedElement = Mock.Of<IPublishedElement>();
+
+        var json = @"
+{
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockGrid + @""": [
+            {
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D"",
+                ""rowSpan"": 1,
+                ""columnSpan"": 12,
+                ""areas"": []
+            }
+        ]
+    },
+    ""contentData"": [
+        {
+            ""contentTypeKey"": """ + ContentKey1 + @""",
+            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+        }
+    ]
+}";
+        var converted =
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
+                BlockGridModel;
+
+        Assert.IsNotNull(converted);
+        Assert.AreEqual(1, converted.Count);
+        var item0 = converted[0].Content;
+        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
+        Assert.AreEqual(UdiParser.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), converted[0].ContentUdi);
+        Assert.AreEqual("Test1", item0.ContentType.Alias);
+        Assert.IsNull(converted[0].Settings);
+    }
+
+    [Test]
+    public void Ignores_Other_Layouts()
+    {
+        var editor = CreateConverter();
+        var config = ConfigForSingle();
+        var propertyType = GetPropertyType(config);
+        var publishedElement = Mock.Of<IPublishedElement>();
+
+        var json = @"
+{
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockGrid + @""": [
+            {
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D"",
+                ""rowSpan"": 1,
+                ""columnSpan"": 12,
+                ""areas"": []
+            }
+        ],
+       """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
+            {
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+            }
+        ],
+        ""Some.Custom.BlockEditor"": [
+            {
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+            }
+        ]
+    },
+    ""contentData"": [
+        {
+            ""contentTypeKey"": """ + ContentKey1 + @""",
+            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
+        }
+    ]
+}";
+        var converted =
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
+                BlockGridModel;
+
+        Assert.IsNotNull(converted);
+        Assert.AreEqual(1, converted.Count);
+        var item0 = converted[0].Content;
+        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
+        Assert.AreEqual(UdiParser.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), converted[0].ContentUdi);
+        Assert.AreEqual("Test1", item0.ContentType.Alias);
+        Assert.IsNull(converted[0].Settings);
+    }
+
     private BlockGridPropertyValueConverter CreateConverter()
     {
         var publishedSnapshotAccessor = GetPublishedSnapshotAccessor();
@@ -36,14 +174,14 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = new BlockGridPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
-            new JsonNetSerializer(),
+            new SystemTextJsonSerializer(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new BlockGridPropertyValueConstructorCache());
         return editor;
     }
 
-    private BlockGridConfiguration ConfigForSingle() => new()
+    private BlockGridConfiguration ConfigForSingle(Guid? settingsElementTypeKey = null) => new()
     {
-        Blocks = new[] { new BlockGridConfiguration.BlockGridBlockConfiguration { ContentElementTypeKey = ContentKey1 } },
+        Blocks = new[] { new BlockGridConfiguration.BlockGridBlockConfiguration { ContentElementTypeKey = ContentKey1, SettingsElementTypeKey = settingsElementTypeKey} },
     };
 }

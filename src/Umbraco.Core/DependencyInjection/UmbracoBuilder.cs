@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Dictionary;
@@ -19,7 +18,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
@@ -35,7 +33,13 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.Security.Authorization;
+using Umbraco.Cms.Core.Services.FileSystem;
+using Umbraco.Cms.Core.Services.ImportExport;
+using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -185,22 +189,16 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<UmbracoRequestPaths>();
 
-            Services.AddSingleton<InstallStatusTracker>();
-
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
 
             Services.AddSingleton<UriUtility>();
 
-            Services.AddUnique<IDashboardService, DashboardService>();
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
             Services.AddUnique<IInstallationService, InstallationService>();
             Services.AddUnique<IUpgradeService, UpgradeService>();
-
-            // Grid config is not a real config file as we know them
-            Services.AddUnique<IGridConfig, GridConfig>();
 
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
             Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
@@ -219,8 +217,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            Services.AddUnique<ITreeService, TreeService>();
-            Services.AddUnique<ISectionService, SectionService>();
 
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
             Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
@@ -243,7 +239,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<MediaPermissions>();
 
             Services.AddSingleton<PropertyEditorCollection>();
-            Services.AddSingleton<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar
             Services.AddUnique<IServerRoleAccessor>(f =>
@@ -261,7 +256,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
 
             Services
+                .AddNotificationAsyncHandler<MemberGroupSavingNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
+                .AddNotificationAsyncHandler<MemberGroupDeletingNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
@@ -279,34 +276,71 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IKeyValueService, KeyValueService>();
             Services.AddUnique<IPublicAccessService, PublicAccessService>();
             Services.AddUnique<IContentVersionService, ContentVersionService>();
+            Services.AddUnique<IUserGroupPermissionService, UserGroupPermissionService>();
+            Services.AddUnique<IUserGroupService, UserGroupService>();
+            Services.AddUnique<IUserPermissionService, UserPermissionService>();
             Services.AddUnique<IUserService, UserService>();
+            Services.AddUnique<IWebProfilerService, WebProfilerService>();
             Services.AddUnique<ILocalizationService, LocalizationService>();
-            Services.AddUnique<IMacroService, MacroService>();
+            Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
+            Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
+            Services.AddUnique<IContentTypeContainerService, ContentTypeContainerService>();
+            Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
+            Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
+            Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
+            Services.AddUnique<ICultureService, CultureService>();
+            Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMemberGroupService, MemberGroupService>();
             Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
             Services.AddUnique<IConsentService, ConsentService>();
             Services.AddUnique<IPropertyValidationService, PropertyValidationService>();
             Services.AddUnique<IDomainService, DomainService>();
             Services.AddUnique<ITagService, TagService>();
+            Services.AddUnique<IContentPermissionService, ContentPermissionService>();
+            Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
+            Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
+            Services.AddUnique<IContentEditingService, ContentEditingService>();
+            Services.AddUnique<IContentPublishingService, ContentPublishingService>();
+            Services.AddUnique<IContentValidationService, ContentValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
+            Services.AddUnique<IMemberValidationService, MemberValidationService>();
+            Services.AddUnique<IMediaPermissionService, MediaPermissionService>();
             Services.AddUnique<IMediaService, MediaService>();
+            Services.AddUnique<IMediaEditingService, MediaEditingService>();
+            Services.AddUnique<IMediaValidationService, MediaValidationService>();
             Services.AddUnique<IContentTypeService, ContentTypeService>();
             Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
             Services.AddUnique<IMediaTypeService, MediaTypeService>();
+            Services.AddUnique<IContentTypeEditingService, ContentTypeEditingService>();
+            Services.AddUnique<IMediaTypeEditingService, MediaTypeEditingService>();
             Services.AddUnique<IFileService, FileService>();
+            Services.AddUnique<ITemplateService, TemplateService>();
+            Services.AddUnique<IScriptService, ScriptService>();
+            Services.AddUnique<IStylesheetService, StylesheetService>();
+            Services.AddUnique<IStylesheetFolderService, StylesheetFolderService>();
+            Services.AddUnique<IPartialViewService, PartialViewService>();
+            Services.AddUnique<IScriptFolderService, ScriptFolderService>();
+            Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();
+            Services.AddUnique<ITemporaryFileService, TemporaryFileService>();
+            Services.AddUnique<ITemplateContentParserService, TemplateContentParserService>();
             Services.AddUnique<IEntityService, EntityService>();
+            Services.AddUnique<IOEmbedService, OEmbedService>();
             Services.AddUnique<IRelationService, RelationService>();
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
+            Services.AddUnique<IMemberContentEditingService, MemberContentEditingService>();
+            Services.AddUnique<IMemberTypeEditingService, MemberTypeEditingService>();
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
+            Services.AddUnique<ITreeEntitySortingService, TreeEntitySortingService>();
             Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
                 factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
                 factory.GetRequiredService<IExternalLoginWithKeyRepository>()
             ));
+            Services.AddUnique<ILogViewerService, LogViewerService>();
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
@@ -316,6 +350,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
+            Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
+            Services.AddUnique<IPreviewService, PreviewService>();
 
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
@@ -327,6 +363,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
             Services.AddUnique<IDictionaryService, DictionaryService>();
             Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
+            Services.AddUnique<IMediaImportService, MediaImportService>();
 
             // Register filestream security analyzers
             Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
@@ -341,6 +378,31 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
             Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
+
+            // Two factor providers
+            Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
+            Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+
+            // Add Query services
+            Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
+            Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
+
+            // Authorizers
+            Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
+            Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
+            Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
+            Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
+            Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
+            Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
+            Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
+
+            // Segments
+            Services.AddUnique<ISegmentService, NoopSegmentService>();
+            
+            // definition Import/export
+            Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
+            Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
+            Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
         }
     }
 }

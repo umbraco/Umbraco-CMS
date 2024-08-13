@@ -17,6 +17,10 @@ public class DataTypeDto
     [Column("propertyEditorAlias")]
     public string EditorAlias { get; set; } = null!; // TODO: should this have a length
 
+    [Column("propertyEditorUiAlias")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? EditorUiAlias { get; set; }
+
     [Column("dbType")]
     [Length(50)]
     public string DbType { get; set; } = null!;

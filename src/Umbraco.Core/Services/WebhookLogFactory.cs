@@ -16,7 +16,7 @@ public class WebhookLogFactory : IWebhookLogFactory
             Url = webhook.Url,
             WebhookKey = webhook.Key,
             RetryCount = retryCount,
-            RequestHeaders = requestMessage.Headers.ToString(),
+            RequestHeaders = $"{requestMessage.Content?.Headers}{requestMessage.Headers}",
             RequestBody = await requestMessage.Content?.ReadAsStringAsync(cancellationToken)!,
             ExceptionOccured = exception is not null,
         };
@@ -24,7 +24,8 @@ public class WebhookLogFactory : IWebhookLogFactory
         if (httpResponseMessage is not null)
         {
             log.StatusCode = MapStatusCodeToMessage(httpResponseMessage.StatusCode);
-            log.ResponseHeaders = httpResponseMessage.Headers.ToString();
+            log.IsSuccessStatusCode = httpResponseMessage.IsSuccessStatusCode;
+            log.ResponseHeaders = $"{httpResponseMessage.Content.Headers}{httpResponseMessage.Headers}";
             log.ResponseBody = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
         }
         else if (exception is HttpRequestException httpRequestException)

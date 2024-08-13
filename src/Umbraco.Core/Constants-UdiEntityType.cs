@@ -29,14 +29,12 @@ public static partial class Constants
         public const string Member = "member";
 
         public const string DictionaryItem = "dictionary-item";
-        public const string Macro = "macro";
         public const string Template = "template";
 
         public const string DocumentType = "document-type";
         public const string DocumentTypeContainer = "document-type-container";
 
-        // TODO: What is this? This alias is only used for the blue print tree to render the blueprint's document type, it's not a real udi type
-        public const string DocumentTypeBluePrints = "document-type-blueprints";
+        public const string DocumentBlueprintContainer = "document-blueprint-container";
         public const string MediaType = "media-type";
         public const string MediaTypeContainer = "media-type-container";
         public const string DataType = "data-type";
@@ -57,12 +55,10 @@ public static partial class Constants
         public const string AnyString = "any-string"; // that one is for tests
 
         public const string Language = "language";
-        public const string MacroScript = "macroscript";
         public const string MediaFile = "media-file";
         public const string TemplateFile = "template-file";
         public const string Script = "script";
         public const string Stylesheet = "stylesheet";
         public const string PartialView = "partial-view";
-        public const string PartialViewMacro = "partial-view-macro";
     }
 }

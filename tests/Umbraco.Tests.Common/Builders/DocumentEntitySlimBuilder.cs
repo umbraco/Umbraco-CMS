@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
@@ -20,7 +19,6 @@ public class DocumentEntitySlimBuilder
         IWithSortOrderBuilder,
         IWithParentIdBuilder
 {
-    private GenericDictionaryBuilder<DocumentEntitySlimBuilder, string, object> _additionalDataBuilder;
     private string _contentTypeAlias;
     private string _contentTypeIcon;
     private string _contentTypeThumbnail;
@@ -128,13 +126,6 @@ public class DocumentEntitySlimBuilder
         return this;
     }
 
-    public GenericDictionaryBuilder<DocumentEntitySlimBuilder, string, object> AddAdditionalData()
-    {
-        var builder = new GenericDictionaryBuilder<DocumentEntitySlimBuilder, string, object>(this);
-        _additionalDataBuilder = builder;
-        return builder;
-    }
-
     public override DocumentEntitySlim Build()
     {
         var id = _id ?? 1;
@@ -171,15 +162,6 @@ public class DocumentEntitySlimBuilder
             HasChildren = hasChildren,
             Published = published
         };
-
-        if (_additionalDataBuilder != null)
-        {
-            var additionalData = _additionalDataBuilder.Build();
-            foreach (var kvp in additionalData)
-            {
-                documentEntitySlim.AdditionalData.Add(kvp.Key, kvp.Value);
-            }
-        }
 
         return documentEntitySlim;
     }

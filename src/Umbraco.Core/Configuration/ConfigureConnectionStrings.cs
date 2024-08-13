@@ -41,7 +41,6 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
             return;
         }
 
-        options.Name = name;
         options.ConnectionString = _configuration.GetUmbracoConnectionString(name, out string? providerName);
         options.ProviderName = providerName ??
                                ConnectionStrings.DefaultProviderName;

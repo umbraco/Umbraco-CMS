@@ -29,7 +29,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     private string? _description;
     private bool _hasPropertyTypeBeenRemoved;
     private string? _icon = "icon-folder";
-    private bool _isContainer;
+    private Guid? _listView;
     private bool _isElement;
     private PropertyGroupCollection _propertyGroups;
     private string? _thumbnail = "folder.png";
@@ -182,17 +182,13 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         set => SetPropertyValueAndDetectChanges(value, ref _allowedAsRoot, nameof(AllowedAsRoot));
     }
 
-    /// <summary>
-    ///     Gets or Sets a boolean indicating whether this ContentType is a Container
-    /// </summary>
-    /// <remarks>
-    ///     ContentType Containers doesn't show children in the tree, but rather in grid-type view.
-    /// </remarks>
+
+    /// <inheritdoc />
     [DataMember]
-    public bool IsContainer
+    public Guid? ListView
     {
-        get => _isContainer;
-        set => SetPropertyValueAndDetectChanges(value, ref _isContainer, nameof(IsContainer));
+        get => _listView;
+        set => SetPropertyValueAndDetectChanges(value, ref _listView, nameof(ListView));
     }
 
     /// <inheritdoc />

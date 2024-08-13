@@ -18,8 +18,6 @@ internal class PartialViewRepository : FileRepository<string, IPartialView>, IPa
     {
     }
 
-    protected virtual PartialViewType ViewType => PartialViewType.PartialView;
-
     public override IPartialView? Get(string? id)
     {
         if (FileSystem is null)
@@ -41,7 +39,7 @@ internal class PartialViewRepository : FileRepository<string, IPartialView>, IPa
         DateTime updated = FileSystem.GetLastModified(path).UtcDateTime;
 
         // var content = GetFileContent(path);
-        var view = new PartialView(ViewType, path, file => GetFileContent(file.OriginalPath))
+        var view = new PartialView(path, file => GetFileContent(file.OriginalPath))
         {
             // id can be the hash
             Id = path.GetHashCode(),
@@ -62,10 +60,6 @@ internal class PartialViewRepository : FileRepository<string, IPartialView>, IPa
     public override void Save(IPartialView entity)
     {
         var partialView = entity as PartialView;
-        if (partialView != null)
-        {
-            partialView.ViewType = ViewType;
-        }
 
         base.Save(entity);
 
