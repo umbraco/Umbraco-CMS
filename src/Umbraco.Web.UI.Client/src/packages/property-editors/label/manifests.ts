@@ -10,7 +10,7 @@ export const manifests: Array<ManifestTypes> = [
 		meta: {
 			label: 'Label',
 			icon: 'icon-readonly',
-			group: 'pickers',
+			group: 'common',
 			propertyEditorSchemaAlias: 'Umbraco.Label',
 			supportsReadOnly: true,
 		},

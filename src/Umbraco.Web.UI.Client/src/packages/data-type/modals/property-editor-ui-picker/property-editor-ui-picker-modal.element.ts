@@ -1,37 +1,28 @@
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
-interface GroupedPropertyEditorUIs {
-	[key: string]: Array<ManifestPropertyEditorUi>;
-}
 @customElement('umb-property-editor-ui-picker-modal')
 export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalValue
 > {
 	@state()
-	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};
+	private _groupedPropertyEditorUIs: Array<{ key: string; items: Array<ManifestPropertyEditorUi> }> = [];
 
 	@state()
 	private _propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
-	@state()
-	private _submitLabel = 'Select';
-
 	override connectedCallback(): void {
 		super.connectedCallback();
-
-		// TODO: We never parse on a submit label, so this seem weird as we don't enable this of other places.
-		//this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 
 		this.#usePropertyEditorUIs();
 	}
@@ -39,103 +30,102 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	#usePropertyEditorUIs() {
 		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
-			this._propertyEditorUIs = propertyEditorUIs.filter(
-				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
-			);
+			this._propertyEditorUIs = propertyEditorUIs
+				.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias)
+				.sort((a, b) => a.meta.label.localeCompare(b.meta.label));
 
-			// TODO: groupBy is not known by TS yet
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
-			this._groupedPropertyEditorUIs = Object.groupBy(
-				this._propertyEditorUIs,
-				(propertyEditorUi: ManifestPropertyEditorUi) => propertyEditorUi.meta.group,
-			);
+			this.#groupPropertyEditorUIs(this._propertyEditorUIs);
 		});
 	}
 
 	#handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		this.#select(propertyEditorUi.alias);
-	}
-
-	#select(alias: string) {
-		this.value = { selection: [alias] };
+		this.value = { selection: [propertyEditorUi.alias] };
+		this._submitModal();
 	}
 
 	#handleFilterInput(event: UUIInputEvent) {
-		let query = (event.target.value as string) || '';
-		query = query.toLowerCase();
+		const query = ((event.target.value as string) || '').toLowerCase();
 
 		const result = !query
 			? this._propertyEditorUIs
-			: this._propertyEditorUIs.filter((propertyEditorUI) => {
-					return (
-						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query)
-					);
-				});
+			: this._propertyEditorUIs.filter(
+					(propertyEditorUI) =>
+						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query),
+				);
 
-		// TODO: groupBy is not known by TS yet
+		this.#groupPropertyEditorUIs(result);
+	}
+
+	#groupPropertyEditorUIs(items: Array<ManifestPropertyEditorUi>) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
-		this._groupedPropertyEditorUIs = Object.groupBy(
-			result,
-			(propertyEditorUI: ManifestPropertyEditorUi) => propertyEditorUI.meta.group,
+		const grouped = Object.groupBy(items, (propertyEditorUi: ManifestPropertyEditorUi) =>
+			fromCamelCase(propertyEditorUi.meta.group),
 		);
+
+		this._groupedPropertyEditorUIs = Object.keys(grouped)
+			.sort((a, b) => a.localeCompare(b))
+			.map((key) => ({ key, items: grouped[key] }));
 	}
 
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('propertyEditorPicker_openPropertyEditorPicker')}>
-				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
+				<uui-box>${this.#renderFilter()} ${this.#renderGrid()}</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
-					<uui-button
-						label="${this._submitLabel}"
-						look="primary"
-						color="positive"
-						@click=${this._submitModal}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
 	}
 
-	private _renderFilter() {
-		return html` <uui-input
-			type="search"
-			id="filter"
-			@input="${this.#handleFilterInput}"
-			placeholder="Type to filter..."
-			label="Type to filter icons"
-			${umbFocus()}>
-			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
-		</uui-input>`;
+	#renderFilter() {
+		return html`
+			<uui-input
+				type="search"
+				id="filter"
+				@input=${this.#handleFilterInput}
+				placeholder=${this.localize.term('placeholders_filter')}
+				label=${this.localize.term('placeholders_filter')}
+				${umbFocus()}>
+				<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
+			</uui-input>
+		`;
 	}
 
-	private _renderGrid() {
-		return html` ${Object.entries(this._groupedPropertyEditorUIs).map(
-			([key, value]) =>
-				html` <h4>${key}</h4>
-					${this._renderGroupItems(value)}`,
-		)}`;
-	}
-
-	private _renderGroupItems(groupItems: Array<ManifestPropertyEditorUi>) {
-		return html` <ul id="item-grid">
+	#renderGrid() {
+		return html`
 			${repeat(
-				groupItems,
-				(propertyEditorUI) => propertyEditorUI.alias,
-				(propertyEditorUI) =>
-					html` <li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
-						<button type="button" @click="${() => this.#handleClick(propertyEditorUI)}">
-							<umb-icon name="${propertyEditorUI.meta.icon}" class="icon"></umb-icon>
-							${propertyEditorUI.meta.label || propertyEditorUI.name}
-						</button>
-					</li>`,
+				this._groupedPropertyEditorUIs,
+				(group) => group.key,
+				(group) => html`
+					<h4>${group.key}</h4>
+					${this.#renderGroupItems(group.items)}
+				`,
 			)}
-		</ul>`;
+		`;
+	}
+
+	#renderGroupItems(groupItems: Array<ManifestPropertyEditorUi>) {
+		return html`
+			<ul id="item-grid">
+				${repeat(
+					groupItems,
+					(propertyEditorUI) => propertyEditorUI.alias,
+					(propertyEditorUI) => html`
+						<li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
+							<button type="button" @click=${() => this.#handleClick(propertyEditorUI)}>
+								<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
+								${propertyEditorUI.meta.label || propertyEditorUI.name}
+							</button>
+						</li>
+					`,
+				)}
+			</ul>
+		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			#filter {
 				width: 100%;
