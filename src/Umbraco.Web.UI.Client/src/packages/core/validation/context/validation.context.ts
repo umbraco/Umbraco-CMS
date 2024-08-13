@@ -22,7 +22,6 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
 	translationDataOf(path: string): any {
-		console.log('GetValueByJsonPath', path);
 		return this.#translationData.asObservablePart((data) => GetValueByJsonPath(data, path));
 	}
 	setTranslationData(data: any): void {
@@ -72,10 +71,13 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 
 	setDataPath(dataPath: string): void {
 		if (this.#baseDataPath) {
+			if (this.#baseDataPath === dataPath) return;
+			console.log(this.#baseDataPath, dataPath);
 			// Just fire an error, as I haven't made the right clean up jet. Or haven't thought about what should happen if it changes while already setup.
 			// cause maybe all the messages should be removed as we are not interested in the old once any more. But then on the other side, some might be relevant as this is the same entity that changed its paths?
 			throw new Error('Data path is already set, we do not support changing the context data-path as of now.');
 		}
+		if (!dataPath) return;
 		this.#baseDataPath = dataPath;
 
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (parent) => {
@@ -87,9 +89,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 
 			this.messages.clear();
 
-			console.log('observe path', dataPath);
 			this.observe(parent.translationDataOf(dataPath), (data) => {
-				console.log('got data', data);
 				this.setTranslationData(data);
 			});
 

@@ -36,6 +36,10 @@ export class UmbBlockElementDataValidationPathTranslator extends UmbValidationPa
 		const data = this._context.getTranslationData();
 
 		const specificValue = data[this.#propertyName][index];
+		if (!specificValue || !specificValue.udi) {
+			console.log('block did not have UDI', this.#propertyName, index, data);
+			return false;
+		}
 		// replace the values[ number ] with JSON-Path filter values[@.(...)], continues by the rest of the path:
 		return this.#pathStart + UmbDataPathBlockElementDataFilter(specificValue) + path.substring(path.indexOf(']'));
 	}

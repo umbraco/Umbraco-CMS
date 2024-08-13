@@ -32,9 +32,11 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		super(host);
 
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
-		this.observe(this.unique, (udi) =>
-			this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.udi = '${udi}')]`),
-		);
+		this.observe(this.unique, (udi) => {
+			if (udi) {
+				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.udi = '${udi}')]`);
+			}
+		});
 	}
 
 	reset() {
