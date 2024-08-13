@@ -26,7 +26,6 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <Target Name="BuildBellePreconditions" BeforeTargets="Build">
   <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="Build">
     <Message Text="Skip BuildBellissima target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip BuildBellissima target because '$(BellissimaPath)' already exists" Importance="high" Condition="Exists('$(BellissimaPath)')" />
