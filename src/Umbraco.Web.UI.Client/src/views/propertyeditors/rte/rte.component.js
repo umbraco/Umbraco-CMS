@@ -264,7 +264,7 @@
                         },
                         culture: vm.umbProperty?.culture ?? null,
                         segment: vm.umbProperty?.segment ?? null,
-                      blockEditorApi: vm.noBlocksMode ? undefined : vm.blockEditorApi,
+                        blockEditorApi: vm.noBlocksMode ? undefined : vm.blockEditorApi,
                         parentForm: vm.propertyForm,
                         valFormManager: vm.valFormManager,
                         currentFormInput: $scope.rteForm.modelValue
@@ -948,7 +948,19 @@
           return undefined;
         }
 
-        return vm.layout[layoutIndex].$block;
+        var layoutEntry = vm.layout[layoutIndex];
+        if(layoutEntry.$block === undefined || layoutEntry.$block.config === undefined) {
+           // make block model
+           var blockObject = getBlockObject(layoutEntry);
+           if (blockObject === null) {
+               // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
+               return false;
+           }
+
+           // set the BlockObject on our layout entry.
+           layoutEntry.$block = blockObject;
+        }
+        return layoutEntry.$block;
     }
 
       vm.blockEditorApi = {

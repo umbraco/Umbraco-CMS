@@ -1543,6 +1543,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
               blockEl.$index = block.index;
               blockEl.$block = block;
               blockEl.update();
+            } else {
+              console.error('Could not find block with content udi: ' + blockContentUdi);
             }
           }
         }
