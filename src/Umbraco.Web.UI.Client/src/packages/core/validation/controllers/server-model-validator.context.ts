@@ -2,7 +2,7 @@ import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { UmbDataPathPropertyValueFilter } from '../utils/data-path-property-value-filter.function.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '../const.js';
-import { UMB_SERVER_MODEL_VALIDATION_CONTEXT } from './server-model-validation.context-token.js';
+import { UMB_SERVER_MODEL_VALIDATOR_CONTEXT } from './server-model-validator.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
@@ -18,8 +18,8 @@ interface ValidateErrorResponseBodyModel {
 	type: string;
 }
 
-export class UmbServerModelValidationContext
-	extends UmbContextBase<UmbServerModelValidationContext>
+export class UmbServerModelValidatorContext
+	extends UmbContextBase<UmbServerModelValidatorContext>
 	implements UmbValidator
 {
 	#validatePromise?: Promise<void>;
@@ -34,7 +34,7 @@ export class UmbServerModelValidationContext
 	}
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SERVER_MODEL_VALIDATION_CONTEXT);
+		super(host, UMB_SERVER_MODEL_VALIDATOR_CONTEXT);
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
 			if (this.#context) {
 				this.#context.removeValidator(this);

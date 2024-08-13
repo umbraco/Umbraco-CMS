@@ -28,22 +28,40 @@ As well Tabs and other navigation can use this to be highlighted, so the user ca
 
 The Path, points to the location of the model that the message is concerning.
 
-The following models headline is too long, which can be target with this path:
+The following models headline can be target with this path:
 
 Data:
 ```
 {
-	type: "client",
-	path: "$.values[?(@.alias = 'my-property-alias')].value",
-	message: "Must contain at least 3 words"
+	settings: {
+		title: 'too short'
+	}
 }
 ```
 
 JsonPath:
 ```
-"$.values[?(@.alias = 'my-property-alias')].value"
+"$.settings.title"
 ```
 
+The following example shows how we use JsonPath Queries to target entries of an array:
+
+Data:
+```
+{
+	values: [
+		{
+			alias: 'my-alias',
+			value: 'my-value'
+		}
+	]
+}
+```
+
+JsonPath:
+```
+"$.values.[?(@.alias = 'my-alias')].value"
+```
 
 Paths are based on JSONPath, using JSON Path Queries when looking up data of an Array. Using Queries enables Paths to not point to specific index, but what makes a entry unique.
 
@@ -62,3 +80,5 @@ We provide a few built in Validators which handles most cases.
 ### Form Control Validator
 
 This Validator binds a Form Control Element with the Validation Context. When the Form Control becomes Invalid, its Validation Message is appended to the Validation Context.
+
+### Server Model Validator

@@ -53,7 +53,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
-	UmbServerModelValidationContext,
+	UmbServerModelValidatorContext,
 	UmbValidationContext,
 	UmbVariantValuesValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
@@ -91,7 +91,7 @@ export class UmbDocumentWorkspaceContext
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
 
-	#serverValidation = new UmbServerModelValidationContext(this);
+	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepository?: UmbDocumentValidationRepository;
 
 	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
