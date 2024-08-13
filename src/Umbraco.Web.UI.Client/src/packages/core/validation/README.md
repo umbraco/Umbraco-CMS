@@ -24,9 +24,10 @@ Because each validation issue is presented in the Validation Context as a Messag
 One benefit of this is that Elements that are removed from screen can still have their validation messages preventing the submission of a dataset.
 As well Tabs and other navigation can use this to be highlighted, so the user can be guide to the location.
 
-### Path
+### Path aka. Data Path
 
-The Path, points to the location of the model that the message is concerning.
+The Path also named Data Path, A Path pointing to the related data in the model.
+A massage uses this to point to the location in the model that the message is concerned.
 
 The following models headline can be target with this path:
 
@@ -91,9 +92,9 @@ This is needed to allow the user to make changes to the data, without loosing th
 
 ## Validation Path Translator
 
-Validation Path Translator translate Message Paths into a format that works while manipulating the model.
-This enables the user to retrieve validation messages from the server regarding entries of a list, and then the user can insert more items and still have the validation appearing in the right spots.
-This would not be possible with index based paths, which is why we translate them into JSON Path Queries.
+Validation Path Translator translate Message Paths into a format that is independent of the actual current data. But compatible with mutations of that data model.
+This enables the user to retrieve validation messages from the server, and then the user can insert more items and still have the validation appearing in the right spots.
+This would not be possible with index based paths, which is why we translate those into JSON Path Queries.
 
 Such conversation could be from this path:
 ```
@@ -104,3 +105,13 @@ To this path:
 ```
 "$.values.[?(@.alias = 'my-alias')].value"
 ```
+
+Once this path is converted to use Json Path Queries, the Data can be changed. The concerned entry might get another index. Without that affecting the accuracy of the path.
+
+### Late registered Path Translators
+
+Translators can be registered late. This means that a Property Editor that has a complex value structure, can register a Path Translator for its part of the data. Such Translator will appear late because the Property might not be rendered in the users current view, but first when the user navigates there.
+This is completely fine, as messages can be partly translated and then enhanced by late coming Path Translators.
+
+This fact enables a property to observe if there is any Message Paths that start with the same path as the Data Path for the Property. In this was a property can know that it contains a Validation Message without the Message Path begin completely translated.
+

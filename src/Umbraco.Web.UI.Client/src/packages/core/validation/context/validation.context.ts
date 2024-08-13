@@ -15,6 +15,11 @@ function ReplaceStartOfString(path: string, startFrom: string, startTo: string):
 	return path;
 }
 
+/**
+ * Validation Context is the core of Validation.
+ * It hosts Validators that has to validate for the context to be valid.
+ * It can also be used as a Validator as part of a parent Validation Context.
+ */
 export class UmbValidationContext extends UmbControllerBase implements UmbValidator {
 	// The current provider controller, that is providing this context:
 	#providerCtrl?: UmbContextProviderController<UmbValidationContext, UmbValidationContext, UmbValidationContext>;
@@ -47,10 +52,18 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 		super(host);
 	}
 
+	/**
+	 * Add a path translator to this validation context.
+	 * @param translator
+	 */
 	async addTranslator(translator: UmbValidationMessageTranslator) {
 		this.messages.addTranslator(translator);
 	}
 
+	/**
+	 * Remove a path translator from this validation context.
+	 * @param translator
+	 */
 	async removeTranslator(translator: UmbValidationMessageTranslator) {
 		this.messages.removeTranslator(translator);
 	}
@@ -64,11 +77,33 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 		this.provideContext(UMB_VALIDATION_CONTEXT, this);
 		return this;
 	}
+	/**
+	 * Provide this validation context to a specific controller host.
+	 * This can be used to Host a validation context in a Workspace, but provide it on a certain scope, like a specific Workspace View.
+	 * @param controllerHost {UmbClassInterface}
+	 */
 	provideAt(controllerHost: UmbClassInterface): void {
 		this.#providerCtrl?.destroy();
 		this.#providerCtrl = controllerHost.provideContext(UMB_VALIDATION_CONTEXT, this);
 	}
 
+	/**
+	 * Define a specific data path for this validation context.
+	 * This will turn this validation context into a sub-context of the parent validation context.
+	 * This means that a two-way binding for messages will be established between the parent and the sub-context.
+	 * And it will inherit the Translation Data from its parent.
+	 *
+	 * messages and data will be localizes accordingly to the given data path.
+	 * @param dataPath {string} - The data path to bind this validation context to.
+	 * @returns
+	 * @example
+	 * ```ts
+	 * const validationContext = new UmbValidationContext(host);
+	 * validationContext.setDataPath("$.values[?(@.alias='my-property')].value");
+	 * ```
+	 *
+	 * A message with the path: '$.values[?(@.alias='my-property')].value.innerProperty', will for above example become '$.innerProperty' for the local Validation Context.
+	 */
 	setDataPath(dataPath: string): void {
 		if (this.#baseDataPath) {
 			if (this.#baseDataPath === dataPath) return;
@@ -106,7 +141,6 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 					}
 					this.#parentMessages = msgs;
 					msgs.forEach((msg) => {
-						// TODO: Subtract the base path from the path, so it becomes local to this context:
 						const path = ReplaceStartOfString(msg.path, this.#baseDataPath!, '$');
 						// Notice, the local message uses the same key. [NL]
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
@@ -129,7 +163,6 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 					}
 					this.#localMessages = msgs;
 					msgs.forEach((msg) => {
-						// TODO: Prefix the base path from our base path, so it fits in the parent context:
 						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
 						const path = ReplaceStartOfString(msg.path, '$', this.#baseDataPath!);
 						// Notice, the parent message uses the same key. [NL]
@@ -138,25 +171,24 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 				},
 				'observeLocalMessages',
 			);
-
-			// observe if one of the locals got removed.
-			// It can maybe be done with one set of known/gotten parent messages, that then can be used to detect which are removed. Maybe from both sides.
-
-			// Benefits for workspaces:
-			// — The workspace can be validated locally, and then the messages can propagate to parent context. (Do we even want that?)
-			// — The workspace can easier know about its validation state
-			// — Its the only way the sub-workspace can be validated without triggering the whole validation.
-			// - The workspace can inherit messages from parent context... — which is good for Blocks
-			// - The workspace can have its own server messages, that is propagated to parent context.
-			// - The workspace can inherit server messages from parent context... — server validation of a block, that is part of the parent workspace.
-			// - Remove parent messages if they go away again if they gets remove here.
 		}).skipHost();
+		// Notice skipHost ^^, this is because we do not want it to consume it self, as this would be a match for this consumption, instead we will look at the parent and above. [NL]
 	}
 
+	/**
+	 * Get if this context is valid.
+	 * Notice this does not verify the validity.
+	 */
 	get isValid(): boolean {
 		return this.#isValid;
 	}
 
+	/**
+	 * Add a validator to this context.
+	 * This validator will have to be valid for the context to be valid.
+	 * If the context is in validation mode, the validator will be validated immediately.
+	 * @param validator { UmbValidator } - The validator to add to this context.
+	 */
 	addValidator(validator: UmbValidator): void {
 		if (this.#validators.includes(validator)) return;
 		this.#validators.push(validator);
@@ -166,6 +198,10 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 		}
 	}
 
+	/**
+	 * Remove a validator from this context.
+	 * @param validator {UmbValidator} - The validator to remove from this context.
+	 */
 	removeValidator(validator: UmbValidator): void {
 		const index = this.#validators.indexOf(validator);
 		if (index !== -1) {
@@ -179,7 +215,8 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 	}
 
 	/**
-	 *
+	 * Validate this context, all the validators of this context will be validated.
+	 * Notice its a recursive check meaning sub validation contexts also validates their validators.
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
 	 */
 	async validate(): Promise<void> {
@@ -206,6 +243,9 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 		return Promise.resolve();
 	}
 
+	/**
+	 * Focus the first invalid element that this context can find.
+	 */
 	focusFirstInvalidElement(): void {
 		const firstInvalid = this.#validators.find((v) => !v.isValid);
 		if (firstInvalid) {
@@ -213,6 +253,9 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 		}
 	}
 
+	/**
+	 * Reset the validation state of this context.
+	 */
 	reset(): void {
 		this.#validationMode = false;
 		this.#validators.forEach((v) => v.reset());
