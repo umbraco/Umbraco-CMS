@@ -97,7 +97,7 @@ test('can choose start node for the content picker in the content', async ({umbr
   const childContentPickerName = 'TestChildContentPicker';
   await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
-  const contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
+  contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with start node
@@ -128,7 +128,7 @@ test.skip('can ignore user start node for the content picker in the content', as
   const childContentPickerName = 'TestChildContentPicker';
   await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
-  const contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
+  contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with the setting "ignore user start node" is enable
