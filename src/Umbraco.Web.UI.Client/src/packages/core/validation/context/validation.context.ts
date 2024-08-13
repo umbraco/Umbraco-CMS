@@ -109,7 +109,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 						// TODO: Subtract the base path from the path, so it becomes local to this context:
 						const path = ReplaceStartOfString(msg.path, this.#baseDataPath!, '$');
 						// Notice, the local message uses the same key. [NL]
-						this.messages.addMessage(msg.type, path, msg.message, msg.key);
+						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
 				},
 				'observeParentMessages',
@@ -133,7 +133,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 						// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
 						const path = ReplaceStartOfString(msg.path, '$', this.#baseDataPath!);
 						// Notice, the parent message uses the same key. [NL]
-						this.#parent!.messages.addMessage(msg.type, path, msg.message, msg.key);
+						this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
 				},
 				'observeLocalMessages',

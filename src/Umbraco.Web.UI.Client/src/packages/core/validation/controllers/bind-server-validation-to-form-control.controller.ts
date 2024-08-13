@@ -66,7 +66,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 		if (!this.#controlValidator) {
 			this.#controlValidator = this.#control.addValidator(
 				'customError',
-				() => this.#messages.map((x) => x.message).join(', '),
+				() => this.#messages.map((x) => x.body).join(', '),
 				() => !this.#isValid,
 			);
 			//this.#control.addEventListener('change', this.#onControlChange);
