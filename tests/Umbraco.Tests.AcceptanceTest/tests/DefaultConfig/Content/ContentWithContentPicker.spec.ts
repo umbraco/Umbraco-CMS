@@ -63,6 +63,7 @@ test('can publish content with the content picker data type', async ({umbracoApi
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
   expect(contentData.values[0].value).toEqual(contentPickerId);
 });
 
