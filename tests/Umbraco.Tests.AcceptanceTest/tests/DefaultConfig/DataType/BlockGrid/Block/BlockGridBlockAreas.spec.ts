@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
-test('can update grid columns for areas for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update grid columns for areas for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const griColumns = 6;
@@ -37,7 +37,7 @@ test('can update grid columns for areas for a block', async ({page, umbracoApi, 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaGridColumns(blockGridEditorName, contentElementTypeId, griColumns)).toBeTruthy();
 });
 
-test('can add an area for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -53,11 +53,11 @@ test('can add an area for a block', async ({page, umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible()
+  await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-// TODO: unskip, issues selecing locator
+// TODO: There are currently issues when trying to select the locator.
 test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -71,7 +71,7 @@ test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToBlockAreasTab();
 });
 
-test('can update alias an area for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update alias an area for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -94,8 +94,8 @@ test('can update alias an area for a block', async ({page, umbracoApi, umbracoUi
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, newAlias)).toBeTruthy();
 });
 
-test('can remove an area for a block', async ({page, umbracoApi, umbracoUi}) => {
-// Arrange
+test('can remove an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -115,7 +115,7 @@ test('can remove an area for a block', async ({page, umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, areaAlias)).toBeFalsy();
 });
 
-test('can add multiple areas for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add multiple areas for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -132,12 +132,12 @@ test('can add multiple areas for a block', async ({page, umbracoApi, umbracoUi})
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible()
+  await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, areaAlias)).toBeTruthy();
 });
 
-test('can add create button label for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add create button label for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -160,7 +160,7 @@ test('can add create button label for an area in a block', async ({page, umbraco
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithCreateButtonLabel(blockGridEditorName, contentElementTypeId, areaAlias, createButtonLabel)).toBeTruthy();
 });
 
-test('can remove create button label for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove create button label for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -184,8 +184,7 @@ test('can remove create button label for an area in a block', async ({page, umbr
 });
 
 //TODO: Frontend issue. when value is inserted to the min or max, it is set as a string instead of number
-
-test.skip('can add min allowed for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add min allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -198,8 +197,6 @@ test.skip('can add min allowed for an area in a block', async ({page, umbracoApi
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAreasTab();
   await umbracoUi.dataType.goToAreaByAlias(areaAlias);
-  // TODO: Look into this
-  // The input is set as string, should be number
   await umbracoUi.dataType.enterMinAllowedInArea(minAllowed);
   await umbracoUi.dataType.clickAreaSubmitButton();
   await umbracoUi.dataType.clickSubmitButton();
@@ -210,7 +207,7 @@ test.skip('can add min allowed for an area in a block', async ({page, umbracoApi
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMinAllowed(blockGridEditorName, contentElementTypeId, areaAlias, minAllowed)).toBeTruthy();
 });
 
-test('can remove min allowed for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove min allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -235,7 +232,7 @@ test('can remove min allowed for an area in a block', async ({page, umbracoApi, 
 });
 
 //TODO: Frontend issue. when value is inserted to the min or max, it is set as a string instead of number
-test.skip('can add add max allowed for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add add max allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -258,7 +255,7 @@ test.skip('can add add max allowed for an area in a block', async ({page, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeTruthy();
 });
 
-test('can remove max allowed for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove max allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
@@ -282,7 +279,7 @@ test('can remove max allowed for an area in a block', async ({page, umbracoApi, 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
-// TODO: front end is not working
+// TODO: There is no frontend validation for min and max values
 test.skip('min can not be more than max an area in a block', async ({page, umbracoApi, umbracoUi}) => {
 // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -307,7 +304,7 @@ test.skip('min can not be more than max an area in a block', async ({page, umbra
   await umbracoUi.dataType.isSuccessNotificationVisible();
 });
 
-// TODO: does not work
+// TODO: It is currently not possible to add a specified allowance
 test.skip('can add specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -332,27 +329,27 @@ test.skip('can add specified allowance for an area in a block', async ({page, um
   console.log(block.values[0].value[0].areas[0].specifiedAllowance);
 });
 
-// TODO: does not work
+// TODO: It is currently not possible to add a specified allowance
 test.skip('can update specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
 
 });
 
-// TODO: does not work
+// TODO: It is currently not possible to add a specified allowance
 test.skip('can remove specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
 
 });
 
-// TODO: does not work
+// TODO: It is currently not possible to add a specified allowance
 test.skip('can add multiple specified allowances for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
 
 });
 
-// TODO: does not work
+// TODO: It is currently not possible to add a specified allowance
 test.skip('can add specified allowance with min and max for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
 
 });
 
-// TODO: does not work
+// TODO: It is currently not possible to add a specified allowance
 test.skip('can remove min and max from specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
 
 });

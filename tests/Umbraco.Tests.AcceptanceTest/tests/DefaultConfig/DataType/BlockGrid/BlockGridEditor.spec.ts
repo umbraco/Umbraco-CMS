@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
-test('can create a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const blockGridLocatorName = 'Block Grid';
   const blockGridEditorAlias = 'Umbraco.BlockGrid';
@@ -24,7 +24,6 @@ test('can create a block grid editor', async ({page, umbracoApi, umbracoUi}) => 
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await page.pause();
   await umbracoUi.dataType.clickCreateButton();
   await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
   await umbracoUi.dataType.enterDataTypeName(blockGridEditorName);
@@ -72,7 +71,7 @@ test('can delete a block grid editor', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isTreeItemVisible(blockGridEditorName, false);
 });
 
-test('can add a block to a block grid editor', async ({page ,umbracoApi, umbracoUi}) => {
+test('can add a block to a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -94,7 +93,7 @@ test('can add a block to a block grid editor', async ({page ,umbracoApi, umbraco
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can add multiple blocks to a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can add multiple blocks to a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondElementName = 'SecondBlockGridElement';
@@ -119,7 +118,7 @@ test('can add multiple blocks to a block grid editor', async ({page, umbracoApi,
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeId);
 });
 
-test('can remove a block from a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can remove a block from a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -139,7 +138,7 @@ test('can remove a block from a block grid editor', async ({umbracoApi, umbracoU
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName)
 });
 
-test('can add a block to a group in a block grid editor', async ({page,umbracoApi, umbracoUi}) => {
+test('can add a block to a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -163,7 +162,7 @@ test('can add a block to a group in a block grid editor', async ({page,umbracoAp
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can add multiple blocks to a group in a block grid editor', async ({page,umbracoApi, umbracoUi}) => {
+test('can add multiple blocks to a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondElementName = 'SecondBlockGridElement';
@@ -188,7 +187,7 @@ test('can add multiple blocks to a group in a block grid editor', async ({page,u
   await umbracoApi.documentType.ensureNameNotExists(secondElementName);
 });
 
-test('can delete a block in a group from a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can delete a block in a group from a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -206,7 +205,6 @@ test('can delete a block in a group from a block grid editor', async ({umbracoAp
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-
 // THIS TEST IS CURRENTLY FLAKY.
 test('can move a block from a group to another group in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
@@ -219,10 +217,10 @@ test('can move a block from a group to another group in a block grid editor', as
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.clickAddGroupButton();
-  await umbracoUi.dataType.enterGroupName(secondGroupName,1);
+  await umbracoUi.dataType.enterGroupName(secondGroupName, 1);
   // Drag and Drop
   const dragFromLocator = page.getByRole('link', {name: elementTypeName});
-  const dragToLocator =   page.locator('.group').filter({hasText: secondGroupName}).locator('#add-button');
+  const dragToLocator = page.locator('.group').filter({hasText: secondGroupName}).locator('#add-button');
   await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
   await umbracoUi.dataType.clickSaveButton();
 
@@ -232,22 +230,19 @@ test('can move a block from a group to another group in a block grid editor', as
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeFalsy();
 });
 
-
 // When deleting a group should there not be a confirmation button? and should the block be moved another group when the group it was in is deleted?
-test.skip('can delete a group in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
 
-
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  await page.pause();
 });
 
-test('can add a min and max amount to a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a min and max amount to a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
@@ -264,7 +259,7 @@ test('can add a min and max amount to a block grid editor', async ({page, umbrac
   expect(dataTypeData.values[0].value.max).toBe(2);
 });
 
-test('max can not be less than min in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('max can not be less than min in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockGridWithMinAndMaxAmount(blockGridEditorName, 2, 2);
 
@@ -282,7 +277,7 @@ test('max can not be less than min in a block grid editor', async ({page, umbrac
   expect(dataTypeData.values[0].value.max).toBe(2);
 });
 
-test('can enable live editing mode in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can enable live editing mode in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
@@ -298,13 +293,13 @@ test('can enable live editing mode in a block grid editor', async ({page, umbrac
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, true)).toBeTruthy();
 });
 
-test('can disable live editing mode in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can disable live editing mode in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createBlockGridWithLiveEditingMode(blockGridEditorName, true);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  // This wait is currently necessary, sometimes there are issues when clicking the liveEdtingMode button
+  // This wait is currently necessary, sometimes there are issues when clicking the liveEditingMode button
   await umbracoUi.waitForTimeout(2000);
   await umbracoUi.dataType.clickLiveEditingMode();
   await umbracoUi.dataType.clickSaveButton();
@@ -314,9 +309,9 @@ test('can disable live editing mode in a block grid editor', async ({page, umbra
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, false)).toBeTruthy();
 });
 
-test('can add editor width in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can add editor width in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const propertyEditorWidth = '100%'
+  const propertyEditorWidth = '100%';
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
@@ -329,9 +324,9 @@ test('can add editor width in a block grid editor', async ({page, umbracoApi, um
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockGridEditorName, propertyEditorWidth)).toBeTruthy();
 });
 
-test('can remove editor width in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove editor width in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const propertyEditorWidth = '100%'
+  const propertyEditorWidth = '100%';
   await umbracoApi.dataType.createBlockGridWithPropertyEditorWidth(blockGridEditorName, propertyEditorWidth);
 
   // Act
@@ -345,9 +340,9 @@ test('can remove editor width in a block grid editor', async ({page, umbracoApi,
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockGridEditorName, '')).toBeTruthy();
 });
 
-test('can add a create button label in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a create button label in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const createButtonLabel = 'Create Block'
+  const createButtonLabel = 'Create Block';
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
@@ -360,9 +355,9 @@ test('can add a create button label in a block grid editor', async ({page, umbra
   expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeTruthy();
 });
 
-test('can remove a create button label in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a create button label in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const createButtonLabel = 'Create Block'
+  const createButtonLabel = 'Create Block';
   await umbracoApi.dataType.createBlockGridWithCreateButtonLabel(blockGridEditorName, createButtonLabel);
   expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeTruthy();
 
@@ -377,7 +372,7 @@ test('can remove a create button label in a block grid editor', async ({page, um
   expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, '')).toBeTruthy();
 });
 
-test('can update grid columns in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can update grid columns in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const gridColumns = 3;
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);

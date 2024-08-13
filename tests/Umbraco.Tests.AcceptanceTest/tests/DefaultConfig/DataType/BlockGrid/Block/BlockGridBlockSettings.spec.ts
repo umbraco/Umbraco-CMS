@@ -16,8 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
-// Settings
-test('can add a label to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a label to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const labelText = 'TestLabel';
@@ -36,7 +35,7 @@ test('can add a label to a block', async ({page, umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockGridEditorName, elementTypeId, labelText)).toBeTruthy();
 });
 
-test('can remove a label from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const labelText = 'TestLabel';
@@ -56,7 +55,7 @@ test('can remove a label from a block', async ({page, umbracoApi, umbracoUi}) =>
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockGridEditorName, elementTypeId, labelText)).toBeFalsy();
 });
 
-test('can open content model in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -65,14 +64,13 @@ test('can open content model in a block', async ({page, umbracoApi, umbracoUi}) 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await page.pause();
   await umbracoUi.dataType.openBlockContentModel();
 
   // Assert
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-test('can add a settings model to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -92,7 +90,7 @@ test('can add a settings model to a block', async ({page, umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockGridEditorName, [settingsElementTypeId])).toBeTruthy();
 });
 
-test('can remove a settings model from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a settings model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -114,7 +112,7 @@ test('can remove a settings model from a block', async ({page, umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockGridEditorName, [settingsElementTypeId])).toBeFalsy();
 });
 
-test('can enable allow in root from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can enable allow in root from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -132,7 +130,7 @@ test('can enable allow in root from a block', async ({page, umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesBlockEditorBlockHaveAllowInRootEnabled(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-test('can enable allow in areas from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can enable allow in areas from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -150,7 +148,7 @@ test('can enable allow in areas from a block', async ({page, umbracoApi, umbraco
   expect(await umbracoApi.dataType.doesBlockEditorBlockHaveAllowInAreasEnabled(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-test('can add a column span to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a column span to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const columnSpan = [1];
@@ -170,7 +168,7 @@ test('can add a column span to a block', async ({page, umbracoApi, umbracoUi}) =
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainColumnSpanOptions(blockGridEditorName, contentElementTypeId, columnSpan)).toBeTruthy();
 });
 
-test('can add multiple column spans to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add multiple column spans to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const columnSpan = [1, 3, 6, 8];
@@ -190,7 +188,7 @@ test('can add multiple column spans to a block', async ({page, umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainColumnSpanOptions(blockGridEditorName, contentElementTypeId, columnSpan)).toBeTruthy();
 });
 
-test('can remove a column span from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a column span from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const columnSpan = [4];
@@ -210,7 +208,7 @@ test('can remove a column span from a block', async ({page, umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainColumnSpanOptions(blockGridEditorName, contentElementTypeId, [])).toBeTruthy();
 });
 
-test('can add min and max row span to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add min and max row span to a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const rowSpanMin = 2;
@@ -232,7 +230,7 @@ test('can add min and max row span to a block', async ({page, umbracoApi, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainRowSpanOptions(blockGridEditorName, contentElementTypeId, rowSpanMin, rowSpanMax)).toBeTruthy();
 });
 
-test('can remove min and max row spans from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove min and max row spans from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const rowSpanMin = undefined;
@@ -240,7 +238,6 @@ test('can remove min and max row spans from a block', async ({page, umbracoApi, 
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithSizeOptions(blockGridEditorName, contentElementTypeId, undefined, 2, 6);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainRowSpanOptions(blockGridEditorName, contentElementTypeId, 2, 6)).toBeTruthy();
-
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);

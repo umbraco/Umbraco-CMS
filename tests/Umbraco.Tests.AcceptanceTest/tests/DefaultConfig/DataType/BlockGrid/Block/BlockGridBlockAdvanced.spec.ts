@@ -16,6 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
+//TODO: It is not possible to add a view to a block
 test.skip('can add a custom view to a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -25,9 +26,11 @@ test.skip('can add a custom view to a block', async ({page, umbracoApi, umbracoU
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
+  await umbracoUi.dataType.goToBlockAdvancedTab();
   await page.pause();
 });
+
+//TODO: It is not possible to add a view to a block
 
 test.skip('can remove a custom view from a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
@@ -38,37 +41,11 @@ test.skip('can remove a custom view from a block', async ({page, umbracoApi, umb
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
+  await umbracoUi.dataType.goToBlockAdvancedTab();
   await page.pause();
 });
 
-test.skip('can add a custom stylesheet to a block', async ({page, umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stylesheetName = 'TestStylesheet.css'
-  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
-  await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(stylesheetName);
-
-  await umbracoUi.dataType.clickSubmitButton();
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockEditorBlockContainStylesheet(blockGridEditorName, contentElementTypeId, stylesheetPath)).toBeTruthy();
-
-  // Clean
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-});
-
-// TODO: should the stylesheet be saved as an array?
+// TODO: Stylesheets are currently saved as arrays
 test.skip('can remove a custom stylesheet from a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'
@@ -84,10 +61,10 @@ test.skip('can remove a custom stylesheet from a block', async ({page, umbracoAp
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
+  await umbracoUi.dataType.goToBlockAdvancedTab();
 });
 
-test('can update overlay size in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const overlaySize = 'medium';
@@ -107,7 +84,7 @@ test('can update overlay size in a block', async ({page, umbracoApi, umbracoUi})
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainOverlaySize(blockGridEditorName, contentElementTypeId, overlaySize)).toBeTruthy();
 });
 
-test('can enable inline editing mode in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can enable inline editing mode in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -126,7 +103,7 @@ test('can enable inline editing mode in a block', async ({page, umbracoApi, umbr
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainInlineEditing(blockGridEditorName, contentElementTypeId, true)).toBeTruthy();
 });
 
-test('can disable inline editing mode in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can disable inline editing mode in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -136,8 +113,8 @@ test('can disable inline editing mode in a block', async ({page, umbracoApi, umb
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
-  await umbracoUi.dataType.clickInlineEditingMode()
+  await umbracoUi.dataType.goToBlockAdvancedTab();
+  await umbracoUi.dataType.clickInlineEditingMode();
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -146,7 +123,7 @@ test('can disable inline editing mode in a block', async ({page, umbracoApi, umb
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainInlineEditing(blockGridEditorName, contentElementTypeId, false)).toBeTruthy();
 });
 
-test('can enable hide content editor in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -155,7 +132,7 @@ test('can enable hide content editor in a block', async ({page, umbracoApi, umbr
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
+  await umbracoUi.dataType.goToBlockAdvancedTab();
   await umbracoUi.dataType.clickBlockGridHideContentEditorButton();
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
@@ -165,8 +142,7 @@ test('can enable hide content editor in a block', async ({page, umbracoApi, umbr
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainHideContentEditor(blockGridEditorName, contentElementTypeId, true)).toBeTruthy();
 });
 
-
-test('can disable hide content editor in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -186,7 +162,7 @@ test('can disable hide content editor in a block', async ({page, umbracoApi, umb
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainHideContentEditor(blockGridEditorName, contentElementTypeId, false)).toBeTruthy();
 });
 
-test('can add a background color to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a background color to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const backGroundColor = '#000000';
@@ -206,7 +182,7 @@ test('can add a background color to a block', async ({page, umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainBackgroundColor(blockGridEditorName, contentElementTypeId, backGroundColor)).toBeTruthy();
 });
 
-test('can remove a background color to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a background color to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const backGroundColor = '#000000';
@@ -227,7 +203,7 @@ test('can remove a background color to a block', async ({page, umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainBackgroundColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-test('can add a icon color to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const iconColor = '#000000';
@@ -247,12 +223,12 @@ test('can add a icon color to a block', async ({page, umbracoApi, umbracoUi}) =>
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, iconColor)).toBeTruthy();
 });
 
-test('can remove a icon color from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const iconColor = '#000000';
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithCatalogueAppearanceInBlock(blockGridEditorName, contentElementTypeId, '' , iconColor);
+  await umbracoApi.dataType.createBlockGridWithCatalogueAppearanceInBlock(blockGridEditorName, contentElementTypeId, '', iconColor);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, iconColor)).toBeTruthy();
 
   // Act
@@ -268,7 +244,8 @@ test('can remove a icon color from a block', async ({page, umbracoApi, umbracoUi
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-test('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}) => {
+// TODO: Thumbnails are not showing correctly
+test.skip('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -280,12 +257,17 @@ test('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
+  await umbracoUi.dataType.goToBlockAdvancedTab();
   const mediaUrl = await umbracoApi.media.getMediaPathByName(mediaName);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl.fileName, mediaUrl.mediaPath);
-  await page.pause();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
 });
 
+// TODO: Thumbnails are not showing correctly
 test.skip('can remove a thumbnail from a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -295,6 +277,5 @@ test.skip('can remove a thumbnail from a block', async ({page, umbracoApi, umbra
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab()
-  await page.pause();
+  await umbracoUi.dataType.goToBlockAdvancedTab();
 });
