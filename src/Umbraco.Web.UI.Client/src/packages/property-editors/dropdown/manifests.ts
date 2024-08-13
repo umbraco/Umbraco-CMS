@@ -11,7 +11,7 @@ export const manifests: Array<ManifestTypes> = [
 			label: 'Dropdown',
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 			icon: 'icon-list',
-			group: 'pickers',
+			group: 'lists',
 		},
 	},
 	schemaManifest,

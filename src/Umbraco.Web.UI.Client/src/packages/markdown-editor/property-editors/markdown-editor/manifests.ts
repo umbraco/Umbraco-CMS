@@ -10,7 +10,7 @@ const manifest: ManifestPropertyEditorUi = {
 		label: 'Markdown Editor',
 		propertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
 		icon: 'icon-code',
-		group: 'pickers',
+		group: 'richContent',
 		settings: {
 			properties: [
 				{

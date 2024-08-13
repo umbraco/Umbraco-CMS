@@ -52,9 +52,7 @@ export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					data: {
-						submitLabel: 'Submit',
-					},
+					data: {},
 					value: { selection: this._ids ?? [] },
 				};
 			})
