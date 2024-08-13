@@ -8,7 +8,7 @@ The system both supports handling front-end validation, server-validation and ot
 
 The core of the system is a Validation Context, this holds the messages and more.
 
-### Validation Messages
+## Validation Messages
 
 A Validation message consist of a type, path and body. This typically looks like this:
 
@@ -24,7 +24,7 @@ Because each validation issue is presented in the Validation Context as a Messag
 One benefit of this is that Elements that are removed from screen can still have their validation messages preventing the submission of a dataset.
 As well Tabs and other navigation can use this to be highlighted, so the user can be guide to the location.
 
-#### Path
+### Path
 
 The Path, points to the location of the model that the message is concerning.
 
@@ -82,3 +82,25 @@ We provide a few built in Validators which handles most cases.
 This Validator binds a Form Control Element with the Validation Context. When the Form Control becomes Invalid, its Validation Message is appended to the Validation Context.
 
 ### Server Model Validator
+
+This Validator can asks a end-point for validation of the model.
+
+The Server Model Validator stores the data that was send to the server on the Validation Context. This is then later used by Validation Path Translators to convert index based paths to Json Path Queries.
+
+This is needed to allow the user to make changes to the data, without loosing the accuracy of the messages coming from server validation.
+
+## Validation Path Translator
+
+Validation Path Translator translate Message Paths into a format that works while manipulating the model.
+This enables the user to retrieve validation messages from the server regarding entries of a list, and then the user can insert more items and still have the validation appearing in the right spots.
+This would not be possible with index based paths, which is why we translate them into JSON Path Queries.
+
+Such conversation could be from this path:
+```
+"$.values.[5].value"
+```
+
+To this path:
+```
+"$.values.[?(@.alias = 'my-alias')].value"
+```
