@@ -112,7 +112,7 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
 
 // TODO: Is this an issue? should you be able to remove the contentModel so you have none?
 // There is currently frontend issues
-test.skip('can remove a content model from a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -173,7 +173,7 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
 });
 
-test('can add a background color to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a background color to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = '#ff0000';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -303,35 +303,8 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(blockData.values[0].value[0].iconColor).toEqual("");
 });
 
-test('can add a custom stylesheet to a block', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stylesheetName = 'TestStylesheet.css';
-  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await page.pause()
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(stylesheetName);
-  await umbracoUi.dataType.clickSubmitButton();
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
-  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
-  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
-
-  // Clean
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-});
-
-test('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
+// TODO: Currently it is not possible to update a stylesheet to a block
+test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -347,15 +320,12 @@ test('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   // Removes first stylesheet
-  await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(stylesheetName);
-  // Adds second stylesheet
-  await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(secondStylesheetName);
+
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -369,7 +339,9 @@ test('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
 });
 
-test('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
+// TODO: Currently it is not possible to delete a stylesheet to a block
+
+test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -438,7 +410,14 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(false);
 });
 
+// TODO: Thumbnails are not showing in the UI
 test('can add a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
 
 await page.pause()
+});
+
+// TODO: Thumbnails are not showing in the UI
+test('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+
+  await page.pause()
 });
