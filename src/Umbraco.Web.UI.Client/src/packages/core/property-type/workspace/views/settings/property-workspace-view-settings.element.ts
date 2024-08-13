@@ -182,28 +182,34 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			<uui-box class="uui-text">
 				<div class="container">
 					<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
-					<uui-input
-						id="name-input"
-						name="name"
-						required
-						label=${this.localize.term('placeholders_entername')}
-						placeholder=${this.localize.term('placeholders_entername')}
-						.value=${this._data?.name}
-						@input=${this.#onNameChange}
-						${umbBindToValidation(this, '$.headline')}
-						${umbFocus()}>
-						<!-- TODO: validation for bad characters -->
-					</uui-input>
-					<uui-input-lock
-						id="alias-input"
-						name="alias"
-						label=${this.localize.term('placeholders_enterAlias')}
-						placeholder=${this.localize.term('placeholders_enterAlias')}
-						.value=${this._data?.alias}
-						?locked=${this._aliasLocked}
-						@input=${this.#onAliasChange}
-						@lock-change=${this.#onToggleAliasLock}>
-					</uui-input-lock>
+					<uui-form-validation-message>
+						<uui-input
+							id="name-input"
+							name="name"
+							label=${this.localize.term('placeholders_entername')}
+							placeholder=${this.localize.term('placeholders_entername')}
+							.value=${this._data?.name}
+							@input=${this.#onNameChange}
+							required
+							${umbBindToValidation(this, '$.name')}
+							${umbFocus()}>
+							<!-- TODO: validation for bad characters -->
+						</uui-input>
+					</uui-form-validation-message>
+					<uui-form-validation-message>
+						<uui-input-lock
+							id="alias-input"
+							name="alias"
+							label=${this.localize.term('placeholders_enterAlias')}
+							placeholder=${this.localize.term('placeholders_enterAlias')}
+							.value=${this._data?.alias}
+							?locked=${this._aliasLocked}
+							required
+							${umbBindToValidation(this, '$.alias')}
+							@input=${this.#onAliasChange}
+							@lock-change=${this.#onToggleAliasLock}>
+						</uui-input-lock>
+					</uui-form-validation-message>
 					<uui-textarea
 						id="description-input"
 						name="description"
@@ -212,9 +218,13 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						placeholder=${this.localize.term('placeholders_enterDescription')}
 						.value=${this._data?.description}></uui-textarea>
 				</div>
-				<umb-data-type-flow-input
-					.value=${this._data?.dataType?.unique ?? ''}
-					@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
+				<uui-form-validation-message>
+					<umb-data-type-flow-input
+						.value=${this._data?.dataType?.unique ?? ''}
+						@change=${this.#onDataTypeIdChange}
+						required
+						${umbBindToValidation(this, '$.dataType.unique')}></umb-data-type-flow-input>
+				</uui-form-validation-message>
 				<hr />
 				<div class="container">
 					<b><umb-localize key="validation_validation">Validation</umb-localize></b>

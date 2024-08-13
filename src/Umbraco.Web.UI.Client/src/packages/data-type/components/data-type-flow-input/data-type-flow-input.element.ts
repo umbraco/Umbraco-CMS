@@ -1,10 +1,10 @@
 import { UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '../../modals/index.js';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 // Note: Does only support picking a single data type. But this could be developed later into this same component. To follow other picker input components.
 /**
@@ -15,7 +15,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  * @fires focus - when the input gains focus
  */
 @customElement('umb-data-type-flow-input')
-export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, '') {
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -47,6 +47,12 @@ export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, 
 	constructor() {
 		super();
 
+		this.addValidator(
+			'valueMissing',
+			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => this.hasAttribute('required') && this.value === '',
+		);
+
 		this.#editDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL);
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
@@ -64,6 +70,10 @@ export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, 
 			.observeRouteBuilder((routeBuilder) => {
 				this._createRoute = routeBuilder(null);
 			});
+	}
+
+	override focus() {
+		this.shadowRoot?.querySelector('umb-ref-data-type')?.focus();
 	}
 
 	override render() {
@@ -87,6 +97,9 @@ export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, 
 						label="Select Property Editor"
 						look="placeholder"
 						color="default"
+						@focus=${() => {
+							this.pristine = false;
+						}}
 						.href=${this._createRoute}></uui-button>
 				`;
 	}
@@ -97,6 +110,11 @@ export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, 
 				width: 100%;
 				--uui-button-padding-top-factor: 4;
 				--uui-button-padding-bottom-factor: 4;
+			}
+			:host(:invalid:not([pristine])) #empty-state-button {
+				--uui-button-border-color: var(--uui-color-danger);
+				--uui-button-border-width: 2px;
+				--uui-button-contrast: var(--uui-color-danger);
 			}
 		`,
 	];
