@@ -7,6 +7,7 @@ import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/cont
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-property-type-workspace-view-settings')
 export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -54,9 +55,13 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
-			this.observe(instance.data, (data) => {
-				this._data = data;
-			});
+			this.observe(
+				instance.data,
+				(data) => {
+					this._data = data;
+				},
+				'observeData',
+			);
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
@@ -180,10 +185,12 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<uui-input
 						id="name-input"
 						name="name"
+						required
 						label=${this.localize.term('placeholders_entername')}
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._data?.name}
 						@input=${this.#onNameChange}
+						${umbBindToValidation(this, '$.headline')}
 						${umbFocus()}>
 						<!-- TODO: validation for bad characters -->
 					</uui-input>
@@ -426,14 +433,11 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			uui-input {
 				width: 100%;
 			}
-			#alias-lock {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
+			uui-input:focus-within {
+				z-index: 1;
 			}
-			#alias-lock uui-icon {
-				margin-bottom: 2px;
+			uui-input-lock:focus-within {
+				z-index: 1;
 			}
 			.container {
 				display: flex;
