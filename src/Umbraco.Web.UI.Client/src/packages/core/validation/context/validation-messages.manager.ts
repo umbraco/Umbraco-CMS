@@ -74,12 +74,22 @@ export class UmbValidationMessagesManager {
 
 	addMessage(type: UmbValidationMessageType, path: string, message: string, key: string = UmbId.new()): void {
 		path = this.#translatePath(path) ?? path;
+		// check if there is an existing message with the same path and type, and append the new messages: [NL]
+		if (this.#messages.getValue().find((x) => x.type === type && x.path === path && x.message === message)) {
+			return;
+		}
 		this.#messages.appendOne({ type, key, path, message });
 	}
 
 	addMessages(type: UmbValidationMessageType, path: string, messages: Array<string>): void {
 		path = this.#translatePath(path) ?? path;
-		this.#messages.append(messages.map((message) => ({ type, key: UmbId.new(), path, message })));
+		// filter out existing messages with the same path and type, and append the new messages: [NL]
+		const existingMessages = this.#messages.getValue();
+		const newMessages = messages.filter(
+			(message) =>
+				existingMessages.find((x) => x.type === type && x.path === path && x.message === message) === undefined,
+		);
+		this.#messages.append(newMessages.map((message) => ({ type, key: UmbId.new(), path, message })));
 	}
 
 	/*
