@@ -9,7 +9,7 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbSearchProvider, UmbSearchRepository } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchProvider } from '@umbraco-cms/backoffice/search';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
