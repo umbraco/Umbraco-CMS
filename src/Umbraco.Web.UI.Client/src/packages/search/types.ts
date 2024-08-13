@@ -13,6 +13,7 @@ export type UmbSearchRequestArgs = {
 	query: string;
 };
 
-export interface UmbSearchProvider<SearchResultItemType extends UmbSearchResultItemModel> extends UmbApi {
+export interface UmbSearchProvider<SearchResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel>
+	extends UmbApi {
 	search(args: UmbSearchRequestArgs): Promise<UmbRepositoryResponse<UmbPagedModel<SearchResultItemType>>>;
 }
