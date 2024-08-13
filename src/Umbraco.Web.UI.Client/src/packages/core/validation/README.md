@@ -82,6 +82,8 @@ We provide a few built in Validators which handles most cases.
 
 This Validator binds a Form Control Element with the Validation Context. When the Form Control becomes Invalid, its Validation Message is appended to the Validation Context.
 
+Notice this one also comes as a Lit Directive called `umbBindToValidation`.
+
 ### Server Model Validator
 
 This Validator can asks a end-point for validation of the model.
