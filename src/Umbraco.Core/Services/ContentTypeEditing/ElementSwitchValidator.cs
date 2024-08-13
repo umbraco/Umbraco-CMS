@@ -22,12 +22,15 @@ public class ElementSwitchValidator : IElementSwitchValidator
 
     public async Task<bool> AncestorsAreAlignedAsync(IContentType contentType)
     {
+        // this call does not return the system roots
         var ancestorIds = contentType.AncestorIds();
         if (ancestorIds.Length == 0)
         {
-            return false;
+            // if there are no ancestors, validation passes
+            return true;
         }
 
+        // if there are any ancestors where IsElement is different from the contentType, the validation fails
         return await Task.FromResult(_contentTypeService.GetAll(ancestorIds)
             .Any(ancestor => ancestor.IsElement != contentType.IsElement) == false);
     }
@@ -36,6 +39,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
     {
         IEnumerable<IContentType> descendants = _contentTypeService.GetDescendants(contentType.Id, false);
 
+        // if there are any descendants where IsElement is different from the contentType, the validation fails
         return await Task.FromResult(descendants.Any(descendant => descendant.IsElement != contentType.IsElement) == false);
     }
 
@@ -48,13 +52,15 @@ public class ElementSwitchValidator : IElementSwitchValidator
         // get all dataTypes that are based on those propertyEditors
         IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorAliasAsync(blockEditorAliases);
 
-        // check whether any of the configurations on those dataTypes have this element selected as a possible block
+        // if any dataType has a configuration where this element is selected as a possible block, the validation fails.
         return dataTypes.Any(dataType =>
             editors.First(editor => editor.Alias == dataType.EditorAlias)
                 .GetValueEditor(dataType.ConfigurationObject)
-                .ConfiguredElementTypeKeys().Contains(contentType.Key) == false);
+                .ConfiguredElementTypeKeys().Contains(contentType.Key) == true) == false;
     }
 
     public async Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType) =>
+
+        // if any content for the content type exists, the validation fails.
         await Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) == false);
 }
