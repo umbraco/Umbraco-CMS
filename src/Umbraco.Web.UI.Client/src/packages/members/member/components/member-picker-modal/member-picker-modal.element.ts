@@ -1,13 +1,13 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
-import type { UmbMemberDetailModel } from '../../types.js';
 import { UmbMemberSearchProvider } from '../../search/member.search-provider.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
-import { html, customElement, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { debounce, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-member-picker-modal')
 export class UmbMemberPickerModalElement extends UmbModalBaseElement<
@@ -91,20 +91,21 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
-			<uui-box> ${this.#renderSearch()} ${this.#renderItems()} </uui-box>
-
-			<div slot="actions">
-				<uui-button
-					label=${this.localize.term('general_cancel')}
-					@click=${() => this.modalContext?.reject()}></uui-button>
-				<uui-button
-					label=${this.localize.term('general_submit')}
-					look="primary"
-					color="positive"
-					@click=${() => this.modalContext?.submit()}></uui-button>
-			</div>
-		</umb-body-layout> `;
+		return html`
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
+				<uui-box>${this.#renderSearch()} ${this.#renderItems()}</uui-box>
+				<div slot="actions">
+					<uui-button
+						label=${this.localize.term('general_cancel')}
+						@click=${() => this.modalContext?.reject()}></uui-button>
+					<uui-button
+						color="positive"
+						look="primary"
+						label=${this.localize.term('general_submit')}
+						@click=${() => this.modalContext?.submit()}></uui-button>
+				</div>
+			</umb-body-layout>
+		`;
 	}
 
 	#renderItems() {
@@ -120,18 +121,26 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 	#renderSearch() {
 		return html`
-			<uui-input .value=${this._searchQuery} id="search-input" placeholder="Search..." @input=${this.#onSearchInput}>
+			<uui-input
+				id="search-input"
+				placeholder=${this.localize.term('placeholders_search')}
+				.value=${this._searchQuery}
+				@input=${this.#onSearchInput}>
 				<div slot="prepend">
 					${this._searching
 						? html`<uui-loader-circle id="search-indicator"></uui-loader-circle>`
 						: html`<uui-icon name="search"></uui-icon>`}
 				</div>
-
-				<div slot="append">
-					<uui-button type="button" @click=${this.#onSearchClear} compact>
-						<uui-icon name="icon-delete"></uui-icon>
-					</uui-button>
-				</div>
+				${when(
+					this._searchQuery,
+					() => html`
+						<div slot="append">
+							<uui-button type="button" @click=${this.#onSearchClear} compact>
+								<uui-icon name="icon-delete"></uui-icon>
+							</uui-button>
+						</div>
+					`,
+				)}
 			</uui-input>
 			<div id="search-divider"></div>
 			${this.#renderSearchResult()}
