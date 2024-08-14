@@ -245,7 +245,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderPickerSearchResultItem(item: any) {
-		return html` <uui-menu-item label=${item.entityType + ' ' + item.unique}> </uui-menu-item> `;
+		return html`
+			<umb-picker-search-result-item
+				.props=${{ item }}
+				.item=${item}
+				.entityType=${item.entityType}></umb-picker-search-result-item>
+		`;
 	}
 
 	static override styles = [
