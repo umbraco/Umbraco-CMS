@@ -252,7 +252,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			>
 			<uui-action-bar>
 				${this._showContentEdit && this._workspaceEditContentPath
-					? html`<uui-button label="edit" look="secondary" href=${this._workspaceEditContentPath}>
+					? html`<uui-button
+							label="edit"
+							look="secondary"
+							color=${this._contentInvalid ? 'danger' : ''}
+							href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
 							${this._contentInvalid
 								? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
@@ -307,14 +311,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 			:host([drag-placeholder]) {
 				opacity: 0.2;
+				--umb-block-list-entry-actions-opacity: 0;
 			}
 
-			:host([settings-invalid])::before,
-			:host([content-invalid])::before {
+			:host([settings-invalid])::after,
+			:host([content-invalid])::after {
 				content: '';
 				position: absolute;
 				inset: 0;
-				z-index: 1;
 				pointer-events: none;
 				border: 1px solid var(--uui-color-danger);
 				border-radius: var(--uui-border-radius);
