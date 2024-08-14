@@ -133,7 +133,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		if (contextVariantId && propertyVariantId) {
 			if (contextVariantId.segment !== propertyVariantId.segment) {
 				// TODO: Translate this, ideally the actual culture is mentioned in the message:
-				shareMessage = 'Shared with all segments of this culture';
+				shareMessage = 'Shared across culture';
 			}
 			if (contextVariantId.culture !== propertyVariantId.culture) {
 				// TODO: Translate this:
