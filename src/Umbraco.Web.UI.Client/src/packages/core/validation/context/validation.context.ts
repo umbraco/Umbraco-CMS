@@ -276,6 +276,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 	}
 
 	override destroy(): void {
+		this.#providerCtrl = undefined;
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}

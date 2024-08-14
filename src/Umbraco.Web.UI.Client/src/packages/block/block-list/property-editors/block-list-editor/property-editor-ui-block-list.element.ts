@@ -51,6 +51,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 	#validationContext = new UmbValidationContext(this).provide();
 	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
+	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
@@ -133,15 +134,22 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this.observe(
 				context.dataPath,
 				(dataPath) => {
-					//
-					// TODO: Make translator for settings.
-
+					// Translate paths for content elements:
 					this.#contentDataPathTranslator?.destroy();
 					if (dataPath) {
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
 
 						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
+					}
+
+					// Translate paths for settings elements:
+					this.#settingsDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
 					}
 				},
 				'observeDataPath',

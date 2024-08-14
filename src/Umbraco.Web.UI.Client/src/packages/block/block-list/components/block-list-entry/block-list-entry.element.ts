@@ -10,6 +10,8 @@ import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathBlockElementDataFilter } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-block-list-entry
@@ -33,6 +35,16 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (!value) return;
 		this._contentUdi = value;
 		this.#context.setContentUdi(value);
+
+		new UmbObserveValidationStateController(
+			this,
+			`$.contentData[${UmbDataPathBlockElementDataFilter({ udi: value })}]`,
+			(hasMessages) => {
+				this._contentInvalid = hasMessages;
+				this._blockViewProps.contentInvalid = hasMessages;
+			},
+			'observeMessagesForContent',
+		);
 	}
 	private _contentUdi?: string | undefined;
 
@@ -60,6 +72,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_inlineEditingMode?: boolean;
+
+	// 'content-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	_contentInvalid?: boolean;
+
+	// 'settings-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	_settingsInvalid?: boolean;
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
@@ -141,6 +161,20 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.settings,
 			(settings) => {
 				this.#updateBlockViewProps({ settings });
+
+				this.removeUmbControllerByAlias('observeMessagesForSettings');
+				if (settings) {
+					// Observe settings validation state:
+					new UmbObserveValidationStateController(
+						this,
+						`$.settingsData[${UmbDataPathBlockElementDataFilter(settings)}]`,
+						(hasMessages) => {
+							this._settingsInvalid = hasMessages;
+							this._blockViewProps.settingsInvalid = hasMessages;
+						},
+						'observeMessagesForSettings',
+					);
+				}
 			},
 			null,
 		);
@@ -218,16 +252,26 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			>
 			<uui-action-bar>
 				${this._showContentEdit && this._workspaceEditContentPath
-					? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
+					? html`<uui-button label="edit" look="secondary" href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
+							${this._contentInvalid
+								? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+								: ''}
 						</uui-button>`
 					: ''}
 				${this._hasSettings && this._workspaceEditSettingsPath
-					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
+					? html`<uui-button
+							label="Edit settings"
+							look="secondary"
+							color=${this._settingsInvalid ? 'danger' : ''}
+							href=${this._workspaceEditSettingsPath}>
 							<uui-icon name="icon-settings"></uui-icon>
+							${this._settingsInvalid
+								? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+								: ''}
 						</uui-button>`
 					: ''}
-				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
+				<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
@@ -248,10 +292,32 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
+				opacity: 0;
+				transition: opacity 120ms;
+			}
+			:host(:hover) uui-action-bar,
+			uui-action-bar:focus,
+			:host(:focus-within) uui-action-bar {
+				opacity: 1;
 			}
 
 			:host([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			:host([settings-invalid])::before,
+			:host([content-invalid])::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+				z-index: 1;
+				pointer-events: none;
+				border: 1px solid var(--uui-color-danger);
+				border-radius: var(--uui-border-radius);
+			}
+
+			uui-badge {
+				z-index: 2;
 			}
 		`,
 	];
