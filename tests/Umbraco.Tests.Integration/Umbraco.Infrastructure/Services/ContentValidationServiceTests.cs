@@ -56,7 +56,7 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                       "properties": [
                                           {
                                             "alias": "title",
-                                            "value": "Valid root content"
+                                            "value": "Valid root content title"
                                           },
                                           {
                                             "alias": "blocks",
@@ -75,13 +75,15 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "udi": "umb://element/f36cebfad03b44519e604bf32c5b1e2f",
                                                     "properties": [
-                                                        { "alias": "title", "value": "Invalid nested content" }
+                                                        { "alias": "title", "value": "Invalid nested content title (ref #4)" },
+                                                        { "alias": "text", "value": "Valid nested content text" }
                                                     ]
                                                   }, {
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "udi": "umb://element/b8173e4a0618475c8277c3c6af68bee6",
                                                     "properties": [
-                                                        { "alias": "title", "value": "Valid nested content" }
+                                                        { "alias": "title", "value": "Valid nested content title" },
+                                                        { "alias": "text", "value": "Invalid nested content text (ref #5)" }
                                                     ]
                                                   }
                                                 ],
@@ -89,13 +91,15 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "udi": "umb://element/c9129a4671bb4b4e8f0ad525ad4a5de3",
                                                     "properties": [
-                                                        { "alias": "title", "value": "Valid nested setting" }
+                                                        { "alias": "title", "value": "Valid nested setting title" },
+                                                        { "alias": "text", "value": "Invalid nested setting text (ref #6)" }
                                                     ]
                                                   }, {
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "udi": "umb://element/77f7ea3507664395bf7f0c9df04530f7",
                                                     "properties": [
-                                                        { "alias": "title", "value": "Invalid nested setting" }
+                                                        { "alias": "title", "value": "Invalid nested setting title (ref #7)" },
+                                                        { "alias": "text", "value": "Valid nested setting text)" }
                                                     ]
                                                   }
                                                 ]
@@ -106,7 +110,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
                                       "udi": "umb://element/3af93b5b5e404c64b1422564309fc4c7",
                                       "properties": [
-                                          { "alias": "title", "value": "Invalid root content" }
+                                          { "alias": "title", "value": "Invalid root content title (ref #1)" },
+                                          { "alias": "text", "value": "Valid root content text" }
                                       ]
                                     }
                                   ],
@@ -114,13 +119,15 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
                                         "udi": "umb://element/65db1ecd78e041a584f07296123a0a73",
                                         "properties": [
-                                            { "alias": "title", "value": "Invalid root setting" }
+                                            { "alias": "title", "value": "Invalid root setting title (ref #2)" },
+                                            { "alias": "text", "value": "Valid root setting text" }
                                         ]
                                       }, {
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
                                         "udi": "umb://element/efb9583ce67043f282fb2a0cb0f3e736",
                                         "properties": [
-                                            { "alias": "title", "value": "Valid root setting" }
+                                            { "alias": "title", "value": "Valid root setting title" },
+                                            { "alias": "text", "value": "Invalid root setting text (ref #3)" }
                                         ]
                                       }
                                   ]
@@ -131,11 +138,23 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             },
             setup.DocumentType);
 
-        Assert.AreEqual(4, validationResult.ValidationErrors.Count());
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.contentData[0].title"));
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.settingsData[1].title"));
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].title"));
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].title"));
+        Assert.AreEqual(7, validationResult.ValidationErrors.Count());
+
+        // ref #1
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].properties[0]"));
+        // ref #2
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].properties[0]"));
+        // ref #3
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[1].properties[1]"));
+
+        // ref #4
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].properties[1].contentData[0].properties[0]"));
+        // ref #5
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].properties[1].contentData[1].properties[1]"));
+        // ref #6
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].properties[1].settingsData[0].properties[1]"));
+        // ref #7
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].properties[1].settingsData[1].properties[0]"));
     }
 
     [TestCase(true)]
@@ -393,6 +412,10 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         var textBoxDataType = await dataTypeService.GetAsync("Textstring");
         Assert.IsNotNull(textBoxDataType, "Could not get the default TextBox data type");
         elementType.AddPropertyType(new PropertyType(ShortStringHelper, textBoxDataType, "title")
+        {
+            ValidationRegExp = "^Valid.*$"
+        });
+        elementType.AddPropertyType(new PropertyType(ShortStringHelper, textBoxDataType, "text")
         {
             ValidationRegExp = "^Valid.*$"
         });
