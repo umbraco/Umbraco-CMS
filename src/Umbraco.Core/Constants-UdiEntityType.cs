@@ -33,14 +33,17 @@ public static partial class Constants
 
         public const string DocumentType = "document-type";
         public const string DocumentTypeContainer = "document-type-container";
-
         public const string DocumentBlueprintContainer = "document-blueprint-container";
+
         public const string MediaType = "media-type";
         public const string MediaTypeContainer = "media-type-container";
+
+        public const string MemberType = "member-type";
+        public const string MemberTypeContainer = "member-type-container";
+        public const string MemberGroup = "member-group";
+
         public const string DataType = "data-type";
         public const string DataTypeContainer = "data-type-container";
-        public const string MemberType = "member-type";
-        public const string MemberGroup = "member-group";
 
         public const string RelationType = "relation-type";
 

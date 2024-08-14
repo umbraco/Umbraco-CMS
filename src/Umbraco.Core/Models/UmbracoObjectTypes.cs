@@ -36,14 +36,6 @@ public enum UmbracoObjectTypes
     Media,
 
     /// <summary>
-    ///     Member Type
-    /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberType, typeof(IMemberType))]
-    [FriendlyName("Member Type")]
-    [UmbracoUdiType(Constants.UdiEntityType.MemberType)]
-    MemberType,
-
-    /// <summary>
     ///     Template
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.Template, typeof(ITemplate))]
@@ -52,12 +44,12 @@ public enum UmbracoObjectTypes
     Template,
 
     /// <summary>
-    ///     Member Group
+    ///     Document Type
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberGroup, typeof(IMemberGroup))]
-    [FriendlyName("Member Group")]
-    [UmbracoUdiType(Constants.UdiEntityType.MemberGroup)]
-    MemberGroup,
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentType, typeof(IContentType))]
+    [FriendlyName("Document Type")]
+    [UmbracoUdiType(Constants.UdiEntityType.DocumentType)]
+    DocumentType,
 
     /// <summary>
     ///     "Media Type
@@ -68,12 +60,20 @@ public enum UmbracoObjectTypes
     MediaType,
 
     /// <summary>
-    ///     Document Type
+    ///     Member Type
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentType, typeof(IContentType))]
-    [FriendlyName("Document Type")]
-    [UmbracoUdiType(Constants.UdiEntityType.DocumentType)]
-    DocumentType,
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberType, typeof(IMemberType))]
+    [FriendlyName("Member Type")]
+    [UmbracoUdiType(Constants.UdiEntityType.MemberType)]
+    MemberType,
+
+    /// <summary>
+    ///     Member Group
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberGroup, typeof(IMemberGroup))]
+    [FriendlyName("Member Group")]
+    [UmbracoUdiType(Constants.UdiEntityType.MemberGroup)]
+    MemberGroup,
 
     /// <summary>
     ///     Recycle Bin
@@ -113,6 +113,14 @@ public enum UmbracoObjectTypes
     [FriendlyName("Media Type Container")]
     [UmbracoUdiType(Constants.UdiEntityType.MediaTypeContainer)]
     MediaTypeContainer,
+
+    /// <summary>
+    ///     Member type container
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberTypeContainer)]
+    [FriendlyName("Member Type Container")]
+    [UmbracoUdiType(Constants.UdiEntityType.MemberTypeContainer)]
+    MemberTypeContainer,
 
     /// <summary>
     ///     Media type container
