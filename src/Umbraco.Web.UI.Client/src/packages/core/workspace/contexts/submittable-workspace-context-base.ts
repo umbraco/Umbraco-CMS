@@ -109,6 +109,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	#rejectSubmit = () => {
 		if (this.#submitPromise) {
+			// TODO: Capture the validation contexts messages on open, and then reset to them in this case. [NL]
+
 			this.#submitReject?.();
 			this.#submitPromise = undefined;
 			this.#submitResolve = undefined;
@@ -134,7 +136,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#resolveSubmit();
 
 		// Calling reset on the validation context here. [NL]
-		// TODO: Consider if we really ant this, cause on save, we do not want to reset this... [NL] (Also adapt to concept of multiple validation contexts)
+		// TODO: Capture the validation messages on open, and then reset to that.
 		//this.validation.reset();
 	};
 

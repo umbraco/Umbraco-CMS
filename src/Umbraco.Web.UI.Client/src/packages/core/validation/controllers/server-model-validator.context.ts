@@ -92,7 +92,6 @@ export class UmbServerModelValidatorContext
 							culture: variant.culture,
 							segment: variant.segment,
 						})}].value`;
-						// TODO: Make a const that holds this translation-key:
 						this.#context!.messages.addMessages('server', path, [UMB_VALIDATION_EMPTY_LOCALIZATION_KEY]);
 					});
 				});

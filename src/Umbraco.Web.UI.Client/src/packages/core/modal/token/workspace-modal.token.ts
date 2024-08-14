@@ -5,7 +5,6 @@ export interface UmbWorkspaceModalData<DataModelType = unknown> {
 	baseDataPath?: string;
 }
 
-// TODO: It would be good with a WorkspaceValueBaseType, to avoid the  hardcoded type for unique here:
 export type UmbWorkspaceModalValue =
 	| {
 			unique: string;
