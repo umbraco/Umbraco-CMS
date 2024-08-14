@@ -12,8 +12,8 @@ public class CreateMemberTypeFolderController : MemberTypeFolderControllerBase
 {
     public CreateMemberTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IContentTypeContainerService contentTypeContainerService)
-        : base(backOfficeSecurityAccessor, contentTypeContainerService)
+        IMemberTypeContainerService memberTypeContainerService)
+        : base(backOfficeSecurityAccessor, memberTypeContainerService)
     {
     }
 
@@ -25,7 +25,7 @@ public class CreateMemberTypeFolderController : MemberTypeFolderControllerBase
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateFolderRequestModel createFolderRequestModel)
-        => await CreateFolderAsync<ByKeyDocumentTypeFolderController>(
+        => await CreateFolderAsync<ByKeyMemberTypeFolderController>(
             createFolderRequestModel,
             controller => nameof(controller.ByKey)).ConfigureAwait(false);
 }

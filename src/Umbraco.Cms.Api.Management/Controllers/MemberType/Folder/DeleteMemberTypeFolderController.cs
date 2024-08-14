@@ -11,8 +11,8 @@ public class DeleteMemberTypeFolderController : MemberTypeFolderControllerBase
 {
     public DeleteMemberTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IContentTypeContainerService contentTypeContainerService)
-        : base(backOfficeSecurityAccessor, contentTypeContainerService)
+        IMemberTypeContainerService memberTypeContainerService)
+        : base(backOfficeSecurityAccessor, memberTypeContainerService)
     {
     }
 

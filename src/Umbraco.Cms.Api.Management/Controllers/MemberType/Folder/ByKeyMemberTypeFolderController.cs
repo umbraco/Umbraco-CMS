@@ -12,8 +12,8 @@ public class ByKeyMemberTypeFolderController : MemberTypeFolderControllerBase
 {
     public ByKeyMemberTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IContentTypeContainerService contentTypeContainerService)
-        : base(backOfficeSecurityAccessor, contentTypeContainerService)
+        IMemberTypeContainerService memberTypeContainerService)
+        : base(backOfficeSecurityAccessor, memberTypeContainerService)
     {
     }
 
