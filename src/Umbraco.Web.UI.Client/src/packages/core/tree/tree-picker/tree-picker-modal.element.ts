@@ -3,13 +3,14 @@ import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-pic
 import { html, customElement, state, ifDefined, nothing, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeElement, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbSearchProvider } from '@umbraco-cms/backoffice/search';
+import { UmbTreePickerModalContext } from './tree-picker-modal.context.js';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -43,40 +44,49 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#searchProvider?: any;
 
+	// TODO: find a way to implement through the manifest api field
+	#api = new UmbTreePickerModalContext(this);
+
+	constructor() {
+		super();
+		this.observe(
+			this.#api.selection.selection,
+			(selection) => {
+				this.updateValue({ selection });
+				this.requestUpdate();
+			},
+			'umbSelectionObserver',
+		);
+	}
+
 	override connectedCallback() {
 		super.connectedCallback();
 
 		// TODO: We should make a nicer way to observe the value..  [NL]
 		// This could be by observing when the modalCOntext gets set. [NL]
-		if (this.modalContext) {
-			this.observe(this.modalContext.value, (value) => {
-				this._selectionConfiguration.selection = value?.selection ?? [];
-			});
-		}
+		this._selectionConfiguration.selection = this.value?.selection ?? [];
+		this.#api.selection.setSelection(this.value?.selection ?? []);
 
 		// Same here [NL]
 		this._selectionConfiguration.multiple = this.data?.multiple ?? false;
+		this.#api.selection.setMultiple(this.data?.multiple ?? false);
+		this.#api.selection.setSelectable(true);
 
 		this.#initCreateAction();
 		this.#initSearch();
 	}
 
-	// Selection
-
-	#onSelectionChange(event: UmbSelectionChangeEvent) {
-		event.stopPropagation();
-		const element = event.target as UmbTreeElement;
-		this.value = { selection: element.getSelection() };
-		this.modalContext?.dispatchEvent(new UmbSelectionChangeEvent());
-	}
+	// Tree Selection
 
 	#onSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
+		this.#api.selection.select(event.unique);
 		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
 	}
 
 	#onDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
+		this.#api.selection.deselect(event.unique);
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 
@@ -194,7 +204,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					startNode: this.data?.startNode,
 					foldersOnly: this.data?.foldersOnly,
 				}}
-				@selection-change=${this.#onSelectionChange}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}></umb-tree>
 		`;
