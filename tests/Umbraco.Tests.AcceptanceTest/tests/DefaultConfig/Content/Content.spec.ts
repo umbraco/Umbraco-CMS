@@ -91,7 +91,7 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(wrongContentName);
+  await umbracoUi.content.goToContentWithName(wrongContentName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
@@ -111,7 +111,7 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(contentText);
   await umbracoUi.content.clickSaveButton();
 
