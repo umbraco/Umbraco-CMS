@@ -1,13 +1,20 @@
-import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbValidator } from '../interfaces/validator.interface.js';
+import type { UmbValidationMessageTranslator } from '../translators/index.js';
+import { GetValueByJsonPath } from '../utils/json-path.function.js';
 import { type UmbValidationMessage, UmbValidationMessagesManager } from './validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
+import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbValidationMessageTranslator } from '../translators/index.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { GetValueByJsonPath } from '../utils/json-path.function.js';
 
+/**
+ * Helper method to replace the start of a string with another string.
+ * @param path {string}
+ * @param startFrom {string}
+ * @param startTo {string}
+ * @returns {string}
+ */
 function ReplaceStartOfString(path: string, startFrom: string, startTo: string): string {
 	if (path.startsWith(startFrom + '.')) {
 		return startTo + path.slice(startFrom.length);
@@ -95,7 +102,6 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 	 *
 	 * messages and data will be localizes accordingly to the given data path.
 	 * @param dataPath {string} - The data path to bind this validation context to.
-	 * @returns
 	 * @example
 	 * ```ts
 	 * const validationContext = new UmbValidationContext(host);
@@ -178,6 +184,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 	/**
 	 * Get if this context is valid.
 	 * Notice this does not verify the validity.
+	 * @returns {boolean}
 	 */
 	get isValid(): boolean {
 		return this.#isValid;
