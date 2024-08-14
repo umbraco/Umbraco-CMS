@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Options;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
@@ -126,7 +127,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
             builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
-            
+
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
         }
@@ -135,11 +136,13 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         // Register required services for ModelsBuilderDashboardController
         builder.Services.AddSingleton<IModelsGenerator, ModelsGenerator>();
-        
+
         // TODO: Remove in v13 - this is only here in case someone is already using this generator directly
         builder.Services.AddSingleton<ModelsGenerator>();
         builder.Services.AddSingleton<OutOfDateModelsStatus>();
         builder.Services.AddSingleton<ModelsGenerationError>();
+
+        builder.Services.ConfigureOptions<ConfigurePropertySettingsOptions>();
 
         return builder;
     }
@@ -165,7 +168,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         // This is what the community MB would replace, all of the above services are fine to be registered
         builder.Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
-        
+
         return builder;
     }
 }

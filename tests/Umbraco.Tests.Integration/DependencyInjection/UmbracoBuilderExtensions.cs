@@ -97,6 +97,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
         builder.Services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
 
+        builder.Services.AddSingleton<IReservedFieldNamesService, ReservedFieldNamesService>();
+
         return builder;
     }
 

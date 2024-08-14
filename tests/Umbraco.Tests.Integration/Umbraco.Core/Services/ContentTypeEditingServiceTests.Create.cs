@@ -710,17 +710,6 @@ public partial class ContentTypeEditingServiceTests
         Assert.AreEqual(ContentTypeOperationStatus.InvalidParent, result.Status);
     }
 
-    // test some properties from IPublishedContent
-    [TestCase(nameof(IPublishedContent.Id))]
-    [TestCase(nameof(IPublishedContent.Name))]
-    [TestCase(nameof(IPublishedContent.SortOrder))]
-    // test some properties from IPublishedElement
-    [TestCase(nameof(IPublishedElement.Properties))]
-    [TestCase(nameof(IPublishedElement.ContentType))]
-    [TestCase(nameof(IPublishedElement.Key))]
-    // test some methods from IPublishedContent
-    [TestCase(nameof(IPublishedContent.IsDraft))]
-    [TestCase(nameof(IPublishedContent.IsPublished))]
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("   ")]
@@ -729,21 +718,12 @@ public partial class ContentTypeEditingServiceTests
     [TestCase("!\"#¤%&/()=)?`")]
     public async Task Cannot_Use_Invalid_PropertyType_Alias(string propertyTypeAlias)
     {
-        // ensure that property casing is ignored when handling reserved property aliases
-        var propertyTypeAliases = new[]
-        {
-            propertyTypeAlias, propertyTypeAlias.ToLowerInvariant(), propertyTypeAlias.ToUpperInvariant()
-        };
+        var propertyType = ContentTypePropertyTypeModel("Test Property", propertyTypeAlias);
+        var createModel = ContentTypeCreateModel("Test", propertyTypes: new[] { propertyType });
 
-        foreach (var alias in propertyTypeAliases)
-        {
-            var propertyType = ContentTypePropertyTypeModel("Test Property", alias);
-            var createModel = ContentTypeCreateModel("Test", propertyTypes: new[] { propertyType });
-
-            var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
-        }
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
     }
 
     [TestCase("testProperty", "testProperty")]
@@ -818,9 +798,7 @@ public partial class ContentTypeEditingServiceTests
     [TestCase(".")]
     [TestCase("-")]
     [TestCase("!\"#¤%&/()=)?`")]
-    [TestCase("system")]
-    [TestCase("System")]
-    [TestCase("SYSTEM")]
+    [TestCaseSource(nameof(DifferentCapitalizedAlias), new object[] { "System"})]
     public async Task Cannot_Use_Invalid_Alias(string contentTypeAlias)
     {
         var createModel = ContentTypeCreateModel("Test", contentTypeAlias);
