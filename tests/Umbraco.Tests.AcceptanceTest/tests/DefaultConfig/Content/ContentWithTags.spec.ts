@@ -1,4 +1,4 @@
-﻿import { ConstantHelper, test, AliasHelper } from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -19,6 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create content with one tag', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Draft'; 
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -36,20 +37,20 @@ test('can create content with one tag', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value).toEqual([tagsName[0]]);
 });
 
 test('can publish content with multiple tags', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickPlusIconButton();
   await umbracoUi.content.enterTag(tagsName[0]);
   await umbracoUi.content.enterTag(tagsName[1]);
@@ -59,6 +60,7 @@ test('can publish content with multiple tags', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value).toEqual(tagsName);
 });
 
@@ -70,7 +72,7 @@ test('can remove a tag in the content', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeTagByName(tagsName[0]);
   await umbracoUi.content.clickSaveButton();
 
