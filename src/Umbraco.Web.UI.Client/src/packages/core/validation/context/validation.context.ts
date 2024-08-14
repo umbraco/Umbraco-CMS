@@ -228,6 +228,11 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 			() => Promise.resolve(false),
 		);
 
+		if (!this.messages) {
+			// This Context has been destroyed while is was validating, so we should not continue.
+			return;
+		}
+
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
 		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
 		const isValid = this.messages.getHasAnyMessages() ? false : resultsStatus;
