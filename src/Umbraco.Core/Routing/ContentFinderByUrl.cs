@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -15,6 +17,13 @@ public class ContentFinderByUrl : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrl> _logger;
     private readonly IDocumentUrlService _documentUrlService;
+
+    [Obsolete("Use non-obsoleted constructor. This will be removed in Umbraco 16.")]
+    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor)
+    : this(logger, umbracoContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
+
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
@@ -82,7 +91,7 @@ public class ContentFinderByUrl : IContentFinder
 
 
         // TODO find better way to strip the id from the route
-        var documentKey = _documentUrlService.GetDocumentKeyByRouteAsync(docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length), docreq.Culture, docreq.Domain?.ContentId).GetAwaiter().GetResult(); //TODO proper async
+        var documentKey = _documentUrlService.GetDocumentKeyByRouteAsync(docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length), docreq.Culture ?? "en-US", docreq.Domain?.ContentId).GetAwaiter().GetResult(); //TODO proper async and default culture
 
         IPublishedContent? node =
             umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);

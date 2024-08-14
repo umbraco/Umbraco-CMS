@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
@@ -265,7 +266,7 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
 
         Assert.AreEqual(expectedCulture, frequest.Culture);
 
-        var finder = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
+        var finder = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
         var result = await finder.TryFindContent(frequest);
 
         Assert.IsTrue(result);
@@ -313,7 +314,7 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
         publishedRouter.FindAndSetDomain(frequest);
 
         // find document
-        var finder = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
+        var finder = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
         var result = await finder.TryFindContent(frequest);
 
         // apply wildcard domain
@@ -350,7 +351,7 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
 
         Assert.AreEqual(expectedCulture, frequest.Culture);
 
-        var finder = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
+        var finder = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
         var result = await finder.TryFindContent(frequest);
 
         Assert.IsTrue(result);

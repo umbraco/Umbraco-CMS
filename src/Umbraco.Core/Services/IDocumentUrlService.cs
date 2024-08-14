@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,17 +22,12 @@ namespace Umbraco.Cms.Core.Services;
 public interface IDocumentUrlService
 {
 
+    /// <summary>
+    /// Initializes the service and ensure the content in the database is correct with the current configuration.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task InitAsync(CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Rebuilds all urls for all documents in all combinations.
-    /// </summary>
-    Task RebuildAllUrlsAsync();
-
-    /// <summary>
-    /// Gets a bool indicating whether the current urls are valid with the current configuration or not.
-    /// </summary>
-    Task<bool> ShouldRebuildUrlsAsync();
 
     /// <summary>
     /// Gets the Url from a document key, culture and segment. Preview urls are returned if isPreview is true.
@@ -40,7 +36,7 @@ public interface IDocumentUrlService
     /// <param name="culture">The culture code.</param>
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
     /// <returns>The url of the document.</returns>
-    Task<string?> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft);
+    string? GetUrlSegment(Guid documentKey, string culture, bool isDraft);
 
     /// <summary>
     /// Creates or updates a url for a document key, culture and segment and draft information.
@@ -72,10 +68,10 @@ public interface IDocumentUrlService
     /// <param name="isDraft">Whether to delete the url of the draft or published document.</param>
     Task DeleteUrlAsync(Guid documentKey);
 
-    Task<Guid?> GetDocumentKeyByRouteAsync(string route, string? culture, int? documentStartNodeId);
+    Task<Guid?> GetDocumentKeyByRouteAsync(string route, string culture, int? documentStartNodeId);
 }
 
-public class DocumentUrlServiceInitializer : IHostedService
+public class DocumentUrlServiceInitializer : IHostedService, IHostedLifecycleService
 {
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IRuntimeState _runtimeState;
@@ -111,6 +107,15 @@ public class DocumentUrlServiceInitializer : IHostedService
         return Task.CompletedTask;
     }
 
+    public Task StoppingAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StoppedAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }
 
 public class DocumentUrlService : IDocumentUrlService
@@ -125,7 +130,6 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IDomainService _domainService;
     private readonly ILanguageService _languageService;
-    private readonly IMemoryCache _memoryCache;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
     private bool _isInitialized = false;
@@ -140,8 +144,7 @@ public class DocumentUrlService : IDocumentUrlService
         IContentService contentService,
         IShortStringHelper shortStringHelper,
         IDomainService domainService,
-        ILanguageService languageService,
-        IMemoryCache memoryCache)
+        ILanguageService languageService)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -153,15 +156,20 @@ public class DocumentUrlService : IDocumentUrlService
         _shortStringHelper = shortStringHelper;
         _domainService = domainService;
         _languageService = languageService;
-        _memoryCache = memoryCache;
     }
 
     public async Task InitAsync(CancellationToken cancellationToken)
     {
-        var scope = _coreScopeProvider.CreateCoreScope();
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        if (await ShouldRebuildUrlsAsync())
+        {
+            await RebuildAllUrlsAsync();
+        }
+
+
         IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments = _documentUrlRepository.GetAll();
 
-        var languages = await _languageService.GetAllAsync();
+        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         var languageIdToIsoCode = languages.ToDictionary(x => x.Id, x => x.IsoCode);
         foreach (PublishedDocumentUrlSegment publishedDocumentUrlSegment in publishedDocumentUrlSegments)
         {
@@ -194,9 +202,15 @@ public class DocumentUrlService : IDocumentUrlService
         await CreateOrUpdateUrlSegmentsAsync(documents);
     }
 
-    public Task<bool> ShouldRebuildUrlsAsync() => throw new NotImplementedException();
+    public Task<bool> ShouldRebuildUrlsAsync()
+    {
+        // TODO check that the url providers has not chanaged
+        // TODO check that the ... has not changed
 
-    public Task<string?> GetUrlSegmentAsync(Guid documentKey, string culture, bool isDraft)
+        return Task.FromResult(false);
+    }
+
+    public string? GetUrlSegment(Guid documentKey, string culture, bool isDraft)
     {
         ThrowIfNotInitialized();
         var cacheKey = CreateCacheKey(documentKey, culture, isDraft);
@@ -204,7 +218,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegment? urlSegment);
 
-        return Task.FromResult(urlSegment?.UrlSegment);
+        return urlSegment?.UrlSegment;
     }
 
     private void ThrowIfNotInitialized()
@@ -283,7 +297,7 @@ public class DocumentUrlService : IDocumentUrlService
     public Task DeleteUrlAsync(Guid documentKey, string culture, string segment, bool isDraft) => throw new NotImplementedException();
 
     public Task DeleteUrlAsync(Guid documentKey) => throw new NotImplementedException();
-    public async Task<Guid?> GetDocumentKeyByRouteAsync(string route, string? culture, int? documentStartNodeId)
+    public async Task<Guid?> GetDocumentKeyByRouteAsync(string route, string culture, int? documentStartNodeId) /*TODO draft mode?*/
     {
         var urlSegments = route.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
 
@@ -292,29 +306,27 @@ public class DocumentUrlService : IDocumentUrlService
         var hideTopLevelNodeFromPath = _globalSettings.HideTopLevelNodeFromPath;
 
         if ((!_globalSettings.ForceCombineUrlPathLeftToRight
-             && CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft))
+             && CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft))
         {
             urlSegments = urlSegments.Reverse().ToArray();
         }
 
-
-
         // If a domain is assigned to this route, we need to follow the url segments
         if (runnerKey.HasValue)
         {
-            // If there is url segments it means the domain root has been requested
+            // If there is no url segments it means the domain root has been requested
             if (urlSegments.Length == 0)
             {
                 return runnerKey.Value;
             }
 
-            //Otherwise we have to follow the parts
+            // Otherwise we have to find the child with that segment anc follow that
             foreach (var urlSegment in urlSegments)
             {
                 //Get the children of the runnerKey and find the child (if any) with the correct url segment
                 var childKeys = GetChildKeys(runnerKey.Value);
 
-                runnerKey = await GetChildWithUrlSegmentAsync(childKeys, urlSegment, culture);
+                runnerKey = GetChildWithUrlSegment(childKeys, urlSegment, culture);
 
                 if (runnerKey is null)
                 {
@@ -323,13 +335,10 @@ public class DocumentUrlService : IDocumentUrlService
             }
 
             return runnerKey;
-
         }
         // If there is no parts, it means it is a root (and no assigned domain)
-        else if(urlSegments.Length == 0)
+        if(urlSegments.Length == 0)
         {
-
-
             // if we do not hide the top level and no domain was found, it maens there is no content.
             // TODO we can remove this to keep consistency witht the old routing, but it seems incorrect to allow that.
             if (hideTopLevelNodeFromPath is false)
@@ -340,34 +349,65 @@ public class DocumentUrlService : IDocumentUrlService
             return GetTopMostRootKey();
         }
 
+        // Otherwise we have to find the root items (or child of the first root when hideTopLevelNodeFromPath is true) and follow the url segments in them to get to correct document key
 
-
-
-
-
-
-        foreach (var routePart in urlSegments)
+        for (var index = 0; index < urlSegments.Length; index++)
         {
+            if (runnerKey is null)
+            {
+                break;
+            }
 
-
-          //  runnerKey = ..
+            var urlSegment = urlSegments[index];
+            IEnumerable<Guid> runnerKeys = index == 0
+                ? GetKeysInRoot(hideTopLevelNodeFromPath)
+                : GetChildKeys(runnerKey.Value);
+            runnerKey = GetChildWithUrlSegment(runnerKeys, urlSegment, culture);
         }
 
-
-
-
-        // TODO route is weird, it can be a documentId before a path.
-
-        return Guid.Empty;
-        //if(an)
+        return runnerKey;
     }
 
-    private async Task<Guid?> GetChildWithUrlSegmentAsync(IEnumerable<Guid> childKeys, string urlSegment, string? culture)
+    //TODO test cases:
+    // - Find the root, when a domain is set
+    // - Find a nested child, when a domain is set
+
+    // - Find the root when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find a nested child of item in the root top when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is true
+    // - Find the root when no domain is set and hideTopLevelNodeFromPath is false
+    // - Find a nested child of item in the root top when no domain is set and hideTopLevelNodeFromPath is false
+    // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is false
+
+    private IEnumerable<Guid> GetKeysInRoot(bool replaceFirstRootItemWithItsChildren)
+    {
+        //TODO replace with something more performand
+        IEnumerable<Guid> rootKeys = _contentService.GetRootContent().Select(x=>x.Key);
+
+        var replace = replaceFirstRootItemWithItsChildren;
+        foreach (Guid rootKey in rootKeys)
+        {
+            if (replace)
+            {
+                IEnumerable<Guid> childKeys = GetChildKeys(rootKey);
+
+                foreach (Guid childKey in childKeys)
+                {
+                    yield return childKey;
+                }
+
+                replace = false;
+            }
+
+            yield return rootKey;
+        }
+    }
+
+    private Guid? GetChildWithUrlSegment(IEnumerable<Guid> childKeys, string urlSegment, string culture)
     {
         foreach (Guid childKey in childKeys)
         {
-            var childUrlSegment =
-                await GetUrlSegmentAsync(childKey, culture! /*TODO figure out if this really is nullable */, false /*TODO figure out about this*/);
+            var childUrlSegment = GetUrlSegment(childKey, culture, false /*TODO figure out about this*/);
 
             if (string.Equals(childUrlSegment, urlSegment))
             {
@@ -381,7 +421,6 @@ public class DocumentUrlService : IDocumentUrlService
     // TODO replace with a navigational service when available
     private IEnumerable<Guid> GetChildKeys(Guid documentKey)
     {
-
         var id = _contentService.GetById(documentKey)?.Id;
 
         if (id.HasValue is false)
@@ -392,16 +431,14 @@ public class DocumentUrlService : IDocumentUrlService
         return _contentService.GetPagedChildren(id.Value, 0, int.MaxValue, out _).Select(x => x.Key);
     }
 
+    // TODO replace with a navigational service when available
     private Guid? GetTopMostRootKey()
     {
-        // TODO replace with a navigational service when available
         return _contentService.GetRootContent().FirstOrDefault()?.Key;
     }
 
-    private string CreateCacheKey(Guid documentKey, string culture, bool isDraft)
-    {
-        return $"{documentKey}|{culture}|{isDraft}";
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}";
 
     private Guid? GetStartNodeKey(int? documentStartNodeId)
     {
@@ -413,162 +450,5 @@ public class DocumentUrlService : IDocumentUrlService
         // TODO find performand whey to do this
         return _contentService.GetById(documentStartNodeId.Value)?.Key;
     }
-
-    private async Task<Route?> GetRouteAsync(Guid documentKey, bool isDraft, string? culture, string? segment)
-        {
-
-            //First, we need to walk up from the note to the ancesctor with a domain or is the cotent root, and collect all the url segments.
-            var urlSegments = new List<string>();
-
-
-            // IPublishedContent? content = node;
-            IContent? document = _contentService.GetById(documentKey);
-
-            if (document is null || document.Trashed)
-            {
-                return null;
-            }
-
-            var urlSegment = GetUrlSegment(document, culture, segment);
-            var hasDomains = await HasDomainAssignedAsync(document.Key, culture);
-
-            // content is null at root
-            Guid? runnerKey = documentKey;
-            while (hasDomains == false && runnerKey.HasValue)
-            {
-                // no segment indicates this is not published when this is a variant
-                if (urlSegment.IsNullOrWhiteSpace())
-                {
-                    return null;
-                }
-
-                urlSegments.Add(urlSegment);
-
-                // move to parent node
-                runnerKey = document is not null ? GetParentKeyFromDocumentKey(document) : null;
-                if (runnerKey.HasValue)
-                {
-                    document = _contentService.GetById(runnerKey.Value);
-                    if (document is not null)
-                    {
-                        urlSegment = GetUrlSegment(document, culture, segment);
-                    }
-                }
-
-                hasDomains = document is not null && await HasDomainAssignedAsync(document.Key, culture);
-            }
-
-            // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
-            if (urlSegment.IsNullOrWhiteSpace())
-            {
-                return null;
-            }
-
-            var hideTopLevelNode = _globalSettings.HideTopLevelNodeFromPath;
-
-            // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-            if (hasDomains == false && hideTopLevelNode)
-            {
-                ApplyHideTopLevelNodeFromPath(document!, urlSegments, isDraft); // todo should this have been the original document or the root?
-            }
-
-            // assemble the route- We only have to reverse for left to right languages
-            if (_globalSettings.ForceCombineUrlPathLeftToRight || !CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft)
-            {
-                urlSegments.Reverse();
-            }
-
-            var path = "/" + string.Join("/", urlSegments); // will be "/" or "/foo" or "/foo/bar" etc
-
-            // prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
-            // and is done so that we know the ID of the domain node for the path
-            var route = (document?.Id.ToString(CultureInfo.InvariantCulture) ?? string.Empty) + path;
-
-            return new Route(document?.Key, path);
-        }
-
-    /// <summary>
-    /// Removes the first segment of the urlSegments, if the document is the original root (the item with / as url).
-    /// </summary>
-    private void ApplyHideTopLevelNodeFromPath(IContentBase document, List<string> urlSegments, bool isDraft)
-    {
-        // TODO weird fact that we need to test: If the root items is reordered, the urls will change, so the first item will get the /, and thereby the entire subtrees of the moved and old parent have to be rebuild to match old behavior.
-
-        // TODO how can I determine what is the original root, if all urls are begin rebuild? Do we need to store this in key/value?. We could do a migration to add that from the existing logic.
-        var parentKey = GetParentKeyFromDocumentKey(document);
-
-        // in theory if hideTopLevelNodeFromPath is true, then there should be only one
-        // top-level node, or else domains should be assigned. but for backward compatibility
-        // we add this check - we look for the document matching "/" and if it's not us, then
-        // we do not hide the top level path
-        // it has to be taken care of in GetByRoute too so if
-        // "/foo" fails (looking for "/*/foo") we try also "/foo".
-        // this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
-        // that's the way it works pre-4.10 and we try to be backward compat for the time being
-        if(parentKey.HasValue)
-        {
-            if (IsFirstRoot(parentKey.Value))
-            {
-                urlSegments.RemoveAt(urlSegments.Count - 1);
-            }
-        }
-        else
-        {
-            urlSegments.RemoveAt(urlSegments.Count - 1);
-        }
-    }
-
-    private async Task<bool> HasDomainAssignedAsync(Guid documentKey, string? culture, bool includeWildcards = false)
-    {
-        var assigned = await _domainService.GetAssignedDomainsAsync(documentKey, includeWildcards);
-
-        // It's super important that we always compare cultures with ignore case, since we can't be sure of the casing!
-        // Comparing with string.IsNullOrEmpty since both empty string and null signifies invariant.
-        return string.IsNullOrEmpty(culture)
-            ? assigned.Any()
-            : assigned.Any(x => x.LanguageIsoCode?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
-    }
-
-    //TODO replace implementation with navigational service when available
-    private bool IsFirstRoot(Guid parentKey) => _contentService.GetRootContent().FirstOrDefault()?.Key == parentKey;
-
-
-
-
-    private string? GetUrlSegment(IContentBase document, string? culture, string? segment) => document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture); //TODO can we use segment?
-
-    //TODO replace implementation with navigational service when available
-    private Guid? GetParentKeyFromDocumentKey(IContentBase document)
-    {
-        if (document.ParentId == 0)
-        {
-            return null;
-        }
-
-        Attempt<Guid> attempt = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>()
-            .GetKeyForId(document.ParentId, UmbracoObjectTypes.Document);
-
-        return attempt.Success ? attempt.Result : null;
-    }
-}
-
-public sealed class Route
-{
-    public Route(Guid? relativeRouteKey, string path)
-    {
-        RelativeRouteKey = relativeRouteKey;
-        Path = path;
-    }
-
-    /// <summary>
-    /// The key of the document that has a domain assigned. Null if no domain is assigned.
-    /// </summary>
-    public Guid? RelativeRouteKey { get; }
-
-    /// <summary>
-    /// The full path of the route.
-    /// </summary>
-    public string Path { get; }
-
 
 }

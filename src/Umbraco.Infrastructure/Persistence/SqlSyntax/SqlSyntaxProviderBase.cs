@@ -154,7 +154,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             indexType += " NONCLUSTERED";
         }
 
-        return indexType;
+        return indexType.Trim();
     }
 
     public virtual string GetSpecialDbType(SpecialDbType dbType)

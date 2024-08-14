@@ -24,19 +24,19 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public async Task RebuildAllUrlsAsync()
+    public async Task InitAsync()
     {
-        ContentService.PublishBranch(Textpage, true, []);
-
-        for (int i = 3; i < 10; i++)
-        {
-            var unusedSubPage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page " + i, Textpage.Id);
-            unusedSubPage.Key = Guid.NewGuid();
-            ContentService.Save(unusedSubPage);
-            ContentService.Publish(unusedSubPage, new string[0]);
-        }
-
-        await DocumentUrlService.RebuildAllUrlsAsync();
+        // ContentService.PublishBranch(Textpage, true, []);
+        //
+        // for (int i = 3; i < 10; i++)
+        // {
+        //     var unusedSubPage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page " + i, Textpage.Id);
+        //     unusedSubPage.Key = Guid.NewGuid();
+        //     ContentService.Save(unusedSubPage);
+        //     ContentService.Publish(unusedSubPage, new string[0]);
+        // }
+        //
+        // await DocumentUrlService.InitAsync(CancellationToken.None);
 
     }
 }
