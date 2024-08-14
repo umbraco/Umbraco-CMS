@@ -1,7 +1,7 @@
+import { UMB_VALIDATION_CONTEXT } from '../index.js';
 import type { UmbValidationMessageTranslator } from './validation-message-path-translator.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_VALIDATION_CONTEXT } from '../index.js';
 
 export abstract class UmbValidationPathTranslatorBase
 	extends UmbControllerBase

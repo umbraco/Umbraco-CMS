@@ -1,4 +1,4 @@
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	GetPropertyNameFromPath,
 	UmbDataPathPropertyValueFilter,

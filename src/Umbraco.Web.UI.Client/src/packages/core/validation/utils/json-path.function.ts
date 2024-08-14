@@ -1,3 +1,8 @@
+/**
+ *
+ * @param data
+ * @param path
+ */
 export function GetValueByJsonPath(data: any, path: string): any {
 	// strip $ from the path:
 	const strippedPath = path.startsWith('$.') ? path.slice(2) : path;
@@ -5,6 +10,10 @@ export function GetValueByJsonPath(data: any, path: string): any {
 	return GetNextPropertyValueFromPath(data, strippedPath);
 }
 
+/**
+ *
+ * @param path
+ */
 export function GetPropertyNameFromPath(path: string): string {
 	// find next '.' or '[' in the path, using regex:
 	const match = path.match(/\.|\[/);
@@ -15,6 +24,11 @@ export function GetPropertyNameFromPath(path: string): string {
 	return path.slice(0, match.index);
 }
 
+/**
+ *
+ * @param data
+ * @param path
+ */
 function GetNextPropertyValueFromPath(data: any, path: string): any {
 	if (!data) return undefined;
 	// find next '.' or '[' in the path, using regex:
@@ -75,6 +89,10 @@ function GetNextPropertyValueFromPath(data: any, path: string): any {
 	}
 }
 
+/**
+ *
+ * @param filter
+ */
 function JsFilterFromJsonPathFilter(filter: string): any {
 	// strip ?( and ) from the filter
 	const jsFilter = filter.slice(2, -1);

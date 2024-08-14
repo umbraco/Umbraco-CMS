@@ -4,6 +4,7 @@ import type { UmbBlockDataType } from '../types.js';
  * Validation Data Path filter for Block Element Data.
  * write a JSON-Path filter similar to `?(@.udi = 'my-udi://1234')`
  * @param udi {string} - The udi of the block Element data.
+ * @param data {{udi: string}} - A data object with the udi property.
  * @returns
  */
 export function UmbDataPathBlockElementDataFilter(data: Pick<UmbBlockDataType, 'udi'>): string {

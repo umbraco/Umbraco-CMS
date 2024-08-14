@@ -1,6 +1,6 @@
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbValidationPathTranslatorBase } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataFilter } from './data-path-element-data-filter.function.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbValidationPathTranslatorBase } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockElementDataValidationPathTranslator extends UmbValidationPathTranslatorBase {
 	#propertyName: string;

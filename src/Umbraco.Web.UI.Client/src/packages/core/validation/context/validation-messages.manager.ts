@@ -19,19 +19,6 @@ export class UmbValidationMessagesManager {
 		this.#messages.asObservable().subscribe((x) => console.log('all messages:', x));
 	}*/
 
-	/*
-	serializeMessages(fromPath: string, toPath: string): void {
-		this.#messages.setValue(
-			this.#messages.getValue().map((x) => {
-				if (x.path.indexOf(fromPath) === 0) {
-					x.path = toPath + x.path.substring(fromPath.length);
-				}
-				return x;
-			}),
-		);
-	}
-	*/
-
 	getHasAnyMessages(): boolean {
 		return this.#messages.getValue().length !== 0;
 	}
@@ -90,13 +77,6 @@ export class UmbValidationMessagesManager {
 		);
 		this.#messages.append(newBodies.map((body) => ({ type, key: UmbId.new(), path, body })));
 	}
-
-	/*
-	appendMessage(msg: UmbValidationMessage): void {
-		const path = this.#translatePath(msg.path) ?? msg.path;
-		this.#messages.appendOne({ ...msg, path });
-	}
-		*/
 
 	removeMessageByKey(key: string): void {
 		this.#messages.removeOne(key);
