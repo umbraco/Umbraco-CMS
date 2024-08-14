@@ -7,10 +7,9 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const link = 'https://docs.umbraco.com';
 const linkTitle = 'Umbraco Documentation';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -27,6 +26,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'LinkedDocument';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -60,19 +60,18 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
 test('can publish content with the document link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create a document to link
   const documentTypeForLinkedDocumentName = 'TestDocumentType';
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'ContentToPick';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickSubmitButton();
@@ -101,13 +100,12 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
@@ -129,19 +127,17 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
 test('can create content with the media link', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create a media to pick
   const mediaFileName = 'TestMediaFileForContent';
-  const mediaTypeName = 'Image';
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
-  const mediaFileId = await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  const mediaFileId = await umbracoApi.media.createDefaultMediaWithImage(mediaFileName);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.selectLinkByName(mediaFileName);
   await umbracoUi.content.clickSubmitButton();
@@ -166,19 +162,17 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
 test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create a media to pick
   const mediaFileName = 'TestMediaFileForContent';
-  const mediaTypeName = 'Image';
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
-  const mediaFileId = await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  const mediaFileId = await umbracoApi.media.createDefaultMediaWithImage(mediaFileName);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   // Add media link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.selectLinkByName(mediaFileName);
@@ -217,10 +211,11 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeUrlPickerByName(linkTitle);
   await umbracoUi.content.clickSaveButton();
 
@@ -237,10 +232,11 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
+  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickEditUrlPickerButtonByName(linkTitle);
   await umbracoUi.content.enterLinkTitle(updatedLinkTitle);
   await umbracoUi.content.clickSubmitButton();
