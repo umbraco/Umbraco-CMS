@@ -6,7 +6,7 @@ import type { UmbBlockDataType } from '../types.js';
  * @param udi {string} - The udi of the block Element data.
  * @returns
  */
-export function UmbDataPathBlockElementDataFilter(data: UmbBlockDataType): string {
+export function UmbDataPathBlockElementDataFilter(data: Pick<UmbBlockDataType, 'udi'>): string {
 	// write a array of strings for each property, where alias must be present and culture and segment are optional
 	//const filters: Array<string> = [`@.udi = '${udi}'`];
 	//return `?(${filters.join(' && ')})`;
