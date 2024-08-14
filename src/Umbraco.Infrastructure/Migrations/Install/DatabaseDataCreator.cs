@@ -1062,6 +1062,7 @@ internal class DatabaseDataCreator
                     Thumbnail = Constants.Icons.MediaFolder,
                     AllowAtRoot = true,
                     Variations = (byte)ContentVariation.Nothing,
+                    ListView = Constants.DataTypes.Guids.ListViewMediaGuid
                 });
         }
 
@@ -1886,11 +1887,13 @@ internal class DatabaseDataCreator
         }
 
         // layouts for the list view
-        const string cardLayout =
-            "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": true, \"selected\": true}";
-        const string listLayout =
-            "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": true,\"selected\": true}";
-        const string layouts = "[" + cardLayout + "," + listLayout + "]";
+        string TableCollectionView(string collectionViewType) =>
+            $"{{\"name\": \"List\",\"collectionView\": \"Umb.CollectionView.{collectionViewType}.Table\", \"icon\": \"icon-list\", \"isSystem\": true, \"selected\": true}}";
+
+        string GridCollectionView(string collectionViewType) =>
+            $"{{\"name\": \"Grid\",\"collectionView\": \"Umb.CollectionView.{collectionViewType}.Grid\",\"icon\": \"icon-thumbnails-small\", \"isSystem\": true,\"selected\": true}}";
+
+        string Layouts(string collectionViewType) => $"[{GridCollectionView(collectionViewType)},{TableCollectionView(collectionViewType)}]";
 
         // Insert data types only if the corresponding Node record exists (which may or may not have been created depending on configuration
         // of data types to create).
@@ -1931,7 +1934,7 @@ internal class DatabaseDataCreator
                     EditorUiAlias = "Umb.PropertyEditorUi.TinyMCE",
                     DbType = "Ntext",
                     Configuration =
-                        "{\"toolbar\":[\"ace\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
+                        "{\"toolbar\":[\"sourcecode\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
                 });
         }
 
@@ -2094,7 +2097,7 @@ internal class DatabaseDataCreator
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
-                        layouts +
+                        Layouts("Document") +
                         ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
@@ -2113,7 +2116,7 @@ internal class DatabaseDataCreator
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
-                        layouts +
+                        Layouts("Media") +
                         ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }

@@ -211,6 +211,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
         // The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
         xml.Add(new XAttribute("Id", dataType.EditorAlias));
+        xml.Add(new XAttribute("EditorUiAlias", dataType.EditorUiAlias ?? dataType.EditorAlias));
         xml.Add(new XAttribute("Definition", dataType.Key));
         xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
         xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationObject)));

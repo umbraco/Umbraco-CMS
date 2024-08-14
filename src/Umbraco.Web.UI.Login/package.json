@@ -15,11 +15,11 @@
 	"dependencies": {
 	},
 	"devDependencies": {
-    "@umbraco-cms/backoffice": "file:../Umbraco.Web.UI.Client",
-    "@umbraco-ui/uui-css": "^1.8.0-rc.0",
-    "msw": "^2.2.13",
-		"typescript": "^5.3.3",
-		"vite": "^5.2.6",
+    "@umbraco-cms/backoffice": "^14.0.0",
+    "@umbraco-ui/uui-css": "^1.8.0",
+    "msw": "^2.3.0",
+		"typescript": "^5.4.5",
+		"vite": "^5.2.11",
 		"vite-tsconfig-paths": "^4.3.2"
 	},
 	"msw": {

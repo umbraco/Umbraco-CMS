@@ -154,6 +154,14 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             return null;
         }
 
+        if (editorValue is string sourceString && sourceString.DetectIsJson() is false)
+        {
+            return new FileUploadValue()
+            {
+                Src = sourceString
+            };
+        }
+
         return _jsonSerializer.TryDeserialize(editorValue, out FileUploadValue? modelValue)
             ? modelValue
             : throw new ArgumentException($"Could not parse editor value to a {nameof(FileUploadValue)} object.");

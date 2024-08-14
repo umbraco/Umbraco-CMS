@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Locking;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -76,6 +77,9 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             MediaService.DeleteMediaOfType(typeId);
         }
     }
+
+    protected override bool CanDelete(IMediaType item)
+        => item.IsSystemMediaType() is false;
 
     #region Notifications
 

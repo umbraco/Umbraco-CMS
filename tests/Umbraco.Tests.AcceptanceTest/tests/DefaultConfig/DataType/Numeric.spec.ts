@@ -14,16 +14,16 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  }
+    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
+  }   
 });
 
-test('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
+test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = -5;
   const expectedDataTypeValues = {
-    alias: "min",
-    value: minimumValue,
+    "alias": "min",
+    "value": minimumValue
   };
 
   // Act
@@ -39,8 +39,8 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maximumValue = 1000000;
   const expectedDataTypeValues = {
-    alias: "max",
-    value: maximumValue,
+    "alias": "max",
+    "value": maximumValue
   };
 
   // Act
@@ -52,12 +52,12 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
+test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stepSizeValue = 5;
   const expectedDataTypeValues = {
-    alias: "step",
-    value: stepSizeValue,
+    "alias": "step",
+    "value": stepSizeValue
   };
 
   // Act
@@ -67,4 +67,35 @@ test('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
   // Assert
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
+
+test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedDataTypeValues = {
+    "alias": "allowDecimals",
+    "value": true
+  };
+
+  // Act
+  await umbracoUi.dataType.clickAllowDecimalsSlider();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
+
+// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
+test.skip('cannot update the minimum greater than the maximum', async ({umbracoUi}) => {
+  // Arrange
+  const minimumValue = 5;
+  const maximumValue = 2;
+
+  // Act
+  await umbracoUi.dataType.enterMinimumValue(minimumValue.toString());
+  await umbracoUi.dataType.enterMaximumValue(maximumValue.toString());
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isErrorNotificationVisible();
 });

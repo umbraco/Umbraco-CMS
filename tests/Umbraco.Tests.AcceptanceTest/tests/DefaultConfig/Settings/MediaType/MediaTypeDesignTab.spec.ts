@@ -98,7 +98,7 @@ test('can add a description to property in a media type', {tag: '@smoke'}, async
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
   await umbracoUi.mediaType.enterPropertyEditorDescription(descriptionText);
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
@@ -118,7 +118,7 @@ test('can set a property as mandatory in a media type', {tag: '@smoke'}, async (
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
   await umbracoUi.mediaType.clickMandatorySlider();
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
@@ -140,7 +140,7 @@ test('can set up validation for a property in a media type', async ({umbracoApi,
   await umbracoUi.mediaType.selectValidationOption('');
   await umbracoUi.mediaType.enterRegEx(regex);
   await umbracoUi.mediaType.enterRegExMessage(regexMessage);
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
@@ -158,8 +158,8 @@ test('can set appearance as label on top for property in a media type', async ({
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
-  await umbracoUi.mediaType.clickLabelOnTopButton();
-  await umbracoUi.mediaType.clickUpdateButton();
+  await umbracoUi.mediaType.clickLabelAboveButton();
+  await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
@@ -215,8 +215,8 @@ test('can create a media type with multiple groups', {tag: '@smoke'}, async ({um
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickAddGroupButton();
-  await umbracoUi.mediaType.addPropertyEditor(secondDataTypeName, 1);
   await umbracoUi.mediaType.enterGroupName(secondGroupName, 1);
+  await umbracoUi.mediaType.addPropertyEditor(secondDataTypeName, 1);
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert

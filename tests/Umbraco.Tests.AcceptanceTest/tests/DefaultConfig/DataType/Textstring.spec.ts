@@ -14,16 +14,16 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  }
+    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
+  }   
 });
 
-test('can update Maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
+test('can update maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxCharsValue = 126;
   const expectedDataTypeValues = {
-    alias: "maxChars",
-    value: maxCharsValue,
+    "alias": "maxChars",
+    "value": maxCharsValue
   };
 
   // Act

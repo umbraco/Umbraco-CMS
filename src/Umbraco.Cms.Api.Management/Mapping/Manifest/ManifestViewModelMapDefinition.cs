@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Manifest;
+using Umbraco.Cms.Api.Management.ViewModels.Manifest;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
 
@@ -13,6 +13,7 @@ public class ManifestViewModelMapDefinition : IMapDefinition
     private static void Map(PackageManifest source, ManifestResponseModel target, MapperContext context)
     {
         target.Name = source.Name;
+        target.Id = source.Id;
         target.Version = source.Version;
         target.Extensions = source.Extensions;
     }

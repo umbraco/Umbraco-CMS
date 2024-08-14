@@ -16,4 +16,6 @@ public interface IMediaTypeEditingService
         IEnumerable<string> currentPropertyAliases);
 
     Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take);
+
+    Task<PagedModel<IMediaType>> GetFolderMediaTypes(int skip, int take);
 }

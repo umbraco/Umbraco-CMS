@@ -85,7 +85,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
-            .AddUmbracoOptions<PackageManifestSettings>()
             .AddUmbracoOptions<WebhookSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes

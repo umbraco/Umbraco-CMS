@@ -1140,6 +1140,8 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
         }
 
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
         // we need to guard against unsaved changes before proceeding; the content will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(content))
         {
@@ -1186,8 +1188,6 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-
             // this will create the correct culture impact even if culture is * or null
             IEnumerable<CultureImpact?> impacts =
                 cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
@@ -1199,7 +1199,15 @@ public class ContentService : RepositoryService, IContentService
                 content.PublishCulture(impact);
             }
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+            // Change state to publishing
+            content.PublishedState = PublishedState.Publishing;
+            var publishingNotification = new ContentPublishingNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(publishingNotification))
+            {
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+            }
+
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, publishingNotification.State, userId);
             scope.Complete();
             return result;
         }
@@ -1254,6 +1262,12 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
+            var savingNotification = new ContentSavingNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+            }
+
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
@@ -1262,7 +1276,7 @@ public class ContentService : RepositoryService, IContentService
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
                 scope.Complete();
                 return result;
             }
@@ -1276,7 +1290,7 @@ public class ContentService : RepositoryService, IContentService
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
 
                 scope.Complete();
 
@@ -1327,9 +1341,15 @@ public class ContentService : RepositoryService, IContentService
 
             scope.WriteLock(Constants.Locks.ContentTree);
 
+            var savingNotification = new ContentSavingNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+            }
+
             var allLangs = _languageRepository.GetMany().ToList();
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
             scope.Complete();
             return result;
         }
@@ -1359,8 +1379,8 @@ public class ContentService : RepositoryService, IContentService
         IContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
         int userId,
-        out IDictionary<string, object?>? initialNotificationState,
         bool branchOne = false,
         bool branchRoot = false)
     {
@@ -1422,7 +1442,6 @@ public class ContentService : RepositoryService, IContentService
             _documentRepository.Save(c);
         }
 
-        initialNotificationState = null;
         if (publishing)
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
@@ -1440,9 +1459,18 @@ public class ContentService : RepositoryService, IContentService
                 culturesUnpublishing,
                 eventMessages,
                 allLangs,
-                out initialNotificationState);
+                notificationState);
+
             if (publishResult.Success)
             {
+                // raise Publishing notification
+                if (scope.Notifications.PublishCancelable(
+                        new ContentPublishingNotification(content, eventMessages).WithState(notificationState)))
+                {
+                    _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
+                }
+
                 // note: StrategyPublish flips the PublishedState to Publishing!
                 publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, eventMessages);
 
@@ -1503,7 +1531,7 @@ public class ContentService : RepositoryService, IContentService
                 // handling events, business rules, etc
                 // note: StrategyUnpublish flips the PublishedState to Unpublishing!
                 // note: This unpublishes the entire document (not different variants)
-                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, out initialNotificationState);
+                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
                 if (unpublishResult.Success)
                 {
                     unpublishResult = StrategyUnpublish(content, eventMessages);
@@ -1539,7 +1567,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 // events and audit
                 scope.Notifications.Publish(
-                    new ContentUnpublishedNotification(content, eventMessages).WithState(initialNotificationState));
+                    new ContentUnpublishedNotification(content, eventMessages).WithState(notificationState));
                 scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
                 if (culturesUnpublishing != null)
@@ -1601,7 +1629,7 @@ public class ContentService : RepositoryService, IContentService
                     scope.Notifications.Publish(
                         new ContentTreeChangeNotification(content, changeType, eventMessages));
                     scope.Notifications.Publish(
-                        new ContentPublishedNotification(content, eventMessages).WithState(initialNotificationState));
+                        new ContentPublishedNotification(content, eventMessages).WithState(notificationState));
                 }
 
                 // it was not published and now is... descendants that were 'published' (but
@@ -1611,7 +1639,7 @@ public class ContentService : RepositoryService, IContentService
                 {
                     IContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
                     scope.Notifications.Publish(
-                        new ContentPublishedNotification(descendants, eventMessages).WithState(initialNotificationState));
+                        new ContentPublishedNotification(descendants, eventMessages).WithState(notificationState));
                 }
 
                 switch (publishResult.Result)
@@ -1711,6 +1739,13 @@ public class ContentService : RepositoryService, IContentService
                         continue; // shouldn't happen but no point in processing this document if there's nothing there
                     }
 
+                    var savingNotification = new ContentSavingNotification(d, evtMsgs);
+                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    {
+                        results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                        continue;
+                    }
+
                     foreach (var c in pendingCultures)
                     {
                         // Clear this schedule for this culture
@@ -1721,7 +1756,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     _documentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
+                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     if (result.Success == false)
                     {
                         _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1775,6 +1810,13 @@ public class ContentService : RepositoryService, IContentService
                     {
                         continue; // shouldn't happen but no point in processing this document if there's nothing there
                     }
+                    var savingNotification = new ContentSavingNotification(d, evtMsgs);
+                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    {
+                        results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                        continue;
+                    }
+
 
                     var publishing = true;
                     foreach (var culture in pendingCultures)
@@ -1820,7 +1862,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
+                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     }
 
                     if (result.Success == false)
@@ -2162,6 +2204,12 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
         }
 
+        var savingNotification = new ContentSavingNotification(document, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
+        }
+
         // publish & check if values are valid
         if (!publishCultures(document, culturesToPublish, allLangs))
         {
@@ -2169,7 +2217,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, userId, out initialNotificationState, true, isRoot);
+        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
@@ -3018,19 +3066,8 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyCollection<string>? culturesUnpublishing,
         EventMessages evtMsgs,
         IReadOnlyCollection<ILanguage> allLangs,
-        out IDictionary<string, object?>? initialNotificationState)
+        IDictionary<string, object?>? notificationState)
     {
-        // raise Publishing notification
-        var notification = new ContentPublishingNotification(content, evtMsgs);
-        var notificationResult = scope.Notifications.PublishCancelable(notification);
-        initialNotificationState = notification.State;
-
-        if (notificationResult)
-        {
-            _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-        }
-
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // If it's null it's invariant
@@ -3268,12 +3305,11 @@ public class ContentService : RepositoryService, IContentService
         ICoreScope scope,
         IContent content,
         EventMessages evtMsgs,
-        out IDictionary<string, object?>? initialNotificationState)
+        IDictionary<string, object?>? notificationState)
     {
         // raise Unpublishing notification
-        var notification = new ContentUnpublishingNotification(content, evtMsgs);
+        var notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
         var notificationResult = scope.Notifications.PublishCancelable(notification);
-        initialNotificationState = notification.State;
 
         if (notificationResult)
         {
