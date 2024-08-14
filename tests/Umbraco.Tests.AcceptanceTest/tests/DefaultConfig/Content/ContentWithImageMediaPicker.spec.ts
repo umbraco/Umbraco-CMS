@@ -8,7 +8,7 @@ const customDataTypeName = 'Custom Image Media Picker';
 const groupName = 'TestGroup';
 const mediaName = 'TestImage';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
@@ -44,8 +44,8 @@ test('can publish content with a image media picker', async ({umbracoApi, umbrac
   // Arrange
   const expectedState = 'Published';
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -65,8 +65,8 @@ test('can add an image to the image media picker', async ({umbracoApi, umbracoUi
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -89,8 +89,8 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
-  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(dataTypeName), imageId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentTypeId, AliasHelper.toAlias(dataTypeName), imageId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -113,8 +113,8 @@ test.skip('image count can not be less that min amount set in image media picker
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 1);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -134,8 +134,8 @@ test.skip('image count can not be more that max amount set in image media picker
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 0);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -160,8 +160,8 @@ test('can add an image from the image media picker with a start node', async ({u
   const imageFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImageAndParentId(mediaName, imageFolderId);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataTypeWithStartNodeId(customDataTypeName, imageFolderId);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -187,8 +187,8 @@ test('can add an image from the image media picker with focal point enabled', as
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 1, true);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), imageId);
   const widthPercentage = 40;
   const heightPercentage = 20;
   await umbracoUi.goToBackOffice();
@@ -216,8 +216,8 @@ test('can reset focal point in a image from the image media picker', async ({umb
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 1, true);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.4, top: 0.2});
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.4, top: 0.2});
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -247,8 +247,8 @@ test.skip('can add an image from the image media picker with a image crop', asyn
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataTypeWithCrop(customDataTypeName, cropLabel, cropWidth, cropHeight);
-  const documentId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
-  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentId, AliasHelper.toAlias(customDataTypeName), imageId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), imageId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
