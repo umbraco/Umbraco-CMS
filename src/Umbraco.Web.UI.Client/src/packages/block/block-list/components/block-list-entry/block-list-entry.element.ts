@@ -287,18 +287,22 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host {
 				position: relative;
 				display: block;
+				--umb-block-list-entry-actions-opacity: 0;
 			}
+
+			:host([settings-invalid]),
+			:host([content-invalid]),
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-block-list-entry-actions-opacity: 1;
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
-				opacity: 0;
+				opacity: var(--umb-block-list-entry-actions-opacity, 0);
 				transition: opacity 120ms;
-			}
-			:host(:hover) uui-action-bar,
-			uui-action-bar:focus,
-			:host(:focus-within) uui-action-bar {
-				opacity: 1;
 			}
 
 			:host([drag-placeholder]) {
