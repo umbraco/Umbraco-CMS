@@ -51,7 +51,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	readonly settings = new UmbBlockElementManager(this, 'settingsData');
 
-	// TODO: Get the name of the contentElementType..
+	// TODO: Get the name from the content element type. Or even better get the Label, but that has to be re-actively updated.
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
 
