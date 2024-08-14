@@ -32,7 +32,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
 
         // if there are any ancestors where IsElement is different from the contentType, the validation fails
         return await Task.FromResult(_contentTypeService.GetAll(ancestorIds)
-            .Any(ancestor => ancestor.IsElement != contentType.IsElement) == false);
+            .Any(ancestor => ancestor.IsElement != contentType.IsElement) is false);
     }
 
     public async Task<bool> DescendantsAreAlignedAsync(IContentType contentType)
@@ -40,7 +40,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
         IEnumerable<IContentType> descendants = _contentTypeService.GetDescendants(contentType.Id, false);
 
         // if there are any descendants where IsElement is different from the contentType, the validation fails
-        return await Task.FromResult(descendants.Any(descendant => descendant.IsElement != contentType.IsElement) == false);
+        return await Task.FromResult(descendants.Any(descendant => descendant.IsElement != contentType.IsElement) is false);
     }
 
     public async Task<bool> ElementToDocumentNotUsedInBlockStructuresAsync(IContentTypeBase contentType)
@@ -56,11 +56,11 @@ public class ElementSwitchValidator : IElementSwitchValidator
         return dataTypes.Any(dataType =>
             editors.First(editor => editor.Alias == dataType.EditorAlias)
                 .GetValueEditor(dataType.ConfigurationObject)
-                .ConfiguredElementTypeKeys().Contains(contentType.Key) == true) == false;
+                .ConfiguredElementTypeKeys().Contains(contentType.Key)) is false;
     }
 
     public async Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType) =>
 
         // if any content for the content type exists, the validation fails.
-        await Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) == false);
+        await Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) is false);
 }
