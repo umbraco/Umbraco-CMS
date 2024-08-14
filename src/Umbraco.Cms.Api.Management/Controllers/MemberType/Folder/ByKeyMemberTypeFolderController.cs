@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Folder;
 
 [ApiVersion("1.0")]
-public class ByKeyDocumentTypeFolderController : MemberTypeFolderControllerBase
+public class ByKeyMemberTypeFolderController : MemberTypeFolderControllerBase
 {
-    public ByKeyDocumentTypeFolderController(
+    public ByKeyMemberTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentTypeContainerService contentTypeContainerService)
         : base(backOfficeSecurityAccessor, contentTypeContainerService)
