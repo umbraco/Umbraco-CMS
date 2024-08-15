@@ -2,6 +2,7 @@ import { UmbMemberCollectionRepository } from '../../collection/index.js';
 import type { UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -39,6 +40,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			},
 			'umbSelectionObserver',
 		);
+	}
+
+	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('data') && this.data) {
+			this.#api.setData(this.data);
+		}
 	}
 
 	override async firstUpdated() {
