@@ -2,18 +2,20 @@ import { UMB_PICKER_MODAL_CONTEXT } from '../picker-modal.context.token.js';
 import type { UmbPickerModalContext } from '../picker-modal.context.js';
 import { customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 const elementName = 'umb-picker-modal-search-result';
 @customElement(elementName)
 export class UmbPickerModalSearchResultElement extends UmbLitElement {
 	@state()
-	_query: unknown;
+	_query?: UmbSearchRequestArgs;
 
 	@state()
 	_searching: boolean = false;
 
 	@state()
-	_items: unknown[] = [];
+	_items: UmbEntityModel[] = [];
 
 	#pickerModalContext?: UmbPickerModalContext;
 
@@ -37,7 +39,7 @@ export class UmbPickerModalSearchResultElement extends UmbLitElement {
 		});
 	}
 
-	override render(): unknown {
+	override render() {
 		if (this._query && this._searching === false && this._items.length === 0) {
 			return this.#renderEmptyResult();
 		}
@@ -45,17 +47,17 @@ export class UmbPickerModalSearchResultElement extends UmbLitElement {
 		return html`
 			${repeat(
 				this._items,
-				(item: any) => item.unique,
-				(item: any) => this.#renderResultItem(item),
+				(item) => item.unique,
+				(item) => this.#renderResultItem(item),
 			)}
 		`;
 	}
 
 	#renderEmptyResult() {
-		return html`<small>No result for <strong>"${this._query}"</strong>.</small>`;
+		return html`<small>No result for <strong>"${this._query?.query}"</strong>.</small>`;
 	}
 
-	#renderResultItem(item: any) {
+	#renderResultItem(item: UmbEntityModel) {
 		return html`
 			<umb-picker-search-result-item .props=${{ item }} .entityType=${item.entityType}></umb-picker-search-result-item>
 		`;
