@@ -33,6 +33,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super();
 		this.#api.selection.setSelectable(true);
 		this.#observePickerSelection();
+	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
 		this.#initCreateAction();
 	}
 
