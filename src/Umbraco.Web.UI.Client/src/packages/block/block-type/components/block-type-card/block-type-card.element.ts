@@ -28,7 +28,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		value = transformServerPathToClientPath(value);
 		if (value) {
 			this.#init.then(() => {
-				this._iconFile = this.#appUrl + removeInitialSlashFromPath(value);
+				this._iconFile = this.#appUrl + value;
 			});
 		} else {
 			this._iconFile = undefined;

@@ -29,7 +29,7 @@ export class UmbBlockGridManagerContext<
 
 		if (layoutStylesheet) {
 			// Cause we await initAppUrl in setting the _editorConfiguration, we can trust the appUrl begin here.
-			return this.#appUrl! + removeInitialSlashFromPath(transformServerPathToClientPath(layoutStylesheet));
+			return this.#appUrl! + transformServerPathToClientPath(layoutStylesheet);
 		}
 		return undefined;
 	});
