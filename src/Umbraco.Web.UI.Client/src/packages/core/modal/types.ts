@@ -2,10 +2,10 @@ export interface UmbPickerModalData<ItemType> {
 	multiple?: boolean;
 	filter?: (item: ItemType) => boolean;
 	pickableFilter?: (item: ItemType) => boolean;
-	search?: UmbPickerModalSearchData;
+	search?: UmbPickerModalSearchConfig;
 }
 
-export interface UmbPickerModalSearchData {
+export interface UmbPickerModalSearchConfig {
 	providerAlias: string;
 }
 

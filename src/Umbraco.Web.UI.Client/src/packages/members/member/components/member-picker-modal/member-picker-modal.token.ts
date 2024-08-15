@@ -1,12 +1,12 @@
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import { UMB_MEMBER_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
-import type { UmbPickerModalSearchData } from '@umbraco-cms/backoffice/modal';
+import type { UmbPickerModalSearchConfig } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbMemberPickerModalData {
 	multiple?: boolean;
 	filter?: (member: UmbMemberItemModel) => boolean;
-	search?: UmbPickerModalSearchData;
+	search?: UmbPickerModalSearchConfig;
 }
 
 export interface UmbMemberPickerModalValue {
