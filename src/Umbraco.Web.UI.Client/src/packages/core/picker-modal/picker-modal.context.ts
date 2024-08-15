@@ -27,10 +27,9 @@ export class UmbPickerModalContext<
 	setData(data: ModalDataType | undefined) {
 		const searchProviderAlias = data?.search?.providerAlias;
 		if (searchProviderAlias) {
-			this.search.setConfig({ providerAlias: searchProviderAlias });
+			this.search.updateConfig({ providerAlias: searchProviderAlias });
 			this.search.setSearchable(true);
 		} else {
-			this.search.setConfig({ providerAlias: undefined });
 			this.search.setSearchable(false);
 		}
 	}

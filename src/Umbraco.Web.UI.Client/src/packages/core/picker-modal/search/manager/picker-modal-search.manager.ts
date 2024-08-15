@@ -67,6 +67,16 @@ export class UmbPickerModalSearchManager<
 	}
 
 	/**
+	 * Update the current configuration for the search manager.
+	 * @param {Partial<UmbPickerModalSearchManagerConfig>} partialConfig
+	 * @memberof UmbPickerModalSearchManager
+	 */
+	public updateConfig(partialConfig: Partial<UmbPickerModalSearchManagerConfig>) {
+		const mergedConfig = { ...this.#config, ...partialConfig } as UmbPickerModalSearchManagerConfig;
+		this.setConfig(mergedConfig);
+	}
+
+	/**
 	 * Returns whether items can be searched.
 	 * @returns {boolean} Whether items can be searched.
 	 * @memberof UmbPickerModalSearchManager
