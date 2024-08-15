@@ -1,6 +1,7 @@
 import type { UmbTreeSelectionConfiguration } from '../types.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import { UmbTreePickerModalContext } from './tree-picker-modal.context.js';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -56,8 +57,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.#initCreateAction();
 	}
 
-	// Tree Selection
+	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('data') && this.data) {
+			this.#api.setData(this.data);
+		}
+	}
 
+	// Tree Selection
 	#onSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
 		this.#api.selection.select(event.unique);
