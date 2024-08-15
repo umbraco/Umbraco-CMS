@@ -8,7 +8,7 @@ export class UmbExportMediaTypeEntityAction extends UmbEntityActionBase<object> 
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
-		const data = await this.#repository.requestExport(this.args.unique);
+		const { data } = await this.#repository.requestExport(this.args.unique);
 		if (!data) return;
 
 		blobDownload(data, `${this.args.unique}.udt`, 'text/xml');
