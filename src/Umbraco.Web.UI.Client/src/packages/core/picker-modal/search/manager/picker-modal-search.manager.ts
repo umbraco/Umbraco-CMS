@@ -3,7 +3,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
@@ -27,6 +27,9 @@ export class UmbPickerModalSearchManager<
 
 	#resultItems = new UmbArrayState<ResultItemType>([], (x) => x.unique);
 	public readonly resultItems = this.#resultItems.asObservable();
+
+	#resultTotalItems = new UmbNumberState(0);
+	public readonly resultTotalItems = this.#resultTotalItems.asObservable();
 
 	#config?: UmbPickerModalSearchManagerConfig;
 	// TODO: lower requirement for search provider item type
@@ -117,6 +120,7 @@ export class UmbPickerModalSearchManager<
 		if (!query) throw new Error('No query provided');
 		const { data } = await this.#searchProvider.search(query);
 		this.#resultItems.setValue(data?.items ?? []);
+		this.#resultTotalItems.setValue(data?.total ?? 0);
 		this.#searching.setValue(false);
 	}
 }
