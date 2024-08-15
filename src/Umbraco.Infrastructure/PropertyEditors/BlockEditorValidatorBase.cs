@@ -28,7 +28,7 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
             new { Path = nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.SettingsData }
         };
 
-        var propertiesJsonPathPart = nameof(BlockItemData.Properties).ToFirstLowerInvariant();
+        var propertiesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
 
         foreach (var group in itemDataGroups)
         {
@@ -46,9 +46,9 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
                 //       we need to ensure that all properties for all languages have a matching "item" entry here, to handle validation of
                 //       required properties (see comment in the top of this method). a separate task has been created, get in touch with KJA.
                 var elementValidation = new ElementTypeValidationModel(item.ContentTypeAlias, item.Key);
-                for (var j = 0; j < item.Properties.Count; j++)
+                for (var j = 0; j < item.Values.Count; j++)
                 {
-                    BlockPropertyValue blockPropertyValue = item.Properties[j];
+                    BlockPropertyValue blockPropertyValue = item.Values[j];
                     IPropertyType? propertyType = blockPropertyValue.PropertyType;
                     if (propertyType is null)
                     {

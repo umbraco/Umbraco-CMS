@@ -97,7 +97,7 @@ internal class BlockEditorValues<TValue, TLayout>
         }
 
         // resolve the actual property types for all block properties
-        foreach (BlockPropertyValue property in block.Properties)
+        foreach (BlockPropertyValue property in block.Values)
         {
             if (!propertyTypes.TryGetValue(property.Alias, out IPropertyType? propertyType))
             {
@@ -114,7 +114,7 @@ internal class BlockEditorValues<TValue, TLayout>
         }
 
         // remove all block properties that did not resolve a property type
-        block.Properties.RemoveAll(blockProperty => blockProperty.PropertyType is null);
+        block.Values.RemoveAll(blockProperty => blockProperty.PropertyType is null);
 
         block.ContentTypeAlias = contentType.Alias;
 

@@ -25,7 +25,7 @@ internal sealed class BlockValuePropertyIndexValueFactory :
         => contentTypeDictionary.TryGetValue(input.ContentTypeKey, out var result) ? result : null;
 
     protected override IDictionary<string, object?> GetRawProperty(BlockItemData blockItemData)
-        => blockItemData.Properties
+        => blockItemData.Values
             .Where(p => p.Culture is null && p.Segment is null)
             .ToDictionary(p => p.Alias, p => p.Value);
 

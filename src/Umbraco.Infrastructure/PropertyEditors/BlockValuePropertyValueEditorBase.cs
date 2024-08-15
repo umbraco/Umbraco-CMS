@@ -48,7 +48,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     {
         var result = new HashSet<UmbracoEntityReference>();
         BlockPropertyValue[] blockPropertyValues = blockValue.ContentData.Concat(blockValue.SettingsData)
-            .SelectMany(x => x.Properties).ToArray();
+            .SelectMany(x => x.Values).ToArray();
         if (blockPropertyValues.Any(p => p.PropertyType is null))
         {
             throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to find references within them.", nameof(blockValue));
@@ -92,7 +92,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         // loop through all content and settings data
         foreach (BlockItemData row in blockValue.ContentData.Concat(blockValue.SettingsData))
         {
-            foreach (BlockPropertyValue blockPropertyValue in row.Properties)
+            foreach (BlockPropertyValue blockPropertyValue in row.Values)
             {
                 if (blockPropertyValue.PropertyType is null)
                 {
@@ -134,7 +134,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
 
         foreach (BlockItemData item in items)
         {
-            foreach (BlockPropertyValue blockPropertyValue in item.Properties)
+            foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType;
                 if (propertyType is null)
@@ -179,7 +179,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     {
         foreach (BlockItemData item in items)
         {
-            foreach (BlockPropertyValue blockPropertyValue in item.Properties)
+            foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType;
                 if (propertyType is null)

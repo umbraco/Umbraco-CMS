@@ -58,7 +58,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"properties": [
+                                                                  			"values": [
                                                                   			    { "alias": "singleLineText", "value": "The single line of text in the block" },
                                                                                 { "alias": "bodyText", "value": "<p>The body text in the block</p>" }
                                                                   			]
@@ -182,7 +182,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             [
                 new(contentElementUdi, elementType.Key, elementType.Alias)
                 {
-                    Properties = new List<BlockPropertyValue>
+                    Values = new List<BlockPropertyValue>
                     {
                         new() { Alias = "singleLineText", Value = "The single line of text in the block" },
                         new() { Alias = "bodyText", Value = "<p>The body text in the block</p>" },
@@ -305,7 +305,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                     Udi = contentElementUdi,
                     ContentTypeAlias = elementType.Alias,
                     ContentTypeKey = elementType.Key,
-                    Properties = new List<BlockPropertyValue>
+                    Values = new List<BlockPropertyValue>
                     {
                         new() { Alias = "singleLineText", Value = "The single line of text in the grid root" },
                         new() { Alias = "bodyText", Value = "<p>The body text in the grid root</p>" },
@@ -316,7 +316,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                     Udi = contentAreaElementUdi,
                     ContentTypeAlias = elementType.Alias,
                     ContentTypeKey = elementType.Key,
-                    Properties = new List<BlockPropertyValue>
+                    Values = new List<BlockPropertyValue>
                     {
                         new() { Alias = "singleLineText", Value = "The single line of text in the grid area" },
                         new() { Alias = "bodyText", Value = "<p>The body text in the grid area</p>" },

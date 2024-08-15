@@ -801,7 +801,7 @@ public class BlockListElementLevelVariationTests : UmbracoIntegrationTest
                         Udi = contentElementUdi,
                         ContentTypeAlias = elementType.Alias,
                         ContentTypeKey = elementType.Key,
-                        Properties = blocksProperty.BlockContentValues
+                        Values = blocksProperty.BlockContentValues
                     }
                 ],
                 SettingsData =
@@ -811,7 +811,7 @@ public class BlockListElementLevelVariationTests : UmbracoIntegrationTest
                         Udi = settingsElementUdi,
                         ContentTypeAlias = elementType.Alias,
                         ContentTypeKey = elementType.Key,
-                        Properties = blocksProperty.BlockSettingsValues
+                        Values = blocksProperty.BlockSettingsValues
                     }
                 ]
             };

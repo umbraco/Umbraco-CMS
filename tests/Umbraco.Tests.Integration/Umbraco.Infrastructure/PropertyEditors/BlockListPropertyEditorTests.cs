@@ -64,7 +64,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
                     Udi = contentElementUdi,
                     ContentTypeAlias = elementType.Alias,
                     ContentTypeKey = elementType.Key,
-                    Properties =
+                    Values =
                     [
                         new ()
                         {
@@ -122,7 +122,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
                     Udi = contentElementUdi,
                     ContentTypeAlias = elementType.Alias,
                     ContentTypeKey = elementType.Key,
-                    Properties =
+                    Values =
                     [
                         new ()
                         {
@@ -181,7 +181,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
                     Udi = contentElementUdi,
                     ContentTypeAlias = elementType.Alias,
                     ContentTypeKey = elementType.Key,
-                    Properties =
+                    Values =
                     [
                         new ()
                         {
@@ -210,7 +210,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
         Assert.IsNotNull(toEditorValue);
         Assert.AreEqual(1, toEditorValue.ContentData.Count);
 
-        var properties = toEditorValue.ContentData.First().Properties;
+        var properties = toEditorValue.ContentData.First().Values;
         Assert.AreEqual(1, properties.Count);
         Assert.Multiple(() =>
         {

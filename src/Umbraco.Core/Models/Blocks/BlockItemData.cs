@@ -34,7 +34,7 @@ public class BlockItemData
     [JsonIgnore]
     public Guid Key => Udi is not null ? ((GuidUdi)Udi).Guid : throw new InvalidOperationException("No Udi assigned");
 
-    public IList<BlockPropertyValue> Properties { get; set; } = new List<BlockPropertyValue>();
+    public IList<BlockPropertyValue> Values { get; set; } = new List<BlockPropertyValue>();
 
     [Obsolete("Use Properties instead. Will be removed in V17.")]
     [JsonExtensionData]

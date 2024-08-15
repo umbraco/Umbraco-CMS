@@ -269,7 +269,7 @@ public class BlockEditorComponentTests
             ""udi"": """ + (contentGuid1.IsNullOrWhiteSpace()
             ? string.Empty
             : Udi.Create(Constants.UdiEntityType.Element, Guid.Parse(contentGuid1)).ToString()) + @""",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""featureName"", ""value"": ""Hello"" },
                 { ""alias"": ""featureDetails"", ""value"": ""World"" }
             ]
@@ -277,7 +277,7 @@ public class BlockEditorComponentTests
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
             ""udi"": ""umb://element/" + contentGuid2 + @""",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""featureName"", ""value"": ""Another"" },
                 { ""alias"": ""featureDetails"", ""value"": ""Feature"" },
                 { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
@@ -288,7 +288,7 @@ public class BlockEditorComponentTests
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
             ""udi"": ""umb://element/" + settingsGuid1 + @""",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""featureName"", ""value"": ""Setting 1"" },
                 { ""alias"": ""featureDetails"", ""value"": ""Setting 2"" }
             ]
@@ -418,38 +418,38 @@ public class BlockEditorComponentTests
     ""contentData"": [{
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/d05861169d124582a7c2826e52a51b47"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Element one - 12 cols"" }
             ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/5abad9f1b4e24d7aa269fbd1b50033ac"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Element one - 6 cols, left side"" }
             ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
             ""udi"": ""umb://element/76e24aeb6eeb4370892ca521932a96df"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Element one - 6 cols, right side"" }
             ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/90549d94555647fdbe4d111c7178ada4"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""One more element one - 12 cols"" },
                 { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
             ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
             ""udi"": ""umb://element/5fc866c590be4d01a28a979472a1ffee"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Nested element two - left side"" }
             ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/264536b65b0f4641aa43d4bfb515831d"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Nested element one - right side"" }
             ]
         }
@@ -457,7 +457,7 @@ public class BlockEditorComponentTests
     ""settingsData"": [{
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
             ""udi"": ""umb://element/262d5efd2eeb43ed95e95c094c45ce1c"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""enabled"", ""value"": 1 }
             ]
         }, {
@@ -469,7 +469,7 @@ public class BlockEditorComponentTests
         }, {
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
             ""udi"": ""umb://element/3dfabc96584c4c35ac2e6bf06ffa20de"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""enabled"", ""value"": 1 }
             ]
         }

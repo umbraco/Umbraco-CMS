@@ -39,7 +39,7 @@ public class RichTextPropertyEditorHelperTests
                                        "contentData": [{
                                                "contentTypeKey": "b2f0806c-d231-4c78-88b2-3c97d26e1123",
                                                "udi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02",
-                                               "properties": [
+                                               "values": [
                                                    { "alias": "contentPropertyAlias", "value": "A content property value" }
                                                ]
                                              }
@@ -47,7 +47,7 @@ public class RichTextPropertyEditorHelperTests
                                          "settingsData": [{
                                                  "contentTypeKey": "e7a9447f-e14d-44dd-9ae8-e68c3c3da598",
                                                  "udi": "umb://element/d2eeef66411142f4a1647a523eaffbc2",
-                                                 "properties": [
+                                                 "values": [
                                                      { "alias": "settingsPropertyAlias", "value": "A settings property value" }
                                                  ]
                                              }
@@ -70,7 +70,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
         Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Element, itemGuid), item.Udi);
         Assert.AreEqual(itemGuid, item.Key);
-        var contentProperties = value.Blocks.ContentData.First().Properties;
+        var contentProperties = value.Blocks.ContentData.First().Values;
         Assert.AreEqual(1, contentProperties.Count);
         Assert.Multiple(() =>
         {
@@ -85,7 +85,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
         Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Element, itemGuid), item.Udi);
         Assert.AreEqual(itemGuid, item.Key);
-        var settingsProperties = value.Blocks.SettingsData.First().Properties;
+        var settingsProperties = value.Blocks.SettingsData.First().Values;
         Assert.AreEqual(1, settingsProperties.Count);
         Assert.Multiple(() =>
         {
@@ -111,7 +111,7 @@ public class RichTextPropertyEditorHelperTests
                                   "contentData": [{
                                           "contentTypeKey": "b2f0806c-d231-4c78-88b2-3c97d26e1123",
                                           "udi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02",
-                                          "properties": [
+                                          "values": [
                                               { "alias": "contentPropertyAlias", "value": "A content property value" }
                                           ]
                                         }
@@ -119,7 +119,7 @@ public class RichTextPropertyEditorHelperTests
                                     "settingsData": [{
                                             "contentTypeKey": "e7a9447f-e14d-44dd-9ae8-e68c3c3da598",
                                             "udi": "umb://element/d2eeef66411142f4a1647a523eaffbc2",
-                                            "properties": [
+                                            "values": [
                                                 { "alias": "settingsPropertyAlias", "value": "A settings property value" }
                                             ]
                                         }
@@ -142,7 +142,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
         Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Element, itemGuid), item.Udi);
         Assert.AreEqual(itemGuid, item.Key);
-        var contentProperties = value.Blocks.ContentData.First().Properties;
+        var contentProperties = value.Blocks.ContentData.First().Values;
         Assert.AreEqual(1, contentProperties.Count);
         Assert.Multiple(() =>
         {
@@ -157,7 +157,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
         Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Element, itemGuid), item.Udi);
         Assert.AreEqual(itemGuid, item.Key);
-        var settingsProperties = value.Blocks.SettingsData.First().Properties;
+        var settingsProperties = value.Blocks.SettingsData.First().Values;
         Assert.AreEqual(1, settingsProperties.Count);
         Assert.Multiple(() =>
         {
@@ -182,7 +182,7 @@ public class RichTextPropertyEditorHelperTests
                                   "contentData": [{
                                           "contentTypeKey": "b2f0806c-d231-4c78-88b2-3c97d26e1123",
                                           "udi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02",
-                                          "properties": [
+                                          "values": [
                                               { "alias": "contentPropertyAlias", "value": "A content property value" }
                                           ]
                                         }
@@ -206,7 +206,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
         Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Element, itemGuid), item.Udi);
         Assert.AreEqual(itemGuid, item.Key);
-        var contentProperties = value.Blocks.ContentData.First().Properties;
+        var contentProperties = value.Blocks.ContentData.First().Values;
         Assert.AreEqual(1, contentProperties.Count);
         Assert.Multiple(() =>
         {

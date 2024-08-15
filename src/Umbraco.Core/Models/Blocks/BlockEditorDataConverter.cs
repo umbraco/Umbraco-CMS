@@ -86,9 +86,9 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
         foreach (BlockItemData blockItemData in blockItemDatas)
         {
             // only overwrite the Properties collection if none have been added at this point
-            if (blockItemData.Properties.Any() is false && blockItemData.RawPropertyValues.Any())
+            if (blockItemData.Values.Any() is false && blockItemData.RawPropertyValues.Any())
             {
-                blockItemData.Properties = blockItemData
+                blockItemData.Values = blockItemData
                     .RawPropertyValues
                     .Select(item => new BlockPropertyValue { Alias = item.Key, Value = item.Value })
                     .ToList();
