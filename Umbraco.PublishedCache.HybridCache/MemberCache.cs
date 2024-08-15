@@ -10,10 +10,10 @@ public class MemberCache : IPublishedMemberHybridCache
     private readonly IMemberCacheService _memberCacheService;
     private readonly PublishedContentTypeCache _publishedContentTypeCache;
 
-    public MemberCache(IMemberCacheService memberCacheService, PublishedContentTypeCache publishedContentTypeCache)
+    public MemberCache(IMemberCacheService memberCacheService, IPublishedContentCacheAccessor publishedContentCacheAccessor)
     {
         _memberCacheService = memberCacheService;
-        _publishedContentTypeCache = publishedContentTypeCache;
+        _publishedContentTypeCache = publishedContentCacheAccessor.Get();
     }
 
     public async Task<IPublishedMember?> GetById(Guid key) =>

@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
@@ -14,19 +12,10 @@ internal class PublishedContentFactory : IPublishedContentFactory
 
     public PublishedContentFactory(
         IVariationContextAccessor variationContextAccessor,
-        IContentTypeService contentTypeService,
-        IMemberTypeService memberTypeService,
-        IMediaTypeService mediaTypeService,
-        IPublishedContentTypeFactory publishedContentTypeFactory,
-        ILoggerFactory loggerFactory)
+        IPublishedContentCacheAccessor publishedContentCacheAccessor)
     {
         _variationContextAccessor = variationContextAccessor;
-        _contentTypeCache = new PublishedContentTypeCache(
-            contentTypeService,
-            mediaTypeService,
-            memberTypeService,
-            publishedContentTypeFactory,
-            loggerFactory.CreateLogger<PublishedContentTypeCache>());
+        _contentTypeCache = publishedContentCacheAccessor.Get();
     }
 
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)

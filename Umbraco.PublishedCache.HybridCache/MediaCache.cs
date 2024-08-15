@@ -10,10 +10,10 @@ public class MediaCache : IPublishedMediaHybridCache
     private readonly IMediaCacheService _mediaCacheService;
     private readonly PublishedContentTypeCache _publishedContentTypeCache;
 
-    public MediaCache(IMediaCacheService mediaCacheService, PublishedContentTypeCache publishedContentTypeCache)
+    public MediaCache(IMediaCacheService mediaCacheService, IPublishedContentCacheAccessor publishedContentCacheAccessor)
     {
         _mediaCacheService = mediaCacheService;
-        _publishedContentTypeCache = publishedContentTypeCache;
+        _publishedContentTypeCache = publishedContentCacheAccessor.Get();
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id) => await _mediaCacheService.GetByIdAsync(id);

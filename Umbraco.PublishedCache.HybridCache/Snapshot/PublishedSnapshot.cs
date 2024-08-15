@@ -1,7 +1,6 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
 
@@ -16,9 +15,6 @@ public class PublishedSnapshot : IPublishedSnapshot
     {
         _defaultPreview = defaultPreview;
         _publishedSnapshotElementsFactory = publishedSnapshotPublishedSnapshotElementsFactory;
-        // _elementsCache = new FastDictionaryAppCache();
-        // var domainStore = new SnapDictionary<int, Domain>();
-        // _domainCache = new DomainCache(domainStore.CreateSnapshot(), defaultCultureAccessor.DefaultCulture);
     }
 
     private PublishedSnapshotElements Elements

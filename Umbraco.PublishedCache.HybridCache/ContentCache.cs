@@ -13,11 +13,11 @@ public sealed class ContentCache : IPublishedContentHybridCache
     private readonly IIdKeyMap _idKeyMap;
     private readonly PublishedContentTypeCache _contentTypeCache;
 
-    public ContentCache(IContentCacheService contentCacheService, IIdKeyMap idKeyMap, PublishedContentTypeCache contentTypeCache)
+    public ContentCache(IContentCacheService contentCacheService, IIdKeyMap idKeyMap, IPublishedContentCacheAccessor publishedContentCacheAccessor)
     {
         _contentCacheService = contentCacheService;
         _idKeyMap = idKeyMap;
-        _contentTypeCache = contentTypeCache;
+        _contentTypeCache = publishedContentCacheAccessor.Get();
     }
 
     public async Task<IPublishedContent?> GetById(int id, bool preview = false)

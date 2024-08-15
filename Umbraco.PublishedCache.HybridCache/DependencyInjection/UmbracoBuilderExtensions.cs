@@ -12,6 +12,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
+using Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
 
 
 namespace Umbraco.Extensions;
@@ -27,6 +28,7 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddUmbracoHybridCache(this IUmbracoBuilder builder)
     {
         builder.Services.AddHybridCache();
+        builder.Services.AddUnique<IPublishedContentCacheAccessor, PublishedContentCacheAccessor>();
         builder.Services.AddSingleton<IPublishedContentHybridCache, ContentCache>();
         builder.Services.AddSingleton<IPublishedMediaHybridCache, MediaCache>();
         builder.Services.AddTransient<IPublishedMemberHybridCache, MemberCache>();
@@ -36,6 +38,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IMemberCacheService, MemberCacheService>();
         builder.Services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
         builder.Services.AddTransient<ICacheNodeFactory, CacheNodeFactory>();
+        builder.Services.AddUnique<IPublishedSnapshotElementsFactory, PublishedSnapshotElementsFactory>();
+        builder.Services.AddUnique<IPublishedSnapshotService, PublishedSnapshotService>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
             IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();
@@ -55,7 +59,6 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SeedingNotificationHandler>();
-
         return builder;
     }
 }
