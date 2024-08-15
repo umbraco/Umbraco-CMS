@@ -46,10 +46,18 @@ export class UmbDocumentPickerSearchResultItemElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this.item) return nothing;
+		const item = this.item;
+		if (!item) return nothing;
 
 		return html`
-			<uui-ref-node name=${this.item.name} id=${this.item.unique} readonly selectable ?selected=${this._isSelected}>
+			<uui-ref-node
+				name=${item.name}
+				id=${item.unique}
+				readonly
+				selectable
+				@selected=${() => this.#pickerModalContext?.selection.select(item.unique)}
+				@deselected=${() => this.#pickerModalContext?.selection.deselect(item.unique)}
+				?selected=${this._isSelected}>
 				${this.#renderIcon()}
 			</uui-ref-node>
 		`;
