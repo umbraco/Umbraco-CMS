@@ -25,6 +25,10 @@ export class UmbPickerModalSearchElement extends UmbLitElement {
 			this.observe(this.#pickerModalContext.search.searching, (searching) => {
 				this._searching = searching;
 			});
+
+			this.observe(this.#pickerModalContext.search.query, (query) => {
+				this._query = query?.query || '';
+			});
 		});
 	}
 
