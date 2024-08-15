@@ -32,6 +32,7 @@ public interface IPublishedCache
     /// <param name="contentId">The content Udi identifier.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     IPublishedContent? GetById(bool preview, Udi contentId);
 
     /// <summary>
@@ -56,6 +57,7 @@ public interface IPublishedCache
     /// <param name="contentId">The content unique identifier.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     IPublishedContent? GetById(Udi contentId);
 
     /// <summary>
@@ -82,6 +84,7 @@ public interface IPublishedCache
     /// <param name="culture">A culture.</param>
     /// <returns>The contents.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null);
 
     /// <summary>
@@ -90,6 +93,7 @@ public interface IPublishedCache
     /// <param name="culture">A culture.</param>
     /// <returns>The contents.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     IEnumerable<IPublishedContent> GetAtRoot(string? culture = null);
 
     /// <summary>
@@ -98,6 +102,7 @@ public interface IPublishedCache
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <returns>A value indicating whether the cache contains published content.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     bool HasContent(bool preview);
 
     /// <summary>
@@ -105,6 +110,7 @@ public interface IPublishedCache
     /// </summary>
     /// <returns>A value indicating whether the cache contains published content.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete] // FIXME: Remove when replacing nucache
     bool HasContent();
 
     /// <summary>
@@ -127,6 +133,7 @@ public interface IPublishedCache
     /// </summary>
     /// <param name="contentType">The content type.</param>
     /// <returns>The contents.</returns>
+    [Obsolete] // FIXME: Remove when replacing nucache
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
 
     /// <summary>
