@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Umbraco.Tests.AcceptanceTest.UmbracoProject": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50268;http://localhost:50269"
+    }
+  }
+}
