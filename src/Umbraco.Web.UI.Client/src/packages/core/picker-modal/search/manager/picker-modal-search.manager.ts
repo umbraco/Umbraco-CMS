@@ -90,6 +90,13 @@ export class UmbPickerModalSearchManager<
 	 */
 	public search() {
 		if (this.getSearchable() === false) throw new Error('Search is not enabled');
+
+		const query = this.#query.getValue();
+		if (!query?.query) {
+			this.clear();
+			return;
+		}
+
 		this.#searching.setValue(true);
 		this.#debouncedSearch();
 	}
@@ -102,6 +109,7 @@ export class UmbPickerModalSearchManager<
 		this.#query.setValue(undefined);
 		this.#resultItems.setValue([]);
 		this.#searching.setValue(false);
+		this.#resultTotalItems.setValue(0);
 	}
 
 	/**
@@ -142,6 +150,12 @@ export class UmbPickerModalSearchManager<
 		if (!this.#searchProvider) throw new Error('Search provider is not available');
 		const query = this.#query.getValue();
 		if (!query) throw new Error('No query provided');
+
+		if (!query.query) {
+			this.clear();
+			return;
+		}
+
 		const { data } = await this.#searchProvider.search(query);
 		this.#resultItems.setValue(data?.items ?? []);
 		this.#resultTotalItems.setValue(data?.total ?? 0);
