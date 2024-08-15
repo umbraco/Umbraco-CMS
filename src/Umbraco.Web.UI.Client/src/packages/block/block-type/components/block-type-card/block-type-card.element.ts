@@ -6,7 +6,7 @@ import { html, customElement, property, state, ifDefined } from '@umbraco-cms/ba
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { removeInitialSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
