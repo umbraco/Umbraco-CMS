@@ -43,14 +43,20 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			this.#api.setData(this.data);
 
 			const multiple = this.data?.multiple ?? false;
-			this._selectionConfiguration.multiple = multiple;
 			this.#api.selection.setMultiple(multiple);
+			this._selectionConfiguration = {
+				...this._selectionConfiguration,
+				multiple,
+			};
 		}
 
 		if (_changedProperties.has('value')) {
 			const selection = this.value?.selection ?? [];
-			this._selectionConfiguration.selection = selection;
 			this.#api.selection.setSelection(selection);
+			this._selectionConfiguration = {
+				...this._selectionConfiguration,
+				selection: [...selection],
+			};
 		}
 	}
 
