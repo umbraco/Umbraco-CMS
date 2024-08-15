@@ -1,19 +1,55 @@
 import type { UmbDocumentItemModel } from '../repository/item/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbPickerModalContext } from '@umbraco-cms/backoffice/picker-modal';
+import { UMB_PICKER_MODAL_CONTEXT } from '@umbraco-cms/backoffice/picker-modal';
 
 const elementName = 'umb-document-picker-search-result-item';
 @customElement(elementName)
 export class UmbDocumentPickerSearchResultItemElement extends UmbLitElement {
+	#item?: UmbDocumentItemModel | undefined;
 	@property({ type: Object })
-	item?: UmbDocumentItemModel;
+	public get item(): UmbDocumentItemModel | undefined {
+		return this.#item;
+	}
+	public set item(value: UmbDocumentItemModel | undefined) {
+		this.#item = value;
+		this.#observeIsSelected();
+	}
+
+	@state()
+	_isSelected = false;
+
+	#pickerModalContext?: UmbPickerModalContext;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_PICKER_MODAL_CONTEXT, (context) => {
+			this.#pickerModalContext = context;
+			this.#observeIsSelected();
+		});
+	}
+
+	#observeIsSelected() {
+		const selectionManager = this.#pickerModalContext?.selection;
+		if (!selectionManager) return;
+
+		const unique = this.item?.unique;
+		if (unique === undefined) return;
+
+		this.observe(selectionManager.selection, () => {
+			this._isSelected = selectionManager.isSelected(unique);
+			console.log(this._isSelected);
+		});
+	}
 
 	override render() {
 		if (!this.item) return nothing;
 
 		return html`
-			<uui-ref-node name=${this.item.name} id=${this.item.unique} readonly selectable>
+			<uui-ref-node name=${this.item.name} id=${this.item.unique} readonly selectable ?selected=${this._isSelected}>
 				${this.#renderIcon()}
 			</uui-ref-node>
 		`;
