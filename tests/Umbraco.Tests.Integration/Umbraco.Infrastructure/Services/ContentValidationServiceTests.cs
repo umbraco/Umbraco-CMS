@@ -141,20 +141,20 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(7, validationResult.ValidationErrors.Count());
 
         // ref #1
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].values[0]"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].values[0].value"));
         // ref #2
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].values[0]"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].values[0].value"));
         // ref #3
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[1].values[1]"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[1].values[1].value"));
 
         // ref #4
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].contentData[0].values[0]"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.contentData[0].values[0].value"));
         // ref #5
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].contentData[1].values[1]"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.contentData[1].values[1].value"));
         // ref #6
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].settingsData[0].values[1]"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.settingsData[0].values[1].value"));
         // ref #7
-        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].settingsData[1].values[0]"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].values[1].value.settingsData[1].values[0].value"));
     }
 
     [TestCase(true)]

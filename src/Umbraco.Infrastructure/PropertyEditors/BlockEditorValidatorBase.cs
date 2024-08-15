@@ -28,7 +28,7 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
             new { Path = nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.SettingsData }
         };
 
-        var propertiesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
+        var valuesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
 
         foreach (var group in itemDataGroups)
         {
@@ -56,7 +56,7 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
                     }
 
                     elementValidation.AddPropertyTypeValidation(
-                        new PropertyTypeValidationModel(propertyType, blockPropertyValue.Value, $"{group.Path}[{i}].{propertiesJsonPathPart}[{j}]"));
+                        new PropertyTypeValidationModel(propertyType, blockPropertyValue.Value, $"{group.Path}[{i}].{valuesJsonPathPart}[{j}].value"));
                 }
 
                 yield return elementValidation;
