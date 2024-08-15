@@ -1,7 +1,7 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
 import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
-import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -29,7 +29,7 @@ export class UmbBlockGridManagerContext<
 
 		if (layoutStylesheet) {
 			// Cause we await initAppUrl in setting the _editorConfiguration, we can trust the appUrl begin here.
-			return this.#appUrl! + transformServerPathToClientPath(layoutStylesheet);
+			return removeLastSlashFromPath(this.#appUrl!) + transformServerPathToClientPath(layoutStylesheet);
 		}
 		return undefined;
 	});
