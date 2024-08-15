@@ -1,6 +1,6 @@
 import { UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '../../modals/index.js';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -47,12 +47,6 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 	constructor() {
 		super();
 
-		this.addValidator(
-			'valueMissing',
-			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => this.hasAttribute('required') && this.value === '',
-		);
-
 		this.#editDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL);
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
@@ -70,6 +64,16 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 			.observeRouteBuilder((routeBuilder) => {
 				this._createRoute = routeBuilder(null);
 			});
+	}
+
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this.addValidator(
+			'valueMissing',
+			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => this.hasAttribute('required') && this.value === '',
+		);
 	}
 
 	override focus() {

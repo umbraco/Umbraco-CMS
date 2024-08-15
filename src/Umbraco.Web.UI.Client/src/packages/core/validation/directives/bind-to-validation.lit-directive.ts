@@ -12,6 +12,8 @@ class UmbBindToValidationDirective extends AsyncDirective {
 	#el?: UmbFormControlMixinInterface<unknown>;
 	#validator?: UmbFormControlValidator;
 
+	// For Directives their arguments have to be defined on the Render method, despite them, not being used by the render method. In this case they are used by the update method.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	override render(host: UmbControllerHost, dataPath: string) {
 		return nothing;
 	}
