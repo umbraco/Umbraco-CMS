@@ -41,13 +41,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		if (_changedProperties.has('data')) {
 			this.#api.setData(this.data);
-			this._selectionConfiguration.multiple = this.data?.multiple ?? false;
-			this.#api.selection.setMultiple(this.data?.multiple ?? false);
+
+			const multiple = this.data?.multiple ?? false;
+			this._selectionConfiguration.multiple = multiple;
+			this.#api.selection.setMultiple(multiple);
 		}
 
 		if (_changedProperties.has('value')) {
-			this._selectionConfiguration.selection = this.value?.selection ?? [];
-			this.#api.selection.setSelection(this.value.selection);
+			const selection = this.value?.selection ?? [];
+			this._selectionConfiguration.selection = selection;
+			this.#api.selection.setSelection(selection);
 		}
 	}
 
