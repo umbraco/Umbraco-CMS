@@ -3,17 +3,41 @@ import { UmbPickerModalSearchManager } from './search/manager/picker-modal-searc
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbPickerModalContext extends UmbContextBase<UmbPickerModalContext> {
+export class UmbPickerModalContext<
+	ModalDataType extends UmbPickerModalData<any> = UmbPickerModalData<any>,
+> extends UmbContextBase<UmbPickerModalContext> {
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly search = new UmbPickerModalSearchManager(this);
 
+	#data = new UmbObjectState<ModalDataType | undefined>(undefined);
+	public readonly data = this.#data.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PICKER_MODAL_CONTEXT);
+	}
 
-		// TODO: temp hardcoded search provider
-		this.search.setConfig({
-			providerAlias: 'Umb.SearchProvider.Document',
-		});
+	/**
+	 * Set the data for the picker modal
+	 * @param {ModalDataType} data
+	 * @memberof UmbPickerModalContext
+	 */
+	setData(data: ModalDataType) {
+		const searchProviderAlias = data.search?.providerAlias;
+		if (searchProviderAlias) {
+			this.search.setConfig({ providerAlias: searchProviderAlias });
+			this.search.setSearchable(true);
+		}
+	}
+
+	/**
+	 * Get the data for the picker modal
+	 * @returns {ModalDataType | undefined}
+	 * @memberof UmbPickerModalContext
+	 */
+	getData(): ModalDataType | undefined {
+		return this.#data.getValue();
 	}
 }
