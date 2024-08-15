@@ -1,6 +1,6 @@
 import { UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '../../modals/index.js';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
-import { css, html, customElement, property, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
