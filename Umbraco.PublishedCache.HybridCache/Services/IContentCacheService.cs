@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal interface IContentCacheService
+public interface IContentCacheService
 {
     Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false);
 

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal interface IMemberCacheService
+public interface IMemberCacheService
 {
     Task<IPublishedMember?> GetByKey(Guid key);
 }

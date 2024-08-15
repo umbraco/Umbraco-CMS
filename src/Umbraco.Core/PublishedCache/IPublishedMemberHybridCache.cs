@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
-public interface IPublishedMemberHybridCache
+public interface IPublishedMemberHybridCache : IPublishedMemberCache
 {
     /// <summary>
     ///     Get an <see cref="IPublishedContent" /> from an <see cref="IMember" />

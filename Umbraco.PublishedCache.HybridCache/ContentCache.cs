@@ -7,7 +7,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-internal sealed class ContentCache : IPublishedContentHybridCache
+public sealed class ContentCache : IPublishedContentHybridCache
 {
     private readonly IContentCacheService _contentCacheService;
     private readonly IIdKeyMap _idKeyMap;
