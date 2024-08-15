@@ -1,6 +1,6 @@
 import type { UmbDocumentItemModel } from '../repository/item/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPickerModalContext } from '@umbraco-cms/backoffice/picker-modal';
 import { UMB_PICKER_MODAL_CONTEXT } from '@umbraco-cms/backoffice/picker-modal';
@@ -68,7 +68,7 @@ export class UmbDocumentPickerSearchResultItemElement extends UmbLitElement {
 		return html`<umb-icon slot="icon" name=${this.item.documentType.icon}></umb-icon>`;
 	}
 
-	static override styles = [UmbTextStyles, css``];
+	static override styles = [UmbTextStyles];
 }
 
 export { UmbDocumentPickerSearchResultItemElement as element };
