@@ -31,6 +31,27 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	constructor() {
 		super();
+		this.#api.selection.setSelectable(true);
+		this.#observePickerSelection();
+		this.#initCreateAction();
+	}
+
+	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.updated(_changedProperties);
+
+		if (_changedProperties.has('data')) {
+			this.#api.setData(this.data);
+			this._selectionConfiguration.multiple = this.data?.multiple ?? false;
+			this.#api.selection.setMultiple(this.data?.multiple ?? false);
+		}
+
+		if (_changedProperties.has('value')) {
+			this._selectionConfiguration.selection = this.value?.selection ?? [];
+			this.#api.selection.setSelection(this.value.selection);
+		}
+	}
+
+	#observePickerSelection() {
 		this.observe(
 			this.#api.selection.selection,
 			(selection) => {
@@ -41,37 +62,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		);
 	}
 
-	override connectedCallback() {
-		super.connectedCallback();
-
-		// TODO: We should make a nicer way to observe the value..  [NL]
-		// This could be by observing when the modalCOntext gets set. [NL]
-		this._selectionConfiguration.selection = this.value?.selection ?? [];
-		this.#api.selection.setSelection(this.value?.selection ?? []);
-
-		// Same here [NL]
-		this._selectionConfiguration.multiple = this.data?.multiple ?? false;
-		this.#api.selection.setMultiple(this.data?.multiple ?? false);
-		this.#api.selection.setSelectable(true);
-
-		this.#initCreateAction();
-	}
-
-	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
-		super.updated(_changedProperties);
-		if (_changedProperties.has('data') && this.data) {
-			this.#api.setData(this.data);
-		}
-	}
-
 	// Tree Selection
-	#onSelected(event: UmbSelectedEvent) {
+	#onTreeItemSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
 		this.#api.selection.select(event.unique);
 		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
 	}
 
-	#onDeselected(event: UmbDeselectedEvent) {
+	#onTreeItemDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
 		this.#api.selection.deselect(event.unique);
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
@@ -140,8 +138,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					startNode: this.data?.startNode,
 					foldersOnly: this.data?.foldersOnly,
 				}}
-				@selected=${this.#onSelected}
-				@deselected=${this.#onDeselected}></umb-tree>
+				@selected=${this.#onTreeItemSelected}
+				@deselected=${this.#onTreeItemDeselected}></umb-tree>
 		`;
 	}
 
