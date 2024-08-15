@@ -19,6 +19,9 @@ export class UmbPickerModalSearchManager<
 	ResultItemType extends UmbEntityModel = UmbEntityModel,
 	QueryType extends UmbSearchRequestArgs = UmbSearchRequestArgs,
 > extends UmbControllerBase {
+	#searchable = new UmbBooleanState(false);
+	public readonly searchable = this.#searchable.asObservable();
+
 	#query = new UmbObjectState<QueryType | undefined>(undefined);
 	public readonly query = this.#query.asObservable();
 
@@ -64,10 +67,29 @@ export class UmbPickerModalSearchManager<
 	}
 
 	/**
+	 * Returns whether items can be searched.
+	 * @returns {boolean} Whether items can be searched.
+	 * @memberof UmbPickerModalSearchManager
+	 */
+	public getSearchable(): boolean {
+		return this.#searchable.getValue();
+	}
+
+	/**
+	 * Sets whether items can be searched.
+	 * @param {boolean} value Whether items can be searched.
+	 * @memberof UmbPickerModalSearchManager
+	 */
+	public setSearchable(value: boolean) {
+		this.#searchable.setValue(value);
+	}
+
+	/**
 	 * Search for items based on the current query.
 	 * @memberof UmbPickerModalSearchManager
 	 */
 	public search() {
+		if (this.getSearchable() === false) throw new Error('Search is not enabled');
 		this.#searching.setValue(true);
 		this.#debouncedSearch();
 	}
@@ -88,6 +110,7 @@ export class UmbPickerModalSearchManager<
 	 * @memberof UmbPickerModalSearchManager
 	 */
 	public setQuery(query: QueryType) {
+		if (this.getSearchable() === false) throw new Error('Search is not enabled');
 		if (!this.query) {
 			this.clear();
 			return;
@@ -115,6 +138,7 @@ export class UmbPickerModalSearchManager<
 	#debouncedSearch = debounce(this.#search, 300);
 
 	async #search() {
+		if (this.getSearchable() === false) throw new Error('Search is not enabled');
 		if (!this.#searchProvider) throw new Error('Search provider is not available');
 		const query = this.#query.getValue();
 		if (!query) throw new Error('No query provided');
