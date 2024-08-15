@@ -64,7 +64,10 @@ export class UmbPickerModalSearchManager<
 	 * Search for items based on the current query.
 	 * @memberof UmbPickerModalSearchManager
 	 */
-	public search = debounce(this.#debouncedSearch, 300);
+	public search() {
+		this.#searching.setValue(true);
+		this.#debouncedSearch();
+	}
 
 	/**
 	 * Clear the current search query and result items.
@@ -106,7 +109,9 @@ export class UmbPickerModalSearchManager<
 		if (!this.#searchProvider) throw new Error(`Search Provider with alias ${providerAlias} is not available`);
 	}
 
-	async #debouncedSearch() {
+	#debouncedSearch = debounce(this.#search, 300);
+
+	async #search() {
 		if (!this.#searchProvider) throw new Error('Search provider is not available');
 		const query = this.#query.getValue();
 		if (!query) throw new Error('No query provided');
