@@ -1,6 +1,6 @@
 import type { UmbTreeSelectionConfiguration } from '../types.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
-import { UmbTreePickerModalContext } from './tree-picker-modal.context.js';
+import { UmbTreeItemPickerModalContext } from './tree-picker-modal.context.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -30,7 +30,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	_searchQuery?: string;
 
 	// TODO: find a way to implement through the manifest api field
-	#api = new UmbTreePickerModalContext(this);
+	#api = new UmbTreeItemPickerModalContext(this);
 
 	constructor() {
 		super();
