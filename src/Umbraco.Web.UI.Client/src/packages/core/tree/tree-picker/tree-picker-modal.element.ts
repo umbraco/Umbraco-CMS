@@ -26,6 +26,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	_createLabel?: string;
 
+	@state()
+	_searchQuery?: string;
+
 	// TODO: find a way to implement through the manifest api field
 	#api = new UmbTreePickerModalContext(this);
 
@@ -33,6 +36,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super();
 		this.#api.selection.setSelectable(true);
 		this.#observePickerSelection();
+		this.#observeSearch();
 	}
 
 	override connectedCallback(): void {
@@ -71,7 +75,17 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this.updateValue({ selection });
 				this.requestUpdate();
 			},
-			'umbSelectionObserver',
+			'umbPickerSelectionObserver',
+		);
+	}
+
+	#observeSearch() {
+		this.observe(
+			this.#api.search.query,
+			(query) => {
+				this._searchQuery = query?.query;
+			},
+			'umbPickerSearchQueryObserver',
 		);
 	}
 
@@ -139,6 +153,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderTree() {
+		if (this._searchQuery) {
+			return nothing;
+		}
+
 		return html`
 			<umb-tree
 				alias=${ifDefined(this.data?.treeAlias)}
