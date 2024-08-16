@@ -1,10 +1,9 @@
 import type { UmbPickerSearchManagerConfig } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -16,7 +15,7 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
  * @template QueryType
  */
 export class UmbPickerSearchManager<
-	ResultItemType extends UmbEntityModel = UmbEntityModel,
+	ResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel,
 	QueryType extends UmbSearchRequestArgs = UmbSearchRequestArgs,
 > extends UmbControllerBase {
 	#searchable = new UmbBooleanState(false);
@@ -35,8 +34,7 @@ export class UmbPickerSearchManager<
 	public readonly resultTotalItems = this.#resultTotalItems.asObservable();
 
 	#config?: UmbPickerSearchManagerConfig;
-	// TODO: lower requirement for search provider item type
-	#searchProvider?: UmbSearchProvider<any, QueryType>;
+	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, QueryType>;
 
 	/**
 	 * Creates an instance of UmbPickerSearchManager.
