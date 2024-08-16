@@ -38,7 +38,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	override render() {
 		if (!this._isSearchable) return nothing;
 
-		if (this._query && this._searching === false && this._items.length === 0) {
+		if (this._query?.query && this._searching === false && this._items.length === 0) {
 			return this.#renderEmptyResult();
 		}
 
