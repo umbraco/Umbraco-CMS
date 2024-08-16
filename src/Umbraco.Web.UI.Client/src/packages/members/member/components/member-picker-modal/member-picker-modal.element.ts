@@ -20,7 +20,6 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
-	// TODO: find a way to implement through the manifest api field
 	#pickerContext = new UmbCollectionItemPickerContext(this);
 
 	override connectedCallback(): void {
