@@ -1,6 +1,6 @@
 import type { UmbTreeSelectionConfiguration } from '../types.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
-import { UmbTreeItemPickerModalContext } from './tree-picker-modal.context.js';
+import { UmbTreeItemPickerContext } from './tree-picker-modal.context.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -29,12 +29,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	_searchQuery?: string;
 
-	// TODO: find a way to implement through the manifest api field
-	#api = new UmbTreeItemPickerModalContext(this);
+	#pickerContext = new UmbTreeItemPickerContext(this);
 
 	constructor() {
 		super();
-		this.#api.selection.setSelectable(true);
+		this.#pickerContext.selection.setSelectable(true);
 		this.#observePickerSelection();
 		this.#observeSearch();
 	}
@@ -48,10 +47,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
-			this.#api.setData(this.data);
+			this.#pickerContext.setConfig(this.data);
 
 			const multiple = this.data?.multiple ?? false;
-			this.#api.selection.setMultiple(multiple);
+			this.#pickerContext.selection.setMultiple(multiple);
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
 				multiple,
@@ -60,7 +59,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		if (_changedProperties.has('value')) {
 			const selection = this.value?.selection ?? [];
-			this.#api.selection.setSelection(selection);
+			this.#pickerContext.selection.setSelection(selection);
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
 				selection: [...selection],
@@ -70,7 +69,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observePickerSelection() {
 		this.observe(
-			this.#api.selection.selection,
+			this.#pickerContext.selection.selection,
 			(selection) => {
 				this.updateValue({ selection });
 				this.requestUpdate();
@@ -81,7 +80,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observeSearch() {
 		this.observe(
-			this.#api.search.query,
+			this.#pickerContext.search.query,
 			(query) => {
 				this._searchQuery = query?.query;
 			},
@@ -92,13 +91,13 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	// Tree Selection
 	#onTreeItemSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
-		this.#api.selection.select(event.unique);
+		this.#pickerContext.selection.select(event.unique);
 		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
 	}
 
 	#onTreeItemDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
-		this.#api.selection.deselect(event.unique);
+		this.#pickerContext.selection.deselect(event.unique);
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 

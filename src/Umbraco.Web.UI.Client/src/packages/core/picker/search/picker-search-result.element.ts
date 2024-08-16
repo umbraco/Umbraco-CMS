@@ -1,5 +1,5 @@
-import { UMB_PICKER_MODAL_CONTEXT } from '../picker-modal.context.token.js';
-import type { UmbPickerModalContext } from '../picker-modal.context.js';
+import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
+import type { UmbPickerContext } from '../picker.context.js';
 import { customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
@@ -18,12 +18,12 @@ export class UmbPickerModalSearchResultElement extends UmbLitElement {
 	@state()
 	_items: UmbEntityModel[] = [];
 
-	#pickerModalContext?: UmbPickerModalContext;
+	#pickerModalContext?: UmbPickerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_PICKER_MODAL_CONTEXT, (context) => {
+		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
 			this.#pickerModalContext = context;
 
 			this.observe(this.#pickerModalContext.search.query, (query) => {

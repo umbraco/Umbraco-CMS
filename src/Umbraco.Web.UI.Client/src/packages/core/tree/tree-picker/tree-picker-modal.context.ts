@@ -1,10 +1,10 @@
-import { UmbPickerModalContext } from '@umbraco-cms/backoffice/picker-modal';
+import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbTreeItemPickerModalContext extends UmbPickerModalContext {
+export class UmbTreeItemPickerContext extends UmbPickerContext {
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
 }
 
-export { UmbTreeItemPickerModalContext as api };
+export { UmbTreeItemPickerContext as api };

@@ -7,7 +7,7 @@ import { customElement, html, repeat, state } from '@umbraco-cms/backoffice/exte
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbCollectionItemPickerModalContext } from '@umbraco-cms/backoffice/collection';
+import { UmbCollectionItemPickerContext } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-member-picker-modal')
 export class UmbMemberPickerModalElement extends UmbModalBaseElement<
@@ -21,7 +21,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager(this);
 
 	// TODO: find a way to implement through the manifest api field
-	#api = new UmbCollectionItemPickerModalContext(this);
+	#pickerContext = new UmbCollectionItemPickerContext(this);
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -45,7 +45,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('data') && this.data) {
-			this.#api.setData(this.data);
+			this.#pickerContext.setConfig(this.data);
 		}
 	}
 

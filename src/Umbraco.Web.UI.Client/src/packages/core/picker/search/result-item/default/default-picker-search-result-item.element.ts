@@ -1,8 +1,8 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPickerModalContext } from '@umbraco-cms/backoffice/picker-modal';
-import { UMB_PICKER_MODAL_CONTEXT } from '@umbraco-cms/backoffice/picker-modal';
+import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
+import { UMB_PICKER_CONTEXT } from '@umbraco-cms/backoffice/picker';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 const elementName = 'umb-default-picker-search-result-item';
@@ -21,19 +21,19 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 	@state()
 	_isSelected = false;
 
-	#pickerModalContext?: UmbPickerModalContext;
+	#pickerContext?: UmbPickerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_PICKER_MODAL_CONTEXT, (context) => {
-			this.#pickerModalContext = context;
+		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
+			this.#pickerContext = context;
 			this.#observeIsSelected();
 		});
 	}
 
 	#observeIsSelected() {
-		const selectionManager = this.#pickerModalContext?.selection;
+		const selectionManager = this.#pickerContext?.selection;
 		if (!selectionManager) return;
 
 		const unique = this.item?.unique;
@@ -55,8 +55,8 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 				id=${item.unique}
 				readonly
 				selectable
-				@selected=${() => this.#pickerModalContext?.selection.select(item.unique)}
-				@deselected=${() => this.#pickerModalContext?.selection.deselect(item.unique)}
+				@selected=${() => this.#pickerContext?.selection.select(item.unique)}
+				@deselected=${() => this.#pickerContext?.selection.deselect(item.unique)}
 				?selected=${this._isSelected}>
 				${this.#renderIcon()}
 			</uui-ref-node>
