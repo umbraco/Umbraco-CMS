@@ -11,8 +11,11 @@ import '@umbraco-cms/backoffice/ufm';
 @customElement('umb-ref-list-block')
 export class UmbRefListBlockElement extends UmbLitElement {
 	//
-	@property({ type: String })
+	@property({ type: String, reflect: false })
 	label?: string;
+
+	@property({ type: String, reflect: false })
+	icon?: string;
 
 	@state()
 	_content?: UmbBlockDataType;
@@ -46,6 +49,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
+				<uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon>
 				<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
 			</uui-ref-node>
 		`;

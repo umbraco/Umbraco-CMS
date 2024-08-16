@@ -200,11 +200,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block .label=${this._label}></umb-ref-list-block>`;
+		return html`<umb-ref-list-block .label=${this._label} .icon=${this._icon}></umb-ref-list-block>`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block .label=${this._label}></umb-inline-list-block>`;
+		return html`<umb-inline-list-block .label=${this._label} .icon=${this._icon}></umb-inline-list-block>`;
 	}
 
 	#renderBlock() {
