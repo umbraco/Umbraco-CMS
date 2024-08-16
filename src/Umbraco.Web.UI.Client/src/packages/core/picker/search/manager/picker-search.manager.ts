@@ -8,7 +8,7 @@ import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backo
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
 /**
- * A manager for searching items in a picker modal.
+ * A manager for searching items in a picker.
  * @exports
  * @class UmbPickerSearchManager
  * @augments {UmbControllerBase}
