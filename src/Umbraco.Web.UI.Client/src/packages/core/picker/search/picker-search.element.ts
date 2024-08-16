@@ -14,6 +14,9 @@ export class UmbPickerSearchElement extends UmbLitElement {
 	@state()
 	_searching: boolean = false;
 
+	@state()
+	_isSearchable: boolean = false;
+
 	#pickerContext?: UmbPickerContext;
 
 	constructor() {
@@ -21,14 +24,9 @@ export class UmbPickerSearchElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
 			this.#pickerContext = context;
-
-			this.observe(this.#pickerContext.search.searching, (searching) => {
-				this._searching = searching;
-			});
-
-			this.observe(this.#pickerContext.search.query, (query) => {
-				this._query = query?.query || '';
-			});
+			this.observe(this.#pickerContext.search.searchable, (isSearchable) => (this._isSearchable = isSearchable));
+			this.observe(this.#pickerContext.search.searching, (searching) => (this._searching = searching));
+			this.observe(this.#pickerContext.search.query, (query) => (this._query = query?.query || ''));
 		});
 	}
 
@@ -39,6 +37,8 @@ export class UmbPickerSearchElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (!this._isSearchable) return nothing;
+
 		return html`
 			<uui-input .value=${this._query} placeholder="Search..." @input=${this.#onInput}>
 				<div slot="prepend">
