@@ -29,9 +29,6 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 	},
 	data: {
 		treeAlias: 'Umb.Tree.DocumentType',
-		search: {
-			providerAlias: UMB_DOCUMENT_TYPE_SEARCH_PROVIDER_ALIAS,
-		},
 		createAction: {
 			label: '#content_createEmpty',
 			modalData: {
