@@ -3,16 +3,17 @@ import { customElement, html, nothing, property, state } from '@umbraco-cms/back
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPickerModalContext } from '@umbraco-cms/backoffice/picker-modal';
 import { UMB_PICKER_MODAL_CONTEXT } from '@umbraco-cms/backoffice/picker-modal';
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 const elementName = 'umb-default-picker-search-result-item';
 @customElement(elementName)
 export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
-	#item?: any | undefined;
+	#item?: UmbSearchResultItemModel | undefined;
 	@property({ type: Object })
-	public get item(): UmbDocumentItemModel | undefined {
+	public get item(): UmbSearchResultItemModel | undefined {
 		return this.#item;
 	}
-	public set item(value: any | undefined) {
+	public set item(value: UmbSearchResultItemModel | undefined) {
 		this.#item = value;
 		this.#observeIsSelected();
 	}
@@ -63,17 +64,17 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 	}
 
 	#renderIcon() {
-		if (!this.item?.documentType.icon) return nothing;
-		return html`<umb-icon slot="icon" name=${this.item.documentType.icon}></umb-icon>`;
+		if (!this.item?.icon) return nothing;
+		return html`<umb-icon slot="icon" name=${this.item.icon}></umb-icon>`;
 	}
 
 	static override styles = [UmbTextStyles];
 }
 
-export { UmbDocumentPickerSearchResultItemElement as element };
+export { UmbDefaultPickerSearchResultItemElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentPickerSearchResultItemElement;
+		[elementName]: UmbDefaultPickerSearchResultItemElement;
 	}
 }

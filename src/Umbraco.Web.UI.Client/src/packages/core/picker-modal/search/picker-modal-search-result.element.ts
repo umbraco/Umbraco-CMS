@@ -4,6 +4,7 @@ import { customElement, html, repeat, state } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { ManifestPickerSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
 
 const elementName = 'umb-picker-modal-search-result';
 @customElement(elementName)
@@ -59,7 +60,10 @@ export class UmbPickerModalSearchResultElement extends UmbLitElement {
 
 	#renderResultItem(item: UmbEntityModel) {
 		return html`
-			<umb-picker-search-result-item .props=${{ item }} .entityType=${item.entityType}></umb-picker-search-result-item>
+			<umb-extension-with-api-slot
+				type="pickerSearchResultItem"
+				.filter=${(manifest: ManifestPickerSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
+				.elementProps=${{ item }}></umb-extension-with-api-slot>
 		`;
 	}
 }
