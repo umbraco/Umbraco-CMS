@@ -111,6 +111,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             UrlSegment = dto.UrlSegment,
             DocumentKey = dto.UniqueId,
             LanguageId = dto.LanguageId,
+            IsDraft = dto.IsDraft
         };
 
     private DocumentUrlDto BuildDto(PublishedDocumentUrlSegment model)

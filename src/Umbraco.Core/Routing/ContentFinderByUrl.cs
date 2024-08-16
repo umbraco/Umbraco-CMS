@@ -91,7 +91,12 @@ public class ContentFinderByUrl : IContentFinder
 
 
         // TODO find better way to strip the id from the route
-        var documentKey = _documentUrlService.GetDocumentKeyByRouteAsync(docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length), docreq.Culture ?? "en-US", docreq.Domain?.ContentId).GetAwaiter().GetResult(); //TODO proper async and default culture
+        var documentKey = _documentUrlService.GetDocumentKeyByRoute(
+            docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length),
+            docreq.Culture ?? "en-US",
+            docreq.Domain?.ContentId,
+            umbracoContext.InPreviewMode
+            ); //TODO default culture
 
         IPublishedContent? node =
             umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
@@ -109,6 +114,12 @@ public class ContentFinderByUrl : IContentFinder
             {
                 _logger.LogDebug("No match.");
             }
+        }
+
+        // TODO remove this check
+        if (node?.Key != documentKey)
+        {
+            throw new InvalidOperationException("For some reason the routing was different. Investigate!!");
         }
 
         return node;

@@ -21,8 +21,8 @@ public class DocumentUrlDto
     [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
     public Guid UniqueId { get; set; }
 
-    // [Column("published")]
-    // public bool Published { get; set; }
+    [Column("isDraft")]
+    public bool IsDraft { get; set; }
 
     [Column("languageId")]
     [ForeignKey(typeof(LanguageDto))]
