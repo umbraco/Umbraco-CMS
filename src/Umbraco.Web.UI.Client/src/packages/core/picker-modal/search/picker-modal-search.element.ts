@@ -34,7 +34,7 @@ export class UmbPickerModalSearchElement extends UmbLitElement {
 
 	#onInput(event: UUIInputEvent) {
 		const value = event.target.value as string;
-		this.#pickerModalContext?.search.setQuery({ query: value });
+		this.#pickerModalContext?.search.updateQuery({ query: value });
 		this.#pickerModalContext?.search.search();
 	}
 

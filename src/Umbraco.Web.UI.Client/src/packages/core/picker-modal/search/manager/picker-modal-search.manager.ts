@@ -146,6 +146,16 @@ export class UmbPickerModalSearchManager<
 		return this.#query.getValue();
 	}
 
+	/**
+	 * Update the current search query.
+	 * @param {Partial<QueryType>} query
+	 * @memberof UmbPickerModalSearchManager
+	 */
+	public updateQuery(query: Partial<QueryType>) {
+		const mergedQuery = { ...this.getQuery(), ...query } as QueryType;
+		this.#query.setValue(mergedQuery);
+	}
+
 	async #initSearch() {
 		const providerAlias = this.#config?.providerAlias;
 		if (!providerAlias) throw new Error('No search provider alias provided');
