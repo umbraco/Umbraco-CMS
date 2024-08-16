@@ -220,6 +220,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 				label=${this.localize.term('placeholders_entername')}
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
+				required
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantFilter(this._variantId)}].name`, this._name ?? '')}
 				${umbFocus()}
 			>
