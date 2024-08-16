@@ -72,7 +72,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
 				<uui-box>
-					<umb-picker-search></umb-picker-search>
+					<umb-picker-search-field></umb-picker-search-field>
 					<umb-picker-search-result></umb-picker-search-result>
 					${this.#renderItems()}</uui-box
 				>

@@ -147,7 +147,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 	#renderSearch() {
 		return html`
-			<umb-picker-search></umb-picker-search>
+			<umb-picker-search-field></umb-picker-search-field>
 			<umb-picker-search-result></umb-picker-search-result>
 		`;
 	}

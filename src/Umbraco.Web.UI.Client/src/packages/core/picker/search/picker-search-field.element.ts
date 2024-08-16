@@ -5,9 +5,9 @@ import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-picker-search';
+const elementName = 'umb-picker-search-field';
 @customElement(elementName)
-export class UmbPickerSearchElement extends UmbLitElement {
+export class UmbPickerSearchFieldElement extends UmbLitElement {
 	@state()
 	_query: string = '';
 
@@ -84,6 +84,6 @@ export class UmbPickerSearchElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPickerSearchElement;
+		[elementName]: UmbPickerSearchFieldElement;
 	}
 }
