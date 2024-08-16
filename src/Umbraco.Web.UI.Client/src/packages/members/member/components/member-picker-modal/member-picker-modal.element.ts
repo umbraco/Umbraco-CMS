@@ -4,7 +4,6 @@ import type { UmbMemberItemModel } from '../../repository/index.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionItemPickerContext } from '@umbraco-cms/backoffice/collection';
@@ -18,21 +17,12 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	private _members: Array<UmbMemberDetailModel> = [];
 
 	#collectionRepository = new UmbMemberCollectionRepository(this);
-	#selectionManager = new UmbSelectionManager(this);
-
 	#pickerContext = new UmbCollectionItemPickerContext(this);
-
-	override connectedCallback(): void {
-		super.connectedCallback();
-		this.#selectionManager.setSelectable(true);
-		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.value?.selection ?? []);
-	}
 
 	constructor() {
 		super();
 		this.observe(
-			this.#selectionManager.selection,
+			this.#pickerContext.selection.selection,
 			(selection) => {
 				this.updateValue({ selection });
 				this.requestUpdate();
@@ -43,8 +33,14 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(_changedProperties);
-		if (_changedProperties.has('data') && this.data) {
-			this.#pickerContext.setConfig(this.data);
+
+		if (_changedProperties.has('data')) {
+			this.#pickerContext.search.updateConfig({ ...this.data?.search });
+			this.#pickerContext.selection.setMultiple(this.data?.multiple ?? false);
+		}
+
+		if (_changedProperties.has('value')) {
+			this.#pickerContext.selection.setSelection(this.value?.selection);
 		}
 	}
 
@@ -89,9 +85,9 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			<uui-menu-item
 				label=${item.variants[0].name ?? ''}
 				selectable
-				@selected=${() => this.#selectionManager.select(item.unique)}
-				@deselected=${() => this.#selectionManager.deselect(item.unique)}
-				?selected=${this.#selectionManager.isSelected(item.unique)}>
+				@selected=${() => this.#pickerContext.selection.select(item.unique)}
+				@deselected=${() => this.#pickerContext.selection.deselect(item.unique)}
+				?selected=${this.#pickerContext.selection.isSelected(item.unique)}>
 				<uui-icon slot="icon" name="icon-user"></uui-icon>
 			</uui-menu-item>
 		`;
