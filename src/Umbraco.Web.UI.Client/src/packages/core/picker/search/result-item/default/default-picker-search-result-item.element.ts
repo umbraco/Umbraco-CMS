@@ -68,7 +68,7 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 		return html`<umb-icon slot="icon" name=${this.item.icon}></umb-icon>`;
 	}
 
-	static override styles = [UmbTextStyles];
+	static override readonly styles = [UmbTextStyles];
 }
 
 export { UmbDefaultPickerSearchResultItemElement as element };

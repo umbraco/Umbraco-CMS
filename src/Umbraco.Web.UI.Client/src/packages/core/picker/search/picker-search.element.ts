@@ -59,7 +59,7 @@ export class UmbPickerSearchElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-input {
