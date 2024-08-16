@@ -1,5 +1,4 @@
 import { UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import { UMB_DOCUMENT_TYPE_SEARCH_PROVIDER_ALIAS } from '../search/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
