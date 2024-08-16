@@ -8,7 +8,6 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 type UuiInputTypeType = typeof UUIInputElement.prototype.type;
 
