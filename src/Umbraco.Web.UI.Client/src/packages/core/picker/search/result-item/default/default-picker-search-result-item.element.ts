@@ -8,7 +8,7 @@ import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 const elementName = 'umb-default-picker-search-result-item';
 @customElement(elementName)
 export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
-	#item?: UmbSearchResultItemModel | undefined;
+	#item: UmbSearchResultItemModel | undefined;
 	@property({ type: Object })
 	public get item(): UmbSearchResultItemModel | undefined {
 		return this.#item;
