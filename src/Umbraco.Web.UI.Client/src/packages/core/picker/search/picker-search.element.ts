@@ -1,4 +1,4 @@
-import type { UmbPickerContext as UmbPickerContext } from '../picker.context.js';
+import type { UmbPickerContext } from '../picker.context.js';
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
