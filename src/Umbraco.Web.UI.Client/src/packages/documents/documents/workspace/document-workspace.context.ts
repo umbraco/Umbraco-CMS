@@ -53,6 +53,9 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
+	UMB_VALIDATION_CONTEXT,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
 	UmbValidationContext,
 	UmbVariantValuesValidationPathTranslator,
@@ -635,6 +638,7 @@ export class UmbDocumentWorkspaceContext
 			culture = selected[0];
 			const variantId = UmbVariantId.FromString(culture);
 			const saveData = this.#buildSaveData([variantId]);
+			await this.#runMandatoryValidationForSaveData(saveData);
 			await this.#performSaveOrCreate(saveData);
 		}
 
@@ -678,6 +682,7 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const saveData = this.#buildSaveData(variantIds);
+		await this.#runMandatoryValidationForSaveData(saveData);
 
 		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
@@ -713,6 +718,24 @@ export class UmbDocumentWorkspaceContext
 				return await Promise.reject();
 			},
 		);
+	}
+
+	async #runMandatoryValidationForSaveData(saveData: UmbDocumentDetailModel) {
+		// Check that the data is valid before we save it.
+		// Check variants have a name:
+		const variantWithoutAName = saveData.variants.filter((x) => !x.name);
+		console.log('variantWithoutAName', variantWithoutAName);
+		if (variantWithoutAName.length > 0) {
+			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
+			variantWithoutAName.forEach((variant) => {
+				validationContext.messages.addMessage(
+					'client',
+					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
+					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+				);
+			});
+			throw new Error('All variants must have a name');
+		}
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
@@ -765,6 +788,7 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const saveData = this.#buildSaveData(variantIds);
+		await this.#runMandatoryValidationForSaveData(saveData);
 		return await this.#performSaveOrCreate(saveData);
 	}
 
