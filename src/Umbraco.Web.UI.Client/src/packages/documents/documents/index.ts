@@ -12,7 +12,6 @@ export * from './reference/index.js';
 export * from './repository/index.js';
 export * from './user-permissions/index.js';
 export * from './workspace/index.js';
-export * from './picker/index.js';
 
 export * from './tree/index.js';
 export { UMB_CONTENT_MENU_ALIAS } from './menu/manifests.js';

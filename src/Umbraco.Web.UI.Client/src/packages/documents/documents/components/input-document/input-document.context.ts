@@ -1,5 +1,5 @@
-import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from '../../picker/index.js';
-import { UMB_DOCUMENT_PICKER_MODAL } from '../../picker/index.js';
+import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from '../../modals/index.js';
+import { UMB_DOCUMENT_PICKER_MODAL } from '../../modals/index.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbDocumentItemModel } from '../../repository/index.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
