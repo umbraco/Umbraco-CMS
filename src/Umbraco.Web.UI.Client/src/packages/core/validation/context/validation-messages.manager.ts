@@ -24,6 +24,7 @@ export class UmbValidationMessagesManager {
 	}
 
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
+		path = path.toLowerCase();
 		// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. using a more performant way than Regex:
 		return this.#messages.asObservablePart((msgs) =>
 			msgs.filter(
@@ -35,11 +36,13 @@ export class UmbValidationMessagesManager {
 	}
 
 	messagesOfTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
+		path = path.toLowerCase();
 		// Find messages that matches the given type and path.
 		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => x.type === type && x.path === path));
 	}
 
 	hasMessagesOfPathAndDescendant(path: string): Observable<boolean> {
+		path = path.toLowerCase();
 		return this.#messages.asObservablePart((msgs) =>
 			// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. Using a more performant way than Regex: [NL]
 			msgs.some(
@@ -50,6 +53,7 @@ export class UmbValidationMessagesManager {
 		);
 	}
 	getHasMessagesOfPathAndDescendant(path: string): boolean {
+		path = path.toLowerCase();
 		return this.#messages
 			.getValue()
 			.some(
@@ -60,7 +64,7 @@ export class UmbValidationMessagesManager {
 	}
 
 	addMessage(type: UmbValidationMessageType, path: string, body: string, key: string = UmbId.new()): void {
-		path = this.#translatePath(path) ?? path;
+		path = this.#translatePath(path.toLowerCase()) ?? path.toLowerCase();
 		// check if there is an existing message with the same path and type, and append the new messages: [NL]
 		if (this.#messages.getValue().find((x) => x.type === type && x.path === path && x.body === body)) {
 			return;
@@ -69,7 +73,7 @@ export class UmbValidationMessagesManager {
 	}
 
 	addMessages(type: UmbValidationMessageType, path: string, bodies: Array<string>): void {
-		path = this.#translatePath(path) ?? path;
+		path = this.#translatePath(path.toLowerCase()) ?? path.toLowerCase();
 		// filter out existing messages with the same path and type, and append the new messages: [NL]
 		const existingMessages = this.#messages.getValue();
 		const newBodies = bodies.filter(
@@ -82,6 +86,7 @@ export class UmbValidationMessagesManager {
 		this.#messages.removeOne(key);
 	}
 	removeMessagesByTypeAndPath(type: UmbValidationMessageType, path: string): void {
+		path = path.toLowerCase();
 		this.#messages.filter((x) => !(x.type === type && x.path === path));
 	}
 	removeMessagesByType(type: UmbValidationMessageType): void {
