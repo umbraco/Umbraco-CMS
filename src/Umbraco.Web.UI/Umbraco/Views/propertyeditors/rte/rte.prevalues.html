@@ -1,0 +1,49 @@
+<div ng-controller="Umbraco.PrevalueEditors.RteController" class="rte-editor-preval umb-rte">
+
+    <umb-control-group label="Toolbar" description="Pick the toolbar options that should be available when editing">
+        <div ng-repeat="cmd in tinyMceConfig.commands">
+            <umb-checkbox
+                model="cmd.selected"
+                on-change="selectCommand(cmd)"
+                icon="{{cmd.icon}}"
+                text="{{cmd.name}}"
+                class="mce-cmd">
+            </umb-checkbox>
+        </div>
+    </umb-control-group>
+
+    <umb-control-group label="Stylesheets" description="Pick the stylesheets whose editor styles should be available when editing">
+        <div ng-repeat="css in stylesheets">
+
+            <umb-checkbox
+                model="css.selected"
+                on-change="selectStylesheet(css)"
+                text="{{css.name}}">
+            </umb-checkbox>
+
+        </div>
+    </umb-control-group>
+
+    <umb-control-group label="Dimensions" description="Set the editor dimensions">
+        <div class="vertical-align-items">
+            <input type="number" min="0" ng-model="model.value.dimensions.width" class="umb-property-editor-small" title="Width" placeholder="Width" /> &times;
+            <input type="number" min="0" ng-model="model.value.dimensions.height" class="umb-property-editor-small" title="Height" placeholder="Height" /> Pixels
+        </div>
+    </umb-control-group>
+
+    <umb-control-group label="Maximum size for inserted images" description="Maximum width or height - enter 0 to disable resizing">
+        <div class="vertical-align-items">
+            <input type="number" min="0" ng-model="model.value.maxImageSize" class="umb-property-editor-small" title="Maximum width or height" placeholder="Maximum width or height" /> Pixels
+        </div>
+    </umb-control-group>
+
+    <umb-control-group label="Mode" description="Select mode">
+        <div class="vertical-align-items">
+            <select ng-model="model.value.mode">
+                <option value="classic">Classic</option> <!-- Theme:modern & inline:false-->
+                <option value="distraction-free">Distraction Free</option> <!-- Theme:inlite & inline:true -->
+            </select>
+        </div>
+    </umb-control-group>
+
+</div>

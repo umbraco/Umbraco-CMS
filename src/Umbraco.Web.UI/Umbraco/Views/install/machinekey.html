@@ -1,0 +1,23 @@
+<div ng-controller="Umbraco.Installer.MachineKeyController">
+    <h1>Configure an ASP.Net Machine Key</h1>
+    <p>
+        By default the installer will generate a custom ASP.Net Machine Key for your site and install it into your web.config file.
+        A Machine Key is used for hashing and encryption and it is recommended that you install a custom one into your site.
+        This ensures that your site is fully portable between environments that might have different Machine Key settings and that
+        your site by default will work with load balancing when installed between various server environments.
+    </p>
+
+    <form name="myForm" class="form-horizontal" novalidate ng-submit="continue();">
+
+        <div class="row">
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" value="Continue" class="btn btn-success" />
+
+                    <button class="btn" ng-click="ignoreKey()">I don't want a custom Machine Key</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>

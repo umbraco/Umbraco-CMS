@@ -1,0 +1,30 @@
+<div ng-controller="Umbraco.PropertyEditors.textAreaController">
+    <ng-form name="textareaFieldForm">
+        <textarea ng-model="model.value"
+            id="{{model.alias}}"
+            name="textarea"
+            rows="{{model.config.rows || 10}}"
+            class="umb-property-editor umb-textarea textstring"
+            val-server="value"
+            ng-keyup="change()"
+            ng-trim="false"
+            ng-required="model.validation.mandatory"
+            aria-required="{{model.validation.mandatory}}">
+        </textarea>
+
+        <span ng-messages="textareaFieldForm.textarea.$error" show-validation-on-submit >
+            <span class="help-inline" ng-message="required">{{mandatoryMessage}}</span>
+            <span class="help-inline" ng-message="valServer">{{textareaFieldForm.textarea.errorMsg}}</span>
+        </span>
+
+        <div class="help" ng-if="nearMaxLimit">
+            <p class="sr-only" tabindex="0">{{model.label}} <localize key="textbox_characters_left" tokens="[maxChars - charsCount]" watch-tokens="true">%0% characters left.</localize></p>
+            <p aria-hidden="true"><localize key="textbox_characters_left" tokens="[maxChars - charsCount]" watch-tokens="true">%0% characters left.</localize></p>
+        </div>
+        <div class="help text-error" ng-if="validLength === false">
+            <p class="sr-only" tabindex="0">{{model.label}} <localize key="textbox_characters_exceed" tokens="[maxChars, charsCount - maxChars]" watch-tokens="true">Maximum %0% characters, <strong>%1%</strong> too many.</localize></p>
+            <p aria-hidden="true"><localize key="textbox_characters_exceed" tokens="[maxChars, charsCount - maxChars]" watch-tokens="true">Maximum %0% characters, <strong>%1%</strong> too many.</localize></p>
+        </div>
+
+    </ng-form>
+</div>

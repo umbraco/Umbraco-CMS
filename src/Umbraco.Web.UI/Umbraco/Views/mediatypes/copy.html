@@ -1,0 +1,53 @@
+<div class="umb-dialog" ng-controller="Umbraco.Editors.MediaTypes.CopyController">
+
+    <div class="umb-dialog-body">
+        <div class="umb-pane">
+
+            <p class="abstract" ng-hide="success">
+                <localize key="contentTypeEditor_folderToCopy">Select the folder to copy</localize> <strong>{{source.name}}</strong>&nbsp;<localize key="contentTypeEditor_structureBelow">to in the tree structure below</localize>
+            </p>
+
+            <umb-loader ng-show="busy"></umb-loader>
+
+            <div ng-show="error">
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
+            </div>
+
+            <div ng-show="success">
+                <div class="alert alert-success">
+                    <strong>{{source.name}}</strong> <localize key="contentTypeEditor_copiedUnderneath">was copied underneath</localize>&nbsp;<strong>{{target.name}}</strong>
+                </div>
+                <button type="button" class="btn btn-primary" ng-click="close()">Ok</button>
+            </div>
+
+            <div ng-hide="success">
+
+                <div>
+                    <umb-tree section="settings"
+                              treealias="mediaTypes"
+                              customtreeparams="foldersonly=1"
+                              hideheader="false"
+                              hideoptions="true"
+                              isdialog="true"
+                              api="dialogTreeApi"
+                              on-init="onTreeInit()"
+                              enablecheckboxes="true">
+                    </umb-tree>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+        <button type="button" class="btn btn-link" ng-click="close()" ng-show="!busy">
+            <localize key="general_cancel">Cancel</localize>
+        </button>
+        <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy || !target">
+            <localize key="actions_copy">Copy</localize>
+        </button>
+    </div>
+</div>

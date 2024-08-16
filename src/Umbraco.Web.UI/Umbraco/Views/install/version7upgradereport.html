@@ -1,0 +1,22 @@
+<div>
+    <h1>Major version upgrade from {{installer.current.model.currentVersion}} to {{installer.current.model.newVersion}}</h1>
+    <h2>There were {{installer.current.model.errors.length}} issues detected</h2>
+    <p>
+        The following compatibility issues were found. If you continue, all non-compatible property editors will be converted to a Readonly/Label.                             
+        You will be able to change the property editor to a compatible type manually by editing the data type after installation.
+    </p>
+    <p>
+        Otherwise, if you choose not to proceed, you will need to fix the errors listed below. 
+        Refer to v{{installer.current.model.newVersion}} upgrade instructions for full details.
+    </p>
+    
+    <ul class="upgrade-report">
+        <li ng-repeat="item in installer.current.model.errors">
+            {{item}}
+        </li>
+    </ul>
+    
+    <p>
+        <button class="btn btn-success" ng-click="forward()">Continue</button>
+   </p>
+</div>

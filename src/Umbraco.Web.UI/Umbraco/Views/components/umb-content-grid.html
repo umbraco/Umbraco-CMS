@@ -1,0 +1,40 @@
+<div class="umb-content-grid">
+
+   <div
+      class="umb-content-grid__item umb-outline umb-outline--surrounding"
+      ng-repeat="item in content"
+      ng-class="{'-selected': item.selected}"
+      ng-click="clickItem(item, $event, $index)">
+
+      <div class="umb-content-grid__content">
+
+        <a class="umb-content-grid__item-name umb-outline"
+           ng-href="{{'#' + item.editPath}}"
+           ng-click="clickItemName(item, $event, $index)"
+           ng-class="{'-light': !item.published && item.updater != null}">
+            <i class="umb-content-grid__icon {{ item.icon }}" aria-hidden="true"></i>
+            <span>{{ item.name }}</span>
+        </a>
+
+        <ul class="umb-content-grid__details-list" ng-class="{'-light': !item.published && item.updater != null}">
+            <li class="umb-content-grid__details-item" ng-if="item.state">
+                <div class="umb-content-grid__details-label"><localize key="general_status"></localize>:</div>
+                <div class="umb-content-grid__details-value"><umb-variant-state variant="item"></umb-variant-state></div>
+            </li>
+            <li class="umb-content-grid__details-item" ng-repeat="property in contentProperties">
+                <div class="umb-content-grid__details-label">{{ property.header }}:</div>
+                <div class="umb-content-grid__details-value">{{ item[property.alias] }}</div>
+            </li>
+        </ul>
+
+      </div>
+
+   </div>
+
+    <umb-empty-state
+       ng-if="!content"
+       position="center">
+       <localize key="content_noItemsToShow">There are no items to show</localize>
+    </umb-empty-state>
+
+</div>

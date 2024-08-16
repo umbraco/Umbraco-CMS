@@ -1,0 +1,40 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.DocumentTypes.DeleteController">
+
+    <div class="umb-dialog-body">
+
+        <p class="abstract">
+            <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize>
+            <strong>{{currentNode.name}}</strong>?
+        </p>
+
+        <ng-switch on="currentNode.nodeType">
+            <div ng-switch-when="container">
+                <umb-confirm
+                    on-confirm="performContainerDelete"
+                    on-cancel="cancel" confirm-button-style="danger">
+                </umb-confirm>
+            </div>
+
+            <div ng-switch-default>
+                <p>
+                	<i class="icon-alert red"></i>
+                    <strong class="red">
+                        <localize key="contentTypeEditor_allDocuments">All Documents</localize>
+                    </strong>
+                    <localize key="contentTypeEditor_usingThisDocument">
+                        using this document type will be deleted permanently, please confirm you want to delete these as well.
+                    </localize>
+                </p>
+
+                <hr />
+
+                <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}"></umb-checkbox>
+
+                <umb-confirm confirm-disabled="!confirmed" confirm-label-key="delete" on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
+                </umb-confirm>
+            </div>
+        </ng-switch>
+
+
+    </div>
+</div>

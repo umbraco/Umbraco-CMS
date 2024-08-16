@@ -1,0 +1,21 @@
+<div>
+    <h1>Upgrading Umbraco</h1>
+    <p>
+        Welcome to the Umbraco installer. You see this screen because your Umbraco installation needs a quick upgrade
+        of its database and files, which will ensure your website is kept as fast, secure and up to date as possible.
+    </p>
+    <p>
+        Detected current version <strong>{{installer.current.model.currentVersion}}</strong> ({{installer.current.model.currentState}}),
+        which needs to be upgraded to <strong>{{installer.current.model.newVersion}}</strong> ({{installer.current.model.newState}}).
+        To compare versions and read a report of changes between versions, use the <em>View Report</em> button below.
+    </p>
+    <p>
+        <a ng-href="{{installer.current.model.reportUrl}}" target="_blank" class="btn btn-info">View Report</a>
+    </p>
+    <p>
+        Simply click <strong>continue</strong> below to be guided through the rest of the upgrade.
+    </p>
+    <p>
+        <button class="btn btn-success" ng-click="install()">Continue</button>
+   </p>
+</div>

@@ -1,0 +1,103 @@
+<div>
+
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+    <form name="contentForm" ng-submit="save()" novalidate val-form-manager>
+
+        <umb-editor-view ng-if="!page.loading">
+
+            <umb-variant-content-editors
+                page="page"
+                content="content"
+                culture="culture"
+                segment="segment"
+                on-select-app="appChanged(app)"
+                on-select-app-anchor="appAnchorChanged(app, anchor)"
+                on-back="onBack()"
+                show-back="!(infiniteModel && infiniteModel.infiniteMode)">
+            </umb-variant-content-editors>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+
+                    <umb-breadcrumbs
+                        ng-if="ancestors && ancestors.length > 0"
+                        ancestors="ancestors"
+                        for-new-entity="page.isNew"
+                        entity-type="content">
+                    </umb-breadcrumbs>
+
+                </umb-editor-footer-content-left>
+
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode"
+                        action="close()"
+                        button-style="link"
+                        label-key="general_close"
+                        shortcut="esc"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        alias="preview"
+                        ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
+                        type="button"
+                        button-style="link"
+                        action="preview(content)"
+                        label-key="buttons_saveAndPreview">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="page.showSaveButton"
+                        alias="save"
+                        type="button"
+                        button-style="{{page.saveButtonStyle}}"
+                        state="page.saveButtonState"
+                        action="save(content)"
+                        label-key="buttons_save"
+                        shortcut="ctrl+s"
+                        add-ellipsis="{{page.saveButtonEllipsis}}">
+                    </umb-button>
+
+                    <umb-button-group
+                        ng-if="defaultButton && !content.trashed && !content.isElement"
+                        button-style="success"
+                        default-button="defaultButton"
+                        sub-buttons="subButtons"
+                        state="page.buttonGroupState"
+                        direction="up"
+                        float="right"
+                        label-key="buttons_morePublishingOptions"
+                        label="More publishing options">
+                    </umb-button-group>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfiniteSaveAndClose"
+                        action="saveAndClose(content)"
+                        button-style="primary"
+                        state="saveAndCloseButtonState"
+                        label-key="buttons_saveAndClose"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfinitePublishAndClose"
+                        action="publishAndClose(content)"
+                        button-style="primary"
+                        state="publishAndCloseButtonState"
+                        label-key="buttons_publishAndClose"
+                        type="button">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+</div>

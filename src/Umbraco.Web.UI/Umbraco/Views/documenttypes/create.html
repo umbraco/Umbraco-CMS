@@ -1,0 +1,84 @@
+<div ng-controller="Umbraco.Editors.DocumentTypes.CreateController">
+    <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
+        <div class="umb-pane" ng-show="!model.creatingFolder">
+            <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+
+            <ul class="umb-actions umb-actions-child">
+                <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
+                    <button type="button" ng-click="createDocType()" class="umb-action-link umb-outline btn-reset" umb-auto-focus>
+                        <i class="large icon icon-document" aria-hidden="true"></i>
+                        <span class="menu-label">
+                            <localize key="create_documentTypeWithTemplate">Document Type with Template</localize>
+                            <small><localize key="create_documentTypeWithTemplateDescription">The data definition for a content page that can be created by editors in the content tree and is directly accessible via a URL.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
+                    <button type="button" ng-click="createComponent()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-item-arrangement" aria-hidden="true"></i>
+                        <span class="menu-label">
+                            <localize key="create_documentType">Document Type</localize>
+                            <small><localize key="create_documentTypeDescription">The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeWithIsElementTypeChecked" class="umb-action">
+                    <button type="button" ng-click="createElement()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-science" aria-hidden="true"></i>
+                        <span class="menu-label">
+                            <localize key="create_elementType">Element Type</localize>
+                            <small><localize key="create_elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Nested Content' property editor.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeWithoutTemplateForComposition" class="umb-action">
+                    <button type="button" ng-click="createComposition()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-defrag" aria-hidden="true"></i>
+                        <span class="menu-label">
+                            <localize key="create_composition">Composition</localize>
+                            <small><localize key="create_compositionDescription">Defines a re-usable set of properties that can be included in the definition of multiple other Document Types. For example, a set of 'Common Page Settings'.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-folder" ng-if="model.allowCreateFolder" class="umb-action">
+                    <button type="button" ng-click="showCreateFolder()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-folder" aria-hidden="true"></i>
+                        <span class="menu-label">
+                            <localize key="create_folder">Folder</localize>
+                            <small>
+                                <localize key="create_folderDescription">Used to organise the Document Types, Compositions and Element Types created in this Document Type tree.</localize>
+                            </small>
+                        </span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="umb-pane" ng-show="model.creatingFolder">
+            <form novalidate name="createFolderForm"
+                  ng-submit="createContainer()"
+                  val-form-manager>
+
+                <div ng-show="error">
+                    <div class="alert alert-error">
+                        <div><strong>{{error.errorMsg}}</strong></div>
+                        <div>{{error.data.message}}</div>
+                    </div>
+                </div>
+
+                <umb-control-group label="Enter a folder name" hide-label="false">
+                    <input type="text" name="folderName" maxlength="255" ng-model="model.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+            </form>
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!model.creatingFolder">
+        <button type="button" class="btn btn-info" ng-click="close(true)">
+            <localize key="buttons_somethingElse">Do something else</localize>
+        </button>
+
+    </div>
+</div>

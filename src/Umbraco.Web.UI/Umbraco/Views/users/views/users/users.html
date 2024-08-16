@@ -1,0 +1,550 @@
+<div ng-controller="Umbraco.Editors.Users.UsersController as vm" class="clearfix">
+
+    <!-- Users Overview -->
+    <div ng-if="vm.usersViewState === 'overview'">
+
+        <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+
+        <umb-editor-sub-header ng-class="{'--state-selection':(vm.selection.length > 0)}">
+
+            <!-- No selection -->
+            <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
+                <umb-button-group
+                    ng-if="vm.defaultButton"
+                    button-style="outline"
+                    default-button="vm.defaultButton"
+                    sub-buttons="vm.subButtons">
+                </umb-button-group>
+            </umb-editor-sub-header-content-left>
+
+            <umb-editor-sub-header-content-right ng-if="vm.selection.length === 0">
+                <umb-editor-sub-header-section>
+                    <umb-layout-selector
+                        ng-if="vm.layouts"
+                        layouts="vm.layouts"
+                        active-layout="vm.activeLayout"
+                        on-layout-select="vm.selectLayout(layout)">
+                    </umb-layout-selector>
+                </umb-editor-sub-header-section>
+                <umb-editor-sub-header-section>
+
+                    <umb-mini-search model="vm.usersOptions.filter" on-search="vm.searchUsers()" on-blur="vm.onBlurSearch()">
+                    </umb-mini-search>
+
+                </umb-editor-sub-header-section>
+            </umb-editor-sub-header-content-right>
+
+            <!-- With selection -->
+            <umb-editor-sub-header-content-left ng-if="vm.selection.length > 0">
+                <umb-editor-sub-header-section>
+                    <umb-button
+                        type="button"
+                        button-style="white"
+                        label-key="buttons_clearSelection"
+                        action="vm.clearSelection()"
+                        disabled="actionInProgress">
+                    </umb-button>
+                </umb-editor-sub-header-section>
+                <umb-editor-sub-header-section>
+                    <strong>{{ vm.selection.length }} <localize key="general_of">of</localize> {{ vm.users.length }} <localize key="general_selected">selected</localize></strong>
+                </umb-editor-sub-header-section>
+
+            </umb-editor-sub-header-content-left>
+
+            <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
+                <umb-button
+                    style="margin-right: 5px;"
+                    disabled="!vm.allowSetUserGroup"
+                    type="button"
+                    size="xs"
+                    button-style="white"
+                    label-key="actions_setGroup"
+                    icon="icon-users"
+                    action="vm.openBulkUserGroupPicker()">
+                </umb-button>
+
+                <umb-button
+                    style="margin-right: 5px;"
+                    disabled="!vm.allowEnableUser"
+                    type="button"
+                    size="xs"
+                    button-style="white"
+                    state="vm.enableUserButtonState"
+                    label-key="actions_enable"
+                    icon="icon-check"
+                    action="vm.enableUsers()">
+                </umb-button>
+
+                <umb-button
+                    style="margin-right: 5px;"
+                    disabled="!vm.allowUnlockUser"
+                    type="button"
+                    size="xs"
+                    button-style="white"
+                    state="vm.unlockUserButtonState"
+                    label-key="actions_unlock"
+                    icon="icon-unlocked"
+                    action="vm.unlockUsers()">
+                </umb-button>
+
+                <umb-button
+                    disabled="!vm.allowDisableUser"
+                    type="button"
+                    size="xs"
+                    button-style="white"
+                    state="vm.disableUserButtonState"
+                    label-key="actions_disable"
+                    icon="icon-block"
+                    action="vm.disableUsers()">
+                </umb-button>
+
+            </umb-editor-sub-header-content-right>
+
+        </umb-editor-sub-header>
+
+        <!-- Filters -->
+        <div class="flex items-center mb3">
+
+            <div style="font-size: 16px;">
+                <span class="bold"><localize key="sections_users">Users</localize></span> <span ng-if="vm.usersOptions.totalItems">({{vm.usersOptions.totalItems}})</span>
+            </div>
+
+            <div class="flex ml-auto">
+                <!-- State filter -->
+                <div class="umb-filter" ng-if="vm.userStatesFilter.length > 0">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('state')">
+                        <span><localize key="general_status">Status</localize>:</span>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
+                        <span class="caret" aria-hidden="true"></span>
+                    </button>
+                    <umb-dropdown class="pull-right" ng-if="vm.page.showStatusFilter" on-close="vm.page.showStatusFilter = false;">
+                        <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter | filter:{ key: '!All'}" ng-show="userState.count > 0" style="padding: 8px 20px 8px 16px;">
+                            <div class="flex items-center">
+                                <umb-checkbox input-id="userstate-{{$index}}"
+                                              name="userstate"
+                                              model="userState.selected"
+                                              on-change="vm.setUserStatesFilter(userState)">
+                                </umb-checkbox>
+                                <label for="userstate-{{$index}}">
+                                    <umb-badge size="s" color="{{userState.color}}">{{userState.name}} <span class="ml1 umb-badge__count">{{userState.count}}</span></umb-badge>
+                                </label>
+                            </div>
+                        </umb-dropdown-item>
+                    </umb-dropdown>
+                </div>
+
+                <!-- Groups filter -->
+                <div class="umb-filter">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('group')">
+                        <span><localize key="general_groups">Groups</localize>:</span>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getFilterName(vm.userGroups) }}</span>
+                        <span class="caret" aria-hidden="true"></span>
+                    </button>
+                    <umb-dropdown class="pull-right" ng-if="vm.page.showGroupFilter" on-close="vm.page.showGroupFilter = false;">
+                        <umb-dropdown-item ng-repeat="userGroup in vm.userGroups" style="padding: 8px 20px 8px 16px;">
+                            <div class="flex items-center">
+                                <umb-checkbox input-id="usergroup-{{$index}}"
+                                              name="usergroup"
+                                              model="userGroup.selected"
+                                              on-change="vm.setUserGroupFilter(userGroup)">
+                                </umb-checkbox>
+                                <label for="usergroup-{{$index}}">
+                                    <span class="flex items-center">
+                                        <i class="{{userGroup.icon}}" aria-hidden="true"></i>
+                                        <span class="ml1">{{userGroup.name}}</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </umb-dropdown-item>
+                    </umb-dropdown>
+                </div>
+
+                <!-- Order By -->
+                <div class="umb-filter">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('orderBy')">
+                        <span><localize key="general_orderBy">Order by</localize>:</span>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
+                        <span class="caret" aria-hidden="true"></span>
+                    </button>
+                    <umb-dropdown class="pull-right" ng-if="vm.page.showOrderByFilter" on-close="vm.page.showOrderByFilter = false;" umb-keyboard-list>
+                        <umb-dropdown-item ng-repeat="sortData in vm.userSortData">
+                            <button type="button" ng-click="vm.setOrderByFilter(sortData.key, sortData.direction)">{{sortData.label}}</button>
+                        </umb-dropdown-item>
+                    </umb-dropdown>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Empty states -->
+        <umb-empty-state
+            ng-if="!vm.loading && !vm.users.length && vm.usersOptions.filter.length > 0"
+            position="center">
+            <localize key="general_searchNoResult"></localize>
+        </umb-empty-state>
+
+        <!-- Layout: Cards -->
+        <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
+            <div class="umb-user-card umb-outline umb-outline--surrounding" ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user, $event)">
+                <div class="umb-user-card__content">
+                    <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
+                        {{ user.userDisplayState.name }}
+                    </umb-badge>
+                    <a class="umb-user-card__goToUser" ng-click="vm.clickUser(user, $event)" ng-href="#{{::vm.getEditPath(user)}}">
+                        <div class="umb-user-card__avatar">
+                            <umb-avatar size="l" color="secondary" name="{{user.name}}" img-src="{{user.avatars[2]}}" img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
+                            </umb-avatar>
+                        </div>
+                        <div class="umb-user-card__name">{{user.name}}</div>
+                    </a>
+                    <div class="umb-user-card__group">
+                        <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
+                    </div>
+                    <div class="umb-user-card__last-login">
+                        <div ng-if="user.formattedLastLogin">
+                            <div>
+                                <localize key="user_lastLogin">Last login</localize>
+                            </div>
+                            {{ user.formattedLastLogin }}
+                        </div>
+                        <div ng-if="!user.formattedLastLogin">
+                            <div>{{ user.name | umbWordLimit:1 }}
+                                <localize key="user_noLogin">has not logged in yet</localize>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layout: Table -->
+        <div ng-if="vm.activeLayout.path === '2'">
+
+            <div class="umb-table umb-user-table" ng-class="{'-has-selection': vm.selection.length > 0}">
+                <div class="umb-table-head">
+                    <div class="umb-table-row">
+                        <div class="umb-table-cell umb-user-table-col-avatar not-fixed" style="width: 70px; padding:10px 15px;">
+                            <button type="button" class="btn-reset umb-checkmark__action" style="outline: none;" ng-click="vm.selectAll()">
+                                <umb-checkmark checked="vm.areAllSelected()" size="xs"></umb-checkmark>
+                            </button>
+                        </div>
+                        <div class="umb-table-cell umb-table__name"><localize key="general_name">Name</localize></div>
+                        <div class="umb-table-cell"><localize key="user_usergroup">User group</localize></div>
+                        <div class="umb-table-cell"><localize key="user_lastLogin">Last login</localize></div>
+                        <div class="umb-table-cell"><localize key="general_status">Status</localize></div>
+                    </div>
+                </div>
+                <div class="umb-table-body">
+                    <div ng-repeat="user in vm.users track by user.key"
+                        ng-click="vm.selectUser(user, vm.selection, $event)"
+                        ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}"
+                        class="umb-table-row umb-user-table-row umb-outline umb-outline--surrounding">
+                        <div class="umb-table-cell umb-user-table-col-avatar not-fixed" scope="row" style="width: 70px; padding:10px 15px;">
+                            <a ng-click="vm.clickUser(user, $event)" ng-href="#{{::vm.getEditPath(user)}}">
+                                <umb-avatar
+                                    size="xs"
+                                    color="secondary"
+                                    name="{{user.name}}"
+                                    img-src="{{user.avatars[0]}}"
+                                    img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
+                                </umb-avatar>
+                            </a>
+                        </div>
+                        <div class="umb-table-cell umb-table__name">
+                            <a class="umb-table-body__link"
+                               ng-click="vm.clickUser(user, $event)"
+                               ng-href="#{{::vm.getEditPath(user)}}"
+                               ng-bind="user.name">
+                            </a>
+                        </div>
+                        <div class="umb-table-cell"><div><span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span></div></div>
+                        <div class="umb-table-cell">{{ user.formattedLastLogin }}</div>
+                        <div class="umb-table-cell" style="text-transform: capitalize;">
+                            <umb-badge
+                                size="xs"
+                                ng-if="user.userDisplayState.key !== 'Active'"
+                                color="{{user.userDisplayState.color}}">
+                                {{ user.userDisplayState.name }}
+                            </umb-badge>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pagination -->
+        <div ng-if="!vm.loading" class="flex justify-center">
+            <umb-pagination
+                ng-if="vm.usersOptions.totalPages"
+                page-number="vm.usersOptions.pageNumber"
+                total-pages="vm.usersOptions.totalPages"
+                on-change="vm.changePageNumber(pageNumber)">
+            </umb-pagination>
+        </div>
+
+    </div>
+
+    <!-- Add user -->
+    <div ng-if="vm.usersViewState === 'inviteUser' || vm.usersViewState === 'createUser'">
+
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setUsersViewState('overview');"><span aria-hidden="true">&larr;</span> <localize key="user_backToUsers">Back to users</localize></button>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+        <div class="flex justify-center">
+            <umb-box style="max-width: 600px;">
+                <umb-box-content>
+                    <form name="addUserForm" no-validate val-form-manager class="block-form">
+                        <div>
+                            <div ng-if="vm.usersViewState === 'inviteUser'">
+                                <h3 class="bold" style="margin-bottom: 0;">
+                                    <localize key="user_inviteUser">Invite User</localize>
+                                </h3>
+                                <p style="line-height: 1.6em; margin-bottom: 15px;">
+                                    <localize key="user_inviteUserHelp"></localize>
+                                </p>
+                            </div>
+                            <div ng-if="vm.usersViewState === 'createUser'">
+                                <h3 class="bold" style="margin-bottom: 0;">
+                                    <localize key="user_createUser">Create user</localize>
+                                </h3>
+                                <p style="line-height: 1.6em; margin-bottom: 15px;">
+                                    <localize key="user_createUserHelp"></localize>
+                                </p>
+                            </div>
+                        </div>
+
+                        <umb-control-group label="@general_name" label-for="name" required="true">
+                            <input type="text" name="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
+                                   umb-auto-focus required val-server-field="Name" />
+                            <span ng-messages="addUserForm.name.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.name.errorMsg}}</span>
+                            </span>
+
+                        </umb-control-group>
+
+                        <umb-control-group label="@general_username" label-for="username" required="true" ng-if="!vm.usernameIsEmail">
+                            <input type="text" name="username" localize="placeholder" placeholder="@placeholders_enterusername" class="input-block-level"
+                                   ng-model="vm.newUser.username" val-server-field="Username" ng-required="vm.usernameIsEmail" />
+                            <span ng-messages="addUserForm.username.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.username.errorMsg}}</span>
+                            </span>
+
+                        </umb-control-group>
+
+                        <umb-control-group label="@general_email" label-for="email" required="true">
+                            <input type="email" name="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
+                                   ng-model="vm.newUser.email" required val-email val-server-field="Email" />
+                            <span ng-messages="addUserForm.email.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.email.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-control-group label="@user_usergroup" description="@user_groupsHelp" required="true">
+
+                            <umb-user-group-preview
+                                ng-repeat="group in vm.newUser.userGroups"
+                                icon="group.icon"
+                                name="group.name"
+                                sections="group.sections"
+                                content-start-node="group.contentStartNode"
+                                media-start-node="group.mediaStartNode"
+                                allow-remove="true"
+                                on-remove="vm.removeSelectedUserGroup($index, vm.newUser.userGroups)">
+                            </umb-user-group-preview>
+
+                            <button type="button" style="max-width: 100%;" class="btn-reset umb-node-preview-add" ng-click="vm.openUserGroupPicker($event)">
+                                <localize key="general_add">Add</localize>
+                            </button>
+
+                            <input type="hidden" ng-model="vm.newUser.userGroupsValidation" ng-required="!vm.newUser.userGroups.length" />
+
+                        </umb-control-group>
+
+                        <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message" required="true">
+                            <textarea name="message"
+                                      type="text"
+                                      class="input-block-level"
+                                      localize="placeholder"
+                                      placeholder="@placeholders_enterMessage"
+                                      ng-model="vm.newUser.message"
+                                      rows="4"
+                                      required val-server-field="Message">
+                            </textarea>
+                            <span ng-messages="addUserForm.message.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.message.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-button
+                            ng-if="vm.usersViewState === 'inviteUser'"
+                            button-style="action"
+                            state="vm.page.createButtonState"
+                            type="button"
+                            action="vm.inviteUser(addUserForm)"
+                            label-key="user_sendInvite"
+                            size="m">
+                        </umb-button>
+
+                        <umb-button
+                            ng-if="vm.usersViewState === 'createUser'"
+                            button-style="action"
+                            state="vm.page.createButtonState"
+                            type="button"
+                            action="vm.createUser(addUserForm)"
+                            label-key="user_createUser"
+                            size="m">
+                        </umb-button>
+
+                    </form>
+                </umb-box-content>
+            </umb-box>
+        </div>
+    </div>
+
+    <!-- Create user success -->
+    <div ng-if="vm.usersViewState === 'createUserSuccess'">
+
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setUsersViewState('overview');"><span aria-hidden="true">&larr;</span> <localize key="user_backToUsers">Back to users</localize></button>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+        <div class="flex justify-center">
+
+            <umb-box style="max-width: 500px;">
+                <umb-box-content>
+
+                    <!-- Success text -->
+                    <div class="flex items-center" style="margin-bottom: 15px;">
+                        <umb-checkmark
+                            checked="vm.usersViewState === 'createUserSuccess'"
+                            size="m">
+                        </umb-checkmark>
+                        <h3 class="bold" style="margin: 0 0 0 10px;">
+                            {{vm.newUser.name | umbWordLimit:1}}
+                            <localize key="user_userCreated">has been created</localize>
+                        </h3>
+                    </div>
+
+                    <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userCreatedSuccessHelp"></localize></p>
+
+                    <!-- New password -->
+                    <div>
+                        <label class="bold"><localize key="user_password">Password</localize></label>
+                        <div class="flex items-center justify-between" style="background-color: #f3f3f5; padding: 10px 20px; border-radius: 3px; margin-bottom: 30px;">
+                            <div ng-show="vm.newUser.showPassword">{{vm.newUser.resetPasswordValue}}</div>
+                            <div ng-show="!vm.newUser.showPassword">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+                            <div>
+                                <umb-button ng-if="!vm.newUser.showPassword"
+                                            type="button"
+                                            action="vm.toggleNewUserPassword()"
+                                            label-key="general_show"
+                                            size="xs">
+                                </umb-button>
+                                <umb-button ng-if="vm.newUser.showPassword"
+                                            type="button"
+                                            action="vm.toggleNewUserPassword()"
+                                            label-key="general_hide"
+                                            size="xs">
+                                </umb-button>
+                                <umb-button ng-if="vm.newUser.resetPasswordValue"
+                                            umb-clipboard
+                                            umb-clipboard-success="vm.copySuccess(e)"
+                                            umb-clipboard-error="vm.copyError(e)"
+                                            umb-clipboard-text="{{vm.newUser.resetPasswordValue}}"
+                                            state="vm.page.copyPasswordButtonState"
+                                            type="button"
+                                            label-key="general_copy" size="xs">
+                                </umb-button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- actions -->
+                    <div>
+                        <umb-button
+                            type="button" button-style="info"
+                            label-key="user_createAnotherUser"
+                            action="vm.setUsersViewState('createUser');"
+                            size="m">
+                        </umb-button>
+                        <umb-button
+                            type="button"
+                            button-style="action"
+                            label-key="user_goToProfile"
+                            action="vm.goToUser(vm.newUser);"
+                            size="m">
+                        </umb-button>
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+
+        </div>
+    </div>
+
+    <!-- Invite user success -->
+    <div ng-if="vm.usersViewState === 'inviteUserSuccess'">
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setUsersViewState('overview');"><span aria-hidden="true">&larr;</span> <localize key="user_backToUsers">Back to users</localize></button>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+        <div class="flex justify-center">
+
+            <umb-box style="max-width: 500px;">
+                <umb-box-content>
+
+                <!-- Success text -->
+                <div class="flex items-center" style="margin-bottom: 15px;">
+                    <umb-checkmark
+                        checked="vm.usersViewState === 'inviteUserSuccess'"
+                        readonly="true"
+                        size="m">
+                    </umb-checkmark>
+                    <h3 class="bold" style="margin: 0 0 0 10px;">
+                        {{vm.newUser.name | umbWordLimit:1}}
+                        <localize key="user_userInvited">has been invited</localize>
+                    </h3>
+                </div>
+
+                <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userInvitedSuccessHelp"></localize></p>
+
+                <!-- actions -->
+                <div>
+                    <umb-button
+                        type="button" button-style="info"
+                        label-key="user_inviteAnotherUser"
+                        action="vm.setUsersViewState('inviteUser');"
+                        size="m">
+                    </umb-button>
+                    <umb-button
+                        ng-if="vm.newUser.id"
+                        type="button"
+                        button-style="action"
+                        label-key="user_goToProfile"
+                        action="vm.goToUser(vm.newUser);"
+                        size="m">
+                    </umb-button>
+                </div>
+
+                </umb-box-content>
+            </umb-box>
+
+        </div>
+
+    </div>
+
+</div>

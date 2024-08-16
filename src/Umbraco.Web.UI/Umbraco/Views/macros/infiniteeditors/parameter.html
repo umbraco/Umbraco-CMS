@@ -1,0 +1,89 @@
+<div ng-controller="Umbraco.Editors.ParameterEditorController as vm">
+
+    <form name="parameterForm" novalidate val-form-manager>
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <umb-box>
+
+                    <umb-box-content class="block-form content-type-editor-dialog edit-property-settings">
+
+                        <div class="umb-control-group" ng-if="!model.parameter.locked">
+                            <div class="control-group">
+                                <textarea class="editor-label"
+                                          data-element="property-name"
+                                          name="propertyLabel"
+                                          ng-model="model.parameter.label"
+                                          localize="placeholder"
+                                          placeholder="@placeholders_entername"
+                                          umb-auto-focus
+                                          focus-on-filled="true"
+                                          umb-auto-resize
+                                          required
+                                          ng-keypress="vm.submitOnEnter($event)">
+                                </textarea>
+                                <div ng-messages="parameterForm.propertyLabel.$error" show-validation-on-submit>
+                                    <span class="umb-validation-label" ng-message="required">Required label</span>
+                                </div>
+                            </div>
+                            <div class="control-group -no-margin">
+                                <umb-generate-alias enable-lock="true" alias-from="model.parameter.label" alias="model.parameter.key"></umb-generate-alias>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-reset editor-placeholder" data-element="editor-add" ng-if="!model.parameter.editor" hotkey="alt+shift+e" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                            <localize key="shortcuts_addEditor"></localize>
+                        </button>
+
+                        <div class="editor clearfix" ng-if="model.parameter.editor">
+
+                            <button type="button" class="btn-reset editor-info" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                                <div class="editor-icon-wrapper">
+                                    <i class="icon {{ model.parameter.dataTypeIcon }}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}" aria-hidden="true"></i>
+                                </div>
+
+                                <div class="editor-details">
+                                    <span class="editor-name">{{ model.parameter.dataTypeName }}</span>
+                                    <span class="editor-editor">{{ model.parameter.editor }}</span>
+                                </div>
+                            </button>
+
+                        </div>
+
+                    </umb-box-content>
+                </umb-box>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button type="button"
+                                button-style="link"
+                                label-key="general_close"
+                                shortcut="esc"
+                                action="vm.close()">
+                    </umb-button>
+                    <umb-button type="button"
+                                button-style="success"
+                                label-key="general_submit"
+                                state="vm.saveButtonState"
+                                action="vm.submit(model)">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+            '
+        </umb-editor-view>
+
+    </form>
+
+</div>

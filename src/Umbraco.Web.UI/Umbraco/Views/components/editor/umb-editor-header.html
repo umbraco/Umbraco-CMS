@@ -1,0 +1,105 @@
+<div data-element="editor-header" class="umb-editor-header" ng-class="{'-split-view-active': splitViewOpen === true}">
+    <umb-loader ng-show="loading"></umb-loader>
+    <div class="flex items-center" style="height: 100%;" ng-hide="loading">
+
+        <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
+            <button type="button" class="umb-editor-header__back" ng-click="goBack()" prevent-default>
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                <span class="sr-only"><localize key="visuallyHiddenTexts_goBack">Go back</localize></span>
+            </button>
+        </div>
+
+        <div class="flex items-center" style="flex: 1;">
+
+            <ng-form data-element="editor-icon" name="iconForm">
+                <button
+                    type="button" class="umb-panel-header-icon"
+                    ng-if="!hideIcon"
+                    ng-click="openIconPicker()"
+                    ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
+                    title="{{$parent.icon}}">
+                        <umb-icon class="icon {{$parent.icon}}" icon="{{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null"></umb-icon>
+                        <span class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                            <localize key="settings_addIcon">Add icon</localize>
+                        </span>
+                </button>
+            </ng-form>
+
+            <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
+                <div>
+                    <p tabindex="0" class="sr-only" ng-show="accessibility.a11yMessageVisible">
+                        {{accessibility.a11yMessage}}
+                    </p>
+                </div>
+                <div class="umb-editor-header__name-wrapper" ng-show="!nameLocked || !hideAlias">
+                    <label for="headerName" class="sr-only" ng-show="accessibility.a11yNameVisible">{{accessibility.a11yName}}</label>
+                    <ng-form name="headerNameForm">
+                        <input data-element="editor-name-field"
+                               no-password-manager
+                               type="text"
+                               id="headerName"
+                               class="umb-editor-header__name-input"
+                               localize="placeholder"
+                               placeholder="@placeholders_entername"
+                               name="headerName"
+                               ng-show="!nameLocked"
+                               ng-model="name"
+                               ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                               umb-auto-focus
+                               focus-on-filled="true"
+                               val-server-field="Name"
+                               ng-required="nameRequired != null ? nameRequired : true"
+                               aria-required="{{nameRequired != null ? nameRequired : true}}"
+                               aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
+                               autocomplete="off"
+                               maxlength="255"/>
+                    </ng-form>
+
+                    <umb-generate-alias data-element="editor-alias"
+                                        class="umb-panel-header-alias"
+                                        ng-if="!hideAlias"
+                                        alias="$parent.alias"
+                                        alias-from="$parent.name"
+                                        enable-lock="aliasLocked !== true"
+                                        validation-position="'right'"
+                                        server-validation-field="Alias">
+                    </umb-generate-alias>
+
+                </div>
+
+                <h1 class="umb-panel-header-name" id="editor-headline-{{$id}}" ng-if="nameLocked" title="{{key}}">{{ name }}</h1>
+
+                <input data-element="editor-description"
+                       no-password-manager
+                       type="text"
+                       class="umb-panel-header-description"
+                       localize="placeholder"
+                       placeholder="@placeholders_enterDescription"
+                       ng-if="!hideDescription && !descriptionLocked"
+                       ng-model="$parent.description"/>
+
+                <p class="umb-panel-header-locked-description" id="editor-description-{{$id}}" ng-if="descriptionLocked">{{ description }}</p>
+
+            </div>
+
+        </div>
+
+        <div ng-if="navigation && splitViewOpen !== true">
+            <umb-editor-navigation
+                data-element="editor-sub-views"
+                navigation="navigation"
+                on-select="selectNavigationItem(item)">
+            </umb-editor-navigation>
+        </div>
+
+        <div ng-if="menu.currentNode && splitViewOpen !== true && hideActionsMenu !== true">
+            <umb-editor-menu
+                data-element="editor-actions"
+                current-node="menu.currentNode"
+                current-section="{{menu.currentSection}}">
+            </umb-editor-menu>
+        </div>
+
+    </div>
+
+</div>

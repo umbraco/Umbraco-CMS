@@ -1,0 +1,186 @@
+<div class="umb-package-details">
+
+    <umb-load-indicator ng-if="loading === true"></umb-load-indicator>
+
+    <!-- Main Column -->
+    <div class="umb-package-details__main-content" ng-if="loading === false">
+
+        <!-- Links -->
+        <umb-box data-element="node-info-urls" class="mb4">
+            <umb-box-header title-key="general_links"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-empty-state ng-if="!nodeUrl"
+                                 size="small">
+                    <localize key="content_noMediaLink"></localize>
+                </umb-empty-state>
+
+                <ul ng-if="nodeUrl" class="nav nav-stacked mb0">
+                    <li>
+                        <a href="" ng-attr-href="{{node.extension !== 'svg' ? nodeUrl : undefined}}" ng-click="node.extension === 'svg' && openSVG()" target="_blank" rel="noopener" class="umb-outline">
+                            <i class="icon icon-out" aria-hidden="true"></i>
+                            <span>{{nodeFileName}}</span>
+                        </a>
+                    </li>
+                </ul>
+
+            </umb-box-content>
+        </umb-box>
+
+        <!-- Media Tracking (NO Items) -->
+        <umb-box ng-if="(hasContentReferences === false) && (hasMediaReferences === false) && (hasMemberReferences === false) && loading === false">
+            <umb-box-header title-key="references_tabName"></umb-box-header>
+            <umb-box-content>
+                <umb-empty-state size="small">
+                    This Media item has no references.
+                </umb-empty-state>
+            </umb-box-content>
+        </umb-box>
+
+        <!-- Media Tracking (With Items) -->
+        <div ng-if="loading === false">
+            <!-- Content -->
+            <div ng-if="contentReferences.items.length > 0">
+
+                <h5 class="mt0" style="margin-bottom: 20px;">
+                    <localize key="references_labelUsedByDocuments">Used in Documents</localize>
+                </h5>
+
+                <div class="umb-table">
+                    <div class="umb-table-head">
+                        <div class="umb-table-row">
+                            <div class="umb-table-cell"></div>
+                            <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
+                            <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
+                            <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                        </div>
+                    </div>
+                    <div class="umb-table-body">
+                        <div class="umb-table-row" ng-repeat="reference in contentReferences.items">
+                            <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                            <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
+                            <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
+                            <div class="umb-table-cell umb-table-cell--nano"><a ng-href="#/content/content/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="contentReferences.totalPages"
+                                    page-number="contentReferences.pageNumber"
+                                    total-pages="contentReferences.totalPages"
+                                    on-change="changeContentPageNumber(pageNumber)">
+                    </umb-pagination>
+                </div>
+            </div>
+
+            <!-- Members -->
+            <div ng-if="memberReferences.items.length > 0">
+
+                <h5 class="mt0" style="margin-bottom: 20px;">
+                    <localize key="references_labelUsedByMembers">Used in Members</localize>
+                </h5>
+
+                <div class="umb-table">
+                    <div class="umb-table-head">
+                        <div class="umb-table-row">
+                            <div class="umb-table-cell"></div>
+                            <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
+                            <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
+                            <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                        </div>
+                    </div>
+                    <div class="umb-table-body">
+                        <div class="umb-table-row" ng-repeat="reference in memberReferences.items">
+                            <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                            <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
+                            <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
+                            <div class="umb-table-cell umb-table-cell--nano"><a href="#/member/member/edit/{{::reference.key}}"><localize key="general_open">Open</localize></a></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="memberReferences.totalPages"
+                                    page-number="memberReferences.pageNumber"
+                                    total-pages="memberReferences.totalPages"
+                                    on-change="changeMemberPageNumber(pageNumber)">
+                    </umb-pagination>
+                </div>
+            </div>
+
+            <!-- Media -->
+            <div ng-if="mediaReferences.items.length > 0">
+
+                <h5 class="mt0" style="margin-bottom: 20px;">
+                    <localize key="references_labelUsedByMedia">Used in Media</localize>
+                </h5>
+
+                <div class="umb-table">
+                    <div class="umb-table-head">
+                        <div class="umb-table-row">
+                            <div class="umb-table-cell"></div>
+                            <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
+                            <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
+                            <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                        </div>
+                    </div>
+                    <div class="umb-table-body">
+                        <div class="umb-table-row" ng-repeat="reference in mediaReferences.items">
+                            <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                            <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
+                            <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
+                            <div class="umb-table-cell umb-table-cell--nano"><a href="#/media/media/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="mediaReferences.totalPages"
+                                    page-number="mediaReferences.pageNumber"
+                                    total-pages="mediaReferences.totalPages"
+                                    on-change="changeMediaPageNumber(pageNumber)">
+                    </umb-pagination>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="umb-package-details__sidebar" ng-if="loading === false">
+        <!-- General Info -->
+        <umb-box data-element="node-info-general">
+            <umb-box-header title-key="general_general"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-create-date" label="@content_createDate">
+                    {{node.createDateFormatted}} by {{ node.owner.name }}
+                </umb-control-group>
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-update-date" label="@content_updateDate">
+                    {{node.updateDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group data-element="node-info-media-type" label="@content_mediatype">
+                    <umb-node-preview style="max-width: 100%; margin-bottom: 0px;"
+                                      icon="node.icon"
+                                      name="node.contentTypeName"
+                                      allow-open="allowChangeMediaType"
+                                      on-open="openMediaType(mediaType)">
+                    </umb-node-preview>
+                </umb-control-group>
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
+                    <div>{{ node.id }}</div>
+                    <small>{{ node.key }}</small>
+                </umb-control-group>
+
+            </umb-box-content>
+        </umb-box>
+    </div>
+
+</div>

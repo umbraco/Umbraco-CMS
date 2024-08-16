@@ -1,0 +1,46 @@
+<div ng-controller="Umbraco.Editors.Content.CreateBlueprintController">
+
+    <form name="blueprintForm"
+          novalidate
+          ng-submit="create()"
+          val-form-manager>
+
+        <div class="umb-dialog-body" ng-cloak>
+            <div class="umb-pane block-form">
+                
+                <h5 ng-bind-html="title"></h5>
+
+                <p class="abstract" style="margin-bottom: 20px;">
+                    <localize key="blueprints_blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</localize>.
+                </p>
+
+                <umb-control-group label="@general_name" hide-label="false">
+                    <input type="text" name="name" ng-model="message.name" class="umb-textstring textstring input-block-level"
+                           val-server-field="name"
+                           required />
+                    <span ng-messages="blueprintForm.name.$error" show-validation-on-submit >
+                        <span class="help-inline" ng-message="required"><localize key="required" /></span>
+                        <span class="help-inline" ng-message="valServerField">{{blueprintForm.name.errorMsg}}</span>
+                    </span>           
+                </umb-control-group>
+
+            </div>
+
+        </div>
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            
+            <umb-button label-key="general_cancel"
+                        action="cancel()"
+                        type="button"
+                        button-style="link">
+            </umb-button>
+            
+            <umb-button label-key="general_create"
+                        type="submit"
+                        button-style="success">
+            </umb-button>
+
+        </div>
+
+    </form>
+</div>

@@ -1,0 +1,97 @@
+<div ng-controller="Umbraco.Editors.DocumentType.PermissionsController as vm">
+
+    <umb-box>
+        <umb-box-content>
+
+            <div class="sub-view-columns" ng-hide="model.isElement">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_allowAsRootHeading" /></h5>
+                    <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
+                </div>
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-as-root"
+                                checked="model.allowAsRoot"
+                                on-click="vm.toggleAllowAsRoot()"
+                                hotkey="alt+shift+r">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+            <div class="sub-view-columns" ng-hide="model.isElement">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>
+                    <small><localize key="contentTypeEditor_childNodesDescription" /></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-child-selector selected-children="vm.selectedChildren"
+                                        available-children="vm.contentTypes"
+                                        parent-name="model.name"
+                                        parent-icon="model.icon"
+                                        parent-id="model.id"
+                                        on-add="vm.addChild"
+                                        on-remove="vm.removeChild"
+                                        on-sort="vm.sortChildren">
+                    </umb-child-selector>
+                </div>
+
+            </div>
+
+            <div class="sub-view-columns">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_cultureVariantHeading" /></h5>
+                    <small><localize key="contentTypeEditor_cultureVariantDescription" /></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                checked="model.allowCultureVariant"
+                                on-click="vm.toggleAllowCultureVariants()"
+                                hotkey="alt+shift+v">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+
+            <div class="sub-view-columns" ng-if="vm.showAllowSegmentationOption">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_segmentVariantHeading" /></h5>
+                    <small><localize key="contentTypeEditor_segmentVariantDescription" /></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                checked="model.allowSegmentVariant"
+                                on-click="vm.toggleAllowSegmentVariants()">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+            <div class="sub-view-columns">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_elementHeading" /></h5>
+                    <small><localize key="contentTypeEditor_elementDescription" /></small>
+                    <small ng-if="!vm.canToggleIsElement"><br/><localize key="contentTypeEditor_elementCannotToggle" /></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-is-element"
+                                checked="model.isElement"
+                                disabled="!vm.canToggleIsElement"
+                                on-click="vm.toggleIsElement()">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+            </umb-box-content>
+    </umb-box>
+</div>

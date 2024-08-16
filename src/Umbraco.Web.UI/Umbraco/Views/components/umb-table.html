@@ -1,0 +1,82 @@
+<div>
+    <div class="umb-table" ng-if="vm.items">
+        <!-- Listviews head section -->
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell">
+
+                    <button type="button" class="umb-table__action" ng-show="vm.allowSelectAll" ng-click="vm.selectAll()">
+                        <umb-checkmark checked="vm.isSelectedAll()" size="xs"></umb-checkmark>
+                    </button>
+
+                </div>
+                <div class="umb-table-cell umb-table__name">
+                    <button
+                        type="button"
+                        class="umb-table-head__link sortable"
+                        ng-click="vm.sort('Name', true, true)"
+                        prevent-default>
+                        <localize key="general_name">Name</localize>
+                        <i class="umb-table-head__icon icon" aria-hidden="true" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
+                    </button>
+                </div>
+                <div class="umb-table-cell" ng-show="vm.items[0].state">
+                    <localize key="general_status">Status</localize>
+                </div>
+                <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
+                    <button
+                        type="button"
+                        class="umb-table-head__link"
+                        ng-click="vm.sort(column.alias, column.allowSorting, column.isSystem)"
+                        ng-class="{'sortable':column.allowSorting}" prevent-default>
+                        <span ng-bind="column.header"></span>
+                        <i class="umb-table-head__icon icon" aria-hidden="true" ng-class="{'icon-navigation-up': vm.isSortDirection(column.alias, 'asc'), 'icon-navigation-down': vm.isSortDirection(column.alias, 'desc')}"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Listview body section -->
+        <div class="umb-table-body">
+            <div class="umb-table-row -selectable umb-outline"
+                 ng-repeat="item in vm.items track by $index"
+                 ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null}"
+                 ng-click="vm.selectItem(item, $index, $event)">
+
+                <div class="umb-table-cell">
+                    <i class="umb-table-body__icon umb-table-body__fileicon {{item.icon}}" aria-hidden="true" ng-class="vm.getIcon(item)"></i>
+                    <i class="umb-table-body__icon umb-table-body__checkicon icon-check" aria-hidden="true"></i>
+                </div>
+                <div class="umb-table-cell umb-table__name">
+                    <a title="{{ item.name }}" class="umb-table-body__link"
+                       ng-href="{{'#' + item.editPath}}"
+                       ng-click="vm.clickItem(item, $event)"
+                       ng-bind="item.name">
+                    </a>
+                </div>
+                <div class="umb-table-cell" ng-show="item.state">
+                    <umb-variant-state
+                        variant="item">
+                    </umb-variant-state>
+                </div>
+                <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
+                    <span title="{{column.header}}: {{item[column.alias]}}">
+
+                        <div ng-if="!column.isSensitive">
+                            {{item[column.alias]}}
+                        </div>
+
+                        <em ng-show="column.isSensitive" class="muted">
+                            <localize key="content_isSensitiveValue_short"></localize>
+                        </em>
+
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- If list is empty, then display -->
+    <umb-empty-state ng-hide="vm.items"
+                     position="center">
+        <localize key="content_listViewNoItems">There are no items show in the list.</localize>
+    </umb-empty-state>
+</div>

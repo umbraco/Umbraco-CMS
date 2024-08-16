@@ -1,0 +1,13 @@
+<div class="form-search">
+    <umb-icon icon="icon-search" class="icon icon-search" ng-if="showSearch == 'false'"></umb-icon>
+    <button type="button" class="btn-reset icon icon-arrow-left" ng-if="showSearch == 'true'" localize="title" title="@general_back" ng-click="hideSearch()"></button>
+    <input type="text"
+           ng-model="term"
+           class="umb-search-field search-query -full-width-input"
+           placeholder="{{searchPlaceholderText}}"
+           umb-auto-focus="{{autoFocus ? 'true' : 'false'}}">
+    <h4 ng-if="showSearch && searchFromName">
+        <small><localize key="general_search">Search</localize>:&nbsp;</small>
+        {{searchFromName}}
+    </h4>
+</div>

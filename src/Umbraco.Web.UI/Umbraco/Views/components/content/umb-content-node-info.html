@@ -1,0 +1,183 @@
+<div class="umb-package-details">
+
+    <div class="umb-package-details__main-content">
+
+        <umb-box ng-if="currentUrls" data-element="node-info-urls">
+            <umb-box-header title-key="general_links"></umb-box-header>
+            <umb-box-content class="block-form">
+                <ul class="nav nav-stacked mb0">
+                    <li ng-repeat="url in currentUrls">
+                        <a href="{{url.text}}" target="_blank" rel="noopener" ng-if="url.isUrl" class="umb-outline">
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 55px;display: inline-block">{{url.culture}}</span>
+                            <i class="icon icon-out" aria-hidden="true"></i>
+                            <span>{{url.text}}</span>
+                        </a>
+                        <div ng-if="!url.isUrl" style="margin-top: 4px;">
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 55px;display: inline-block">{{url.culture}}</span>
+                            <em>{{url.text}}</em>
+                        </div>
+                    </li>
+                </ul>
+            </umb-box-content>
+        </umb-box>
+        <umb-box data-element="node-info-redirects" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
+            <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
+            <umb-box-content class="block-form">
+                <div style="position: relative;">
+                    <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                    <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
+                    <div ng-show="hasRedirects">
+                        <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
+                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                            <li ng-repeat="redirectUrl in redirectUrls">
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank" rel="noopener" class="umb-outline">
+                                    <i ng-class="value.icon" class="icon-out" aria-hidden="true"></i>
+                                    {{redirectUrl.originalUrl}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </umb-box-content>
+        </umb-box>
+
+        <umb-box data-element="node-info-history">
+
+            <umb-box-header title-key="{{historyLabelKey}}" ng-if="historyLabelKey">
+                <umb-button
+                    ng-hide="node.trashed || node.id === 0"
+                    type="button"
+                    button-style="outline"
+                    action="openRollback()"
+                    label-key="actions_rollback"
+                    size="xs"
+                    add-ellipsis="true">
+                </umb-button>
+            </umb-box-header>
+
+            <umb-box-content class="block-form">
+
+                <div style="position: relative;">
+
+                    <div ng-show="loadingAuditTrail" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                    <umb-load-indicator ng-show="loadingAuditTrail"></umb-load-indicator>
+
+                    <div ng-show="auditTrail.length === 0" style="padding: 10px;">
+                        <umb-empty-state
+                            position="center"
+                            size="small">
+                            <localize key="content_noChanges"></localize>
+                        </umb-empty-state>
+                    </div>
+
+                    <div class="history">
+
+                        <div ng-show="auditTrail.length > 1" class="history-line"></div>
+
+                        <div class="history-item" ng-repeat="item in auditTrail">
+
+                            <div class="history-item__break">
+                                <div class="history-item__avatar">
+                                    <umb-avatar
+                                        color="secondary"
+                                        size="xs"
+                                        name="{{item.userName}}"
+                                        img-src="{{item.userAvatars[3]}}"
+                                        img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
+                                    </umb-avatar>
+                                </div>
+
+                                <div>
+                                    <div>{{ item.userName }}</div>
+                                    <div class="history-item__date">{{item.timestampFormatted}}</div>
+                                </div>
+                            </div>
+
+                            <div class="history-item__break">
+                                <umb-badge
+                                    class="history-item__badge"
+                                    size="xs"
+                                    color="{{item.logTypeColor}}">
+                                    <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
+                                </umb-badge>
+                                <span class="history-item__description">
+                                    <localize key="auditTrails_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="auditTrailOptions.totalPages > 1"
+                                    page-number="auditTrailOptions.pageNumber"
+                                    total-pages="auditTrailOptions.totalPages"
+                                    on-change="auditTrailPageChange(pageNumber)">
+                    </umb-pagination>
+                </div>
+
+            </umb-box-content>
+        </umb-box>
+    </div>
+
+    <div class="umb-package-details__sidebar">
+
+        <umb-box data-element="node-info-general">
+            <umb-box-header title-key="general_general"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-control-group data-element="node-info-status" label="@general_status">
+                    <umb-badge size="xs" color="{{status.color}}">
+                        <umb-variant-state variant="currentVariant"></umb-variant-state>
+                    </umb-badge>
+                </umb-control-group>
+
+                <umb-control-group ng-show="node.id !== 0" data-element="node-info-create-date" label="@template_createdDate">
+                    {{currentVariant.createDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group ng-show="node.id !== 0 && currentVariant.releaseDateFormatted" data-element="node-info-publish-date" label="@content_releaseDate">
+                    {{currentVariant.releaseDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group ng-show="node.id !== 0 && currentVariant.expireDateFormatted" data-element="node-info-expire-date" label="@content_expireDate">
+                    {{currentVariant.expireDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group data-element="node-info-document-type" label="@content_documentType">
+                    <umb-node-preview
+                        style="min-width: 100%; margin-bottom: 0;"
+                        icon="node.icon"
+                        name="node.contentTypeName"
+                        alias="documentType.alias"
+                        allow-open="allowChangeDocumentType"
+                        on-open="openDocumentType(documentType)">
+                    </umb-node-preview>
+                </umb-control-group>
+
+                <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
+
+                    <div class="flex items-center">
+                        <select class="input-block-level"
+                                ng-model="node.template"
+                                ng-options="key as value for (key, value) in availableTemplates"
+                                ng-change="updateTemplate(node.template)">
+                            <option value="">{{chooseLabel}}...</option>
+                        </select>
+                        <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
+                            <localize key="general_open">Open</localize>
+                        </button>
+                    </div>
+                </umb-control-group>
+
+                <umb-control-group ng-show="node.id !== 0" data-element="node-info-id" label="Id">
+                    <div>{{ node.id }}</div>
+                    <small>{{ node.key }}</small>
+                </umb-control-group>
+
+            </umb-box-content>
+        </umb-box>
+    </div>
+</div>

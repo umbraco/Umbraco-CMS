@@ -1,0 +1,35 @@
+<div data-element="editor-data-types" ng-controller="Umbraco.Editors.DataType.EditController as vm">
+
+    <form name="contentForm" novalidate val-form-manager ng-submit="vm.save()">
+        <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+        <umb-editor-view ng-if="!vm.page.loading">
+            <umb-editor-header name="vm.content.name"
+                            name-locked="vm.page.nameLocked"
+                            hide-icon="true"
+                            hide-description="true"
+                            hide-alias="true"
+                            navigation="vm.page.navigation"
+                            editorfor="vm.header.editorfor"
+                            setpagetitle="vm.header.setPageTitle">
+            </umb-editor-header>
+
+            <umb-editor-container class="form-horizontal">
+                <umb-editor-sub-views sub-views="vm.page.navigation" model="vm">
+                </umb-editor-sub-views>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button type="submit"
+                                button-style="success"
+                                state="vm.page.saveButtonState"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+        </umb-editor-view>
+    </form>
+
+</div>

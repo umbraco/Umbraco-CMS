@@ -1,0 +1,51 @@
+<div ng-controller="Umbraco.Editors.Packages.CreatedController as vm">
+
+    <umb-editor-sub-header>
+
+        <umb-editor-sub-header-content-left>
+            <umb-button
+                button-style="action"
+                type="button"
+                action="vm.createPackage()"
+                label="Create package"
+                label-key="packager_createPackage">
+            </umb-button>
+        </umb-editor-sub-header-content-left>
+
+    </umb-editor-sub-header>
+
+    <table class="table table-hover">
+        <tbody>
+            <tr ng-repeat="createdPackage in vm.createdPackages track by createdPackage.id" style="cursor: pointer;" ng-click="vm.goToPackage(createdPackage)">
+                <td class="flex items-center">
+                    <div class="umb-package-list__item-icon">
+                        <i ng-if="!createdPackage.iconUrl" class="icon-box"></i>
+                        <img ng-if="createdPackage.iconUrl" ng-src="{{createdPackage.iconUrl}}" alt="" />
+                    </div>
+                    <div class="umb-package-list__item-content">
+                        <div class="umb-package-list__item-name">{{ createdPackage.name }}</div>
+                        <div class="umb-package-list__item-description">
+                            {{ createdPackage.version }} | <a href="{{ createdPackage.url }}" target="_blank" rel="noopener">{{ createdPackage.url }}</a> | {{ createdPackage.author }}
+                        </div>
+                    </div>
+                </td>
+                <td style="text-align: right;">
+                    <umb-button
+                        type="button"
+                        button-style="danger"
+                        state="createdPackage.deleteButtonState"
+                        label-key="general_delete"
+                        action="vm.deleteCreatedPackage($event, $index, createdPackage)">
+                    </umb-button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <umb-empty-state
+        ng-if="vm.createdPackages.length === 0"
+        position="center">
+        <localize key="packager_noPackagesCreated">No packages have been created yet</localize>
+    </umb-empty-state>
+
+</div>

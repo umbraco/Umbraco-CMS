@@ -1,0 +1,193 @@
+<div ng-controller="Umbraco.Editors.Content.ProtectController as vm">
+    <form name="vm.protectForm" novalidate>
+        <div class="umb-dialog-body form-horizontal" ng-cloak>
+            <umb-pane ng-hide="vm.success">
+
+                <div ng-show="vm.error">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.error.errorMsg}}</strong></div>
+                        <div>{{vm.error.data.message}}</div>
+                    </div>
+                </div>
+
+                <umb-load-indicator ng-show="vm.loading">
+                </umb-load-indicator>
+
+                <div ng-show="!vm.step && !vm.loading">
+                    <p class="abstract" ng-hide="success">
+                        <localize key="publicAccess_paHowWould" tokens="[currentNode.name]">Choose how to restrict access to this page</localize>
+                    </p>
+
+                    <div class="pa-select-type">
+
+                        <umb-radiobutton input-id="protectionTypeMember"
+                                         name="protectionType"
+                                         value="member"
+                                         model="vm.type"
+                                         text="">
+                        </umb-radiobutton>
+
+                        <label for="protectionTypeMember" class="flex flex-column flex-auto">
+                            <strong class="pa-access-header bold"><localize key="publicAccess_paMembers">Specific members protection</localize></strong>
+                            <span class=""><localize key="publicAccess_paMembersHelp">If you want to grant access to specific members</localize></span>
+                        </label>
+                    </div>
+
+                    <div class="pa-select-type">
+
+                        <umb-radiobutton input-id="protectionTypeGroup"
+                                         name="protectionType"
+                                         value="group"
+                                         model="vm.type">
+                        </umb-radiobutton>
+
+                        <label for="protectionTypeGroup" class="flex flex-column flex-auto">
+                            <strong class="pa-access-header bold"><localize key="publicAccess_paGroups">Group based protection</localize></strong>
+                            <span><localize key="publicAccess_paGroupsHelp">If you want to grant access to all members of specific member groups</localize></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div ng-show="vm.step && !vm.loading && !vm.removing">
+                    <div ng-if="vm.step === 'member'">
+                        <p><localize key="publicAccess_paSelectMembers" tokens="[currentNode.name]">Select the members that should have access to this page</localize></p>
+                        <div>
+                            <umb-node-preview ng-repeat="member in vm.members | orderBy:'name'"
+                                              icon="'icon-user'"
+                                              name="member.name"
+                                              allow-remove="true"
+                                              on-remove="vm.removeMember(member)">
+                            </umb-node-preview>
+                            <button type="button" ng-click="vm.pickMember()" class="umb-node-preview-add">
+                                <localize key="general_add">Add</localize>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div ng-show="vm.step === 'group' && !vm.hasGroups">
+                        <p><localize key="publicAccess_paGroupsNoGroups">You need to create a member group before you can use group based authentication</localize></p>
+                    </div>
+
+                    <div ng-show="vm.step === 'group' && vm.hasGroups">
+                        <p><localize key="publicAccess_paSelectGroups" tokens="[currentNode.name]">Select the groups that should have access to this page</localize></p>
+                        <div>
+                            <umb-node-preview ng-repeat="group in vm.groups | orderBy:'name'"
+                                              icon="'icon-users'"
+                                              name="group.name"
+                                              allow-remove="true"
+                                              on-remove="vm.removeGroup(group)">
+                            </umb-node-preview>
+                            <button type="button" ng-click="vm.pickGroup()" class="umb-node-preview-add">
+                                <localize key="general_add">Add</localize>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div ng-show="vm.step === 'member' || vm.hasGroups">
+                        <p class="mt4"><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
+                        <div>
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label>
+                                        <strong><localize key="publicAccess_paLoginPage">Login Page</localize></strong>
+                                        <small><localize key="publicAccess_paLoginPageHelp">Choose the page that contains the login form</localize></small>
+                                    </label>
+                                    <umb-node-preview ng-show="vm.loginPage"
+                                                      icon="vm.loginPage.icon"
+                                                      name="vm.loginPage.name"
+                                                      allow-remove="true"
+                                                      on-remove="vm.loginPage = null">
+                                    </umb-node-preview>
+                                    <button type="button" ng-show="!vm.loginPage" ng-click="vm.pickLoginPage()" class="umb-node-preview-add">
+                                        <localize key="general_add">Add</localize>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="control-group umb-control-group">
+                                <div class="umb-el-wrap">
+                                    <label>
+                                        <strong><localize key="publicAccess_paErrorPage">Error Page</localize></strong>
+                                        <small><localize key="publicAccess_paErrorPageHelp">Used when people are logged on, but do not have access</localize></small>
+                                    </label>
+                                    <umb-node-preview ng-show="vm.errorPage"
+                                                      icon="vm.errorPage.icon"
+                                                      name="vm.errorPage.name"
+                                                      allow-remove="true"
+                                                      on-remove="vm.errorPage = null">
+                                    </umb-node-preview>
+                                    <button type="button" ng-show="!vm.errorPage" ng-click="vm.pickErrorPage()" class="umb-node-preview-add">
+                                        <localize key="general_add">Add</localize>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-show="vm.removing">
+                    <p><localize key="publicAccess_paRemoveProtectionConfirm" tokens="[currentNode.name]">Are you sure you want to remove the protection from this page?</localize></p>
+                </div>
+
+            </umb-pane>
+
+            <umb-pane ng-show="vm.success">
+                <div class="alert alert-success" ng-bind-html="vm.success.message"></div>
+                <umb-button type="button"
+                            action="vm.close()"
+                            button-style="success"
+                            label-key="general_ok">
+                </umb-button>
+            </umb-pane>
+        </div>
+
+        <div class="umb-dialog-footer umb-btn-toolbar" ng-hide="vm.loading || vm.success">
+            <umb-button ng-hide="vm.removing"
+                        type="button"
+                        button-style="link"
+                        action="vm.close()"
+                        label-key="general_close">
+            </umb-button>
+
+            <umb-button ng-hide="vm.step  || vm.removing"
+                        type="button"
+                        action="vm.next()"
+                        button-style="action"
+                        label-key="general_next"
+                        disabled="vm.loading || !vm.type">
+            </umb-button>
+
+            <umb-button ng-show="vm.canRemove && !vm.removing"
+                        type="button"
+                        action="vm.removeProtection()"
+                        button-style="warning"
+                        label-key="publicAccess_paRemoveProtection"
+                        disabled="vm.buttonState === 'busy'">
+            </umb-button>
+
+            <umb-button ng-show="vm.step && !vm.removing"
+                        type="button"
+                        action="vm.save()"
+                        state="vm.buttonState"
+                        button-style="success"
+                        label-key="buttons_save"
+                        disabled="vm.buttonState === 'busy' || !vm.isValid()">
+            </umb-button>
+
+            <umb-button ng-show="vm.removing"
+                        type="button"
+                        button-style="link"
+                        action="vm.close()"
+                        label-key="buttons_confirmActionCancel">
+            </umb-button>
+
+            <umb-button ng-show="vm.removing"
+                        type="button"
+                        action="vm.removeProtectionConfirm()"
+                        state="vm.buttonState"
+                        button-style="success"
+                        label-key="buttons_confirmActionConfirm"
+                        disabled="vm.buttonState === 'busy'">
+            </umb-button>
+        </div>
+    </form>
+</div>

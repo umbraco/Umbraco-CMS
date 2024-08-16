@@ -1,0 +1,91 @@
+<div ng-controller="Umbraco.Editors.UserPickerController as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-load-indicator
+                ng-if="vm.loading">
+            </umb-load-indicator>
+
+            <umb-box>
+                <umb-box-content>
+                    <umb-search-filter
+                        input-id="userpicker-search"
+                        model="vm.usersOptions.filter"
+                        label-key="placeholders_filter"
+                        text="Type to filter..."
+                        on-change="vm.searchUsers()"
+                        css-class="w-100 mb-15"
+                        auto-focus="true">
+                    </umb-search-filter>
+
+                    <div class="umb-user-picker-item-list">
+                        <button type="button" class="btn-reset umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
+                            <div class="umb-user-picker-list-item__avatar">
+                                <umb-checkmark
+                                    class="umb-user-picker-list-item__checkmark"
+                                    ng-if="user.selected"
+                                    checked="user.selected">
+                                </umb-checkmark>
+                                <umb-avatar
+                                    size="s"
+                                    color="secondary"
+                                    name="{{user.name}}"
+                                    img-src="{{user.avatars[0]}}"
+                                    img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
+                                </umb-avatar>
+                            </div>
+                            <div class="umb-user-picker-list-item__content">
+                                <div class="umb-user-picker-list-item__name">{{ user.name }}</div>
+                                <div class="umb-user-picker-list-item__group">
+                                    <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-center">
+                        <umb-pagination
+                            ng-if="vm.usersOptions.totalPages"
+                            page-number="vm.usersOptions.pageNumber"
+                            total-pages="vm.usersOptions.totalPages"
+                            on-change="vm.changePageNumber(pageNumber)">
+                        </umb-pagination>
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    ng-if="vm.multiPicker"
+                    type="button"
+                    disabled="model.selection.length === 0"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

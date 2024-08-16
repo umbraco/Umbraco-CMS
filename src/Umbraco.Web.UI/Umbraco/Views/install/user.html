@@ -1,0 +1,71 @@
+<div ng-controller="Umbraco.Install.UserController">
+    <h1>Install Umbraco 8</h1>
+
+    <p>Enter your name, email and password to install Umbraco 8 with its default settings, alternatively you can customize your installation</p>
+
+    <form name="myForm" class="form-horizontal" novalidate ng-submit="validateAndInstall();">
+
+        <div class="row">
+            <div class="span8">
+                <div class="pull-right">
+                    <div class="control-group">
+                        <label class="control-label" for="name">Name</label>
+                        <div class="controls">
+                            <input type="text" id="name" name="name" placeholder="Full name" required ng-model="installer.current.model.name" />
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="email">Email</label>
+                        <div class="controls">
+                            <input type="email" id="email" name="email" placeholder="you@example.com" val-email required ng-model="installer.current.model.email" />
+                            <small class="inline-help">Your email will be used as your login</small>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="password">Password</label>
+                        <div class="controls">
+                            <!-- why isn't this masked: https://www.nngroup.com/articles/stop-password-masking/ -->
+                            <input type="text" name="installer.current.model.password"
+                                   ng-minlength="{{installer.current.model.minCharLength}}"
+                                   ng-pattern="passwordPattern"
+                                   autocorrect="off"
+                                   autocapitalize="off"
+                                   autocomplete="off"
+                                   required
+                                   ng-model="installer.current.model.password" id="password" />
+                            <small class="inline-help">At least {{installer.current.model.minCharLength}} characters long</small>
+
+                            <small ng-if="installer.current.model.minNonAlphaNumericLength > 0" class="inline-help">
+                                At least {{installer.current.model.minNonAlphaNumericLength}} symbol{{installer.current.model.minNonAlphaNumericLength > 1 ? 's' : ''}}
+                            </small>
+                        </div>
+                    </div>
+
+
+                    <div class="control-group">
+                        <div class="controls">
+                            <label>
+                                <input type="checkbox"
+                                       id="subscribeToNewsLetter"
+                                       name="subscribeToNewsLetter"
+                                       ng-model="installer.current.model.subscribeToNewsLetter" />
+                                Keep me updated on Umbraco Versions, Security Bulletins and Community News
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group" ng-class="{disabled:myForm.$invalid}">
+                        <div class="controls">
+                            <input type="submit" ng-disabled="myForm.$invalid" value="Install" class="btn btn-success" />
+                            <button class="btn btn-info control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Customize</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>

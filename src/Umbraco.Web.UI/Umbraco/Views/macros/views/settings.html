@@ -1,0 +1,76 @@
+<div ng-controller="Umbraco.Editors.Macros.SettingsController as vm">
+
+    <div class="umb-package-details">
+
+        <div class="umb-package-details__main-content">
+
+            <umb-box>
+                <umb-box-header title="Macro partial view"></umb-box-header>
+                <umb-box-content>
+                    <umb-control-group label="Macro partial view" required="true" hide-label="true">
+
+                        <umb-node-preview
+                            ng-if="model.macro.node"
+                            icon="model.macro.node.icon"
+                            name="model.macro.node.name"
+                            allow-edit="true"
+                            allow-remove="true"
+                            on-edit="model.openViewPicker()"
+                            on-remove="model.removeMacroView()">
+                        </umb-node-preview>
+
+                        <input type="hidden" ng-model="mandatoryViewValidator" ng-required="!model.macro.node" />
+
+                        <button type="button"
+                                class="umb-node-preview-add"
+                                ng-show="!model.macro.node"
+                                ng-click="model.openViewPicker()">
+                            <localize key="general_add">Add</localize>
+                        </button>
+
+                    </umb-control-group>
+                </umb-box-content>
+            </umb-box>
+            <umb-box>
+                <umb-box-header title="Editor settings"></umb-box-header>
+                <umb-box-content>
+                    <umb-control-group label="Use in rich text editor and the grid">
+                        <umb-toggle checked="model.macro.useInEditor" on-click="model.toggle('useInEditor')"></umb-toggle>
+                    </umb-control-group>
+                    <umb-control-group label="Render in rich text editor and the grid" ng-if="model.macro.useInEditor">
+                        <umb-toggle checked="model.macro.renderInEditor && model.macro.useInEditor" on-click="model.toggle('renderInEditor')"></umb-toggle>
+                    </umb-control-group>
+                </umb-box-content>
+            </umb-box>
+            <umb-box>
+                <umb-box-header title="Cache settings"></umb-box-header>
+                <umb-box-content>
+                    <umb-control-group label="Cache period">
+                        <input type="number" min="0" ng-model="model.macro.cachePeriod" />
+                    </umb-control-group>
+                    <umb-control-group label="Cache by page">
+                        <umb-toggle checked="model.macro.cacheByPage" on-click="model.toggle('cacheByPage')"></umb-toggle>
+                    </umb-control-group>
+                    <umb-control-group label="Cache personalized">
+                        <umb-toggle checked="model.macro.cacheByUser" on-click="model.toggle('cacheByUser')"></umb-toggle>
+                    </umb-control-group>
+                </umb-box-content>
+            </umb-box>
+
+        </div>
+
+        <div class="umb-package-details__sidebar">
+            <umb-box data-element="node-info-general">
+                <umb-box-header title-key="general_general"></umb-box-header>
+                <umb-box-content class="block-form">
+                    <umb-control-group label="Id">
+                        <div>{{model.macro.id}}</div>
+                        <small>{{model.macro.key}}</small>
+                    </umb-control-group>
+                </umb-box-content>
+            </umb-box>
+        </div>
+
+    </div>
+
+</div>

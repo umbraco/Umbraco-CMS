@@ -1,0 +1,58 @@
+<div class="umb-property-file-upload">
+
+    <ng-form name="vm.fileUploadForm" ng-class="{ 'drag-over': vm.dragover }">
+        <input type="hidden" ng-model="mandatoryValidator" ng-required="vm.required && !vm.files.length" />
+
+        <div class="fileinput-button umb-upload-button-big" ng-hide="vm.files.length > 0">
+            <i class="icon icon-page-up" aria-hidden="true"></i>
+            <p><localize key="media_clickToUpload">Click to upload</localize></p>
+            <umb-single-file-upload></umb-single-file-upload>
+        </div>
+        
+        <div ng-if="vm.files.length > 0">
+            <div ng-if="!vm.hideSelection">
+
+                <div class="umb-fileupload clearfix" ng-repeat="file in vm.files">
+
+                    <div ng-if="file.isImage || file.extension === 'svg'">
+                        <div class="gravity-container">
+                            <div class="viewport">
+                                <img ng-if="file.isClientSide" ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}" />
+                                <a ng-if="!file.isClientSide" href="#" ng-href="{{file.fileSrc}}" target="_blank" rel="noopener">
+                                    <img ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="!file.isImage && file.extension !== 'svg'">
+                        <a class="span6 thumbnail tc" ng-show="!file.isClientSide" href="#" ng-href="{{file.fileName}}" target="_blank" rel="noopener">
+                            <umb-file-icon
+                                extension="{{file.extension}}"
+                                size="m">
+                            </umb-file-icon>
+                            <div class="mt2">{{file.fileName}}</div>
+                        </a>
+                        <div class="span6 thumbnail tc" ng-show="file.isClientSide">
+                            <umb-file-icon
+                                extension="{{file.extension}}"
+                                size="m">
+                            </umb-file-icon>
+                            <div class="mt2">{{file.fileName}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-link btn-crop-delete" aria-hidden="true" ng-click="vm.clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></button>
+                    <button type="button" class="sr-only" ng-if="file.isImage" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
+                    <button type="button" class="sr-only" ng-if="!file.isImage" ng-click="vm.clear()"><localize key="content_uploadClearFileContext">Click here to remove the file from the media item</localize></button>
+                </div>
+
+            </div>
+            <div ng-if="vm.hideSelection">
+                <div ng-transclude></div>
+            </div>
+        </div>
+
+    </ng-form>
+</div>

@@ -1,0 +1,122 @@
+<div class="redirecturlsearch" ng-controller="Umbraco.Dashboard.RedirectUrlsController as vm">
+
+    <umb-load-indicator ng-if="vm.dashboard.loading"></umb-load-indicator>
+
+    <umb-editor-sub-header>
+
+        <umb-editor-sub-header-content-right>
+
+            <umb-editor-sub-header-section ng-if="vm.dashboard.userIsAdmin === true">
+
+                <umb-button
+                    ng-if="vm.dashboard.urlTrackerDisabled === false"
+                    type="button"
+                    size="s"
+                    action="vm.disableUrlTracker($event)"
+                    label-key="redirectUrls_disableUrlTracker"
+                    button-style="danger">
+                </umb-button>
+
+                <umb-button
+                    ng-if="vm.dashboard.urlTrackerDisabled === true"
+                    type="button"
+                    size="s"
+                    button-style="success"
+                    action="vm.enableUrlTracker()"
+                    label-key="redirectUrls_enableUrlTracker">
+                </umb-button>
+
+            </umb-editor-sub-header-section>
+
+            <umb-editor-sub-header-section ng-if="vm.dashboard.urlTrackerDisabled === false">
+
+                <ng-form novalidate>
+                    <div class="inner-addon left-addon">
+                        <umb-search-filter
+                            input-id="redirect-search"
+                            model="vm.dashboard.searchTerm"
+                            label-key="general_typeToSearch"
+                            text="Type to search"
+                            on-change="vm.filter()"
+                            prevent-submit-on-enter="true">
+                        </umb-search-filter>
+                    </div>
+                </ng-form>
+
+            </umb-editor-sub-header-section>
+
+        </umb-editor-sub-header-content-right>
+
+    </umb-editor-sub-header>
+
+    <div class="umb-table" ng-if="vm.redirectUrls.length > 0 && vm.dashboard.loading === false" ng-class="{'umb-table-inactive': vm.dashboard.urlTrackerDisabled === true}">
+
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b1"><localize key="redirectUrls_culture">Culture</localize></div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b4"><localize key="redirectUrls_originalUrl">Original URL</localize></div>
+                <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;"></div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b5"><localize key="redirectUrls_redirectedTo">Redirected To</localize></div>
+            </div>
+        </div>
+
+        <div class="umb-table-body">
+
+            <div class="umb-table-row -solid" ng-repeat="redirect in vm.redirectUrls">
+
+                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b1">
+                    {{redirect.culture ||'*'}}
+                </div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b4">
+                    <a class="umb-table-body__link" href="{{redirect.originalUrl}}" target="_blank" rel="noopener" title="{{redirect.originalUrl}}">{{redirect.originalUrl}}</a>
+                </div>
+
+                <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;">
+                    <i class="umb-table-body__icon umb-table-body__fileicon icon-arrow-right" style="font-size: 12px; line-height: 1;"></i>
+                </div>
+
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b5 items-center">
+                    <div class="flx-s1 flx-g1 flx-b0" style="margin-right: 20px;">
+                        <a class="umb-table-body__link" href="{{redirect.destinationUrl}}" target="_blank" rel="noopener" title="{{redirect.destinationUrl}}">{{redirect.destinationUrl}}</a>
+                    </div>
+                    <umb-button
+                        type="button"
+                        button-style="danger"
+                        size="xs"
+                        state="redirect.deleteButtonState"
+                        action="vm.removeRedirect(redirect, $event)"
+                        label-key="general_remove">
+                    </umb-button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <umb-empty-state
+        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading"
+        position="center">
+        <div><localize key="redirectUrls_noRedirects">No redirects have been made</localize></div>
+        <small class="faded"><localize key="redirectUrls_noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page</localize></small>
+    </umb-empty-state>
+
+    <umb-empty-state
+        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length > 0 && !vm.dashboard.loading"
+        position="center">
+        <localize key="general_searchNoResult"></localize>
+    </umb-empty-state>
+
+    <div class="flex justify-center items-center">
+        <umb-pagination
+            ng-if="vm.pagination.totalPages > 1 && !vm.dashboard.loading"
+            page-number="vm.pagination.pageNumber"
+            total-pages="vm.pagination.totalPages"
+            on-next="vm.goToPage"
+            on-prev="vm.goToPage"
+            on-go-to-page="vm.goToPage">
+        </umb-pagination>
+    </div>
+
+</div>

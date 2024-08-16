@@ -1,0 +1,17 @@
+<div ng-controller="Umbraco.PropertyEditors.ColorPickerController as vm">
+
+    <div ng-if="!isConfigured">
+        <localize key="colorpicker_noColors">You haven't defined any colors</localize>
+    </div>
+
+    <umb-color-swatches 
+        colors="model.config.items"
+        selected-color="model.value"
+        size="m"
+        use-label="model.useLabel"
+        on-select="vm.selectColor(color)">
+    </umb-color-swatches>
+
+    <input type="hidden" name="selectedColor" ng-model="model.selectedColor" val-property-validator="validateMandatory" />
+
+</div>

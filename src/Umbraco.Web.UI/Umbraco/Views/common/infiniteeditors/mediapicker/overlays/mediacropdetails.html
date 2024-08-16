@@ -1,0 +1,97 @@
+<div ng-controller="Umbraco.Editors.MediaCropDetailsController as vm">
+    <umb-editor-view>
+
+        <umb-editor-header name="model.title"
+                           name-locked="true"
+                           hide-alias="true"
+                           hide-icon="true"
+                           hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <div class="umb-control-group" ng-if="vm.shouldShowUrl">
+                <h5>
+                    <localize key="@general_url"></localize>
+                </h5>
+                <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="model.target.url" />
+            </div>
+
+            <div class="umb-control-group" ng-if="model.target">
+                <h5>
+                    <localize key="@content_altTextOptional"></localize>
+                </h5>
+                <input type="text" class="umb-property-editor umb-textstring" ng-model="model.target.altText" umb-auto-focus />
+            </div>
+
+            <div class="umb-control-group" ng-if="model.target">
+                <h5>
+                    <localize key="@content_captionTextOptional"></localize>
+                </h5>
+                <input type="text" class="umb-property-editor umb-textstring" ng-model="model.target.caption" />
+            </div>
+
+            <div class="umb-control-group" ng-if="model.target">
+                <div ng-if="vm.hasCrops === false && vm.disableFocalPoint">
+                    <h5>
+                        <localize key="general_preview">Preview</localize>
+                    </h5>
+
+                    <img ng-src="{{model.target.thumbnail}}" alt="{{model.target.name}}" />
+                </div>
+
+                <div ng-if="vm.hasCrops === false && vm.disableFocalPoint == false">
+                    <h5>
+                        <localize key="@general_focalPoint">Focal point</localize>
+                    </h5>
+
+                    <div ng-if="model.target.image">
+                        <umb-image-gravity src="model.target.image"
+                                           center="model.target.focalPoint"
+                                           on-value-changed="vm.focalPointChanged(left, top)">
+                        </umb-image-gravity>
+                    </div>
+                </div>
+
+                <div ng-if="vm.hasCrops">
+                    <h5>
+                        <localize key="@general_cropSection">Crop section</localize>
+                    </h5>
+
+                    <div>
+                        <umb-image-crop height="{{model.cropSize.height}}"
+                                        width="{{model.cropSize.width}}"
+                                        crop="model.target.coordinates"
+                                        center="model.target.focalPoint"
+                                        max-size="400"
+                                        src="model.target.image">
+                        </umb-image-crop>
+                    </div>
+                </div>
+
+            </div>
+
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+
+                <umb-button action="vm.close()"
+                            button-style="link"
+                            shortcut="esc"
+                            label-key="general_close"
+                            type="button">
+                </umb-button>
+
+                <umb-button button-style="success"
+                            label-key="buttons_select"
+                            type="button"
+                            disabled="model.selection.length === 0"
+                            action="vm.submit(model)">
+                </umb-button>
+
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+</div>

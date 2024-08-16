@@ -1,0 +1,58 @@
+<div ng-controller="Umbraco.Editors.InsertOverlay as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-box>
+                <umb-box-content>
+                    <div class="umb-insert-code-boxes">
+                        <button type="button" ng-if="model.allowedTypes.umbracoField" class="btn-reset umb-insert-code-box" ng-click="vm.openPageFieldOverlay()">
+                            <h2 class="umb-insert-code-box__title"><localize key="template_insertPageField">Value</localize></h2>
+                            <p class="umb-insert-code-box__description"><localize key="template_insertPageFieldDesc">Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.</localize></p>
+                        </button>
+                        <button type="button" ng-if="model.allowedTypes.partial" class="btn-reset umb-insert-code-box" ng-click="vm.openPartialOverlay()">
+                            <h2 class="umb-insert-code-box__title"><localize key="template_insertPartialView">Partial view</localize></h2>
+                            <p class="umb-insert-code-box__description">
+                                <localize key="template_insertPartialViewDesc">A partial view is a separate template file which can be rendered inside another template, it's great for reusing markup or for separating complex templates into separate files.</localize>
+                            </p>
+                        </button>
+                        <button type="button" ng-if="model.allowedTypes.macro" class="btn-reset umb-insert-code-box" ng-click="vm.openMacroPicker()">
+                            <h2 class="umb-insert-code-box__title"><localize key="template_insertMacro">Macro</localize></h2>
+                            <p class="umb-insert-code-box__description">
+                                <localize key="template_insertMacroDesc">A Macro is a configurable component which is great for reusable parts of your design, where you need the option to provide parameters, such as galleries, forms and lists.</localize>
+                            </p>
+                        </button>
+                        <button type="button" ng-if="model.allowedTypes.dictionary" class="btn-reset umb-insert-code-box" ng-click="vm.openDictionaryItemOverlay()">
+                            <h2 class="umb-insert-code-box__title"><localize key="template_insertDictionaryItem">Dictionary item</localize></h2>
+                            <p class="umb-insert-code-box__description"><localize key="template_insertDictionaryItemDesc">A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.</localize></p>
+                        </button>
+                    </div>
+                </umb-box-content>
+            </umb-box>
+
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

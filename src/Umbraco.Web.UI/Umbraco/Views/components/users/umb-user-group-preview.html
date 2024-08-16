@@ -1,0 +1,46 @@
+<div class="umb-user-group-preview">
+    
+    <i ng-if="icon" class="umb-user-group-preview__icon {{ icon }}"></i>
+    
+    <div class="umb-user-group-preview__content">
+        <div class="umb-user-group-preview__name">{{ name }}</div>
+
+        <div class="umb-user-group-preview__permissions" ng-if="sections">
+            <span>
+                <span class="bold"><localize key="main_sections">Sections</localize>:</span>
+                <span ng-repeat="section in sections" class="umb-user-group-preview__permission">{{ section.name }}</span>
+                <span ng-if="sections.length === 0">All sections</span>
+            </span>
+        </div>
+
+        <div class="umb-user-group-preview__permissions" ng-if="!hideContentStartNode">
+            <span>
+                <span class="bold"><localize key="user_startnode">Content start node</localize>:</span>
+                <span ng-if="!contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                <span ng-if="contentStartNode">{{ contentStartNode.name }}</span>
+            </span>
+        </div>
+        
+        <div class="umb-user-group-preview__permissions" ng-if="!hideMediaStartNode">
+            <span>
+                <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>
+                <span ng-if="!mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                <span ng-if="mediaStartNode">{{ mediaStartNode.name }}</span>
+            </span>
+        </div>
+
+        <div class="umb-user-group-preview__permissions" ng-if="permissions">
+            <span>
+                <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
+                <span ng-repeat="permission in permissions" class="umb-user-group-preview__permission">{{ permission.name }}</span>
+            </span>
+        </div>
+
+    </div>
+
+    <div class="umb-user-group-preview__actions">
+        <button class="btn-link umb-user-group-preview__action" title="Edit" ng-if="allowEdit" ng-click="onEdit()"><localize key="general_edit">Edit</localize></button>
+        <button class="btn-link umb-user-group-preview__action umb-user-group-preview__action--red" title="Remove" ng-if="allowRemove" ng-click="onRemove()"><localize key="general_remove">Remove</localize></button>
+    </div>
+
+</div>

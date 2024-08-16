@@ -1,0 +1,23 @@
+<button data-element="sub-view-{{vm.item.alias}}"
+        type="button"
+        ng-click="vm.clicked()"
+        hotkey="{{::vm.hotkey}}"
+        hotkey-when-hidden="true"
+        ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError }"
+        ng-disabled="vm.item.disabled"
+        class="umb-sub-views-nav-item__action umb-outline umb-outline--thin"
+        aria-haspopup="{{ vm.item.anchors && vm.item.anchors.length > 1 }}"
+        aria-expanded="{{ vm.expanded }}">
+    <i class="icon {{ vm.item.icon }}" aria-hidden="true"></i>
+    <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>
+    <div ng-show="vm.item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
+    <div ng-show="!vm.item.badge" class="badge -type-alert --error-badge">!</div>
+</button>
+
+<umb-dropdown on-close="vm.close()" deep-blur="vm.close()" umb-keyboard-list class="umb-sub-views-nav-item__anchor_dropdown" ng-class="{'is-expanded': vm.expanded}" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
+    <umb-dropdown-item ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
+        <a href="#group-{{anchor.id}}" ng-click="vm.anchorClicked(anchor, $event)" prevent-default>
+            <span class="sr-only"><localize key="visuallyHiddenTexts_jumpTo">Jump to</localize></span> {{anchor.label}} <span class="sr-only"><localize key="visuallyHiddenTexts_group"> group</localize></span>
+        </a>
+    </umb-dropdown-item>
+</umb-dropdown>

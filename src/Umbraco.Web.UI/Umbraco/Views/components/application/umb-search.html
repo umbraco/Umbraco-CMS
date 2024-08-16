@@ -1,0 +1,72 @@
+
+<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keydown="vm.handleKeyDown($event)" role="dialog"
+    aria-labelledby="search-overlay-title" aria-describedby="search-overlay-description">
+
+    <div class="sr-only">
+        <h1 id="search-overlay-title">
+            <localize key="visuallyHiddenTexts_searchOverlayTitle">Search the Umbraco backoffice</localize>
+        </h1>
+        <p id="search-overlay-description">
+            <localize key="visuallyHiddenTexts_searchOverlayDescription">Search for content nodes, media nodes etc. across the
+                backoffice.</localize>
+        </p>
+    </div>
+
+    <div class="flex items-center">
+        <label for="app-search" class="umb-search__label">
+            <umb-icon icon="icon-search" class="umb-search-input-icon icon-search"></umb-icon>
+            <span class="sr-only">
+                <localize key="general_search">Search...</localize>
+            </span>
+        </label>
+        <span class="sr-only" id="search-input-description">
+            <localize key="visuallyHiddenTexts_searchInputDescription">When autocomplete results are available, press up and
+                down arrows,
+                or use the tab key and use the enter key to select.</localize>
+        </span>
+        <input
+            class="umb-search-input"
+            type="text"
+            ng-model="vm.searchQuery"
+            ng-model-options="{ debounce: 200 }"
+            ng-change="vm.search(vm.searchQuery)"
+            localize="placeholder"
+            placeholder="@placeholders_search"
+            id="app-search"
+            focus-when="{{vm.searchHasFocus}}"
+            aria-describedby="search-input-description"
+            aria-expanded="{{vm.hasResults}}"
+            aria-owns="search-results"
+            aria-autocomplete="list"
+        />
+        <button ng-show="vm.searchQuery.length > 0" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">
+            <localize key="general_clear">Clear</localize>
+        </button>
+    </div>
+
+    <div class="umb-search-results">
+        <div class="umb-search-group" ng-repeat="(key, group) in vm.searchResults" id="search-results" role="listbox">
+            <div class="umb-search-group__title" aria-hidden="true">{{key}}</div>
+            <ul class="umb-search-items">
+                <li class="umb-search-item" ng-repeat="result in group.results" active-result="{{result === vm.activeResult}}">
+                    <a class="umb-search-result__link" ng-href="#/{{result.editorPath}}" ng-click="vm.clickItem(result)">
+                        <umb-icon icon="{{result.icon}}" class="umb-search-result__icon {{result.icon}}"></umb-icon>
+                        <span class="umb-search-result__meta">
+                            <span class="umb-search-result__name">{{result.name}}</span>
+                            <span class="umb-search-result__description" ng-show="result.subTitle">
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_path">Path:</localize>
+                                </span>
+                                <span>{{result.subTitle}}</span>
+                            </span>
+                        </span>
+                    </a>
+                    <span class="sr-only">
+                        <localize key="visuallyHiddenTexts_foundIn">Found in</localize> {{key}}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

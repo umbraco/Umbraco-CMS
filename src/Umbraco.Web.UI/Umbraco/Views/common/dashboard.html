@@ -1,0 +1,37 @@
+<div ng-controller="Umbraco.DashboardController">
+
+    <form name="dashboardForm" val-form-manager>
+
+        <umb-load-indicator ng-show="page.loading"></umb-load-indicator>
+
+        <div class="umb-dashboard" ng-if="!page.loading" data-element='dashboard'>
+
+            <div class="umb-dashboard__header" ng-show="dashboard.tabs.length > 1">
+                <umb-tabs-nav
+                    ng-if="dashboard.tabs"
+                    tabs="dashboard.tabs"
+                    on-tab-change="changeTab(tab)">
+                </umb-tabs-nav>
+            </div>
+
+            <div class="umb-dashboard__content">
+
+                <umb-tab-content ng-repeat="tab in dashboard.tabs" ng-if="tab.active" tab="tab" class="row-fluid">
+
+                    <div ng-repeat="property in tab.properties">
+
+                        <div class="clearfix">
+                            <div ng-include="property.view"></div>
+                        </div>
+
+                    </div>
+
+                </umb-tab-content>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>

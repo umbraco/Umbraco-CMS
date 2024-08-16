@@ -1,0 +1,84 @@
+<div ng-controller="Umbraco.PropertyEditors.ContentPickerController" class="umb-property-editor umb-contentpicker">
+
+    <p ng-if="(renderModel|filter:{trashed:true}).length == 1"><localize key="contentPicker_pickedTrashedItem"></localize></p>
+    <p ng-if="(renderModel|filter:{trashed:true}).length > 1"><localize key="contentPicker_pickedTrashedItems"></localize></p>
+
+    <ng-form name="contentPickerForm">
+
+        <div ui-sortable="sortableOptions" ng-model="sortableModel">
+            <umb-node-preview ng-repeat="node in renderModel track by node.id"
+                              icon="node.icon"
+                              name="node.name"
+                              published="node.published"
+                              description="node.url"
+                              sortable="!sortableOptions.disabled"
+                              allow-remove="allowRemoveButton"
+                              allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
+                              on-remove="remove($index)"
+                              on-open="openEditor(node)">
+            </umb-node-preview>
+        </div>
+
+        <button
+            ng-show="model.config.multiPicker === true && renderModel.length < model.config.maxNumber || renderModel.length === 0 || !model.config.maxNumber"
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="openCurrentPicker()"
+            id="{{model.alias}}"
+            aria-label="{{model.label}}: {{labels.general_add}}"
+        >
+            <localize key="general_add">Add</localize>
+            <span class="sr-only">...</span>
+        </button>
+
+        <div class="umb-contentpicker__min-max-help" ng-if="model.config.multiPicker === true && (model.config.maxNumber > 1 || model.config.minNumber > 0)">
+
+            <!-- Both min and max items -->
+            <span ng-if="model.config.minNumber && model.config.maxNumber && model.config.minNumber !== model.config.maxNumber">
+                <span ng-if="renderModel.length < model.config.maxNumber">Add between {{model.config.minNumber}} and {{model.config.maxNumber}} items</span>
+                <span ng-if="renderModel.length > model.config.maxNumber">
+                    <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected"> items selected</localize>
+                </span>
+            </span>
+
+            <!-- Equal min and max -->
+            <span ng-if="model.config.minNumber && model.config.maxNumber && model.config.minNumber === model.config.maxNumber">
+                <span ng-if="renderModel.length < model.config.maxNumber">Add {{model.config.minNumber - renderModel.length}} item(s)</span>
+                <span ng-if="renderModel.length > model.config.maxNumber">
+                    <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected"> items selected</localize>
+                </span>
+            </span>
+
+            <!-- Only max -->
+            <span ng-if="!model.config.minNumber && model.config.maxNumber">
+                <span ng-if="renderModel.length < model.config.maxNumber">Add up to {{model.config.maxNumber}} items</span>
+                <span ng-if="renderModel.length > model.config.maxNumber">
+                    <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
+                </span>
+            </span>
+
+            <!-- Only min -->
+            <span ng-if="model.config.minNumber && !model.config.maxNumber && renderModel.length < model.config.minNumber">
+                Add at least {{model.config.minNumber}} item(s)
+            </span>
+
+        </div>
+
+        <!--These are here because we need ng-form fields to validate against-->
+        <input type="hidden" name="minCount" ng-model="renderModel" />
+        <input type="hidden" name="maxCount" ng-model="renderModel" />
+
+        <div ng-messages="contentPickerForm.minCount.$error" show-validation-on-submit >
+            <div class="help-inline" ng-message="minCount">
+                <localize key="validation_minCount">You need to add at least</localize> {{model.config.minNumber}} <localize key="validation_items">items</localize>
+            </div>
+        </div>
+        <div ng-messages="contentPickerForm.maxCount.$error" show-validation-on-submit >
+            <div class="help-inline" ng-message="maxCount">
+                <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
+            </div>
+        </div>
+
+    </ng-form>
+
+</div>

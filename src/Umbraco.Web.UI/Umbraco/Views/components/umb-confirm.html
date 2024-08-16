@@ -1,0 +1,20 @@
+<div>
+    <p ng-hide="!caption" class="umb-abstract">{{caption}}</p>
+    <div class="btn-toolbar umb-btn-toolbar">
+        <umb-button ng-if="showCancel"
+                    type="button"
+                    action="onCancel()"
+                    button-style="link"
+                    disabled="confirmButtonState === 'busy'"
+                    label-key="general_cancel">
+        </umb-button>
+        <umb-button ng-if="showConfirm"
+                    type="button"
+                    action="confirm()"
+                    button-style="{{confirmButtonStyle || 'primary'}}"
+                    state="confirmButtonState"
+                    disabled="confirmDisabled === true"
+                    label-key="{{confirmLabelKey || 'general_ok'}}">
+        </umb-button>
+    </div>
+</div>

@@ -1,0 +1,232 @@
+<div class="umb-property-editor umb-listview" ng-controller="Umbraco.PropertyEditors.ListViewController" ng-switch="isNew">
+
+   <div class="row-fluid" ng-switch-when="true">
+
+   </div>
+
+   <div class="row-fluid" ng-switch-when="false">
+
+       <umb-editor-sub-header ng-class="{'--state-selection':(selection.length > 0)}">
+
+           <umb-editor-sub-header-content-left>
+
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
+
+                    <!-- Renders when it's only possible to create one specific document type for, which no blueprint exists-->
+                   <div class="btn-group" ng-show="createAllowedButtonSingle">
+                       <button type="button" class="btn btn-outline umb-outline" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
+                           <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
+                       </button>
+                   </div>
+
+                   <!-- Renders when it's only possible to create one specific document type for which a blueprint exits-->
+                   <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints" deep-blur="leaveDropdown()">
+                       <button type="button" class="btn btn-outline umb-outline dropdown-toggle" aria-expanded="{{page.createDropdownOpen}}" ng-click="toggleDropdown()">
+                           <span>
+                               <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
+                           </span>
+                           <span class="caret" aria-hidden="true"></span>
+                        </button>
+
+                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                           <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
+                                <button type="button" ng-click="createBlank(entityType,contentType.alias)">
+                                    <i class="{{::contentType.icon}}" aria-hidden="true"></i>
+                                    {{::contentType.name}} <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
+                                </button>
+
+                                <button type="button" ng-repeat="blueprint in contentType.blueprints track by blueprint.id | orderBy:'name':false" ng-click="createFromBlueprint(entityType, contentType.alias, blueprint.id)">
+                                    &nbsp;&nbsp;<i class="{{::contentType.icon}}" aria-hidden="true"></i>
+                                    {{::blueprint.name}}
+                                </button>
+                            </umb-dropdown-item>
+                       </umb-dropdown>
+                   </div>
+
+                   <!-- Renders when it's possible to create multiple document types and blueprints for one or more of the document types-->
+                   <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints" deep-blur="leaveDropdown()">
+                       <button type="button" class="btn btn-outline umb-outline dropdown-toggle" aria-expanded="{{page.createDropdownOpen === undefined ? false : page.createDropdownOpen}}" ng-click="toggleDropdown()">
+                           <localize key="actions_create">Create</localize>
+                           <span class="caret" aria-hidden="true"></span>
+                       </button>
+
+                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                           <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
+                               <button type="button" ng-click="createBlank(entityType,contentType.alias)">
+                                   <i class="{{::contentType.icon}}" aria-hidden="true"></i>
+                                   {{::contentType.name}} <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
+                               </button>
+
+
+                               <button type="button" ng-repeat="blueprint in contentType.blueprints track by blueprint.id | orderBy:'name':false" ng-click="createFromBlueprint(entityType, contentType.alias, blueprint.id)">
+                                   &nbsp;&nbsp;<i class="{{::contentType.icon}}" aria-hidden="true"></i>
+                                   {{::blueprint.name}}
+                               </button>
+                           </umb-dropdown-item>
+                       </umb-dropdown>
+                   </div>
+
+                   <ul class="umb-actions umb-actions-child">
+
+                       <li ng-repeat="blueprint in docType.blueprints track by blueprint.id | orderBy:'name':false">
+                           <button type="button" ng-click="createFromBlueprint(blueprint.id)">
+                               <i class="large {{docType.icon}}" aria-hidden="true"></i>
+                               <span class="menu-label">
+                                   {{blueprint.name}}&nbsp;
+                               </span>
+                            </button>
+                       </li>
+
+                       <li class="sep" ng-show="allowBlank">
+                           <button type="button" ng-click="createBlank(docType)">
+                               <i class="large {{docType.icon}}" aria-hidden="true"></i>
+                               <span class="menu-label">
+                                   <localize key="blueprints_blankBlueprint">Blank</localize>
+                               </span>
+                            </button>
+                       </li>
+
+                   </ul>
+
+               </umb-editor-sub-header-section>
+
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
+                   <umb-button
+                       type="button"
+                       label="Clear selection"
+                       label-key="buttons_clearSelection"
+                       button-style="white"
+                       action="clearSelection()"
+                       disabled="actionInProgress">
+                   </umb-button>
+               </umb-editor-sub-header-section>
+
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
+                   <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} <localize key="general_of">of</localize> {{ listViewResultSet.items.length }} <localize key="general_selected">selected</localize></strong>
+                   <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
+
+                   <umb-loader position="bottom" ng-show="actionInProgress"></umb-loader>
+               </umb-editor-sub-header-section>
+
+           </umb-editor-sub-header-content-left>
+
+
+           <umb-editor-sub-header-content-right>
+
+               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
+
+                   <umb-layout-selector
+                       ng-show="options.layout.layouts"
+                       layouts="options.layout.layouts"
+                       active-layout="options.layout.activeLayout"
+                       on-layout-select="selectLayout(layout)">
+                   </umb-layout-selector>
+
+               </umb-editor-sub-header-section>
+
+               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
+
+                    <umb-mini-search model="options.filter" on-search="makeSearch()" on-start-typing="onSearchStartTyping()">
+                    </umb-mini-search>
+
+               </umb-editor-sub-header-section>
+
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
+
+                   <umb-button
+                       ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
+                       style="margin-right: 5px;"
+                       type="button"
+                       button-style="white"
+                       label-key="actions_publish"
+                       icon="icon-globe"
+                       action="publish()"
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkUnpublish && (buttonPermissions == null || buttonPermissions.canUnpublish)"
+                       style="margin-right: 5px;"
+                       type="button"
+                       button-style="white"
+                       label-key="actions_unpublish"
+                       icon="icon-block"
+                       action="unpublish()"
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkCopy && (buttonPermissions == null || buttonPermissions.canCopy)"
+                       style="margin-right: 5px;"
+                       type="button"
+                       button-style="white"
+                       label-key="actions_copy"
+                       icon="icon-documents"
+                       action="copy()"
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkMove && (buttonPermissions == null || buttonPermissions.canMove)"
+                       style="margin-right: 5px;"
+                       type="button"
+                       button-style="white"
+                       label-key="actions_move"
+                       icon="icon-enter"
+                       action="move()"
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
+                       type="button"
+                       button-style="white"
+                       label-key="actions_delete"
+                       icon="icon-trash"
+                       action="delete()"
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
+                   </umb-button>
+
+               </umb-editor-sub-header-section>
+
+           </umb-editor-sub-header-content-right>
+
+       </umb-editor-sub-header>
+
+       <umb-list-view-layout
+         ng-if="viewLoaded"
+         content-id="contentId"
+         folders="folders"
+         items="listViewResultSet.items"
+         selection="selection"
+         options="options"
+         entity-type="{{entityType}}"
+         on-get-content="getContent(contentId)">
+      </umb-list-view-layout>
+
+      <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
+
+      <div class="flex justify-center">
+          <umb-pagination
+             ng-show="listViewResultSet.totalPages"
+             page-number="options.pageNumber"
+             total-pages="listViewResultSet.totalPages"
+             on-next="next"
+             on-prev="prev"
+             on-go-to-page="goToPage">
+          </umb-pagination>
+      </div>
+
+    </div>
+
+</div>

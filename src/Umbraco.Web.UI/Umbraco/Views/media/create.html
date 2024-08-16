@@ -1,0 +1,52 @@
+<div ng-controller="Umbraco.Editors.Media.CreateController">
+	<div class="umb-dialog-body with-footer">
+		<div class="umb-pane">
+
+			<h5><localize key="create_createUnder">Create under</localize> {{currentNode.name}}</h5>
+
+            <div ng-if="allowedTypes && allowedTypes.length === 0">
+                <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noMediaTypesWithNoSettingsAccess" /></p>
+                <div ng-if="hasSettingsAccess">
+                    <p class="abstract"><localize key="create_noMediaTypes" /></p>
+                    <a class="btn" href="#settings/mediaTypes/edit/{{mediaTypeId}}?view=permissions" ng-click="close()">
+                        <localize key="create_noMediaTypesEditPermissions" />
+                    </a>
+                </div>
+            </div>
+
+			<ul class="umb-actions umb-actions-child">
+
+				<li data-element="action-{{docType.alias}}" class="umb-action" ng-repeat="docType in allowedTypes">
+					<button ng-click="createMediaItem(docType)" class="umb-action-link umb-outline btn-reset" prevent-default>
+						<i class="large icon {{docType.icon}}"></i>
+						<span class="menu-label">
+							{{docType.name}}
+							<small>{{docType.description}}</small>
+						</span>
+					</button>
+				</li>
+				<!--
+					<li class="add">
+						<a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+							<i class="icon-large icon-plus"></i>
+							<span class="menu-label">
+								Create a new media type
+								<small>
+									Design and configure a new media type
+								</small>
+							</span>
+						</a>
+					</li>
+				-->
+			</ul>
+
+		</div>
+	</div>
+
+	<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+		<button class="btn btn-info" ng-click="closeDialog()">
+			<localize key="buttons_somethingElse">Do something else</localize>
+		</button>
+	</div>
+
+</div>

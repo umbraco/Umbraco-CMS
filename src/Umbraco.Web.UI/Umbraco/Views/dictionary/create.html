@@ -1,0 +1,21 @@
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Dictionary.CreateController as vm">
+  
+  <div class="umb-pane">
+    <h5 tabindex="0"><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+  </div>
+  
+  <div class="umb-pane">
+      <form novalidate name="createDictionaryForm"
+            ng-submit="vm.createItem()"
+            val-form-manager>
+
+          <umb-control-group label="@general_name" hide-label="false" alias="itemKey">
+              <input type="text" name="itemKey" id="itemKey" ng-model="vm.itemKey" class="umb-textstring textstring input-block-level"
+                     umb-auto-focus required
+                     maxlength="1000"/>
+          </umb-control-group>
+
+          <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+      </form>
+  </div>  
+</div>

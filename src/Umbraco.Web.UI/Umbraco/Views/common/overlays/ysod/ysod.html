@@ -1,0 +1,27 @@
+<div ng-controller="Umbraco.Overlays.YsodController">
+
+    <h4 class="heading red">{{model.error.errorMsg}}</h4>
+    <p>{{model.error.data.ExceptionMessage || model.error.data.Message}}</p>
+
+    <div class="umb-control-group">
+        <h5>
+            <localize key="defaultdialogs_exceptionDetail">Exception Details:</localize>
+        </h5>
+        {{model.error.data.ExceptionType}}: {{model.error.data.ExceptionMessage}}
+    </div>
+
+    <div class="umb-control-group">
+        <h5>
+            <localize key="defaultdialogs_stacktrace">Stacktrace:</localize>
+        </h5>
+        <pre style="white-space: pre-wrap; overflow-x: auto;">{{model.error.data.StackTrace}}</pre>
+    </div>
+
+    <div class="umb-control-group" ng-repeat="e in model.error.data.InnerExceptions">
+        <h5>
+            <localize key="defaultdialogs_innerException">Inner Exception:</localize>
+        </h5>
+        <div>{{e.ExceptionType}}: {{e.ExceptionMessage}}</div>
+        <pre style="white-space: pre-wrap; overflow-x: auto;">{{e.StackTrace}}</pre>
+    </div>
+</div>

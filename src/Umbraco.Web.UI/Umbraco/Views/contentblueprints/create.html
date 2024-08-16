@@ -1,0 +1,42 @@
+<div ng-controller="Umbraco.Editors.ContentBlueprint.CreateController as vm">
+
+    <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
+
+        <div class="umb-pane">
+
+            <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+            <p class="abstract">
+                <localize key="create_createContentBlueprint">Select the document type you want to make a content template for</localize>
+            </p>
+
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+            <ul class="umb-actions umb-actions-child">
+                <li class="umb-action" ng-repeat="documentType in vm.documentTypes |orderBy:'name':false">
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.createBlueprint(documentType)">
+                        <i class="large icon {{documentType.icon}}" aria-hidden="true"></i>
+                        <span class="menu-label">
+                            {{documentType.name}}
+                            <small>
+                                {{documentType.description}}
+                            </small>
+                        </span>
+                    </button>
+                </li>
+            </ul>
+
+        </div>
+
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+        <umb-button label-key="buttons_somethingElse"
+                    action="vm.close()"
+                    type="button"
+                    button-style="info">
+        </umb-button>
+
+    </div>
+
+</div>

@@ -1,0 +1,25 @@
+<div class="umb-cropper umb-property-editor" ng-show="src">
+	<div class="crop-container">
+		<div class="viewport" ng-style="style()">
+			<img ng-src="{{src}}" ng-style="dimensions.image"/>
+			<div class="overlay" ng-style="dimensions.image"></div>
+		</div>
+	</div>
+
+	<div class="crop-slider-wrapper" ng-if="loaded">
+        <i class="icon-picture" aria-hidden="true"></i>
+
+        <div class="crop-slider">
+            <umb-range-slider
+                ng-model="sliderValue"
+                options="sliderOptions"
+                on-setup="setup(slider)"
+                on-slide="slide(values)"
+                on-change="change(values)">
+            </umb-range-slider>
+        </div>
+
+        <i class="icon-picture" aria-hidden="true" style="font-size: 22px"></i>
+    </div>
+    
+</div>

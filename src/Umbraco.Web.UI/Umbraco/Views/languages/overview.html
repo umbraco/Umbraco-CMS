@@ -1,0 +1,83 @@
+<div data-element="editor-languages" ng-controller="Umbraco.Editors.Languages.OverviewController as vm" class="clearfix">
+
+    <umb-editor-view footer="false">
+
+        <umb-editor-header name="vm.page.name"
+                           name-locked="true"
+                           hide-icon="true"
+                           hide-description="true"
+                           hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+            <umb-editor-sub-header>
+
+                <umb-editor-sub-header-content-left>
+                    <umb-button button-style="outline"
+                                type="button"
+                                action="vm.addLanguage()"
+                                label-key="languages_addLanguage">
+                    </umb-button>
+                </umb-editor-sub-header-content-left>
+
+            </umb-editor-sub-header>
+
+            <table class="table table-hover" ng-if="!vm.loading">
+                <thead>
+                    <tr>
+                        <th><localize key="general_language">Language</localize></th>
+                        <th>ISO</th>
+                        <th><localize key="general_default">Default</localize></th>
+                        <th><localize key="general_mandatory">Mandatory</localize></th>
+                        <th>Fallback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="language in vm.languages track by language.id" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
+                        <td>
+                           <umb-icon icon="icon-globe" class="language-icon"></umb-icon>
+                            <span>{{ language.name }}</span>
+                        </td>
+                        <td>
+                            <span>{{ language.culture }}</span>
+                        </td>
+                        <td>
+                            <umb-checkmark ng-if="language.isDefault"
+                                           checked="language.isDefault"
+                                           size="xs">
+                            </umb-checkmark>
+                        </td>
+                        <td>
+                            <umb-checkmark ng-if="language.isMandatory"
+                                           checked="language.isMandatory"
+                                           size="xs">
+                            </umb-checkmark>
+                        </td>
+                        <td>
+                            <span ng-if="language.fallbackLanguageId">{{vm.getLanguageById(language.fallbackLanguageId).name}}</span>
+                            <span ng-if="!language.fallbackLanguageId">
+                                (<localize key="languages_none">none</localize>)
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <umb-button ng-if="!language.isDefault"
+                                        type="button"
+                                        size="xxs"
+                                        button-style="danger"
+                                        state="language.deleteButtonState"
+                                        action="vm.deleteLanguage(language, $event)"
+                                        label-key="general_delete">
+                            </umb-button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </umb-editor-container>
+
+    </umb-editor-view>
+
+</div>

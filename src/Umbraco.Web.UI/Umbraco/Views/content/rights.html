@@ -1,0 +1,128 @@
+<div ng-controller="Umbraco.Editors.Content.RightsController as vm">
+
+    <!-- Manage groups -->
+    <div ng-show="vm.viewState === 'manageGroups'">
+        <div class="umb-dialog-body" ng-cloak>
+
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+            <div class="umb-pane" ng-show="!vm.loading" role="dialog" aria-labelledby="content_rights_title" aria-describedby="content_rights_description">
+                
+                <form name="permissionsForm">
+
+                    <div ng-show="vm.saveError">
+                        <div class="alert alert-error">
+                            <div><strong>{{vm.saveError.errorMsg}}</strong></div>
+                            <div>{{vm.saveError.data.message}}</div>
+                        </div>
+                    </div>
+
+                    <div ng-show="vm.saveSuccces">
+                        <div class="alert alert-success">
+                            <localize key="speechBubbles_permissionsSavedFor"></localize><strong> {{currentNode.name}}</strong>
+                        </div>
+                    </div>
+
+                    <h5 id="content_rights_title"><localize key="defaultdialogs_permissionsSet">Set permissions for</localize> {{ currentNode.name }}</h5>
+                    <p id="content_rights_description" class="abstract" style="margin-bottom: 20px;"><localize key="defaultdialogs_permissionsHelp"></localize></p>
+
+                    <div style="position: relative; display: inline-block; margin-bottom: 20px;">
+                        <umb-button
+                            type="button"
+                            button-style="info"
+                            label-key="defaultdialogs_permissionsSet"
+                            action="vm.groupsDropdownOpen = !vm.groupsDropdownOpen"
+                            has-popup="true"
+                            is-expanded="vm.groupsDropdownOpen === undefined ? false : vm.groupsDropdownOpen"
+                            add-ellipsis="true">
+                        </umb-button>
+
+                        <umb-dropdown ng-if="vm.groupsDropdownOpen" on-close="vm.groupsDropdownOpen = false" deep-blur="vm.groupsDropdownOpen = !vm.groupsDropdownOpen">
+                            <umb-dropdown-item ng-repeat="group in vm.availableUserGroups | filter:{selected: '!true'}">
+                                <button type="button" ng-click="vm.editPermissions(group)">
+                                    <i class="{{group.icon}}" aria-hidden="true"></i>
+                                    {{group.name}}
+                                </button>
+                            </umb-dropdown-item>
+                        </umb-dropdown>
+
+                    </div>
+
+                    <div umb-set-dirty-on-change="{{vm.selectedUserGroups}}">
+                        <umb-user-group-preview
+                            ng-repeat="group in vm.selectedUserGroups"
+                            icon="group.icon"
+                            name="group.name"
+                            hide-content-start-node="true"
+                            hide-media-start-node="true"
+                            permissions="group.allowedPermissions"
+                            allow-remove="true"
+                            allow-edit="true"
+                            on-remove="vm.removePermissions($index, vm.selectedUserGroups)"
+                            on-edit="vm.editPermissions(group)">
+                        </umb-user-group-preview>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <umb-button
+                label-key="general_close"
+                disabled="vm.saveState === 'busy'"
+                action="vm.closeDialog()"
+                type="button"
+                button-style="link">
+            </umb-button>
+
+            <umb-button
+                label-key="buttons_save"
+                disabled="vm.saveState === 'busy'"
+                state="vm.saveState"
+                action="vm.save()"
+                type="button"
+                button-style="success">
+            </umb-button>
+        </div>
+
+    </div>
+
+    <!-- Manage permissions -->
+    <div ng-show="vm.viewState === 'managePermissions'">
+
+        <div class="umb-dialog-body" ng-cloak>
+            <div class="umb-pane block-form">
+                <h5>{{ vm.labels.permissionsSetForGroup }}</h5>
+                <umb-control-group
+                    ng-repeat="(category, permissions) in vm.selectedUserGroup.permissions"
+                    label="{{category}}">
+                    <umb-toggle-group items="permissions"></umb-toggle-group>
+                </umb-control-group>
+            </div>
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+            <umb-button
+                label-key="general_cancel"
+                action="vm.cancelManagePermissions()"
+                type="button"
+                button-style="link">
+            </umb-button>
+
+            <umb-button
+                label-key="actions_setPermissions"
+                action="vm.setPermissions(vm.selectedUserGroup)"
+                type="button"
+                button-style="success">
+            </umb-button>
+
+        </div>
+
+    </div>
+
+</div>
+

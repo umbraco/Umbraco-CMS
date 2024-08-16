@@ -1,0 +1,15 @@
+<div ng-controller="Umbraco.PrevalueEditors.ColorPickerController">
+
+    <div ng-if="!isConfigured">
+        <localize key="colorpicker_noColors">You haven't defined any colors</localize>
+    </div>
+
+    <umb-color-swatches
+        colors="model.items"
+        selected-color="model.value"
+        size="s"
+        use-label="model.config.useLabel">
+    </umb-color-swatches>
+
+    <input type="hidden" name="modelValue" ng-model="model.value" />
+</div>

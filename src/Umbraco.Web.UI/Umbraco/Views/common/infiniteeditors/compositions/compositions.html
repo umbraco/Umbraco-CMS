@@ -1,0 +1,117 @@
+<div ng-controller="Umbraco.Editors.CompositionsController as vm">
+
+    <umb-editor-view>
+
+        <form novalidate name="compositionsForm" val-form-manager>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+
+                    <div class="umb-control-group">
+
+                        <umb-search-filter
+                            input-id="composition-search"
+                            model="searchTerm"
+                            label-key="placeholders_filter"
+                            text="Type to filter..."
+                            css-class="w-100"
+                            auto-focus="true">
+                        </umb-search-filter>
+
+                    </div>
+
+                    <div class="umb-control-group">
+                        <localize key="contentTypeEditor_compositionsDescription"></localize>
+                    </div>
+
+                    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
+                                     position="center">
+                        <localize key="contentTypeEditor_noAvailableCompositions"></localize>
+                    </umb-empty-state>
+
+                    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1">
+                        <localize key="contentTypeEditor_compositionInUse"></localize>
+                    </umb-empty-state>
+
+                    <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
+                        <h5><localize key="contentTypeEditor_compositionUsageHeading"></localize></h5>
+                        <p><localize key="contentTypeEditor_compositionUsageSpecification"></localize></p>
+                        <ul class="umb-checkbox-list">
+                            <li class="umb-checkbox-list__item"
+                                ng-repeat="contentTypeEntity in model.whereCompositionUsed">
+                                <a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)">
+                                    <i class="{{contentTypeEntity.contentType.icon}}"></i>
+                                    &nbsp;{{contentTypeEntity.contentType.name}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="umb-control-group -no-border" ng-if="vm.availableGroups.length > 0">
+                        <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:searchTerm">
+                            <li ng-show="vm.availableGroups.length > 1">
+                                <i class="icon-folder umb-checkbox-list__item-icon"></i>
+                                {{group.containerPath}}
+                            </li>
+                            <li class="umb-checkbox-list__item"
+                                ng-repeat="compositeContentType in group.compositeContentTypes | orderBy:'contentType.name' | filter:searchTerm"
+                                ng-class="{'-disabled': (compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited, '-selected': compositeContentType.selected}">
+
+                                <div class="umb-checkbox-list__item-checkbox" ng-class="{'-selected': compositeContentType.selected }">
+                                    <umb-checkbox input-id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
+                                                  model="compositeContentType.selected"
+                                                  on-change="vm.selectCompositeContentType(compositeContentType)"
+                                                  disabled="(compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited || vm.loadingAlias">
+                                    </umb-checkbox>
+                                </div>
+
+                                <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed === false && !compositeContentType.selected}">
+                                    <div class="umb-checkbox-list__item-icon-wrapper">
+                                        <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon" ng-class="{'o-0': compositeContentType.contentType.alias === vm.loadingAlias}"></i>
+                                        <div ng-if="compositeContentType.contentType.alias === vm.loadingAlias" class="umb-button__progress -black umb-checkbox-list__item-checkbox-progress"></div>
+                                    </div>
+                                    {{ compositeContentType.contentType.name }}
+                                    <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
+                                </label>
+
+                            </li>
+                        </ul>
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    state="vm.saveButtonState"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+        </form>
+
+    </umb-editor-view>
+
+</div>

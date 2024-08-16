@@ -1,0 +1,18 @@
+<div class="umb-folder-grid">
+
+   <div
+      class="umb-folder-grid__folder"
+      ng-repeat="folder in folders"
+      ng-class="{'-selected': folder.selected}"
+      ng-click="clickFolder(folder, $event, $index)">
+
+      <div class="umb-folder-grid__folder-description">
+         <i class="umb-folder-grid__folder-icon {{ folder.icon }}"></i>
+         <div ng-click="clickFolderName(folder, $event, $index)" class="umb-folder-grid__folder-name">{{ folder.name }}</div>
+      </div>
+
+      <!--<i class="icon-check umb-folder-grid__action" ng-class="{'-selected': folder.selected}"></i>-->
+
+   </div>
+
+</div>

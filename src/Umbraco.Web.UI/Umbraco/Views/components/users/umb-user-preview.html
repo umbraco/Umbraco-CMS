@@ -1,0 +1,26 @@
+<div class="umb-user-preview">
+
+    <div class="umb-user-preview__avatar">
+        <umb-avatar size="xxs"
+                    color="secondary"
+                    name="{{name}}"
+                    img-src="{{avatars[0]}}"
+                    img-srcset="{{avatars[1]}} 2x, {{avatars[2]}} 3x">
+        </umb-avatar>
+    </div>
+
+    <div class="umb-user-preview__content">
+        <div class="umb-user-preview__name">{{ name }}</div>
+    </div>
+
+    <div class="umb-user-preview__actions">
+        <button type="button"
+                class="umb-user-preview__action umb-user-preview__action--red btn-link"
+                title="Remove {{name}}"
+                ng-if="allowRemove"
+                ng-click="onRemove()">
+            <localize key="general_remove">Remove</localize>
+            <span class="sr-only">{{name}}</span>
+        </button>
+    <div>
+</div>

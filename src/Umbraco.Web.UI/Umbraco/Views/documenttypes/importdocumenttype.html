@@ -1,0 +1,51 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.DocumentTypes.ImportController as vm">
+    <div ng-if="vm.state === 'upload'">
+        <p>
+            <localize key="settings_importDocumentTypeHelp">
+                To import a document type, find the '.udt' file on your computer by clicking the 'Browse' button and click 'Import' (you'll be asked for confirmation on the next screen)
+            </localize>
+        </p>
+
+        <form name="importDoctype">
+
+            <!-- Select files -->
+            <button class="btn btn-action"
+                name="file"
+                ngf-select
+                ng-model="filesHolder"
+                ngf-change="handleFiles($files, $event)"
+                ngf-multiple="true"
+                ngf-pattern="*.udt">
+                <localize key="general_import">Import</localize>
+            </button>
+
+            <localize key="general_or">or</localize>
+
+            <button type="button" class="btn-link" ng-click="close()">
+                <localize key="cancel">Cancel</localize>
+            </button>
+        </form>        
+
+        <div ng-if="importDoctype.file.$error.pattern">Please choose a .udt file to import</div>
+        
+    </div>
+    <div ng-if="vm.state === 'confirm'">
+        <strong>
+            <localize key="name">Name</localize>:
+        </strong>
+        {{vm.model.name}}
+        <br />
+        <strong>
+            <localize key="alias">Alias</localize>:
+        </strong>
+        {{vm.model.alias}}
+        <br />
+        <br />
+        <button class="btn btn-primary" ng-click="import()">
+            <localize key="actions_importDocumentType">Import</localize>
+        </button>
+    </div>
+    <div ng-if="vm.state === 'done'">
+        {{vm.model.name}} has been imported!
+    </div>
+</div>

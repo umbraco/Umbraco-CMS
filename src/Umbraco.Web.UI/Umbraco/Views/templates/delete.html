@@ -1,0 +1,19 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.Templates.DeleteController">
+    <div class="umb-dialog-body">
+
+        <div ng-show="error">
+            <div class="alert alert-error">
+                <div><strong>{{error.errorMsg}}</strong></div>
+                <div>{{error.data.message}}</div>
+            </div>
+        </div>
+
+        <p class="abstract">
+            <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize>&nbsp;<strong>{{currentNode.name}}</strong>?
+        </p>
+
+        <umb-confirm on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
+        </umb-confirm>
+
+    </div>
+</div>

@@ -1,0 +1,143 @@
+<div ng-controller="Umbraco.Overlays.UserController">
+    <div class="umb-control-group" ng-if="!showPasswordFields">
+
+       <h5><localize key="user_yourProfile" /></h5>
+
+       <!--<p class="muted">
+           <small>
+               <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
+           </small>
+       </p>-->
+
+        <umb-button
+            alias="editUser"
+            type="link"
+            href="#/users/users/user/{{user.id}}"
+            action="model.close()"
+            button-style="action"
+            label="Edit"
+            label-key="general_edit"
+            ng-if="canEditProfile">
+       </umb-button>
+
+        <umb-button
+            ng-if="!denyLocalLogin"
+            alias="changePassword"
+            type="button"
+            action="togglePasswordFields()"
+            button-style="action"
+            label="Change password"
+            label-key="general_changePassword">
+       </umb-button>
+
+        <umb-button
+            alias="logOut"
+            type="button"
+            action="logout()"
+            shortcut="ctrl+shift+l"
+            button-style="danger"
+            label="Log out"
+            label-key="general_logout">
+        </umb-button>
+
+    </div>
+
+    <div class="umb-control-group external-logins" ng-if="externalLoginProviders.length > 0 && !showPasswordFields">
+
+        <h5>
+            <localize key="defaultdialogs_externalLoginProviders">External login providers</localize>
+        </h5>
+
+        <div ng-repeat="login in externalLoginProviders">
+
+            <div ng-if="login.customView" ng-include="login.customView"></div>
+
+            <div ng-if="!login.customView && login.properties.ExternalSignInAutoLinkOptions.AllowManualLinking">
+                <form ng-submit="linkProvider($event)" ng-if="login.linkedProviderKey == undefined" method="POST" action="{{externalLinkLoginFormAction}}" name="oauthloginform" id="oauthloginform-{{login.authType}}">
+                    <input type="hidden" name="provider" value="{{login.authType}}" />
+                    <button class="btn btn-block btn-social"
+                            ng-class="login.properties.SocialStyle"
+                            id="{{login.authType}}">
+
+                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                        <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
+                    </button>
+                </form>
+
+                <button ng-if="login.linkedProviderKey != undefined"
+                        ng-click="unlink($event, login.authType, login.linkedProviderKey)"
+                        class="btn btn-block btn-social"
+                        ng-class="login.properties.SocialStyle"
+                        id="{{login.authType}}"
+                        name="provider"
+                        value="{{login.authType}}">
+                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                    <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
+                </button>
+            </div>
+			
+        </div>
+
+    </div>
+
+
+    <div class="umb-control-group" ng-if="!showPasswordFields && history.length">
+        <h5><localize key="user_yourHistory" /></h5>
+        <ul class="umb-tree">
+            <li ng-repeat="item in history | orderBy:'time':true">
+                <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
+                    <i class="{{item.icon}}"></i> {{item.name}}
+                </a>
+            </li>
+        </ul>
+    </div>
+
+
+    <div ng-if="showPasswordFields && !denyLocalLogin">
+
+       <h5>
+           <localize key="general_changePassword">Change password</localize>
+       </h5>
+
+       <form
+          name="passwordForm"
+          class="block-form"
+          ng-submit="changePassword()"
+          novalidate
+          val-form-manager>
+
+         <change-password password-values="changePasswordModel.value"
+                          config="changePasswordModel.config">
+         </change-password>
+
+           <umb-button
+               type="button"
+               action="togglePasswordFields()"
+               label="Back"
+               label-key="general_back"
+               button-style="cancel">
+          </umb-button>
+
+           <umb-button
+               type="submit"
+               label="Change password"
+               label-key="general_changePassword"
+               state="changePasswordButtonState"
+               button-style="success">
+           </umb-button>
+
+       </form>
+
+    </div>
+
+    <div class="umb-control-group" ng-if="tab.length">
+        <div ng-repeat="tab in dashboard">
+            <div ng-repeat="property in tab.properties">
+                <div>
+                    <h3 ng-if="property.caption">{{property.caption}}</h3>
+                    <div ng-include="property.path"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

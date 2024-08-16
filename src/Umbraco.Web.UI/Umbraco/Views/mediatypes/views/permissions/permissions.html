@@ -1,0 +1,37 @@
+<div ng-controller="Umbraco.Editors.MediaType.PermissionsController as vm">
+    <umb-box>
+        <umb-box-content>
+            <div class="sub-view-columns">
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_allowAsRootHeading" /></h5>
+                    <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
+                </div>
+                <div class="sub-view-column-right">
+                    <umb-toggle
+                        checked="model.allowAsRoot"
+                        on-click="vm.toggle()"
+                        hotkey="alt+shift+r">
+                    </umb-toggle>
+                </div>
+            </div>
+            <div class="sub-view-columns">
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>
+                    <small><localize key="contentTypeEditor_childNodesDescription" /></small>
+                </div>
+                <div class="sub-view-column-right">
+                    <umb-child-selector
+                        selected-children="vm.selectedChildren"
+                        available-children="vm.mediaTypes"
+                        parent-name="model.name"
+                        parent-icon="model.icon"
+                        parent-id="model.id"
+                        on-add="vm.addChild"
+                        on-remove="vm.removeChild"
+                        on-sort="vm.sortChildren">
+                    </umb-child-selector>        
+                </div>
+            </div>
+        </umb-box-content>
+    </umb-box>
+</div>

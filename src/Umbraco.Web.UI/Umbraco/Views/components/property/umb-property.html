@@ -1,0 +1,35 @@
+<div class="umb-property">
+    <ng-form name="propertyForm">
+        <div class="control-group umb-control-group"
+             ng-class="{'hidelabel':vm.property.hideLabel, '--label-on-top':vm.property.labelOnTop, 'umb-control-group__listview': vm.property.alias === '_umb_containerView'}">
+
+            <val-property-msg></val-property-msg>
+
+            <div class="umb-el-wrap">
+
+                <div class="control-header" ng-hide="vm.property.hideLabel === true">
+                    <small ng-if="vm.showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
+                        <localize key="contentTypeEditor_inheritedFrom"></localize> {{vm.inheritsFrom}}
+                    </small>
+
+                    <label class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}">
+
+                        {{vm.property.label}}
+
+                        <span ng-if="vm.property.validation.mandatory">
+                            <strong class="umb-control-required">*</strong>
+                        </span>
+
+                    </label>
+
+                    <umb-property-actions ng-if="!vm.showInherit" actions="vm.propertyActions"></umb-property-actions>
+
+                    <small class="control-description" ng-if="vm.property.description" ng-bind-html="vm.property.description | preserveNewLineInHtml"></small>
+                </div>
+
+                <div class="controls" ng-transclude>
+                </div>
+            </div>
+        </div>
+    </ng-form>
+</div>

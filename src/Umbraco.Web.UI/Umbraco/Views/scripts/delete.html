@@ -1,0 +1,12 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.Scripts.DeleteController">
+    <div class="umb-dialog-body">
+
+        <p class="abstract">
+        	<localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
+        </p>
+
+        <umb-confirm on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
+        </umb-confirm>
+
+    </div>
+</div>

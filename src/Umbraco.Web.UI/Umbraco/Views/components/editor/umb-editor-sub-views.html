@@ -1,0 +1,17 @@
+<div class="umb-editor-sub-views">
+
+    <div 
+        id="sub-view-{{$index}}"
+        class="umb-editor-sub-view"
+        ng-repeat="subView in subViews track by subView.alias"
+        ng-class="'sub-view-' + subView.name"
+        val-sub-view="subView">
+
+       <div class="umb-editor-sub-view__content"
+            ng-show="subView.active === true" 
+            ng-include="subView.view">
+        </div>
+
+    </div>
+
+</div>

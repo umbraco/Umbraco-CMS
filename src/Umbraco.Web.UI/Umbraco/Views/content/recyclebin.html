@@ -1,0 +1,21 @@
+<umb-editor-view>
+    <form ng-controller="Umbraco.Editors.Content.RecycleBinController" val-form-manager>
+
+        <umb-editor-header name="page.name"
+                           name-locked="page.nameLocked"
+                           hide-icon="true"
+                           hide-description="true"
+                           hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <div class="umb-editor-sub-views">
+                <div id="sub-view-{{$index}}" ng-repeat="app in content.apps track by app.alias">
+                    <umb-editor-sub-view model="app" content="content">
+                    </umb-editor-sub-view>
+                </div>
+            </div>
+        </umb-editor-container>
+
+    </form>
+</umb-editor-view>

@@ -1,0 +1,95 @@
+<div ng-controller="Umbraco.Editors.Content.CopyController">
+    <div class="umb-dialog-body form-horizontal" ng-cloak>
+        <div class="umb-pane">
+
+            <div ng-show="error">
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
+            </div>
+
+            <div ng-show="success">
+                <div class="alert alert-success">
+                    <strong>{{source.name}}</strong> was copied to
+                    <localize key="actions_wasCopiedTo">was copied to</localize>
+                    <strong>{{target.name}}</strong>
+                </div>
+                <button class="btn btn-primary" ng-click="closeDialog()">Ok</button>
+            </div>
+
+            <p class="abstract" ng-hide="success">
+                <localize key="actions_chooseWhereToCopy">Choose where to copy</localize>
+                <strong>{{source.name}}</strong>
+                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
+            </p>
+
+            <umb-loader ng-show="busy"></umb-loader>
+
+            <div ng-hide="success">
+
+                <div ng-hide="miniListView">
+                    <umb-tree-search-box
+                        hide-search-callback="hideSearch"
+                        search-callback="onSearchResults"
+                        search-from-id="{{searchInfo.searchFromId}}"
+                        search-from-name="{{searchInfo.searchFromName}}"
+                        show-search="{{searchInfo.showSearch}}"
+                        section="{{section}}">
+                    </umb-tree-search-box>
+
+                    <br />
+
+                    <umb-tree-search-results
+                        ng-if="searchInfo.showSearch"
+                        results="searchInfo.results"
+                        select-result-callback="selectResult">
+                    </umb-tree-search-results>
+
+                    <div ng-hide="searchInfo.showSearch">
+                        <umb-tree
+                            section="content"
+                            hideheader="{{treeModel.hideHeader}}"
+                            hideoptions="true"
+                            isdialog="true"
+                            api="dialogTreeApi"
+                            on-init="onTreeInit()"
+                            enablelistviewexpand="true"
+                            enablecheckboxes="true">
+                        </umb-tree>
+                    </div>
+                </div>
+
+                <umb-mini-list-view
+                    ng-if="miniListView"
+                    node="miniListView"
+                    entity-type="Document"
+                    on-select="selectListViewNode(node)"
+                    on-close="closeMiniListView()">
+                </umb-mini-list-view>
+
+                <umb-pane>
+                    <umb-control-group  localize="label" label="@defaultdialogs_relateToOriginalLabel">
+                        <umb-toggle checked="$parent.$parent.relateToOriginal" on-click="$parent.$parent.toggle('relate')"></umb-toggle>
+                    </umb-control-group>
+                </umb-pane>
+
+                <umb-pane>
+                    <umb-control-group localize="label" label="@defaultdialogs_includeDescendants">
+                        <umb-toggle checked="$parent.$parent.recursive" on-click="$parent.$parent.toggle('recursive')"></umb-toggle>
+                    </umb-control-group>
+                </umb-pane>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+        <a class="btn btn-link" ng-click="closeDialog()" ng-show="!busy">
+            <localize key="general_cancel">Cancel</localize>
+        </a>
+        <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy || !target">
+            <localize key="actions_copy">Copy</localize>
+        </button>
+    </div>
+</div>

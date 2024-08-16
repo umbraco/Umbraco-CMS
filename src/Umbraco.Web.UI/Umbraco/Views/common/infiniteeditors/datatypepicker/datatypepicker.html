@@ -1,0 +1,123 @@
+<div ng-controller="Umbraco.Editors.DataTypePickerController as vm">
+    <umb-editor-view data-element="editor-data-type-picker">
+
+        <form novalidate name="DataTypePickerForm" val-form-manager>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+
+                    <umb-search-filter
+                        input-id="datatype-search"
+                        model="vm.searchTerm"
+                        label-key="placeholders_search"
+                        text="Type to search"
+                        on-change="vm.searchTermChanged()"
+                        css-class="w-100"
+                        auto-focus="true"
+                    >
+                    </umb-search-filter>
+
+                    <umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
+
+                    <div ng-if="vm.loading === false && vm.showDataTypes === true">
+                        <div ng-repeat="(key,value) in vm.dataTypes">
+                            <h2 class="h5">{{key | umbCmsTitleCase}}</h2>
+                            <ul class="umb-card-grid -six-in-row">
+                                <li ng-repeat="dataType in value | orderBy:'name'" data-element="datatype-{{dataType.name}}">
+                                    <button
+                                        type="button"
+                                        class="btn-reset umb-card-grid-item"
+                                        ng-click="vm.viewOptionsForEditor(dataType)"
+                                        title="{{ dataType.name }}">
+                                        <span>
+                                            <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
+                                            {{ dataType.name }}
+                                        </span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SEARCH RESULTS -->
+                    <div ng-if="vm.loading === false && vm.showDataTypes === false && vm.searchResult !== null">
+                        <h2 class="h5 -border-bottom -black">
+                            <localize key="contentTypeEditor_searchResultSettings">Available configurations</localize>
+                        </h2>
+                        <div ng-repeat="result in vm.searchResult.configs">
+                            <div ng-if="result.entries.length > 0">
+                                <h3 class="h5">{{result.group | umbCmsTitleCase}}</h3>
+                                <ul class="umb-card-grid -six-in-row">
+                                    <li ng-repeat="dataType in result.entries | orderBy:'name'"
+                                        ng-mouseover="vm.showDetailsOverlay(dataType)">
+                                        <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
+                                            <div class="umb-button__progress"></div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="btn-reset umb-card-grid-item"
+                                            ng-click="vm.pickDataType(dataType)"
+                                            title="{{ dataType.name }}">
+                                            <span>
+                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
+                                                {{ dataType.name }}
+                                            </span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <h2 class="h5 -border-bottom -black">
+                            <localize key="contentTypeEditor_searchResultEditors">Create a new configuration</localize>
+                        </h2>
+                        <div ng-repeat="result in vm.searchResult.dataTypes">
+                            <div ng-if="result.entries.length > 0">
+                                <h3 class="h5">{{result.group | umbCmsTitleCase}}</h3>
+                                <ul class="umb-card-grid -six-in-row">
+                                    <li ng-repeat="dataType in result.entries | orderBy:'name'">
+                                        <button
+                                            type="button"
+                                            class="btn-reset umb-card-grid-item"
+                                            ng-click="vm.pickEditor(dataType)"
+                                            title="{{ dataType.name }}">
+                                            <span>
+                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
+                                                {{ dataType.name }}
+                                            </span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+        </form>
+
+    </umb-editor-view>
+
+</div>

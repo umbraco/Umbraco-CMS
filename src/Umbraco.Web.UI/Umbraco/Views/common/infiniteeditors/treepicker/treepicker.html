@@ -1,0 +1,123 @@
+<div ng-controller="Umbraco.Editors.TreePickerController as vm">
+
+    <form name="propertySettingsForm" novalidate val-form-manager>
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+                    <umb-box>
+                        <umb-box-content>
+
+                            <div ng-hide="vm.miniListView">
+
+                                <div class="umb-language-picker" ng-if="vm.showLanguageSelector && vm.languages.length > 1" on-outside-click="vm.page.languageSelectorIsOpen = false" style="padding-bottom: 5px">
+                                    <button class="umb-language-picker__toggle btn-reset" ng-click="vm.toggleLanguageSelector()">
+                                        <span>{{vm.selectedLanguage.name}}</span>
+                                        <umb-icon icon="{{vm.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand icon-navigation-down"></umb-icon>
+                                    </button>
+                                    <div class="umb-language-picker__dropdown" ng-if="vm.languageSelectorIsOpen">
+                                        <button class="btn-reset" ng-click="vm.selectLanguage(language)" ng-repeat="language in vm.languages">{{language.name}}</button>
+                                    </div>
+                                </div>
+
+                                <div class="umb-control-group" ng-if="vm.enableSearh">
+                                    <umb-tree-search-box
+                                        hide-search-callback="vm.hideSearch"
+                                        search-callback="vm.onSearchResults"
+                                        search-from-id="{{vm.searchInfo.searchFromId}}"
+                                        search-from-name="{{vm.searchInfo.searchFromName}}"
+                                        show-search="{{vm.searchInfo.showSearch}}"
+                                        datatype-key="{{vm.searchInfo.dataTypeKey}}"
+                                        section="{{vm.section}}"
+                                        auto-focus="true">
+                                    </umb-tree-search-box>
+                                </div>
+
+                                <umb-tree-search-results ng-if="vm.searchInfo.showSearch"
+                                                            results="vm.searchInfo.results"
+                                                            select-result-callback="vm.selectResult">
+                                </umb-tree-search-results>
+
+                                <umb-empty-state ng-if="!vm.hasItems && vm.emptyStateMessage" position="center">
+                                    {{ vm.emptyStateMessage }}
+                                </umb-empty-state>
+
+                                <div ng-if="vm.treeReady" ng-hide="vm.searchInfo.showSearch" ng-animate="'tree-fade-out'">
+                                    <umb-tree
+                                        section="{{vm.section}}"
+                                        treealias="{{vm.treeAlias}}"
+                                        hideheader="{{vm.hideHeader}}"
+                                        hideoptions="true"
+                                        isdialog="true"
+                                        customtreeparams="{{vm.customTreeParams}}"
+                                        enablelistviewsearch="true"
+                                        enablelistviewexpand="true"
+                                        enablecheckboxes="{{vm.multiPicker}}"
+                                        on-init="vm.initDialogTree()"
+                                        api="vm.dialogTreeApi">
+                                    </umb-tree>
+                                </div>
+
+                            </div>
+
+                            <umb-mini-list-view
+                                ng-if="vm.miniListView"
+                                node="vm.miniListView"
+                                entity-type="{{vm.entityType}}"
+                                start-node-id="vm.startNodeId"
+                                on-select="vm.selectListViewNode(node)"
+                                on-close="vm.closeMiniListView()"
+                                on-items-loaded="vm.listViewItemsLoaded(items)"
+                                entity-type-filter="vm.filter">
+                            </umb-mini-list-view>
+
+                        </umb-box-content>
+                    </umb-box>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        type="button"
+                        button-style="link"
+                        label-key="general_close"
+                        shortcut="esc"
+                        action="vm.close()">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="model.extraActions"
+                        ng-repeat="action in model.extraActions track by $index"
+                        type="button"
+                        button-style="{{action.style || 'link'}}"
+                        label-key="{{action.labelKey}}"
+                        action="action.action()">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="vm.multiPicker"
+                        type="button"
+                        button-style="success"
+                        label-key="general_submit"
+                        action="vm.submit(model)">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

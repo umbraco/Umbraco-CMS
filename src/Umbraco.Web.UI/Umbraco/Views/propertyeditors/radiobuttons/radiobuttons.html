@@ -1,0 +1,20 @@
+<div class="umb-property-editor umb-radiobuttons" ng-controller="Umbraco.PropertyEditors.RadioButtonsController as vm">
+    <ng-form name="radioButtonsFieldForm">
+
+        <ul class="unstyled">
+            <li ng-repeat="item in vm.viewItems track by item.key">
+                <umb-radiobutton name="{{model.alias}}_{{vm.uniqueId}}"
+                                 value="{{item.value}}"
+                                 model="model.value"
+                                 text="{{item.value}}"
+                                 required="model.validation.mandatory && model.value == ''">
+                </umb-radiobutton>
+            </li>
+        </ul>
+
+        <div ng-messages="radioButtonsFieldForm[model.alias + '_' + vm.uniqueId].$error" show-validation-on-submit>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+        </div>
+
+    </ng-form>
+</div>

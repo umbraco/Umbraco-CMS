@@ -1,0 +1,171 @@
+<div class="usky-grid usky-grid-configuration"
+     ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.LayoutConfigController as vm">
+
+    <umb-editor-view>
+
+        <form novalidate name="LayoutConfigForm" val-form-manager>
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+                <umb-box>
+                    <umb-box-content>
+
+                        <div class="umb-forms-settings form-horizontal">
+
+                            <p>
+                                <localize key="grid_addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</localize>
+                            </p>
+
+                            <umb-control-group label="@general_name">
+                                <input type="text" ng-model="currentLayout.name"/>
+                            </umb-control-group>
+
+                            <div class="uSky-templates-template"
+                                 style="margin: 0; width: 350px; position: relative;">
+
+                                <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
+                                    <div class="tr">
+
+                                        <button type="button" class="btn-reset td uSky-templates-column"
+                                           ng-class="{last:$last, selected:section==currentSection}"
+                                           ng-repeat="section in currentLayout.sections"
+                                           ng-click="configureSection(section, currentLayout)"
+                                           ng-style="{width: percentage(section.grid) +'%'}">
+                                           <span class="sr-only">
+                                            <localize key="grid_editGridLayout">Edit grid layout</localize>
+                                        </span>
+                                        </button>
+
+                                        <button type="button" class="btn-reset td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
+                                           ng-click="configureSection(undefined, currentLayout)"
+                                           ng-style="{width: percentage(availableLayoutSpace) + '%'}">
+                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                            <span class="sr-only">
+                                                <localize key="grid_addGridLayout">Add grid layout</localize>
+                                            </span>
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div ng-if="currentSection != null" style="padding-bottom: 50px;">
+
+                                <umb-control-group label="@general_width">
+                                    <div class="grid-size-scaler">
+                                        <button type="button" class="btn-link" ng-click="scaleDown(currentSection)">
+                                            <i class="icon icon-remove" aria-hidden="true"></i>
+                                        </button>
+                                        <span>{{currentSection.grid}}</span>
+                                        <button type="button" class="btn-link"
+                                                ng-click="scaleUp(currentSection, availableLayoutSpace)">
+                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </umb-control-group>
+
+                                <umb-control-group hide-label="true">
+                                    <i class="icon-delete red" aria-hidden="true"></i>
+                                    <button type="button" class="btn btn-small btn-link"
+                                            ng-click="deleteSection(currentSection, currentLayout)">
+                                        <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete
+                                        </localize>
+                                    </button>
+                                </umb-control-group>
+
+                                <umb-control-group hide-label="true">
+
+                                    <umb-toggle
+                                        class="umb-toggle-group-item__toggle"
+                                        checked="currentSection.allowAll"
+                                        on-click="toggleAllowed(currentSection)"
+                                        show-labels="true"
+                                        label-position="right"
+                                        label-off="Allow all row configurations"
+                                        label-on="Allow all row configurations"
+                                        style="margin-left: 18px">
+                                    </umb-toggle>
+
+                                    <div ng-if="currentSection.allowAll === false">
+                                        <hr/>
+
+                                        <div class="control-group uSky-templates-rows">
+                                            <ul class="unstyled">
+
+                                                <li ng-repeat="row in rows track by $id(row)">
+
+                                                    <div class="flex">
+
+                                                        <umb-checkbox model="row.allowed"
+                                                                      input-id="rowconfig-{{$index}}"
+                                                                      on-change="selectRow(currentSection, row)">
+                                                        </umb-checkbox>
+
+                                                        <button
+                                                            ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)"
+                                                            class="btn-reset flex flex-auto">
+
+                                                            <span class="preview-rows columns" style="margin-top: auto;">
+                                                                <span class="preview-row">
+                                                                    <span class="preview-col"
+                                                                         ng-class="{last:$last}"
+                                                                         ng-repeat="area in row.areas"
+                                                                         ng-style="{width: percentage(area.grid) + '%'}">
+
+                                                                        <span class="preview-cell"></span>
+                                                                    </span>
+                                                                </span>
+                                                            </span>
+
+                                                            <span>
+                                                                {{row.name}}<br/>
+                                                                <small>{{row.areas.length}} cells</small>
+                                                            </span>
+                                                        </button>
+
+                                                    </div>
+
+                                                    <br style="clear: both"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </umb-control-group>
+                            </div>
+
+                        </div>
+
+                    </umb-box-content>
+                </umb-box>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="button"
+                        button-style="link"
+                        label-key="general_close"
+                        shortcut="esc"
+                        action="close()">
+                    </umb-button>
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        label-key="general_submit"
+                        action="submit()">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+
+        </form>
+
+    </umb-editor-view>
+
+</div>

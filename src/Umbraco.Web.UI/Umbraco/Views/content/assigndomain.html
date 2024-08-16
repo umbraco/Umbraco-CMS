@@ -1,0 +1,109 @@
+<div ng-controller="Umbraco.Editors.Content.AssignDomainController as vm" ng-cloak>
+
+    <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+
+    <form name="vm.domainForm" ng-submit="vm.save()" id="assignDomain" novalidate>
+
+        <div ng-hide="vm.loading" class="umb-dialog-body">
+
+            <umb-pane ng-if="!currentNode.metaData.variesByCulture">
+                <h5 class="umb-pane-title"><localize key="assignDomain_setLanguage">Culture</localize></h5>
+                <label for="assignDomain_language" class="control-label"><localize key="general_language"></localize></label>
+                <select class="umb-property-editor umb-dropdown" name="language" id="assignDomain_language" ng-model="vm.language" ng-options="lang.name for lang in vm.languages">
+                    <option value="">{{vm.inherit}}</option>
+                </select>
+            </umb-pane>
+
+            <umb-pane>
+
+                <div ng-show="vm.error">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.error.errorMsg}}</strong></div>
+                        <div>{{vm.error.data.Message}}</div>
+                    </div>
+                </div>
+
+                <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
+                <small class="db mb3">
+                    <localize key="assignDomain_domainHelpWithVariants"></localize>
+                </small>
+                <div class="umb-el-wrap  hidelabel">
+                    <table class="table table-condensed table-bordered domains mb3" ng-if="vm.domains.length > 0">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <localize key="assignDomain_domain"></localize>
+                                    <span class="umb-control-required">*</span>
+                                </th>
+                                <th>
+                                    <localize key="assignDomain_language"></localize>
+                                    <span class="umb-control-required">*</span>
+                                </th>
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="domain in vm.domains">
+                                <td>
+
+                                    <input type="text" class="w-100" ng-model="domain.name" name="domain_name_{{$index}}" required umb-auto-focus />
+
+                                    <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
+                                        <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
+                                    </span>
+                                    <span ng-show="domain.duplicate" class="help-inline"><localize key="assignDomain_duplicateDomain"></localize><span ng-show="domain.other">({{domain.other}})</span></span>
+                                </td>
+                                <td>
+                                    <select
+                                        name="domain_language_{{$index}}"
+                                        class="language w-100"
+                                        ng-model="domain.lang"
+                                        ng-options="lang.name for lang in vm.languages"
+                                        required>
+                                    </select>
+                                </td>
+                                <td>
+                                    <umb-button
+                                        icon="icon-trash"
+                                        action="vm.removeDomain($index)"
+                                        type="button"
+                                        button-style="danger">
+                                    </umb-button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <umb-button
+                    label-key="assignDomain_addNew"
+                    action="vm.addDomain()"
+                    type="button"
+                    button-style="info">
+                </umb-button>
+
+            </umb-pane>
+
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+            <umb-button
+                label-key="general_close"
+                action="vm.closeDialog()"
+                type="button"
+                button-style="link">
+            </umb-button>
+
+            <umb-button
+                label-key="buttons_save"
+                type="submit"
+                button-style="success"
+                state="vm.submitButtonState">
+            </umb-button>
+
+        </div>
+
+    </form>
+
+</div>

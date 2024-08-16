@@ -1,0 +1,24 @@
+<div id="contextMenu" class="umb-modalcolumn fill shadow" ng-animate="'slide'" umb-focus-lock role="dialog"
+    aria-labelledby="contextmenu-title" aria-describedby="contextmenu-description" on-outside-click="outSideClick()">
+    <div>
+        <div class="umb-modalcolumn-header">
+            <h1 id="contextmenu-title">{{ menuDialogTitle }}</h1>
+            <p id="contextmenu-description" class="sr-only">
+                <localize key="visuallyHiddenTexts_contextMenuDescription">Select one of the options to edit the node.</localize>
+            </p>
+        </div>
+
+        <div class="umb-modalcolumn-body">
+            <ul class="umb-actions">
+                <li data-element="action-{{action.alias}}" class="umb-action"
+                    ng-class="{sep:action.separator, '-opens-dialog': action.opensDialog}" ng-repeat="action in menuActions">
+                    <button type="button" ng-click="executeMenuItem(action)"
+                        class="umb-action-link btn-reset umb-outline">
+                        <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
+                        <span class="menu-label">{{ action.name }}</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

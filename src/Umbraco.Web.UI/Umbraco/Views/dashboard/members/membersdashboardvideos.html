@@ -1,0 +1,26 @@
+<div class="row-fluid"
+	ng-init="init('feeds/videos/members')"
+	ng-controller="Umbraco.Dashboard.StartupVideosController">
+
+	<umb-box>
+		<umb-box-content>
+			<h3 class="bold"><localize key="settingsDashboardVideos_trainingHeadline">Hours of Umbraco training videos are only a click away</localize></h3>
+			<localize key="settingsDashboardVideos_trainingDescription">
+        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>
+      </localize>
+		</umb-box-content>
+	</umb-box>
+
+	<div ng-show="videos.length">
+        <h4><localize key="settingsDashboardVideos_getStarted">To get you started</localize>:</h4>
+        <ul class="thumbnails" >
+            <li class="span2" ng-repeat="video in videos">
+                <div class="thumbnail" style="margin-right: 20px">
+                    <a target="_blank" rel="noopener" href="{{video.link}}" title="{{video.title}}">
+                        <img ng-src="{{video.thumbnail}}" alt="{{video.title}}">
+                    </a>
+                </div>
+            </li>
+        </ul>
+	</div>
+</div>

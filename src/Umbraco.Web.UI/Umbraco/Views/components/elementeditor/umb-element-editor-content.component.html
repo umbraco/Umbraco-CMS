@@ -1,0 +1,39 @@
+<div class="form-horizontal">
+    <ng-form name="elementTypeContentForm">
+        <div class="umb-group-panel"
+             data-element="group-{{group.alias}}"
+             ng-repeat="group in vm.model.variants[0].tabs track by group.id">
+
+            <div class="umb-group-panel__header">
+                <div id="group-{{group.id}}">{{ group.label }}</div>
+            </div>
+
+            <div class="umb-group-panel__content">
+                <umb-property
+                    data-element="property-{{property.alias}}"
+                    ng-repeat="property in group.properties track by property.alias"
+                    property="property"
+                    element-key="{{vm.model.key}}"
+                    show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
+                    inherits-from="defaultVariant.language.name">
+
+                    <div ng-class="{'o-40 cursor-not-allowed': vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
+                        <umb-property-editor
+                            model="property"
+                            preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
+                        </umb-property-editor>
+                    </div>
+
+                </umb-property>
+            </div>
+
+        </div>
+
+        <umb-empty-state
+            ng-if="vm.model.tabs.length === 0"
+            position="center">
+            <localize key="content_noProperties"></localize>
+        </umb-empty-state>
+
+    </ng-form>
+</div>

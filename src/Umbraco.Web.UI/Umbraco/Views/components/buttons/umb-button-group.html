@@ -1,0 +1,55 @@
+<div class="btn-group umb-button-group" ng-class="{ 'dropup': direction === 'up', '-with-button-group-toggle': subButtons.length > 0 }">
+
+   <umb-button
+      ng-if="defaultButton"
+      alias="{{defaultButton.alias ? defaultButton.alias : 'groupPrimary' }}"
+      type="{{defaultButton.type}}"
+      action="defaultButton.handler()"
+      href="{{defaultButton.href}}"
+      href-target="{{defaultButton.hrefTarget}}"
+      button-style="{{buttonStyle}}"
+      state="state"
+      label="{{defaultButton.labelKey}}"
+      label-key="{{defaultButton.labelKey}}"
+      shortcut="{{defaultButton.hotKey}}"
+      shortcut-when-hidden="{{defaultButton.hotKeyWhenHidden}}"
+      size="{{size}}"
+      icon="{{icon}}"
+      add-ellipsis={{defaultButton.addEllipsis}}>
+   </umb-button>
+
+   <button
+      type="button"
+      data-element="button-group-toggle"
+      class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}"
+      ng-if="subButtons.length > 0"
+      ng-click="toggleDropdown()"
+      aria-haspopup="true"
+      aria-expanded="{{dropdown.isOpen}}">
+         <span class="caret">
+            <span class="sr-only">
+               <localize key="{{labelKey}}">{{label}}</localize>
+            </span>
+         </span>
+   </button>
+
+    <umb-dropdown
+         ng-if="subButtons.length > 0 && dropdown.isOpen"
+         class="umb-button-group__sub-buttons"
+         on-close="closeDropdown()"
+         deep-blur="closeDropdown()"
+         ng-class="{'-align-right': float === 'right'}">
+      <umb-dropdown-item ng-repeat="subButton in subButtons">
+         <button
+            type="button"
+            data-element="{{subButton.alias ? 'button-' + subButton.alias : 'button-group-secondary-' + $index }}"
+            ng-click="executeMenuItem(subButton)"
+            hotkey="{{subButton.hotKey}}"
+            hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}">
+               <localize key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
+               <span ng-if="subButton.addEllipsis === 'true'">...</span>
+         </button>
+      </umb-dropdown-item>
+   </umb-dropdown>
+
+</div>

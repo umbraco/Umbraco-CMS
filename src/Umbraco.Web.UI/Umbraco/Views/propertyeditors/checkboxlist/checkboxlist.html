@@ -1,0 +1,16 @@
+<div class="umb-property-editor umb-checkboxlist" ng-controller="Umbraco.PropertyEditors.CheckboxListController as vm">
+
+    <ng-form name="checkboxListFieldForm">
+
+        <ul class="unstyled">
+            <li ng-repeat="item in vm.viewItems track by item.key">
+                <umb-checkbox name="{{::model.alias}}_{{::vm.uniqueId}}" value="{{::item.value}}" model="item.checked" text="{{::item.value}}" on-change="vm.change(model, value)" required="model.validation.mandatory && !model.value.length"></umb-checkbox>
+            </li>
+        </ul>
+
+        <div ng-messages="checkboxListFieldForm[model.alias + '_' + vm.uniqueId].$error" show-validation-on-submit>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+        </div>
+
+    </ng-form>
+</div>

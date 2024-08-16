@@ -1,0 +1,277 @@
+<div class="login-overlay">
+
+    <div id="login" class="umb-modalcolumn umb-dialog" ng-class="{'show-validation': vm.loginForm.$invalid}" ng-cloak>
+
+        <div class="login-overlay__background-image" ng-style="{'background-image': 'url('+vm.backgroundImage+')'}"></div>
+
+        <div class="login-overlay__logo">
+            <img ng-src="{{vm.logoImage}}" alt=""/>
+        </div>
+
+        <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser != null" class="umb-login-container">
+
+            <form name="vm.inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
+                <div class="form" ng-if="vm.inviteStep === 1">
+                    <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{vm.invitedUser.name}}</h1>
+                    <p style="line-height: 1.6; margin-bottom: 25px;">
+                        <localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password and avatar setup and then you're good to go</localize>
+                    </p>
+
+                    <div class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
+                        <label for="umb-passwordOne">
+                            <localize key="user_newPassword">New password</localize>
+                            <small style="font-size: 13px;">{{vm.invitedUserPasswordModel.passwordPolicyText}}</small>
+                        </label>
+                        <input type="password" ng-model="vm.invitedUserPasswordModel.password" name="password" id="umb-passwordOne" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
+                        <span ng-messages="inviteUserPasswordForm.password.$error" show-validation-on-submit>
+                            <span class="help-inline" ng-message="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
+                            <span class="help-inline" ng-message="minlength">Minimum {{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
+                            <span class="help-inline" ng-message="valServerField">{{inviteUserPasswordForm.password.errorMsg}}</span>
+                        </span>
+                    </div>
+
+                    <div class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
+                        <label for="umb-confirmPasswordOne"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
+                        <input type="password" ng-model="vm.invitedUserPasswordModel.confirmPassword" name="confirmPassword" id="umb-confirmPasswordOne" class="-full-width-input" required val-compare="password" />
+                        <span ng-messages="inviteUserPasswordForm.confirmPassword.$error" show-validation-on-submit>
+                            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" ng-message="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
+                        </span>
+
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <umb-button type="submit"
+                                    button-style="success"
+                                    state="vm.invitedUserPasswordModel.buttonState"
+                                    label="Save password">
+                        </umb-button>
+                    </div>
+
+                </div>
+            </form>
+
+            <div class="form" ng-if="vm.inviteStep === 2">
+
+                <div class="flex justify-center items-center">
+
+                    <ng-form name="vm.avatarForm">
+
+                        <umb-progress-bar style="max-width: 100px; margin-bottom: 5px;"
+                                          ng-show="vm.avatarFile.uploadStatus === 'uploading'"
+                                          progress="{{ vm.avatarFile.uploadProgress }}"
+                                          size="s">
+                        </umb-progress-bar>
+
+                        <div class="umb-info-local-item text-error mt3" ng-if="vm.avatarFile.uploadStatus === 'error'">
+                            {{ vm.avatarFile.serverErrorMessage }}
+                        </div>
+
+                        <a class="umb-avatar-btn"
+                           ngf-select
+                           ng-model="vm.avatarFile.filesHolder"
+                           ngf-change="vm.changeAvatar($files, $event)"
+                           ngf-multiple="false"
+                           ngf-pattern="{{vm.avatarFile.acceptedFileTypes}}"
+                           ngf-max-size="{{ vm.avatarFile.maxFileSize }}">
+
+                            <umb-avatar color="gray"
+                                        size="xl"
+                                        unknown-char="+"
+                                        img-src="{{vm.invitedUser.avatars[3]}}"
+                                        img-srcset="{{vm.invitedUser.avatars[4]}} 2x, {{vm.invitedUser.avatars[4]}} 3x">
+                            </umb-avatar>
+                        </a>
+
+                    </ng-form>
+                </div>
+
+                <h1 style="margin-bottom: 10px;">Upload a photo</h1>
+                <p style="text-align: center; margin-bottom: 25px; line-height: 1.6em;">
+                    <localize key="user_userinviteAvatarMessage"></localize>
+                </p>
+                <div class="flex justify-center items-center">
+                    <umb-button type="button"
+                                button-style="success"
+                                label="Done"
+                                action="vm.getStarted()">
+                    </umb-button>
+                </div>
+            </div>
+
+        </div>
+        <div ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="!vm.denyLocalLogin && vm.inviteStep === 3" class="umb-login-container">
+            <div class="form">
+                <h1 style="margin-bottom: 10px; text-align: left;">Hi there</h1>
+                <p style="line-height: 1.6; margin-bottom: 25px;">
+                    <localize key="user_userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</localize>
+                </p>
+            </div>
+        </div>
+        <div ng-show="vm.invitedUser == null && !vm.inviteStep" class="umb-login-container">
+
+            <div class="form">
+                <h1>{{greeting}}</h1>
+
+                <div ng-show="vm.view == 'login'">
+
+                    <p>
+                        <span ng-show="vm.isTimedOut"><localize key="login_timeout">Log in below</localize>.</span>
+                    </p>
+
+                    <div class="external-logins" ng-if="vm.externalLoginProviders.length > 0">
+                        <div ng-repeat="login in vm.externalLoginProviders">
+
+                            <div ng-if="!login.customView">
+                                <form method="POST" action="{{vm.externalLoginFormAction}}">
+                                    <button type="submit"
+                                            class="btn btn-block btn-social"
+                                            ng-class="login.properties.SocialStyle"
+                                            id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                                            title="Log in using your {{login.caption}} account">
+                                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                                        <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
+                                    </button>
+                                </form>
+                                <div ng-if="login.errors">
+                                    <div class="text-error" ng-repeat="error in login.errors">
+                                        <span>{{error}}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div ng-if="login.customView" ng-include="login.customView"></div>
+                        </div>
+                    </div>
+
+                    <form ng-if="!vm.denyLocalLogin" method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit()">
+
+                        <div ng-messages="vm.loginForm.$error" class="control-group" aria-live="assertive">
+                            <p ng-message="auth" class="text-error" role="alert" tabindex="0">{{vm.errorMsg}}</p>
+                        </div>
+                        <div class="control-group" ng-class="{error: vm.loginForm.username.$invalid}">
+                            <label for="umb-username">{{vm.labels.usernameLabel}}</label>
+                            <input type="text" ng-model="vm.login" name="username" id="umb-username" class="-full-width-input" placeholder="{{vm.labels.usernamePlaceholder}}" focus-when="{{vm.view === 'login'}}" aria-required="true" />
+                        </div>
+
+                        <div class="control-group" ng-class="{error: vm.loginForm.password.$invalid}">
+                            <label for="umb-passwordTwo"><localize key="general_password">Password</localize></label>
+                            <input type="password" ng-model="vm.password" name="password" id="umb-passwordTwo" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" aria-required="true" />
+                            <div class="password-toggle">
+                                <button type="button" class="btn-reset" ng-click="vm.togglePassword()">
+                                    <span class="password-text show"><localize key="login_showPassword">Show password</localize></span>
+                                    <span class="password-text hide"><localize key="login_hidePassword">Hide password</localize></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <umb-button button-style="success"
+                                        size="m"
+                                        label-key="general_login"
+                                        state="vm.loginStates.submitButton"
+                                        type="submit">
+                            </umb-button>
+                            <div ng-show="vm.allowPasswordReset">
+                                <button type="button" class="btn-reset muted" style="text-decoration: underline;"
+                                    ng-click="vm.showRequestPasswordReset()">
+                                    <localize key="login_forgottenPassword">Forgotten password?</localize>
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'request-password-reset'">
+                    <p tabindex="0">
+                        <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
+                    </p>
+
+                    <form method="POST" name="vm.requestPasswordResetForm" ng-submit="vm.requestPasswordResetSubmit(email)">
+                        <div class="control-group" ng-class="{error: vm.requestPasswordResetForm.email.$invalid}">
+                            <label for="umb-email"><localize key="general_email">Email</localize></label>
+                            <input type="email" val-email ng-model="email" name="email" id="umb-email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" focus-when="{{vm.view === 'request-password-reset'}}" />
+                        </div>
+
+                        <div ng-messages="vm.requestPasswordResetForm.$error" class="control-group" ng-show="vm.requestPasswordResetForm.$invalid">
+                            <p ng-message="auth" class="text-error" role="alert" tabindex="0">{{vm.errorMsg}}</p>
+                        </div>
+
+                        <div class="control-group" ng-show="vm.showEmailResetConfirmation">
+                            <div class="text-info" role="alert">
+                                <p tabindex="0">
+                                    <localize key="login_requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</localize>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <button type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
+                            <button type="button" class="btn-reset muted" ng-click="vm.showLogin()" style="text-decoration: underline;">
+                                <localize key="login_returnToLogin">Return to login form</localize>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'set-password'">
+
+                    <p ng-hide="vm.resetComplete">
+                        <localize key="login_setPasswordInstruction">Please provide a new password.</localize>
+                    </p>
+
+                    <form method="POST" name="vm.setPasswordForm" ng-submit="vm.setPasswordSubmit(vm.password, vm.confirmPassword)">
+
+                        <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
+                            <label for="umb-passwordThree"><localize key="user_newPassword">New password</localize></label>
+                            <input type="password" ng-model="vm.password" name="password" id="umb-passwordThree" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" focus-when="{{vm.view === 'set-password'}}" ng-keyup="vm.newPasswordKeyUp($event)" />
+                            <umb-password-tip password-val="vm.passwordVal"></umb-password-tip>
+                        </div>
+
+                        <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
+                            <label for="umb-confirmPasswordThree"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
+                            <input type="password" ng-model="vm.confirmPassword" name="confirmPassword" id="umb-confirmPasswordThree" class="-full-width-input" localize="placeholder" placeholder="@placeholders_confirmPassword" />
+                        </div>
+
+                        <div ng-messages="vm.setPasswordForm.$error" class="control-group" ng-show="vm.setPasswordForm.$invalid">
+                            <p ng-message="auth" class="text-error" role="alert" tabindex="0">{{vm.errorMsg}}</p>
+                        </div>
+                        <div class="control-group" ng-show="vm.showSetPasswordConfirmation">
+                            <div class="text-info">
+                                <p tabindex="0">
+                                <localize key="login_setPasswordConfirmation">Your new password has been set and you may now use it to log in.</localize>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <button ng-hide="vm.resetComplete" type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
+                            <button type="button" class="btn-reset muted" ng-click="vm.showLogin()">
+                                <localize key="login_returnToLogin">Return to login form</localize>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'password-reset-code-expired'">
+                    <div class="text-error" ng-repeat="error in vm.resetPasswordCodeInfo.errors">
+                        <p class="text-error">{{error}}</p>
+                    </div>
+
+                    <div class="switch-view">
+                        <button type="button" class="btn-reset muted" ng-click="vm.showLogin()">
+                            <localize key="login_returnToLogin">Return to login form</localize>
+                        </button>
+                    </div>
+                </div>
+
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == '2fa-login'">
+                    <div ng-include='vm.twoFactor.view'></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

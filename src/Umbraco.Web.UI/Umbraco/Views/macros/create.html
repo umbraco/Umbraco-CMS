@@ -1,0 +1,31 @@
+<div ng-controller="Umbraco.Editors.Macros.CreateController as vm">
+
+    <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
+    
+        <div class="umb-pane">
+            <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+        </div>
+  
+        <div class="umb-pane">
+            <form novalidate name="createMacroForm"
+                  ng-submit="vm.createItem()"
+                  val-form-manager>
+
+                <div ng-show="error">
+                    <div class="alert alert-error">
+                        <div><strong>{{error.errorMsg}}</strong></div>
+                        <div>{{error.data.message}}</div>
+                    </div>
+                </div>
+
+                <umb-control-group label="@macro_enterMacroName" hide-label="false">
+                    <input type="text" name="itemKey" ng-model="vm.itemKey" class="umb-textstring textstring input-block-level"
+                           umb-auto-focus required maxlength="255" />
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+            </form>
+        </div>
+
+    </div>
+</div>

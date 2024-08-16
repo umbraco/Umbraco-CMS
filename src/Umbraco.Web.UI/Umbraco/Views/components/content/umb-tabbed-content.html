@@ -1,0 +1,36 @@
+<div>
+    <ng-form name="tabbedContentForm">
+        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.id">
+
+            <div class="umb-group-panel__header">
+                <div id="group-{{group.id}}">{{ group.label }}</div>
+            </div>
+
+            <div class="umb-group-panel__content">
+                <umb-property
+                    data-element="property-{{property.alias}}"
+                    ng-repeat="property in group.properties track by property.alias"
+                    property="property"
+                    show-inherit="propertyEditorDisabled(property)"
+                    inherits-from="defaultVariant.displayName">
+
+                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
+                        <umb-property-editor
+                            model="property"
+                            preview="propertyEditorDisabled(property)">
+                        </umb-property-editor>
+                    </div>
+
+                </umb-property>
+            </div>
+
+        </div>
+
+        <umb-empty-state
+            ng-if="content.tabs.length === 0"
+            position="center">
+            <localize key="content_noProperties"></localize>
+        </umb-empty-state>
+
+    </ng-form>
+</div>

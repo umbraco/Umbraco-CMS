@@ -1,0 +1,60 @@
+<div ng-controller="Umbraco.Editors.SectionPickerController as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-load-indicator
+                ng-if="vm.loading">
+            </umb-load-indicator>
+
+            <umb-box ng-if="!vm.loading">
+                <umb-box-content>
+                    <ul class="umb-tree">
+                        <li class="umb-tree-item" ng-repeat="section in vm.sections">
+                            <div class="umb-tree-item__inner" style="padding: 5px 10px;">
+                                <button type="button"
+                                        class="btn-reset text-left flex-auto"
+                                        ng-class="{'umb-tree-node-checked': section.selected }"
+                                        ng-click="vm.selectSection(section)">
+                                    <umb-icon icon="{{section.selected ? 'icon-check' : section.icon}}"
+                                              class="icon umb-tree-icon {{section.selected ? 'icon-check color-green' : section.icon}}">
+                                    </umb-icon>
+                                    <span>{{ section.name }}</span>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

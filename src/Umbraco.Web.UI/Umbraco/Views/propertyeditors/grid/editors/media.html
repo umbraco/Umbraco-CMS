@@ -1,0 +1,28 @@
+<div ng-controller="Umbraco.PropertyEditors.Grid.MediaController">
+    <button type="button" class="btn-reset umb-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
+        <i class="icon icon-picture"></i>
+        <span ng-id="!control.$inserted" class="help-text">
+            <localize key="grid_clickToInsertImage">Click to insert image</localize>
+        </span>
+    </button>
+
+    <div ng-if="thumbnailUrl !== null" class="relative">
+        
+        <img ng-src="{{thumbnailUrl}}" class="fullSizeImage" alt="" />
+
+        <div class="umb-grid-media--controls">
+            <umb-button                
+                action="setImage()"
+                type="button"
+                button-style="info"
+                label-key="defaultdialogs_selectMedia">
+            </umb-button>            
+            <umb-button                
+                action="editImage()"
+                type="button"
+                button-style="info"
+                label-key="general_edit">
+            </umb-button>
+        </div>
+    </div>
+</div>

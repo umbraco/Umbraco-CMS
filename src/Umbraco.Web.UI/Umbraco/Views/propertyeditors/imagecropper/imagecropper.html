@@ -1,0 +1,75 @@
+<div class="umb-property-editor umb-mediapicker"
+     ng-controller="Umbraco.PropertyEditors.ImageCropperController">
+
+    <ng-form name="imageCropperForm">
+        <umb-property-file-upload culture="{{model.culture}}"
+                                  segment="{{model.segment}}"
+                                  property-alias="{{model.alias}}"
+                                  value="model.value.src"
+                                  required="model.validation.mandatory"
+                                  on-files-selected="filesSelected(value, files)"
+                                  on-files-changed="filesChanged(files)"
+                                  on-init="fileUploaderInit(value, files)"
+                                  hide-selection="true">
+
+            <div class="imagecropper clearfix">
+
+                <div ng-if="currentCrop || pendingCrop" style="float:left; max-width: 100%;" class="clearfix">
+                    <div class="umb-cropper__container">
+
+                        <div ng-if="currentCrop">
+                            <umb-image-crop height="{{currentCrop.height}}"
+                                            width="{{currentCrop.width}}"
+                                            crop="currentCrop.coordinates"
+                                            center="model.value.focalPoint"
+                                            max-size="450"
+                                            src="imageSrc">
+                            </umb-image-crop>
+                        </div>
+
+                        <div class="button-drawer" ng-if="currentCrop">
+                            <button type="button" class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
+                            <button type="button" class="btn" ng-click="close()"><localize key="imagecropper_undoEditCrop">Undo edits</localize></button>
+                            <button type="button" class="btn btn-success" ng-click="done()"><localize key="imagecropper_updateEditCrop">Done</localize></button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div ng-if="!currentCrop && !pendingCrop" class="umb-cropper-imageholder clearfix">
+                    <umb-image-gravity src="imageSrc"
+                                       center="model.value.focalPoint"
+                                       on-value-changed="focalPointChanged(left, top)"
+                                       on-image-loaded="imageLoaded(isCroppable, hasDimensions)">
+                    </umb-image-gravity>
+                    <button type="button" class="btn btn-link btn-crop-delete" aria-hidden="true" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></button>
+                    <button type="button" class="sr-only" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
+                </div>
+
+                
+                <ul ng-if="isCroppable" class="umb-sortable-thumbnails cropList clearfix">
+                    <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
+
+                        <umb-image-thumbnail center="model.value.focalPoint"
+                                             crop="value.coordinates"
+                                             src="imageSrc"
+                                             height="{{value.height}}"
+                                             width="{{value.width}}"
+                                             max-size="75">
+                        </umb-image-thumbnail>
+
+                        <div class="crop-information">
+                            <span class="crop-name crop-text">{{value.alias}}</span>
+                            <span class="crop-size crop-text">{{value.width}}px x {{value.height}}px</span>
+                            <span class="crop-annotation crop-text"><localize key="imagecropper_customCrop" ng-show="isCustomCrop(value)">User defined</localize>&nbsp;</span>
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+
+        </umb-property-file-upload>
+
+    </ng-form>
+
+</div>

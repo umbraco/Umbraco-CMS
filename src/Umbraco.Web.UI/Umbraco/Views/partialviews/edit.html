@@ -1,0 +1,97 @@
+<div data-element="editor-partial-views" ng-controller="Umbraco.Editors.PartialViews.EditController as vm">
+
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+   <form name="contentForm"
+      ng-submit="vm.save()"
+      novalidate
+      val-form-manager>
+
+        <umb-editor-view ng-if="!vm.page.loading">
+
+            <umb-editor-header
+                name="vm.partialView.name"
+                hide-alias="true"
+                description="vm.partialView.virtualPath"
+                description-locked="true"
+                hide-icon="true"
+                editorfor="vm.header.editorfor"
+                setpagetitle="vm.header.setPageTitle">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <umb-box>
+                    <umb-box-content>
+
+                        <div class="flex" style="margin-bottom: 30px;">
+
+                            <div class="flex" style="margin-left: auto;">
+
+                                <umb-button-group
+                                    style="margin-right: 5px;"
+                                    default-button="vm.page.insertDefaultButton"
+                                    sub-buttons="vm.page.insertSubButtons"
+                                    size="xs"
+                                    icon="icon-add">
+                                </umb-button-group>
+
+                                <umb-button
+                                    type="button"
+                                    size="xs"
+                                    action="vm.openQueryBuilderOverlay()"
+                                    icon="icon-wand"
+                                    label-key="template_queryBuilder"
+                                    add-ellipsis="true">
+                                </umb-button>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            auto-scale="85"
+                            umb-ace-editor="vm.aceOption"
+                            model="vm.partialView.content">
+                        </div>
+
+                    </umb-box-content>
+                </umb-box>
+                
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+                    <umb-keyboard-shortcuts-overview
+                        model="vm.page.keyboardShortcutsOverview"
+                        show-overlay="vm.showKeyboardShortcut"
+                        on-close="vm.showKeyboardShortcut = false;">
+                    </umb-keyboard-shortcuts-overview>
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button ng-if="model.infiniteMode"
+                                type="button"
+                                button-style="link"
+                                label-key="general_close"
+                                shortcut="esc"
+                                action="vm.close()">
+                    </umb-button>
+                        
+                    <umb-button type="submit"
+                                button-style="success"
+                                state="vm.page.saveButtonState"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+
+         </umb-editor-footer>
+
+        </umb-editor-view>
+    </form>
+
+</div>

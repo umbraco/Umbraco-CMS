@@ -1,0 +1,22 @@
+<div ng-controller="Umbraco.PropertyEditors.MemberPickerController" class="umb-property-editor umb-memberpicker">
+
+	<div>
+		<umb-node-preview
+			ng-repeat="node in renderModel"
+			icon="node.icon"
+			name="node.name"
+			allow-remove="allowRemove"
+			on-remove="remove($index)">
+		</umb-node-preview>
+	</div>
+
+	<button type="button"
+            class="umb-node-preview-add" 
+            ng-show="model.config.multiPicker === true || renderModel.length === 0" 
+		    ng-click="openMemberPicker()">
+		<localize key="general_add">Add</localize>
+	</button>
+
+    <input type="hidden" name="mandatory" ng-model="model.mandatory" ng-required="model.validation.mandatory && !renderModel.length" />
+
+</div>

@@ -1,0 +1,26 @@
+<div>
+    <ng-form name="listViewOrderDirectionForm" class="flex">
+        <ul class="inline">
+            <li class="-no-padding-left">
+                <umb-radiobutton name="orderDirection"
+                                 value="asc"
+                                 model="model.value"
+                                 text="Ascending [a-z]"
+                                 required="true">
+                </umb-radiobutton>
+            </li>
+            <li>
+                <umb-radiobutton name="orderDirection"
+                                 value="desc"
+                                 model="model.value"
+                                 text="Descending [z-a]"
+                                 required="true">
+                </umb-radiobutton>
+            </li>
+        </ul>
+
+        <span ng-messages="listViewOrderDirectionForm.orderDirection.$error" show-validation-on-submit>
+            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+        </span>
+    </ng-form>
+</div>

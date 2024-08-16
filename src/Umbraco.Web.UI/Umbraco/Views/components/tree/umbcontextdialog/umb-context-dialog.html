@@ -1,0 +1,14 @@
+<div id="dialog"
+     class="umb-modalcolumn fill shadow"
+     on-outside-click="outSideClick()"
+     role="dialog"
+     aria-labelledby="contextdialog-title"
+     aria-describedby="contextdialog-description">
+    <div class="umb-modalcolumn-header">
+        <h1 id="contextdialog-title">{{dialogTitle}}</h1>
+        <p id="contextdialog-description" class="sr-only">
+            <localize key="visuallyHiddenTexts_contextDialogDescription" tokens="[dialogTitle,currentNode.name]">Perform action {{dialogTitle}} on the {{currentNode.name}} node</localize>
+        </p>
+    </div>
+    <div class="umb-modalcolumn-body" ng-include="view"></div>
+</div>

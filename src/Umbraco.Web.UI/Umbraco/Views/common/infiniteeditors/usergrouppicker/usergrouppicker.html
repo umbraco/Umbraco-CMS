@@ -1,0 +1,104 @@
+<div ng-controller="Umbraco.Editors.UserGroupPickerController as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+            <umb-box>
+                <umb-box-content>
+
+                    <umb-search-filter
+                        input-id="composition-search"
+                        model="searchTerm"
+                        label-key="placeholders_filter"
+                        text="Type to filter..."
+                        css-class="w-100 mb-15"
+                        auto-focus="true">
+                    </umb-search-filter>
+
+                    <div class="umb-user-group-picker-list">
+
+                        <div class="umb-user-group-picker-list-item" ng-repeat="userGroup in vm.userGroups | filter:searchTerm">
+
+                            <button type="button" class="umb-user-group-picker__action" ng-click="vm.selectUserGroup(userGroup)">
+                                <span class="sr-only" ng-if="!userGroup.selected"><localize key="buttons_select">Select</localize> {{userGroup.name}}</span>
+                                <span class="sr-only" ng-if="userGroup.selected">{{userGroup.name}} <localize key="general_selected">Selected</localize></span>
+                            </button>
+
+                            <div class="umb-user-group-picker-list-item__icon">
+                                <i ng-if="!userGroup.selected" class="{{userGroup.icon}}" aria-hidden="true"></i>
+                                <umb-checkmark ng-if="userGroup.selected" checked="userGroup.selected" size="xs"></umb-checkmark>
+                            </div>
+
+                            <div>
+                                <div class="umb-user-group-picker-list-item__name">{{ userGroup.name }}</div>
+
+                                <div class="umb-user-group-picker-list-item__permission" ng-if="userGroup.sections">
+                                    <span>
+                                        <span class="bold"><localize key="main_sections">Sections</localize>:</span>
+                                        <span ng-repeat="section in userGroup.sections">{{ section.name }}<span ng-if="!$last">, </span></span>
+                                    </span>
+                                </div>
+
+                                <div class="umb-user-group-picker-list-item__permission">
+                                    <span>
+                                        <span class="bold"><localize key="user_startnode">Content start node</localize>:</span>
+                                        <span ng-if="!userGroup.contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                                        <span ng-if="userGroup.contentStartNode">{{ userGroup.contentStartNode.name }}</span>
+                                    </span>
+                                </div>
+
+                                <div class="umb-user-group-picker-list-item__permission">
+                                    <span>
+                                        <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>
+                                        <span ng-if="!userGroup.mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                                        <span ng-if="userGroup.mediaStartNode">{{ userGroup.mediaStartNode.name }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <umb-empty-state
+                        ng-if="vm.userGroups.length === 0 && !vm.loading"
+                        position="center">
+                        <localize key="user_noUserGroupsAdded">No user groups have been added</localize>
+                    </umb-empty-state>
+
+                </umb-box-content>
+            </umb-box>
+
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

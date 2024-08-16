@@ -1,0 +1,22 @@
+<div class="umb_confirm-action__overlay"
+     ng-class="{
+     '-top': direction === 'top',
+     '-right': direction === 'right',
+     '-bottom': direction === 'bottom',
+     '-left': direction === 'left'}"
+     on-outside-click="clickCancel()">
+
+        <button class="umb_confirm-action__overlay-action -confirm btn-reset" ng-click="clickConfirm()" localize="title" title="@buttons_confirmActionConfirm" type="button">
+            <i class="icon-check" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="buttons_confirmActionConfirm">Confirm</localize>
+            </span>
+        </button>
+
+        <button class="umb_confirm-action__overlay-action -cancel btn-reset"  ng-click="clickCancel()" localize="title" title="@buttons_confirmActionCancel" type="button">
+            <i class="icon-delete" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="buttons_confirmActionCancel">Cancel</localize>
+            </span>
+        </button>
+</div>

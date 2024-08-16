@@ -1,0 +1,10 @@
+<div ng-controller="Umbraco.PropertyEditors.UrlListController">
+    <ul class="nav nav-stacked">
+        <li ng-repeat="value in renderModel">
+            <a href="{{getUrl(value.url)}}" prevent-default="{{value.url.indexOf('/') == -1}}" target="{{value.urlTarget}}" class="umb-outline">
+                <i ng-class="value.icon" aria-hidden="true"></i>
+                <span>{{value.linkText || value.url}}</span>
+            </a>
+        </li>
+    </ul>
+</div>

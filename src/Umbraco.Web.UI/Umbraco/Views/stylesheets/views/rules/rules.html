@@ -1,0 +1,31 @@
+<umb-box>
+    <umb-box-content>
+        <div class="sub-view-columns">
+            <div class="sub-view-column-left">
+                <h5><localize key="stylesheet_editorRules">Rich text editor styles</localize></h5>
+                <small><localize key="stylesheet_editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</localize></small>
+            </div>
+            <div class="sub-view-column-right">
+                <div class="umb-property-editor umb-stylesheet-rules form-horizontal" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
+                    <div ui-sortable="sortableOptions" ng-model="model.stylesheet.rules">
+                        <div class="umb-stylesheet-rules__listitem" ng-repeat="rule in model.stylesheet.rules track by $id(rule)">
+                            <i class="icon icon-navigation handle" aria-hidden="true"></i>
+                            <div class="umb-stylesheet-rules__left">{{rule.name}}</div>
+                            <div class="umb-stylesheet-rules__right">
+                                <button type="button" class="umb-node-preview__action" ng-click="edit(rule, $event)"><localize key="general_edit">Edit</localize></button>
+                                <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(rule, $event)"><localize key="general_remove">Remove</localize></button>
+                            </div>
+                        </div>
+                    </div>
+                    <umb-button
+                        type="button"
+                        button-style="info"
+                        action="add($event)"
+                        label-key="general_add">
+                    </umb-button>
+                </div>
+            </div>
+        </div>
+
+    </umb-box-content>
+</umb-box>

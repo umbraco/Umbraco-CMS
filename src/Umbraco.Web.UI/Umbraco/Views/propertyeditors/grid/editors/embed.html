@@ -1,0 +1,13 @@
+<div ng-controller="Umbraco.PropertyEditors.Grid.EmbedController">
+
+    <button type="button" class="btn-reset umb-editor-placeholder" ng-click="setEmbed()" ng-if="trustedValue === null">
+        <i class="icon icon-movie-alt"></i>
+        <span class="help-text"><localize key="grid_clickToEmbed">Click to embed</localize></span>
+    </button>
+
+    <button type="button" class="btn-reset umb-editor-preview" ng-if="control.value" ng-click="setEmbed()">
+        <span class="umb-editor-preview-overlay"></span>
+        <span ng-bind-html="trustedValue"></span>
+    </button>
+
+</div>

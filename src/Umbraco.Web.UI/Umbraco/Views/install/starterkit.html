@@ -1,0 +1,28 @@
+<div ng-controller="Umbraco.Installer.PackagesController" id="starterKits">
+    <h1>Install a starter website</h1>
+
+    <p>
+        Installing a starter website helps you learn how Umbraco works, and
+        gives you a solid and simple foundation to build on top of.
+    </p>
+
+    <small ng-if="!packages || packages.length == 0">Loading...</small>
+
+    <ul class="thumbnails">
+        <li class="span3" ng-repeat="pck in packages">
+            <button type="button" ng-click="setPackageAndContinue(pck.id)" class="btn-reset thumbnail">
+                <img ng-src="https://our.umbraco.com{{
+                        pck.thumbnail
+                    }}?width=170"
+                     alt="{{ pck.name }}" />
+                <small>Install starter website</small>
+            </button>
+        </li>
+    </ul>
+
+    <button type="button"
+            class="btn btn-link btn-link-reverse"
+            ng-click="setPackageAndContinue('00000000-0000-0000-0000-000000000000')">
+        No thanks, I do not want to install a starter website
+    </button>
+</div>

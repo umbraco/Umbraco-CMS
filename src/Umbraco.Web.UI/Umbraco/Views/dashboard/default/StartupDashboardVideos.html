@@ -1,0 +1,18 @@
+<h3>Hours of Umbraco training videos are only a click away</h3>
+<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>
+
+<h4>To get you started:</h4>
+<div class="row-fluid"
+	ng-init="init('https://umbraco.tv/videos/implementor/chapterrss?sort=no')"
+	ng-controller="Umbraco.Dashboard.StartupVideosController">
+
+	<ul class="thumbnails">
+		<li class="span2" ng-repeat="video in videos">
+	    	<div class="thumbnail" style="margin-right: 20px">
+		    	<a target="_blank" rel="noopener" href="{{video.link}}" title="{{video.title}}">
+		    		<img ng-src="{{video.thumbnail}}"  alt="{{video.title}}">
+		    	</a>
+	    	</div>
+	    </li>
+	</ul>
+</div>

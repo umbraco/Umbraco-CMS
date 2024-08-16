@@ -1,0 +1,24 @@
+<div class="umb-property-editor">
+    <ng-form name="decimalFieldForm">
+        <input name="decimalField"
+               type="number"
+               pattern="[\-0-9]+([,\.][0-9]+)?"
+               class="umb-property-editor umb-number"
+               ng-model="model.value"
+               ng-required="model.validation.mandatory"
+               aria-required="{{model.validation.mandatory}}"
+               id="{{model.alias}}"
+               val-server="value"
+               min="{{model.config.min}}"
+               max="{{model.config.max}}"
+               step="{{model.config.step}}"
+               ng-step="model.config.step"
+               fix-number />
+
+        <span ng-messages="decimalFieldForm.decimalField.$error" show-validation-on-submit>
+            <span class="help-inline" ng-message="number"><localize key="validation_invalidNumber">Not a number</localize></span>
+            <span class="help-inline" ng-message="step"><localize key="validation_invalidNumberStepSize">Not a valid numeric step size</localize></span>
+            <span class="help-inline" ng-message="valServer">{{decimalFieldForm.decimalField.errorMsg}}</span>
+        </span>
+    </ng-form>
+</div>

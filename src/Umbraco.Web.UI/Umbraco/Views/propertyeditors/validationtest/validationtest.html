@@ -1,0 +1,17 @@
+<div>
+    <ng-form name="validationTestForm">
+        <p>Enter a numeric value</p>
+
+        <input name="myInput" type="text" ng-model="model.value" class="umb-textstring span7 textstring"
+               required
+               val-regex="^\d*$"
+               val-server="value" />
+
+        <span ng-messages="validationTestForm.myInput.$error" show-validation-on-submit >
+            <span class="help-inline" ng-message="required">Required!</span>
+            <span class="help-inline" ng-message="valRegex">The value entered is not a number</span>
+            <span class="help-inline" ng-message="valServer">A server error occurred</span>
+        </span>
+        
+    </ng-form>
+</div>

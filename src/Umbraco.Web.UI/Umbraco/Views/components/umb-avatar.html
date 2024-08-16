@@ -1,0 +1,7 @@
+<div>
+    <img class="umb-avatar umb-avatar--{{size}}" ng-if="imgSrc" ng-src="{{imgSrc}}" ng-srcset="{{imgSrcset}}" alt="{{avatarAlt}}"/>
+    <div class="umb-avatar umb-avatar--{{size}} umb-avatar--{{color}}" ng-if="!imgSrc">
+        <span ng-if="name">{{ initials }}</span>
+        <span ng-if="!name">{{unknownChar}}</span>
+    </div>
+</div>

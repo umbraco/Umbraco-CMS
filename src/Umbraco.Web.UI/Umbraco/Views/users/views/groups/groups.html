@@ -1,0 +1,119 @@
+<div ng-controller="Umbraco.Editors.Users.GroupsController as vm" class="clearfix">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <umb-editor-sub-header ng-class="{'--state-selection':(vm.selection.length > 0)}">
+
+        <!-- No selection -->
+        <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
+            <umb-button
+                type="button"
+                button-style="outline"
+                action="vm.createUserGroup()"
+                label="Create Group"
+                label-key="actions_createGroup">
+            </umb-button>
+        </umb-editor-sub-header-content-left>
+
+        <umb-editor-sub-header-content-right ng-if="vm.selection.length === 0">
+
+            <umb-editor-sub-header-section>
+
+                <umb-mini-search model="vm.filter">
+                </umb-mini-search>
+
+            </umb-editor-sub-header-section>
+
+        </umb-editor-sub-header-content-right>
+
+        <!-- With selection -->
+        <umb-editor-sub-header-content-left ng-if="vm.selection.length > 0">
+            <umb-editor-sub-header-section>
+                <umb-button
+                    type="button"
+                    label-key="buttons_clearSelection"
+                    button-style="white"
+                    action="vm.clearSelection()"
+                    size="xs">
+                </umb-button>
+            </umb-editor-sub-header-section>
+            <umb-editor-sub-header-section>
+                <strong>{{ vm.selection.length }} <localize key="general_of">of</localize> {{ vm.userGroups.length }} <localize key="general_selected">selected</localize></strong>
+            </umb-editor-sub-header-section>
+        </umb-editor-sub-header-content-left>
+
+        <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
+            <umb-button
+                type="button"
+                label="Delete"
+                label-key="general_delete"
+                button-style="white"
+                icon="icon-trash"
+                action="vm.deleteUserGroups()"
+                size="xs">
+            </umb-button>
+        </umb-editor-sub-header-content-right>
+
+    </umb-editor-sub-header>
+
+    <div style="margin-bottom: 20px;" class="flex items-center">
+        <div style="font-size: 16px;">
+            <span class="bold"><localize key="general_groups">Groups</localize> </span> <span>({{vm.userGroups.length}})</span>
+        </div>
+    </div>
+
+    <div class="umb-table" ng-if="!vm.loading && vm.filteredUserGroups.length">
+
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell"></div>
+                <div class="umb-table-cell"><localize key="general_name">Name</localize></div>
+                <div class="umb-table-cell"><localize key="main_sections">Sections</localize></div>
+                <div class="umb-table-cell umb-table-cell--small"><localize key="user_startnode">Content start node</localize></div>
+                <div class="umb-table-cell umb-table-cell--small"><localize key="user_mediastartnode">Media start node</localize></div>
+            </div>
+        </div>
+
+        <div class="umb-table-body">
+            <div class="umb-table-row"
+                ng-repeat="group in vm.filteredUserGroups track by $index"
+                ng-click="vm.selectUserGroup(group, $index, $event)"
+                ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && !group.isSystemUserGroup}">
+
+                <div class="umb-table-cell">
+                    <i ng-if="group.icon" class="umb-table-body__icon umb-table-body__fileicon {{ group.icon }}"></i>
+                    <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                </div>
+                <div class="umb-table-cell">
+                    <a
+                        class="umb-table-body__link"
+                        ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess}"
+                        ng-click="vm.clickUserGroupName(group, $event)"
+                        ng-href="#{{::vm.getEditPath(group)}}"
+                        ng-bind="group.name">
+                    </a>
+                </div>
+                <div class="umb-table-cell">
+                    <div>
+                        <span ng-repeat="section in group.sections">{{ section.name }}<span ng-if="!$last">, </span></span>
+                        <span ng-if="group.sections.length === 0">All sections</span>
+                    </div>
+                </div>
+                <div class="umb-table-cell umb-table-cell--small">
+                    <span ng-if="!group.contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                    <span ng-if="group.contentStartNode">{{ group.contentStartNode.name }}</span>
+                </div>
+                <div class="umb-table-cell umb-table-cell--small">
+                    <span ng-if="!group.mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                    <span ng-if="group.mediaStartNode">{{ group.mediaStartNode.name }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty states -->
+    <umb-empty-state ng-if="!vm.loading && !vm.filteredUserGroups.length" position="center">
+        <localize key="general_searchNoResult"></localize>
+    </umb-empty-state>
+
+</div>

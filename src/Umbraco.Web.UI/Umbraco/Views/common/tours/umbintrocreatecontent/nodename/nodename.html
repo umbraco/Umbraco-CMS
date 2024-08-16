@@ -1,0 +1,29 @@
+<div ng-controller="Umbraco.Tours.UmbIntroCreateContent.NodeNameController as vm">
+
+    <umb-tour-step on-close="model.endTour()">
+            
+        <umb-tour-step-header
+            title="model.currentStep.title">
+        </umb-tour-step-header>
+        
+        <umb-tour-step-content
+            content="model.currentStep.content">
+            <div ng-if="vm.error" class="color-red" style="margin-top: 5px;">Please enter <b>Home</b> in the field</div>
+        </umb-tour-step-content>
+
+        <umb-tour-step-footer class="flex justify-between items-center">
+
+            <umb-tour-step-counter
+                current-step="model.currentStepIndex + 1"
+                total-steps="model.steps.length">
+            </umb-tour-step-counter>
+
+            <div>
+                <umb-button size="xs" button-style="action" type="button" action="vm.initNextStep()" label="Next"></umb-button>
+            </div>
+
+        </umb-tour-step-footer>
+
+    </umb-tour-step>
+
+</div>

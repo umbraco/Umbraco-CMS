@@ -1,0 +1,12 @@
+<div class="umb-property-editor umb-slider" ng-controller="Umbraco.PropertyEditors.SliderController">
+
+    <div style="padding-top: 50px; padding-bottom: 40px;">
+        <umb-range-slider 
+            ng-model="sliderValue"
+            options="sliderOptions"
+            on-setup="setup(slider)"
+            on-change="change(values)">
+        </umb-range-slider>
+    </div>
+    
+</div>

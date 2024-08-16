@@ -1,0 +1,21 @@
+<ul role="tablist" class="umb-tabs-nav">
+    <li class="umb-tab" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': tabHasError}" val-tab>
+        <button class="btn-reset umb-tab-button" ng-click="vm.clickTab($event, tab)" role="tab" aria-selected="{tab.active}" type="button">{{ tab.label }}</button>
+    </li>
+
+    <li data-element="tab-expand" class="umb-tab umb-tab--expand" ng-class="{ 'open': vm.showTray }" ng-show="vm.needTray">
+        <umb-button-ellipsis
+            action="vm.toggleTray()"
+            text="View more options"
+            label-key="visuallyHiddenTexts_tabExpand"
+            color="#68676b"
+            >
+        </umb-button-ellipsis>
+
+        <umb-dropdown class="umb-tabs-tray" ng-if="vm.showTray" on-close="vm.hideTray()">
+            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" ng-class="{'umb-tabs-tray-item--active': tab.active}">
+                <button class="btn-reset umb-tab-button" ng-click="vm.clickTab($event, tab)" role="tab" aria-selected="{tab.active}" type="button">{{ tab.label }}</button>
+            </umb-dropdown-item>
+        </umb-dropdown>
+    </li>
+</ul>
