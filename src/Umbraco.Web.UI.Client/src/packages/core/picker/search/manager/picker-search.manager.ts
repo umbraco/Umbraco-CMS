@@ -175,7 +175,8 @@ export class UmbPickerSearchManager<
 		}
 
 		const { data } = await this.#searchProvider.search(query);
-		this.#resultItems.setValue(data?.items ?? []);
+		const items = (data?.items as ResultItemType[]) ?? [];
+		this.#resultItems.setValue(items);
 		this.#resultTotalItems.setValue(data?.total ?? 0);
 		this.#searching.setValue(false);
 	}
