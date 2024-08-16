@@ -6,9 +6,9 @@ import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { ManifestPickerSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
 
-const elementName = 'umb-picker-modal-search-result';
+const elementName = 'umb-picker-search-result';
 @customElement(elementName)
-export class UmbPickerModalSearchResultElement extends UmbLitElement {
+export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
 	_query?: UmbSearchRequestArgs;
 
@@ -18,23 +18,23 @@ export class UmbPickerModalSearchResultElement extends UmbLitElement {
 	@state()
 	_items: UmbEntityModel[] = [];
 
-	#pickerModalContext?: UmbPickerContext;
+	#pickerContext?: UmbPickerContext;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
-			this.#pickerModalContext = context;
+			this.#pickerContext = context;
 
-			this.observe(this.#pickerModalContext.search.query, (query) => {
+			this.observe(this.#pickerContext.search.query, (query) => {
 				this._query = query;
 			});
 
-			this.observe(this.#pickerModalContext.search.searching, (query) => {
+			this.observe(this.#pickerContext.search.searching, (query) => {
 				this._searching = query;
 			});
 
-			this.observe(this.#pickerModalContext.search.resultItems, (items) => {
+			this.observe(this.#pickerContext.search.resultItems, (items) => {
 				this._items = items;
 			});
 		});
@@ -70,6 +70,6 @@ export class UmbPickerModalSearchResultElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPickerModalSearchResultElement;
+		[elementName]: UmbPickerSearchResultElement;
 	}
 }
