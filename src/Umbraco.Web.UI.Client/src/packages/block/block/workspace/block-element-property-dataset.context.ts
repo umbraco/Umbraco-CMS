@@ -35,6 +35,10 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 		this.provideContext(UMB_BLOCK_ELEMENT_PROPERTY_DATASET_CONTEXT, this);
 	}
 
+	propertyVariantId?(propertyAlias: string): Promise<Observable<UmbVariantId | undefined>> {
+		return this.#elementManager.propertyVariantId(propertyAlias);
+	}
+
 	/**
 	 * TODO: Write proper JSDocs here.
 	 * @param propertyAlias

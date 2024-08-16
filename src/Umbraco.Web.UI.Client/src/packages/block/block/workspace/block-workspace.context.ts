@@ -6,7 +6,7 @@ import {
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbClassState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -16,6 +16,8 @@ import {
 	UMB_BLOCK_MANAGER_CONTEXT,
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -55,6 +57,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
 
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	readonly variantId = this.#variantId.asObservable();
+
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
@@ -82,6 +87,16 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
 		}).asPromise();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(context.variantId, (variantId) => {
+				this.#variantId.setValue(variantId);
+			});
+		});
+
+		this.observe(this.variantId, (variantId) => {
+			this.content.setVariantId(variantId);
+		});
 
 		this.routes.setRoutes([
 			{
