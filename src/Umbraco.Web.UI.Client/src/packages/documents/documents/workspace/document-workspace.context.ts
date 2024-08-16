@@ -723,11 +723,10 @@ export class UmbDocumentWorkspaceContext
 	async #runMandatoryValidationForSaveData(saveData: UmbDocumentDetailModel) {
 		// Check that the data is valid before we save it.
 		// Check variants have a name:
-		const variantWithoutAName = saveData.variants.filter((x) => !x.name);
-		console.log('variantWithoutAName', variantWithoutAName);
-		if (variantWithoutAName.length > 0) {
+		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
+		if (variantsWithoutAName.length > 0) {
 			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
-			variantWithoutAName.forEach((variant) => {
+			variantsWithoutAName.forEach((variant) => {
 				validationContext.messages.addMessage(
 					'client',
 					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
