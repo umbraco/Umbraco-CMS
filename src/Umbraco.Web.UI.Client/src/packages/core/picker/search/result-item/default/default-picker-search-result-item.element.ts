@@ -53,7 +53,6 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 			<uui-ref-node
 				name=${item.name}
 				id=${item.unique}
-				readonly
 				selectable
 				@selected=${() => this.#pickerContext?.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext?.selection.deselect(item.unique)}
