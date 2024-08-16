@@ -49,12 +49,6 @@ export class UmbPropertyEditorUITextBoxElement
 
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
-
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.variantId, (variantId) => {
-				console.log('text box variant 		', variantId);
-			});
-		});
 	}
 
 	override focus() {
