@@ -28,7 +28,6 @@ export class UmbPickerContext<
 		const searchProviderAlias = config?.search?.providerAlias;
 
 		if (searchProviderAlias) {
-			this.search.setSearchable(true);
 			this.search.updateConfig({ providerAlias: searchProviderAlias });
 
 			const queryParams = config?.search?.queryParams;
