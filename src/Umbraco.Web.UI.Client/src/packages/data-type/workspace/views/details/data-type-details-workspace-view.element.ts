@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -71,11 +72,9 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	override render() {
 		return html`
 			<uui-box>
-				<umb-property-layout label="Property Editor" description=${this.localize.term('propertyEditorPicker_title')}>
-					${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
-						? this.#renderPropertyEditorReference()
-						: this.#renderChooseButton()}
-				</umb-property-layout>
+				${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
+					? this.#renderPropertyEditorReference()
+					: this.#renderChooseButton()}
 			</uui-box>
 			${this.#renderSettings()}
 		`;
@@ -90,37 +89,44 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		`;
 	}
 
+	// Notice, we have implemented a property-layout for each states of the property editor ui picker, in this way the validation message gets removed once the choose-button is gone. (As we are missing ability to detect if elements got removed from DOM)[NL]
 	#renderChooseButton() {
 		return html`
-			<uui-button
-				slot="editor"
-				id="btn-add"
-				label=${this.localize.term('propertyEditorPicker_title')}
-				look="placeholder"
-				color="default"
-				@click=${this.#openPropertyEditorUIPicker}></uui-button>
+			<umb-property-layout label="Property Editor" description=${this.localize.term('propertyEditorPicker_title')}>
+				<uui-button
+					slot="editor"
+					id="btn-add"
+					label=${this.localize.term('propertyEditorPicker_title')}
+					look="placeholder"
+					color="default"
+					required
+					${umbBindToValidation(this)}
+					@click=${this.#openPropertyEditorUIPicker}></uui-button>
+			</umb-property-layout>
 		`;
 	}
 
 	#renderPropertyEditorReference() {
 		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
 		return html`
-			<umb-ref-property-editor-ui
-				slot="editor"
-				name=${this._propertyEditorUiName ?? ''}
-				alias=${this._propertyEditorUiAlias}
-				property-editor-schema-alias=${this._propertyEditorSchemaAlias}
-				standalone
-				@open=${this.#openPropertyEditorUIPicker}>
-				${this._propertyEditorUiIcon
-					? html`<umb-icon name=${this._propertyEditorUiIcon} slot="icon"></umb-icon>`
-					: nothing}
-				<uui-action-bar slot="actions">
-					<uui-button
-						label=${this.localize.term('general_change')}
-						@click=${this.#openPropertyEditorUIPicker}></uui-button>
-				</uui-action-bar>
-			</umb-ref-property-editor-ui>
+			<umb-property-layout label="Property Editor" description=${this.localize.term('propertyEditorPicker_title')}>
+				<umb-ref-property-editor-ui
+					slot="editor"
+					name=${this._propertyEditorUiName ?? ''}
+					alias=${this._propertyEditorUiAlias}
+					property-editor-schema-alias=${this._propertyEditorSchemaAlias}
+					standalone
+					@open=${this.#openPropertyEditorUIPicker}>
+					${this._propertyEditorUiIcon
+						? html`<umb-icon name=${this._propertyEditorUiIcon} slot="icon"></umb-icon>`
+						: nothing}
+					<uui-action-bar slot="actions">
+						<uui-button
+							label=${this.localize.term('general_change')}
+							@click=${this.#openPropertyEditorUIPicker}></uui-button>
+					</uui-action-bar>
+				</umb-ref-property-editor-ui>
+			</umb-property-layout>
 		`;
 	}
 
