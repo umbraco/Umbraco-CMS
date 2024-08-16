@@ -7,7 +7,6 @@ import { UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffic
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
-import { UmbPickerContextConfig } from '@umbraco-cms/backoffice/picker';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
