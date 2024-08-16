@@ -156,9 +156,19 @@ export class UmbPickerSearchManager<
 
 	async #initSearch() {
 		const providerAlias = this.#config?.providerAlias;
-		if (!providerAlias) throw new Error('No search provider alias provided');
+		if (!providerAlias) {
+			this.setSearchable(false);
+			throw new Error('No search provider alias provided');
+		}
+
 		this.#searchProvider = await createExtensionApiByAlias<UmbSearchProvider>(this, providerAlias);
-		if (!this.#searchProvider) throw new Error(`Search Provider with alias ${providerAlias} is not available`);
+
+		if (!this.#searchProvider) {
+			this.setSearchable(false);
+			throw new Error(`Search Provider with alias ${providerAlias} is not available`);
+		}
+
+		this.setSearchable(true);
 	}
 
 	#debouncedSearch = debounce(this.#search, 300);
