@@ -165,7 +165,8 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
     {
         // override to handle logging/events
-        TUser? user = await UserManager.FindByNameAsync(userName);
+        string strippedUsername = userName.Trim();
+        TUser? user = await UserManager.FindByNameAsync(strippedUsername);
         if (user == null)
         {
             return await HandleSignIn(null, userName, SignInResult.Failed);
