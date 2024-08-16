@@ -341,6 +341,12 @@ export class UmbDataTypeWorkspaceContext
 		this.#currentData.update({ editorUiAlias: alias });
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 		return this.#currentData.asObservablePart(

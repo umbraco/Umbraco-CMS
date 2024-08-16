@@ -40,19 +40,23 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
-	 * @param propertyAlias
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return await this.#elementManager.propertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
-	 * @param propertyAlias
-	 * @param value
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
 	 */
-	async setPropertyValue(propertyAlias: string, value: unknown) {
-		return this.#elementManager.setPropertyValue(propertyAlias, value);
+	async setPropertyValue(alias: string, value: unknown) {
+		return this.#elementManager.setPropertyValue(alias, value);
 	}
 }

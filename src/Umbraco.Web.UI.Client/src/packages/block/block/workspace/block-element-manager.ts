@@ -70,6 +70,12 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		return this.variantId;
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 
@@ -82,6 +88,13 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		return this.#data.getValue()?.[propertyAlias] as ReturnType;
 	}
 
+	/**
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
+	 */
 	async setPropertyValue(alias: string, value: unknown) {
 		this.initiatePropertyValueChange();
 		await this.#getDataPromise;

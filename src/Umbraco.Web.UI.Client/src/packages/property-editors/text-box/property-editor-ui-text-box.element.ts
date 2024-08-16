@@ -8,12 +8,13 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 type UuiInputTypeType = typeof UUIInputElement.prototype.type;
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement
-	extends UmbFormControlMixin<string>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -48,6 +49,16 @@ export class UmbPropertyEditorUITextBoxElement
 
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(context.variantId, (variantId) => {
+				console.log('text box variant 		', variantId);
+			});
+		});
+	}
+
+	override focus() {
+		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
 	#onInput(e: InputEvent) {
@@ -68,7 +79,7 @@ export class UmbPropertyEditorUITextBoxElement
 			?readonly=${this.readonly}></uui-input>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {
