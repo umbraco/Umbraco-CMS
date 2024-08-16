@@ -1,7 +1,7 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	GetPropertyNameFromPath,
-	UmbDataPathPropertyValueFilter,
+	UmbDataPathPropertyValueQuery,
 	UmbValidationPathTranslatorBase,
 } from '@umbraco-cms/backoffice/validation';
 
@@ -23,6 +23,6 @@ export class UmbBlockElementDataValidationPathTranslator extends UmbValidationPa
 		const specificValue = { alias: key };
 		// replace the values[ number ] with JSON-Path filter values[@.(...)], continues by the rest of the path:
 		//return '$.values' + UmbVariantValuesValidationPathTranslator(specificValue) + path.substring(path.indexOf(']'));
-		return '$.values[' + UmbDataPathPropertyValueFilter(specificValue) + '.value';
+		return '$.values[' + UmbDataPathPropertyValueQuery(specificValue) + '.value';
 	}
 }

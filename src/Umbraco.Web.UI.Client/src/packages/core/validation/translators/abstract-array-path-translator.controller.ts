@@ -1,14 +1,15 @@
-import { UmbDataPathVariantFilter } from '../utils/index.js';
 import { UmbValidationPathTranslatorBase } from './validation-path-translator-base.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbAbstractArrayValidationPathTranslator extends UmbValidationPathTranslatorBase {
 	#initialPathToMatch: string;
+	#queryMethod: (data: unknown) => string;
 
-	constructor(host: UmbControllerHost, initialPathToMatch: string) {
+	constructor(host: UmbControllerHost, initialPathToMatch: string, queryMethod: (data: any) => string) {
 		super(host);
 
 		this.#initialPathToMatch = initialPathToMatch;
+		this.#queryMethod = queryMethod;
 	}
 	translate(path: string) {
 		if (!this._context) return;
@@ -34,7 +35,7 @@ export abstract class UmbAbstractArrayValidationPathTranslator extends UmbValida
 
 		if (!data) return false;
 		// replace the values[ number ] with JSON-Path filter values[@.(...)], continues by the rest of the path:
-		return this.#initialPathToMatch + UmbDataPathVariantFilter(data as any) + path.substring(path.indexOf(']'));
+		return this.#initialPathToMatch + this.#queryMethod(data) + path.substring(path.indexOf(']'));
 	}
 
 	abstract getDataFromIndex(index: number): unknown | undefined;

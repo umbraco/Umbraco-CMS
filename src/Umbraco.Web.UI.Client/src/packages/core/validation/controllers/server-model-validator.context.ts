@@ -1,5 +1,5 @@
 import type { UmbValidator } from '../interfaces/validator.interface.js';
-import { UmbDataPathPropertyValueFilter } from '../utils/index.js';
+import { UmbDataPathPropertyValueQuery } from '../utils/index.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '../const.js';
 import { UMB_SERVER_MODEL_VALIDATOR_CONTEXT } from './server-model-validator.context-token.js';
@@ -87,7 +87,7 @@ export class UmbServerModelValidatorContext
 				const uniqueMissingProperties = [...new Set(errorBody.missingProperties)];
 				uniqueMissingProperties.forEach((alias) => {
 					this.#data.variants.forEach((variant: any) => {
-						const path = `$.values[${UmbDataPathPropertyValueFilter({
+						const path = `$.values[${UmbDataPathPropertyValueQuery({
 							alias: alias,
 							culture: variant.culture,
 							segment: variant.segment,

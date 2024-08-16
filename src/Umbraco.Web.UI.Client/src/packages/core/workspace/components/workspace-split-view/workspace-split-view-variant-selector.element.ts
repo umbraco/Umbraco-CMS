@@ -12,7 +12,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbDataPathVariantFilter, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 type UmbDocumentVariantOption = {
 	culture: string | null;
@@ -221,7 +221,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				required
-				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantFilter(this._variantId)}].name`, this._name ?? '')}
+				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${umbFocus()}
 			>
 				${

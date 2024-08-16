@@ -2,13 +2,13 @@ import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
 import type { UmbVariantPropertyValueModel } from '@umbraco-cms/backoffice/variant';
 
 /**
- * Validation Data Path filter for Property Value.
+ * Validation Data Path Query generator for Property Value.
  * write a JSON-Path filter similar to `?(@.alias = 'myAlias' && @.culture == 'en-us' && @.segment == 'mySegment')`
  * where culture and segment are optional
  * @param value
  * @returns
  */
-export function UmbDataPathPropertyValueFilter(
+export function UmbDataPathPropertyValueQuery(
 	value: UmbPartialSome<Omit<UmbVariantPropertyValueModel, 'value'>, 'culture' | 'segment'>,
 ): string {
 	// write a array of strings for each property, where alias must be present and culture and segment are optional

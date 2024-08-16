@@ -11,7 +11,7 @@ import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
-import { UmbDataPathBlockElementDataFilter } from '@umbraco-cms/backoffice/block';
+import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-block-list-entry
@@ -38,7 +38,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 		new UmbObserveValidationStateController(
 			this,
-			`$.contentData[${UmbDataPathBlockElementDataFilter({ udi: value })}]`,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ udi: value })}]`,
 			(hasMessages) => {
 				this._contentInvalid = hasMessages;
 				this._blockViewProps.contentInvalid = hasMessages;
@@ -167,7 +167,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 					// Observe settings validation state:
 					new UmbObserveValidationStateController(
 						this,
-						`$.settingsData[${UmbDataPathBlockElementDataFilter(settings)}]`,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery(settings)}]`,
 						(hasMessages) => {
 							this._settingsInvalid = hasMessages;
 							this._blockViewProps.settingsInvalid = hasMessages;

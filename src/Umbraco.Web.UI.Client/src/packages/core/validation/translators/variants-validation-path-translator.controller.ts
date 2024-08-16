@@ -1,9 +1,10 @@
+import { UmbDataPathVariantQuery } from '../utils/data-path-variant-query.function.js';
 import { UmbAbstractArrayValidationPathTranslator } from './abstract-array-path-translator.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbVariantValuesValidationPathTranslator extends UmbAbstractArrayValidationPathTranslator {
+export class UmbVariantsValidationPathTranslator extends UmbAbstractArrayValidationPathTranslator {
 	constructor(host: UmbControllerHost) {
-		super(host, '$.variants[');
+		super(host, '$.variants[', UmbDataPathVariantQuery);
 	}
 
 	getDataFromIndex(index: number) {
