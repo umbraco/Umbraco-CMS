@@ -7,6 +7,7 @@ import { UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffic
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
+import { UmbPickerContextConfig } from '@umbraco-cms/backoffice/picker';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -47,10 +48,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
-			this.#pickerContext.setConfig(this.data);
+			this.#pickerContext.search.updateConfig({ ...this.data?.search });
 
 			const multiple = this.data?.multiple ?? false;
 			this.#pickerContext.selection.setMultiple(multiple);
+
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
 				multiple,
