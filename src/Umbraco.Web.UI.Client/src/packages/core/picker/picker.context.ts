@@ -26,12 +26,20 @@ export class UmbPickerContext<
 	 */
 	setConfig(config: ConfigType | undefined) {
 		const searchProviderAlias = config?.search?.providerAlias;
+
 		if (searchProviderAlias) {
-			this.search.updateConfig({ providerAlias: searchProviderAlias });
 			this.search.setSearchable(true);
-		} else {
-			this.search.setSearchable(false);
+			this.search.updateConfig({ providerAlias: searchProviderAlias });
+
+			const queryParams = config?.search?.queryParams;
+			if (queryParams) {
+				this.search.updateQuery(queryParams);
+			}
+
+			return;
 		}
+
+		this.search.setSearchable(false);
 	}
 
 	/**
@@ -41,5 +49,15 @@ export class UmbPickerContext<
 	 */
 	getConfig(): ConfigType | undefined {
 		return this.#config.getValue();
+	}
+
+	/**
+	 * Update the config for the picker
+	 * @param {Partial<ConfigType>} config
+	 * @memberof UmbPickerContext
+	 */
+	updateConfig(config: Partial<ConfigType>) {
+		const mergedConfig = { ...this.#config.getValue(), ...config } as ConfigType;
+		this.#config.setValue(mergedConfig);
 	}
 }
