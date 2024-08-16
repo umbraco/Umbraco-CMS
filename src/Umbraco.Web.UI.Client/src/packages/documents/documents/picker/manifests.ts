@@ -4,10 +4,9 @@ import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/back
 export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	{
 		type: 'pickerSearchResultItem',
+		kind: 'default',
 		alias: 'Umb.PickerSearchResultItem.Document',
 		name: 'Document Picker Search Result Item',
-		element: () => import('./document-picker-search-result-item.element.js'),
-		api: () => import('./document-picker-search-result-item.context.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 	},
 ];
