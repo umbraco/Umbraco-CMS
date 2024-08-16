@@ -56,6 +56,7 @@ import {
 	UmbServerModelValidatorContext,
 	UmbValidationContext,
 	UmbVariantValuesValidationPathTranslator,
+	UmbVariantsValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -166,6 +167,7 @@ export class UmbDocumentWorkspaceContext
 		this.addValidationContext(new UmbValidationContext(this).provide());
 
 		new UmbVariantValuesValidationPathTranslator(this);
+		new UmbVariantsValidationPathTranslator(this);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));

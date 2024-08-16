@@ -12,6 +12,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDataPathVariantFilter, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 type UmbDocumentVariantOption = {
 	culture: string | null;
@@ -44,6 +45,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	@state()
 	private _name?: string;
+
+	@state()
+	private _variantId?: UmbVariantId;
 
 	@state()
 	private _variantDisplayName = '';
@@ -132,11 +136,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
 		if (!workspaceContext) return;
 
-		const variantId = this.#datasetContext.getVariantId();
+		this._variantId = this.#datasetContext.getVariantId();
 		// Find the variant option matching this, to get the language name...
 
-		const culture = variantId.culture;
-		const segment = variantId.segment;
+		const culture = this._variantId.culture;
+		const segment = this._variantId.segment;
 
 		this.observe(
 			workspaceContext.variantOptions,
@@ -209,12 +213,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
+		return this._variantId
+			? html`
 			<uui-input
 				id="name-input"
 				label=${this.localize.term('placeholders_entername')}
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
+				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantFilter(this._variantId)}].name`, this._name ?? '')}
 				${umbFocus()}
 			>
 				${
@@ -287,7 +293,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 					: nothing
 			}
 		</div>
-		`;
+		`
+			: nothing;
 	}
 
 	static override styles = [

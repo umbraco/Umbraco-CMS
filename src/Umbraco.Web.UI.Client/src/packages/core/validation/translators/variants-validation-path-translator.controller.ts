@@ -1,10 +1,10 @@
-import { UmbDataPathPropertyValueFilter } from '../utils/index.js';
+import { UmbDataPathVariantFilter } from '../utils/index.js';
 import { UmbValidationPathTranslatorBase } from './validation-path-translator-base.controller.js';
 
-const InitialPathToMatch = '$.values[';
+const InitialPathToMatch = '$.variants[';
 const InitialPathToMatchLength = InitialPathToMatch.length;
 
-export class UmbVariantValuesValidationPathTranslator extends UmbValidationPathTranslatorBase {
+export class UmbVariantsValidationPathTranslator extends UmbValidationPathTranslatorBase {
 	translate(path: string) {
 		if (!this._context) return;
 		if (path.indexOf(InitialPathToMatch) !== 0) {
@@ -29,6 +29,6 @@ export class UmbVariantValuesValidationPathTranslator extends UmbValidationPathT
 
 		const specificValue = data.values[index];
 		// replace the values[ number ] with JSON-Path filter values[@.(...)], continues by the rest of the path:
-		return InitialPathToMatch + UmbDataPathPropertyValueFilter(specificValue) + path.substring(path.indexOf(']'));
+		return InitialPathToMatch + UmbDataPathVariantFilter(specificValue) + path.substring(path.indexOf(']'));
 	}
 }
