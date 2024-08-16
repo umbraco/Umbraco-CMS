@@ -3,7 +3,7 @@ import type { UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionItemPickerContext } from '@umbraco-cms/backoffice/collection';
@@ -15,6 +15,9 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 > {
 	@state()
 	private _members: Array<UmbMemberDetailModel> = [];
+
+	@state()
+	private _searchQuery?: string;
 
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#pickerContext = new UmbCollectionItemPickerContext(this);
@@ -28,6 +31,14 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				this.requestUpdate();
 			},
 			'umbSelectionObserver',
+		);
+
+		this.observe(
+			this.#pickerContext.search.query,
+			(query) => {
+				this._searchQuery = query?.query;
+			},
+			'umbPickerSearchQueryObserver',
 		);
 	}
 
@@ -71,6 +82,10 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderItems() {
+		if (this._searchQuery) {
+			return nothing;
+		}
+
 		return html`
 			${repeat(
 				this.#filteredMembers,
