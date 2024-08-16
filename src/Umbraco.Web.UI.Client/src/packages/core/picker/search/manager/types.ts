@@ -1,3 +1,3 @@
-export interface UmbPickerModalSearchManagerConfig {
+export interface UmbPickerSearchManagerConfig {
 	providerAlias: string;
 }

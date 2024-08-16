@@ -1,2 +1,2 @@
-export * from './picker-modal-search.manager.js';
+export * from './picker-search.manager.js';
 export * from './types.js';

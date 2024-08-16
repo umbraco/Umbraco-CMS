@@ -1,4 +1,4 @@
-import type { UmbPickerModalSearchManagerConfig } from './types.js';
+import type { UmbPickerSearchManagerConfig } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -10,12 +10,12 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 /**
  * A manager for searching items in a picker modal.
  * @exports
- * @class UmbPickerModalSearchManager
+ * @class UmbPickerSearchManager
  * @augments {UmbControllerBase}
  * @template ResultItemType
  * @template QueryType
  */
-export class UmbPickerModalSearchManager<
+export class UmbPickerSearchManager<
 	ResultItemType extends UmbEntityModel = UmbEntityModel,
 	QueryType extends UmbSearchRequestArgs = UmbSearchRequestArgs,
 > extends UmbControllerBase {
@@ -34,14 +34,14 @@ export class UmbPickerModalSearchManager<
 	#resultTotalItems = new UmbNumberState(0);
 	public readonly resultTotalItems = this.#resultTotalItems.asObservable();
 
-	#config?: UmbPickerModalSearchManagerConfig;
+	#config?: UmbPickerSearchManagerConfig;
 	// TODO: lower requirement for search provider item type
 	#searchProvider?: UmbSearchProvider<any, QueryType>;
 
 	/**
-	 * Creates an instance of UmbPickerModalSearchManager.
+	 * Creates an instance of UmbPickerSearchManager.
 	 * @param {UmbControllerHost} host The controller host for the search manager.
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -49,37 +49,37 @@ export class UmbPickerModalSearchManager<
 
 	/**
 	 * Set the configuration for the search manager.
-	 * @param {UmbPickerModalSearchManagerConfig} config The configuration for the search manager.
-	 * @memberof UmbPickerModalSearchManager
+	 * @param {UmbPickerSearchManagerConfig} config The configuration for the search manager.
+	 * @memberof UmbPickerSearchManager
 	 */
-	public setConfig(config: UmbPickerModalSearchManagerConfig) {
+	public setConfig(config: UmbPickerSearchManagerConfig) {
 		this.#config = config;
 		this.#initSearch();
 	}
 
 	/**
 	 * Get the current configuration for the search manager.
-	 * @returns {UmbPickerModalSearchManagerConfig | undefined} The current configuration for the search manager.
-	 * @memberof UmbPickerModalSearchManager
+	 * @returns {UmbPickerSearchManagerConfig | undefined} The current configuration for the search manager.
+	 * @memberof UmbPickerSearchManager
 	 */
-	public getConfig(): UmbPickerModalSearchManagerConfig | undefined {
+	public getConfig(): UmbPickerSearchManagerConfig | undefined {
 		return this.#config;
 	}
 
 	/**
 	 * Update the current configuration for the search manager.
-	 * @param {Partial<UmbPickerModalSearchManagerConfig>} partialConfig
-	 * @memberof UmbPickerModalSearchManager
+	 * @param {Partial<UmbPickerSearchManagerConfig>} partialConfig
+	 * @memberof UmbPickerSearchManager
 	 */
-	public updateConfig(partialConfig: Partial<UmbPickerModalSearchManagerConfig>) {
-		const mergedConfig = { ...this.#config, ...partialConfig } as UmbPickerModalSearchManagerConfig;
+	public updateConfig(partialConfig: Partial<UmbPickerSearchManagerConfig>) {
+		const mergedConfig = { ...this.#config, ...partialConfig } as UmbPickerSearchManagerConfig;
 		this.setConfig(mergedConfig);
 	}
 
 	/**
 	 * Returns whether items can be searched.
 	 * @returns {boolean} Whether items can be searched.
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 */
 	public getSearchable(): boolean {
 		return this.#searchable.getValue();
@@ -88,7 +88,7 @@ export class UmbPickerModalSearchManager<
 	/**
 	 * Sets whether items can be searched.
 	 * @param {boolean} value Whether items can be searched.
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 */
 	public setSearchable(value: boolean) {
 		this.#searchable.setValue(value);
@@ -96,7 +96,7 @@ export class UmbPickerModalSearchManager<
 
 	/**
 	 * Search for items based on the current query.
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 */
 	public search() {
 		if (this.getSearchable() === false) throw new Error('Search is not enabled');
@@ -113,7 +113,7 @@ export class UmbPickerModalSearchManager<
 
 	/**
 	 * Clear the current search query and result items.
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 */
 	public clear() {
 		this.#query.setValue(undefined);
@@ -125,7 +125,7 @@ export class UmbPickerModalSearchManager<
 	/**
 	 * Set the search query.
 	 * @param {QueryType} query The search query.
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 */
 	public setQuery(query: QueryType) {
 		if (this.getSearchable() === false) throw new Error('Search is not enabled');
@@ -139,7 +139,7 @@ export class UmbPickerModalSearchManager<
 
 	/**
 	 * Get the current search query.
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 * @returns {QueryType | undefined} The current search query.
 	 */
 	public getQuery(): QueryType | undefined {
@@ -149,7 +149,7 @@ export class UmbPickerModalSearchManager<
 	/**
 	 * Update the current search query.
 	 * @param {Partial<QueryType>} query
-	 * @memberof UmbPickerModalSearchManager
+	 * @memberof UmbPickerSearchManager
 	 */
 	public updateQuery(query: Partial<QueryType>) {
 		const mergedQuery = { ...this.getQuery(), ...query } as QueryType;

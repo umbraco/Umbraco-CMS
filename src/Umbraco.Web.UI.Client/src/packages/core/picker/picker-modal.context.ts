@@ -1,5 +1,5 @@
 import { UMB_PICKER_MODAL_CONTEXT } from './picker-modal.context.token.js';
-import { UmbPickerModalSearchManager } from './search/manager/picker-modal-search.manager.js';
+import { UmbPickerSearchManager } from './search/manager/picker-search.manager.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -10,7 +10,7 @@ export class UmbPickerModalContext<
 	ModalDataType extends UmbPickerModalData<any> = UmbPickerModalData<any>,
 > extends UmbContextBase<UmbPickerModalContext> {
 	public readonly selection = new UmbSelectionManager(this);
-	public readonly search = new UmbPickerModalSearchManager(this);
+	public readonly search = new UmbPickerSearchManager(this);
 
 	#data = new UmbObjectState<ModalDataType | undefined>(undefined);
 	public readonly data = this.#data.asObservable();
