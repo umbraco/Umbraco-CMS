@@ -72,7 +72,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 		this.addValidator(
 			'valueMissing',
 			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => this.hasAttribute('required') && this.value === '',
+			() => this.hasAttribute('required') && !this.value,
 		);
 	}
 
