@@ -84,6 +84,8 @@ This Validator binds a Form Control Element with the Validation Context. When th
 
 Notice this one also comes as a Lit Directive called `umbBindToValidation`.
 
+Also notice this does not bind server validation to the Form Control, see `UmbBindServerValidationToFormControl`
+
 ### Server Model Validator
 
 This Validator can asks a end-point for validation of the model.
@@ -117,3 +119,11 @@ This is completely fine, as messages can be partly translated and then enhanced 
 
 This fact enables a property to observe if there is any Message Paths that start with the same path as the Data Path for the Property. In this was a property can know that it contains a Validation Message without the Message Path begin completely translated.
 
+
+
+## Binders
+
+Validators represent a component of the Validation to be considered, but it does not represent other messages of its path.
+To display messages from a given data-path, a Binder is needed. We bring a few to make this happen:
+
+UmbBindServerValidationToFormControl
