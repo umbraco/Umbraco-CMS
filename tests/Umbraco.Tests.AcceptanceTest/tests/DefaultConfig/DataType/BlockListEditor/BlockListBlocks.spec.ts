@@ -228,14 +228,14 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.selectBlockBackgroundColor("");
+  await umbracoUi.dataType.selectBlockBackgroundColor('');
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].backgroundColor).toEqual("");
+  expect(blockData.values[0].value[0].backgroundColor).toEqual('');
 });
 
 test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -286,7 +286,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   const iconColor = '#ff0000';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, "", iconColor);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, '', iconColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
 
@@ -300,7 +300,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].iconColor).toEqual("");
+  expect(blockData.values[0].value[0].iconColor).toEqual('');
 });
 
 // TODO: Currently it is not possible to update a stylesheet to a block
@@ -325,7 +325,6 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   // Removes first stylesheet
-
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -340,7 +339,6 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
 });
 
 // TODO: Currently it is not possible to delete a stylesheet to a block
-
 test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
@@ -411,13 +409,11 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
 });
 
 // TODO: Thumbnails are not showing in the UI
-test('can add a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
 
-await page.pause()
 });
 
 // TODO: Thumbnails are not showing in the UI
-test('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
 
-  await page.pause()
 });

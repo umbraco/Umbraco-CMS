@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can create a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  //Arrange
+  // Arrange
   const blockListLocatorName = 'Block List';
   const blockListEditorAlias = 'Umbraco.BlockList';
   const blockListEditorUiAlias = 'Umb.PropertyEditorUi.BlockList';
@@ -140,37 +140,43 @@ test('can remove a block from a block list editor', {tag: '@smoke'}, async ({umb
 
 test('can add a min and max amount to a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const minAmount = 1;
+  const maxAmount = 2;
   await umbracoApi.dataType.createEmptyBlockListDataType(blockListEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await umbracoUi.dataType.enterMinAmount('1');
-  await umbracoUi.dataType.enterMaxAmount('2');
+  await umbracoUi.dataType.enterMinAmount(minAmount.toString());
+  await umbracoUi.dataType.enterMaxAmount(maxAmount.toString());
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(dataTypeData.values[0].value.min).toBe(1);
-  expect(dataTypeData.values[0].value.max).toBe(2);
+  expect(dataTypeData.values[0].value.min).toBe(minAmount);
+  expect(dataTypeData.values[0].value.max).toBe(maxAmount);
 });
 
-test('max can not be less than min', async ({umbracoApi, umbracoUi}) => {
+test('max can not be less than min', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createBlockListDataTypeWithMinAndMaxAmount(blockListEditorName, 2, 2);
+  const minAmount = 2;
+  const oldMaxAmount = 2;
+  const newMaxAmount = 1;
+  await umbracoApi.dataType.createBlockListDataTypeWithMinAndMaxAmount(blockListEditorName, minAmount, oldMaxAmount);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await umbracoUi.dataType.enterMaxAmount('1');
+  await umbracoUi.dataType.enterMaxAmount(newMaxAmount.toString());
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible(false);
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value'));
-  expect(dataTypeData.values[0].value.min).toBe(2);
+  console.log(await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value'))
+  await expect(await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value')).toBeTruthy();
+  expect(dataTypeData.values[0].value.min).toBe(minAmount);
   // The max value should not be updated
-  expect(dataTypeData.values[0].value.max).toBe(2);
+  expect(dataTypeData.values[0].value.max).toBe(oldMaxAmount);
 });
 
 test('can enable single block mode', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -297,10 +303,10 @@ test('can remove a property editor width', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await umbracoUi.dataType.enterPropertyEditorWidth("");
+  await umbracoUi.dataType.enterPropertyEditorWidth('');
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, "")).toBeTruthy();
+  expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockListEditorName, '')).toBeTruthy();
 });
