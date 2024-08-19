@@ -8,5 +8,5 @@ export const manifests: Array<ManifestTypes> = [
 	workspaceAliasCondition,
 	workspaceEntityTypeCondition,
 	workspaceHasCollectionCondition,
-	workspaceContentTypeAliasCondition
+	workspaceContentTypeAliasCondition,
 ];

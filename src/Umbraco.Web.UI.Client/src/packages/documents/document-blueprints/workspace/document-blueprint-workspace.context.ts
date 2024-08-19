@@ -253,6 +253,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 	/**
 	 * @function propertyValueByAlias
+	 * @param variantId
 	 * @param {string} propertyAlias
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
 	 * @description Get an Observable for the value of this property.
