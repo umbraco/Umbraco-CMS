@@ -117,17 +117,13 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 			${when(
 				this._fileContent.length,
 				() =>
-					html`<uui-ref-node-Media-type
-						name=${this._fileContent[0].name}
-						alias=${this._fileContent[0].alias}
-						readonly
-						standalone>
+					html`<uui-ref-node name=${this._fileContent[0].name} alias=${this._fileContent[0].alias} readonly standalone>
 						<umb-icon slot="icon" name=${this._fileContent[0].icon}></umb-icon>
 						<uui-button
 							slot="actions"
 							@click=${this.#requestReset}
 							label=${this.localize.term('general_remove')}></uui-button>
-					</uui-ref-node-Media-type>`,
+					</uui-ref-node>`,
 				() =>
 					/**TODO Add localizations */
 					html`<div id="wrapper">
