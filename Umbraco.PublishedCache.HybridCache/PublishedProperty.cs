@@ -5,6 +5,8 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -15,6 +17,9 @@ internal class PublishedProperty : PublishedPropertyBase
 {
     private readonly PublishedContent _content;
     private readonly bool _isPreviewing;
+    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly bool _isMember;
+    private string? _valuesCacheKey;
 
     // the invariant-neutral source and inter values
     private readonly object? _sourceValue;
@@ -24,6 +29,7 @@ internal class PublishedProperty : PublishedPropertyBase
     // the variant and non-variant object values
     private bool _interInitialized;
     private object? _interValue;
+    private CacheValues? _cacheValues;
 
     // the variant source and inter values
     private readonly object _locko = new();
@@ -33,8 +39,9 @@ internal class PublishedProperty : PublishedPropertyBase
     public PublishedProperty(
         IPublishedPropertyType propertyType,
         PublishedContent content,
-        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.None)
-        : this(propertyType, content, null, referenceCacheLevel)
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+        : this(propertyType, content, null, publishedSnapshotAccessor, referenceCacheLevel)
     {
     }
 
@@ -43,7 +50,8 @@ internal class PublishedProperty : PublishedPropertyBase
         IPublishedPropertyType propertyType,
         PublishedContent content,
         PropertyData[]? sourceValues,
-        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.None)
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
         : base(propertyType, referenceCacheLevel)
     {
         if (sourceValues != null)
@@ -71,6 +79,8 @@ internal class PublishedProperty : PublishedPropertyBase
 
         _content = content;
         _isPreviewing = content.IsPreviewing;
+        _isMember = content.ContentType.ItemType == PublishedItemType.Member;
+        _publishedSnapshotAccessor = publishedSnapshotAccessor;
 
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
@@ -78,6 +88,18 @@ internal class PublishedProperty : PublishedPropertyBase
         _sourceVariations = propertyType.Variations;
     }
 
+    // used to cache the CacheValues of this property
+    internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(_content.Key, Alias, _isPreviewing);
+
+    private string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
+    {
+        if (previewing)
+        {
+            return "Cache.Property.CacheValues[D:" + contentUid + ":" + typeAlias + "]";
+        }
+
+        return "Cache.Property.CacheValues[P:" + contentUid + ":" + typeAlias + "]";
+    }
 
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
@@ -141,7 +163,67 @@ internal class PublishedProperty : PublishedPropertyBase
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
-        return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.None, GetInterValue(culture, segment), _isPreviewing);
+        object? value;
+        CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
+
+        // initial reference cache level always is .Content
+        const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
+
+        if (cacheValues.ObjectInitialized)
+        {
+            return cacheValues.ObjectValue;
+        }
+
+        cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
+        cacheValues.ObjectInitialized = true;
+        value = cacheValues.ObjectValue;
+
+        return value;
+    }
+
+    private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
+    {
+        CacheValues cacheValues;
+        IPublishedSnapshot publishedSnapshot;
+        IAppCache? cache;
+        switch (cacheLevel)
+        {
+            case PropertyCacheLevel.None:
+                // never cache anything
+                cacheValues = new CacheValues();
+                break;
+            case PropertyCacheLevel.Snapshot: // Snapshot is obsolete, so for now treat as element
+            case PropertyCacheLevel.Element:
+                // cache within the property object itself, ie within the content object
+                cacheValues = _cacheValues ??= new CacheValues();
+                break;
+            case PropertyCacheLevel.Elements:
+                // cache within the elements cache, unless previewing, then use the snapshot or
+                // elements cache (if we don't want to pollute the elements cache with short-lived
+                // data) depending on settings
+                // for members, always cache in the snapshot cache - never pollute elements cache
+                publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+                cache = publishedSnapshot == null ? null : _isMember == false
+                        ? publishedSnapshot.ElementsCache
+                        : null;
+                cacheValues = GetCacheValues(cache);
+                break;
+            default:
+                throw new InvalidOperationException("Invalid cache level.");
+        }
+
+        return cacheValues;
+    }
+
+    private CacheValues GetCacheValues(IAppCache? cache)
+    {
+        // no cache, don't cache
+        if (cache == null)
+        {
+            return new CacheValues();
+        }
+
+        return (CacheValues)cache.Get(ValuesCacheKey, () => new CacheValues())!;
     }
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
@@ -168,6 +250,53 @@ internal class PublishedProperty : PublishedPropertyBase
         }
 
         public object? SourceValue { get; set; }
+    }
+
+    private class CacheValues : CacheValue
+    {
+        private readonly object _locko = new();
+        private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
+
+        public CacheValue For(string? culture, string? segment)
+        {
+            if (culture == string.Empty && segment == string.Empty)
+            {
+                return this;
+            }
+
+            if (_values == null)
+            {
+                lock (_locko)
+                {
+                    _values ??= InitializeConcurrentDictionary<CompositeStringStringKey, CacheValue>();
+                }
+            }
+
+            var k = new CompositeStringStringKey(culture, segment);
+
+            CacheValue value = _values.GetOrAdd(k, _ => new CacheValue());
+
+            return value;
+        }
+    }
+
+    private class CacheValue
+    {
+        public bool ObjectInitialized { get; set; }
+
+        public object? ObjectValue { get; set; }
+
+        public bool XPathInitialized { get; set; }
+
+        public object? XPathValue { get; set; }
+
+        public bool DeliveryApiDefaultObjectInitialized { get; set; }
+
+        public object? DeliveryApiDefaultObjectValue { get; set; }
+
+        public bool DeliveryApiExpandedObjectInitialized { get; set; }
+
+        public object? DeliveryApiExpandedObjectValue { get; set; }
     }
 
     private static ConcurrentDictionary<TKey, TValue> InitializeConcurrentDictionary<TKey, TValue>()
