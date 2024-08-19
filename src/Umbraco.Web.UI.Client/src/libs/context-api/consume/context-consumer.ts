@@ -1,15 +1,9 @@
 import type { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
-import {
-	isUmbContextProvideEventType,
-	//isUmbContextUnprovidedEventType,
-	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
-	//umbContextUnprovidedEventType,
-} from '../provide/context-provide.event.js';
+import { isUmbContextProvideEventType, UMB_CONTEXT_PROVIDE_EVENT_TYPE } from '../provide/context-provide.event.js';
 import type { UmbContextCallback } from './context-request.event.js';
 import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
 /**
- * @export
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
@@ -55,6 +49,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @public
 	 * @memberof UmbContextConsumer
 	 * @description Make the consumption skip the contexts provided by the Host element.
+	 * @returns {UmbContextConsumer}
 	 */
 	public skipHost() {
 		this.#skipHost = true;
@@ -66,6 +61,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 * @description Pass beyond any context aliases that matches this.
 	 * The default behavior is to stop at first Context Alias match, this is to avoid receiving unforeseen descending contexts.
+	 * @returns {UmbContextConsumer}
 	 */
 	public passContextAliasMatches() {
 		this.#stopAtContextMatch = false;
@@ -103,12 +99,17 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @public
 	 * @memberof UmbContextConsumer
 	 * @description Get the context as a promise.
+	 * @returns {UmbContextConsumer}
 	 */
 	public asPromise(): Promise<ResultType> {
 		return (
 			this.#promise ??
 			(this.#promise = new Promise<ResultType>((resolve) => {
-				this.#instance ? resolve(this.#instance) : (this.#promiseResolver = resolve);
+				if (this.#instance) {
+					resolve(this.#instance);
+				} else {
+					this.#promiseResolver = resolve;
+				}
 			}))
 		);
 	}
