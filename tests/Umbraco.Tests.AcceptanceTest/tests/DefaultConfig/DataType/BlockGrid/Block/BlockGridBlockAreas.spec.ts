@@ -17,10 +17,11 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
+
 test('can update grid columns for areas for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const griColumns = 6;
+  const gridColumns = 6;
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
 
@@ -28,13 +29,13 @@ test('can update grid columns for areas for a block', async ({umbracoApi, umbrac
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAreasTab();
-  await umbracoUi.dataType.enterGridColumnsForArea(griColumns);
+  await umbracoUi.dataType.enterGridColumnsForArea(gridColumns);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaGridColumns(blockGridEditorName, contentElementTypeId, griColumns)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaGridColumns(blockGridEditorName, contentElementTypeId, gridColumns)).toBeTruthy();
 });
 
 test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -92,6 +93,7 @@ test('can update alias an area for a block', async ({umbracoApi, umbracoUi}) => 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, newAlias)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 1)).toBeTruthy();
 });
 
 test('can remove an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -113,6 +115,7 @@ test('can remove an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbr
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, areaAlias)).toBeFalsy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 0)).toBeTruthy();
 });
 
 test('can add multiple areas for a block', async ({umbracoApi, umbracoUi}) => {
@@ -121,6 +124,7 @@ test('can add multiple areas for a block', async ({umbracoApi, umbracoUi}) => {
   const areaAlias = 'TestArea';
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 1)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -135,6 +139,7 @@ test('can add multiple areas for a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isSuccessNotificationVisible();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, areaAlias)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 2)).toBeTruthy();
 });
 
 test('can add create button label for an area in a block', async ({umbracoApi, umbracoUi}) => {
@@ -281,12 +286,12 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
 
 // TODO: There is no frontend validation for min and max values
 test.skip('min can not be more than max an area in a block', async ({page, umbracoApi, umbracoUi}) => {
-// Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  // Arrange
   const areaAlias = 'TestArea';
   const minAllowed = 6;
   const maxAllowed = 7;
   const newMinAllowed = 8;
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, null, undefined, undefined, minAllowed, maxAllowed);
 
@@ -307,8 +312,8 @@ test.skip('min can not be more than max an area in a block', async ({page, umbra
 // TODO: It is currently not possible to add a specified allowance
 test.skip('can add specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const areaAlias = 'TestArea';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
@@ -324,9 +329,6 @@ test.skip('can add specified allowance for an area in a block', async ({page, um
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  const block = await umbracoApi.dataType.getByName(blockGridEditorName);
-  console.log(block.values[0].value[0].areas[0]);
-  console.log(block.values[0].value[0].areas[0].specifiedAllowance);
 });
 
 // TODO: It is currently not possible to add a specified allowance
@@ -346,7 +348,6 @@ test.skip('can add multiple specified allowances for an area in a block', async 
 
 // TODO: It is currently not possible to add a specified allowance
 test.skip('can add specified allowance with min and max for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
-
 });
 
 // TODO: It is currently not possible to add a specified allowance

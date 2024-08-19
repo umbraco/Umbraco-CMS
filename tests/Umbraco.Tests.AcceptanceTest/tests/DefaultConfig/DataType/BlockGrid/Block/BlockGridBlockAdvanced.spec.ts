@@ -31,7 +31,6 @@ test.skip('can add a custom view to a block', async ({page, umbracoApi, umbracoU
 });
 
 //TODO: It is not possible to add a view to a block
-
 test.skip('can remove a custom view from a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -42,7 +41,6 @@ test.skip('can remove a custom view from a block', async ({page, umbracoApi, umb
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await page.pause();
 });
 
 // TODO: Stylesheets are currently saved as arrays
@@ -55,7 +53,6 @@ test.skip('can remove a custom stylesheet from a block', async ({page, umbracoAp
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAdvancedSettingsInBlock(blockGridEditorName, contentElementTypeId, undefined, stylesheetPath, undefined, undefined, undefined);
-  await page.pause();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainStylesheet(blockGridEditorName, contentElementTypeId, stylesheetPath)).toBeTruthy();
 
   // Act
@@ -66,8 +63,8 @@ test.skip('can remove a custom stylesheet from a block', async ({page, umbracoAp
 
 test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const overlaySize = 'medium';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
 

@@ -1,5 +1,5 @@
-import {test} from '@umbraco/playwright-testhelpers';
-import {expect} from "@playwright/test";
+import {test} from "@umbraco/playwright-testhelpers";
+import {expect, } from "@playwright/test";
 
 const blockGridEditorName = 'TestBlockGridEditor';
 const elementTypeName = 'BlockGridElement';
@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  //Arrange
+  //  Arrange
   const blockGridLocatorName = 'Block Grid';
   const blockGridEditorAlias = 'Umbraco.BlockGrid';
   const blockGridEditorUiAlias = 'Umb.PropertyEditorUi.BlockGrid';
@@ -135,7 +135,7 @@ test('can remove a block from a block grid editor', {tag: '@smoke'}, async ({umb
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 
   // Clean
-  await umbracoApi.documentType.ensureNameNotExists(elementTypeName)
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
 test('can add a block to a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
@@ -244,37 +244,43 @@ test.skip('can delete a group in a block grid editor', async ({umbracoApi, umbra
 
 test('can add a min and max amount to a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const minAmount = 1;
+  const maxAmount = 2;
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  await umbracoUi.dataType.enterMinAmount('1');
-  await umbracoUi.dataType.enterMaxAmount('2');
+  await umbracoUi.dataType.enterMinAmount(minAmount.toString());
+  await umbracoUi.dataType.enterMaxAmount(maxAmount.toString());
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
-  expect(dataTypeData.values[0].value.min).toBe(1);
-  expect(dataTypeData.values[0].value.max).toBe(2);
+  expect(dataTypeData.values[0].value.min).toBe(minAmount);
+  expect(dataTypeData.values[0].value.max).toBe(maxAmount);
 });
 
-test('max can not be less than min in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('max can not be less than min in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createBlockGridWithMinAndMaxAmount(blockGridEditorName, 2, 2);
+  const minAmount = 2;
+  const oldMaxAmount = 2;
+  const newMaxAmount = 1;
+  await umbracoApi.dataType.createBlockGridWithMinAndMaxAmount(blockGridEditorName, minAmount, oldMaxAmount);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  await umbracoUi.dataType.enterMaxAmount('1');
+  await umbracoUi.dataType.enterMaxAmount(newMaxAmount.toString());
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible(false);
-  await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value');
+  await page.pause();
+  expect(await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not be exceed the high value')).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
-  expect(dataTypeData.values[0].value.min).toBe(2);
+  expect(dataTypeData.values[0].value.min).toBe(minAmount);
   // The max value should not be updated
-  expect(dataTypeData.values[0].value.max).toBe(2);
+  expect(dataTypeData.values[0].value.max).toBe(oldMaxAmount);
 });
 
 test('can enable live editing mode in a block grid editor', async ({umbracoApi, umbracoUi}) => {
@@ -393,8 +399,3 @@ test.skip('can add a stylesheet a block grid editor', async ({page, umbracoApi, 
 
 test.skip('can remove a stylesheet in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
 });
-
-
-
-
-
