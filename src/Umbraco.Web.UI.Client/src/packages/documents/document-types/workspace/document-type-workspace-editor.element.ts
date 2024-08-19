@@ -4,6 +4,7 @@ import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
@@ -86,10 +87,12 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 						<umb-input-with-alias
 							id="name"
 							label=${this.localize.term('placeholders_entername')}
-							value=${this._name}
-							alias=${this._alias}
+							.value=${this._name}
+							.alias=${this._alias}
 							?auto-generate-alias=${this._isNew}
 							@change="${this.#onNameAndAliasChange}"
+							required
+							${umbBindToValidation(this, '$.name', this._name)}
 							${umbFocus()}>
 						</umb-input-with-alias>
 

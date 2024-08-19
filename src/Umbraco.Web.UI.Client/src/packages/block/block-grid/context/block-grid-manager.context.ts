@@ -7,6 +7,7 @@ import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css/umbraco-blockgridlayout.css';
 
@@ -37,6 +38,16 @@ export class UmbBlockGridManagerContext<
 		const value = x?.getValueByAlias('gridColumns') as string | undefined;
 		return parseInt(value && value !== '' ? value : '12');
 	});
+
+	getMinAllowed() {
+		return this._editorConfiguration.getValue()?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
+	}
+
+	getMaxAllowed() {
+		return (
+			this._editorConfiguration.getValue()?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity
+		);
+	}
 
 	override setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this.#initAppUrl.then(() => {

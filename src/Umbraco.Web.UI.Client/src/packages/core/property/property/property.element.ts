@@ -5,7 +5,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UmbBindValidationMessageToFormControl,
+	UmbBindServerValidationToFormControl,
 	UmbFormControlValidator,
 	UmbObserveValidationStateController,
 } from '@umbraco-cms/backoffice/validation';
@@ -133,17 +133,16 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: false })
+	@property({ type: String, attribute: 'data-path' })
 	public set dataPath(dataPath: string | undefined) {
-		this.#dataPath = dataPath;
+		this.#propertyContext.setDataPath(dataPath);
 		new UmbObserveValidationStateController(this, dataPath, (invalid) => {
 			this._invalid = invalid;
 		});
 	}
 	public get dataPath(): string | undefined {
-		return this.#dataPath;
+		return this.#propertyContext.getDataPath();
 	}
-	#dataPath?: string;
 
 	@state()
 	private _variantDifference?: string;
@@ -172,7 +171,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	#propertyContext = new UmbPropertyContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
-	#validationMessageBinder?: UmbBindValidationMessageToFormControl;
+	#validationMessageBinder?: UmbBindServerValidationToFormControl;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 
@@ -220,9 +219,12 @@ export class UmbPropertyElement extends UmbLitElement {
 		);
 
 		this.observe(
-			this.#propertyContext.validation,
-			(validation) => {
-				this._mandatory = validation?.mandatory;
+			this.#propertyContext.validationMandatory,
+			(mandatory) => {
+				this._mandatory = mandatory;
+				if (this._element) {
+					this._element.mandatory = mandatory;
+				}
 			},
 			null,
 		);
@@ -281,6 +283,8 @@ export class UmbPropertyElement extends UmbLitElement {
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+				// No need to observe mandatory, as we already do so and set it on the _element if present: [NL]
+				this._element.mandatory = this._mandatory;
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(
@@ -303,15 +307,25 @@ export class UmbPropertyElement extends UmbLitElement {
 					},
 					null,
 				);
+				this.#configObserver = this.observe(
+					this.#propertyContext.validationMandatoryMessage,
+					(mandatoryMessage) => {
+						if (mandatoryMessage) {
+							this._element!.mandatoryMessage = mandatoryMessage ?? undefined;
+						}
+					},
+					null,
+				);
 
 				if ('checkValidity' in this._element) {
-					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, this.#dataPath);
+					const dataPath = this.dataPath;
+					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
 					// We trust blindly that the dataPath is available at this stage. [NL]
-					if (this.#dataPath) {
-						this.#validationMessageBinder = new UmbBindValidationMessageToFormControl(
+					if (dataPath) {
+						this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
 							this,
 							this._element as any,
-							this.#dataPath,
+							dataPath,
 						);
 						this.#validationMessageBinder.value = this.#propertyContext.getValue();
 					}
