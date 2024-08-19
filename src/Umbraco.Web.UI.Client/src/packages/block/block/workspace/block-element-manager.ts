@@ -4,9 +4,10 @@ import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbClassState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockElementManager extends UmbControllerBase {
 	//
@@ -28,11 +29,17 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		new UmbDocumentTypeDetailRepository(this),
 	);
 
-	constructor(host: UmbControllerHost) {
-		// TODO: Get Workspace Alias via Manifest.
+	readonly validation = new UmbValidationContext(this);
+
+	constructor(host: UmbControllerHost, dataPathPropertyName: string) {
 		super(host);
 
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
+		this.observe(this.unique, (udi) => {
+			if (udi) {
+				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.udi = '${udi}')]`);
+			}
+		});
 	}
 
 	reset() {
@@ -124,6 +131,13 @@ export class UmbBlockElementManager extends UmbControllerBase {
 
 	public createPropertyDatasetContext(host: UmbControllerHost) {
 		return new UmbBlockElementPropertyDatasetContext(host, this);
+	}
+
+	public setup(host: UmbClassInterface) {
+		this.createPropertyDatasetContext(host);
+
+		// Provide Validation Context for this view:
+		this.validation.provideAt(host);
 	}
 
 	public override destroy(): void {
