@@ -6,6 +6,8 @@ import {
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
+import { manifests as exportManifests } from './export/manifests.js';
+import { manifests as importManifests } from './import/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -27,4 +29,6 @@ export const manifests: Array<ManifestTypes> = [
 	...createManifests,
 	...moveManifests,
 	...duplicateManifests,
+	...exportManifests,
+	...importManifests,
 ];
