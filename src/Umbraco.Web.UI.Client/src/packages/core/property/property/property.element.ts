@@ -437,7 +437,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				bottom: 0;
 				background-color: white;
 				opacity: 0.5;
-				z-index: 1;
+				z-index: 1000;
 			}
 		`,
 	];
