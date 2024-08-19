@@ -404,6 +404,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
             Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
 
+            // add validation services
+            Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
+
             // Routing
             Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
             Services.AddHostedService<DocumentUrlServiceInitializer>();
