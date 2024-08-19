@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -15,6 +16,7 @@ internal class PublishedContent : PublishedContentBase
     public PublishedContent(
         ContentNode contentNode,
         ContentData contentData,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IVariationContextAccessor variationContextAccessor)
         : base(variationContextAccessor)
     {
@@ -31,7 +33,7 @@ internal class PublishedContent : PublishedContentBase
             // add one property per property type - this is required, for the indexing to work
             // if contentData supplies pdatas, use them, else use null
             contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? pdatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, pdatas, propertyType.CacheLevel);
+            properties[i++] = new PublishedProperty(propertyType, this, pdatas, publishedSnapshotAccessor, propertyType.CacheLevel);
         }
 
         _properties = properties;

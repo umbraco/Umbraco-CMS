@@ -7,13 +7,16 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 internal class PublishedContentFactory : IPublishedContentFactory
 {
     private readonly PublishedContentTypeCache _contentTypeCache;
+    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
 
     public PublishedContentFactory(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IVariationContextAccessor variationContextAccessor,
         IPublishedContentCacheAccessor publishedContentCacheAccessor)
     {
+        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _variationContextAccessor = variationContextAccessor;
         _contentTypeCache = publishedContentCacheAccessor.Get();
     }
@@ -50,7 +53,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             member.CreateDate,
             member.CreatorId);
 
-        return new PublishedMember(member, n, d, _variationContextAccessor);
+        return new PublishedMember(member, n, d, _publishedSnapshotAccessor, _variationContextAccessor);
     }
 
     private Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
@@ -93,6 +96,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             : new PublishedContent(
                 node,
                 contentData,
+                _publishedSnapshotAccessor,
                 _variationContextAccessor);
 
     private IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>

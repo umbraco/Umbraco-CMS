@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -14,8 +15,9 @@ internal class PublishedMember : PublishedContent, IPublishedMember
         IMember member,
         ContentNode contentNode,
         ContentData contentData,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IVariationContextAccessor variationContextAccessor)
-        : base(contentNode, contentData, variationContextAccessor) =>
+        : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor) =>
         _member = member;
 
     public string Email => _member.Email;
