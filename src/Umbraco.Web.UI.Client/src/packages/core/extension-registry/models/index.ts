@@ -71,8 +71,8 @@ import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.mode
 import type { ManifestEntryPoint } from './entry-point.model.js';
 import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
 import type { ManifestSectionRoute } from './section-route.model.js';
-import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestPickerSearchResultItem } from './picker-search-result-item.model.js';
+import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './app-entry-point.model.js';
 export type * from './auth-provider.model.js';
