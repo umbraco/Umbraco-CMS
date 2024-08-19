@@ -4,7 +4,6 @@ export const UMB_DEBUG_CONTEXT_EVENT_TYPE = 'umb:debug-contexts';
 export type UmbContextCallback<T> = (instance: T) => void;
 
 /**
- 
  * @interface UmbContextRequestEvent
  */
 export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
@@ -16,7 +15,6 @@ export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
 }
 
 /**
- 
  * @class UmbContextRequestEventImplementation
  * @augments {Event}
  * @implements {UmbContextRequestEvent}

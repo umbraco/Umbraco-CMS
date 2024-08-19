@@ -27,9 +27,9 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
-	 * @param {Element} host
-	 * @param {string} contextIdentifier
-	 * @param {UmbContextCallback} callback
+	 * @param {Element} host - The host element.
+	 * @param {string} contextIdentifier - The context identifier, an alias or a Context Token.
+	 * @param {UmbContextCallback} callback - The callback.
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
@@ -49,7 +49,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @public
 	 * @memberof UmbContextConsumer
 	 * @description Make the consumption skip the contexts provided by the Host element.
-	 * @returns {UmbContextConsumer}
+	 * @returns {UmbContextConsumer} - The current instance of the UmbContextConsumer.
 	 */
 	public skipHost() {
 		this.#skipHost = true;
@@ -61,7 +61,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 * @description Pass beyond any context aliases that matches this.
 	 * The default behavior is to stop at first Context Alias match, this is to avoid receiving unforeseen descending contexts.
-	 * @returns {UmbContextConsumer}
+	 * @returns {UmbContextConsumer} - The current instance of the UmbContextConsumer.
 	 */
 	public passContextAliasMatches() {
 		this.#stopAtContextMatch = false;
@@ -99,7 +99,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @public
 	 * @memberof UmbContextConsumer
 	 * @description Get the context as a promise.
-	 * @returns {UmbContextConsumer}
+	 * @returns {UmbContextConsumer} - A promise that resolves when the context is consumed.
 	 */
 	public asPromise(): Promise<ResultType> {
 		return (
