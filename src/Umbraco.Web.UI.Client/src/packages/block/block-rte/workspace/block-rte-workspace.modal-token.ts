@@ -11,7 +11,7 @@ export const UMB_BLOCK_RTE_WORKSPACE_MODAL = new UmbModalToken<UmbBlockRteWorksp
 			type: 'sidebar',
 			size: 'medium',
 		},
-		data: { entityType: 'block', preset: {}, originData: {} },
+		data: { entityType: 'block', preset: {}, originData: {}, baseDataPath: undefined as unknown as string },
 	},
 	// Recast the type, so the entityType data prop is not required:
 ) as UmbModalToken<Omit<UmbWorkspaceModalData, 'entityType'>, UmbWorkspaceModalValue>;

@@ -16,6 +16,7 @@ import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-regist
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropertyTypeModel = UmbPropertyTypeModel>
 	extends UmbSubmittableWorkspaceContextBase<PropertyTypeData>
@@ -39,6 +40,9 @@ export class UmbPropertyTypeWorkspaceContext<PropertyTypeData extends UmbPropert
 
 	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
 		super(host, args.manifest.alias);
+
+		this.addValidationContext(new UmbValidationContext(this).provide());
+
 		const manifest = args.manifest;
 		this.#entityType = manifest.meta?.entityType;
 

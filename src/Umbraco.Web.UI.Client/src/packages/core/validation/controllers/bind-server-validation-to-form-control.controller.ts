@@ -1,14 +1,18 @@
 import type { UmbValidationMessage } from '../context/validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import type { UmbFormControlMixinInterface } from '../mixins/form-control.mixin.js';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { defaultMemoization } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const ctrlSymbol = Symbol();
 const observeSymbol = Symbol();
 
-export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
+/**
+ * Binds server validation to a form control.
+ * This controller will add a custom error to the form control if the validation context has any messages for the specified data path.
+ */
+export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
 	#control: UmbFormControlMixinInterface<unknown>;
@@ -24,7 +28,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 			this.#value = value;
 		} else {
 			// If not valid lets see if we should remove server validation [NL]
-			if (!jsonStringComparison(this.#value, value)) {
+			if (!defaultMemoization(this.#value, value)) {
 				this.#value = value;
 				// Only remove server validations from validation context [NL]
 				this.#messages.forEach((message) => {
@@ -62,7 +66,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 		if (!this.#controlValidator) {
 			this.#controlValidator = this.#control.addValidator(
 				'customError',
-				() => this.#messages.map((x) => x.message).join(', '),
+				() => this.#messages.map((x) => x.body).join(', '),
 				() => !this.#isValid,
 			);
 			//this.#control.addEventListener('change', this.#onControlChange);
