@@ -111,15 +111,6 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		);
 
 		this.observe(this.#datasetContext.currentVariantCultureIsReadOnly, (value) => {
-			// always allow invariant properties to be editable
-			const isInvariant = this.#variantId?.getValue()?.isInvariant();
-
-			// always allow editing invariant properties
-			if (isInvariant) {
-				this.#isReadOnly.setValue(false);
-				return;
-			}
-
 			this.#isReadOnly.setValue(value);
 		});
 	}
