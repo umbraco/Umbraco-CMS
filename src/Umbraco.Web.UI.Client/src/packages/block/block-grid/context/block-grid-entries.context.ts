@@ -98,9 +98,9 @@ export class UmbBlockGridEntriesContext
 
 	getMaxAllowed() {
 		if (this.#areaKey) {
-			return this.#areaType?.minAllowed ?? Infinity;
+			return this.#areaType?.maxAllowed ?? Infinity;
 		}
-		return this._manager?.getMinAllowed() ?? Infinity;
+		return this._manager?.getMaxAllowed() ?? Infinity;
 	}
 
 	getLayoutContainerElement() {
