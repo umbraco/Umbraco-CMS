@@ -4,7 +4,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
-
  * @class UmbMemberGroupItemStore
  * @augments {UmbStoreBase}
  * @description - Data Store for Member Group items

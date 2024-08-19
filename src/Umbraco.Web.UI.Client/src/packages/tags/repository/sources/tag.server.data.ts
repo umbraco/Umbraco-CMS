@@ -21,6 +21,12 @@ export class UmbTagServerDataSource {
 
 	/**
 	 * Get a list of tags on the server
+	 * @param root0
+	 * @param root0.query
+	 * @param root0.skip
+	 * @param root0.take
+	 * @param root0.tagGroup
+	 * @param root0.culture
 	 * @returns {*}
 	 * @memberof UmbTagServerDataSource
 	 */

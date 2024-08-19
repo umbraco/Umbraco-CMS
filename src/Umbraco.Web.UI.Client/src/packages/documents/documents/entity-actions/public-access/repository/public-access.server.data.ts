@@ -48,6 +48,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 	 * Updates Public Access for the given Document unique
 	 * @param {string} unique
 	 * @param {PublicAccessRequestModel} data
+	 * @param requestBody
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	async update(unique: string, requestBody: PublicAccessRequestModel) {

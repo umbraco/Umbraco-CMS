@@ -30,6 +30,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Creates a new Data Type scaffold
 	 * @param {(string | null)} parentUnique
+	 * @param preset
 	 * @returns { CreateDataTypeRequestModel }
 	 * @memberof UmbDataTypeServerDataSource
 	 */
@@ -78,6 +79,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Inserts a new Data Type on the server
 	 * @param {UmbDataTypeDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
@@ -114,6 +116,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	/**
 	 * Updates a DataType on the server
 	 * @param {UmbDataTypeDetailModel} DataType
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */

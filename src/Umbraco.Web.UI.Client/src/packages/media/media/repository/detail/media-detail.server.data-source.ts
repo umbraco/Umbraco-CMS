@@ -100,6 +100,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Inserts a new Media on the server
 	 * @param {UmbMediaDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
@@ -137,6 +138,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Updates a Media on the server
 	 * @param {UmbMediaDetailModel} Media
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */

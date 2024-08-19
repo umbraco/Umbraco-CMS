@@ -50,6 +50,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	/**
 	 * Creates an instance of UmbTreeServerDataSourceBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
+	 * @param args
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	constructor(

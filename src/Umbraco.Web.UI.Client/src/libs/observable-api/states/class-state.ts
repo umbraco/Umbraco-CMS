@@ -8,7 +8,6 @@ export interface UmbClassStateData {
 }
 
 /**
- 
  * @class UmbClassState
  * @augments {UmbBasicState<T>}
  * @description - This state can hold class instance which has a equal method to compare in coming instances for changes.

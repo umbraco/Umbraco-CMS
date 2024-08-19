@@ -15,7 +15,6 @@ export interface UmbNotificationDefaultData {
 }
 
 /**
- 
  * @interface UmbNotificationOptions
  * @template UmbNotificationData
  */

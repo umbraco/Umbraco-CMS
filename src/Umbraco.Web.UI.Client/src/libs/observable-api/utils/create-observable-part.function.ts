@@ -5,7 +5,6 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { distinctUntilChanged, map, shareReplay } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
- 
  * @function createObservablePart
  * @param {Observable<T>} source - RxJS Subject to use for this Observable.
  * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.

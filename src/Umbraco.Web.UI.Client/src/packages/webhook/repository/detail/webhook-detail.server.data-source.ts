@@ -113,6 +113,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	/**
 	 * Updates a Webhook on the server
 	 * @param {UmbWebhookDetailModel} Webhook
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */

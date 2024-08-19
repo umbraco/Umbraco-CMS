@@ -22,6 +22,9 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 
 	/**
 	 * Get a list of cultures on the server
+	 * @param root0
+	 * @param root0.skip
+	 * @param root0.take
 	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */

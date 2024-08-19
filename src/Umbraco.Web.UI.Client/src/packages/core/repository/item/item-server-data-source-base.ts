@@ -22,6 +22,7 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	/**
 	 * Creates an instance of UmbItemServerDataSourceBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
+	 * @param args
 	 * @memberof UmbItemServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost, args: UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType>) {

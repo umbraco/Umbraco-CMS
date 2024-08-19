@@ -29,6 +29,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Creates a new Document scaffold
+	 * @param preset
 	 * @returns { UmbDocumentDetailModel }
 	 * @memberof UmbDocumentServerDataSource
 	 */
@@ -128,6 +129,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	/**
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */

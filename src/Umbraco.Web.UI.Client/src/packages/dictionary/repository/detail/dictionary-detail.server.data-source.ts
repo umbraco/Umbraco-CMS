@@ -72,6 +72,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Inserts a new Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
@@ -103,6 +104,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Updates a Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} Dictionary
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */

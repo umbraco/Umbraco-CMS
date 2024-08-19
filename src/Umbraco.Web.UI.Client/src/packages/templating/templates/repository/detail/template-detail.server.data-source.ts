@@ -112,6 +112,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Updates a Template on the server
 	 * @param {UmbTemplateDetailModel} Template
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbTemplateServerDataSource
 	 */

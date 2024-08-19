@@ -23,6 +23,7 @@ export class UmbDocumentCreateBlueprintServerDataSource {
 	/**
 	 * Fetches the Culture and Hostnames for the given Document unique
 	 * @param {string} unique
+	 * @param requestBody
 	 * @memberof UmbDocumentCreateBlueprintServerDataSource
 	 */
 	async create(requestBody: CreateDocumentBlueprintFromDocumentRequestModel) {

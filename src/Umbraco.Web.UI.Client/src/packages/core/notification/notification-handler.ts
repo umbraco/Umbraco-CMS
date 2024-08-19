@@ -7,7 +7,6 @@ import type { UUIToastNotificationElement } from '@umbraco-cms/backoffice/extern
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
- 
  * @class UmbNotificationHandler
  */
 export class UmbNotificationHandler {

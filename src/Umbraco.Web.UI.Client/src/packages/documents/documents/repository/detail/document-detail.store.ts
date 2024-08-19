@@ -4,7 +4,6 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
-
  * @class UmbDocumentDetailStore
  * @augments {UmbStoreBase}
  * @description - Data Store for Document Details

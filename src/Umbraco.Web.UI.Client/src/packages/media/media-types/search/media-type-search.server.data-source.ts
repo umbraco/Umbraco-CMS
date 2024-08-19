@@ -24,6 +24,7 @@ export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<U
 
 	/**
 	 * Get a list of versions for a data
+	 * @param args
 	 * @returns {*}
 	 * @memberof UmbMediaTypeSearchServerDataSource
 	 */

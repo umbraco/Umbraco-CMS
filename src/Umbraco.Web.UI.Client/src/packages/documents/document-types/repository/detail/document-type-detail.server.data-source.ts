@@ -31,6 +31,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Creates a new Document Type scaffold
 	 * @param {(string | null)} parentUnique
+	 * @param preset
 	 * @returns { CreateDocumentTypeRequestModel }
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
@@ -134,6 +135,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Inserts a new Media Type on the server
 	 * @param {UmbDocumentTypeDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
@@ -204,6 +206,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Updates a DocumentType on the server
 	 * @param {UmbDocumentTypeDetailModel} DocumentType
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */

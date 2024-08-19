@@ -3,7 +3,6 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
-
  * @class UmbStylesheetTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Stylesheets

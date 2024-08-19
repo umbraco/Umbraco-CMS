@@ -184,6 +184,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 	/**
 	 * Updates a MemberType on the server
 	 * @param {UmbMemberTypeDetailModel} MemberType
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbMemberTypeServerDataSource
 	 */

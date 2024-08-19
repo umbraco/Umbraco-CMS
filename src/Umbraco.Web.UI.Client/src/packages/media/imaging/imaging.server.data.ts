@@ -24,6 +24,8 @@ export class UmbImagingServerDataSource {
 	/**
 	 * Fetches the URL for the given media items as resized images
 	 * @param {string} unique
+	 * @param uniques
+	 * @param imagingModel
 	 * @memberof UmbImagingServerDataSource
 	 */
 	async getItems(uniques: Array<string>, imagingModel?: UmbImagingModel) {

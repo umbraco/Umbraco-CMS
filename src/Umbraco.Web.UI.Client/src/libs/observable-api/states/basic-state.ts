@@ -1,7 +1,6 @@
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
- 
  * @class UmbBasicState
  * @description - State ensures the data is unique, not updating any Observes unless there is an actual change of the value using `===`.
  */

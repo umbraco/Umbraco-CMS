@@ -136,6 +136,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Updates a UserGroup on the server
 	 * @param {UmbUserGroupDetailModel} UserGroup
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */

@@ -29,6 +29,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Creates a new Document scaffold
+	 * @param preset
 	 * @returns { UmbDocumentBlueprintDetailModel }
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
@@ -120,6 +121,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentBlueprintDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
@@ -153,6 +155,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Updates a Document on the server
 	 * @param {UmbDocumentBlueprintDetailModel} Document
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */

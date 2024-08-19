@@ -21,6 +21,8 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Get a list of versions for a document
+	 * @param id
+	 * @param culture
 	 * @returns {*}
 	 * @memberof UmbRollbackServerDataSource
 	 */
@@ -30,6 +32,7 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Get a specific version by id
+	 * @param versionId
 	 * @returns {*}
 	 * @memberof UmbRollbackServerDataSource
 	 */

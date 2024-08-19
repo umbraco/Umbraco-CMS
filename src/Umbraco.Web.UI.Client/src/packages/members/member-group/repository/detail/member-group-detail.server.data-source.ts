@@ -98,6 +98,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Updates a MemberGroup on the server
 	 * @param {UmbMemberGroupDetailModel} MemberGroup
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbMemberGroupServerDataSource
 	 */

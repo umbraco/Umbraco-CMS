@@ -149,6 +149,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Updates a User on the server
 	 * @param {UmbUserDetailModel} User
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */

@@ -74,6 +74,7 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests root items of a tree
+	 * @param args
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
@@ -92,6 +93,7 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests tree items of a given parent
 	 * @param {(string | null)} parentUnique
+	 * @param args
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */

@@ -129,6 +129,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Inserts a new Media Type on the server
 	 * @param {UmbMediaTypeDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
@@ -196,6 +197,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Updates a MediaType on the server
 	 * @param {UmbMediaTypeDetailModel} MediaType
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */

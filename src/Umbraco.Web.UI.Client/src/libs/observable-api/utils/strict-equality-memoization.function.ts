@@ -1,5 +1,4 @@
 /**
- 
  * @function strictEqualityMemoization
  * @param {unknown} previousValue - The previous value to compare.
  * @param {unknown} currentValue - The current value to compare.

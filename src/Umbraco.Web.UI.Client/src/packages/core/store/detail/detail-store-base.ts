@@ -4,7 +4,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
-
  * @class UmbDetailStoreBase
  * @augments {UmbStoreBase}
  * @description - Data Store for Data Type items

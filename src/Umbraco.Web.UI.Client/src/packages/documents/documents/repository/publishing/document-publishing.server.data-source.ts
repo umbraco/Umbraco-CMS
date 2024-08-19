@@ -31,6 +31,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Publish one or more variants of a Document
 	 * @param {string} unique
 	 * @param {Array<UmbVariantId>} variantIds
+	 * @param variants
 	 * @returns {*}
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
@@ -86,6 +87,9 @@ export class UmbDocumentPublishingServerDataSource {
 
 	/**
 	 * Publish variants of a document and all its descendants
+	 * @param unique
+	 * @param variantIds
+	 * @param includeUnpublishedDescendants
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publishWithDescendants(

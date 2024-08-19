@@ -4,7 +4,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- 
  * @class UmbPartialViewDetailStore
  * @augments {UmbStoreBase}
  * @description - Data Store for Partial View detail

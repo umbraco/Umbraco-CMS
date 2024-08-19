@@ -112,6 +112,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Updates a Language on the server
 	 * @param {UmbLanguageDetailModel} Language
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */

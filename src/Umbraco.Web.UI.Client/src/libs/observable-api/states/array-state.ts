@@ -4,7 +4,6 @@ import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
 import { UmbDeepState } from './deep-state.js';
 
 /**
- 
  * @class UmbArrayState
  * @augments {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.

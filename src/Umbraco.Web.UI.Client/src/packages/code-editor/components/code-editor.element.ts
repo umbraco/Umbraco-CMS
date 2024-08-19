@@ -219,6 +219,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	/**
 	 * Finds all occurrence of the given string or matches the given regular expression.
 	 * @param {string} text
+	 * @param searchOptions
 	 * @returns {*}
 	 * @memberof UmbCodeEditorElement
 	 */
