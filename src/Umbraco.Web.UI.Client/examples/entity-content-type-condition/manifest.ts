@@ -1,24 +1,22 @@
-import { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspaceView = {
-  type: 'workspaceView',
-  alias: 'Example.WorkspaceView.EntityContentTypeCondition',
-  name: "Example Workspace View With Entity Content Type Condition",
-  element : () => import('./workspace-view.element.js'),
-  meta: {
-    icon : 'icon-bus',
-    label : 'Conditional',
-    pathname : 'conditional'
-  },
-  conditions : [
-    {
-      alias : 'Umb.Condition.WorkspaceContentTypeAlias',
+	type: 'workspaceView',
+	alias: 'Example.WorkspaceView.EntityContentTypeCondition',
+	name: 'Example Workspace View With Entity Content Type Condition',
+	element: () => import('./workspace-view.element.js'),
+	meta: {
+		icon: 'icon-bus',
+		label: 'Conditional',
+		pathname: 'conditional',
+	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.WorkspaceContentTypeAlias',
 			//match : 'blogPost'
-      oneOf : ['blogPost','mediaType1']
-    }
-  ]
+			oneOf: ['blogPost', 'mediaType1'],
+		},
+	],
 };
 
-export const manifests = [
-  workspace
-]
+export const manifests = [workspace];

@@ -11,23 +11,33 @@ import type {
 /**
  * Condition to apply workspace extension based on a content type alias
  */
-export class UmbWorkspaceContentTypeAliasCondition extends UmbConditionBase<WorkspaceContentTypeAliasConditionConfig> implements UmbExtensionCondition {
-	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceContentTypeAliasConditionConfig>) {
+export class UmbWorkspaceContentTypeAliasCondition
+	extends UmbConditionBase<WorkspaceContentTypeAliasConditionConfig>
+	implements UmbExtensionCondition
+{
+	constructor(
+		host: UmbControllerHost,
+		args: UmbConditionControllerArguments<WorkspaceContentTypeAliasConditionConfig>,
+	) {
 		super(host, args);
 
 		let permissionCheck: ((contentTypeAliases: string[]) => boolean) | undefined = undefined;
 		if (this.config.match) {
 			permissionCheck = (contentTypeAliases: string[]) => contentTypeAliases.includes(this.config.match!);
 		} else if (this.config.oneOf) {
-			permissionCheck = (contentTypeAliases: string[]) => contentTypeAliases.some(item => this.config.oneOf!.includes(item));
+			permissionCheck = (contentTypeAliases: string[]) =>
+				contentTypeAliases.some((item) => this.config.oneOf!.includes(item));
 		}
 
 		if (permissionCheck !== undefined) {
 			this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (context) => {
-				this.observe(context.structure.contentTypeAliases,(contentTypeAliases) => {
-					this.permitted = contentTypeAliases ? permissionCheck(contentTypeAliases) : false;
-				},
-				'workspaceContentTypeAliasConditionObserver');
+				this.observe(
+					context.structure.contentTypeAliases,
+					(contentTypeAliases) => {
+						this.permitted = contentTypeAliases ? permissionCheck(contentTypeAliases) : false;
+					},
+					'workspaceContentTypeAliasConditionObserver',
+				);
 			});
 		} else {
 			throw new Error(
@@ -37,22 +47,21 @@ export class UmbWorkspaceContentTypeAliasCondition extends UmbConditionBase<Work
 	}
 }
 
-export type WorkspaceContentTypeAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
-	/**
-	 * Define a content type alias in which workspace this extension should be available
-	 *
-	 * @example
-	 * Depends on implementation, but i.e. "article", "image", "blockPage"
-	 */
-	match?: string;
-	/**
-	 * Define one or more content type aliases in which workspace this extension should be available
-	 *
-	 * @example
-	 * ["article", "image", "blockPage"]
-	 */
-	oneOf?: Array<string>;
-};
+export type WorkspaceContentTypeAliasConditionConfig =
+	UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
+		/**
+		 * Define a content type alias in which workspace this extension should be available
+		 * @example
+		 * Depends on implementation, but i.e. "article", "image", "blockPage"
+		 */
+		match?: string;
+		/**
+		 * Define one or more content type aliases in which workspace this extension should be available
+		 * @example
+		 * ["article", "image", "blockPage"]
+		 */
+		oneOf?: Array<string>;
+	};
 
 export const manifest: ManifestCondition = {
 	type: 'condition',
