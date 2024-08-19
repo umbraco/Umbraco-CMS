@@ -13,7 +13,7 @@ type UuiInputTypeType = typeof UUIInputElement.prototype.type;
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement
-	extends UmbFormControlMixin<string>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -83,7 +83,7 @@ export class UmbPropertyEditorUITextBoxElement
 			?readonly=${this.readonly}></uui-input>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

@@ -129,6 +129,12 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		throw new Error('You cannot set a name of a area-type.');
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: keyof UmbBlockGridTypeAreaType) {
 		return this.#data.asObservablePart((data) => data?.[propertyAlias as keyof UmbBlockGridTypeAreaType] as ReturnType);
 	}
@@ -137,6 +143,13 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		return this.#data.getValue()?.[propertyAlias as keyof UmbBlockGridTypeAreaType] as ReturnType;
 	}
 
+	/**
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
+	 */
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#data.value;
 		if (currentData) {
