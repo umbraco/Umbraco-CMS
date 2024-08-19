@@ -57,7 +57,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 			if (!this.#api) throw new Error('No api defined');
 			await this.#api.execute();
 			this._buttonState = 'success';
-		} catch (error) {
+		} catch {
 			this._buttonState = 'failed';
 		}
 

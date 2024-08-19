@@ -11,6 +11,7 @@ import type { UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
 /**
  *
  * @param manifest
+ * @returns
  */
 function ExtensionApiArgsMethod(
 	manifest: ManifestWorkspaceAction<MetaWorkspaceAction>,

@@ -94,7 +94,11 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	 */
 	public toggleSelect(unique: ValueType) {
 		if (this.getSelectable() === false) return;
-		this.isSelected(unique) ? this.deselect(unique) : this.select(unique);
+		if (this.isSelected(unique)) {
+			this.deselect(unique);
+		} else {
+			this.select(unique);
+		}
 	}
 
 	/**

@@ -96,7 +96,11 @@ export abstract class UmbBaseExtensionInitializer<
 
 	asPromise(): Promise<void> {
 		return new Promise((resolve) => {
-			this.#isPermitted === true ? resolve() : this.#promiseResolvers.push(resolve);
+			if (this.#isPermitted === true) {
+				resolve();
+			} else {
+				this.#promiseResolvers.push(resolve);
+			}
 		});
 	}
 
@@ -299,7 +303,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#isPermitted === true) {
 			this._conditionsAreBad();
 			this.#isPermitted = false;
-			this.#onPermissionChanged?.(false, this as any);
+			this.#onPermissionChanged?.(false, this as unknown as SubClassType);
 		}
 	}
 
@@ -307,7 +311,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#isPermitted === true) {
 			this.#isPermitted = undefined;
 			this._conditionsAreBad();
-			this.#onPermissionChanged?.(false, this as any);
+			this.#onPermissionChanged?.(false, this as unknown as SubClassType);
 		}
 	}
 
@@ -321,7 +325,7 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#overwrites = [];
 		this.#cleanConditions();
 		this.#onPermissionChanged = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 		super.destroy();
 	}
 }

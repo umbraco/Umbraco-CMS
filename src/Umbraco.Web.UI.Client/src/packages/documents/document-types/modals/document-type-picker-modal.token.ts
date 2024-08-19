@@ -12,6 +12,7 @@ export type UmbDocumentTypePickerModalData = UmbTreePickerModalData<
 	typeof UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.PARAMS
 >;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentTypePickerModalValue extends UmbTreePickerModalValue {}
 
 export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<

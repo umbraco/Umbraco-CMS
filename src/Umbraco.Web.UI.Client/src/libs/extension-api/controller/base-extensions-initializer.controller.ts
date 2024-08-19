@@ -14,7 +14,6 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
 /**
  * This abstract Controller holds the core to manage a multiple Extensions.
  * When one or more extensions are permitted to be used, then the extender of this class can instantiate the relevant single extension initiator relevant for this type.
- * @export
  * @abstract
  * @class UmbBaseExtensionsInitializer
  */
@@ -37,7 +36,11 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	asPromise(): Promise<void> {
 		return new Promise((resolve) => {
-			this.#permittedExts.length > 0 ? resolve() : this.#promiseResolvers.push(resolve);
+			if (this.#permittedExts.length > 0) {
+				resolve();
+			} else {
+				this.#promiseResolvers.push(resolve);
+			}
 		});
 	}
 
@@ -200,8 +203,8 @@ export abstract class UmbBaseExtensionsInitializer<
 		if (!this.#extensionRegistry) return;
 
 		const oldPermittedExtsLength = this.#exposedPermittedExts?.length ?? 0;
-		(this._extensions as any) = undefined;
-		(this.#permittedExts as any) = undefined;
+		(this._extensions as unknown) = undefined;
+		(this.#permittedExts as unknown) = undefined;
 		this.#exposedPermittedExts = undefined;
 		if (this.#changeDebounce) {
 			cancelAnimationFrame(this.#changeDebounce);
@@ -213,7 +216,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		this.#promiseResolvers.length = 0;
 		this.#filter = undefined;
 		this.#onChange = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 		super.destroy();
 	}
 }

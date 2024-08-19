@@ -15,6 +15,7 @@ export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEn
 	meta: MetaType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaEntityAction {}
 
 export interface ManifestEntityActionDefaultKind extends ManifestEntityAction<MetaEntityActionDefaultKind> {
@@ -108,6 +109,7 @@ export interface ManifestEntityActionReloadTreeItemChildrenKind
 	kind: 'reloadTreeItemChildren';
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityActionDefaultKind {}
 
 // DUPLICATE TO
