@@ -273,7 +273,7 @@
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"remark-gfm": "^3.0.1",
-		"rollup": "^4.18.1",
+		"rollup": "^4.21.0",
 		"rollup-plugin-esbuild": "^6.1.1",
 		"rollup-plugin-import-css": "^3.5.0",
 		"rollup-plugin-web-worker-loader": "^1.6.1",
