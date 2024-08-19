@@ -702,6 +702,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 				alias: 'blockGroups',
 				value: [{ key: 'demo-block-group-id', name: 'Demo Blocks' }],
 			},
+      {
+        alias: 'layoutStylesheet',
+        value: '/wwwroot/css/umbraco-blockgridlayout.css'
+      },
 			{
 				alias: 'blocks',
 				value: [

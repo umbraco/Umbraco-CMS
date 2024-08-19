@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_TYPE_IMPORT_MODAL } from './modal/document-type-import-modal.token.js';
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbImportDocumentTypeEntityAction extends UmbEntityActionBase<object> {
@@ -9,6 +10,14 @@ export class UmbImportDocumentTypeEntityAction extends UmbEntityActionBase<objec
 			data: { unique: this.args.unique },
 		});
 		await modalContext.onSubmit().catch(() => {});
+
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(event);
 	}
 }
 

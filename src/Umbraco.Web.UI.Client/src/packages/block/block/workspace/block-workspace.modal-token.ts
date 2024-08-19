@@ -3,6 +3,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockWorkspaceData<OriginDataType = unknown> extends UmbWorkspaceModalData {
 	originData: OriginDataType;
+	baseDataPath: string;
 }
 
 export const UMB_BLOCK_WORKSPACE_MODAL = new UmbModalToken<UmbBlockWorkspaceData, UmbWorkspaceModalValue>(
@@ -12,7 +13,7 @@ export const UMB_BLOCK_WORKSPACE_MODAL = new UmbModalToken<UmbBlockWorkspaceData
 			type: 'sidebar',
 			size: 'large',
 		},
-		data: { entityType: 'block', preset: {}, originData: {} },
+		data: { entityType: 'block', preset: {}, originData: {}, baseDataPath: undefined as unknown as string },
 	},
 	// Recast the type, so the entityType data prop is not required:
 ) as UmbModalToken<Omit<UmbWorkspaceModalData, 'entityType'>, UmbWorkspaceModalValue>;

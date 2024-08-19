@@ -17,7 +17,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	@state()
 	_content?: UmbBlockDataType;
 
-	@state()
+	@property()
 	_workspaceEditPath?: string;
 
 	constructor() {
@@ -44,6 +44,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	}
 
 	override render() {
+		// TODO: apply `slot="name"` to the `umb-ufm-render` element, when UUI supports it. [NL]
 		return html`
 			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
 				<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
