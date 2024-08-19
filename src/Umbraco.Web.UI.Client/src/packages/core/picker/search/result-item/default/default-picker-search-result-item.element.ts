@@ -41,7 +41,6 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 
 		this.observe(selectionManager.selection, () => {
 			this._isSelected = selectionManager.isSelected(unique);
-			console.log(this._isSelected);
 		});
 	}
 
@@ -50,21 +49,16 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbLitElement {
 		if (!item) return nothing;
 
 		return html`
-			<uui-ref-node
+			<umb-ref-item
 				name=${item.name}
 				id=${item.unique}
+				icon=${item.icon ?? 'icon-document'}
 				selectable
 				@selected=${() => this.#pickerContext?.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext?.selection.deselect(item.unique)}
 				?selected=${this._isSelected}>
-				${this.#renderIcon()}
-			</uui-ref-node>
+			</umb-ref-item>
 		`;
-	}
-
-	#renderIcon() {
-		if (!this.item?.icon) return nothing;
-		return html`<umb-icon slot="icon" name=${this.item.icon}></umb-icon>`;
 	}
 
 	static override readonly styles = [UmbTextStyles];
