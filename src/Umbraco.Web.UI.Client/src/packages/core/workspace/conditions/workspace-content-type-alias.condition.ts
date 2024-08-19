@@ -8,6 +8,8 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
+const ObserveSymbol = Symbol();
+
 /**
  * Condition to apply workspace extension based on a content type alias
  */
@@ -36,7 +38,7 @@ export class UmbWorkspaceContentTypeAliasCondition
 					(contentTypeAliases) => {
 						this.permitted = contentTypeAliases ? permissionCheck(contentTypeAliases) : false;
 					},
-					'workspaceContentTypeAliasConditionObserver',
+					ObserveSymbol,
 				);
 			});
 		} else {
