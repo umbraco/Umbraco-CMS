@@ -6,7 +6,7 @@ import { jsonStringComparison } from '../utils/json-string-comparison.function.j
 import { UmbBasicState } from './basic-state.js';
 
 /**
- * @export
+
  * @class UmbDeepState
  * @augments {BehaviorSubject<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the data to ensure its not manipulated from any implementations.

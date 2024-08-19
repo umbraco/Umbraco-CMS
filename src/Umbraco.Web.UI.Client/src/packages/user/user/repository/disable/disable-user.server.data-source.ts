@@ -5,7 +5,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for disabling users
- * @export
+
  * @class UmbDisableUserServerDataSource
  */
 export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource {

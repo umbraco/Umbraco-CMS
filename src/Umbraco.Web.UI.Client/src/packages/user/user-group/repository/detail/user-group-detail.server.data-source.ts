@@ -12,7 +12,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the User Group that fetches data from the server
- * @export
+
  * @class UmbUserGroupServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

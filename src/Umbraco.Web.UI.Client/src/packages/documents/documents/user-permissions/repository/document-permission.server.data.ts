@@ -2,7 +2,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- * @export
+
  * @class UmbUserGroupCollectionServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

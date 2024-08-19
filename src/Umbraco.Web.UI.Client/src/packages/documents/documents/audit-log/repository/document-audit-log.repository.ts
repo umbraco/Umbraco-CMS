@@ -6,7 +6,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Repository for the document audit log
- * @export
+
  * @class UmbDocumentAuditLogRepository
  * @augments {UmbRepositoryBase}
  */

@@ -16,7 +16,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Media Type tree that fetches data from the server
- * @export
+
  * @class UmbMediaTypeTreeServerDataSource
  * @augments {UmbTreeServerDataSourceBase}
  */

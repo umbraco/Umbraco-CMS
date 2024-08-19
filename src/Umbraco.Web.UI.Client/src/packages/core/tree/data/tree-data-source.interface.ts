@@ -9,7 +9,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Interface for a tree data source constructor.
- * @export
+
  * @interface UmbTreeDataSourceConstructor
  * @template TreeItemType
  */
@@ -19,7 +19,7 @@ export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemMo
 
 /**
  * Interface for a tree data source.
- * @export
+
  * @interface UmbTreeDataSource
  * @template TreeItemType
  */

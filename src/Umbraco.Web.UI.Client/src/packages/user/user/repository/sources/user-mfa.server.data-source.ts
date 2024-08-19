@@ -4,7 +4,7 @@ import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resourc
 
 /**
  * A data source for User MFA items that fetches data from the server
- * @export
+
  * @class UmbMfaServerDataSource
  */
 export class UmbUserMfaServerDataSource {

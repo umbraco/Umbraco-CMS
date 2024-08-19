@@ -1,7 +1,7 @@
 import { UmbBasicState } from './basic-state.js';
 
 /**
- * @export
+
  * @class UmbBooleanState
  * @augments {UmbBasicState<T>}
  * @description - This state ensures the data is unique, not updating any Observes unless there is an actual change of the value.

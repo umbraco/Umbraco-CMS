@@ -13,7 +13,7 @@ import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffic
 
 /**
  * A data source for the Member Type Composition that fetches data from the server
- * @export
+
  * @class UmbMemberTypeCompositionServerDataSource
  */
 export class UmbMemberTypeCompositionServerDataSource

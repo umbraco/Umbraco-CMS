@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Document Create Blueprint that fetches data from the server
- * @export
+
  * @class UmbDocumentCreateBlueprintServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

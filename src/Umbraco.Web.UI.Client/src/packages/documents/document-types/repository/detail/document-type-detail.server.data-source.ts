@@ -13,7 +13,7 @@ import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@
 
 /**
  * A data source for the Document Type that fetches data from the server
- * @export
+
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
+
  * @class UmbScriptDetailStore
  * @augments {UmbStoreBase}
  * @description - Data Store for scripts

@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
+
  * @class UmbStylesheetItemStore
  * @augments {UmbItemStoreBase}
  * @description - Data Store for Stylesheet items

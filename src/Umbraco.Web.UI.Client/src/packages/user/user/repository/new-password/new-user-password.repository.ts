@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A repository for generating and assigning a new password for a user
- * @export
+
  * @class UmbNewUserPasswordRepository
  * @augments {UmbUserRepositoryBase}
  */

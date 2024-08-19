@@ -12,7 +12,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A server data source for Document publishing
- * @export
+
  * @class UmbDocumentPublishingServerDataSource
  * @implements {DocumentTreeDataSource}
  */

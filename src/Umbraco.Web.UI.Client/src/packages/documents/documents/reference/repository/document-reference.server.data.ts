@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- * @export
+
  * @class UmbDocumentReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

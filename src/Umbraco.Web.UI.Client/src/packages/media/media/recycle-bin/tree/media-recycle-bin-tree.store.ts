@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
- * @export
+
  * @class UmbMediaRecycleBinTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for Media Recycle Bin Tree Items

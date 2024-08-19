@@ -14,7 +14,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the user collection data from the server.
- * @export
+
  * @class UmbUserCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */

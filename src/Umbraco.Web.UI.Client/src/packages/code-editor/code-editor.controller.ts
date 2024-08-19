@@ -23,7 +23,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  * By using monaco library directly you can access the entire monaco API along with code completions, actions etc. This class creates some level of abstraction over the monaco editor. It only provides basic functionality, that should be enough for most of the use cases and should be possible to implement with any code editor library.
  *
  * Current issues: [shadow DOM related issues](https://github.com/microsoft/monaco-editor/labels/editor-shadow-dom) #3217  currently fixed by a hack , [razor syntax highlight](https://github.com/microsoft/monaco-editor/issues/1997)
- * @export
+
  * @class UmbCodeEditor
  */
 export class UmbCodeEditorController extends UmbControllerBase {

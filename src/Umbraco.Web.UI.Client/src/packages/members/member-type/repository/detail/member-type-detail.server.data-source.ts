@@ -13,7 +13,7 @@ import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-
 
 /**
  * A data source for the Member Type that fetches data from the server
- * @export
+
  * @class UmbMemberTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

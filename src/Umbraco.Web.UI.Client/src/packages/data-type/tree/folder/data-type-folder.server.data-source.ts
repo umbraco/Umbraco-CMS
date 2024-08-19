@@ -5,7 +5,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for a Data Type folder that fetches data from the server
- * @export
+
  * @class UmbDataTypeFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

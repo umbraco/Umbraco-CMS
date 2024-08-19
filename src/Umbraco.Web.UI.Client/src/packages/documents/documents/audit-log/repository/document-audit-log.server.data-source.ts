@@ -8,7 +8,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Server data source for the document audit log
- * @export
+
  * @class UmbAuditLogServerDataSource
  */
 export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSource<UmbDocumentAuditLogModel> {

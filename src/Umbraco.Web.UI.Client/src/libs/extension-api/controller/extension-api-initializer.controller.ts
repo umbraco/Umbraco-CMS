@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * ```ts
  * const controller = new UmbExtensionApiController(host, extensionRegistry, alias, [], (permitted, ctrl) => { ctrl.api.helloWorld() }));
  * ```
- * @export
+
  * @class UmbExtensionApiController
  */
 export class UmbExtensionApiInitializer<

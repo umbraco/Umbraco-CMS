@@ -12,7 +12,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Media Recycle Bin tree that fetches data from the server
- * @export
+
  * @class UmbMediaRecycleBinTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */

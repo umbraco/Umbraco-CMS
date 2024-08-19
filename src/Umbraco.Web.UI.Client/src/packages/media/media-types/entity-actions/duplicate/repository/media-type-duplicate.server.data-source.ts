@@ -5,7 +5,7 @@ import type { UmbDuplicateToDataSource, UmbDuplicateToRequestArgs } from '@umbra
 
 /**
  * Duplicate Document Server Data Source
- * @export
+
  * @class UmbDuplicateMediaTypeServerDataSource
  */
 export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateToDataSource {

@@ -7,7 +7,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the dictionary collection data from the server.
- * @export
+
  * @class UmbDictionaryCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */

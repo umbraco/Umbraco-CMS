@@ -15,7 +15,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Base class for a tree repository.
- * @export
+
  * @abstract
  * @class UmbTreeRepositoryBase
  * @augments {UmbRepositoryBase}

@@ -5,7 +5,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Culture and Hostnames that fetches data from the server
- * @export
+
  * @class UmbDocumentCultureAndHostnamesServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

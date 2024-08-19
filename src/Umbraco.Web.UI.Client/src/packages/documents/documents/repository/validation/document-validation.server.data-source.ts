@@ -9,7 +9,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for Document Validation
- * @export
+
  * @class UmbDocumentPublishingServerDataSource
  * @implements {DocumentTreeDataSource}
  */

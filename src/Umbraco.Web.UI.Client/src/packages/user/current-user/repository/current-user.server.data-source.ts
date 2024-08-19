@@ -5,7 +5,7 @@ import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resourc
 
 /**
  * A data source for the current user that fetches data from the server
- * @export
+
  * @class UmbCurrentUserServerDataSource
  */
 export class UmbCurrentUserServerDataSource {

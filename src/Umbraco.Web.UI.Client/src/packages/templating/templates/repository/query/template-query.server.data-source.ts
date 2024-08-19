@@ -6,7 +6,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template Query Builder that fetches data from the server
- * @export
+
  * @class UmbTemplateQueryServerDataSource
  */
 export class UmbTemplateQueryServerDataSource {

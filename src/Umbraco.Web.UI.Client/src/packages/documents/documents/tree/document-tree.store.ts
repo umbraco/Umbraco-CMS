@@ -3,7 +3,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * @export
+
  * @class UmbDocumentTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Document Items

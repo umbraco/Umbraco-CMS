@@ -11,7 +11,7 @@ import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observab
 
 /**
  * Context API for the installer
- * @export
+
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {

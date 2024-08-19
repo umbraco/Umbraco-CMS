@@ -17,7 +17,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Stylesheet tree that fetches data from the server
- * @export
+
  * @class UmbStylesheetTreeServerDataSource
  * @implements {UmbTreeServerDataSourceBase}
  */

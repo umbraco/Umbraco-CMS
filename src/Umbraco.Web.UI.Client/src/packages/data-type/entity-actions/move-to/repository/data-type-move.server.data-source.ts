@@ -5,7 +5,7 @@ import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backo
 
 /**
  * Move Data Type Server Data Source
- * @export
+
  * @class UmbMoveDataTypeServerDataSource
  */
 export class UmbMoveDataTypeServerDataSource implements UmbMoveDataSource {

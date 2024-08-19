@@ -10,7 +10,7 @@ import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A data source that fetches the member collection data from the server.
- * @export
+
  * @class UmbMemberCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */

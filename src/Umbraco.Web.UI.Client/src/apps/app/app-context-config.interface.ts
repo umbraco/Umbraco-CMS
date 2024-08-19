@@ -1,6 +1,6 @@
 /**
  * Configuration interface for the Umbraco App Context
- * @export
+
  * @interface UmbAppContextConfig
  */
 export interface UmbAppContextConfig {

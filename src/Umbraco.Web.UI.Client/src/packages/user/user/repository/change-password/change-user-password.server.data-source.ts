@@ -4,7 +4,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for changing the password of a user
- * @export
+
  * @class UmbChangeUserPasswordServerDataSource
  */
 export class UmbChangeUserPasswordServerDataSource {

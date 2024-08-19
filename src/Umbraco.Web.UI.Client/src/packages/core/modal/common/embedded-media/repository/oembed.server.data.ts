@@ -4,7 +4,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the OEmbed that fetches data from a given URL.
- * @export
+
  * @class UmbOEmbedServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

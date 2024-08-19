@@ -4,7 +4,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Tag that fetches data from the server
- * @export
+
  * @class UmbTagServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

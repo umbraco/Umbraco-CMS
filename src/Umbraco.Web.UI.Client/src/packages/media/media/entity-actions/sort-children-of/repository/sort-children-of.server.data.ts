@@ -5,7 +5,7 @@ import type { UmbSortChildrenOfArgs, UmbSortChildrenOfDataSource } from '@umbrac
 
 /**
  * A server data source for sorting children of a Media
- * @export
+
  * @class UmbSortChildrenOfMediaServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

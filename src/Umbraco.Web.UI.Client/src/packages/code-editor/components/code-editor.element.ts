@@ -29,7 +29,7 @@ const elementName = 'umb-code-editor';
  * The element will listen to the theme context and update the theme accordingly.
  * Parts of the monaco Api is exposed through the `editor` property. You can access the monaco editor instance through `editor.monacoEditor`.
  * @element umb-code-editor
- * @export
+
  * @class UmbCodeEditorElement
  * @augments {UmbLitElement}
  * @implements {UmbCodeEditorHost}

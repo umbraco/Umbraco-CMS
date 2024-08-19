@@ -7,7 +7,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Partial View folders that fetches data from the server
- * @export
+
  * @class UmbPartialViewFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

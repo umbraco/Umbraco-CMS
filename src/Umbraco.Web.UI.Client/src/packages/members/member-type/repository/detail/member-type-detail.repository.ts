@@ -6,7 +6,7 @@ import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for the Member Type detail
- * @export
+
  * @class UmbMemberTypeDetailRepository
  * @augments {UmbDetailRepositoryBase<UmbMemberTypeDetailModel>}
  */

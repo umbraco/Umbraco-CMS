@@ -8,7 +8,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Document Blueprint items that fetches data from the server
- * @export
+
  * @class UmbDocumentBlueprintItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */

@@ -13,7 +13,7 @@ import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-
 
 /**
  * A data source for the Media Type that fetches data from the server
- * @export
+
  * @class UmbMediaTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

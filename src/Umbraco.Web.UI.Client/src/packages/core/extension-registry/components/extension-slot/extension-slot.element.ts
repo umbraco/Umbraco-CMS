@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * @element umb-extension-slot
  * @description A element which renderers the extensions of a given type or types.
  * @slot default - slot for inserting additional things into this slot.
- * @export
+
  * @class UmbExtensionSlot
  * @augments {UmbLitElement}
  */

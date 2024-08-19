@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * @export
+
  * @class UmbWebhookEventStore
  * @augments {UmbStoreBase}
  * @description - Data Store for Webhook Events

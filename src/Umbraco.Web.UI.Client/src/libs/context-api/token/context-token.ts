@@ -3,7 +3,7 @@ export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseTy
 ) => instance is DiscriminatorResult;
 
 /**
- * @export
+
  * @class UmbContextToken
  * @template BaseType - A generic type of the API before decimated.
  * @template ResultType - A concrete type of the API after decimation, use this when you apply a discriminator method. Note this is optional and defaults to the BaseType.

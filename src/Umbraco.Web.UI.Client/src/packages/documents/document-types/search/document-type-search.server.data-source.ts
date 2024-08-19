@@ -7,7 +7,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
- * @export
+
  * @class UmbDocumentTypeSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

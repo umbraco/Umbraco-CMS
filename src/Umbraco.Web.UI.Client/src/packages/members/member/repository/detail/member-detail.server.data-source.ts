@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Member that fetches data from the server
- * @export
+
  * @class UmbMemberServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
