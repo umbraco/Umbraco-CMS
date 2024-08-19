@@ -12,5 +12,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 public interface IIndexedEntitySearchService
 {
-    PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false);
+    PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, Guid? startFrom, int skip = 0, int take = 100, bool ignoreUserStartNodes = false );
+
+    PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
+        => Search(objectType, query, null, skip, take, ignoreUserStartNodes);
 }
