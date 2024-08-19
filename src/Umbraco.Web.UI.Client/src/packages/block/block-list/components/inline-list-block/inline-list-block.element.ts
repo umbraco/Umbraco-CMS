@@ -94,7 +94,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		return html`
 			<span id="content">
 				<span id="icon">
-					<uui-icon .name=${this.icon ?? null}></uui-icon>
+					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
 					<div id="name">${this.label}</div>

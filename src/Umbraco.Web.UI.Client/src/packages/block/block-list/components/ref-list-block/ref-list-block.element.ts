@@ -50,7 +50,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		// TODO: apply `slot="name"` to the `umb-ufm-render` element, when UUI supports it. [NL]
 		return html`
 			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
-				<uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon>
+				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
 			</uui-ref-node>
 		`;
