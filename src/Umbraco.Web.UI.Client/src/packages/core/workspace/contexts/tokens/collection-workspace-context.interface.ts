@@ -7,10 +7,3 @@ export interface UmbCollectionWorkspaceContext<T extends UmbContentTypeModel> ex
 	getCollectionAlias(): string;
 	structure: UmbContentTypeStructureManager<T>;
 }
-
-/**
- * @deprecated Use UmbCollectionWorkspaceContextInterface instead — Will be removed before RC.
- * TODO: Delete before RC.
- */
-export interface UmbWorkspaceCollectionContextInterface<T extends UmbContentTypeModel>
-	extends UmbCollectionWorkspaceContext<T> {}

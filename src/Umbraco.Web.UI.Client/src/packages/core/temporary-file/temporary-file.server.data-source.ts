@@ -4,7 +4,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source to upload temporary files to the server
- * @export
  * @class UmbTemporaryFileServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -13,7 +12,7 @@ export class UmbTemporaryFileServerDataSource {
 
 	/**
 	 * Creates an instance of UmbTemporaryFileServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -23,7 +23,11 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 			onChange: () => {
-				condition.permitted ? this.enable() : this.disable();
+				if (condition.permitted) {
+					this.enable();
+				} else {
+					this.disable();
+				}
 			},
 		});
 	}

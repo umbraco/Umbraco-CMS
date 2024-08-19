@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for a Document Blueprint folder that fetches data from the server
- * @export
  * @class UmbDocumentBlueprintFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 
 	/**
 	 * Creates an instance of UmbDocumentBlueprintFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

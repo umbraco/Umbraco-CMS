@@ -5,7 +5,6 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Interface for a tree store.
- * @export
  * @interface UmbTreeStore
  * @augments {UmbStore<TreeItemType>}
  * @augments {UmbApi}

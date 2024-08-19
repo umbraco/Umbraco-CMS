@@ -284,7 +284,7 @@
 		"tsc-alias": "^1.8.10",
 		"typedoc": "^0.26.5",
 		"typescript": "^5.5.3",
-		"typescript-eslint": "^7.16.1",
+		"typescript-eslint": "^8.0.1",
 		"typescript-json-schema": "^0.64.0",
 		"vite": "^5.3.4",
 		"vite-plugin-static-copy": "^1.0.6",

@@ -4,7 +4,6 @@ import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
 import { UmbDeepState } from './deep-state.js';
 
 /**
- * @export
  * @class UmbArrayState
  * @augments {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
@@ -248,6 +247,6 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	override destroy() {
 		super.destroy();
 		this.#sortMethod = undefined;
-		(this.getUniqueMethod as any) = undefined;
+		(this.getUniqueMethod as unknown) = undefined;
 	}
 }

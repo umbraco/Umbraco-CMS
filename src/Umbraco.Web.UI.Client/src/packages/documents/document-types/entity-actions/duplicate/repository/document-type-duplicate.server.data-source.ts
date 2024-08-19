@@ -5,7 +5,6 @@ import type { UmbDuplicateToDataSource, UmbDuplicateToRequestArgs } from '@umbra
 
 /**
  * Duplicate Document Server Data Source
- * @export
  * @class UmbDuplicateDocumentTypeServerDataSource
  */
 export class UmbDuplicateDocumentTypeServerDataSource implements UmbDuplicateToDataSource {
@@ -13,7 +12,7 @@ export class UmbDuplicateDocumentTypeServerDataSource implements UmbDuplicateToD
 
 	/**
 	 * Creates an instance of UmbDuplicateDocumentTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDuplicateDocumentTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

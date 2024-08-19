@@ -8,6 +8,7 @@ export interface UmbBlockGridWorkspaceOriginData {
 	areaKey?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbBlockGridWorkspaceData extends UmbBlockWorkspaceData<UmbBlockGridWorkspaceOriginData> {}
 
 export const UMB_BLOCK_GRID_WORKSPACE_MODAL = new UmbModalToken<UmbBlockGridWorkspaceData, UmbWorkspaceModalValue>(

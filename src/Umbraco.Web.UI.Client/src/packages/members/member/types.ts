@@ -21,6 +21,7 @@ export interface UmbMemberDetailModel {
 	variants: Array<UmbVariantModel>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMemberVariantModel extends UmbVariantModel {}
 
 export interface UmbMemberValueModel<ValueType = unknown> {
@@ -30,4 +31,5 @@ export interface UmbMemberValueModel<ValueType = unknown> {
 	value: ValueType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMemberVariantOptionModel extends UmbVariantOptionModel<UmbMemberVariantModel> {}

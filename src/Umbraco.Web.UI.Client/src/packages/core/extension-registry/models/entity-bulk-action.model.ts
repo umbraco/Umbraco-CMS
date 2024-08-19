@@ -15,6 +15,7 @@ export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction 
 	meta: MetaType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaEntityBulkAction {}
 
 export interface ManifestEntityBulkActionDefaultKind extends ManifestEntityBulkAction<MetaEntityBulkActionDefaultKind> {

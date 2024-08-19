@@ -24,7 +24,6 @@ export interface UmbTreeServerDataSourceBaseArgs<
 
 /**
  * A data source for a tree that fetches data from the server
- * @export
  * @class UmbTreeServerDataSourceBase
  * @implements {UmbTreeDataSource}
  */
@@ -50,7 +49,8 @@ export abstract class UmbTreeServerDataSourceBase<
 
 	/**
 	 * Creates an instance of UmbTreeServerDataSourceBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
+	 * @param args
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	constructor(

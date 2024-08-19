@@ -169,9 +169,11 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			const newGroupKey = element.getAttribute('data-umb-group-key');
 			const movedItem = e.detail?.item as UmbBlockTypeWithGroupKey;
 			// Check if item moved back to original group...
-			movedItem.groupKey === newGroupKey
-				? (this.#moveData = undefined)
-				: (this.#moveData = value.map((block) => ({ ...block, groupKey: newGroupKey })));
+			if (movedItem.groupKey === newGroupKey) {
+				this.#moveData = undefined;
+			} else {
+				this.#moveData = value.map((block) => ({ ...block, groupKey: newGroupKey }));
+			}
 		} else if (e.detail?.moveComplete) {
 			// Move complete, get the blocks that were in an untouched group
 			const blocks = this.#value
@@ -193,9 +195,9 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		}
 	}
 
-	// TODO: Implement confirm dialog
+	// TODO: Implement confirm dialog [NL]
 	#deleteGroup(groupKey: string) {
-		// TODO: make one method for updating the blockGroupsDataSetValue:
+		// TODO: make one method for updating the blockGroupsDataSetValue: [NL]
 		// This one that deletes might require the ability to parse what to send as an argument to the method, then a filtering can occur before.
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
@@ -208,7 +210,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#changeGroupName(e: UUIInputEvent, groupKey: string) {
 		const groupName = e.target.value as string;
-		// TODO: make one method for updating the blockGroupsDataSetValue:
+		// TODO: make one method for updating the blockGroupsDataSetValue: [NL]
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this.#blockGroups?.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),

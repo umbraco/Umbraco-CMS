@@ -10,7 +10,6 @@ let manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 
 /**
  * A server data source for Data Type items
- * @export
  * @class UmbDataTypeItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -20,7 +19,7 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 > {
 	/**
 	 * Creates an instance of UmbDataTypeItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeItemServerDataSource
 	 */
 

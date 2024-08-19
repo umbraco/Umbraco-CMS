@@ -70,6 +70,6 @@ export class UmbExtensionsElementInitializer<
 	public override destroy(): void {
 		super.destroy();
 		this.#props = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 	}
 }

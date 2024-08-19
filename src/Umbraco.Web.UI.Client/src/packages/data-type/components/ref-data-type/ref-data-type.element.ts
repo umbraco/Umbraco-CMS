@@ -74,8 +74,8 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 					this.#requestIconSVG(icon);
 				}
 			},
-		),
-			'_observeIcon';
+			'_observeIcon',
+		);
 	}
 
 	#requestIconSVG(iconName: string) {

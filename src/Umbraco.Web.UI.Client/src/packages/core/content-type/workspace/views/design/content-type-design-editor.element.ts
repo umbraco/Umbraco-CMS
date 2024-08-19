@@ -271,9 +271,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
 		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
-		this.#tabsStructureHelper?.isOwnerChildContainer(tabId)
-			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
-			: '';
+		if (this.#tabsStructureHelper?.isOwnerChildContainer(tabId)) {
+			window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'));
+		}
 	}
 	async #addTab() {
 		// If there is already a Tab with no name, then focus it instead of adding a new one: [NL]

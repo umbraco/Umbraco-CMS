@@ -12,6 +12,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
  * @param constructorArgs
  * @param fallbackElement
  * @param fallbackApi
+ * @returns {Promise<{ element?: ElementType; api?: ApiType }>} - Returns an object with the created element and api.
  */
 export async function createExtensionElementWithApi<
 	ElementType extends UmbControllerHostElement,

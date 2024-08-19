@@ -3,7 +3,6 @@ import type { UmbAction } from '@umbraco-cms/backoffice/action';
 
 /**
  * Interface for an entity action.
- * @export
  * @interface UmbEntityAction
  */
 export interface UmbEntityAction<ArgsMetaType> extends UmbAction<UmbEntityActionArgs<ArgsMetaType>> {

@@ -1,7 +1,6 @@
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
- * @export
  * @class UmbBasicState
  * @description - State ensures the data is unique, not updating any Observes unless there is an actual change of the value using `===`.
  */
@@ -54,7 +53,7 @@ export class UmbBasicState<T> {
 	 */
 	public destroy(): void {
 		this._subject?.complete();
-		(this._subject as any) = undefined;
+		(this._subject as unknown) = undefined;
 	}
 
 	/**

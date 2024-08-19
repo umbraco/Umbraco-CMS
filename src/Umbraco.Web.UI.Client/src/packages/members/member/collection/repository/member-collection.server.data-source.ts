@@ -10,7 +10,6 @@ import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A data source that fetches the member collection data from the server.
- * @export
  * @class UmbMemberCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -19,7 +18,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 
 	/**
 	 * Creates an instance of UmbMemberCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

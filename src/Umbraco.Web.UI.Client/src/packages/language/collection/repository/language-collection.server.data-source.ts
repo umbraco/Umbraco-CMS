@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the language collection data from the server.
- * @export
  * @class UmbLanguageCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Creates an instance of UmbLanguageCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

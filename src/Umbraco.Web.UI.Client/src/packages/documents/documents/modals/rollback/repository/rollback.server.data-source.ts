@@ -4,7 +4,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
- * @export
  * @class UmbRollbackServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -13,7 +12,7 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Creates an instance of UmbRollbackServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,6 +21,8 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Get a list of versions for a document
+	 * @param id
+	 * @param culture
 	 * @returns {*}
 	 * @memberof UmbRollbackServerDataSource
 	 */
@@ -31,6 +32,7 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Get a specific version by id
+	 * @param versionId
 	 * @returns {*}
 	 * @memberof UmbRollbackServerDataSource
 	 */

@@ -5,7 +5,6 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A entity context for the isTrashed state.
- * @export
  * @class UmbIsTrashedEntityContext
  * @augments {UmbContextBase<UmbIsTrashedEntityContext>}
  * @implements {UmbIsTrashedEntityContext}

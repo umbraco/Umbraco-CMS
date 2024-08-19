@@ -7,14 +7,13 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 
 /**
  * A data source for user items that fetches data from the server
- * @export
  * @class UmbUserItemServerDataSource
  * @implements {UmbItemDataSource}
  */
 export class UmbUserItemServerDataSource extends UmbItemServerDataSourceBase<UserItemResponseModel, UmbUserItemModel> {
 	/**
 	 * Creates an instance of UmbUserItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

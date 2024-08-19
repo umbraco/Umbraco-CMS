@@ -4,7 +4,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbTemplateItemStore
  * @augments {UmbStoreBase}
  * @description - Data Store for Template items
@@ -13,7 +12,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 export class UmbTemplateItemStore extends UmbItemStoreBase<UmbTemplateItemModel> {
 	/**
 	 * Creates an instance of UmbTemplateItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemplateItemStore
 	 */
 	constructor(host: UmbControllerHost) {

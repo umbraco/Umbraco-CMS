@@ -5,4 +5,4 @@ export interface ManifestMonacoMarkdownEditorAction extends ManifestApi<any> {
 	meta?: MetaMonacoMarkdownEditorAction;
 }
 
-export interface MetaMonacoMarkdownEditorAction {}
+export type MetaMonacoMarkdownEditorAction = object;

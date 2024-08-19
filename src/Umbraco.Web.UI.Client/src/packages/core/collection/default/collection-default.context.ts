@@ -68,7 +68,11 @@ export class UmbDefaultCollectionContext<
 	#initialized = false;
 
 	#init = new Promise<void>((resolve) => {
-		this.#initialized ? resolve() : (this.#initResolver = resolve);
+		if (this.#initialized) {
+			resolve();
+		} else {
+			this.#initResolver = resolve;
+		}
 	});
 
 	#actionEventContext: UmbActionEventContext | undefined;
