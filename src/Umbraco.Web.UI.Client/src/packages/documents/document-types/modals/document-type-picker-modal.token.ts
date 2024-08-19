@@ -1,6 +1,10 @@
 import { UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import type { UmbDocumentTypeTreeItemModel } from '@umbraco-cms/backoffice/document-type';
+import {
+	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+	type UmbDocumentTypeTreeItemModel,
+} from '@umbraco-cms/backoffice/document-type';
 import {
 	type UmbTreePickerModalValue,
 	type UmbTreePickerModalData,
@@ -27,12 +31,12 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 		createAction: {
 			label: '#content_createEmpty',
 			modalData: {
-				entityType: 'document-type',
+				entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 				preset: {},
 			},
 			extendWithPathPattern: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 			extendWithPathParams: {
-				parentEntityType: 'document-type-root',
+				parentEntityType: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 				parentUnique: null,
 				presetAlias: null,
 			},

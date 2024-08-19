@@ -44,8 +44,10 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
-	 * @param propertyAlias
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return await this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias);

@@ -30,6 +30,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -78,6 +79,8 @@ export class UmbDocumentTypeWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DocumentType');
+
+		this.addValidationContext(new UmbValidationContext(this).provide());
 
 		// General for content types:
 		//this.data = this.structure.ownerContentType;

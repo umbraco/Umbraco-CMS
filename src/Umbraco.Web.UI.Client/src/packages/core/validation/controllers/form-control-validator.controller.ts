@@ -6,6 +6,10 @@ import { UmbValidationValidEvent } from '../events/validation-valid.event.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/**
+ * Bind a Form Controls validation state to the validation context.
+ * This validator will validate the form control and add messages to the validation context if the form control is invalid.
+ */
 export class UmbFormControlValidator extends UmbControllerBase implements UmbValidator {
 	// The path to the data that this validator is validating.
 	readonly #dataPath?: string;
