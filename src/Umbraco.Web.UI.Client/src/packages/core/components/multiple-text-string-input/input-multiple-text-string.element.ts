@@ -71,7 +71,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 	 * Disables the input
 	 * @type {boolean}
 	 * @attr
-	 * @default false
+	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
 	public set disabled(value) {
@@ -89,7 +89,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 	 * Makes the input readonly
 	 * @type {boolean}
 	 * @attr
-	 * @default false
+	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
 	public set readonly(value) {
@@ -186,11 +186,11 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	getFormElement() {
+	override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
 			${this.#renderAddButton()}`;
 	}
@@ -230,7 +230,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#action {
 				display: block;

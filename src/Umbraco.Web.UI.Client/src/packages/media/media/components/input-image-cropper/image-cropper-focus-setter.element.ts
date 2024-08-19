@@ -26,12 +26,12 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	#DOT_RADIUS = 6 as const;
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#removeEventListeners();
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (this.hideFocalPoint) return;
@@ -42,7 +42,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		}
 	}
 
-	protected update(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override update(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.update(changedProperties);
 
 		if (changedProperties.has('src')) {
@@ -52,7 +52,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		}
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
 		this.style.setProperty('--dot-radius', `${this.#DOT_RADIUS}px`);
@@ -140,7 +140,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		if (!this.src) return nothing;
 		return html`
 			<div id="wrapper">
@@ -150,7 +150,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: flex;
 			width: 100%;

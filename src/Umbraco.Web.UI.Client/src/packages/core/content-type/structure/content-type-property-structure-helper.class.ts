@@ -21,7 +21,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	#structure?: UmbContentTypeStructureManager<T>;
 
-	private _containerId?: string | null;
+	#containerId?: string | null;
 
 	// State which holds all the properties of the current container, this is a composition of all properties from the containers that matches our target [NL]
 	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.id);
@@ -59,12 +59,12 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	}
 
 	public setContainerId(value?: string | null) {
-		if (this._containerId === value) return;
-		this._containerId = value;
+		if (this.#containerId === value) return;
+		this.#containerId = value;
 		this.#observeContainers();
 	}
 	public getContainerId() {
-		return this._containerId;
+		return this.#containerId;
 	}
 
 	private _containerName?: string;
@@ -74,9 +74,9 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	#containers?: Array<UmbPropertyTypeContainerModel>;
 	#observeContainers() {
-		if (!this.#structure || this._containerId === undefined) return;
+		if (!this.#structure || this.#containerId === undefined) return;
 
-		if (this._containerId === null) {
+		if (this.#containerId === null) {
 			this.observe(
 				this.#structure.propertyStructuresOf(null),
 				(properties) => {
@@ -87,7 +87,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			this.removeUmbControllerByAlias('_observeContainers');
 		} else {
 			this.observe(
-				this.#structure.containerById(this._containerId),
+				this.#structure.containerById(this.#containerId),
 				(container) => {
 					if (container) {
 						this._containerName = container.name ?? '';
@@ -180,23 +180,6 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
-
-	async createPropertyScaffold(ownerId?: string | null) {
-		await this.#init;
-		if (!this.#structure) return;
-
-		return await this.#structure.createPropertyScaffold(ownerId);
-	}
-	/*
-		Only used by legacy implementation:
-		@deprecated
-	*/
-	async addProperty(containerId?: string, sortOrder?: number) {
-		await this.#init;
-		if (!this.#structure) return;
-
-		return await this.#structure.createProperty(null, containerId, sortOrder);
-	}
 
 	async insertProperty(property: UmbPropertyTypeModel, sortOrder?: number) {
 		await this.#init;

@@ -8,15 +8,10 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { DocumentBlueprintTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbTreeAncestorsOfRequestArgs,
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for a data type tree that fetches data from the server
- * @export
  * @class UmbDocumentBlueprintTreeServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -26,7 +21,7 @@ export class UmbDocumentBlueprintTreeServerDataSource extends UmbTreeServerDataS
 > {
 	/**
 	 * Creates an instance of UmbDocumentBlueprintTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -59,7 +54,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	}
 };
 
-const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
+const getAncestorsOf = () => {
 	throw new Error('Not implemented');
 	/** TODO: Implement when endpoint becomes available... */
 };

@@ -18,27 +18,27 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 		if (!config) return;
 
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
-		this.min = minMax?.min ?? 0;
-		this.max = minMax?.max ?? Infinity;
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 	}
 
 	@state()
-	min = 0;
+	_min = 0;
 
 	@state()
-	max = Infinity;
+	_max = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMemberGroupElement }) {
 		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-member-group
-				.min=${this.min}
-				.max=${this.max}
-				.value=${this.value ?? ''}
+				.min=${this._min}
+				.max=${this._max}
+				.value=${this.value}
 				?showOpenButton=${true}
 				@change=${this.#onChange}></umb-input-member-group>
 		`;

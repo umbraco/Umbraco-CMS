@@ -1,15 +1,17 @@
-import { getPropertyValueByAlias } from '../index.js';
-import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
+import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import { getPropertyValueByAlias } from '../index.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
+
+import '@umbraco-cms/backoffice/ufm';
 
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
@@ -96,7 +98,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
 
-	render() {
+	override render() {
 		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
 	}
 
@@ -170,13 +172,27 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(item, column.alias)}</li>`,
+					(column) => this.#renderProperty(item, column),
 				)}
 			</ul>
 		`;
 	}
 
-	static styles = [
+	#renderProperty(item: UmbDocumentCollectionItemModel, column: UmbCollectionColumnConfiguration) {
+		const value = getPropertyValueByAlias(item, column.alias);
+		return html`
+			<li>
+				<span>${column.header}:</span>
+				${when(
+					column.nameTemplate,
+					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
+					() => html`${value}`,
+				)}
+			</li>
+		`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

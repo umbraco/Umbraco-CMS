@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the UserGroup that fetches data from the server
- * @export
  * @class UmbUserGroupCollectionServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 
 	/**
 	 * Creates an instance of UmbUserGroupCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserGroupCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

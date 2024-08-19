@@ -1,17 +1,16 @@
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_MEDIA_RECYCLE_BIN_TREE_STORE_CONTEXT } from './media-recycle-bin-tree.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
- * @export
  * @class UmbMediaRecycleBinTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Tree Data Store for Media Recycle Bin Tree Items
  */
 export class UmbMediaRecycleBinTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbMediaRecycleBinTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaRecycleBinTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -19,6 +18,4 @@ export class UmbMediaRecycleBinTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
-export const UMB_MEDIA_RECYCLE_BIN_TREE_STORE_CONTEXT = new UmbContextToken<UmbMediaRecycleBinTreeStore>(
-	'UmbMediaRecycleBinTreeStore',
-);
+export { UmbMediaRecycleBinTreeStore as api };

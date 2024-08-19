@@ -32,9 +32,9 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 		host.addUmbController(this);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#host?.removeUmbController(this);
-		(this.#host as any) = undefined;
+		(this.#host as unknown) = undefined;
 		super.destroy();
 	}
 }

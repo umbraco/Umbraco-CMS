@@ -1,12 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	css,
-	html,
-	customElement,
-	state,
-	ifDefined,
-	type PropertyValueMap,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -14,15 +7,33 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 type UuiInputTypeType = typeof UUIInputElement.prototype.type;
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement
-	extends UmbFormControlMixin<string>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
 	#defaultType: UuiInputTypeType = 'text';
 
 	@state()
@@ -44,29 +55,35 @@ export class UmbPropertyEditorUITextBoxElement
 		this._placeholder = config?.getValueByAlias('placeholder');
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
+	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
 
-	private onChange(e: Event) {
+	override focus() {
+		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
+	}
+
+	#onInput(e: InputEvent) {
 		const newValue = (e.target as HTMLInputElement).value;
 		if (newValue === this.value) return;
 		this.value = newValue;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-input
 			.value=${this.value ?? ''}
 			.type=${this._type}
 			placeholder=${ifDefined(this._placeholder)}
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
-			@input=${this.onChange}></uui-input>`;
+			@input=${this.#onInput}
+			?required=${this.mandatory}
+			.requiredMessage=${this.mandatoryMessage}
+			?readonly=${this.readonly}></uui-input>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

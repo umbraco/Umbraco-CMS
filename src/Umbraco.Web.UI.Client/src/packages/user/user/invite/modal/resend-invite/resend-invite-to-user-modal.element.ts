@@ -37,7 +37,7 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`<uui-dialog-layout headline="Resend invite">
 			${this.#renderForm()}
 

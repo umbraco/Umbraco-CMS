@@ -1,8 +1,12 @@
+// TODO: clean up this file
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
-/** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
+/**
+ * Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
  * https://github.com/advisories/GHSA-w7jx-j77m-wp65
  * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
+ * @param editor
  */
 export const uriAttributeSanitizer = (editor: Editor) => {
 	const uriAttributesToSanitize = ['src', 'href', 'data', 'background', 'action', 'formaction', 'poster', 'xlink:href'];

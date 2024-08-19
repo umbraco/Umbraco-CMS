@@ -6,7 +6,6 @@ import {
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { html, customElement, state, repeat, css, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
@@ -17,9 +16,12 @@ import {
 	type UmbFormControlValidatorConfig,
 } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
+ * @param args
+ * @returns { null | true }
  */
 function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>) {
 	// If this has areas, we do not want to move, unless we are at the edge
@@ -132,7 +134,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
-	#controlValidator: UmbFormControlValidator;
 
 	@property({ attribute: false })
 	public set areaKey(value: string | null | undefined) {
@@ -210,16 +211,16 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.observe(
 				manager.layoutStylesheet,
 				(stylesheet) => {
-					if (this._styleElement && this._styleElement.href === stylesheet) return;
+					if (!stylesheet || this._styleElement?.href === stylesheet) return;
 					this._styleElement = document.createElement('link');
-					this._styleElement.setAttribute('rel', 'stylesheet');
-					this._styleElement.setAttribute('href', stylesheet);
+					this._styleElement.rel = 'stylesheet';
+					this._styleElement.href = stylesheet;
 				},
 				'observeStylesheet',
 			);
 		});
 
-		this.#controlValidator = new UmbFormControlValidator(this, this /*, this.#dataPath*/);
+		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
 	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
@@ -267,7 +268,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type. [NL]
-	render() {
+	override render() {
 		return html`
 			${this._styleElement}
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
@@ -292,7 +293,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
 			return html`<uui-button-group>
 				<uui-button
-					id="add-button"
 					look="placeholder"
 					label=${this._singleBlockTypeName
 						? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
@@ -316,7 +316,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

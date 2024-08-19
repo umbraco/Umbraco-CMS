@@ -1,5 +1,5 @@
 import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValue } from './index.js';
+import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -75,7 +75,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-rich-media
 				.alias=${this._alias}

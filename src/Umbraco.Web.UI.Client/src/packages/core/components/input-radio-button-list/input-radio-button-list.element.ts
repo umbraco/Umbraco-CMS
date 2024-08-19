@@ -11,17 +11,17 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 	#value: string = '';
 
 	@property()
-	public set value(value: string) {
+	public override set value(value: string) {
 		this.#value = value;
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.#value;
 	}
 
 	@property({ type: Array })
 	public list: Array<UmbRadioButtonItem> = [];
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -32,7 +32,7 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		if (!this.list) return nothing;
 
 		return html`
@@ -50,7 +50,7 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 		return html`<uui-radio value=${item.value} label=${item.label}></uui-radio>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

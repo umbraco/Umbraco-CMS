@@ -10,7 +10,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 /**
  * A base property dataset context implementation.
  * @class UmbPropertyDatasetContextBase
- * @extends {UmbContextBase}
+ * @augments {UmbContextBase}
  */
 export class UmbPropertyDatasetContextBase
 	extends UmbContextBase<typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE>
@@ -47,7 +47,10 @@ export class UmbPropertyDatasetContextBase
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#values.asObservablePart((values) => {
@@ -57,7 +60,11 @@ export class UmbPropertyDatasetContextBase
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
 	 */
 	setPropertyValue(alias: string, value: unknown) {
 		this.#values.appendOne({ alias, value });

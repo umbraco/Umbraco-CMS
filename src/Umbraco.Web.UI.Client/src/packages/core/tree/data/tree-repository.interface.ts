@@ -11,9 +11,8 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Interface for a tree repository.
- * @export
  * @interface UmbTreeRepository
- * @extends {UmbApi}
+ * @augments {UmbApi}
  * @template TreeItemType
  * @template TreeRootType
  */

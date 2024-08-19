@@ -22,7 +22,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 		this.addEventListener(UUIRefEvent.OPEN, () => this.dispatchEvent(new Event('click')));
 	}
 
-	public render() {
+	override render() {
 		return html`
 			<button
 				type="button"
@@ -31,7 +31,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 				@click=${this.handleOpenClick}
 				@keydown=${this.handleOpenKeydown}
 				?disabled=${this.disabled}>
-				${when(this.icon, () => html`<span id="icon"><uui-icon name=${this.icon ?? ''}></uui-icon></span>`)}
+				${when(this.icon, () => html`<span id="icon"><umb-icon name=${this.icon ?? ''}></umb-icon></span>`)}
 				<div id="info">
 					<div id="name">${this.name}</div>
 					<small id="detail">${this.detail}</small>
@@ -42,7 +42,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefElement.styles,
 		...UUIRefNodeElement.styles,
 		UmbTextStyles,

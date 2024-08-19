@@ -6,9 +6,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export const UMB_TAG_STORE_CONTEXT = new UmbContextToken<UmbTagStore>('UmbTagStore');
 /**
- * @export
  * @class UmbTagStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Template Details
  */
 export class UmbTagStore extends UmbStoreBase {
@@ -16,7 +15,7 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of UmbTagStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTagStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -26,15 +25,17 @@ export class UmbTagStore extends UmbStoreBase {
 	/**
 	 * Append a tag to the store
 	 * @param {TagResponseModel} TAG
+	 * @param tag
 	 * @memberof UmbTagStore
 	 */
-	append(tag: TagResponseModel) {
+	override append(tag: TagResponseModel) {
 		this._data.append([tag]);
 	}
 
 	/**
 	 * Append a tag to the store
 	 * @param {id} TagResponseModel id.
+	 * @param id
 	 * @memberof UmbTagStore
 	 */
 	byId(id: TagResponseModel['id']) {

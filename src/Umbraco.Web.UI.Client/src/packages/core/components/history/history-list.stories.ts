@@ -1,10 +1,9 @@
 import './history-list.element.js';
 import './history-item.element.js';
 
-import type { Meta, Story } from '@storybook/web-components';
-
 import type { UmbHistoryListElement } from './history-list.element.js';
 import type { UmbHistoryItemElement } from './history-item.element.js';
+import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {

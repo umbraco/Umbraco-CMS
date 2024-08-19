@@ -3,6 +3,10 @@ export type UmbObjectWithVariantProperties = {
 	segment: string | null;
 };
 
+/**
+ *
+ * @param variant
+ */
 export function variantPropertiesObjectToString(variant: UmbObjectWithVariantProperties): string {
 	// Currently a direct copy of the toString method of variantId.
 	return (variant.culture || UMB_INVARIANT_CULTURE) + (variant.segment ? `_${variant.segment}` : '');
@@ -77,15 +81,19 @@ export class UmbVariantId {
 
 	// TODO: needs localization option:
 	// TODO: Consider if this should be handled else where, it does not seem like the responsibility of this class, since it contains wordings:
-	public toDifferencesString(variantId: UmbVariantId): string {
+	public toDifferencesString(
+		variantId: UmbVariantId,
+		invariantMessage: string = 'Invariant',
+		unsegmentedMessage: string = 'Unsegmented',
+	): string {
 		let r = '';
 
 		if (variantId.culture !== this.culture) {
-			r = 'Invariant';
+			r = invariantMessage;
 		}
 
 		if (variantId.segment !== this.segment) {
-			r = (r !== '' ? ' ' : '') + 'Unsegmented';
+			r = (r !== '' ? ' ' : '') + unsegmentedMessage;
 		}
 
 		return r;

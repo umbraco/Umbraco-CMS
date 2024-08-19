@@ -7,7 +7,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import type { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
@@ -18,7 +18,16 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
-	public readonly validation = new UmbValidationContext(this);
+	//public readonly validation = new UmbValidationContext(this);
+	#validationContexts: Array<UmbValidationContext> = [];
+
+	/**
+	 * Appends a validation context to the workspace.
+	 * @param context
+	 */
+	addValidationContext(context: UmbValidationContext) {
+		this.#validationContexts.push(context);
+	}
 
 	#submitPromise: Promise<void> | undefined;
 	#submitResolve: (() => void) | undefined;
@@ -42,14 +51,15 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
 		super(host, UMB_WORKSPACE_CONTEXT.toString());
 		this.workspaceAlias = workspaceAlias;
-		// TODO: Consider if we can turn this consumption to submitComplete, just as a getContext. [NL]
+		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext) = context;
 		});
 	}
 
 	protected resetState() {
-		this.validation.reset();
+		//this.validation.reset();
+		this.#validationContexts.forEach((context) => context.reset());
 		this.#isNew.setValue(undefined);
 	}
 
@@ -59,6 +69,15 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	protected setIsNew(isNew: boolean) {
 		this.#isNew.setValue(isNew);
+	}
+
+	/**
+	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
+	 * @returns Promise that resolves to void when the validation is complete.
+	 */
+	async validate(): Promise<Array<void>> {
+		//return this.validation.validate();
+		return Promise.all(this.#validationContexts.map((context) => context.validate()));
 	}
 
 	async requestSubmit(): Promise<void> {
@@ -76,7 +95,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this.validation.validate().then(
+		this.validate().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
@@ -90,6 +109,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	#rejectSubmit = () => {
 		if (this.#submitPromise) {
+			// TODO: Capture the validation contexts messages on open, and then reset to them in this case. [NL]
+
 			this.#submitReject?.();
 			this.#submitPromise = undefined;
 			this.#submitResolve = undefined;
@@ -115,7 +136,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#resolveSubmit();
 
 		// Calling reset on the validation context here. [NL]
-		this.validation.reset();
+		// TODO: Capture the validation messages on open, and then reset to that.
+		//this.validation.reset();
 	};
 
 	//abstract getIsDirty(): Promise<boolean>;

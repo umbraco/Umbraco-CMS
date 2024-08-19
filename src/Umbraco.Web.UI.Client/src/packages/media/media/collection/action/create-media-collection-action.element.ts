@@ -69,7 +69,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		this.#retrieveAllowedMediaTypesOf(this._mediaTypeUnique ?? '');
 	}
 
@@ -80,10 +80,10 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		}
 	}
 
-	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';
 	}
 
@@ -98,7 +98,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._allowedMediaTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
 	}
 
@@ -106,7 +106,12 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		if (this._allowedMediaTypes.length !== 1) return;
 
 		const item = this._allowedMediaTypes[0];
-		const label = (this.manifest?.meta.label ?? this.localize.term('general_create')) + ' ' + item.name;
+		const label =
+			(this.manifest?.meta.label
+				? this.localize.string(this.manifest?.meta.label)
+				: this.localize.term('general_create')) +
+			' ' +
+			item.name;
 
 		return html`<uui-button
 			color="default"
@@ -119,8 +124,8 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		if (!this._allowedMediaTypes.length) return;
 
 		const label = this.manifest?.meta.label
-			? this.localize.string(this.manifest.meta.label)
-			: this.manifest?.name ?? '';
+			? this.localize.string(this.manifest?.meta.label)
+			: this.localize.term('general_create');
 
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">

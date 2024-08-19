@@ -13,6 +13,15 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	@property({ type: Boolean })
 	value: undefined | boolean = undefined;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	_labelOff?: string;
 
@@ -27,7 +36,7 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 		this.value ??= config.getValueByAlias('default') ?? false;
 		this._labelOff = config.getValueByAlias('labelOff');
 		this._labelOn = config.getValueByAlias('labelOn');
-		this._showLabels = Boolean(config.getValueByAlias('showLabels')) ?? false;
+		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
@@ -35,14 +44,15 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-toggle
 				.labelOn=${this._labelOn}
 				.labelOff=${this._labelOff}
 				?checked=${this.value}
 				?showLabels=${this._showLabels}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-toggle>
 		`;
 	}

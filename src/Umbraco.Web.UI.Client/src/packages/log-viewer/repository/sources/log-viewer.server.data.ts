@@ -10,7 +10,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the log saved searches
- * @export
  * @class UmbLogSearchesServerDataSource
  * @implements {TemplateDetailDataSource}
  */
@@ -19,7 +18,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 
 	/**
 	 * Creates an instance of UmbLogSearchesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,9 +27,8 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 
 	/**
 	 * Grabs all the log viewer saved searches from the server
-	 *
 	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
@@ -38,9 +36,8 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	}
 	/**
 	 * Get a log viewer saved search by name from the server
-	 *
 	 * @param {{ name: string }} { name }
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getSavedSearchByName({ name }: { name: string }) {
@@ -49,9 +46,8 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 
 	/**
 	 *	Post a new log viewer saved search to the server
-	 *
 	 * @param {{ requestBody?: SavedLogSearch }} { requestBody }
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
@@ -62,9 +58,8 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	}
 	/**
 	 * Remove a log viewer saved search by name from the server
-	 *
 	 * @param {{ name: string }} { name }
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async deleteSavedSearchByName({ name }: { name: string }) {
@@ -73,8 +68,6 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 }
 /**
  * A data source for the log messages and levels
- *
- * @export
  * @class UmbLogMessagesServerDataSource
  * @implements {LogMessagesDataSource}
  */
@@ -83,7 +76,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 
 	/**
 	 * Creates an instance of UmbLogMessagesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -92,9 +85,8 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 
 	/**
 	 * Grabs all the loggers from the server
-	 *
 	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
@@ -103,9 +95,8 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 
 	/**
 	 * Grabs all the number of different log messages from the server
-	 *
 	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevelCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
@@ -119,7 +110,6 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	}
 	/**
 	 *	Grabs all the log messages from the server
-	 *
 	 * @param {{
 	 * 		skip?: number;
 	 * 		take?: number;
@@ -137,7 +127,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * 		startDate,
 	 * 		endDate,
 	 * 	}
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLogs({
@@ -172,7 +162,6 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	}
 	/**
 	 * Grabs all the log message templates from the server
-	 *
 	 * @param {{
 	 * 		skip?: number;
 	 * 		take?: number;
@@ -184,7 +173,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * 		startDate,
 	 * 		endDate,
 	 * 	}
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerMessageTemplate({

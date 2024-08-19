@@ -1,5 +1,5 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
-import type { UmbUserDetailModel } from '../../../types.js';
+import type { UmbUserStartNodesModel } from '../../../types.js';
 import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -10,7 +10,7 @@ const elementName = 'umb-user-workspace-access';
 @customElement(elementName)
 export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	@state()
-	private _user?: UmbUserDetailModel;
+	private _calculatedStartNodes?: UmbUserStartNodesModel;
 
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
@@ -19,11 +19,15 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
-			this.observe(this.#userWorkspaceContext.data, (user) => (this._user = user), 'umbUserObserver');
+			this.observe(
+				this.#userWorkspaceContext.calculatedStartNodes,
+				(calculatedStartNodes) => (this._calculatedStartNodes = calculatedStartNodes),
+				'umbUserObserver',
+			);
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <uui-box id="access" headline=${this.localize.term('user_access')}>
 			<div slot="header" class="faded-text">
 				<umb-localize key="user_accessHelp"
@@ -40,18 +44,20 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	#renderDocumentStartNodes() {
 		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
 			<umb-user-document-start-node
-				.uniques=${this._user?.documentStartNodeUniques.map((reference) => reference.unique) ||
+				readonly
+				.uniques=${this._calculatedStartNodes?.documentStartNodeUniques.map((reference) => reference.unique) ||
 				[]}></umb-user-document-start-node>`;
 	}
 
 	#renderMediaStartNodes() {
 		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
 			<umb-user-media-start-node
-				.uniques=${this._user?.mediaStartNodeUniques.map((reference) => reference.unique) ||
+				readonly
+				.uniques=${this._calculatedStartNodes?.mediaStartNodeUniques.map((reference) => reference.unique) ||
 				[]}></umb-user-media-start-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#access {

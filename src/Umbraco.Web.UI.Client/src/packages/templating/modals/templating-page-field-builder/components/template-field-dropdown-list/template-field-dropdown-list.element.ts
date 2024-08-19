@@ -147,12 +147,12 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 		this.value = this._customFields.find((field) => field.alias === alias) as FieldPickerValue;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-combobox id="preview">
 				<uui-combobox-list @change=${this.#onChange}>
 					<uui-combobox-list-option value="system">
-						<strong>${this.localize.term('formSettings_systemFields')}</strong>
+						<strong>${this.localize.term('template_systemFields')}</strong>
 					</uui-combobox-list-option>
 					<uui-combobox-list-option value="document-type" display-value=${this.localize.term('content_documentType')}>
 						<strong> ${this.localize.term('content_documentType')} </strong>
@@ -174,7 +174,8 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 
 	#renderAliasDropdown() {
 		if (this._type !== FieldType.SYSTEM && !this._unique) return;
-		return html`<strong>${this._uniqueName}</strong>
+		return html`
+			<strong>${this.localize.string(this._uniqueName ?? '')}</strong>
 			<uui-combobox id="value" value=${ifDefined(this.value?.alias)}>
 				<uui-combobox-list @change=${this.#onChangeValue}>
 					${repeat(
@@ -184,10 +185,11 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 							html`<uui-combobox-list-option value=${ifDefined(field.alias)}>${field.alias}</uui-combobox-list-option>`,
 					)}
 				</uui-combobox-list>
-			</uui-combobox>`;
+			</uui-combobox>
+		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-combobox {
 				width: 100%;

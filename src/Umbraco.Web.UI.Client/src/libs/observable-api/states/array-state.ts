@@ -4,9 +4,8 @@ import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
 import { UmbDeepState } from './deep-state.js';
 
 /**
- * @export
  * @class UmbArrayState
- * @extends {UmbDeepState<T>}
+ * @augments {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  *
@@ -22,7 +21,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @method sortBy
+	 * @function sortBy
 	 * @param {(a: T, b: T) => number} sortMethod - A method to be used for sorting every time data is set.
 	 * @description - A sort method to this Subject.
 	 * @example <caption>Example add sort method</caption>
@@ -35,12 +34,16 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 */
 	sortBy(sortMethod?: (a: T, b: T) => number) {
 		this.#sortMethod = sortMethod;
-		super.setValue(this.getValue().sort(this.#sortMethod));
+		const value = this.getValue();
+		if (value) {
+			super.setValue([...value].sort(this.#sortMethod));
+		}
 		return this;
 	}
 
 	/**
-	 * @method setValue
+	 * @function setValue
+	 * @param value
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if sortBy has been defined for this state the data will be sorted before set. If data is different than current this will trigger observations to update.
 	 * @example <caption>Example change the data of a state</caption>
@@ -49,18 +52,18 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.setValue('Goodnight')
 	 * // myState.value is equal 'Goodnight'.
 	 */
-	setValue(value: T[]) {
+	override setValue(value: T[]) {
 		if (this.#sortMethod) {
-			super.setValue(value.sort(this.#sortMethod));
+			super.setValue([...value].sort(this.#sortMethod));
 		} else {
 			super.setValue(value);
 		}
 	}
 
 	/**
-	 * @method remove
+	 * @function remove
 	 * @param {unknown[]} uniques - The unique values to remove.
-	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with id '1' and '2'</caption>
 	 * const data = [
@@ -87,9 +90,9 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @method removeOne
+	 * @function removeOne
 	 * @param {unknown} unique - The unique value to remove.
-	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with id '1'</caption>
 	 * const data = [
@@ -114,9 +117,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @method filter
+	 * @function filter
+	 * @param predicate
 	 * @param {unknown} filterMethod - The unique value to remove.
-	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with key '1'</caption>
 	 * const data = [
@@ -132,7 +136,6 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * 		{ key: 2, value: 'bar'},
 	 * 		{ key: 3, value: 'poo'}
 	 * ]
-	 *
 	 */
 	filter(predicate: (value: T, index: number, array: T[]) => boolean) {
 		this.setValue(this.getValue().filter(predicate));
@@ -140,9 +143,9 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @method appendOne
+	 * @function appendOne
 	 * @param {T} entry - new data to be added in this Subject.
-	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
@@ -164,10 +167,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @method appendOneAt
+	 * @function appendOneAt
 	 * @param {T} entry - new data to be added in this Subject.
 	 * @param {T} index - index of where to append this data into the Subject.
-	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
@@ -191,9 +194,9 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @method append
+	 * @function append
 	 * @param {T[]} entries - A array of new data to be added in this Subject.
-	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject, if it compares to existing data it will replace it.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
@@ -220,10 +223,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @method updateOne
+	 * @function updateOne
 	 * @param {unknown} unique - Unique value to find entry to update.
 	 * @param {Partial<T>} entry - new data to be added in this Subject.
-	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Update a item with some new data, requires the ArrayState to be constructed with a getUnique method.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
@@ -241,9 +244,9 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 		return this;
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 		this.#sortMethod = undefined;
-		(this.getUniqueMethod as any) = undefined;
+		(this.getUniqueMethod as unknown) = undefined;
 	}
 }

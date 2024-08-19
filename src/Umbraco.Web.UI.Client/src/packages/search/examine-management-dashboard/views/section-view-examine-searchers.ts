@@ -34,7 +34,9 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	private _workspacePath = 'aa';
 
 	private _onKeyPress(e: KeyboardEvent) {
-		e.key == 'Enter' ? this._onSearch() : undefined;
+		if (e.key == 'Enter') {
+			this._onSearch();
+		}
 	}
 
 	#entityType = '';
@@ -80,7 +82,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 					return field.name ?? '';
 				});
 
-				// TODO: I don't get this code, not sure what the purpose is, it seems like a mistake:
+				// TODO: I don't get this code, not sure what the purpose is, it seems like a mistake: [NL]
 				this._exposedFields = this._exposedFields
 					? this._exposedFields.filter((field) => {
 							return { name: field.name, exposed: field.exposed };
@@ -117,7 +119,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		await modalContext.onSubmit().catch(() => undefined);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('general_search')}>
 				<p>
@@ -250,7 +252,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		})}`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

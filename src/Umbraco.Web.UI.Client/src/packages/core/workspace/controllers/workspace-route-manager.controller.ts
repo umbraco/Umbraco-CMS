@@ -8,6 +8,12 @@ export class UmbWorkspaceRouteManager extends UmbControllerBase {
 	public readonly routes = this.#routes.asObservable();
 
 	setRoutes(routes: Array<UmbRoute>) {
-		this.#routes.setValue(routes);
+		this.#routes.setValue([
+			...routes,
+			{
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			},
+		]);
 	}
 }

@@ -1,12 +1,11 @@
 import type { UmbScriptDetailModel } from '../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_SCRIPT_DETAIL_STORE_CONTEXT } from './script-detail.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbScriptDetailStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for scripts
  */
 export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailModel> {
@@ -21,5 +20,3 @@ export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailMode
 }
 
 export default UmbScriptDetailStore;
-
-export const UMB_SCRIPT_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbScriptDetailStore>('UmbScriptDetailStore');

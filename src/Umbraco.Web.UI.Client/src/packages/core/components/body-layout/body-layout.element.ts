@@ -18,13 +18,13 @@ import {
  * @slot - Slot for main content
  * @slot icon - Slot for icon
  * @slot name - Slot for name
+ * @slot header - Slot for header element
  * @slot footer - Slot for footer element
  * @slot footer-info - Slot for info in the footer
  * @slot actions - Slot for actions in the footer
  * @slot default - slot for main content
- * @export
  * @class UmbBodyLayout
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 @customElement('umb-body-layout')
 export class UmbBodyLayoutElement extends LitElement {
@@ -56,7 +56,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (this.headerTransparent) {
 			requestAnimationFrame(() => {
@@ -65,7 +65,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		}
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._scrollContainer?.removeEventListener('scroll', this.#onScroll);
 	}
@@ -79,7 +79,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		target.style.display = hasChildren ? 'flex' : 'none';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div
 				id="header"
@@ -136,7 +136,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -54,17 +54,18 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 	#mapDataTypeConfigToCollectionConfig(
 		config: UmbPropertyEditorConfigCollection | undefined,
 	): UmbCollectionConfiguration {
+		const pageSize = Number(config?.getValueByAlias('pageSize'));
 		return {
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
-			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
+			pageSize: isNaN(pageSize) ? 50 : pageSize,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}
 
-	render() {
+	override render() {
 		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
 		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
 	}

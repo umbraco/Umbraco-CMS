@@ -34,7 +34,7 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor
 				alias="Umb.Workspace.RelationType"
@@ -48,7 +48,7 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

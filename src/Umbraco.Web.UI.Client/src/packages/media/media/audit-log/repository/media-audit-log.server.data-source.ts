@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Server data source for the Media audit log
- * @export
  * @class UmbAuditLogServerDataSource
  */
 export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<UmbMediaAuditLogModel> {
@@ -16,7 +15,7 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 
 	/**
 	 * Creates an instance of UmbAuditLogServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbAuditLogServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -26,7 +25,7 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 	/**
 	 * Get the audit log for a Media
 	 * @param {UmbAuditLogRequestArgs} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaAuditLogServerDataSource
 	 */
 	async getAuditLog(args: UmbAuditLogRequestArgs) {

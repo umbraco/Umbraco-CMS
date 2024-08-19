@@ -1,10 +1,10 @@
 import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
+import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
@@ -27,10 +27,8 @@ export class UmbLanguageWorkspaceContext
 	#validationErrors = new UmbObjectState<any | undefined>(undefined);
 	readonly validationErrors = this.#validationErrors.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.Language');
+		super(host, UMB_LANGUAGE_WORKSPACE_ALIAS);
 
 		this.routes.setRoutes([
 			{
@@ -57,7 +55,7 @@ export class UmbLanguageWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -133,7 +131,7 @@ export class UmbLanguageWorkspaceContext
 		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

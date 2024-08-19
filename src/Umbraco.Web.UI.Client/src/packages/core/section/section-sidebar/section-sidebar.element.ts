@@ -5,9 +5,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
-	#sectionSidebarContext = new UmbSectionSidebarContext(this);
+	constructor() {
+		super();
+		new UmbSectionSidebarContext(this);
+	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-section-sidebar-context-menu>
 				<uui-scroll-container id="scroll-container">
@@ -17,7 +20,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

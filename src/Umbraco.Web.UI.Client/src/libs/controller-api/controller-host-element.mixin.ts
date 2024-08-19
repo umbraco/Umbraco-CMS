@@ -5,8 +5,7 @@ import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-a
 /**
  * This mixin enables a web-component to host controllers.
  * This enables controllers to be added to the life cycle of this element.
- *
- * @param {Object} superClass - superclass to be extended.
+ * @param {object} superClass - superclass to be extended.
  * @mixin
  */
 export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
@@ -18,17 +17,17 @@ export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(
 			return this;
 		}
 
-		connectedCallback() {
+		override connectedCallback() {
 			super.connectedCallback?.();
 			this.hostConnected();
 		}
 
-		disconnectedCallback() {
+		override disconnectedCallback() {
 			super.disconnectedCallback?.();
 			this.hostDisconnected();
 		}
 
-		destroy(): void {}
+		override destroy(): void {}
 	}
 
 	return UmbControllerHostElementClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;

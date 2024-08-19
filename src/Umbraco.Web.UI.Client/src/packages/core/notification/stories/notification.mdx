@@ -72,7 +72,7 @@ class MyElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<button @click="${this._handleClick}">Open Notification</button>`;
 	}
 }
@@ -110,7 +110,7 @@ export class UmbNotificationLayoutCustom extends LitElement {
 		this.notificationHandler.close(true);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-toast-notification-layout headline="${this.data.headline}" class="uui-text">
 				${this.data.user.name}
@@ -163,7 +163,7 @@ class MyElement extends LitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<button @click="${this._handleClick}">Open Notification</button>`;
 	}
 }

@@ -53,7 +53,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 	/**
 	 * Returns the current view.
-	 * @return {ManifestCollectionView}
+	 * @returns {ManifestCollectionView}
 	 * @memberof UmbCollectionContext
 	 */
 	public getCurrentView() {
@@ -97,6 +97,11 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				redirectTo: fallbackView,
 			});
 		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this.#routes.setValue(routes);
 	}

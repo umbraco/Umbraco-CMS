@@ -11,7 +11,6 @@ import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observab
 
 /**
  * Context API for the installer
- * @export
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
@@ -38,7 +37,7 @@ export class UmbInstallerContext {
 	/**
 	 * Observable method to get the current step in the installation process
 	 * @public
-	 * @return {*}  {Observable<number>}
+	 * @returns {*}  {Observable<number>}
 	 * @memberof UmbInstallerContext
 	 */
 	public currentStepChanges(): Observable<number> {
@@ -48,7 +47,7 @@ export class UmbInstallerContext {
 	/**
 	 * Observable method to get the install status in the installation process
 	 * @public
-	 * @return {*}  {(Observable<ProblemDetails | null>)}
+	 * @returns {*}  {(Observable<ProblemDetails | null>)}
 	 * @memberof UmbInstallerContext
 	 */
 	public installStatusChanges(): Observable<ProblemDetails | null> {
@@ -96,7 +95,7 @@ export class UmbInstallerContext {
 	/**
 	 * Get the data for the installation process
 	 * @public
-	 * @return {*}  {PostInstallRequest}
+	 * @returns {*}  {PostInstallRequest}
 	 * @memberof UmbInstallerContext
 	 */
 	public getData(): InstallRequestModel {

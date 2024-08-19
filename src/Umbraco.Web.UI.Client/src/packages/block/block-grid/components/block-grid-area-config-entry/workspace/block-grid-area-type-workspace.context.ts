@@ -1,11 +1,10 @@
 import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import {
-	type UmbInvariantDatasetWorkspaceContext,
-	type UmbRoutableWorkspaceContext,
-	type UmbWorkspaceContext,
-	UmbWorkspaceRouteManager,
+import type {
+	UmbInvariantDatasetWorkspaceContext,
+	UmbRoutableWorkspaceContext,
+	UmbWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
@@ -15,6 +14,7 @@ import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbBlockGridTypeAreaType>
@@ -22,8 +22,6 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = true;
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	#entityType: string;
 	#data = new UmbObjectState<UmbBlockGridTypeAreaType | undefined>(undefined);
@@ -46,16 +44,24 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			{
 				path: 'edit/:id',
 				component: () => import('./block-grid-area-type-workspace-editor.element.js'),
-				setup: (_component, info) => {
+				setup: (component, info) => {
 					const id = info.match.params.id;
-					(_component as any).workspaceAlias = manifest.alias;
+					(component as any).workspaceAlias = manifest.alias;
 					this.load(id);
+				},
+			},
+			{
+				path: 'create',
+				component: () => import('./block-grid-area-type-workspace-editor.element.js'),
+				setup: (component) => {
+					(component as any).workspaceAlias = manifest.alias;
+					this.create();
 				},
 			},
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -71,7 +77,6 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			if (value) {
 				const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
 				if (blockTypeData) {
-					console.log(blockTypeData);
 					this.#data.setValue(blockTypeData);
 					return;
 				}
@@ -82,17 +87,24 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	}
 
 	async create() {
-		throw new Error('Method not implemented.');
-		/*
-		//Only set groupKey property if it exists
-		const data: UmbBlockGridTypeAreaType = {
+		this.resetState();
+		let data: UmbBlockGridTypeAreaType = {
+			key: UmbId.new(),
+			alias: '',
+			columnSpan: 12,
+			rowSpan: 1,
+			minAllowed: 0,
+			maxAllowed: undefined,
+			specifiedAllowance: [],
+		};
 
+		// If we have a modal context, we blend in the modal preset data: [NL]
+		if (this.modalContext) {
+			data = { ...data, ...this.modalContext.data.preset };
 		}
 
 		this.setIsNew(true);
 		this.#data.setValue(data);
-		return { data };
-		*/
 	}
 
 	getData() {
@@ -110,10 +122,19 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	getName() {
 		return this.#data.getValue()?.alias;
 	}
+
+	// TODO: [v15] ignoring unused name parameter to avoid breaking changes
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setName(name: string | undefined) {
 		throw new Error('You cannot set a name of a area-type.');
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: keyof UmbBlockGridTypeAreaType) {
 		return this.#data.asObservablePart((data) => data?.[propertyAlias as keyof UmbBlockGridTypeAreaType] as ReturnType);
 	}
@@ -122,6 +143,13 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		return this.#data.getValue()?.[propertyAlias as keyof UmbBlockGridTypeAreaType] as ReturnType;
 	}
 
+	/**
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
+	 */
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#data.value;
 		if (currentData) {
@@ -142,7 +170,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

@@ -4,13 +4,13 @@ import { classMap, customElement, css, html, property } from '@umbraco-cms/backo
 /**
  *  @element umb-stack
  *  @description - Element for displaying items in a stack with even spacing between
- *  @extends LitElement
+ *  @augments LitElement
  */
 @customElement('umb-stack')
 export class UmbStackElement extends UmbLitElement {
 	/**
 	 * Look
-	 * @type {String}
+	 * @type {string}
 	 * @memberof UmbStackElement
 	 */
 	@property({ type: String })
@@ -18,13 +18,13 @@ export class UmbStackElement extends UmbLitElement {
 
 	/**
 	 * Divide
-	 * @type {Boolean}
+	 * @type {boolean}
 	 * @memberof UmbStackElement
 	 */
 	@property({ type: Boolean })
 	divide: boolean = false;
 
-	render() {
+	override render() {
 		return html`
 			<div class=${classMap({ divide: this.divide, compact: this.look === 'compact' })}>
 				<slot></slot>
@@ -32,7 +32,7 @@ export class UmbStackElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			div {
 				display: block;

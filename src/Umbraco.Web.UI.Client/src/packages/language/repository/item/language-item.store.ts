@@ -4,16 +4,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbLanguageItemStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Language items
  */
 
 export class UmbLanguageItemStore extends UmbItemStoreBase<UmbLanguageItemModel> {
 	/**
 	 * Creates an instance of UmbLanguageItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageItemStore
 	 */
 	constructor(host: UmbControllerHost) {

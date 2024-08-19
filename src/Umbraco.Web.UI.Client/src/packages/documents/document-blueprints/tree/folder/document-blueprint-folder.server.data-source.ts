@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for a Document Blueprint folder that fetches data from the server
- * @export
  * @class UmbDocumentBlueprintFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 
 	/**
 	 * Creates an instance of UmbDocumentBlueprintFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,7 +23,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Fetches a Document Blueprint folder from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -52,7 +51,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Creates a Document Blueprint folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -82,7 +81,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Updates a Document Blueprint folder on the server
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async update(args: UmbUpdateFolderModel) {
@@ -107,7 +106,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 	/**
 	 * Deletes a Document Blueprint folder on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async delete(unique: string) {

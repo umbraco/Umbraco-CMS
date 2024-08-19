@@ -40,14 +40,14 @@ export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 		this._allowedMediaTypes = allowedMediaTypes?.items ?? [];
 	}
 
-	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				popovertarget="collection-action-menu-popover"
@@ -79,7 +79,7 @@ export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#not-allowed {
 				padding: var(--uui-size-space-3);

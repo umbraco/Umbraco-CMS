@@ -89,11 +89,11 @@ export class UmbExtensionsElementAndApiInitializer<
 		return extController;
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#constructorArgs = undefined;
 		this.#elProps = undefined;
 		this.#apiProps = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 	}
 }

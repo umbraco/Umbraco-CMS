@@ -1,17 +1,19 @@
 import { UmbMemberTypePickerContext } from './input-member-type.context.js';
 import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-member-type')
-export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -34,7 +36,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -60,13 +62,12 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
-	public set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection. [NL]
-		this.selection = splitStringToArray(idsString);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@state()
@@ -93,7 +94,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -103,7 +104,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		});
 	}
 
-	render() {
+	override render() {
 		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
@@ -136,7 +137,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 	#renderItem(item: UmbUniqueItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node-document-type name=${item.name}>
+			<uui-ref-node-document-type name=${this.localize.string(item.name)}>
 				${when(item.icon, () => html`<umb-icon slot="icon" name=${item.icon!}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button
@@ -149,7 +150,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

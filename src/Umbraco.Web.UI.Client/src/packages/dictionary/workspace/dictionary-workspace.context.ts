@@ -1,10 +1,9 @@
-import { UmbDictionaryDetailRepository } from '../repository/index.js';
 import type { UmbDictionaryDetailModel } from '../types.js';
+import { UmbDictionaryDetailRepository } from '../repository/index.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
@@ -36,8 +35,6 @@ export class UmbDictionaryWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly dictionary = this.#data.asObservablePart((data) => data);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Dictionary');
 
@@ -68,7 +65,7 @@ export class UmbDictionaryWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -168,7 +165,7 @@ export class UmbDictionaryWorkspaceContext
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

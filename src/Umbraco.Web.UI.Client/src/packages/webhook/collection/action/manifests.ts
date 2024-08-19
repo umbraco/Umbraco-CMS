@@ -8,7 +8,7 @@ export const createManifest: ManifestCollectionAction = {
 	alias: 'Umb.CollectionAction.Webhook.Create',
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 		href: 'section/settings/workspace/webhook/create',
 	},
 	conditions: [

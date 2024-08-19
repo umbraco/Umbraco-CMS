@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Dictionary that fetches data from the server
- * @export
  * @class UmbDictionaryServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Creates an instance of UmbDictionaryServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -30,7 +29,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Creates a new Dictionary scaffold
-	 * @return { CreateDictionaryRequestModel }
+	 * @returns { CreateDictionaryRequestModel }
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async createScaffold() {
@@ -47,7 +46,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Fetches a Dictionary with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async read(unique: string) {
@@ -73,7 +72,8 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Inserts a new Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} model
-	 * @return {*}
+	 * @param parentUnique
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async create(model: UmbDictionaryDetailModel, parentUnique: string | null) {
@@ -104,7 +104,8 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Updates a Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} Dictionary
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async update(model: UmbDictionaryDetailModel) {
@@ -134,7 +135,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Deletes a Dictionary on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async delete(unique: string) {

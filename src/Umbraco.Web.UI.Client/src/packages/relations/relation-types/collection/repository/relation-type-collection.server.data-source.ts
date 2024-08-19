@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the relation type collection data from the server.
- * @export
  * @class UmbRelationTypeCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 
 	/**
 	 * Creates an instance of UmbRelationTypeCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbRelationTypeCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -27,7 +26,7 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 	/**
 	 * Gets the relation type collection filtered by the given filter.
 	 * @param {UmbRelationTypeCollectionFilterModel} filter
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbRelationTypeCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbRelationTypeCollectionFilterModel) {

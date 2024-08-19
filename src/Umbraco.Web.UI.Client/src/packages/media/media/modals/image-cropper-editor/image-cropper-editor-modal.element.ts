@@ -1,6 +1,6 @@
 import { UmbMediaUrlRepository } from '../../repository/index.js';
 import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
-import type { UmbCropModel } from '../../property-editors/index.js';
+import type { UmbCropModel } from '../../types.js';
 import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 import type {
@@ -11,6 +11,7 @@ import { css, customElement, html, state } from '@umbraco-cms/backoffice/externa
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import './components/image-cropper-editor-field.element.js';
 
 /** TODO Make some of the components from property editor image cropper reuseable for this modal... */
 
@@ -60,7 +61,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this._key = this.data?.key ?? '';
@@ -78,10 +79,21 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const item = data?.[0];
 
 		if (!item?.url) return;
+
+		/**
+		 * Combine the crops from the property editor with the stored crops and ignore any invalid crops
+		 * (e.g. crops that have been removed from the property editor)
+		 * @remark If a crop is removed from the property editor, it will be ignored and not saved
+		 */
+		const crops: Array<UmbCropModel> = this._crops.map((crop) => {
+			const existingCrop = this.value.crops?.find((c) => c.alias === crop.alias);
+			return existingCrop ? { ...crop, ...existingCrop } : crop;
+		});
+
 		const value: UmbImageCropperPropertyEditorValue = {
 			...this.value,
 			src: item.url,
-			crops: this.value.crops?.length ? this.value.crops : this._crops,
+			crops,
 			focalPoint: this.value.focalPoint ?? { left: 0.5, top: 0.5 },
 		};
 		this._imageCropperValue = value;
@@ -112,7 +124,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this.value = { key: this._key, unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
 				${this.#renderBody()}
@@ -131,31 +143,44 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	#renderBody() {
 		return html`
 			<div id="layout">
-				<umb-image-cropper-field
+				<umb-image-cropper-editor-field
 					.value=${this._imageCropperValue}
 					?hideFocalPoint=${this._hideFocalPoint}
-					@change=${this.#onChange}></umb-image-cropper-field>
-				<div id="options">
-					<uui-menu-item @click=${this.#openMediaPicker} label=${this.localize.term('mediaPicker_changeMedia')}>
-						<umb-icon slot="icon" name="icon-search"></umb-icon>
-					</uui-menu-item>
-					<uui-menu-item
-						href=${this._editMediaPath + 'edit/' + this._unique}
-						label=${this.localize.term('mediaPicker_openMedia')}>
-						<umb-icon slot="icon" name="icon-out"></umb-icon>
-					</uui-menu-item>
-				</div>
+					@change=${this.#onChange}>
+					<div id="actions" slot="actions">
+						<uui-button compact @click=${this.#openMediaPicker} label=${this.localize.term('mediaPicker_changeMedia')}>
+							<uui-icon name="icon-search"></uui-icon>${this.localize.term('mediaPicker_changeMedia')}
+						</uui-button>
+						<uui-button
+							compact
+							href=${this._editMediaPath + 'edit/' + this._unique}
+							label=${this.localize.term('mediaPicker_openMedia')}>
+							<uui-icon name="icon-out"></uui-icon>${this.localize.term('mediaPicker_openMedia')}
+						</uui-button>
+					</div>
+				</umb-image-cropper-editor-field>
 			</div>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#layout {
 				height: 100%;
 				display: flex;
 				flex-direction: column;
 				justify-content: space-between;
+			}
+			umb-image-cropper-editor-field {
+				flex-grow: 1;
+			}
+
+			#actions {
+				display: inline-flex;
+				gap: var(--uui-size-space-3);
+			}
+			uui-icon {
+				padding-right: var(--uui-size-3);
 			}
 
 			#options {

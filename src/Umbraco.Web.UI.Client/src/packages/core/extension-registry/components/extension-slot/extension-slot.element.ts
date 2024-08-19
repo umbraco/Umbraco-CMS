@@ -1,19 +1,18 @@
 import { umbExtensionsRegistry } from '../../registry.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-extension-slot
  * @description A element which renderers the extensions of a given type or types.
  * @slot default - slot for inserting additional things into this slot.
- * @export
  * @class UmbExtensionSlot
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 
 // TODO: Fire change event.
@@ -24,7 +23,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementInitializer;
 
 	@state()
-	private _permitted: Array<UmbExtensionElementInitializer> = [];
+	private _permitted?: Array<UmbExtensionElementInitializer>;
 
 	/**
 	 * The type or types of extensions to render.
@@ -34,7 +33,6 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot type="my-extension-type"></umb-extension-slot>
 	 * or multiple:
 	 * <umb-extension-slot .type=${['my-extension-type','another-extension-type']}></umb-extension-slot>
-	 *
 	 */
 	@property({ type: String })
 	public get type(): string | string[] | undefined {
@@ -54,7 +52,6 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * @memberof UmbExtensionSlot
 	 * @example
 	 * <umb-extension-slot type="my-extension-type" .filter=${(ext) => ext.meta.anyPropToFilter === 'foo'}></umb-extension-slot>
-	 *
 	 */
 	@property({ type: Object, attribute: false })
 	public get filter(): (manifest: any) => boolean {
@@ -97,12 +94,12 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		index: number,
 	) => TemplateResult | HTMLElement | null | undefined;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#attached = true;
 		this.#observeExtensions();
 	}
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		this.#attached = false;
 		this.#extensionsController?.destroy();
 		this.#extensionsController = undefined;
@@ -128,17 +125,19 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		}
 	}
 
-	render() {
-		return this._permitted.length > 0
-			? repeat(
-					this._permitted,
-					(ext) => ext.alias,
-					(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
-				)
-			: html`<slot></slot>`;
+	override render() {
+		return this._permitted
+			? this._permitted.length > 0
+				? repeat(
+						this._permitted,
+						(ext) => ext.alias,
+						(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
+					)
+				: html`<slot></slot>`
+			: '';
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: contents;
 		}

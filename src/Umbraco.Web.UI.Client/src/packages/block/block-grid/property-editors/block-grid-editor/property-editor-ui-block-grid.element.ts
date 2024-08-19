@@ -1,16 +1,16 @@
-import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
-import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
-import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import '../../components/block-grid-entries/index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
+import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	private _layoutColumns?: number;
 
 	@property({ attribute: false })
-	public set value(value: UmbBlockGridValueModel | undefined) {
+	public override set value(value: UmbBlockGridValueModel | undefined) {
 		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
@@ -63,7 +63,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		this.#context.setContents(this._value.contentData);
 		this.#context.setSettings(this._value.settingsData);
 	}
-	public get value(): UmbBlockGridValueModel {
+	public override get value(): UmbBlockGridValueModel {
 		return this._value;
 	}
 
@@ -88,7 +88,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		});
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
 		this.observe(this.#context.gridColumns, (gridColumns) => {
@@ -99,13 +99,13 @@ export class UmbPropertyEditorUIBlockGridElement
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <umb-block-grid-entries
 			.areaKey=${null}
 			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

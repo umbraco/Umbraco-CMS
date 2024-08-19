@@ -64,7 +64,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-toggle
 				?checked=${this.value.allowBulkPublish}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkPublish')}
@@ -76,7 +76,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 			<uui-toggle
 				?checked=${this.value.allowBulkCopy}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkCopy')}
-				label="Allow bulk copy (content only)"></uui-toggle>
+				label="Allow bulk duplicate (content only)"></uui-toggle>
 			<uui-toggle
 				?checked=${this.value.allowBulkMove}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkMove')}
@@ -84,10 +84,10 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 			<uui-toggle
 				?checked=${this.value.allowBulkDelete}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkDelete')}
-				label="Allow bulk delete"></uui-toggle>`;
+				label="Allow bulk trash"></uui-toggle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

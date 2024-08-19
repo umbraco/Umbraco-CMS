@@ -35,8 +35,11 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		});
 	}
 
-	/** We cannot render the umb-modal element directly in the uui-modal-container because it wont get recognized by UUI.
-	 *  We therefore have a helper class which creates the uui-modal element and returns it. */
+	/**
+	 * We cannot render the umb-modal element directly in the uui-modal-container because it wont get recognized by UUI.
+	 *  We therefore have a helper class which creates the uui-modal element and returns it.
+	 * @param modals
+	 */
 	#createModalElements(modals: Array<UmbModalContext>) {
 		this.removeAttribute('fill-background');
 		const oldValue = this._modals;
@@ -89,7 +92,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		return modalElement.render();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-modal-container id="container">
 				${this._modals.length > 0
@@ -103,7 +106,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {

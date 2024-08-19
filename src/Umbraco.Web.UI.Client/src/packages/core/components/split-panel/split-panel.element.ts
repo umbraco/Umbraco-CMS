@@ -8,6 +8,7 @@ import {
 	query,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
+import { clamp } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Custom element for a split panel with adjustable divider.
@@ -61,12 +62,12 @@ export class UmbSplitPanelElement extends LitElement {
 
 	#hasInitialized = false;
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#disconnect();
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (!this.#hasInitialized) return;
@@ -89,13 +90,9 @@ export class UmbSplitPanelElement extends LitElement {
 		}
 	}
 
-	#clamp(value: number, min: number, max: number) {
-		return Math.min(Math.max(value, min), max);
-	}
-
 	#setPosition(pos: number) {
 		const { width } = this.mainElement.getBoundingClientRect();
-		const localPos = this.#clamp(pos, 0, width);
+		const localPos = clamp(pos, 0, width);
 		const percentagePos = (localPos / width) * 100;
 		this.position = percentagePos + '%';
 	}
@@ -127,7 +124,7 @@ export class UmbSplitPanelElement extends LitElement {
 		const move = (event: PointerEvent) => {
 			const { clientX } = event;
 			const { left, width } = this.mainElement.getBoundingClientRect();
-			const localPos = this.#clamp(clientX - left, 0, width);
+			const localPos = clamp(clientX - left, 0, width);
 			const mappedPos = mapXAxisToSnap(localPos, width);
 
 			this.#lockedPanelWidth = this.lock === 'start' ? mappedPos : width - mappedPos;
@@ -222,7 +219,32 @@ export class UmbSplitPanelElement extends LitElement {
 		this.#connect();
 	}
 
-	render() {
+	#onKeydown(event: KeyboardEvent) {
+		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+			const { width } = this.mainElement.getBoundingClientRect();
+			const divider = this.dividerElement.getBoundingClientRect();
+
+			const dividerPos = divider.left - this.mainElement.getBoundingClientRect().left;
+			const percentageFromWidth = (dividerPos / width) * 100;
+
+			const multiplier = event.shiftKey ? 10 : 1;
+			const step = 1 * multiplier * (event.key === 'ArrowLeft' ? -1 : 1);
+
+			const newPercent = percentageFromWidth + step;
+			const toPixels = (newPercent / 100) * this.mainElement.getBoundingClientRect().width;
+
+			this.#setPosition(toPixels);
+		}
+
+		if (event.key === 'Home' || event.key === 'End') {
+			event.preventDefault();
+			const { width } = this.mainElement.getBoundingClientRect();
+			const newPos = event.key === 'Home' ? 0 : width;
+			this.#setPosition(newPos);
+		}
+	}
+
+	override render() {
 		return html`
 			<div id="main">
 				<slot
@@ -230,13 +252,13 @@ export class UmbSplitPanelElement extends LitElement {
 					@slotchange=${this.#onSlotChanged}
 					style="width: ${this._hasStartPanel ? '100%' : '0'}"></slot>
 				<div id="divider">
-					<div id="divider-touch-area" tabindex="0"></div>
+					<div id="divider-touch-area" tabindex="0" @keydown=${this.#onKeydown}></div>
 				</div>
 				<slot name="end" @slotchange=${this.#onSlotChanged} style="width: ${this._hasEndPanel ? '100%' : '0'}"></slot>
 			</div>
 		`;
 	}
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: contents;
 			--umb-split-panel-initial-position: 50%;
@@ -269,7 +291,7 @@ export class UmbSplitPanelElement extends LitElement {
 		#divider-touch-area {
 			position: absolute;
 			top: 0;
-			left: 0;
+			left: 5px;
 			height: 100%;
 			width: var(--umb-split-panel-divider-touch-area-width);
 			transform: translateX(-50%);

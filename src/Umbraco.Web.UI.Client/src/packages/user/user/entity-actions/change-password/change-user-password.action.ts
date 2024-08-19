@@ -9,7 +9,7 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -27,3 +27,5 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 		await repository.changePassword(this.args.unique, data.newPassword);
 	}
 }
+
+export { UmbChangeUserPasswordEntityAction as api };

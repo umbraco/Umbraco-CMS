@@ -25,3 +25,5 @@ export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<
 		}
 	}
 }
+
+export { UmbDeleteUserGroupEntityBulkAction as api };

@@ -19,8 +19,8 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	#allowedSections = new UmbBasicState<Array<UmbExtensionManifestInitializer<ManifestSection>>>([]);
 	public readonly allowedSections = this.#allowedSections.asObservable();
 
-	#verison = new UmbStringState(undefined);
-	public readonly version = this.#verison.asObservable();
+	#version = new UmbStringState(undefined);
+	public readonly version = this.#version.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT);
@@ -70,7 +70,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 			) ?? [];
 
 		const version = [major, minor, patch].join('.') + (prerelease ? `-${prerelease}` : '');
-		this.#verison.setValue(version);
+		this.#version.setValue(version);
 	}
 
 	public setActiveSectionAlias(alias: string) {

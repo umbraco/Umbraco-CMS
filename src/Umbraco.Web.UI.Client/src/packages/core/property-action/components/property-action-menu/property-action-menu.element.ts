@@ -1,24 +1,23 @@
 import type { UmbPropertyActionArgs } from '../property-action/types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type {
-	ManifestPropertyAction,
-	ManifestTypes,
-	MetaPropertyAction,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyAction, MetaPropertyAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
+/**
+ *
+ * @param manifest
+ * @returns
+ */
 function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<MetaPropertyAction>] {
 	return [{ meta: manifest.meta }];
 }
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-	#actionsInitializer?: UmbExtensionsElementAndApiInitializer<ManifestTypes, 'propertyAction'>;
-
 	@state()
 	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestPropertyAction, never>> = [];
 
@@ -27,7 +26,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		this.#propertyEditorUiAlias = alias;
 
 		// TODO: Stop using string for 'propertyAction', we need to start using Const. [NL]
-		this.#actionsInitializer = new UmbExtensionsElementAndApiInitializer(
+		new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			'propertyAction',
@@ -42,7 +41,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 	#propertyEditorUiAlias = '';
 
-	render() {
+	override render() {
 		if (!this._actions?.length) return nothing;
 		return html`
 			<uui-button id="popover-trigger" popovertarget="property-action-popover" label="Open actions menu" compact>
@@ -60,7 +59,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -5,10 +5,10 @@ import { html, customElement, property, state, nothing, ifDefined } from '@umbra
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionVerbElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-entity-user-permission')
-export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string {
 		return this._entityType;
@@ -28,7 +28,7 @@ export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(Umb
 
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -53,7 +53,11 @@ export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(Umb
 	#onChangeUserPermission(event: UmbChangeEvent, permissionVerbs: Array<string>) {
 		event.stopPropagation();
 		const target = event.target as UmbUserPermissionVerbElement;
-		target.allowed ? this.#addUserPermission(permissionVerbs) : this.#removeUserPermission(permissionVerbs);
+		if (target.allowed) {
+			this.#addUserPermission(permissionVerbs);
+		} else {
+			this.#removeUserPermission(permissionVerbs);
+		}
 	}
 
 	#addUserPermission(permissionVerbs: Array<string>) {
@@ -68,7 +72,7 @@ export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(Umb
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderGroupedPermissions(this._manifests)} `;
 	}
 
@@ -101,7 +105,7 @@ export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(Umb
 				this.#onChangeUserPermission(event, manifest.meta.verbs)}></umb-input-user-permission-verb>`;
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#manifestObserver?.destroy();
 	}

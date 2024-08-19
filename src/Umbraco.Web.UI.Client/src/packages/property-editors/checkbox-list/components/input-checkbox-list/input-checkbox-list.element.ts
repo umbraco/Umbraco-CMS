@@ -22,11 +22,14 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 	}
 
 	@property()
-	public set value(value: string) {
+	public override set value(value: string) {
 		this.selection = value.split(',');
 	}
+	public override get value(): string {
+		return this.selection.join(',');
+	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -45,7 +48,7 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 		this.selection = values;
 	}
 
-	render() {
+	override render() {
 		if (!this.list) return nothing;
 		return html`
 			<form>
@@ -64,7 +67,7 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 		return html`<uui-checkbox ?checked=${item.checked} label=${item.label} value=${item.value}></uui-checkbox>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-checkbox {
 				width: 100%;

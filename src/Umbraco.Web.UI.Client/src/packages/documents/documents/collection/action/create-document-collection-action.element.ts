@@ -72,7 +72,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		if (this._documentTypeUnique) {
 			this.#retrieveAllowedDocumentTypesOf(this._documentTypeUnique);
 		}
@@ -86,10 +86,10 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		}
 	}
 
-	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';
 	}
 
@@ -104,7 +104,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return this._allowedDocumentTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
 	}
 
@@ -112,7 +112,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		if (this._allowedDocumentTypes.length !== 1) return;
 
 		const item = this._allowedDocumentTypes[0];
-		const label = (this.manifest?.meta.label ?? this.localize.term('general_create')) + ' ' + item.name;
+		const label =
+			(this.manifest?.meta.label
+				? this.localize.string(this.manifest?.meta.label)
+				: this.localize.term('general_create')) +
+			' ' +
+			item.name;
 
 		return html`
 			<uui-button color="default" href=${this.#getCreateUrl(item)} label=${label} look="outline"></uui-button>
@@ -122,7 +127,9 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	#renderDropdown() {
 		if (!this._allowedDocumentTypes.length) return;
 
-		const label = this.manifest?.meta.label ?? this.localize.term('general_create');
+		const label = this.manifest?.meta.label
+			? this.localize.string(this.manifest?.meta.label)
+			: this.localize.term('general_create');
 
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
@@ -149,7 +156,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-scroll-container {
 				max-height: 500px;

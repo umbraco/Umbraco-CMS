@@ -1,6 +1,6 @@
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { clamp } from '@umbraco-cms/backoffice/external/uui';
+import { clamp } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-temporary-file-badge')
 export class UmbTemporaryFileBadgeElement extends UmbLitElement {
@@ -19,7 +19,7 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 		return this._progress;
 	}
 
-	render() {
+	override render() {
 		return html`<uui-badge>
 			<div id="wrapper">
 				<uui-loader-circle progress=${this.progress}></uui-loader-circle>
@@ -28,7 +28,7 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 		</uui-badge>`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: block;
 		}

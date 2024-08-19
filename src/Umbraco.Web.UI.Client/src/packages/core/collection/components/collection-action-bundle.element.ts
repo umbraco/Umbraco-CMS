@@ -3,7 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-action-bundle')
 export class UmbCollectionActionBundleElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`<umb-extension-slot type="collectionAction"></umb-extension-slot>`;
 	}
 }

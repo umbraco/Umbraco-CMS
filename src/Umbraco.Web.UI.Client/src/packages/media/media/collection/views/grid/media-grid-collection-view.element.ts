@@ -8,6 +8,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
+import '@umbraco-cms/backoffice/imaging';
+
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()
@@ -52,7 +54,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
 
-		this.observe(this.#collectionContext.thumbnailItems, (items) => (this._items = items), '_observeItems');
+		this.observe(this.#collectionContext.items, (items) => (this._items = items), '_observeItems');
 
 		this.observe(
 			this.#collectionContext.selection.selection,
@@ -85,7 +87,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
 
-	render() {
+	override render() {
 		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
 	}
 
@@ -127,18 +129,12 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
 				class="media-item">
-				${when(
-					item.url,
-					() => html`<img src=${item.url!} alt=${item.name} draggable="false" />`,
-					() => html`<umb-icon name=${item.icon}></umb-icon>`,
-				)}
-				<!-- TODO: [LK] I'd like to indicate a busy state when bulk actions are triggered. -->
-				<!-- <div class="container"><uui-loader></uui-loader></div> -->
+				<umb-imaging-thumbnail unique=${item.unique} alt=${item.name} icon=${item.icon}></umb-imaging-thumbnail>
 			</uui-card-media>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -157,16 +153,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 				grid-auto-rows: 200px;
 				gap: var(--uui-size-space-5);
-			}
-
-			img {
-				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
-				background-size: 10px 10px;
-				background-repeat: repeat;
-			}
-
-			umb-icon {
-				font-size: var(--uui-size-8);
 			}
 		`,
 	];

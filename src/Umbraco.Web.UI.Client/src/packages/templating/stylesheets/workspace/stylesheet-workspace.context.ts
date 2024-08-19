@@ -6,13 +6,11 @@ import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-edit
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -37,14 +35,8 @@ export class UmbStylesheetWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 
-	#isCodeEditorReady = new UmbBooleanState(false);
-	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS);
-		this.#loadCodeEditor();
 
 		this.routes.setRoutes([
 			{
@@ -66,6 +58,7 @@ export class UmbStylesheetWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbStylesheetWorkspaceEditorElement,
 				setup: (component: PageComponent, info: IRoutingInfo) => {
+					// TODO: Decode uniques [NL]
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -73,18 +66,9 @@ export class UmbStylesheetWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
-	}
-
-	async #loadCodeEditor() {
-		try {
-			await loadCodeEditor();
-			this.#isCodeEditorReady.setValue(true);
-		} catch (error) {
-			console.error(error);
-		}
 	}
 
 	getEntityType(): string {
@@ -176,7 +160,7 @@ export class UmbStylesheetWorkspaceContext
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

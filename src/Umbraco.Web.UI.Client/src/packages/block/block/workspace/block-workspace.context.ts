@@ -1,22 +1,23 @@
 import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
-import { UmbBlockElementManager } from './block-element-manager.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
+import { UmbBlockElementManager } from './block-element-manager.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbClassState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -37,9 +38,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#entityType: string;
 
-	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
-	readonly isNew = this.#isNew.asObservable();
-
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
@@ -51,20 +49,24 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
 	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
 
-	readonly content = new UmbBlockElementManager(this);
+	readonly content = new UmbBlockElementManager(this, 'contentData');
 
-	readonly settings = new UmbBlockElementManager(this);
+	readonly settings = new UmbBlockElementManager(this, 'settingsData');
 
-	// TODO: Get the name of the contentElementType..
+	// TODO: Get the name from the content element type. Or even better get the Label, but that has to be re-actively updated.
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	readonly variantId = this.#variantId.asObservable();
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		this.addValidationContext(this.content.validation);
+		this.addValidationContext(this.settings.validation);
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
@@ -88,6 +90,16 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
 		}).asPromise();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(context.variantId, (variantId) => {
+				this.#variantId.setValue(variantId);
+			});
+		});
+
+		this.observe(this.variantId, (variantId) => {
+			this.content.setVariantId(variantId);
+		});
 
 		this.routes.setRoutes([
 			{
@@ -118,13 +130,24 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		]);
 	}
 
+	protected override resetState() {
+		super.resetState();
+		this.#label.setValue(undefined);
+		this.#layout.setValue(undefined);
+		this.#initialLayout = undefined;
+		this.#initialContent = undefined;
+		this.#initialSettings = undefined;
+		this.content.reset();
+		this.settings.reset();
+		this.removeUmbControllerByAlias('isNewRedirectController');
+	}
+
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
 		await this.#editorConfigPromise;
 		if (!this.#blockManager || !this.#blockEntries) {
 			throw new Error('Block manager not found');
-			return;
 		}
 
 		this.observe(
@@ -136,57 +159,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			'observeLayoutInitially',
 		);
 
-		this.observe(
-			this.#blockEntries.layoutOf(unique),
-			(layoutData) => {
-				this.#layout.setValue(layoutData as LayoutDataType);
-
-				// Content:
-				const contentUdi = layoutData?.contentUdi;
-				if (contentUdi) {
-					this.observe(
-						this.#blockManager!.contentOf(contentUdi),
-						(contentData) => {
-							this.content.setData(contentData);
-						},
-						'observeContent',
-					);
-					if (!this.#initialContent) {
-						this.observe(
-							this.#blockManager!.contentOf(contentUdi),
-							(contentData) => {
-								this.#initialContent ??= contentData;
-								this.removeUmbControllerByAlias('observeContentInitially');
-							},
-							'observeContentInitially',
-						);
-					}
-				}
-
-				// Settings:
-				const settingsUdi = layoutData?.settingsUdi;
-				if (settingsUdi) {
-					this.observe(
-						this.#blockManager!.settingsOf(settingsUdi),
-						(settingsData) => {
-							this.settings.setData(settingsData);
-						},
-						'observeSettings',
-					);
-					if (!this.#initialSettings) {
-						this.observe(
-							this.#blockManager!.contentOf(settingsUdi),
-							(settingsData) => {
-								this.#initialSettings ??= settingsData;
-								this.removeUmbControllerByAlias('observeSettingsInitially');
-							},
-							'observeSettingsInitially',
-						);
-					}
-				}
-			},
-			'observeLayout',
-		);
+		this.#observeBlockData(unique);
 
 		if (this.#liveEditingMode) {
 			this.#establishLiveSync();
@@ -218,13 +191,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			throw new Error('Block Entries could not create block');
 		}
 
-		this.#layout.setValue(blockCreated.layout as LayoutDataType);
-		this.content.setData(blockCreated.content);
-		if (blockCreated.settings) {
-			this.settings.setData(blockCreated.settings);
-		}
+		// TODO: We should investigate if it makes sense to gather
 
-		if (this.#liveEditingMode) {
+		if (!this.#liveEditingMode) {
+			this.#layout.setValue(blockCreated.layout as LayoutDataType);
+			this.content.setData(blockCreated.content);
+			if (blockCreated.settings) {
+				this.settings.setData(blockCreated.settings);
+			}
+		} else {
 			// Insert already, cause we are in live editing mode:
 			const blockInserted = await this.#blockEntries.insert(
 				blockCreated.layout,
@@ -235,8 +210,72 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			if (!blockInserted) {
 				throw new Error('Block Entries could not insert block');
 			}
+
+			const unique = blockCreated.layout.contentUdi;
+
+			this.#observeBlockData(unique);
 			this.#establishLiveSync();
 		}
+	}
+
+	#observeBlockData(unique: string) {
+		if (!this.#blockEntries) {
+			throw new Error('Block Entries not found');
+			return;
+		}
+		this.observe(
+			this.#blockEntries.layoutOf(unique),
+			(layoutData) => {
+				this.#layout.setValue(layoutData as LayoutDataType);
+
+				// Content:
+				const contentUdi = layoutData?.contentUdi;
+				if (!contentUdi) {
+					return;
+				}
+
+				this.observe(
+					this.#blockManager!.contentOf(contentUdi),
+					(contentData) => {
+						this.content.setData(contentData);
+					},
+					'observeContent',
+				);
+				if (!this.#initialContent) {
+					this.observe(
+						this.#blockManager!.contentOf(contentUdi),
+						(contentData) => {
+							this.#initialContent ??= contentData;
+							this.removeUmbControllerByAlias('observeContentInitially');
+						},
+						'observeContentInitially',
+					);
+				}
+
+				// Settings:
+				const settingsUdi = layoutData?.settingsUdi;
+				if (settingsUdi) {
+					this.observe(
+						this.#blockManager!.settingsOf(settingsUdi),
+						(settingsData) => {
+							this.settings.setData(settingsData);
+						},
+						'observeSettings',
+					);
+					if (!this.#initialSettings) {
+						this.observe(
+							this.#blockManager!.settingsOf(settingsUdi),
+							(settingsData) => {
+								this.#initialSettings ??= settingsData;
+								this.removeUmbControllerByAlias('observeSettingsInitially');
+							},
+							'observeSettingsInitially',
+						);
+					}
+				}
+			},
+			'observeLayout',
+		);
 	}
 
 	#establishLiveSync() {
@@ -257,13 +296,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		});
 	}
 
-	getIsNew() {
-		return this.#isNew.value;
-	}
-	setIsNew(value: boolean): void {
-		this.#isNew.setValue(value);
-	}
-
 	getData() {
 		return this.#layout.getValue();
 	}
@@ -280,8 +312,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		return 'block name content element type here...';
 	}
 
-	// NOTICE currently the property methods are for layout, but this could be seen as wrong, we might need to dedicate a data manager for the layout as well.
-
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<propertyAliasType extends keyof LayoutDataType>(propertyAlias: propertyAliasType) {
 		return this.#layout.asObservablePart(
 			(layout) => layout?.[propertyAlias as keyof LayoutDataType] as LayoutDataType[propertyAliasType],
@@ -293,6 +329,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		return this.#layout.getValue()?.[propertyAlias as keyof LayoutDataType] as LayoutDataType[propertyAliasType];
 	}
 
+	/**
+	 * @function setPropertyValue
+	 * @param {string} alias
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
+	 */
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#layout.value;
 		if (currentData) {
@@ -362,7 +405,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 	};
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#layout.destroy();
 		this.#label.destroy();

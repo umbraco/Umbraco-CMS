@@ -1,6 +1,6 @@
-import { UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL } from '../current-user-mfa-enable-provider/current-user-mfa-enable-provider-modal.token.js';
+import { UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL } from '../current-user-mfa-enable/current-user-mfa-enable-modal.token.js';
 import { UmbCurrentUserRepository } from '../../repository/index.js';
-import { UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL } from '../current-user-mfa-disable-provider/current-user-mfa-disable-provider-modal.token.js';
+import { UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL } from '../current-user-mfa-disable/current-user-mfa-disable-modal.token.js';
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -65,7 +65,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		this.modalContext?.submit();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('member_2fa')}">
 				<div id="main">
@@ -89,6 +89,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
+	 * @param item
 	 */
 	#renderProvider(item: UmbMfaLoginProviderOption) {
 		return html`
@@ -137,6 +138,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * Open the provider modal.
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to either enable the provider.
+	 * @param item
 	 */
 	async #onProviderEnable(item: UmbMfaLoginProviderOption) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -152,6 +154,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * Open the provider modal.
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to disable the provider.
+	 * @param item
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -163,7 +166,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 			.catch(() => undefined);
 	}
 
-	static styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

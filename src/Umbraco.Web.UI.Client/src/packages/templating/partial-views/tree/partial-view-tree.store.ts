@@ -1,17 +1,16 @@
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT } from './partial-view-tree.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
- * @export
  * @class UmbPartialViewTreeStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Tree Data Store for PartialView
  */
 export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbPartialViewTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbPartialViewTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -20,7 +19,3 @@ export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 }
 
 export default UmbPartialViewTreeStore;
-
-export const UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT = new UmbContextToken<UmbPartialViewTreeStore>(
-	'UmbPartialViewTreeStore',
-);

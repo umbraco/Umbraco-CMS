@@ -2,12 +2,11 @@ import { availableLanguages } from './input-tiny-mce.languages.js';
 import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
-import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
-import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
-import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
+import { type ClassConstructor, loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import { css, customElement, html, property, query } from '@umbraco-cms/backoffice/external/lit';
+import { getProcessedImageUrl, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
+import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
@@ -22,6 +21,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 /**
  * Handles the resize event
+ * @param e
  */
 // TODO: This does somehow not belong as a utility method as it is very specific to this implementation. [NL]
 async function onResize(
@@ -53,19 +53,16 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 
-	@state()
-	private _tinyConfig: RawEditorOptions = {};
-
-	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
+	#plugins: Array<ClassConstructor<UmbTinyMcePluginBase> | undefined> = [];
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
 	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
 	}
 
-	set value(newValue: FormDataEntryValue | FormData) {
+	override set value(newValue: FormDataEntryValue | FormData) {
 		super.value = newValue;
 		const newContent = newValue?.toString() ?? '';
 
@@ -74,7 +71,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		}
 	}
 
-	get value(): FormDataEntryValue | FormData {
+	override get value(): FormDataEntryValue | FormData {
 		return super.value;
 	}
 
@@ -85,15 +82,31 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return this.#editorRef;
 	}
 
-	protected async firstUpdated(): Promise<void> {
-		await Promise.all([...(await this.#loadPlugins())]);
-		await this.#setTinyConfig();
+	constructor() {
+		super();
+
+		this.#loadEditor();
 	}
 
-	disconnectedCallback() {
+	async #loadEditor() {
+		this.observe(umbExtensionsRegistry.byType('tinyMcePlugin'), async (manifests) => {
+			this.#plugins.length = 0;
+			this.#plugins = await this.#loadPlugins(manifests);
+
+			let config: RawEditorOptions = {};
+			manifests.forEach((manifest) => {
+				if (manifest.meta?.config) {
+					config = umbDeepMerge(manifest.meta.config, config);
+				}
+			});
+
+			this.#setTinyConfig(config);
+		});
+	}
+
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 
-		// TODO: Test if there is any problems with destroying the RTE here, but not initializing on connectedCallback. (firstUpdated is only called first time the element is rendered, not when it is reconnected)
 		this.#editorRef?.destroy();
 	}
 
@@ -102,30 +115,16 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * need the editor instance as a ctor argument. If we load them in the editor
 	 * setup method, the asynchronous nature means the editor is loaded before
 	 * the plugins are ready and so are not associated with the editor.
+	 * @param manifests
 	 */
-	async #loadPlugins() {
-		const observable = umbExtensionsRegistry?.byType('tinyMcePlugin');
-		const manifests = await firstValueFrom(observable);
-
+	async #loadPlugins(manifests: Array<ManifestTinyMcePlugin>) {
 		const promises = [];
 		for (const manifest of manifests) {
 			if (manifest.js) {
-				promises.push(
-					loadManifestApi(manifest.js).then((plugin) => {
-						if (plugin) {
-							this.#plugins.push(plugin);
-						}
-					}),
-				);
+				promises.push(await loadManifestApi(manifest.js));
 			}
 			if (manifest.api) {
-				promises.push(
-					loadManifestApi(manifest.api).then((plugin) => {
-						if (plugin) {
-							this.#plugins.push(plugin);
-						}
-					}),
-				);
+				promises.push(await loadManifestApi(manifest.api));
 			}
 		}
 		return promises;
@@ -181,7 +180,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return formatStyles;
 	}
 
-	async #setTinyConfig() {
+	async #setTinyConfig(additionalConfig?: RawEditorOptions) {
 		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
 
 		const stylesheetPaths = this.configuration?.getValueByAlias<string[]>('stylesheets') ?? [];
@@ -230,7 +229,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		}
 
 		// set the default values that will not be modified via configuration
-		this._tinyConfig = {
+		let config: RawEditorOptions = {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
 			contextMenu: false,
@@ -244,18 +243,22 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			setup: (editor) => this.#editorSetup(editor),
 			target: this._editorElement,
 			paste_data_images: false,
+			language: this.#getLanguage(),
+			promotion: false,
+			convert_unsafe_embeds: true, // [JOV] Workaround for CVE-2024-29881
 
 			// Extend with configuration options
 			...configurationOptions,
 		};
 
-		this.#setLanguage();
-
-		if (this.#editorRef) {
-			this.#editorRef.destroy();
+		// Extend with additional configuration options
+		if (additionalConfig) {
+			config = umbDeepMerge(additionalConfig, config);
 		}
 
-		const editors = await renderEditor(this._tinyConfig).catch((error) => {
+		this.#editorRef?.destroy();
+
+		const editors = await renderEditor(config).catch((error) => {
 			console.error('Failed to render TinyMCE', error);
 			return [];
 		});
@@ -263,8 +266,9 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	}
 
 	/**
-	 * Sets the language to use for TinyMCE */
-	#setLanguage() {
+	 * Gets the language to use for TinyMCE
+	 */
+	#getLanguage() {
 		const localeId = this.localize.lang();
 		//try matching the language using full locale format
 		let languageMatch = availableLanguages.find((x) => localeId?.localeCompare(x) === 0);
@@ -277,22 +281,11 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			}
 		}
 
-		// only set if language exists, will fall back to tiny default
-		if (languageMatch) {
-			this._tinyConfig.language = languageMatch;
-		}
+		return languageMatch;
 	}
 
 	#editorSetup(editor: Editor) {
 		editor.suffix = '.min';
-
-		// instantiate plugins - these are already loaded in this.#loadPlugins
-		// to ensure they are available before setting up the editor.
-		// Plugins require a reference to the current editor as a param, so can not
-		// be instantiated until we have an editor
-		for (const plugin of this.#plugins) {
-			new plugin({ host: this, editor });
-		}
 
 		// define keyboard shortcuts
 		editor.addShortcut('Ctrl+S', '', () =>
@@ -336,13 +329,24 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 				}
 			});
 		});
-		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
+
+		// instantiate plugins to ensure they are available before setting up the editor.
+		// Plugins require a reference to the current editor as a param, so can not
+		// be instantiated until we have an editor
+		for (const plugin of this.#plugins) {
+			if (plugin) {
+				// [v15]: This might be improved by changing to `createExtensionApi` and avoiding the `#loadPlugins` method altogether, but that would require a breaking change
+				// because that function sends the UmbControllerHost as the first argument, which is not the case here.
+				new plugin({ host: this, editor });
+			}
+		}
 	}
 
 	#onInit(editor: Editor) {
 		//enable browser based spell checking
 		editor.getBody().setAttribute('spellcheck', 'true');
 		uriAttributeSanitizer(editor);
+		editor.setContent(this.value?.toString() ?? '');
 	}
 
 	#onChange(value: string) {
@@ -354,25 +358,17 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * Nothing rendered by default - TinyMCE initialization creates
 	 * a target div and binds the RTE to that element
 	 */
-	render() {
+	override render() {
 		return html`<div class="editor"></div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			.tox-tinymce {
 				position: relative;
 				min-height: 100px;
 				border-radius: 0;
 				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border, #d8d7d9));
-			}
-
-			.tox-tinymce-aux {
-				z-index: 9000;
-			}
-
-			.tox-tinymce-inline {
-				z-index: 900;
 			}
 
 			.tox-tinymce-fullscreen {
@@ -382,11 +378,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			/* FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed */
 			.tox .tox-collection__item-label {
 				line-height: 1 !important;
-			}
-
-			/* Solves issue 1019 by lowering un-needed z-index on header.*/
-			.tox.tox-tinymce .tox-editor-header {
-				z-index: 0;
 			}
 		`,
 	];

@@ -6,7 +6,6 @@ import { css, customElement, html, property, state, when, LitElement } from '@um
 /**
  *  A simple styled box for showing code-based error messages or blocks od code.
  *  @slot the full message
- *
  */
 @customElement('umb-code-block')
 export class UmbCodeBlockElement extends LitElement {
@@ -30,7 +29,7 @@ export class UmbCodeBlockElement extends LitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderHeader()}
 			<pre><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
@@ -59,7 +58,7 @@ export class UmbCodeBlockElement extends LitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

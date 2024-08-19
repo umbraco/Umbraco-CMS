@@ -1,4 +1,4 @@
-import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
+import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document that fetches data from the server
- * @export
  * @class UmbDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Creates an instance of UmbDocumentServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -30,7 +29,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Creates a new Document scaffold
-	 * @return { UmbDocumentDetailModel }
+	 * @param preset
+	 * @returns { UmbDocumentDetailModel }
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDocumentDetailModel> = {}) {
@@ -74,7 +74,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	/**
 	 * Fetches a Document with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async read(unique: string) {
@@ -129,7 +129,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	/**
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @return {*}
+	 * @param parentUnique
+	 * @returns {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async create(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
@@ -163,7 +164,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	/**
 	 * Updates a Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async update(model: UmbDocumentDetailModel) {
@@ -194,7 +195,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	/**
 	 * Deletes a Document on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async delete(unique: string) {

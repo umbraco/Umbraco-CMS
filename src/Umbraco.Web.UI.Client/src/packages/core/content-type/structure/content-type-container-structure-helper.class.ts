@@ -1,7 +1,7 @@
 import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '../types.js';
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -16,6 +16,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	#childType?: UmbPropertyContainerTypes = 'Group';
 
 	#structure?: UmbContentTypeStructureManager<T>;
+
+	#containerObservers: Array<UmbController> = [];
 
 	// State containing the all containers defined in the data:
 	#childContainers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
@@ -150,30 +152,31 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				this.#parentType,
 			),
 			(containers) => {
-				// We want to remove hasProperties of groups that does not exist anymore.:
-				// this.#removeHasPropertiesOfGroup()
 				this.#hasProperties.setValue([]);
 				this.#childContainers.setValue([]);
+				this.#containerObservers.forEach((x) => x.destroy());
+				this.#containerObservers = [];
 
 				containers.forEach((container) => {
 					this.#observeHasPropertiesOf(container.id);
 
-					this.observe(
-						this.#structure!.containersOfParentId(container.id, this.#childType!),
-						(containers) => {
-							// get the direct owner containers of this container id:
-							this.#ownerChildContainers =
-								this.#structure!.getOwnerContainers(this.#childType!, this.#containerId!) ?? [];
-							// TODO: Maybe check for dif before setting it? Cause currently we are setting it every time one of the containers change. [NL]
+					this.#containerObservers.push(
+						this.observe(
+							this.#structure!.containersOfParentId(container.id, this.#childType!),
+							(containers) => {
+								// get the direct owner containers of this container id: [NL]
+								this.#ownerChildContainers =
+									this.#structure!.getOwnerContainers(this.#childType!, this.#containerId!) ?? [];
 
-							// Remove existing containers that are not the parent of the new containers:
-							this.#childContainers.filter(
-								(x) => x.parent?.id !== container.id || containers.some((y) => y.id === x.id),
-							);
+								// Remove existing containers that are not the parent of the new containers: [NL]
+								this.#childContainers.filter(
+									(x) => x.parent?.id !== container.id || containers.some((y) => y.id === x.id),
+								);
 
-							this.#childContainers.append(containers);
-						},
-						'_observeGroupsOf_' + container.id,
+								this.#childContainers.append(containers);
+							},
+							'_observeGroupsOf_' + container.id,
+						),
 					);
 				});
 			},
@@ -182,7 +185,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	#observeRootContainers() {
-		if (!this.#structure || !this.#childType || !this.#containerId === undefined) return;
+		if (!this.#structure || !this.#childType || this.#containerId === undefined) return;
 
 		this.observe(
 			this.#structure.rootContainers(this.#childType),
@@ -233,6 +236,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	/**
 	 * Returns true if the container is an owner container.
+	 * @param containerId
 	 */
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;

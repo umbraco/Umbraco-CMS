@@ -3,18 +3,20 @@ import { UmbStaticFilePickerContext } from './input-static-file.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-static-file')
-export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputStaticFileElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	#serializer = new UmbServerFilePathUniqueSerializer();
 
 	/**
 	 * This is a minimum amount of selected files in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -37,7 +39,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 	 * This is a maximum amount of selected files in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -63,14 +65,12 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
-	// get value is handled by super class.
-	public set value(pathsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selection = splitStringToArray(pathsString);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@property()
@@ -100,11 +100,11 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		if (!this._items) return nothing;
 		return html`
 			<uui-ref-list>
@@ -141,7 +141,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		if (!item.unique) return;
 		return html`
 			<uui-ref-node name=${item.name} .detail=${this.#serializer.toServerPath(item.unique) || ''}>
-				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
+				<!-- TODO: implement is trashed, if we cant retrieve the item on the server (but only ask the server if we need to anyway...). <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}
@@ -151,7 +151,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

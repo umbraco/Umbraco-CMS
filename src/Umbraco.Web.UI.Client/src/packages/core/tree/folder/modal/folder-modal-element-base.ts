@@ -15,7 +15,7 @@ export abstract class UmbFolderModalElementBase<
 
 	folderRepository?: UmbFolderRepository;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#observeRepository();
 	}
@@ -55,7 +55,7 @@ export abstract class UmbFolderModalElementBase<
 		this.onFormSubmit({ name });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term(this._isNew ? 'actions_folderCreate' : 'actions_folderRename')}>
 				<uui-box>
@@ -95,7 +95,7 @@ export abstract class UmbFolderModalElementBase<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#name {

@@ -6,20 +6,19 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  * @description
  * @slot default - Slot footer items
  * @slot actions - Slot actions
- * @export
  * @class UmbFooterLayout
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
 @customElement('umb-footer-layout')
 export class UmbFooterLayoutElement extends LitElement {
-	render() {
+	override render() {
 		return html`
 			<slot></slot>
 			<slot id="actions" name="actions"></slot>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

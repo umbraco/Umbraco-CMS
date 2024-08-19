@@ -1,3 +1,5 @@
+import { UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -6,8 +8,6 @@ import type {
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-
-export const UMB_MEDIA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MediaType';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -30,6 +30,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
+			compositionRepositoryAlias: UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

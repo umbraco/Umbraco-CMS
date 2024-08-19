@@ -1,8 +1,10 @@
 import type { JsLoaderProperty } from '../types/utils.js';
 
-export async function loadManifestPlainJs<JsType extends object>(
-	property: JsLoaderProperty<JsType>,
-): Promise<JsType | undefined> {
+/**
+ *
+ * @param property
+ */
+export async function loadManifestPlainJs<JsType>(property: JsLoaderProperty<JsType>): Promise<JsType | undefined> {
 	const propType = typeof property;
 	if (propType === 'function') {
 		// Promise function

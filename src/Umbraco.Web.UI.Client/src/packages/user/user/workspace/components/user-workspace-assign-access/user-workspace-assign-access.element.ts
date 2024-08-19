@@ -1,6 +1,6 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
-import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
@@ -113,7 +113,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', selection);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>
@@ -185,7 +185,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 declare global {

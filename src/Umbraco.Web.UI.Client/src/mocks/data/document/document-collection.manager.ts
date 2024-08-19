@@ -17,11 +17,6 @@ export class UmbMockDocumentCollectionManager {
 
 	getCollectionDocumentById({
 		id,
-		dataTypeId,
-		orderBy,
-		orderCulture,
-		orderDirection,
-		filter,
 		skip = 0,
 		take = 100,
 	}: {

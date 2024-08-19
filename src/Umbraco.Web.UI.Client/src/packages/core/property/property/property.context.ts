@@ -1,5 +1,4 @@
 import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
@@ -11,43 +10,62 @@ import {
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbPropertyTypeAppearanceModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbPropertyTypeAppearanceModel,
+	UmbPropertyTypeValidationModel,
+} from '@umbraco-cms/backoffice/content-type';
 
 export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
+
 	#label = new UmbStringState(undefined);
 	public readonly label = this.#label.asObservable();
+
 	#description = new UmbStringState(undefined);
 	public readonly description = this.#description.asObservable();
+
 	#appearance = new UmbObjectState<UmbPropertyTypeAppearanceModel | undefined>(undefined);
 	public readonly appearance = this.#appearance.asObservable();
+
 	#value = new UmbDeepState<ValueType | undefined>(undefined);
 	public readonly value = this.#value.asObservable();
+
 	#configValues = new UmbArrayState<UmbPropertyEditorConfigProperty>([], (x) => x.alias);
 	public readonly configValues = this.#configValues.asObservable();
 
 	#config = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
 	public readonly config = this.#config.asObservable();
 
-	private _editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
-	public readonly editor = this._editor.asObservable();
+	#validation = new UmbObjectState<UmbPropertyTypeValidationModel | undefined>(undefined);
+	public readonly validation = this.#validation.asObservable();
+
+	public readonly validationMandatory = this.#validation.asObservablePart((x) => x?.mandatory);
+	public readonly validationMandatoryMessage = this.#validation.asObservablePart((x) => x?.mandatoryMessage);
+
+	#dataPath = new UmbStringState(undefined);
+	public readonly dataPath = this.#dataPath.asObservable();
+
+	#editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
+	public readonly editor = this.#editor.asObservable();
+
 	setEditor(editor: UmbPropertyEditorUiElement | undefined) {
-		this._editor.setValue(editor ?? undefined);
+		this.#editor.setValue(editor ?? undefined);
 	}
 	getEditor() {
-		return this._editor.getValue();
+		return this.#editor.getValue();
 	}
 
 	// property variant ID:
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	public readonly variantId = this.#variantId.asObservable();
 
-	private _variantDifference = new UmbStringState(undefined);
-	public readonly variantDifference = this._variantDifference.asObservable();
+	#variantDifference = new UmbStringState(undefined);
+	public readonly variantDifference = this.#variantDifference.asObservable();
 
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
@@ -60,17 +78,29 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 			this._observeProperty();
 		});
 
-		this.observe(this.alias, () => {
-			this._observeProperty();
-		});
+		this.observe(
+			this.alias,
+			() => {
+				this._observeProperty();
+			},
+			null,
+		);
 
-		this.observe(this.configValues, (configValues) => {
-			this.#config.setValue(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
-		});
+		this.observe(
+			this.configValues,
+			(configValues) => {
+				this.#config.setValue(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
+			},
+			null,
+		);
 
-		this.observe(this.variantId, () => {
-			this._generateVariantDifferenceString();
-		});
+		this.observe(
+			this.variantId,
+			() => {
+				this._generateVariantDifferenceString();
+			},
+			null,
+		);
 	}
 
 	private async _observeProperty(): Promise<void> {
@@ -97,9 +127,20 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	private _generateVariantDifferenceString() {
 		if (!this.#datasetContext) return;
 		const contextVariantId = this.#datasetContext.getVariantId?.() ?? undefined;
-		this._variantDifference.setValue(
-			contextVariantId ? this.#variantId.getValue()?.toDifferencesString(contextVariantId) : '',
-		);
+		const propertyVariantId = this.#variantId.getValue();
+
+		let shareMessage;
+		if (contextVariantId && propertyVariantId) {
+			if (contextVariantId.segment !== propertyVariantId.segment) {
+				// TODO: Translate this, ideally the actual culture is mentioned in the message:
+				shareMessage = 'Shared across culture';
+			}
+			if (contextVariantId.culture !== propertyVariantId.culture) {
+				// TODO: Translate this:
+				shareMessage = 'Shared';
+			}
+		}
+		this.#variantDifference.setValue(shareMessage);
 	}
 
 	public setAlias(alias: string | undefined): void {
@@ -108,24 +149,28 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	public getAlias(): string | undefined {
 		return this.#alias.getValue();
 	}
+
 	public setLabel(label: string | undefined): void {
 		this.#label.setValue(label);
 	}
 	public getLabel(): string | undefined {
 		return this.#label.getValue();
 	}
+
 	public setDescription(description: string | undefined): void {
 		this.#description.setValue(description);
 	}
 	public getDescription(): string | undefined {
 		return this.#description.getValue();
 	}
+
 	public setAppearance(appearance: UmbPropertyTypeAppearanceModel | undefined): void {
 		this.#appearance.setValue(appearance);
 	}
 	public getAppearance(): UmbPropertyTypeAppearanceModel | undefined {
 		return this.#appearance.getValue();
 	}
+
 	/**
 	 * Set the value of this property.
 	 * @param value {ValueType} the whole value to be set
@@ -135,6 +180,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		if (!this.#datasetContext || !alias) return;
 		this.#datasetContext?.setPropertyValue(alias, value);
 	}
+
 	/**
 	 * Gets the current value of this property.
 	 * Notice this is not reactive, you should us the `value` observable for that.
@@ -143,17 +189,33 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	public getValue(): ValueType | undefined {
 		return this.#value.getValue();
 	}
+
 	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined): void {
 		this.#configValues.setValue(config ?? []);
 	}
 	public getConfig(): Array<UmbPropertyEditorConfigProperty> | undefined {
 		return this.#configValues.getValue();
 	}
+
 	public setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId.setValue(variantId);
 	}
 	public getVariantId(): UmbVariantId | undefined {
 		return this.#variantId.getValue();
+	}
+
+	public setValidation(validation: UmbPropertyTypeValidationModel | undefined): void {
+		this.#validation.setValue(validation);
+	}
+	public getValidation(): UmbPropertyTypeValidationModel | undefined {
+		return this.#validation.getValue();
+	}
+
+	public setDataPath(dataPath: string | undefined): void {
+		this.#dataPath.setValue(dataPath);
+	}
+	public getDataPath(): string | undefined {
+		return this.#dataPath.getValue();
 	}
 
 	public resetValue(): void {
@@ -163,7 +225,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property. (Get it via the dataset) [NL]
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		super.destroy();
 		this.#alias.destroy();
 		this.#label.destroy();

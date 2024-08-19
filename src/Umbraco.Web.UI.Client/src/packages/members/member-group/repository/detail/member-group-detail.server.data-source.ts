@@ -9,7 +9,6 @@ import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api
 
 /**
  * A data source for the Member Group that fetches data from the server
- * @export
  * @class UmbMemberGroupServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Creates an instance of UmbMemberGroupServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,7 +27,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Creates a new Member Group scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateMemberGroupRequestModel }
+	 * @returns { CreateMemberGroupRequestModel }
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async createScaffold() {
@@ -44,7 +43,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Fetches a Member Group with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async read(unique: string) {
@@ -71,7 +70,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Inserts a new Member Group on the server
 	 * @param {UmbMemberGroupDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async create(model: UmbMemberGroupDetailModel) {
@@ -99,7 +98,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Updates a MemberGroup on the server
 	 * @param {UmbMemberGroupDetailModel} MemberGroup
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async update(model: UmbMemberGroupDetailModel) {
@@ -129,7 +129,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Deletes a Member Group on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async delete(unique: string) {

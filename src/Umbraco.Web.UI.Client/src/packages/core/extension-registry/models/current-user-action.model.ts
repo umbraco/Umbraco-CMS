@@ -29,6 +29,7 @@ export interface ManifestCurrentUserAction<MetaType extends MetaCurrentUserActio
 	meta: MetaType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaCurrentUserAction {}
 
 export interface ManifestCurrentUserActionDefaultKind<
@@ -41,7 +42,6 @@ export interface ManifestCurrentUserActionDefaultKind<
 export interface MetaCurrentUserActionDefaultKind extends MetaCurrentUserAction {
 	/**
 	 * An icon to represent the action to be performed
-	 *
 	 * @examples [
 	 *   "icon-box",
 	 *   "icon-grid"
@@ -51,7 +51,6 @@ export interface MetaCurrentUserActionDefaultKind extends MetaCurrentUserAction 
 
 	/**
 	 * The friendly name of the action to perform
-	 *
 	 * @examples [
 	 *   "Create",
 	 *   "Create Content Template"

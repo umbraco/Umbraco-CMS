@@ -1,5 +1,5 @@
 import type { UmbWebhookDetailModel } from '../../../../../types.js';
-import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-webhook-table-entity-actions-column-layout')
@@ -14,7 +14,7 @@ export class UmbWebhookTableEntityActionsColumnLayoutElement extends UmbLitEleme
 		this._isOpen = false;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-dropdown .open=${this._isOpen} compact hide-expand>
 				<uui-symbol-more slot="label"></uui-symbol-more>

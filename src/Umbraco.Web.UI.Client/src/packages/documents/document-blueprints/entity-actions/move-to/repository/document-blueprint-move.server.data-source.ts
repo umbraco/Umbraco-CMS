@@ -5,7 +5,6 @@ import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backo
 
 /**
  * Move DocumentBlueprint Server Data Source
- * @export
  * @class UmbMoveDocumentBlueprintServerDataSource
  */
 export class UmbMoveDocumentBlueprintServerDataSource implements UmbMoveDataSource {
@@ -13,7 +12,7 @@ export class UmbMoveDocumentBlueprintServerDataSource implements UmbMoveDataSour
 
 	/**
 	 * Creates an instance of UmbMoveDocumentBlueprintServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMoveDocumentBlueprintServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,7 +23,8 @@ export class UmbMoveDocumentBlueprintServerDataSource implements UmbMoveDataSour
 	 * Move an item for the given id to the target unique
 	 * @param {string} unique
 	 * @param {(string | null)} targetUnique
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbMoveDocumentBlueprintServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {

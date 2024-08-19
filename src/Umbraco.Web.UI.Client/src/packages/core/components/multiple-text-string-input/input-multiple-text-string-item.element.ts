@@ -66,16 +66,16 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		event.stopPropagation();
 	}
 
-	public async focus() {
+	public override async focus() {
 		await this.updateComplete;
 		this._input?.focus();
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation" class="handle"></uui-icon>`}
 
@@ -109,7 +109,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

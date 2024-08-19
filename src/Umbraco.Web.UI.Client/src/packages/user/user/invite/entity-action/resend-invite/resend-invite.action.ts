@@ -10,7 +10,7 @@ export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEn
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -25,3 +25,5 @@ export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEn
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbResendInviteToUserEntityAction as api };

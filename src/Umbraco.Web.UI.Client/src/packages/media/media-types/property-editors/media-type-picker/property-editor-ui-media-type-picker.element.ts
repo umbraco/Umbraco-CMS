@@ -15,24 +15,24 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 		if (!config) return;
 
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
-		this.min = minMax?.min ?? 0;
-		this.max = minMax?.max ?? Infinity;
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 	}
 
 	@state()
-	min = 0;
+	_min = 0;
 
 	@state()
-	max = Infinity;
+	_max = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMediaTypeElement }) {
-		this.value = event.target.selection.join(',');
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
-			<umb-input-media-type .min=${this.min} .max=${this.max} .value=${this.value ?? ''} @change=${this.#onChange}>
+			<umb-input-media-type .min=${this._min} .max=${this._max} .value=${this.value} @change=${this.#onChange}>
 			</umb-input-media-type>
 		`;
 	}

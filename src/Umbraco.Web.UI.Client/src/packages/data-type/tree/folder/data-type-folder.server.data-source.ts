@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for a Data Type folder that fetches data from the server
- * @export
  * @class UmbDataTypeFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates an instance of UmbDataTypeFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,7 +23,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Fetches a Data Type folder from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -52,7 +51,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Creates a Data Type folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -82,7 +81,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Updates a Data Type folder on the server
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async update(args: UmbUpdateFolderModel) {
@@ -107,7 +106,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Deletes a Data Type folder on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async delete(unique: string) {

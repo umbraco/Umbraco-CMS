@@ -68,29 +68,46 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return this._variant?.state === 'Draft';
 	}
 
-	renderIconContainer() {
+	override renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
 				${this.item?.documentType.icon
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
-							<!--
-							// TODO: implement correct status symbol
-							<span id="status-symbol"></span>
-							-->
+							${this.#renderStateIcon()}
 						`
 					: nothing}
 			</span>
 		`;
 	}
 
-	renderLabel() {
+	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
 			>${this.#getLabel()}</span
 		> `;
 	}
 
-	static styles = [
+	#renderStateIcon() {
+		if (this.item?.isProtected) {
+			return this.#renderIsProtectedIcon();
+		}
+
+		if (this.item?.documentType.collection) {
+			return this.#renderIsCollectionIcon();
+		}
+
+		return nothing;
+	}
+
+	#renderIsCollectionIcon() {
+		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
+	}
+
+	#renderIsProtectedIcon() {
+		return html`<umb-icon id="state-icon" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
+	}
+
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#icon-container {
@@ -101,16 +118,49 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				vertical-align: middle;
 			}
 
-			#status-symbol {
-				width: 5px;
-				height: 5px;
-				border: 1px solid white;
-				background-color: blue;
-				display: block;
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			#state-icon {
 				position: absolute;
-				bottom: 0;
-				right: 0;
+				bottom: -5px;
+				right: -5px;
+				font-size: 10px;
+				background: var(--uui-color-surface);
+				width: 14px;
+				height: 14px;
 				border-radius: 100%;
+				line-height: 14px;
+			}
+
+			:hover #state-icon {
+				background: var(--uui-color-surface-emphasis);
+			}
+
+			/** Active */
+			[active] #state-icon {
+				background: var(--uui-color-current);
+			}
+
+			[active]:hover #state-icon {
+				background: var(--uui-color-current-emphasis);
+			}
+
+			/** Selected */
+			[selected] #state-icon {
+				background-color: var(--uui-color-selected);
+			}
+
+			[selected]:hover #state-icon {
+				background-color: var(--uui-color-selected-emphasis);
+			}
+
+			/** Disabled */
+			[disabled] #state-icon {
+				background-color: var(--uui-color-disabled);
 			}
 
 			.draft {

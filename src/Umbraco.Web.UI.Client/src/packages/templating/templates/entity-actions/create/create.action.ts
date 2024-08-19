@@ -2,12 +2,12 @@ import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action'
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
+export class UmbCreateTemplateEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const url = `section/settings/workspace/template/create/parent/${this.args.entityType}/${
 			this.args.unique || 'null'
 		}`;
@@ -15,3 +15,5 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
 		history.pushState(null, '', url);
 	}
 }
+
+export { UmbCreateTemplateEntityAction as api };

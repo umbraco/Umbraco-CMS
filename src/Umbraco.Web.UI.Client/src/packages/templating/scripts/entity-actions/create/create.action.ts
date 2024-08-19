@@ -9,7 +9,7 @@ export class UmbScriptCreateOptionsEntityAction extends UmbEntityActionBase<neve
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_SCRIPT_CREATE_OPTIONS_MODAL, {
 			data: {
@@ -22,6 +22,6 @@ export class UmbScriptCreateOptionsEntityAction extends UmbEntityActionBase<neve
 
 		await modalContext.onSubmit();
 	}
-
-
 }
+
+export { UmbScriptCreateOptionsEntityAction as api };

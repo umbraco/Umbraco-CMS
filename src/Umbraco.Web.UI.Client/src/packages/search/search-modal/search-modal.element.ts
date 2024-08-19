@@ -60,7 +60,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this.#observeProviders();
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		this.addEventListener('keydown', this.#onKeydown);
@@ -71,7 +71,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		});
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 
 		this.removeEventListener('keydown', this.#onKeydown);
@@ -279,7 +279,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="top">
 				${this.#renderSearchIcon()}
@@ -393,7 +393,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

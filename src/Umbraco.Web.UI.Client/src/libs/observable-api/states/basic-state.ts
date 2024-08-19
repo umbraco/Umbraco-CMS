@@ -1,7 +1,6 @@
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
- * @export
  * @class UmbBasicState
  * @description - State ensures the data is unique, not updating any Observes unless there is an actual change of the value using `===`.
  */
@@ -13,8 +12,8 @@ export class UmbBasicState<T> {
 	}
 
 	/**
-	 * @method asObservable
-	 * @return {Observable} Observable that the State casts to.
+	 * @function asObservable
+	 * @returns {Observable} Observable that the State casts to.
 	 * @description - Creates a new Observable with this State as the source. Observe this to subscribe to its value and future changes.
 	 * @example <caption>Example observe the data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
@@ -37,8 +36,8 @@ export class UmbBasicState<T> {
 	}
 
 	/**
-	 * @method getValue
-	 * @return {T} The current data of this state.
+	 * @function getValue
+	 * @returns {T} The current data of this state.
 	 * @description - Provides the current data of this state.
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
@@ -49,16 +48,16 @@ export class UmbBasicState<T> {
 	}
 
 	/**
-	 * @method destroy
+	 * @function destroy
 	 * @description - Destroys this state and completes all observations made to it.
 	 */
 	public destroy(): void {
 		this._subject?.complete();
-		(this._subject as any) = undefined;
+		(this._subject as unknown) = undefined;
 	}
 
 	/**
-	 * @method setValue
+	 * @function setValue
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 * @example <caption>Example change the data of a state</caption>

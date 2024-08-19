@@ -5,12 +5,13 @@ export type ObserverCallback<T> = (value: T) => void;
 
 export class UmbObserver<T> {
 	#source!: Observable<T>;
-	#callback!: ObserverCallback<T>;
+	#callback?: ObserverCallback<T>;
 	#subscription!: Subscription;
 
 	constructor(source: Observable<T>, callback?: ObserverCallback<T>) {
 		this.#source = source;
 		if (callback) {
+			this.#callback = callback;
 			this.#subscription = source.subscribe(callback);
 		}
 	}
@@ -44,7 +45,7 @@ export class UmbObserver<T> {
 
 	hostConnected() {
 		// Notice: This will not re-subscribe if this controller was destroyed. Only if the subscription was closed.
-		if (this.#subscription?.closed) {
+		if (this.#subscription?.closed && this.#callback) {
 			this.#subscription = this.#source.subscribe(this.#callback);
 		}
 	}
@@ -58,9 +59,9 @@ export class UmbObserver<T> {
 	destroy(): void {
 		if (this.#subscription) {
 			this.#subscription.unsubscribe();
-			(this.#callback as any) = undefined;
-			(this.#subscription as any) = undefined;
+			(this.#callback as unknown) = undefined;
+			(this.#subscription as unknown) = undefined;
 		}
-		(this.#source as any) = undefined;
+		(this.#source as unknown) = undefined;
 	}
 }

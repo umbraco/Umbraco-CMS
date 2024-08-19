@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbCurrentUserExternalLoginModalElement } from './external-login-modal.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -13,7 +13,7 @@ class UmbServerExtensionsHostElement extends UmbLitElement {
 		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 	}
 
-	render() {
+	override render() {
 		return html`<slot></slot>`;
 	}
 }

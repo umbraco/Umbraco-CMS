@@ -14,8 +14,7 @@ export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('Umb
 
 /**
  * Store for Packages
- * @export
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  */
 export class UmbPackageStore extends UmbStoreBase {
 	#configuration = new UmbObjectState<PackageConfigurationResponseModel>({ marketplaceUrl: '' });
@@ -46,7 +45,7 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of PackageStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof PackageStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -57,8 +56,9 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Append items to the store
+	 * @param packages
 	 */
-	appendItems(packages: Array<UmbPackage>) {
+	override appendItems(packages: Array<UmbPackage>) {
 		this.#packages.next(packages);
 		this.isPackagesLoaded = true;
 	}

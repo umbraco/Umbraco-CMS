@@ -5,10 +5,6 @@ import {
 	type UmbBlockGridScalableContext,
 	UmbBlockGridScaleManager,
 } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
 	UmbBooleanState,
@@ -17,6 +13,10 @@ import {
 	appendToFrozenArray,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -30,8 +30,8 @@ export class UmbBlockGridEntryContext
 	implements UmbBlockGridScalableContext
 {
 	//
-	readonly columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
-	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan);
+	readonly columnSpan = this._layout.asObservablePart((x) => (x ? (x.columnSpan ?? null) : undefined));
+	readonly rowSpan = this._layout.asObservablePart((x) => (x ? (x.rowSpan ?? null) : undefined));
 	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
@@ -208,7 +208,7 @@ export class UmbBlockGridEntryContext
 		this.observe(
 			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
 			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
-				if (!layoutColumns) return;
+				if (!layoutColumns || columnSpan === undefined) return;
 				const newColumnSpan = this.#calcColumnSpan(
 					columnSpan ?? layoutColumns,
 					relevantColumnSpanOptions,
@@ -230,16 +230,15 @@ export class UmbBlockGridEntryContext
 		this.observe(
 			observeMultiple([this.minMaxRowSpan, this.rowSpan]),
 			([minMax, rowSpan]) => {
-				if (minMax) {
-					const newRowSpan = Math.max(minMax[0], Math.min(rowSpan ?? 1, minMax[1]));
-					if (newRowSpan !== rowSpan) {
-						const layoutValue = this._layout.getValue();
-						if (!layoutValue) return;
-						this._layout.setValue({
-							...layoutValue,
-							rowSpan: newRowSpan,
-						});
-					}
+				if (!minMax || rowSpan === undefined) return;
+				const newRowSpan = Math.max(minMax[0], Math.min(rowSpan ?? 1, minMax[1]));
+				if (newRowSpan !== rowSpan) {
+					const layoutValue = this._layout.getValue();
+					if (!layoutValue) return;
+					this._layout.setValue({
+						...layoutValue,
+						rowSpan: newRowSpan,
+					});
 				}
 			},
 			'observeRowSpanValidation',
@@ -259,10 +258,8 @@ export class UmbBlockGridEntryContext
 				return newColumnSpan;
 			}
 		} else {
-			// Reset to the layoutColumns.
-			if (layoutColumns !== columnSpan) {
-				return layoutColumns;
-			}
+			// Fallback to the layoutColumns.
+			return layoutColumns;
 		}
 		return columnSpan;
 	}

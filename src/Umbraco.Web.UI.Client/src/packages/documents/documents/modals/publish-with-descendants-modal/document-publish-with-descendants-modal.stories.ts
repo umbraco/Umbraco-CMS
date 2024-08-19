@@ -1,12 +1,12 @@
 import './document-publish-with-descendants-modal.element.js';
 
-import type { Meta, StoryObj } from '@storybook/web-components';
 import { UmbDocumentVariantState } from '../../types.js';
 import type {
 	UmbDocumentPublishWithDescendantsModalData,
 	UmbDocumentPublishWithDescendantsModalValue,
 } from './document-publish-with-descendants-modal.token.js';
 import type { UmbDocumentPublishWithDescendantsModalElement } from './document-publish-with-descendants-modal.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentPublishWithDescendantsModalData = {

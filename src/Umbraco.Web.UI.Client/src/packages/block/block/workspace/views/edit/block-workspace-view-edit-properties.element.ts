@@ -1,5 +1,5 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -32,6 +32,9 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	@state()
 	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
+	@state()
+	_dataPaths?: Array<string>;
+
 	constructor() {
 		super();
 
@@ -48,26 +51,36 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 			this.#propertyStructureHelper.propertyStructure,
 			(propertyStructure) => {
 				this._propertyStructure = propertyStructure;
+				this.#generatePropertyDataPath();
 			},
 			'observePropertyStructure',
 		);
 	}
 
-	render() {
+	#generatePropertyDataPath() {
+		if (!this._propertyStructure) return;
+		this._dataPaths = this._propertyStructure.map((property) => `$.${property.alias}`);
+	}
+
+	override render() {
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) => html`<umb-property-type-based-property .property=${property}></umb-property-type-based-property> `,
+			(property, index) =>
+				html`<umb-property-type-based-property
+					class="property"
+					data-path=${this._dataPaths![index]}
+					.property=${property}></umb-property-type-based-property> `,
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
-			umb-property-type-based-property {
+			.property {
 				border-bottom: 1px solid var(--uui-color-divider);
 			}
-			umb-property-type-based-property:last-child {
+			.property:last-child {
 				border-bottom: 0;
 			}
 		`,

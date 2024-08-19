@@ -6,7 +6,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for inviting users
- * @export
  * @class UmbInviteUserServerDataSource
  */
 export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
@@ -15,6 +14,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Creates an instance of UmbInviteUserServerDataSource.
+	 * @param host
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -34,6 +34,8 @@ export class UmbBlockRteManagerContext<
 	create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		// TODO: [v15] ignoring unused modalData parameter to avoid breaking changes
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		modalData?: UmbBlockRteWorkspaceData,
 	) {
 		const data = super.createBlockData(contentElementTypeKey, partialLayoutEntry);
@@ -78,7 +80,10 @@ export class UmbBlockRteManagerContext<
 		return true;
 	}
 
-	/** @internal */
+	/**
+	 * @param contentUdi
+	 * @internal
+	 */
 	public deleteLayoutElement(contentUdi: string) {
 		if (!this.#editor) return;
 

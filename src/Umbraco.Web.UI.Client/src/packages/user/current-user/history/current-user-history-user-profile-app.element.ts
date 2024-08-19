@@ -1,5 +1,5 @@
 import type { UmbCurrentUserHistoryItem, UmbCurrentUserHistoryStore } from './current-user-history.store.js';
-import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.js';
+import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
 import { html, customElement, state, map, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -43,7 +43,7 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		return input.substring(9, frontChars) + separator + input.substring(input.length - backChars);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('user_yourHistory')}>
 				<uui-ref-list>${map(this._history, (item) => html` ${this.#renderItem(item)} `)}</uui-ref-list>
@@ -62,7 +62,7 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-ref-node {

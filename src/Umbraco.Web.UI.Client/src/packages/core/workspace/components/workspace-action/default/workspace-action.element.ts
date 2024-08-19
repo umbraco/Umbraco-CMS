@@ -1,12 +1,18 @@
 import type { UmbWorkspaceAction } from '../workspace-action.interface.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type {
-	ManifestWorkspaceAction,
-	MetaWorkspaceActionDefaultKind,
+import {
+	umbExtensionsRegistry,
+	type ManifestWorkspaceAction,
+	type ManifestWorkspaceActionMenuItem,
+	type MetaWorkspaceActionDefaultKind,
 } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	type UmbExtensionElementAndApiInitializer,
+	UmbExtensionsElementAndApiInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 
 import '../../workspace-action-menu/index.js';
 
@@ -17,12 +23,14 @@ export class UmbWorkspaceActionElement<
 > extends UmbLitElement {
 	#manifest?: ManifestWorkspaceAction<MetaType>;
 	#api?: ApiType;
+	#extensionsController?: UmbExtensionsElementAndApiInitializer<
+		ManifestWorkspaceActionMenuItem,
+		'workspaceActionMenuItem',
+		ManifestWorkspaceActionMenuItem
+	>;
 
 	@state()
 	private _buttonState?: UUIButtonState;
-
-	@state()
-	private _aliases: Array<string> = [];
 
 	@state()
 	_href?: string;
@@ -60,6 +68,9 @@ export class UmbWorkspaceActionElement<
 		return this.#api;
 	}
 
+	@state()
+	private _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
+
 	/**
 	 * Create a list of original and overwritten aliases of workspace actions for the action.
 	 */
@@ -77,7 +88,8 @@ export class UmbWorkspaceActionElement<
 				}
 			}
 		}
-		this._aliases = Array.from(aliases);
+
+		this.#observeExtensions(Array.from(aliases));
 	}
 
 	private async _onClick(event: MouseEvent) {
@@ -91,7 +103,7 @@ export class UmbWorkspaceActionElement<
 			if (!this.#api) throw new Error('No api defined');
 			await this.#api.execute();
 			this._buttonState = 'success';
-		} catch (error) {
+		} catch {
 			this._buttonState = 'failed';
 		}
 
@@ -108,26 +120,60 @@ export class UmbWorkspaceActionElement<
 		);
 	}
 
-	render() {
+	#observeExtensions(aliases: string[]): void {
+		this.#extensionsController?.destroy();
+		this.#extensionsController = new UmbExtensionsElementAndApiInitializer<
+			ManifestWorkspaceActionMenuItem,
+			'workspaceActionMenuItem',
+			ManifestWorkspaceActionMenuItem
+		>(
+			this,
+			umbExtensionsRegistry,
+			'workspaceActionMenuItem',
+			ExtensionApiArgsMethod,
+			(action) => {
+				return Array.isArray(action.forWorkspaceActions)
+					? action.forWorkspaceActions.some((alias) => aliases.includes(alias))
+					: aliases.includes(action.forWorkspaceActions);
+			},
+			(extensionControllers) => {
+				this._items = extensionControllers;
+			},
+			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+		);
+	}
+
+	#renderButton() {
 		return html`
-			<uui-button-group>
-				<uui-button
-					id="action-button"
-					.href=${this._href}
-					@click=${this._onClick}
-					look=${this.#manifest?.meta.look || 'default'}
-					color=${this.#manifest?.meta.color || 'default'}
-					label=${ifDefined(
-						this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
-					)}
-					.disabled=${this._isDisabled}
-					.state=${this._buttonState}></uui-button>
-				<umb-workspace-action-menu
-					.forWorkspaceActions=${this._aliases}
-					color="${this.#manifest?.meta.color || 'default'}"
-					look="${this.#manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
-			</uui-button-group>
+			<uui-button
+				id="action-button"
+				.href=${this._href}
+				@click=${this._onClick}
+				look=${this.#manifest?.meta.look || 'default'}
+				color=${this.#manifest?.meta.color || 'default'}
+				label=${ifDefined(
+					this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
+				)}
+				.disabled=${this._isDisabled}
+				.state=${this._buttonState}></uui-button>
 		`;
+	}
+
+	#renderActionMenu() {
+		return html`
+			<umb-workspace-action-menu
+				.items=${this._items}
+				color="${this.#manifest?.meta.color || 'default'}"
+				look="${this.#manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
+		`;
+	}
+
+	override render() {
+		return when(
+			this._items.length,
+			() => html` <uui-button-group> ${this.#renderButton()} ${this.#renderActionMenu()} </uui-button-group> `,
+			() => this.#renderButton(),
+		);
 	}
 }
 
@@ -137,4 +183,13 @@ declare global {
 	interface HTMLElementTagNameMap {
 		'umb-workspace-action': UmbWorkspaceActionElement;
 	}
+}
+
+/**
+ *
+ * @param manifest
+ * @returns An array of arguments to pass to the extension API initializer.
+ */
+function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
+	return [{ meta: manifest.meta }];
 }

@@ -1,5 +1,6 @@
 import type { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 
 export interface MetaTinyMcePlugin {
 	/**
@@ -9,7 +10,6 @@ export interface MetaTinyMcePlugin {
 	toolbar?: Array<{
 		/**
 		 * The alias of the toolbar button that will be configured in the TinyMCE editor.
-		 *
 		 * @see [TinyMCE Toolbar](https://www.tiny.cloud/docs/tinymce/6/toolbar-configuration-options/) for more information.
 		 */
 		alias: string;
@@ -26,6 +26,19 @@ export interface MetaTinyMcePlugin {
 		 */
 		icon?: string;
 	}>;
+
+	/**
+	 * Sets the default configuration for the TinyMCE editor. This configuration will be used when the editor is initialized.
+	 * @see [TinyMCE Configuration](https://www.tiny.cloud/docs/configure/) for more information.
+	 * @optional
+	 * @examples [
+	 * {
+	 *   "plugins": "wordcount",
+	 *   "statusbar": true
+	 * }
+	 * ]
+	 */
+	config?: RawEditorOptions;
 }
 
 /**
@@ -34,7 +47,6 @@ export interface MetaTinyMcePlugin {
  * A plugin can add things like buttons, menu items, context menu items, etc. through the TinyMCE API.
  * A plugin can also add custom commands to the editor.
  * A plugin can also modify the behavior of the editor.
- *
  * @see [TinyMCE Plugin](https://www.tiny.cloud/docs/tinymce/6/apis/tinymce.plugin/) for more information.
  */
 export interface ManifestTinyMcePlugin extends ManifestApi<UmbTinyMcePluginBase> {

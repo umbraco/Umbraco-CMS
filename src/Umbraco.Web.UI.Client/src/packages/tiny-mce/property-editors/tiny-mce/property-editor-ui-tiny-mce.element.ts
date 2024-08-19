@@ -6,7 +6,6 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import {
-	UmbBlockRteEntriesContext,
 	type UmbBlockRteLayoutModel,
 	UmbBlockRteManagerContext,
 	type UmbBlockRteTypeModel,
@@ -75,7 +74,6 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	private _latestMarkup = ''; // The latest value gotten from the TinyMCE editor.
 
 	#managerContext = new UmbBlockRteManagerContext(this);
-	#entriesContext = new UmbBlockRteEntriesContext(this);
 
 	constructor() {
 		super();
@@ -101,7 +99,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onChange(event: InputEvent & { target: HTMLInputElement }) {
+	#onChange() {
 		const editor = this.#managerContext.getTinyMceEditor();
 		if (!editor) return;
 
@@ -138,7 +136,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-tiny-mce .configuration=${this._config} .value=${this._markup} @change=${this.#onChange}>
 			</umb-input-tiny-mce>

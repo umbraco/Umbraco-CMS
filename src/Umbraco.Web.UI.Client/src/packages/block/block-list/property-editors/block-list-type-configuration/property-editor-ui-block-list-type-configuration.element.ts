@@ -1,7 +1,7 @@
-import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
+import type { UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockTypeBaseModel, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
@@ -61,7 +61,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-input-block-type
 			.value=${this.value}
 			.workspacePath=${this._workspacePath}

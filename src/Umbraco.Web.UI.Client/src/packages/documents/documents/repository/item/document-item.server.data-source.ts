@@ -7,7 +7,6 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 
 /**
  * A data source for Document items that fetches data from the server
- * @export
  * @class UmbDocumentItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 > {
 	/**
 	 * Creates an instance of UmbDocumentItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

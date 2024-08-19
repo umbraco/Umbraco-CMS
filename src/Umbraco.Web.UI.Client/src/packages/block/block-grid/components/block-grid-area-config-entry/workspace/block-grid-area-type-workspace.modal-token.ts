@@ -1,6 +1,7 @@
 import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbBlockGridAreaTypeWorkspaceData extends UmbWorkspaceModalData {}
 
 export const UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL = new UmbModalToken<

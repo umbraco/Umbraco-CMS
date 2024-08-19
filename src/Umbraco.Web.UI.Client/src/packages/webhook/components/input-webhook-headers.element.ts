@@ -14,13 +14,13 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	private _headers: Array<{ name: string; value: string }> = [];
 
 	@state()
-	private _headerNames: string[] = ['Accept', 'Content-Type', 'User-Agent', 'Content-Length'];
+	private _headerNames: string[] = ['Accept', 'Content-Length', 'Content-Type', 'User-Agent'];
 
 	get #filterHeaderNames() {
 		return this._headerNames.filter((name) => !this._headers.find((header) => header.name === name));
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
 		if (!this.headers) return;
@@ -28,7 +28,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		this._headers = Object.entries(this.headers).map(([name, value]) => ({ name, value }));
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('_headers')) {
@@ -78,7 +78,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				.value=${header.value}
 				@input=${(e: InputEvent) => this.#onInput(e, 'value', index)}
 				list="valueList" />
-			<uui-button @click=${() => this.#removeHeader(index)} label="Remove"></uui-button>
+			<uui-button @click=${() => this.#removeHeader(index)} label=${this.localize.term('general_remove')}></uui-button>
 		`;
 	}
 
@@ -105,8 +105,8 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		if (!this._headers.length) return nothing;
 
 		return html`
-			<span class="grid-top">KEY</span>
-			<span class="grid-top">VALUE</span>
+			<span class="grid-top"><umb-localize key="general_name">Name</umb-localize></span>
+			<span class="grid-top"><umb-localize key="general_value">Value</umb-localize></span>
 			<span class="grid-top"></span>
 			${repeat(
 				this._headers,
@@ -116,14 +116,14 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderGrid()}
 			<uui-button id="add" look="placeholder" @click=${this.#addHeader}>Add</uui-button>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#grid {

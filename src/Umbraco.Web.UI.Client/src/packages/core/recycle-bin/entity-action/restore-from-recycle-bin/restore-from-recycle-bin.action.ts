@@ -7,16 +7,15 @@ import type { MetaEntityActionRestoreFromRecycleBinKind } from '@umbraco-cms/bac
 
 /**
  * Entity action for restoring an item from the recycle bin.
- * @export
  * @class UmbRestoreFromRecycleBinEntityAction
- * @extends {UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind>}
+ * @augments {UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind>}
  */
 export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind> {
 	/**
 	 * Executes the action.
 	 * @memberof UmbRestoreFromRecycleBinEntityAction
 	 */
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot restore an item without a unique identifier.');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

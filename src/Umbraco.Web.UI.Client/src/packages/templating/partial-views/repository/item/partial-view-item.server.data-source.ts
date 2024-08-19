@@ -8,7 +8,6 @@ import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api
 
 /**
  * A data source for script items that fetches data from the server
- * @export
  * @class UmbPartialViewItemServerDataSource
  * @implements {UmbItemDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 
 	/**
 	 * Creates an instance of UmbPartialViewItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,7 +27,7 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

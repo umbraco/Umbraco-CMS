@@ -7,7 +7,6 @@ import { type UmbMemberTypeDetailModel, UmbMemberTypeDetailRepository } from '@u
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -60,7 +59,6 @@ export class UmbMemberWorkspaceContext
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -128,7 +126,7 @@ export class UmbMemberWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
@@ -229,6 +227,13 @@ export class UmbMemberWorkspaceContext
 		return this.structure.propertyStructureById(propertyId);
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @param {UmbVariantId} variantId
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#currentData.asObservablePart(
 			(data) =>
@@ -378,7 +383,7 @@ export class UmbMemberWorkspaceContext
 		return new UmbMemberPropertyDatasetContext(host, this, variantId);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#currentData.destroy();
 		super.destroy();
 		this.#persistedData.destroy();
@@ -399,43 +404,40 @@ export class UmbMemberWorkspaceContext
 		this.#currentData.setValue({ ...currentData, ...data });
 	}
 
-	get email() {
+	get email(): string {
 		return this.#get('email') || '';
 	}
 
-	get username() {
+	get username(): string {
 		return this.#get('username') || '';
 	}
 
-	get isLockedOut() {
+	get isLockedOut(): boolean {
 		return this.#get('isLockedOut') || false;
 	}
 
-	get isTwoFactorEnabled() {
+	get isTwoFactorEnabled(): boolean {
 		return this.#get('isTwoFactorEnabled') || false;
 	}
 
-	get isApproved() {
+	get isApproved(): boolean {
 		return this.#get('isApproved') || false;
 	}
 
-	get failedPasswordAttempts() {
+	get failedPasswordAttempts(): number {
 		return this.#get('failedPasswordAttempts') || 0;
 	}
 
-	//TODO Use localization for "never"
-	get lastLockOutDate() {
-		return this.#get('lastLockoutDate') || 'never';
+	get lastLockOutDate(): string | null {
+		return this.#get('lastLockoutDate') ?? null;
 	}
 
-	get lastLoginDate() {
-		return this.#get('lastLoginDate') || 'never';
+	get lastLoginDate(): string | null {
+		return this.#get('lastLoginDate') ?? null;
 	}
 
-	get lastPasswordChangeDate() {
-		const date = this.#get('lastPasswordChangeDate');
-		if (!date) return 'never';
-		return new Date(date).toLocaleString();
+	get lastPasswordChangeDate(): string | null {
+		return this.#get('lastPasswordChangeDate') ?? null;
 	}
 
 	get memberGroups() {

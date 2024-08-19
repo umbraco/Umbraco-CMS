@@ -7,7 +7,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
- * @export
  * @class UmbDataTypeSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<Um
 
 	/**
 	 * Creates an instance of UmbDataTypeSearchServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeSearchServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -25,7 +24,8 @@ export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<Um
 
 	/**
 	 * Get a list of versions for a data
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbDataTypeSearchServerDataSource
 	 */
 	async search(args: UmbSearchRequestArgs) {

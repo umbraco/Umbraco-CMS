@@ -494,6 +494,23 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Code Editor',
+		id: 'dt-codeEditor',
+		parent: null,
+		editorAlias: 'Umbraco.Plain.String',
+		editorUiAlias: 'Umb.PropertyEditorUi.CodeEditor',
+		hasChildren: false,
+		isFolder: false,
+		canIgnoreStartNodes: false,
+		isDeletable: true,
+		values: [
+			{
+				alias: 'language',
+				value: 'html',
+			},
+		],
+	},
+	{
 		name: 'Markdown Editor',
 		id: 'dt-markdownEditor',
 		parent: null,
@@ -684,6 +701,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'blockGroups',
 				value: [{ key: 'demo-block-group-id', name: 'Demo Blocks' }],
+			},
+			{
+				alias: 'layoutStylesheet',
+				value: '/wwwroot/css/umbraco-blockgridlayout.css',
 			},
 			{
 				alias: 'blocks',

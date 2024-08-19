@@ -1,19 +1,18 @@
 import type { UmbMemberTypeItemModel } from './types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_MEMBER_TYPE_ITEM_STORE_CONTEXT } from './member-type-item.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- * @export
  * @class UmbMemberTypeItemStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Member Type items
  */
 
 export class UmbMemberTypeItemStore extends UmbItemStoreBase<UmbMemberTypeItemModel> {
 	/**
 	 * Creates an instance of UmbMemberTypeItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeItemStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,5 +21,3 @@ export class UmbMemberTypeItemStore extends UmbItemStoreBase<UmbMemberTypeItemMo
 }
 
 export default UmbMemberTypeItemStore;
-
-export const UMB_MEMBER_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMemberTypeItemStore>('UmbMemberTypeItemStore');

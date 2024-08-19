@@ -7,7 +7,6 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 
 /**
  * A server data source for Static File items
- * @export
  * @class UmbStaticFileItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 > {
 	/**
 	 * Creates an instance of UmbStaticFileItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStaticFileItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

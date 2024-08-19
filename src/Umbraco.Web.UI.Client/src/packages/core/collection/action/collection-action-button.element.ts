@@ -57,25 +57,24 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 			if (!this.#api) throw new Error('No api defined');
 			await this.#api.execute();
 			this._buttonState = 'success';
-		} catch (error) {
+		} catch {
 			this._buttonState = 'failed';
 		}
 
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
-	render() {
+	override render() {
+		const label = this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name;
 		return html`
 			<uui-button
 				id="action-button"
-				@click=${this._onClick}
-				look="outline"
 				color="default"
-				label=${ifDefined(
-					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
-				)}
-				href="${ifDefined(this.manifest?.meta.href)}"
-				.state=${this._buttonState}></uui-button>
+				look="outline"
+				label=${ifDefined(label)}
+				href=${ifDefined(this.manifest?.meta.href)}
+				.state=${this._buttonState}
+				@click=${this._onClick}></uui-button>
 		`;
 	}
 }

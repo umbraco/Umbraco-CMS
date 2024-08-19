@@ -110,9 +110,16 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#onClick(view: UmbCollectionViewLayout) {
 		this.#collectionContext?.setLastSelectedView(this._entityUnique, view.alias);
+
+		setTimeout(() => {
+			// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			this._popover?.hidePopover();
+		}, 100);
 	}
 
-	render() {
+	override render() {
 		if (!this._currentView) return nothing;
 		if (this._views.length <= 1) return nothing;
 
@@ -146,19 +153,16 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
 				--uui-button-content-align: left;
+				--uui-menu-item-flat-structure: 1;
 			}
 
 			.filter-dropdown {
 				padding: var(--uui-size-space-3);
-			}
-
-			umb-icon {
-				display: inline-block;
 			}
 		`,
 	];

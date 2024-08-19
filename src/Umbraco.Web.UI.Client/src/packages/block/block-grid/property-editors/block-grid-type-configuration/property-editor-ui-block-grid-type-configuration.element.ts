@@ -17,14 +17,17 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
+import {
+	UMB_BLOCK_GRID_TYPE,
+	UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
+	type UmbBlockGridTypeGroupType,
+} from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_PROPERTY_CONTEXT,
 	UMB_PROPERTY_DATASET_CONTEXT,
 	type UmbPropertyDatasetContext,
 } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -61,8 +64,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#datasetContext?: UmbPropertyDatasetContext;
 	#blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
-		typeof UMB_WORKSPACE_MODAL.DATA,
-		typeof UMB_WORKSPACE_MODAL.VALUE
+		typeof UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL.VALUE
 	>;
 
 	#value: Array<UmbBlockTypeWithGroupKey> = [];
@@ -105,11 +108,11 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this.#observeBlockGroups();
 		});
 
-		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(
+			this,
+			UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
+		)
 			.addAdditionalPath(UMB_BLOCK_GRID_TYPE)
-			.onSetup(() => {
-				return { data: { entityType: UMB_BLOCK_GRID_TYPE, preset: {} }, modal: { size: 'large' } };
-			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newpath = routeBuilder({});
 				this._workspacePath = newpath;
@@ -166,9 +169,11 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			const newGroupKey = element.getAttribute('data-umb-group-key');
 			const movedItem = e.detail?.item as UmbBlockTypeWithGroupKey;
 			// Check if item moved back to original group...
-			movedItem.groupKey === newGroupKey
-				? (this.#moveData = undefined)
-				: (this.#moveData = value.map((block) => ({ ...block, groupKey: newGroupKey })));
+			if (movedItem.groupKey === newGroupKey) {
+				this.#moveData = undefined;
+			} else {
+				this.#moveData = value.map((block) => ({ ...block, groupKey: newGroupKey }));
+			}
 		} else if (e.detail?.moveComplete) {
 			// Move complete, get the blocks that were in an untouched group
 			const blocks = this.#value
@@ -190,9 +195,9 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		}
 	}
 
-	// TODO: Implement confirm dialog
+	// TODO: Implement confirm dialog [NL]
 	#deleteGroup(groupKey: string) {
-		// TODO: make one method for updating the blockGroupsDataSetValue:
+		// TODO: make one method for updating the blockGroupsDataSetValue: [NL]
 		// This one that deletes might require the ability to parse what to send as an argument to the method, then a filtering can occur before.
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
@@ -205,14 +210,14 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#changeGroupName(e: UUIInputEvent, groupKey: string) {
 		const groupName = e.target.value as string;
-		// TODO: make one method for updating the blockGroupsDataSetValue:
+		// TODO: make one method for updating the blockGroupsDataSetValue: [NL]
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this.#blockGroups?.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),
 		);
 	}
 
-	render() {
+	override render() {
 		return html`<div id="groups">
 			${this._notGroupedBlockTypes
 				? html`<umb-input-block-type
@@ -256,7 +261,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input:not(:hover, :focus) {

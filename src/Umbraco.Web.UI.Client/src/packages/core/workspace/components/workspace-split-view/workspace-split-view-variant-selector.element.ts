@@ -1,17 +1,18 @@
 import type { ActiveVariant } from '../../controllers/index.js';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	type UUIInputElement,
 	UUIInputEvent,
 	type UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 type UmbDocumentVariantOption = {
 	culture: string | null;
@@ -44,6 +45,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	@state()
 	private _name?: string;
+
+	@state()
+	private _variantId?: UmbVariantId;
 
 	@state()
 	private _variantDisplayName = '';
@@ -132,11 +136,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
 		if (!workspaceContext) return;
 
-		const variantId = this.#datasetContext.getVariantId();
+		this._variantId = this.#datasetContext.getVariantId();
 		// Find the variant option matching this, to get the language name...
 
-		const culture = variantId.culture;
-		const segment = variantId.segment;
+		const culture = this._variantId.culture;
+		const segment = this._variantId.segment;
 
 		this.observe(
 			workspaceContext.variantOptions,
@@ -189,14 +193,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return this._variants?.length > 1;
 	}
 
-	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._variantSelectorOpen = event.newState === 'open';
 
 		if (!this._popoverElement) return;
 
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		const isOpen = event.newState === 'open';
 		if (!isOpen) return;
 
@@ -205,13 +212,16 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		this._popoverElement.style.width = `${host.width}px`;
 	}
 
-	render() {
-		return html`
+	override render() {
+		return this._variantId
+			? html`
 			<uui-input
 				id="name-input"
-				label="Document name (TODO: Localize)"
+				label=${this.localize.term('placeholders_entername')}
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
+				required
+				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${umbFocus()}
 			>
 				${
@@ -284,10 +294,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 					: nothing
 			}
 		</div>
-		`;
+		`
+			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#name-input {

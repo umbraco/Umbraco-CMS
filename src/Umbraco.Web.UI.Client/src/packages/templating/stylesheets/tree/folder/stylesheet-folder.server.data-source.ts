@@ -1,5 +1,5 @@
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbCreateFolderModel, UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
 import type { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -7,7 +7,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Stylesheet folders that fetches data from the server
- * @export
  * @class UmbStylesheetFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 	/**
 	 * Creates an instance of UmbStylesheetFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -27,7 +26,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 	/**
 	 * Fetches a Stylesheet folder from the server
 	 * @param {string} unique
-	 * @return {UmbDataSourceResponse<UmbFolderModel>}
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -59,7 +58,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 	/**
 	 * Creates a Stylesheet folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {UmbDataSourceResponse<UmbFolderModel>}
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -92,7 +91,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 	/**
 	 * Deletes a Stylesheet folder on the server
 	 * @param {string} unique
-	 * @return {UmbDataSourceErrorResponse}
+	 * @returns {UmbDataSourceErrorResponse}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
 	async delete(unique: string) {
@@ -109,7 +108,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 		);
 	}
 
-	async update(args: UmbUpdateFolderModel): Promise<any> {
+	async update(): Promise<any> {
 		throw new Error('Updating is not supported');
 	}
 }

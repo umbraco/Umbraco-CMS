@@ -6,7 +6,6 @@ import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from
 import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -36,8 +35,6 @@ export class UmbUserGroupWorkspaceContext
 	readonly fallbackPermissions = this.#data.asObservablePart((data) => data?.fallbackPermissions || []);
 	readonly permissions = this.#data.asObservablePart((data) => data?.permissions || []);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.UserGroup');
 
@@ -45,7 +42,7 @@ export class UmbUserGroupWorkspaceContext
 			{
 				path: 'create',
 				component: UmbUserGroupWorkspaceEditorElement,
-				setup: (component, info) => {
+				setup: () => {
 					this.create();
 
 					new UmbWorkspaceIsNewRedirectController(
@@ -66,7 +63,7 @@ export class UmbUserGroupWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -119,7 +116,7 @@ export class UmbUserGroupWorkspaceContext
 		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

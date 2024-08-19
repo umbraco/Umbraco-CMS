@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the User Group that fetches data from the server
- * @export
  * @class UmbUserGroupServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 	/**
 	 * Creates an instance of UmbUserGroupServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -31,7 +30,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Creates a new User Group scaffold
 	 * @param {(string | null)} parentUnique
-	 * @return { CreateUserGroupRequestModel }
+	 * @returns { CreateUserGroupRequestModel }
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async createScaffold() {
@@ -60,7 +59,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Fetches a User Group with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async read(unique: string) {
@@ -98,7 +97,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Inserts a new User Group on the server
 	 * @param {UmbUserGroupDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async create(model: UmbUserGroupDetailModel) {
@@ -137,7 +136,8 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Updates a UserGroup on the server
 	 * @param {UmbUserGroupDetailModel} UserGroup
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async update(model: UmbUserGroupDetailModel) {
@@ -177,7 +177,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	/**
 	 * Deletes a User Group on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async delete(unique: string) {

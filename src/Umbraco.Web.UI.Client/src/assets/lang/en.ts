@@ -45,7 +45,7 @@ export default {
 		logout: 'Exit',
 		move: 'Move to',
 		notify: 'Notifications',
-		protect: 'Restrict Public Access',
+		protect: 'Public Access',
 		publish: 'Publish',
 		refreshNode: 'Reload',
 		remove: 'Remove',
@@ -95,7 +95,7 @@ export default {
 		sort: 'Allow access to change the sort order for nodes',
 		translate: 'Allow access to translate a node',
 		update: 'Allow access to save a node',
-		createblueprint: 'Allow access to create a Content Template',
+		createblueprint: 'Allow access to create a Document Blueprint',
 		notify: 'Allow access to setup notifications for content nodes',
 	},
 	apps: {
@@ -343,14 +343,16 @@ export default {
 		selectAllVariants: 'Select all variants',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Create a new Content Template from <em>%0%</em>',
+		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
+		createBlueprintItemUnder: "Create a new item under '%0%'",
+		createBlueprintFolderUnder: "Create a new folder under '%0%'",
 		blankBlueprint: 'Blank',
-		selectBlueprint: 'Select a Content Template',
-		createdBlueprintHeading: 'Content Template created',
-		createdBlueprintMessage: "A Content Template was created from '%0%'",
-		duplicateBlueprintMessage: 'Another Content Template with the same name already exists',
+		selectBlueprint: 'Select a Document Blueprint',
+		createdBlueprintHeading: 'Document Blueprint created',
+		createdBlueprintMessage: "A Document Blueprint was created from '%0%'",
+		duplicateBlueprintMessage: 'Another Document Blueprint with the same name already exists',
 		blueprintDescription:
-			'A Content Template is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
+			'A Document Blueprint is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
 	},
 	media: {
 		clickToUpload: 'Click to upload',
@@ -393,7 +395,7 @@ export default {
 	create: {
 		chooseNode: 'Where do you want to create the new %0%',
 		createUnder: 'Create an item under',
-		createContentBlueprint: 'Select the Document Type you want to make a content template for',
+		createContentBlueprint: 'Select the Document Type you want to make a Document Blueprint for',
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
@@ -560,6 +562,7 @@ export default {
 		selectContentType: 'Select content type',
 		selectMediaStartNode: 'Select media start node',
 		selectMember: 'Select member',
+		selectMembers: 'Select members',
 		selectMemberGroup: 'Select member group',
 		selectMemberType: 'Select member type',
 		selectNode: 'Select node',
@@ -692,6 +695,7 @@ export default {
 		hasReferencesDeleteConsequence:
 			'Deleting <strong>%0%</strong> will delete the properties and their data from the following items',
 		acceptDeleteConsequence: 'I understand this action will delete the properties and data based on this Data Type',
+		noConfiguration: 'There is no configuration for this property editor.',
 	},
 	errorHandling: {
 		errorButDataWasSaved:
@@ -827,9 +831,11 @@ export default {
 		logout: 'Logout',
 		macro: 'Macro',
 		mandatory: 'Mandatory',
+		manifest: 'Manifest',
 		message: 'Message',
 		move: 'Move',
 		name: 'Name',
+		never: 'Never',
 		new: 'New',
 		next: 'Next',
 		no: 'No',
@@ -879,6 +885,7 @@ export default {
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
+		unknown: 'Unknown',
 		unknownUser: 'Unknown user',
 		under: 'under',
 		up: 'Up',
@@ -1057,6 +1064,7 @@ export default {
 	language: {
 		cultureCode: 'Culture Code',
 		displayName: 'Culture Name',
+		noFallbackLanguages: 'There are no other languages to choose from',
 	},
 	lockout: {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
@@ -1318,7 +1326,7 @@ export default {
 		packages: 'Packages',
 		marketplace: 'Marketplace',
 		settings: 'Settings',
-		translation: 'Translation',
+		translation: 'Dictionary',
 		users: 'Users',
 	},
 	help: {
@@ -1385,7 +1393,7 @@ export default {
 		editContentPublishedFailedByParent: 'Content could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Content published',
 		editContentPublishedText: 'and visible on the website',
-		editBlueprintSavedHeader: 'Content Template saved',
+		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
 		editContentSavedHeader: 'Content saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
@@ -1555,6 +1563,7 @@ export default {
 		ascending: 'ascending',
 		descending: 'descending',
 		template: 'Template',
+		systemFields: 'System fields',
 	},
 	grid: {
 		media: 'Image',
@@ -1619,8 +1628,7 @@ export default {
 		editProperty: 'Edit property',
 		requiredLabel: 'Required label',
 		enableListViewHeading: 'Enable list view',
-		enableListViewDescription:
-			'Configures the content item to show a sortable and searchable list of its\n      children, the children will not be shown in the tree\n    ',
+		enableListViewDescription: 'Configures the content item to show a sortable and searchable list of its children.',
 		allowedTemplatesHeading: 'Allowed Templates',
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
@@ -1713,8 +1721,7 @@ export default {
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Collections',
-		collectionsDescription:
-			'Configures the content item to show list of its children, the children will not be shown in the tree.',
+		collectionsDescription: 'Configures the content item to show list of its children.',
 		structure: 'Structure',
 		presentation: 'Presentation',
 	},
@@ -1730,11 +1737,11 @@ export default {
 		enabled: 'Enabled',
 		events: 'Events',
 		event: 'Event',
-		url: 'Url',
+		url: 'URL',
 		types: 'Types',
 		webhookKey: 'Webhook key',
 		retryCount: 'Retry count',
-		urlDescription: 'The url to call when the webhook is triggered.',
+		urlDescription: 'The URL to call when the webhook is triggered.',
 		eventDescription: 'The events for which the webhook should be triggered.',
 		contentTypeDescription: 'Only trigger the webhook for a specific content type.',
 		enabledDescription: 'Is the webhook enabled?',
@@ -1742,6 +1749,7 @@ export default {
 		contentType: 'Content Type',
 		headers: 'Headers',
 		selectEventFirst: 'Please select an event first.',
+		selectEvents: 'Select events',
 	},
 	languages: {
 		addLanguage: 'Add language',
@@ -1834,7 +1842,7 @@ export default {
 	},
 	treeHeaders: {
 		content: 'Content',
-		contentBlueprints: 'Content Templates',
+		contentBlueprints: 'Document Blueprints',
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Recycle Bin',
@@ -1873,6 +1881,8 @@ export default {
 		settingsGroup: 'Settings',
 		templatingGroup: 'Templating',
 		thirdPartyGroup: 'Third Party',
+		structureGroup: 'Structure',
+		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
 	},
 	update: {
@@ -1892,6 +1902,11 @@ export default {
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
 		emailRequired: 'Required - enter an email address for this user',
+		emailDescription: (usernameIsEmail: boolean) => {
+			return usernameIsEmail
+				? 'The email address is used for notifications, password recovery, and as the username for logging in'
+				: 'The email address is used for notifications and password recovery';
+		},
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
@@ -1923,6 +1938,8 @@ export default {
 		lastLogin: 'Last login',
 		lastPasswordChangeDate: 'Password last changed',
 		loginname: 'Username',
+		loginnameRequired: 'Required - enter a username for this user',
+		loginnameDescription: 'The username is used for logging in',
 		mediastartnode: 'Media start node',
 		mediastartnodehelp: 'Limit the media library to a specific start node',
 		mediastartnodes: 'Media start nodes',
@@ -2225,7 +2242,7 @@ export default {
 		protectDescription: 'Setup access restrictions on %0%',
 		rightsDescription: 'Setup Permissions on %0%',
 		sortDescription: 'Change sort order for %0%',
-		createblueprintDescription: 'Create Content Template based on %0%',
+		createblueprintDescription: 'Create Document Blueprint based on %0%',
 		openContextMenu: 'Open context menu for',
 		currentLanguage: 'Current language',
 		switchLanguage: 'Switch language to',
@@ -2455,10 +2472,11 @@ export default {
 		tabClipboard: 'Clipboard',
 		tabBlockSettings: 'Settings',
 		headlineAdvanced: 'Advanced',
+		headlineCustomView: 'Custom View',
 		forceHideContentEditor: 'Hide content editor',
 		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay.',
-		girdInlineEditing: 'Inline editing',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Inline editing',
+		gridInlineEditingHelp:
 			'Enables inline editing for the first Property. Additional properties can be edited in the overlay.',
 		blockHasChanges: 'You have made changes to this content. Are you sure you want to discard them?',
 		confirmCancelBlockCreationHeadline: 'Discard creation?',
@@ -2539,15 +2557,15 @@ export default {
 		labelInlineMode: 'Display inline with text',
 	},
 	contentTemplatesDashboard: {
-		whatHeadline: 'What are Content Templates?',
+		whatHeadline: 'What are Document Blueprints?',
 		whatDescription:
-			'Content Templates are pre-defined content that can be selected when creating a new\n      content node.\n    ',
-		createHeadline: 'How do I create a Content Template?',
+			'Document Blueprints are pre-defined content that can be selected when creating a new\n      content node.\n    ',
+		createHeadline: 'How do I create a Document Blueprint?',
 		createDescription:
-			'\n            <p>There are two ways to create a Content Template:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Content Template" to create a new Content Template.</li>\n                <li>Right-click the Content Templates tree in the Settings section and select the Document Type you want to create a Content Template for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Content Template as a foundation for their new page.</p>\n        ',
-		manageHeadline: 'How do I manage Content Templates?',
+			'\n            <p>There are two ways to create a Document Blueprint:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Document Blueprint" to create a new Document Blueprint.</li>\n                <li>Right-click the Document Blueprints tree in the Settings section and select the Document Type you want to create a Document Blueprint for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Document Blueprint as a foundation for their new page.</p>\n        ',
+		manageHeadline: 'How do I manage Document Blueprints?',
 		manageDescription:
-			'You can edit and delete Content Templates from the "Content Templates" tree in the\n      Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete\n      it.\n    ',
+			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the\n      Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete\n      it.\n    ',
 	},
 	preview: {
 		endLabel: 'End',
@@ -2588,5 +2606,22 @@ export default {
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
 			'We will send:\n<ul>\n    <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n    <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n    <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n    <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n</ul>\n<em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n<br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>',
+	},
+	routing: {
+		routeNotFoundTitle: 'Not found',
+		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
+	},
+	codeEditor: {
+		label: 'Code editor',
+		languageConfigLabel: 'Language',
+		languageConfigDescription: 'Select the language for syntax highlighting and IntelliSense.',
+		heightConfigLabel: 'Height',
+		heightConfigDescription: 'Set the height of the code editor in pixels.',
+		lineNumbersConfigLabel: 'Line numbers',
+		lineNumbersConfigDescription: 'Show line numbers in the code editor.',
+		minimapConfigLabel: 'Minimap',
+		minimapConfigDescription: 'Show a minimap in the code editor.',
+		wordWrapConfigLabel: 'Word wrap',
+		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 } as UmbLocalizationDictionary;

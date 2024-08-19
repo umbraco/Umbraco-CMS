@@ -79,10 +79,18 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		});
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
-		this._routes = routes?.length > 0 ? [...routes, { path: '', redirectTo: routes?.[0]?.path }] : [];
+		if (routes.length > 0) {
+			routes.push({ path: '', redirectTo: routes?.[0]?.path });
+
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
+		}
+		this._routes = routes;
 	}
 
-	render() {
+	override render() {
 		return this._routes.length > 0
 			? html`
 					<umb-body-layout main-no-padding>
@@ -143,7 +151,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -5,6 +5,10 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
+/**
+ *
+ * @param manifest
+ */
 function apiArgsMethod(manifest: ManifestEntityBulkAction<MetaEntityBulkAction>) {
 	return [{ meta: manifest.meta }] as unknown[];
 }
@@ -73,7 +77,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		this._collectionContext?.selection.clearSelection();
 	}
 
-	render() {
+	override render() {
 		if (this._selectionLength === 0) return nothing;
 
 		return html`
@@ -82,7 +86,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					<uui-button
 						@click=${this._handleClearSelection}
 						@keydown=${this._handleKeyDown}
-						label="Clear"
+						label=${this.localize.term('buttons_clearSelection')}
 						look="secondary"></uui-button>
 					${this._renderSelectionCount()}
 				</div>
@@ -99,7 +103,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

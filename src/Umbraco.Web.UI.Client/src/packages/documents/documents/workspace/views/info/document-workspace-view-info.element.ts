@@ -185,7 +185,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div class="container">
 				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
@@ -252,7 +252,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				<uui-ref-node-document-type
 					standalone
 					href=${editDocumentTypePath + 'edit/' + this._documentTypeUnique}
-					name=${ifDefined(this._documentTypeName)}>
+					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
 					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
 				</uui-ref-node-document-type>
 			</div>
@@ -310,7 +310,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		this.#workspaceContext?.setTemplate(templateUnique);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

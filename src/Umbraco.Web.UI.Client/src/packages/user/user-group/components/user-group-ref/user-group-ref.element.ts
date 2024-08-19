@@ -8,7 +8,7 @@ import { map } from '@umbraco-cms/backoffice/external/rxjs';
 /**
  *  @element umb-user-group-ref
  *  @description - Component for displaying a reference to a User Group
- *  @extends UUIRefNodeElement
+ *  @augments UUIRefNodeElement
  */
 @customElement('umb-user-group-ref')
 export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
@@ -44,7 +44,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		);
 	}
 
-	protected renderDetail() {
+	protected override renderDetail() {
 		const details: string[] = [];
 
 		if (this.#userPermissionLabels.length > 0) {
@@ -58,7 +58,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		return html`<small id="detail">${details.join(' | ')}<slot name="detail"></slot></small>`;
 	}
 
-	static styles = [...UUIRefNodeElement.styles];
+	static override styles = [...UUIRefNodeElement.styles];
 }
 
 declare global {

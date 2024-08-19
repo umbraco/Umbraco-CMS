@@ -22,14 +22,14 @@ export class UmbPropertyEditorUIOrderDirectionElement extends UmbLitElement impl
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-radio-group @input=${this.#onInput} value=${this.value}>
 			<uui-radio name="order" label="Ascending [a-z]" value="asc"></uui-radio>
 			<uui-radio name="order" label="Descending [z-a]" value="desc"></uui-radio>
 		</uui-radio-group>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-radio-group {

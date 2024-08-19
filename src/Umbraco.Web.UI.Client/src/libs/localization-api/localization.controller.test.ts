@@ -1,7 +1,7 @@
-import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import type { UmbLocalizationSet, UmbLocalizationSetBase } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
 import { UmbLocalizationController } from './localization.controller.js';
+import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -10,19 +10,19 @@ const initialLanguage = 'en-us';
 
 @customElement('umb-localize-controller-host')
 class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
-	@property() lang = initialLanguage;
+	@property() override lang = initialLanguage;
 }
 
 @customElement('umb-localization-render-count')
 class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
 	amountOfUpdates = 0;
 
-	requestUpdate() {
+	override requestUpdate() {
 		super.requestUpdate();
 		this.amountOfUpdates++;
 	}
 
-	render() {
+	override render() {
 		return html`${this.localize.term('logout')}`;
 	}
 }

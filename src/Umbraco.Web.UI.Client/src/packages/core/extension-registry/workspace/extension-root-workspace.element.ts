@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor
 				headline="Extension Insights"

@@ -40,18 +40,18 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 		this.modalContext?.submit();
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		if (!this.data) return;
 		this._filtered = this.data.items;
 	}
 
-	render() {
+	override render() {
 		if (!this.data) return nothing;
 		const items = this._filtered;
 		return html`
-			<umb-body-layout headline=${this.data.headline}>
+			<umb-body-layout headline=${this.localize.string(this.data.headline)}>
 				<div id="main">
 					<uui-input
 						type="search"
@@ -72,7 +72,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 										(item) => item.value,
 										(item) => html`
 											<umb-ref-item
-												name=${item.label}
+												name=${this.localize.string(item.label)}
 												detail=${ifDefined(item.description)}
 												icon=${ifDefined(item.icon)}
 												@click=${() => this.#submit(item)}>
@@ -92,7 +92,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#main {

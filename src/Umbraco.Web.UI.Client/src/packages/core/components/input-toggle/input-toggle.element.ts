@@ -26,14 +26,23 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 	@property({ type: String })
 	labelOff?: string;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	_currentLabel?: string;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#updateLabel();
 	}
@@ -48,14 +57,15 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		this._currentLabel = this.showLabels ? (this.checked ? this.labelOn : this.labelOff) : '';
 	}
 
-	render() {
+	override render() {
 		return html`<uui-toggle
 			.checked=${this.#checked}
 			.label=${this._currentLabel}
-			@change=${this.#onChange}></uui-toggle>`;
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></uui-toggle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-toggle {
 				width: 100%;

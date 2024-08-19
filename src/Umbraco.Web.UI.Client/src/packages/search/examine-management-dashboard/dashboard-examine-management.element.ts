@@ -29,6 +29,10 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 			path: ``,
 			component: () => import('./views/section-view-examine-overview.js'),
 		},
+		{
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		},
 	];
 
 	@state()
@@ -37,7 +41,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	@state()
 	private _activePath = '';
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-transparent>
 				${this.#renderHeader()}
@@ -65,7 +69,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#header {
 				display: flex;

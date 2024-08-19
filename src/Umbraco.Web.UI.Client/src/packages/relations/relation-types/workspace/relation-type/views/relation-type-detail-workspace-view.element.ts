@@ -165,7 +165,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		this.#requestRelations();
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderRelations()}${this.#renderDetails()}`;
 	}
 
@@ -204,7 +204,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

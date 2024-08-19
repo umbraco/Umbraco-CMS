@@ -46,7 +46,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		}
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this._iconsFiltered = this.#icons;
 
@@ -74,7 +74,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		this._currentColor = colorAlias;
 	}
 
-	render() {
+	override render() {
 		// TODO: Missing localization in general. [NL]
 		return html`
 			<umb-body-layout headline="Select Icon">
@@ -148,7 +148,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

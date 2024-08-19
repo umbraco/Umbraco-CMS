@@ -24,7 +24,7 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 	@state()
 	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
 
-	updated(changedProperties: Map<string | number | symbol, unknown>) {
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
 		if (changedProperties.has('value')) {
 			if (!this.value) {
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
 
 		return html`<umb-input-image-cropper

@@ -2,8 +2,11 @@ import type { UmbDataSourceResponse } from '../data-source-response.interface.js
 import type { UmbReadDetailDataSource } from './read/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbDetailDataSourceConstructor<DetailType = any> {
-	new (host: UmbControllerHost): UmbDetailDataSource<DetailType>;
+export interface UmbDetailDataSourceConstructor<
+	DetailType = any,
+	UmbDetailDataSourceType extends UmbDetailDataSource<DetailType> = UmbDetailDataSource<DetailType>,
+> {
+	new (host: UmbControllerHost): UmbDetailDataSourceType;
 }
 
 export interface UmbDetailDataSource<DetailType> extends UmbReadDetailDataSource<DetailType> {

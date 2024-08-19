@@ -1,5 +1,5 @@
-import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
+import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
@@ -10,7 +10,6 @@ import {
 	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -29,9 +28,27 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
+
+/**
+ * @class UmbDataTypeWorkspaceContext
+ * @description - Context for handling data type workspace
+ * There is two overall code flows to be aware about:
+ *
+ * propertyEditorUiAlias is observed
+ * loads propertyEditorUi manifest
+ * then the propertyEditorSchemaAlias is set to what the UI is configured for.
+ *
+ * propertyEditorSchemaAlias is observed
+ * loads the propertyEditorSchema manifest
+ * if no UI is defined then the propertyEditorSchema manifest default ui is set for the propertyEditorUiAlias.
+ *
+ * This supports two cases:
+ * - when editing an existing data type that only has a schema alias set, then it gets the UI set.
+ * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
+ */
 export class UmbDataTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
@@ -74,18 +91,18 @@ export class UmbDataTypeWorkspaceContext
 
 	#settingsDefaultData?: Array<PropertyEditorSettingsDefaultData>;
 
-	#propertyEditorUISettingsSchemaAlias?: string;
-
 	#propertyEditorUiIcon = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiIcon = this.#propertyEditorUiIcon.asObservable();
 
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
+
+		this.addValidationContext(new UmbValidationContext(this).provide());
+
+		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
 
 		this.routes.setRoutes([
@@ -115,7 +132,7 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
@@ -125,7 +142,7 @@ export class UmbDataTypeWorkspaceContext
 		this.#propertyEditorUISettingsDefaultData = [];
 		this.#settingsDefaultData = undefined;
 
-		this._mergeConfigProperties();
+		this.#mergeConfigProperties();
 	}
 
 	// Hold the last set property editor ui alias, so we know when it changes, so we can reset values. [NL]
@@ -135,28 +152,13 @@ export class UmbDataTypeWorkspaceContext
 		this.observe(
 			this.propertyEditorUiAlias,
 			async (propertyEditorUiAlias) => {
-				const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
-				this.#lastPropertyEditorUIAlias = propertyEditorUiAlias;
+				this.#propertyEditorUISettingsProperties = [];
+				this.#propertyEditorUISettingsDefaultData = [];
+
 				// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
 				if (propertyEditorUiAlias === undefined) return;
 
-				// if the property editor ui alias is not set, we use the default alias from the schema
-				if (propertyEditorUiAlias === null) {
-					await this.#observePropertyEditorSchemaAlias();
-					this.setPropertyEditorUiAlias(this.#propertyEditorSchemaConfigDefaultUIAlias!);
-				} else {
-					await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
-					this.setPropertyEditorSchemaAlias(this.#propertyEditorUISettingsSchemaAlias!);
-					await this.#observePropertyEditorSchemaAlias();
-				}
-
-				if (
-					this.getIsNew() ||
-					(previousPropertyEditorUIAlias && previousPropertyEditorUIAlias !== propertyEditorUiAlias)
-				) {
-					this.#transferConfigDefaultData();
-				}
-				this._mergeConfigProperties();
+				this.#observePropertyEditorUIManifest(propertyEditorUiAlias);
 			},
 			'editorUiAlias',
 		);
@@ -166,13 +168,19 @@ export class UmbDataTypeWorkspaceContext
 		return this.observe(
 			this.propertyEditorSchemaAlias,
 			(propertyEditorSchemaAlias) => {
-				this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
+				this.#propertyEditorSchemaSettingsProperties = [];
+				this.#propertyEditorSchemaSettingsDefaultData = [];
+				this.#observePropertyEditorSchemaManifest(propertyEditorSchemaAlias);
 			},
 			'schemaAlias',
-		).asPromise();
+		);
 	}
 
-	#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias?: string) {
+	#observePropertyEditorSchemaManifest(propertyEditorSchemaAlias?: string) {
+		if (!propertyEditorSchemaAlias) {
+			this.removeUmbControllerByAlias('schema');
+			return;
+		}
 		this.observe(
 			propertyEditorSchemaAlias
 				? umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias)
@@ -185,36 +193,56 @@ export class UmbDataTypeWorkspaceContext
 				}));
 				this.#propertyEditorSchemaSettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 				this.#propertyEditorSchemaConfigDefaultUIAlias = manifest?.meta.defaultPropertyEditorUiAlias || null;
+				if (this.#propertyEditorSchemaConfigDefaultUIAlias && this.getPropertyEditorUiAlias() === null) {
+					// Fallback to the default property editor ui for this property editor schema.
+					this.setPropertyEditorUiAlias(this.#propertyEditorSchemaConfigDefaultUIAlias);
+				}
+				this.#mergeConfigProperties();
 			},
 			'schema',
 		);
 	}
 
-	#setPropertyEditorUIConfig(propertyEditorUIAlias: string) {
-		return this.observe(
+	#observePropertyEditorUIManifest(propertyEditorUIAlias: string | null) {
+		if (!propertyEditorUIAlias) {
+			this.removeUmbControllerByAlias('editorUi');
+			return;
+		}
+		this.observe(
 			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
 			(manifest) => {
 				this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
 				this.#propertyEditorUiName.setValue(manifest?.name || null);
 
-				this.#propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
 				// Maps properties to have a weight, so they can be sorted, notice UI properties have a +1000 weight compared to schema properties.
 				this.#propertyEditorUISettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
 					...x,
 					weight: x.weight ?? 1000 + i,
 				}));
 				this.#propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
+				this.setPropertyEditorSchemaAlias(manifest?.meta.propertyEditorSchemaAlias);
+				this.#mergeConfigProperties();
 			},
 			'editorUi',
-		).asPromise();
+		);
 	}
 
-	private _mergeConfigProperties() {
+	#mergeConfigProperties() {
 		if (this.#propertyEditorSchemaSettingsProperties && this.#propertyEditorUISettingsProperties) {
 			// Reset the value to this array, and then afterwards append:
 			this.#properties.setValue(this.#propertyEditorSchemaSettingsProperties);
 			// Append the UI settings properties to the schema properties, so they can override the schema properties:
 			this.#properties.append(this.#propertyEditorUISettingsProperties);
+
+			// If new or if the alias was changed then set default values. This 'complexity' to prevent setting default data when initialized [NL]
+			const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
+			this.#lastPropertyEditorUIAlias = this.getPropertyEditorUiAlias();
+			if (
+				this.getIsNew() ||
+				(previousPropertyEditorUIAlias && previousPropertyEditorUIAlias !== this.#lastPropertyEditorUIAlias)
+			) {
+				this.#transferConfigDefaultData();
+			}
 		}
 	}
 
@@ -303,13 +331,25 @@ export class UmbDataTypeWorkspaceContext
 		this.#currentData.update({ name });
 	}
 
+	getPropertyEditorSchemaAlias() {
+		return this.#currentData.getValue()?.editorAlias;
+	}
 	setPropertyEditorSchemaAlias(alias?: string) {
 		this.#currentData.update({ editorAlias: alias });
+	}
+	getPropertyEditorUiAlias() {
+		return this.#currentData.getValue()?.editorUiAlias;
 	}
 	setPropertyEditorUiAlias(alias?: string) {
 		this.#currentData.update({ editorUiAlias: alias });
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 		return this.#currentData.asObservablePart(
@@ -381,7 +421,7 @@ export class UmbDataTypeWorkspaceContext
 		await this.repository.delete(unique);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.#properties.destroy();

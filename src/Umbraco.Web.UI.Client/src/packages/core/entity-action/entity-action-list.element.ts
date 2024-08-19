@@ -60,7 +60,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	#hasRenderedOnce?: boolean;
-	render() {
+	override render() {
 		return this._filter
 			? html`
 					<umb-extension-with-api-slot
@@ -87,7 +87,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				--uui-menu-item-flat-structure: 1;

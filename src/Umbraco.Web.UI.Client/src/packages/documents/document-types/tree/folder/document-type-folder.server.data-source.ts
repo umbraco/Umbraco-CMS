@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for a Document Type folder that fetches data from the server
- * @export
  * @class UmbDocumentTypeFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 
 	/**
 	 * Creates an instance of UmbDocumentTypeFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,7 +23,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Fetches a Document Type folder from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -52,7 +51,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Creates a Document Type folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
@@ -82,7 +81,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Updates a Document Type folder on the server
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async update(args: UmbUpdateFolderModel) {
@@ -107,7 +106,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 	/**
 	 * Deletes a Document Type folder on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async delete(unique: string) {

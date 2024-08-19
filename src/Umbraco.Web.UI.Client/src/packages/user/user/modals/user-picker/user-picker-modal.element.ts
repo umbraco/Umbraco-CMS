@@ -15,7 +15,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	#selectionManager = new UmbSelectionManager(this);
 	#userCollectionRepository = new UmbUserCollectionRepository(this);
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
@@ -23,7 +23,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 		this.#requestUsers();
 	}
@@ -46,7 +46,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectUsers')}>
 				<uui-box>
@@ -71,7 +71,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-avatar {

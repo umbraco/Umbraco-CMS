@@ -1,13 +1,11 @@
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_WORKSPACE_ALIAS = 'Umb.Workspace.User';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -20,7 +18,6 @@ const workspace: ManifestWorkspaces = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [];
 const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
@@ -42,4 +39,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceActions];

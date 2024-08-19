@@ -11,7 +11,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Language that fetches data from the server
- * @export
  * @class UmbLanguageServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -20,7 +19,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Creates an instance of UmbLanguageServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -30,7 +29,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Creates a new Language scaffold
 	 * @param {Partial<UmbLanguageDetailModel>} [preset]
-	 * @return { CreateLanguageRequestModel }
+	 * @returns { CreateLanguageRequestModel }
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbLanguageDetailModel> = {}) {
@@ -50,7 +49,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Fetches a Language with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async read(unique: string) {
@@ -81,7 +80,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Inserts a new Language on the server
 	 * @param {UmbLanguageDetailModel} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async create(model: UmbLanguageDetailModel) {
@@ -113,7 +112,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Updates a Language on the server
 	 * @param {UmbLanguageDetailModel} Language
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async update(model: UmbLanguageDetailModel) {
@@ -145,7 +145,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Deletes a Language on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async delete(unique: string) {

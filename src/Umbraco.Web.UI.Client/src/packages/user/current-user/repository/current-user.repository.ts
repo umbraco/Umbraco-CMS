@@ -1,13 +1,12 @@
 import { UmbCurrentUserServerDataSource } from './current-user.server.data-source.js';
-import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.js';
+import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for the current user
- * @export
  * @class UmbCurrentUserRepository
- * @extends {UmbRepositoryBase}
+ * @augments {UmbRepositoryBase}
  */
 export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	#currentUserSource = new UmbCurrentUserServerDataSource(this._host);
@@ -26,7 +25,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Request the current user
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbCurrentUserRepository
 	 */
 	async requestCurrentUser() {
@@ -74,7 +73,9 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	/**
 	 * Enable an MFA provider
 	 * @param provider The provider to enable
+	 * @param providerName
 	 * @param code The activation code of the provider to enable
+	 * @param secret
 	 * @memberof UmbCurrentUserRepository
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
@@ -92,6 +93,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	/**
 	 * Disable an MFA provider
 	 * @param provider The provider to disable
+	 * @param providerName
 	 * @param code The activation code of the provider to disable
 	 * @memberof UmbCurrentUserRepository
 	 */

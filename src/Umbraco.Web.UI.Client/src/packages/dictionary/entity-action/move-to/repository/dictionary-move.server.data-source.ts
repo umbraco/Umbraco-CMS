@@ -5,7 +5,6 @@ import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backo
 
 /**
  * Move Dictionary Server Data Source
- * @export
  * @class UmbMoveDictionaryServerDataSource
  */
 export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {
@@ -13,7 +12,7 @@ export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Creates an instance of UmbMoveDictionaryServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMoveDictionaryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,7 +23,8 @@ export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {
 	 * Move an item for the given id to the target unique
 	 * @param {string} unique
 	 * @param {(string | null)} targetUnique
-	 * @return {*}
+	 * @param args
+	 * @returns {*}
 	 * @memberof UmbMoveDictionaryServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {

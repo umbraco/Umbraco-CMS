@@ -713,6 +713,30 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 					labelOnTop: false,
 				},
 			},
+			{
+				id: '34',
+				container: {
+					id: 'all-properties-group-key',
+				},
+				alias: 'codeEditor',
+				name: 'Code Editor',
+				description: 'umb-code-editor configured with the `html` language.',
+				dataType: {
+					id: 'dt-codeEditor',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{

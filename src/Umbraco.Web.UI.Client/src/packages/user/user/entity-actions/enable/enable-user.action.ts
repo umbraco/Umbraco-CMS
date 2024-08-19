@@ -10,7 +10,7 @@ export class UmbEnableUserEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
 		const itemRepository = new UmbUserItemRepository(this);
@@ -32,3 +32,5 @@ export class UmbEnableUserEntityAction extends UmbEntityActionBase<never> {
 		await enableRepository.enable([this.args.unique]);
 	}
 }
+
+export { UmbEnableUserEntityAction as api };

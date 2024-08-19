@@ -60,18 +60,19 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement implements 
 
 	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
+		const pageSize = Number(config.getValueByAlias('pageSize'));
 		return {
 			unique: this._documentUnique,
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
-			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
+			pageSize: isNaN(pageSize) ? 50 : pageSize,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}
 
-	render() {
+	override render() {
 		if (this._loading) return nothing;
 		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
 	}

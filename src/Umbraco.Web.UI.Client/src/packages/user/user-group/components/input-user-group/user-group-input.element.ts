@@ -1,8 +1,11 @@
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from '../../repository/index.js';
 import { UmbUserGroupPickerContext } from './user-group-input.context.js';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-user-group-input')
@@ -11,7 +14,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -34,7 +37,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -61,11 +64,11 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	@property()
-	public set value(idsString: string) {
+	public override set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(idsString);
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.selection.join(',');
 	}
 
@@ -73,6 +76,9 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	private _items?: Array<UmbUserGroupItemModel>;
 
 	#pickerContext = new UmbUserGroupPickerContext(this);
+
+	@state()
+	private _editUserGroupPath = '';
 
 	constructor() {
 		super();
@@ -91,13 +97,22 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(UMB_USER_GROUP_ENTITY_TYPE)
+			.onSetup(async () => {
+				return { data: { entityType: UMB_USER_GROUP_ENTITY_TYPE, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editUserGroupPath = routeBuilder({});
+			});
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
 			<uui-button
@@ -110,8 +125,9 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 
 	private _renderItem(item: UmbUserGroupItemModel) {
 		if (!item.unique) return;
+		const href = `${this._editUserGroupPath}edit/${item.unique}`;
 		return html`
-			<umb-user-group-ref name="${ifDefined(item.name)}">
+			<umb-user-group-ref name="${ifDefined(item.name)}" href=${href}>
 				${item.icon ? html`<umb-icon slot="icon" name=${item.icon}></umb-icon>` : nothing}
 				<uui-action-bar slot="actions">
 					<uui-button
@@ -122,7 +138,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

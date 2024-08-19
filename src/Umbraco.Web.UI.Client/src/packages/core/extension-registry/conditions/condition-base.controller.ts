@@ -24,9 +24,9 @@ export class UmbConditionBase<ConditionConfigType extends UmbConditionConfigBase
 		this.#onChange = args.onChange;
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
-		(this.config as any) = undefined;
-		(this.#onChange as any) = undefined;
+		(this.config as unknown) = undefined;
+		(this.#onChange as unknown) = undefined;
 	}
 }

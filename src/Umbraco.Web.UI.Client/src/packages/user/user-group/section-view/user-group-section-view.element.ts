@@ -30,13 +30,17 @@ export class UmbUserGroupSectionViewElement extends UmbLitElement {
 			path: '',
 			redirectTo: 'collection',
 		},
+		{
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		},
 	];
 
-	render() {
+	override render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -1,21 +1,24 @@
 import { UmbPropertyContext } from './property.context.js';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import {
+	UmbBindServerValidationToFormControl,
+	UmbFormControlValidator,
+	UmbObserveValidationStateController,
+} from '@umbraco-cms/backoffice/validation';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorConfig,
 } from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbBindValidationMessageToFormControl,
-	UmbFormControlValidator,
-	UmbObserveValidationStateController,
-} from '@umbraco-cms/backoffice/validation';
-import type { UmbPropertyTypeAppearanceModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbPropertyTypeAppearanceModel,
+	UmbPropertyTypeValidationModel,
+} from '@umbraco-cms/backoffice/content-type';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  *  @element umb-property
@@ -30,7 +33,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * Label. Name of the property
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String })
 	public set label(label: string | undefined) {
@@ -44,7 +47,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * Description: render a description underneath the label.
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String })
 	public set description(description: string | undefined) {
@@ -70,7 +73,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String })
 	public set alias(alias: string) {
@@ -85,7 +88,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
 	public set propertyEditorUiAlias(value: string | undefined) {
@@ -102,7 +105,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
 	@property({ type: Array, attribute: false })
 	public set config(value: UmbPropertyEditorConfig | undefined) {
@@ -113,23 +116,33 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	/**
+	 * Validation: Validation settings for the property.
+	 */
+	@property({ type: Object, attribute: false })
+	public set validation(validation: UmbPropertyTypeValidationModel | undefined) {
+		this.#propertyContext.setValidation(validation);
+	}
+	public get validation() {
+		return this.#propertyContext.getValidation();
+	}
+
+	/**
 	 * DataPath, declare the path to the value of the data that this property represents.
 	 * @public
 	 * @type {string}
 	 * @attr
-	 * @default ''
+	 * @default
 	 */
-	@property({ type: String, attribute: false })
+	@property({ type: String, attribute: 'data-path' })
 	public set dataPath(dataPath: string | undefined) {
-		this.#dataPath = dataPath;
+		this.#propertyContext.setDataPath(dataPath);
 		new UmbObserveValidationStateController(this, dataPath, (invalid) => {
 			this._invalid = invalid;
 		});
 	}
 	public get dataPath(): string | undefined {
-		return this.#dataPath;
+		return this.#propertyContext.getDataPath();
 	}
-	#dataPath?: string;
 
 	@state()
 	private _variantDifference?: string;
@@ -152,10 +165,13 @@ export class UmbPropertyElement extends UmbLitElement {
 	@state()
 	private _orientation: 'horizontal' | 'vertical' = 'horizontal';
 
+	@state()
+	private _mandatory?: boolean;
+
 	#propertyContext = new UmbPropertyContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
-	#validationMessageBinder?: UmbBindValidationMessageToFormControl;
+	#validationMessageBinder?: UmbBindServerValidationToFormControl;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 
@@ -169,6 +185,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			null,
 		);
+
 		this.observe(
 			this.#propertyContext.label,
 			(label) => {
@@ -176,6 +193,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			null,
 		);
+
 		this.observe(
 			this.#propertyContext.description,
 			(description) => {
@@ -183,6 +201,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			null,
 		);
+
 		this.observe(
 			this.#propertyContext.variantDifference,
 			(variantDifference) => {
@@ -190,10 +209,22 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			null,
 		);
+
 		this.observe(
 			this.#propertyContext.appearance,
 			(appearance) => {
 				this._orientation = appearance?.labelOnTop ? 'vertical' : 'horizontal';
+			},
+			null,
+		);
+
+		this.observe(
+			this.#propertyContext.validationMandatory,
+			(mandatory) => {
+				this._mandatory = mandatory;
+				if (this._element) {
+					this._element.mandatory = mandatory;
+				}
 			},
 			null,
 		);
@@ -252,6 +283,8 @@ export class UmbPropertyElement extends UmbLitElement {
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+				// No need to observe mandatory, as we already do so and set it on the _element if present: [NL]
+				this._element.mandatory = this._mandatory;
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(
@@ -274,15 +307,25 @@ export class UmbPropertyElement extends UmbLitElement {
 					},
 					null,
 				);
+				this.#configObserver = this.observe(
+					this.#propertyContext.validationMandatoryMessage,
+					(mandatoryMessage) => {
+						if (mandatoryMessage) {
+							this._element!.mandatoryMessage = mandatoryMessage ?? undefined;
+						}
+					},
+					null,
+				);
 
 				if ('checkValidity' in this._element) {
-					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, this.#dataPath);
+					const dataPath = this.dataPath;
+					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
 					// We trust blindly that the dataPath is available at this stage. [NL]
-					if (this.#dataPath) {
-						this.#validationMessageBinder = new UmbBindValidationMessageToFormControl(
+					if (dataPath) {
+						this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
 							this,
 							this._element as any,
-							this.#dataPath,
+							dataPath,
 						);
 						this.#validationMessageBinder.value = this.#propertyContext.getValue();
 					}
@@ -293,14 +336,15 @@ export class UmbPropertyElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-property-layout
 				id="layout"
-				.alias=${this._alias}
-				.label=${this._label}
-				.description=${this._description}
+				.alias=${this._alias ?? ''}
+				.label=${this._label ?? ''}
+				.description=${this._description ?? ''}
 				.orientation=${this._orientation ?? 'horizontal'}
+				?mandatory=${this._mandatory}
 				?invalid=${this._invalid}>
 				${this.#renderPropertyActionMenu()}
 				${this._variantDifference
@@ -322,7 +366,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

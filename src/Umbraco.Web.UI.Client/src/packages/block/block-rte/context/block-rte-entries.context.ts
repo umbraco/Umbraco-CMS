@@ -47,7 +47,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 			.addUniquePaths(['propertyAlias', 'variantId'])
 			.addAdditionalPath('block')
 			.onSetup(() => {
-				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
+				return { data: { entityType: 'block', preset: {}, baseDataPath: this._dataPath }, modal: { size: 'medium' } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newPath = routeBuilder({});
@@ -101,7 +101,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard' });
 	}
 
-	async setLayouts(layouts: Array<UmbBlockRteLayoutModel>) {
+	override async setLayouts(layouts: Array<UmbBlockRteLayoutModel>) {
 		await this._retrieveManager;
 		this._manager?.setLayouts(layouts);
 	}
@@ -128,7 +128,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	// create Block?
-	async delete(contentUdi: string) {
+	override async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
 		this._manager?.deleteLayoutElement(contentUdi);

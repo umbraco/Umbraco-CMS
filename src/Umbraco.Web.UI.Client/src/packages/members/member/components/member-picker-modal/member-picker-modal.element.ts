@@ -1,9 +1,12 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
 import type { UmbMemberDetailModel } from '../../types.js';
+import type { UmbMemberItemModel } from '../../repository/index.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
-import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbCollectionItemPickerContext } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-member-picker-modal')
 export class UmbMemberPickerModalElement extends UmbModalBaseElement<
@@ -13,17 +16,46 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _members: Array<UmbMemberDetailModel> = [];
 
-	#collectionRepository = new UmbMemberCollectionRepository(this);
-	#selectionManager = new UmbSelectionManager(this);
+	@state()
+	private _searchQuery?: string;
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.#selectionManager.setSelectable(true);
-		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.value?.selection ?? []);
+	#collectionRepository = new UmbMemberCollectionRepository(this);
+	#pickerContext = new UmbCollectionItemPickerContext(this);
+
+	constructor() {
+		super();
+		this.observe(
+			this.#pickerContext.selection.selection,
+			(selection) => {
+				this.updateValue({ selection });
+				this.requestUpdate();
+			},
+			'umbSelectionObserver',
+		);
+
+		this.observe(
+			this.#pickerContext.search.query,
+			(query) => {
+				this._searchQuery = query?.query;
+			},
+			'umbPickerSearchQueryObserver',
+		);
 	}
 
-	async firstUpdated() {
+	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.updated(_changedProperties);
+
+		if (_changedProperties.has('data')) {
+			this.#pickerContext.search.updateConfig({ ...this.data?.search });
+			this.#pickerContext.selection.setMultiple(this.data?.multiple ?? false);
+		}
+
+		if (_changedProperties.has('value')) {
+			this.#pickerContext.selection.setSelection(this.value?.selection);
+		}
+	}
+
+	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
 		this._members = data?.items ?? [];
 	}
@@ -36,39 +68,62 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	#submit() {
-		this.value = { selection: this.#selectionManager.getSelection() };
-		this.modalContext?.submit();
+	override render() {
+		return html`
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
+				<uui-box>
+					<umb-picker-search-field></umb-picker-search-field>
+					<umb-picker-search-result></umb-picker-search-result>
+					${this.#renderItems()}</uui-box
+				>
+				${this.#renderActions()}
+			</umb-body-layout>
+		`;
 	}
 
-	#close() {
-		this.modalContext?.reject();
+	#renderItems() {
+		if (this._searchQuery) {
+			return nothing;
+		}
+
+		return html`
+			${repeat(
+				this.#filteredMembers,
+				(item) => item.unique,
+				(item) => this.#renderMemberItem(item),
+			)}
+		`;
 	}
 
-	render() {
-		return html`<umb-body-layout headline="Select members">
-			<uui-box>
-				${repeat(
-					this.#filteredMembers,
-					(item) => item.unique,
-					(item) => html`
-						<uui-menu-item
-							label=${item.variants[0].name ?? ''}
-							selectable
-							@selected=${() => this.#selectionManager.select(item.unique)}
-							@deselected=${() => this.#selectionManager.deselect(item.unique)}
-							?selected=${this.#selectionManager.isSelected(item.unique)}>
-							<uui-icon slot="icon" name="icon-globe"></uui-icon>
-						</uui-menu-item>
-					`,
-				)}
-			</uui-box>
+	#renderMemberItem(item: UmbMemberItemModel | UmbMemberDetailModel) {
+		return html`
+			<uui-menu-item
+				label=${item.variants[0].name ?? ''}
+				selectable
+				@selected=${() => this.#pickerContext.selection.select(item.unique)}
+				@deselected=${() => this.#pickerContext.selection.deselect(item.unique)}
+				?selected=${this.#pickerContext.selection.isSelected(item.unique)}>
+				<uui-icon slot="icon" name="icon-user"></uui-icon>
+			</uui-menu-item>
+		`;
+	}
+
+	#renderActions() {
+		return html`
 			<div slot="actions">
-				<uui-button label="Close" @click=${this.#close}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+				<uui-button
+					label=${this.localize.term('general_cancel')}
+					@click=${() => this.modalContext?.reject()}></uui-button>
+				<uui-button
+					color="positive"
+					look="primary"
+					label=${this.localize.term('general_submit')}
+					@click=${() => this.modalContext?.submit()}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		`;
 	}
+
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbMemberPickerModalElement;

@@ -35,7 +35,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _selection: Array<string> = [];
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		const alias = this.data?.compositionRepositoryAlias;
@@ -57,7 +57,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		this.#requestAvailableCompositions();
 	}
 
-	protected async _submitModal() {
+	protected override async _submitModal() {
 		const initSelection = this.data?.selection ?? [];
 		const newSelection = this._selection;
 
@@ -90,17 +90,18 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		await this.#init;
 		if (!this.#compositionRepository) return;
 
-		const isElement = this.data?.isElement;
-		const currentPropertyAliases = this.data?.currentPropertyAliases;
+		// Notice isElement is not available on all types that can be composed.
+		const isElement = this.data?.isElement ?? undefined;
+		const currentPropertyAliases = this.data?.currentPropertyAliases ?? [];
 
 		const { data } = await this.#compositionRepository.availableCompositions({
 			unique: this.#unique,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			// TODO: isElement is not available on all types that can be composed.
-			isElement: isElement ?? false,
+			isElement: isElement,
 			currentCompositeUniques: this._selection,
-			currentPropertyAliases: currentPropertyAliases ?? [],
+			currentPropertyAliases: currentPropertyAliases,
 		});
 
 		if (!data) return;
@@ -122,18 +123,20 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.setValue({ selection: this._selection });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('contentTypeEditor_compositions')}">
 				${this._references.length ? this.#renderHasReference() : this.#renderAvailableCompositions()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					${!this._references.length
-						? html`<uui-button
-								label=${this.localize.term('general_submit')}
-								look="primary"
-								color="positive"
-								@click=${this._submitModal}></uui-button>`
+						? html`
+								<uui-button
+									label=${this.localize.term('general_submit')}
+									look="primary"
+									color="positive"
+									@click=${this._submitModal}></uui-button>
+							`
 						: nothing}
 				</div>
 			</umb-body-layout>
@@ -141,7 +144,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderHasReference() {
-		return html` <umb-localize key="contentTypeEditor_compositionInUse">
+		return html`
+			<umb-localize key="contentTypeEditor_compositionInUse">
 				This Content Type is used in a composition, and therefore cannot be composed itself.
 			</umb-localize>
 			<h4>
@@ -154,19 +158,22 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				${repeat(
 					this._references,
 					(item) => item.unique,
-					(item) =>
-						html`<uui-ref-node-document-type
+					(item) => html`
+						<uui-ref-node-document-type
 							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
-							name=${item.name}>
+							name=${this.localize.string(item.name)}>
 							<umb-icon slot="icon" name=${item.icon}></umb-icon>
-						</uui-ref-node-document-type>`,
+						</uui-ref-node-document-type>
+					`,
 				)}
-			</div>`;
+			</div>
+		`;
 	}
 
 	#renderAvailableCompositions() {
 		if (this._compatibleCompositions) {
-			return html`<umb-localize key="contentTypeEditor_compositionsDescription">
+			return html`
+				<umb-localize key="contentTypeEditor_compositionsDescription">
 					Inherit tabs and properties from an existing Document Type. New tabs will be<br />added to the current
 					Document Type or merged if a tab with an identical name exists.<br />
 				</umb-localize>
@@ -184,11 +191,14 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 								: nothing}
 							${this.#renderCompositionsItems(folder.compositions)}`,
 					)}
-				</div>`;
+				</div>
+			`;
 		} else {
-			return html`<umb-localize key="contentTypeEditor_noAvailableCompositions">
-				There are no Content Types available to use as a composition
-			</umb-localize>`;
+			return html`
+				<umb-localize key="contentTypeEditor_noAvailableCompositions">
+					There are no Content Types available to use as a composition
+				</umb-localize>
+			`;
 		}
 	}
 
@@ -196,19 +206,20 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		return repeat(
 			compositionsList,
 			(compositions) => compositions.unique,
-			(compositions) =>
-				html`<uui-menu-item
-					label=${compositions.name}
+			(compositions) => html`
+				<uui-menu-item
+					label=${this.localize.string(compositions.name)}
 					selectable
 					@selected=${() => this.#onSelectionAdd(compositions.unique)}
 					@deselected=${() => this.#onSelectionRemove(compositions.unique)}
 					?selected=${this._selection.find((unique) => unique === compositions.unique)}>
 					<umb-icon name=${compositions.icon} slot="icon"></umb-icon>
-				</uui-menu-item>`,
+				</uui-menu-item>
+			`,
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				margin: var(--uui-size-6) 0;

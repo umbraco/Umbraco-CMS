@@ -10,8 +10,6 @@ import {
 } from './constants.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
-import { UmbDocumentBlueprintTreeRepository } from './document-blueprint-tree.repository.js';
-import { UmbDocumentBlueprintTreeStore } from './document-blueprint-tree.store.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -24,14 +22,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
 	name: 'Document Blueprint Tree Repository',
-	api: UmbDocumentBlueprintTreeRepository,
+	api: () => import('./document-blueprint-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS,
 	name: 'Document Blueprint Tree Store',
-	api: UmbDocumentBlueprintTreeStore,
+	api: () => import('./document-blueprint-tree.store.js'),
 };
 
 const tree: ManifestTree = {

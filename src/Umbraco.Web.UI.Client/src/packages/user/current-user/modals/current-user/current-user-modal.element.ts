@@ -1,4 +1,4 @@
-import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.js';
+import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
 import type { UmbCurrentUserModel } from '../../types.js';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -58,7 +58,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		this._logOutButtonState = 'success';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="${this._currentUser?.name || ''}">
 				<div id="main">
@@ -81,9 +81,12 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
+			:host {
+				color: var(--uui-color-text);
+			}
 			#main {
 				display: flex;
 				flex-direction: column;

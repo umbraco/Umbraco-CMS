@@ -1,10 +1,11 @@
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/manifests.js';
+import { UmbDocumentBlueprintFolderRepository } from '../../../tree/index.js';
 import type {
 	UmbDocumentBlueprintOptionsCreateModalData,
 	UmbDocumentBlueprintOptionsCreateModalValue,
 } from './index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { type UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbCreateFolderEntityAction, type UmbTreeElement } from '@umbraco-cms/backoffice/tree';
@@ -14,11 +15,23 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 	UmbDocumentBlueprintOptionsCreateModalData,
 	UmbDocumentBlueprintOptionsCreateModalValue
 > {
+	@state()
+	private _parentName?: string;
+
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	#itemRepository = new UmbDocumentBlueprintFolderRepository(this);
+
+	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
+
+		if (this.data.parent.unique) {
+			const { data: parent } = await this.#itemRepository.request(this.data.parent.unique.toString());
+			this._parentName = parent?.name ?? this.localize.term('general_unknown');
+		} else {
+			this._parentName = this.localize.term('treeHeaders_contentBlueprints');
+		}
 
 		// TODO: render the info from this instance in the list of actions
 		this.#createFolderAction = new UmbCreateFolderEntityAction(this, {
@@ -26,7 +39,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 			entityType: this.data.parent.entityType,
 			meta: {
 				icon: 'icon-folder',
-				label: 'New Folder...',
+				label: this.localize.term('create_newFolder'),
 				folderRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
 			},
 		});
@@ -51,17 +64,17 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
-				<uui-box headline="Create a folder under Content Templates">
-					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">
+				<uui-box headline=${this.localize.term('blueprints_createBlueprintFolderUnder', this._parentName)}>
+					<uui-menu-item @click=${this.#onCreateFolderClick} label=${this.localize.term('create_newFolder') + '...'}>
 						<uui-icon slot="icon" name="icon-folder"></uui-icon>
 					</uui-menu-item>
 				</uui-box>
-				<uui-box headline="Create an item under Content Templates">
+				<uui-box headline=${this.localize.term('blueprints_createBlueprintItemUnder', this._parentName)}>
 					<umb-localize key="create_createContentBlueprint">
-						Select the Document Type you want to make a content blueprint for
+						Select the Document Type you want to make a Document Blueprint for
 					</umb-localize>
 					<umb-tree
 						alias="Umb.Tree.DocumentType"
@@ -71,12 +84,16 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 						}}
 						@selected=${this.#onSelected}></umb-tree>
 				</uui-box>
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('buttons_confirmActionCancel')}
+					@click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box:first-child {

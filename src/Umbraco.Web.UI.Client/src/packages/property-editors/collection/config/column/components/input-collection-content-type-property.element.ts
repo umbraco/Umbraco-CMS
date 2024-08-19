@@ -196,7 +196,7 @@ export class UmbInputCollectionContentTypePropertyElement extends UUIFormControl
 
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -328,7 +328,7 @@ export class UmbInputCollectionContentTypePropertyElement extends UUIFormControl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-button
 			label=${this.localize.term('general_choose')}
 			look="placeholder"
@@ -336,7 +336,7 @@ export class UmbInputCollectionContentTypePropertyElement extends UUIFormControl
 			@click=${this.#onClick}></uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

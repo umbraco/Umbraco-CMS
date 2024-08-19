@@ -16,5 +16,7 @@ export class UmbCultureRepository extends UmbControllerBase implements UmbApi {
 		return this.#dataSource.getCollection({ skip, take });
 	}
 
-	destroy() {}
+	override destroy() {}
 }
+
+export { UmbCultureRepository as api };

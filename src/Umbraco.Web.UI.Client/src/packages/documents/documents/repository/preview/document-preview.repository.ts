@@ -10,7 +10,7 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 
 	/**
 	 * Enters preview mode.
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPreviewRepository
 	 */
 	async enter(): Promise<void> {
@@ -20,7 +20,7 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 
 	/**
 	 * Exits preview mode.
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPreviewRepository
 	 */
 	async exit(): Promise<void> {

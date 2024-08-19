@@ -1,11 +1,12 @@
-import type { UmbUserDetailModel, UmbUserStateEnum } from '../types.js';
+import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } from '../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbUserConfigRepository } from '../repository/config/index.js';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbSubmittableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmittableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -17,6 +18,7 @@ export class UmbUserWorkspaceContext
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
+	public readonly configRepository = new UmbUserConfigRepository(this);
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
@@ -31,7 +33,8 @@ export class UmbUserWorkspaceContext
 	readonly mediaStartNodeUniques = this.#currentData.asObservablePart((data) => data?.mediaStartNodeUniques || []);
 	readonly hasMediaRootAccess = this.#currentData.asObservablePart((data) => data?.hasMediaRootAccess || false);
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
+	#calculatedStartNodes = new UmbObjectState<UmbUserStartNodesModel | undefined>(undefined);
+	readonly calculatedStartNodes = this.#calculatedStartNodes.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
@@ -50,6 +53,7 @@ export class UmbUserWorkspaceContext
 
 	async load(unique: string) {
 		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
+
 		if (data) {
 			this.setIsNew(false);
 			this.#persistedData.update(data);
@@ -57,6 +61,10 @@ export class UmbUserWorkspaceContext
 		}
 
 		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
+
+		// Get the calculated start nodes
+		const { data: calculatedStartNodes } = await this.detailRepository.requestCalculateStartNodes(unique);
+		this.#calculatedStartNodes.setValue(calculatedStartNodes);
 	}
 
 	/* TODO: some properties are allowed to update without saving.
@@ -122,7 +130,7 @@ export class UmbUserWorkspaceContext
 		return this.avatarRepository.deleteAvatar(unique);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.detailRepository.destroy();

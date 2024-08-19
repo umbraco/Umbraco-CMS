@@ -9,16 +9,15 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 /**
  * Entity action for trashing an item.
- * @export
  * @class UmbTrashEntityAction
- * @extends {UmbEntityActionBase<MetaEntityActionTrashKind>}
+ * @augments {UmbEntityActionBase<MetaEntityActionTrashKind>}
  */
 export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTrashKind> {
 	/**
 	 * Executes the action.
 	 * @memberof UmbTrashEntityAction
 	 */
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(

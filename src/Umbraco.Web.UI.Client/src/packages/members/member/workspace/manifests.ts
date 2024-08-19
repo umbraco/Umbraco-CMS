@@ -6,6 +6,7 @@ import type {
 	ManifestWorkspaceView,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
 
 export const UMB_MEMBER_WORKSPACE_ALIAS = 'Umb.Workspace.Member';
 
@@ -58,6 +59,9 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_MEMBER_WORKSPACE_ALIAS,
 			},
+			{
+				alias: UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
+			},
 		],
 	},
 	{
@@ -67,7 +71,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/member/member-workspace-view-member.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Member',
+			label: '#treeHeaders_member',
 			pathname: 'member',
 			icon: 'icon-user',
 		},

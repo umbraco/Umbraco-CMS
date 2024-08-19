@@ -1,4 +1,4 @@
-import { UMB_MEDIA_MENU_ALIAS } from '../../menu/manifests.js';
+import { UMB_MEDIA_MENU_ALIAS } from '../../menu/index.js';
 import { UMB_MEDIA_RECYCLE_BIN_TREE_ALIAS } from '../tree/index.js';
 import type { ManifestMenuItemTreeKind, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 

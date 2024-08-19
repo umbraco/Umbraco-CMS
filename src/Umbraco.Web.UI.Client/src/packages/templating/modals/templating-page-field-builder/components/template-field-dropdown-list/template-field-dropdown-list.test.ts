@@ -1,5 +1,5 @@
-import { expect, fixture, html } from '@open-wc/testing';
 import { UmbTemplateFieldDropdownListElement } from './template-field-dropdown-list.element.js';
+import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputDateElement', () => {
 	let element: UmbTemplateFieldDropdownListElement;

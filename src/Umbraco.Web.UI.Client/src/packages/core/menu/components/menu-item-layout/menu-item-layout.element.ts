@@ -40,7 +40,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 	@state()
 	private _isActive = false;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
@@ -57,10 +57,11 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 		this._isActive = location.includes(this.href);
 	}
 
-	render() {
+	override render() {
 		return html`<uui-menu-item
 			href="${ifDefined(this.href)}"
 			label=${this.label}
+			.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this.label}
 			?active=${this._isActive}
 			?has-children=${this.hasChildren}>
 			<umb-icon slot="icon" name=${this.iconName}></umb-icon>
@@ -76,7 +77,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 		</uui-menu-item>`;
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 	}

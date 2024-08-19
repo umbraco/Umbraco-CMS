@@ -10,7 +10,7 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		// default to root
 		let documentItem = null;
 

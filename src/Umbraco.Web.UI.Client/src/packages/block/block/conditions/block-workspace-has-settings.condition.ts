@@ -18,7 +18,7 @@ export class UmbBlockWorkspaceHasSettingsCondition
 			this.observe(
 				context.settings.contentTypeId,
 				(settingsContentTypeId) => {
-					this.permitted = !!settingsContentTypeId;
+					this.permitted = settingsContentTypeId !== undefined;
 				},
 				'observeSettingsElementTypeId',
 			);

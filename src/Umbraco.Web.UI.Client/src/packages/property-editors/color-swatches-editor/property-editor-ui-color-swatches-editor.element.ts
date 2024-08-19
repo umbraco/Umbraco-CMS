@@ -28,7 +28,7 @@ export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-multiple-color-picker-input
 				.items=${this.value}

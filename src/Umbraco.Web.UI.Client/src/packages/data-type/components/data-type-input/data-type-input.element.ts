@@ -30,7 +30,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -53,7 +53,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -82,10 +82,10 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	@property()
-	public set value(uniques: string) {
+	public override set value(uniques: string) {
 		this.selection = splitStringToArray(uniques);
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.selection.join(',');
 	}
 
@@ -113,7 +113,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -127,7 +127,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -166,7 +166,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

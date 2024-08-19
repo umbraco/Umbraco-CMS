@@ -1,20 +1,23 @@
-import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbMediaCollectionRepository } from '../collection/repository/index.js';
+import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbCollectionBulkActionPermissions,
 	UmbCollectionConfiguration,
 } from '@umbraco-cms/backoffice/collection';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-media-section-view')
 export class UmbMediaSectionViewElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+	#entityContext = new UmbEntityContext(this);
 	#mediaCollectionRepository = new UmbMediaCollectionRepository(this);
 
 	@state()
@@ -24,6 +27,9 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 		super();
 
 		this.#defineRoutes();
+
+		this.#entityContext.setEntityType(UMB_MEDIA_ENTITY_TYPE);
+		this.#entityContext.setUnique(null);
 	}
 
 	async #defineRoutes() {
@@ -52,6 +58,10 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 						path: '',
 						redirectTo: 'collection',
 					},
+					{
+						path: `**`,
+						component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+					},
 				];
 			},
 			'_observeConfigDataType',
@@ -60,6 +70,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 
 	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
+		const pageSize = Number(config.getValueByAlias('pageSize'));
 		return {
 			unique: '',
 			dataTypeId: '',
@@ -67,17 +78,17 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
-			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
+			pageSize: isNaN(pageSize) ? 50 : pageSize,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}
 
-	render() {
+	override render() {
 		if (!this._routes) return;
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

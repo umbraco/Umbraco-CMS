@@ -44,7 +44,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<a href="${ensureSlash(path()) + this.manifest?.meta.label}">
 			<uui-box class="group-box"> ${this.manifest?.meta.label} ${this._renderStatus()} </uui-box>
 		</a>`;
@@ -64,27 +64,27 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	_renderCheckResults(resultObject: any) {
 		return html`${resultObject.success > 0
 			? html`<uui-tag look="secondary" color="positive">
-					<uui-icon name="icon-check"></uui-icon>
+					<uui-icon name="check"></uui-icon>
 					${resultObject.success}
-			  </uui-tag> `
+				</uui-tag> `
 			: nothing}
 		${resultObject.warning > 0
 			? html`<uui-tag look="secondary" color="warning">
-					<uui-icon name="icon-alert"></uui-icon>
+					<uui-icon name="alert"></uui-icon>
 					${resultObject.warning}
-			  </uui-tag>`
+				</uui-tag>`
 			: nothing}
 		${resultObject.error > 0
 			? html`<uui-tag look="secondary" color="danger">
-					<uui-icon name="icon-wrong"></uui-icon>
+					<uui-icon name="remove"></uui-icon>
 					${resultObject.error}
-			  </uui-tag>`
+				</uui-tag>`
 			: nothing}
 		${resultObject.info > 0
 			? html`<uui-tag look="secondary">
-					<uui-icon name="icon-info"></uui-icon>
+					<uui-icon name="info"></uui-icon>
 					${resultObject.info}
-			  </uui-tag>`
+				</uui-tag>`
 			: nothing} `;
 	}
 
@@ -117,7 +117,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 		return tags;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.group-box {

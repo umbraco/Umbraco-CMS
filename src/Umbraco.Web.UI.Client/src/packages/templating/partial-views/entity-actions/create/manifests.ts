@@ -1,5 +1,4 @@
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UmbPartialViewCreateOptionsEntityAction } from './create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -9,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.PartialView.CreateOptions',
 		name: 'Partial View Create Options Entity Action',
 		weight: 1200,
-		api: UmbPartialViewCreateOptionsEntityAction,
+		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',

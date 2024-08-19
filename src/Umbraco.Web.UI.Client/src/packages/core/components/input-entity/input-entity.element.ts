@@ -3,13 +3,15 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-entity')
-export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputEntityElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -26,7 +28,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		},
 	});
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -68,29 +70,32 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		this.#pickerContext?.setSelection(uniques);
 		this.#sorter.setModel(uniques);
 	}
-	public get selection(): Array<string> | undefined {
-		return this.#pickerContext?.getSelection();
+	public get selection(): Array<string> {
+		return this.#pickerContext?.getSelection() ?? [];
 	}
 
-	@property()
-	public set value(uniques: string) {
-		this.selection = splitStringToArray(uniques);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string {
-		return this.selection?.join(',') ?? '';
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@property({ attribute: false })
-	public set pickerContext(ctor: new (host: UmbControllerHost) => UmbPickerInputContext<any>) {
+	public set pickerContext(ctor: (new (host: UmbControllerHost) => UmbPickerInputContext) | undefined) {
 		if (this.#pickerContext) return;
-		this.#pickerContext = new ctor(this);
+		this.#pickerContext = ctor ? new ctor(this) : undefined;
 		this.#observePickerContext();
+	}
+	public get pickerContext(): UmbPickerInputContext | undefined {
+		return this.#pickerContext;
 	}
 
 	@state()
 	private _items?: Array<UmbUniqueItemModel>;
 
-	#pickerContext?: UmbPickerInputContext<any>;
+	#pickerContext?: UmbPickerInputContext;
 
 	constructor() {
 		super();
@@ -132,7 +137,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		this.#pickerContext?.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -143,7 +148,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label="${this.localize.term('general_choose')}"></uui-button>
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
@@ -173,7 +178,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

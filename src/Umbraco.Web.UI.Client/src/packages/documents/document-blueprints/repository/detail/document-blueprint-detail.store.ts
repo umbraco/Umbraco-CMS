@@ -1,18 +1,17 @@
 import type { UmbDocumentBlueprintDetailModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT } from './document-blueprint-detail.store.context-token.js';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * @export
  * @class UmbDocumentBlueprintDetailStore
- * @extends {UmbStoreBase}
+ * @augments {UmbStoreBase}
  * @description - Data Store for Document Blueprint Details
  */
 export class UmbDocumentBlueprintDetailStore extends UmbDetailStoreBase<UmbDocumentBlueprintDetailModel> {
 	/**
 	 * Creates an instance of UmbDocumentBlueprintDetailStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
@@ -20,6 +19,4 @@ export class UmbDocumentBlueprintDetailStore extends UmbDetailStoreBase<UmbDocum
 	}
 }
 
-export const UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbDocumentBlueprintDetailStore>(
-	'UmbDocumentBlueprintDetailStore',
-);
+export { UmbDocumentBlueprintDetailStore as api };

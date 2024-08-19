@@ -4,7 +4,6 @@ import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.ele
 import {
 	type UmbSubmittableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
@@ -21,8 +20,6 @@ export class UmbWebhookWorkspaceContext
 	readonly data = this.#data.asObservable();
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-
-	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Webhook');
@@ -52,7 +49,7 @@ export class UmbWebhookWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -127,7 +124,7 @@ export class UmbWebhookWorkspaceContext
 		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

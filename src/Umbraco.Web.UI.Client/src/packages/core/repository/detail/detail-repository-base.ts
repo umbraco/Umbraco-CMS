@@ -8,14 +8,17 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string; entityType: string }>
+export abstract class UmbDetailRepositoryBase<
+		DetailModelType extends { unique: string; entityType: string },
+		UmbDetailDataSourceType extends UmbDetailDataSource<DetailModelType> = UmbDetailDataSource<DetailModelType>,
+	>
 	extends UmbRepositoryBase
 	implements UmbDetailRepository<DetailModelType>, UmbApi
 {
 	#init: Promise<unknown>;
 
 	#detailStore?: UmbDetailStore<DetailModelType>;
-	#detailSource: UmbDetailDataSource<DetailModelType>;
+	protected detailDataSource: UmbDetailDataSourceType;
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(
@@ -25,7 +28,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	) {
 		super(host);
 
-		this.#detailSource = new detailSource(host);
+		this.detailDataSource = new detailSource(host) as UmbDetailDataSourceType;
 
 		this.#init = Promise.all([
 			this.consumeContext(detailStoreContextAlias, (instance) => {
@@ -41,24 +44,24 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	/**
 	 * Creates a scaffold
 	 * @param {Partial<DetailModelType>} [preset]
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async createScaffold(preset?: Partial<DetailModelType>) {
-		return this.#detailSource.createScaffold(preset);
+		return this.detailDataSource.createScaffold(preset);
 	}
 
 	/**
 	 * Requests the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async requestByUnique(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailSource.read(unique);
+		const { data, error } = await this.detailDataSource.read(unique);
 
 		if (data) {
 			this.#detailStore!.append(data);
@@ -70,15 +73,15 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique=null]
-	 * @return {*}
+	 * @param {string | null} [parentUnique]
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async create(model: DetailModelType, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');
 		await this.#init;
 
-		const { data: createdData, error } = await this.#detailSource.create(model, parentUnique);
+		const { data: createdData, error } = await this.detailDataSource.create(model, parentUnique);
 
 		if (createdData) {
 			this.#detailStore?.append(createdData);
@@ -94,7 +97,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	/**
 	 * Saves the given data
 	 * @param {DetailModelType} model
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async save(model: DetailModelType) {
@@ -102,7 +105,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 		if (!model.unique) throw new Error('Unique is missing');
 		await this.#init;
 
-		const { data: updatedData, error } = await this.#detailSource.update(model);
+		const { data: updatedData, error } = await this.detailDataSource.update(model);
 
 		if (updatedData) {
 			this.#detailStore!.updateItem(model.unique, updatedData);
@@ -118,14 +121,14 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	/**
 	 * Deletes the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
-		const { error } = await this.#detailSource.delete(unique);
+		const { error } = await this.detailDataSource.delete(unique);
 
 		if (!error) {
 			this.#detailStore!.removeItem(unique);
@@ -141,7 +144,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async byUnique(unique: string) {
@@ -150,9 +153,9 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 		return this.#detailStore!.byUnique(unique);
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#detailStore = undefined;
-		(this.#detailSource as any) = undefined;
+		(this.detailDataSource as unknown) = undefined;
 		super.destroy();
 	}
 }

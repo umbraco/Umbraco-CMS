@@ -328,7 +328,9 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Opret en ny indholdsskabelon fra <em>%0%</em>',
+		createBlueprintFrom: "Opret en ny indholdsskabelon fra '%0%'",
+		createBlueprintItemUnder: "Opret en ny indholdsskabelon under '%0%'",
+		createBlueprintFolderUnder: "Opret en ny mappe under '%0%'",
 		blankBlueprint: 'Blank',
 		selectBlueprint: 'Vælg en indholdsskabelon',
 		createdBlueprintHeading: 'Indholdsskabelon oprettet',
@@ -538,6 +540,7 @@ export default {
 		selectContentType: 'Vælg indholdstype',
 		selectMediaStartNode: 'Vælg startnode for mediearkivet',
 		selectMember: 'Vælg medlem',
+		selectMembers: 'Vælg medlemmer',
 		selectMemberGroup: 'Vælg medlemsgruppe',
 		selectMemberType: 'Vælg medlemstype',
 		selectNode: 'Vælg node',
@@ -762,6 +765,7 @@ export default {
 		deleted: 'Slettet',
 		deleting: 'Sletter...',
 		design: 'Design',
+		details: 'Detaljer',
 		dictionary: 'Ordbog',
 		dimensions: 'Dimensioner',
 		discard: 'Kassér',
@@ -808,6 +812,7 @@ export default {
 		message: 'Besked',
 		move: 'Flyt',
 		name: 'Navn',
+		never: 'Aldrig',
 		new: 'Ny',
 		next: 'Næste',
 		no: 'Nej',
@@ -850,6 +855,7 @@ export default {
 		submit: 'Indsend',
 		type: 'Type',
 		typeToSearch: 'Skriv for at søge...',
+		unknown: 'Ukendt',
 		unknownUser: 'Ukendt bruger',
 		under: 'under',
 		up: 'Op',
@@ -1582,8 +1588,7 @@ export default {
 		addProperty: 'Tilføj egenskab',
 		requiredLabel: 'Påkrævet label',
 		enableListViewHeading: 'Aktivér listevisning',
-		enableListViewDescription:
-			'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste;\n      undersider vil ikke blive vist i træet\n    ',
+		enableListViewDescription: 'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste.',
 		allowedTemplatesHeading: 'Tilladte skabeloner',
 		allowedTemplatesDescription: 'Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.',
 		allowAtRootHeading: 'Tillad på rodniveau',
@@ -1677,8 +1682,7 @@ export default {
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Samlinger',
-		collectionsDescription:
-			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer, underordnede elementer vil ikke blive vist i træet.',
+		collectionsDescription: 'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer.',
 		structure: 'Struktur',
 		presentation: 'Præsentation',
 	},
@@ -1859,6 +1863,8 @@ export default {
 		lastLogin: 'Seneste login',
 		lastPasswordChangeDate: 'Kodeord sidst ændret',
 		loginname: 'Brugernavn',
+		loginnameRequired: 'Påkrævet - indtast et brugernavn for denne bruger',
+		loginnameDescription: 'Brugernavnet bruges til at logge ind og til at identificere brugeren',
 		mediastartnode: 'Startnode i mediearkivet',
 		mediastartnodehelp: 'Begræns mediebiblioteket til en bestemt startnode',
 		mediastartnodes: 'Medie startnoder',
@@ -1961,7 +1967,12 @@ export default {
 		'2faCodeInput': 'Indtast din verifikationskode',
 		'2faCodeInputHelp': 'Indtast din verifikationskode fra din autentificeringsapp',
 		'2faInvalidCode': 'Den indtastede kode er ugyldig',
-		emailRequired: 'Required - enter an email address for this user',
+		emailRequired: 'Påkrævet - indtast en emailadresse for denne bruger',
+		emailDescription: (usernameIsEmail: boolean) => {
+			return usernameIsEmail
+				? 'Emailadressen bruges som brugernavn og til notifikationer og adgangskode gendannelse'
+				: 'Emailadressen bruges til notifikationer og adgangskode gendannelse';
+		},
 		duplicateLogin: 'A user with this login already exists',
 		nameRequired: 'Required - enter a name for this user',
 		passwordRequiresDigit: "The password must have at least one digit ('0'-'9')",
@@ -2100,7 +2111,7 @@ export default {
 		protectDescription: 'Opsæt offentlig adgang på %0%',
 		rightsDescription: 'Opsæt rettigheder på %0%',
 		sortDescription: 'Juster soterings rækkefølgen for %0%',
-		createblueprintDescription: 'Opret indholds skabelon baseret på %0%',
+		createblueprintDescription: 'Opret indholdsskabelon baseret på %0%',
 		openContextMenu: 'Åben kontext menu for',
 		currentLanguage: 'Aktivt sprog',
 		switchLanguage: 'Skift sprog til',
@@ -2228,7 +2239,7 @@ export default {
 		addCustomStylesheet: 'Tilføj stylesheet',
 		headlineEditorAppearance: 'Redigerings udseende',
 		headlineDataModels: 'Data modeller',
-		headlineCatalogueAppearance: 'katalog udseende',
+		headlineCatalogueAppearance: 'Katalog udseende',
 		labelBackgroundColor: 'Baggrunds farve',
 		labelIconColor: 'Ikon farve',
 		labelContentElementType: 'Indholds model',
@@ -2259,8 +2270,8 @@ export default {
 		headlineAdvanced: 'Avanceret',
 		forceHideContentEditor: 'Skjul indholdseditoren',
 		forceHideContentEditorHelp: 'Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet',
-		girdInlineEditing: 'Direkte redigering',
-		girdInlineEditingHelp:
+		gridInlineEditing: 'Direkte redigering',
+		gridInlineEditingHelp:
 			'Tilføjer direkte redigering a det første felt. Yderligere felter optræder kun i redigerings vinduet.',
 		blockHasChanges: 'Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?',
 		confirmCancelBlockCreationHeadline: 'Annuller oprettelse?',
@@ -2518,5 +2529,23 @@ export default {
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
 			'\n          We will send:\n          <ul>\n            <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n            <li>Number of: Root nodes, Content nodes, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n          </ul>\n          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>\n       ',
+	},
+	routing: {
+		routeNotFoundTitle: 'Ikke fundet',
+		routeNotFoundDescription: 'Den side du leder efter kunne ikke findes. Kontroller adressen og prøv igen.',
+	},
+	codeEditor: {
+		label: 'Code editor',
+		languageConfigLabel: 'Sprog',
+		languageConfigDescription: 'Vælg sprog til syntax highlighting og IntelliSense.',
+		heightConfigLabel: 'Højde',
+		heightConfigDescription: 'Indstil højden på editorvinduet i pixels.',
+		lineNumbersConfigLabel: 'Linjenumre',
+		lineNumbersConfigDescription: 'Vis linjenumre i editorvinduet.',
+		minimapConfigLabel: 'Minimap',
+		minimapConfigDescription: 'Vis en minimap i editorvinduet.',
+		wordWrapConfigLabel: 'Ordbrydning',
+		wordWrapConfigDescription:
+			'Slå ordbrydning til eller fra, så tekst automatisk brydes ved vinduets kant i stedet for at skabe en horisontal scrollbar.',
 	},
 } as UmbLocalizationDictionary;

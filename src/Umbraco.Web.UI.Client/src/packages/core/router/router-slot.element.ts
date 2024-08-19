@@ -10,7 +10,7 @@ import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 /**
  *  @element umb-router-slot
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
- *  @extends UmbLitElement
+ *  @augments UmbLitElement
  * @fires {UmbRouterSlotInitEvent} init - fires when the router is connected
  * @fires {UmbRouterSlotChangeEvent} change - fires when a path of this router is changed
  */
@@ -28,7 +28,8 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		value ??= [];
 		const oldValue = this.#router.routes;
 		if (
-			value.filter((route) => (oldValue ? oldValue.findIndex((r) => r.path === route.path) === -1 : true)).length > 0
+			value.length !== oldValue?.length ||
+			value.filter((route) => oldValue?.findIndex((r) => r.path === route.path) === -1).length > 0
 		) {
 			this.#router.routes = value;
 		}
@@ -74,7 +75,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		return this.#router.match?.fragments.consumed ?? '';
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		// Currently we have to set this every time as RouteSlot looks for its parent every-time it is connected. Aka it has not way to explicitly set the parent.
 		// And we cannot insert the modal router as a slotted-child of the router, as it flushes its children on every route change.
@@ -85,13 +86,13 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		}
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		window.removeEventListener('navigationsuccess', this._onNavigationChanged);
 		this.#listening = false;
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 		this._routerPath = this._constructAbsoluteRouterPath();
 		this.#routeContext._internal_routerGotBasePath(this._routerPath);
@@ -128,11 +129,11 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		}
 	};
 
-	render() {
+	override render() {
 		return html`${this.#router}${this.#modalRouter}`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

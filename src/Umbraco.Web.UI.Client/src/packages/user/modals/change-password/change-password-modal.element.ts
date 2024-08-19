@@ -1,5 +1,5 @@
-import { UmbUserItemRepository } from '../../user/repository/item/user-item.repository.js';
-import { UMB_CURRENT_USER_CONTEXT } from '../../current-user/current-user.context.js';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -67,7 +67,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		this._isCurrentUser = await this.#currentUserContext.isUserCurrentUser(this.data.user.unique);
 	}
 
-	protected async firstUpdated(): Promise<void> {
+	protected override async firstUpdated(): Promise<void> {
 		if (!this.data?.user.unique) return;
 		const { data } = await this.#userItemRepository.requestItems([this.data.user.unique]);
 
@@ -77,7 +77,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${this._headline}>
 				<uui-form>
@@ -129,7 +129,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			uui-input-password {

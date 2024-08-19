@@ -1,4 +1,4 @@
-import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
+import { UMB_USER_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_USER_ENTITY_TYPE, UMB_USER_ROOT_ENTITY_TYPE } from '../entity.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -34,13 +34,17 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 			path: '',
 			redirectTo: 'collection',
 		},
+		{
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		},
 	];
 
-	render() {
+	override render() {
 		return html` <umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

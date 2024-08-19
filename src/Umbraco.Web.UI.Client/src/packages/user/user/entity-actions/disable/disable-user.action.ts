@@ -10,7 +10,7 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
 		const itemRepository = new UmbUserItemRepository(this);
@@ -33,3 +33,5 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
 		await disableUserRepository.disable([this.args.unique]);
 	}
 }
+
+export { UmbDisableUserEntityAction as api };

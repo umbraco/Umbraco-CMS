@@ -35,7 +35,7 @@ export class UmbPaginationManager extends EventTarget {
 
 	/**
 	 * Gets the number of items per page
-	 * @return {number}
+	 * @returns {number}
 	 * @memberof UmbPaginationManager
 	 */
 	public getPageSize() {
@@ -44,7 +44,7 @@ export class UmbPaginationManager extends EventTarget {
 
 	/**
 	 * Gets the total number of items
-	 * @return {number}
+	 * @returns {number}
 	 * @memberof UmbPaginationManager
 	 */
 	public getTotalItems() {
@@ -63,7 +63,7 @@ export class UmbPaginationManager extends EventTarget {
 
 	/**
 	 * Gets the total number of pages
-	 * @return {number}
+	 * @returns {number}
 	 * @memberof UmbPaginationManager
 	 */
 	public getTotalPages() {
@@ -72,7 +72,7 @@ export class UmbPaginationManager extends EventTarget {
 
 	/**
 	 * Gets the current page number
-	 * @return {number}
+	 * @returns {number}
 	 * @memberof UmbPaginationManager
 	 */
 	public getCurrentPageNumber() {
@@ -100,7 +100,7 @@ export class UmbPaginationManager extends EventTarget {
 
 	/**
 	 * Gets the number of items to skip
-	 * @return {number}
+	 * @returns {number}
 	 * @memberof UmbPaginationManager
 	 */
 	public getSkip() {

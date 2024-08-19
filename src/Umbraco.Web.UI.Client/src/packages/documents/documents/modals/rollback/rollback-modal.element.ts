@@ -246,6 +246,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			diffs.push({ alias: item.alias, diff });
 		});
 
+		/**
+		 *
+		 * @param str
+		 */
 		function trimQuotes(str: string): string {
 			return str.replace(/^['"]|['"]$/g, '');
 		}
@@ -295,7 +299,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">
@@ -320,7 +324,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

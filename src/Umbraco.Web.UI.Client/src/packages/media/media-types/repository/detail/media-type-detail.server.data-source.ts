@@ -9,11 +9,10 @@ import type {
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Media Type that fetches data from the server
- * @export
  * @class UmbMediaTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 	/**
 	 * Creates an instance of UmbMediaTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -32,7 +31,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Creates a new Media Type scaffold
 	 * @param {Partial<UmbMediaTypeDetailModel>} [preset]
-	 * @return { CreateMediaTypeRequestModel }
+	 * @returns { CreateMediaTypeRequestModel }
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMediaTypeDetailModel> = {}) {
@@ -61,7 +60,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Fetches a Media Type with the given id from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -130,7 +129,8 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Inserts a new Media Type on the server
 	 * @param {UmbMediaTypeDetailModel} model
-	 * @return {*}
+	 * @param parentUnique
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
@@ -197,7 +197,8 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Updates a MediaType on the server
 	 * @param {UmbMediaTypeDetailModel} MediaType
-	 * @return {*}
+	 * @param model
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async update(model: UmbMediaTypeDetailModel) {
@@ -262,7 +263,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Deletes a Media Type on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async delete(unique: string) {

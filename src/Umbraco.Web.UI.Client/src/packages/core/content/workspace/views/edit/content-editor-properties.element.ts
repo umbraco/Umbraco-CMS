@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -58,7 +58,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		if (!this.#variantId || !this._propertyStructure) return;
 		this._dataPaths = this._propertyStructure.map(
 			(property) =>
-				`$.values[${UmbDataPathPropertyValueFilter({
+				`$.values[${UmbDataPathPropertyValueQuery({
 					alias: property.alias,
 					culture: property.variesByCulture ? this.#variantId!.culture : null,
 					segment: property.variesBySegment ? this.#variantId!.segment : null,
@@ -66,7 +66,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 		);
 	}
 
-	render() {
+	override render() {
 		return this._propertyStructure && this._dataPaths
 			? repeat(
 					this._propertyStructure,
@@ -74,13 +74,13 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 					(property, index) =>
 						html`<umb-property-type-based-property
 							class="property"
-							.dataPath=${this._dataPaths![index]}
+							data-path=${this._dataPaths![index]}
 							.property=${property}></umb-property-type-based-property> `,
 				)
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.property {

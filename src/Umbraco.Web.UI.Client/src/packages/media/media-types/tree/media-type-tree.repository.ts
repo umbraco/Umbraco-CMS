@@ -1,6 +1,6 @@
 import { UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaTypeTreeServerDataSource } from './media-type-tree.server.data-source.js';
-import { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT } from './media-type-tree.store.js';
+import { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT } from './media-type-tree.store.context-token.js';
 import type { UmbMediaTypeTreeItemModel, UmbMediaTypeTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

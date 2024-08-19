@@ -1,5 +1,5 @@
 import { umbUserGroupMockDb } from '../user-group/user-group.db.js';
-import { arrayFilter, stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
+import { stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
@@ -58,7 +58,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 
 	/**
 	 * Get current user
-	 * @return {*}  {UmbCurrentUser}
+	 * @returns {*}  {UmbCurrentUser}
 	 * @memberof UmbUserData
 	 */
 	getCurrentUser(): CurrentUserResponseModel {
@@ -76,7 +76,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			hasAccessToSensitiveData: true,
 			avatarUrls: [],
 			hasAccessToAllLanguages: true,
-			languageIsoCode: firstUser.languageIsoCode,
+			languageIsoCode: firstUser.languageIsoCode || null,
 			languages: [],
 			documentStartNodeIds: firstUser.documentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,

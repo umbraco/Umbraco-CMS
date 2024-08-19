@@ -1,5 +1,5 @@
 import type { UmbContentPickerSource } from '../../types.js';
-import type { UmbInputContentPickerSourceElement } from './input-content-picker-source/input-content-picker-source.element.js';
+import type { UmbInputContentPickerSourceElement } from './input-content-picker-source.element.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -9,7 +9,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // import of local component
-import './input-content-picker-source/index.js';
+import './input-content-picker-source.element.js';
 
 /**
  * @element umb-property-editor-ui-content-picker-source
@@ -34,7 +34,7 @@ export class UmbPropertyEditorUIContentPickerSourceElement extends UmbLitElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-input-content-picker-source
 			@change=${this.#onChange}
 			.type=${this.value?.type ?? 'content'}

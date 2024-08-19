@@ -17,7 +17,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
 
@@ -45,7 +45,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_readyToSave')}>
 			<p id="subtitle">
 				<umb-localize key="content_variantsToSave">Choose which variants to be saved.</umb-localize>
@@ -66,7 +66,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

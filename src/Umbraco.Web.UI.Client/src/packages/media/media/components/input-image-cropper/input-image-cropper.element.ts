@@ -1,6 +1,6 @@
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
-import { html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, query, state, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -42,7 +42,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		this.#manager = new UmbTemporaryFileManager(this);
 	}
 
-	protected firstUpdated(): void {
+	protected override firstUpdated(): void {
 		this.#mergeCrops();
 	}
 
@@ -61,8 +61,9 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onBrowse() {
+	#onBrowse(e: Event) {
 		if (!this._dropzone) return;
+		e.stopImmediatePropagation();
 		this._dropzone.browse();
 	}
 
@@ -95,7 +96,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		};
 	}
 
-	render() {
+	override render() {
 		if (this.value.src || this.file) {
 			return this.#renderImageCropper();
 		}
@@ -105,7 +106,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 
 	#renderDropzone() {
 		return html`
-			<uui-file-dropzone id="dropzone" label="dropzone" @change="${this.#onUpload}">
+			<uui-file-dropzone id="dropzone" label="dropzone" @change="${this.#onUpload}" @click=${this.#onBrowse}>
 				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#onBrowse}"></uui-button>
 			</uui-file-dropzone>
 		`;
@@ -131,6 +132,22 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 			</uui-button>
 		</umb-image-cropper-field> `;
 	}
+
+	static override styles = [
+		css`
+			uui-file-dropzone {
+				position: relative;
+				display: block;
+			}
+			uui-file-dropzone::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				cursor: pointer;
+				border: 1px dashed var(--uui-color-divider-emphasis);
+			}
+		`,
+	];
 }
 
 declare global {

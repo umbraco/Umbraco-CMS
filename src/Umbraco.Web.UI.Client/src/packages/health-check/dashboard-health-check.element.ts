@@ -25,6 +25,10 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 			path: ``,
 			component: () => import('./views/health-check-overview.element.js'),
 		},
+		{
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		},
 	];
 
 	private _healthCheckDashboardContext = new UmbHealthCheckDashboardContext(this);
@@ -38,7 +42,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		});
 	}
 
-	protected firstUpdated() {
+	protected override firstUpdated() {
 		this.#registerHealthChecks();
 	}
 
@@ -71,7 +75,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }

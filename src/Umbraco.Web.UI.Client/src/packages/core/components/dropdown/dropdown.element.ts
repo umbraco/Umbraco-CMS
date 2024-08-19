@@ -35,24 +35,31 @@ export class UmbDropdownElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'hide-expand' })
 	hideExpand = false;
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('open') && this.popoverContainerElement) {
-			// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			this.open ? this.popoverContainerElement.showPopover() : this.popoverContainerElement.hidePopover();
+			if (this.open) {
+				// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				this.popoverContainerElement.showPopover();
+			} else {
+				// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				this.popoverContainerElement.hidePopover();
+			}
 		}
 	}
 
-	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.open = event.newState === 'open';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				id="dropdown-button"
@@ -75,7 +82,7 @@ export class UmbDropdownElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#dropdown-button {

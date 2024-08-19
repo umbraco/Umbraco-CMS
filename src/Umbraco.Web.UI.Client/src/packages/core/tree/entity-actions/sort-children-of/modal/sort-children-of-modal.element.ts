@@ -43,13 +43,15 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+	protected override async firstUpdated(
+		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
+	): Promise<void> {
 		super.firstUpdated(_changedProperties);
 		this.#requestChildren();
 	}
 
 	async #requestChildren() {
-		if (!this.data?.unique === undefined) throw new Error('unique is required');
+		if (this.data?.unique === undefined) throw new Error('unique is required');
 		if (!this.data?.treeRepositoryAlias) throw new Error('treeRepositoryAlias is required');
 
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel>>(
@@ -146,7 +148,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		return sorting;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${'Sort Children'}>
 				<uui-box>${this.#renderChildren()}</uui-box>
@@ -181,7 +183,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		return html`<uui-ref-node .name=${item.name} data-unique=${item.unique}></uui-ref-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#loadMoreButton {

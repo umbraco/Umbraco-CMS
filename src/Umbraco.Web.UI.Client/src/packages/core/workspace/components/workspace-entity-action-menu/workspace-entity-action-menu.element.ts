@@ -45,14 +45,14 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 		this._popover?.hidePopover();
 	}
 
-	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	render() {
+	override render() {
 		return this._unique !== undefined && this._entityType
 			? html`
 					<uui-button
@@ -80,7 +80,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

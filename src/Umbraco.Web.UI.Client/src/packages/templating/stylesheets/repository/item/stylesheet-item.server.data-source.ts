@@ -8,7 +8,6 @@ import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api'
 
 /**
  * A data source for stylesheet items that fetches data from the server
- * @export
  * @class UmbStylesheetItemServerDataSource
  * @implements {UmbItemDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 
 	/**
 	 * Creates an instance of UmbStylesheetItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -28,7 +27,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbStylesheetItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

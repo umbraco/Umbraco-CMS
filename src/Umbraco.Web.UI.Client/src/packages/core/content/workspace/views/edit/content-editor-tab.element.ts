@@ -48,7 +48,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this._hasProperties
 				? html`
@@ -63,7 +63,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 				this._groups,
 				(group) => group.id,
 				(group) =>
-					html`<uui-box .headline=${group.name ?? ''}>
+					html`<uui-box .headline=${this.localize.string(group.name) ?? ''}>
 						<umb-content-workspace-view-edit-properties
 							class="properties"
 							.containerId=${group.id}></umb-content-workspace-view-edit-properties>
@@ -72,7 +72,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

@@ -14,12 +14,10 @@ import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from 
  * @slot name - Slot for name
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
- * @slot default - slot for main content
- * @export
+ * @slot - slot for main content
  * @class UmbWorkspaceEditor
- * @extends {UmbLitElement}
+ * @augments {UmbLitElement}
  */
-// TODO: This element has a bug in the tabs. After the url changes - for example a new entity/file is chosen in the tree and loaded to the workspace the links in the tabs still point to the previous url and therefore views do not change correctly
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()
@@ -56,10 +54,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		this._routes = [];
+		let newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			this._routes = this._workspaceViews.map((manifest) => {
+			newRoutes = this._workspaceViews.map((manifest) => {
 				return {
 					path: `view/${manifest.meta.pathname}`,
 					component: () => createExtensionElement(manifest),
@@ -71,18 +69,19 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				} as UmbRoute;
 			});
 
-			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
-			const firstView = this._workspaceViews[0];
-			if (firstView) {
-				this._routes.push({
-					path: ``,
-					redirectTo: `view/${firstView.meta.pathname}`,
-				});
-			}
+			// Duplicate first workspace and use it for the empty path scenario. [NL]
+			newRoutes.push({ ...newRoutes[0], path: '' });
+
+			newRoutes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
 		}
+
+		this._routes = newRoutes;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout main-no-padding .headline=${this.headline}>
 				${this.#renderBackButton()}
@@ -112,15 +111,18 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							${repeat(
 								this._workspaceViews,
 								(view) => view.alias,
-								(view) => html`
-									<uui-tab
-										href="${this._routerPath}/view/${view.meta.pathname}"
-										.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
-										?active=${'view/' + view.meta.pathname === this._activePath}>
-										<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
-										${view.meta.label ? this.localize.string(view.meta.label) : view.name}
-									</uui-tab>
-								`,
+								(view, index) =>
+									// Notice how we use index 0 to determine which workspace that is active with empty path. [NL]
+									html`
+										<uui-tab
+											href="${this._routerPath}/view/${view.meta.pathname}"
+											.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
+											?active=${'view/' + view.meta.pathname === this._activePath ||
+											(index === 0 && this._activePath === '')}>
+											<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
+											${view.meta.label ? this.localize.string(view.meta.label) : view.name}
+										</uui-tab>
+									`,
 							)}
 						</uui-tab-group>
 					`
@@ -157,7 +159,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

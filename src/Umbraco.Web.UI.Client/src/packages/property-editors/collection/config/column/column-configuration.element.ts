@@ -82,6 +82,15 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
+	#onChangeNameTemplate(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
+		this.value = this.value?.map(
+			(config): UmbCollectionColumnConfiguration =>
+				config.alias === configuration.alias ? { ...config, nameTemplate: e.target.value as string } : config,
+		);
+
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
 	#onRemove(unique: string) {
 		const newValue: Array<UmbCollectionColumnConfiguration> = [];
 
@@ -93,7 +102,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="layout-wrapper">${this.#renderColumns()}</div>
 			${this.#renderInput()}
@@ -135,10 +144,10 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 				</div>
 
 				<uui-input
-					disabled
 					label="template"
-					placeholder="Enter a name template..."
-					.value=${column.nameTemplate ?? ''}></uui-input>
+					placeholder="Enter a label template..."
+					.value=${column.nameTemplate ?? ''}
+					@change=${(e: UUIInputEvent) => this.#onChangeNameTemplate(e, column)}></uui-input>
 
 				<div class="actions">
 					<uui-button
@@ -150,7 +159,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#layout-wrapper {

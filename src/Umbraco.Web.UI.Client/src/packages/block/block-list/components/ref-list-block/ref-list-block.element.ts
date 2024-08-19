@@ -1,6 +1,9 @@
-import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+
+import '@umbraco-cms/backoffice/ufm';
 
 /**
  * @element umb-ref-list-block
@@ -12,6 +15,9 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	label?: string;
 
 	@state()
+	_content?: UmbBlockDataType;
+
+	@property()
 	_workspaceEditPath?: string;
 
 	constructor() {
@@ -19,6 +25,14 @@ export class UmbRefListBlockElement extends UmbLitElement {
 
 		// UMB_BLOCK_LIST_ENTRY_CONTEXT
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
+			this.observe(
+				context.content,
+				(content) => {
+					this._content = content;
+				},
+				'observeContent',
+			);
+
 			this.observe(
 				context.workspaceEditContentPath,
 				(workspaceEditPath) => {
@@ -29,14 +43,16 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		});
 	}
 
-	render() {
-		return html`<uui-ref-node
-			standalone
-			.name=${this.label ?? ''}
-			href=${this._workspaceEditPath ?? '#'}></uui-ref-node>`;
+	override render() {
+		// TODO: apply `slot="name"` to the `umb-ufm-render` element, when UUI supports it. [NL]
+		return html`
+			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
+				<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
+			</uui-ref-node>
+		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);

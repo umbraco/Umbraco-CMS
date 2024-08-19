@@ -25,8 +25,8 @@ export interface UmbUploadableExtensionModel {
 
 /**
  * Manages the dropzone and uploads files to the server.
- * @method createFilesAsMedia - Upload files to the server and creates the items using corresponding media type.
- * @method createFilesAsTemporary - Upload the files as temporary files and returns the data.
+ * @function createFilesAsMedia - Upload files to the server and creates the items using corresponding media type.
+ * @function createFilesAsTemporary - Upload the files as temporary files and returns the data.
  * @observable completed - Emits an array of completed uploads.
  */
 export class UmbDropzoneManager extends UmbControllerBase {
@@ -71,6 +71,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	 * Allows the user to pick a media type option if multiple types are allowed.
 	 * @param files
 	 * @param parentUnique
+	 * @returns Promise<void>
 	 */
 	public async createFilesAsMedia(files: Array<File>, parentUnique: string | null) {
 		if (!files.length) return;
@@ -118,11 +119,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		}
 
 		notAllowedFiles.forEach((file) => {
-			try {
-				throw new Error(`File ${file.name} of type ${file.type} is not allowed here.`);
-			} catch (e) {
-				undefined;
-			}
+			// TODO: It seems like some implementation(user feedback) is missing here? [NL]
+			console.error(`File ${file.name} of type ${file.type} is not allowed here.`);
 		});
 
 		if (!uploadableFiles.length) return;
@@ -187,8 +185,15 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		fileExtensions: Array<string>,
 		parentUnique: string | null,
 	): Promise<Array<UmbUploadableExtensionModel>> {
-		// Getting all media types allowed in our current position based on parent unique.
-		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(parentUnique);
+		let parentMediaType: string | null = null;
+		if (parentUnique) {
+			const { data } = await this.#mediaDetailRepository.requestByUnique(parentUnique);
+			parentMediaType = data?.mediaType.unique ?? null;
+		}
+
+		// Getting all media types allowed in our current position based on parent's media type.
+
+		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(parentMediaType);
 		if (!allAllowedMediaTypes?.items.length) return [];
 
 		const allowedByParent = allAllowedMediaTypes.items;
@@ -256,7 +261,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		//
 	}
 
-	public destroy() {
+	public override destroy() {
 		this.#tempFileManager.destroy();
 		this.#completed.destroy();
 		super.destroy();

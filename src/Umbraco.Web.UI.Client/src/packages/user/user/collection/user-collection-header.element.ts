@@ -63,7 +63,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		);
 	}
 
-	protected firstUpdated() {
+	protected override firstUpdated() {
 		this.#requestUserGroups();
 	}
 
@@ -139,7 +139,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 					.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
 			${this.#renderSearch()}
@@ -234,7 +234,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		return html` <umb-collection-view-bundle></umb-collection-view-bundle> `;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

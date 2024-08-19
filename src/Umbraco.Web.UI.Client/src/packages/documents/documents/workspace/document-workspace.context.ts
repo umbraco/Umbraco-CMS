@@ -23,7 +23,7 @@ import {
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '../paths.js';
-import { UMB_DOCUMENTS_SECTION_PATH } from '../../paths.js';
+import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
@@ -34,7 +34,6 @@ import {
 	type UmbPublishableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -54,8 +53,13 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
-	UmbServerModelValidationContext,
-	UmbVariantValuesValidationMessageTranslator,
+	UMB_VALIDATION_CONTEXT,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbDataPathVariantQuery,
+	UmbServerModelValidatorContext,
+	UmbValidationContext,
+	UmbVariantValuesValidationPathTranslator,
+	UmbVariantsValidationPathTranslator,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -91,8 +95,7 @@ export class UmbDocumentWorkspaceContext
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
 
-	#serverValidation = new UmbServerModelValidationContext(this);
-	#serverValidationValuesTranslator = new UmbVariantValuesValidationMessageTranslator(this, this.#serverValidation);
+	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepository?: UmbDocumentValidationRepository;
 
 	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
@@ -123,7 +126,6 @@ export class UmbDocumentWorkspaceContext
 	);
 	#varies?: boolean;
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -164,6 +166,11 @@ export class UmbDocumentWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
+
+		this.addValidationContext(new UmbValidationContext(this).provide());
+
+		new UmbVariantValuesValidationPathTranslator(this);
+		new UmbVariantsValidationPathTranslator(this);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));
@@ -216,7 +223,7 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
-	resetState() {
+	override resetState() {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(undefined);
@@ -283,6 +290,7 @@ export class UmbDocumentWorkspaceContext
 
 		this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
 		this.#entityContext.setUnique(data.unique);
+		this.#isTrashedContext.setIsTrashed(data.isTrashed);
 		this.setIsNew(true);
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);
@@ -356,6 +364,13 @@ export class UmbDocumentWorkspaceContext
 		return this.structure.propertyStructureById(propertyId);
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @param {UmbVariantId} variantId
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(
 		propertyAlias: string,
 		variantId?: UmbVariantId,
@@ -577,6 +592,7 @@ export class UmbDocumentWorkspaceContext
 
 	async #performSaveOrCreate(saveData: UmbDocumentDetailModel): Promise<void> {
 		if (this.getIsNew()) {
+			// Create:
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
 
@@ -590,7 +606,6 @@ export class UmbDocumentWorkspaceContext
 			this.#persistedData.setValue(data);
 			this.#currentData.setValue(data);
 
-			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
@@ -598,6 +613,7 @@ export class UmbDocumentWorkspaceContext
 			});
 			eventContext.dispatchEvent(event);
 		} else {
+			// Save:
 			const { data, error } = await this.repository.save(saveData);
 			if (!data || error) {
 				console.error('Error saving document', error);
@@ -609,8 +625,8 @@ export class UmbDocumentWorkspaceContext
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
 				entityType: this.getEntityType(),
+				unique: this.getUnique()!,
 			});
 
 			eventContext.dispatchEvent(event);
@@ -629,6 +645,7 @@ export class UmbDocumentWorkspaceContext
 			culture = selected[0];
 			const variantId = UmbVariantId.FromString(culture);
 			const saveData = this.#buildSaveData([variantId]);
+			await this.#runMandatoryValidationForSaveData(saveData);
 			await this.#performSaveOrCreate(saveData);
 		}
 
@@ -672,6 +689,7 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const saveData = this.#buildSaveData(variantIds);
+		await this.#runMandatoryValidationForSaveData(saveData);
 
 		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
@@ -709,6 +727,23 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
+	async #runMandatoryValidationForSaveData(saveData: UmbDocumentDetailModel) {
+		// Check that the data is valid before we save it.
+		// Check variants have a name:
+		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
+		if (variantsWithoutAName.length > 0) {
+			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
+			variantsWithoutAName.forEach((variant) => {
+				validationContext.messages.addMessage(
+					'client',
+					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
+					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+				);
+			});
+			throw new Error('All variants must have a name');
+		}
+	}
+
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
@@ -719,6 +754,14 @@ export class UmbDocumentWorkspaceContext
 			unique,
 			variantIds.map((variantId) => ({ variantId })),
 		);
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.getUnique()!,
+			entityType: this.getEntityType(),
+		});
+
+		eventContext.dispatchEvent(event);
 	}
 
 	async #handleSave() {
@@ -751,17 +794,18 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const saveData = this.#buildSaveData(variantIds);
+		await this.#runMandatoryValidationForSaveData(saveData);
 		return await this.#performSaveOrCreate(saveData);
 	}
 
-	public requestSubmit() {
+	public override requestSubmit() {
 		return this.#handleSave();
 	}
 
 	public submit() {
 		return this.#handleSave();
 	}
-	public invalidSubmit() {
+	public override invalidSubmit() {
 		return this.#handleSave();
 	}
 
@@ -861,7 +905,7 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.structure.destroy();

@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-eye-dropper
 				.opacity=${this._opacity}

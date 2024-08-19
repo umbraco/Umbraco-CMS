@@ -106,18 +106,17 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				path: '',
 				redirectTo: routes[0]?.path,
 			});
+
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
 		}
-
-		// Find the routes who are removed:
-		//const removedRoutes = this._routes.filter((route) => !routes.find((r) => r.path === route.path));
-
-		// Find the routes who are new:
-		//const newRoutes = routes.filter((route) => !this._routes.find((r) => r.path === route.path));
 
 		this._routes = routes;
 	}
 
-	render() {
+	override render() {
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
@@ -139,7 +138,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 								(tab) => {
 									const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 									return html`<uui-tab label=${tab.name ?? 'Unnamed'} .active=${path === this._activePath} href=${path}
-										>${tab.name}</uui-tab
+										>${this.localize.string(tab.name)}</uui-tab
 									>`;
 								},
 							)}
@@ -159,7 +158,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

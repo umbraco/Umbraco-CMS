@@ -1,14 +1,5 @@
 import type { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	repeat,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -171,11 +162,11 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -216,7 +207,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#action {
 				display: block;

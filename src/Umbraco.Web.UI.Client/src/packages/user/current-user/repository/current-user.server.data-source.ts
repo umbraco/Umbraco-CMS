@@ -5,7 +5,6 @@ import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resourc
 
 /**
  * A data source for the current user that fetches data from the server
- * @export
  * @class UmbCurrentUserServerDataSource
  */
 export class UmbCurrentUserServerDataSource {
@@ -13,7 +12,7 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Creates an instance of UmbCurrentUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,7 +21,7 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Get the current user
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
@@ -86,6 +85,9 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Enable an MFA provider
+	 * @param providerName
+	 * @param code
+	 * @param secret
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
@@ -101,6 +103,8 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Disable an MFA provider
+	 * @param providerName
+	 * @param code
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
 		const { error } = await tryExecute(UserService.deleteUserCurrent2FaByProviderName({ providerName, code }));

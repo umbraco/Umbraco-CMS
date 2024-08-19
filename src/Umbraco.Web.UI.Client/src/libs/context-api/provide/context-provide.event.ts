@@ -3,7 +3,6 @@ import type { UmbContextToken } from '../token/context-token.js';
 export const UMB_CONTEXT_PROVIDE_EVENT_TYPE = 'umb:context-provide';
 
 /**
- * @export
  * @interface UmbContextProvideEvent
  */
 export interface UmbContextProvideEvent extends Event {
@@ -11,9 +10,8 @@ export interface UmbContextProvideEvent extends Event {
 }
 
 /**
- * @export
  * @class UmbContextProvideEventImplementation
- * @extends {Event}
+ * @augments {Event}
  * @implements {UmbContextProvideEvent}
  */
 export class UmbContextProvideEventImplementation extends Event implements UmbContextProvideEvent {
@@ -29,7 +27,6 @@ export const isUmbContextProvideEventType = (event: Event): event is UmbContextP
 export const UMB_CONTEXT_UNPROVIDED_EVENT_TYPE = 'umb:context-unprovided';
 
 /**
- * @export
  * @interface UmbContextProvideEvent
  */
 export interface UmbContextUnprovidedEvent extends Event {
@@ -38,9 +35,8 @@ export interface UmbContextUnprovidedEvent extends Event {
 }
 
 /**
- * @export
  * @class UmbContextUnprovidedEventImplementation
- * @extends {Event}
+ * @augments {Event}
  * @implements {UmbContextUnprovidedEvent}
  */
 /*

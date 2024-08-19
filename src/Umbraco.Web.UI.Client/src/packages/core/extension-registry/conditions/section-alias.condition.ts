@@ -24,9 +24,13 @@ export class UmbSectionAliasCondition
 
 		if (permissionCheck !== undefined) {
 			this.consumeContext(UMB_SECTION_CONTEXT, (context) => {
-				this.observe(context.alias, (sectionAlias) => {
-					this.permitted = sectionAlias ? permissionCheck!(sectionAlias) : false;
-				});
+				this.observe(
+					context.alias,
+					(sectionAlias) => {
+						this.permitted = sectionAlias ? permissionCheck!(sectionAlias) : false;
+					},
+					'observeAlias',
+				);
 			});
 		}
 	}
@@ -35,13 +39,11 @@ export class UmbSectionAliasCondition
 export type SectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.SectionAlias'> & {
 	/**
 	 * Define the section that this extension should be available in
-	 *
 	 * @example "Umb.Section.Content"
 	 */
 	match: string;
 	/**
 	 * Define one or more workspaces that this extension should be available in
-	 *
 	 * @example
 	 * ["Umb.Section.Content", "Umb.Section.Media"]
 	 */

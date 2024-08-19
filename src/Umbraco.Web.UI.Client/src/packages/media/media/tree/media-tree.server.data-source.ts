@@ -4,20 +4,15 @@ import type {
 	UmbMediaTreeItemModel,
 	UmbMediaTreeRootItemsRequestArgs,
 } from './types.js';
-import type {
-	UmbTreeAncestorsOfRequestArgs,
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeAncestorsOfRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { MediaService, type MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Media tree that fetches data from the server
- * @export
  * @class UmbMediaTreeServerDataSource
- * @extends {UmbTreeServerDataSourceBase}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	MediaTreeItemResponseModel,
@@ -27,7 +22,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 > {
 	/**
 	 * Creates an instance of UmbMediaTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

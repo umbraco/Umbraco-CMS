@@ -21,19 +21,19 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	constructor() {
 		super();
 		this.#selectionManager.setSelectable(true);
-		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable));
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.value?.selection ?? []);
+		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable), null);
 
 		this.observe(
 			umbExtensionsRegistry.byType('section'),
 			(sections: Array<ManifestSection>) => (this._sections = sections),
-		),
-			'umbSectionsObserver';
+			null,
+		);
+	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
+		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
 	#submit() {
@@ -41,7 +41,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select sections">
 				<uui-box>

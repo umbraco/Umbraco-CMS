@@ -37,7 +37,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			this._tabs = model;
 		},
 		onEnd: ({ item }) => {
-			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			/**
+			 * Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
@@ -207,7 +208,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				redirectTo: routes[0]?.path,
 				guards: [() => this._activeTabId === undefined],
 			});
-			// TODO: Look at this case.
+		}
+
+		if (routes.length !== 0) {
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+				guards: [() => this._activeTabId === undefined],
+			});
 		}
 
 		// If we have an active tab name, then we might have a active tab name re-name, then we will redirect to the new name if it has been changed: [NL]
@@ -225,6 +233,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				}
 			}
 		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this._routes = routes;
 	}
@@ -258,9 +271,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
 		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
-		this.#tabsStructureHelper?.isOwnerChildContainer(tabId)
-			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
-			: '';
+		if (this.#tabsStructureHelper?.isOwnerChildContainer(tabId)) {
+			window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'));
+		}
 	}
 	async #addTab() {
 		// If there is already a Tab with no name, then focus it instead of adding a new one: [NL]
@@ -365,7 +378,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
@@ -404,14 +417,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<div id="actions">
 				${this._compositionRepositoryAlias
-					? html` <uui-button
-							look="outline"
-							label=${this.localize.term('contentTypeEditor_compositions')}
-							compact
-							@click=${this.#openCompositionModal}>
-							<uui-icon name="icon-merge"></uui-icon>
-							${this.localize.term('contentTypeEditor_compositions')}
-						</uui-button>`
+					? html`
+							<uui-button
+								look="outline"
+								label=${this.localize.term('contentTypeEditor_compositions')}
+								compact
+								@click=${this.#openCompositionModal}>
+								<uui-icon name="icon-merge"></uui-icon>
+								${this.localize.term('contentTypeEditor_compositions')}
+							</uui-button>
+						`
 					: ''}
 				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
 					<uui-icon name="icon-navigation"></uui-icon>
@@ -475,7 +490,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		if (this._sortModeActive) {
-			return html`<div class="not-active">
+			return html`<div class="tab">
 				${ownedTab
 					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
@@ -533,7 +548,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		</uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

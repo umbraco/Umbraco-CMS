@@ -10,7 +10,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 export class UmbAppErrorElement extends UmbLitElement {
 	/**
 	 * The headline to display
-	 *
 	 * @attr
 	 */
 	@property()
@@ -18,7 +17,6 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 	/**
 	 * The error message to display
-	 *
 	 * @attr
 	 */
 	@property()
@@ -26,7 +24,6 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 	/**
 	 * The error to display
-	 *
 	 * @attr
 	 */
 	@property()
@@ -34,7 +31,6 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 	/**
 	 * Hide the back button
-	 *
 	 * @attr
 	 */
 	@property({ type: Boolean, attribute: 'hide-back-button' })
@@ -167,43 +163,45 @@ export class UmbAppErrorElement extends UmbLitElement {
 		return nothing;
 	}
 
-	render = () => html`
-		<div id="background"></div>
+	override render() {
+		return html`
+			<div id="background"></div>
 
-		<div id="logo" aria-hidden="true">
-			<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
-		</div>
+			<div id="logo" aria-hidden="true">
+				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
+			</div>
 
-		<div id="container" class="uui-text">
-			<uui-box id="box" headline-variant="h1">
-				${this.hideBackButton
-					? nothing
-					: html`
-							<uui-button
-								slot="header-actions"
-								label=${this.localize.term('general_back')}
-								look="secondary"
-								@click=${() => (location.href = '')}></uui-button>
-						`}
-				<div slot="headline">
-					${this.errorHeadline
-						? this.errorHeadline
-						: html` <umb-localize key="errors_defaultError">An unknown failure has occured</umb-localize> `}
-				</div>
-				<div id="message">${this.errorMessage}</div>
-				${this.error
-					? html`
-							<details>
-								<summary><umb-localize key="general_details">Details</umb-localize></summary>
-								${this.#renderError(this.error)}
-							</details>
-						`
-					: nothing}
-			</uui-box>
-		</div>
-	`;
+			<div id="container" class="uui-text">
+				<uui-box id="box" headline-variant="h1">
+					${this.hideBackButton
+						? nothing
+						: html`
+								<uui-button
+									slot="header-actions"
+									label=${this.localize.term('general_back')}
+									look="secondary"
+									@click=${() => (location.href = '')}></uui-button>
+							`}
+					<div slot="headline">
+						${this.errorHeadline
+							? this.errorHeadline
+							: html` <umb-localize key="errors_defaultError">An unknown failure has occured</umb-localize> `}
+					</div>
+					<div id="message">${this.errorMessage}</div>
+					${this.error
+						? html`
+								<details>
+									<summary><umb-localize key="general_details">Details</umb-localize></summary>
+									${this.#renderError(this.error)}
+								</details>
+							`
+						: nothing}
+				</uui-box>
+			</div>
+		`;
+	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#background {

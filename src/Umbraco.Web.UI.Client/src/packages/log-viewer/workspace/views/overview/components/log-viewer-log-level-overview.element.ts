@@ -20,7 +20,6 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	private _loggers: LoggerResponseModel[] = [];
 	/**
 	 * The name of the logger to get the level for. Defaults to 'Global'.
-	 *
 	 * @memberof UmbLogViewerLogLevelOverviewElement
 	 */
 	@property()
@@ -33,7 +32,7 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`${this._loggers.length > 0
 			? this._loggers.find((logger) => logger.name === this.loggerName)?.level
 			: nothing}`;

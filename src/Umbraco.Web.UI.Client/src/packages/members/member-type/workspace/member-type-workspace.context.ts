@@ -5,7 +5,6 @@ import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-edi
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
-	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -54,7 +53,6 @@ export class UmbMemberTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
@@ -106,7 +104,7 @@ export class UmbMemberTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
 	}
@@ -211,7 +209,7 @@ export class UmbMemberTypeWorkspaceContext
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
 		this.repository.destroy();

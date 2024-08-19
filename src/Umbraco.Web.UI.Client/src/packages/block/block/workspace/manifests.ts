@@ -24,7 +24,7 @@ export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'workspace',
 		kind: 'routable',
-		name: 'Block List Type Workspace',
+		name: 'Block Workspace',
 		alias: UMB_BLOCK_WORKSPACE_ALIAS,
 		api: () => import('./block-workspace.context.js'),
 		meta: {
@@ -61,7 +61,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.WorkspaceView.Block.Settings',
 		name: 'Block Workspace Settings View',
 		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
-		weight: 1000,
+		weight: 900,
 		meta: {
 			label: '#general_settings',
 			pathname: 'settings',
@@ -73,8 +73,6 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
-		],
-		TODO_conditions: [
 			{
 				alias: 'Umb.Condition.BlockWorkspaceHasSettings',
 			},

@@ -36,16 +36,25 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return await this.#entryContext.propertyValueByAlias<ReturnType>(propertyAlias);
+		// TODO: Investigate how I do that with the workspaces..
+		return await this.#entryContext.contentPropertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
+	 * @function setPropertyValue
+	 * @param {string} propertyAlias
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
-		return this.#entryContext.setPropertyValue(propertyAlias, value);
+		// TODO: Investigate how I do that with the workspaces..
+		return this.#entryContext.setContentPropertyValue(propertyAlias, value);
 	}
 }

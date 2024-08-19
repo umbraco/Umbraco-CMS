@@ -106,7 +106,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-box>
 				<umb-property-layout label="Language">
@@ -171,7 +171,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

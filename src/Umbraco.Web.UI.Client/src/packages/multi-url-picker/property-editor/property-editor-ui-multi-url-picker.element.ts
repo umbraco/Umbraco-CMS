@@ -1,5 +1,5 @@
 import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
-import type { UmbMultiUrlPickerElement } from '../multi-url-picker/multi-url-picker.element.js';
+import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -8,8 +8,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
-// import of local component
-import '../multi-url-picker/multi-url-picker.element.js';
+import '../components/input-multi-url/index.js';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -22,7 +21,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor')) ?? false;
+		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor'));
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
@@ -30,7 +29,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
-		return num > 0 ? num : fallback;
+		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
 	@state()
@@ -60,14 +59,14 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		});
 	}
 
-	#onChange(event: CustomEvent & { target: UmbMultiUrlPickerElement }) {
+	#onChange(event: CustomEvent & { target: UmbInputMultiUrlElement }) {
 		this.value = event.target.urls;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
-			<umb-multi-url-picker
+			<umb-input-multi-url
 				.alias=${this._alias}
 				.max=${this._max}
 				.min=${this._min}
@@ -76,7 +75,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 				.variantId=${this._variantId}
 				?hide-anchor=${this._hideAnchor}
 				@change=${this.#onChange}>
-			</umb-multi-url-picker>
+			</umb-input-multi-url>
 		`;
 	}
 }

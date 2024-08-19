@@ -8,10 +8,13 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-document-type')
-export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+	undefined,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -50,7 +53,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default 0
+	 * @default
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
@@ -73,7 +76,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinity
+	 * @default
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
@@ -101,12 +104,12 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
-	public set value(uniques: string) {
+	@property({ type: String })
+	public override set value(uniques: string | undefined) {
 		this.selection = splitStringToArray(uniques);
 	}
-	public get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
@@ -144,7 +147,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -169,7 +172,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
@@ -201,7 +204,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 		if (!item.unique) return;
 		const href = `${this._editPath}edit/${item.unique}`;
 		return html`
-			<uui-ref-node-document-type name=${item.name} id=${item.unique}>
+			<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${item.unique}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
@@ -216,7 +219,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

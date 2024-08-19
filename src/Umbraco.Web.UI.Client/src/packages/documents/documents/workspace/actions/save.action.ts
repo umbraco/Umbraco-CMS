@@ -2,7 +2,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../user-permissions/constants.js';
-import { UmbDocumentUserPermissionCondition } from '../../user-permissions/document-user-permission.condition.js';
+import { UmbDocumentUserPermissionCondition } from '../../user-permissions/condition/document-user-permission.condition.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
@@ -25,7 +25,11 @@ export class UmbDocumentSaveWorkspaceAction extends UmbSubmitWorkspaceAction {
 				oneOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 			onChange: () => {
-				condition.permitted ? this.enable() : this.disable();
+				if (condition.permitted) {
+					this.enable();
+				} else {
+					this.disable();
+				}
 			},
 		});
 	}

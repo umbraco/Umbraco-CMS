@@ -111,20 +111,20 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		this.#repository = new UmbLogViewerRepository(host);
 	}
 
-	hostConnected() {
+	override hostConnected() {
 		super.hostConnected();
 		window.addEventListener('changestate', this.onChangeState);
 		this.onChangeState();
 	}
 
-	hostDisconnected(): void {
+	override hostDisconnected(): void {
 		super.hostDisconnected();
 		window.removeEventListener('changestate', this.onChangeState);
 	}
 
 	onChangeState = () => {
 		const searchQuery = query();
-		this.setFilterExpression(searchQuery.lq);
+		this.setFilterExpression(searchQuery.lq ?? '');
 
 		let validLogLevels: LogLevelModel[] = [];
 		if (searchQuery.loglevels) {
@@ -214,7 +214,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		try {
 			this.#savedSearches.update({ items: [...previousSavedSearches, { name, query }] });
 			await this.#repository.saveSearch({ name, query });
-		} catch (err) {
+		} catch {
 			this.#savedSearches.update({ items: previousSavedSearches });
 		}
 	}
@@ -224,7 +224,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		try {
 			this.#savedSearches.update({ items: previousSavedSearches.filter((search) => search.name !== name) });
 			await this.#repository.removeSearch({ name });
-		} catch (err) {
+		} catch {
 			this.#savedSearches.update({ items: previousSavedSearches });
 		}
 	}

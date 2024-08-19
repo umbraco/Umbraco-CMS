@@ -4,6 +4,7 @@ import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 /**
  * @element umb-data-type-workspace-editor
  * @description - Element for displaying the Data Type Workspace edit route.
@@ -48,20 +49,22 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DataType">
 				<uui-input
 					slot="header"
 					id="nameInput"
-					.value=${this._dataTypeName}
+					.value=${this._dataTypeName ?? ''}
 					@input="${this.#handleInput}"
+					required
+					${umbBindToValidation(this, `$.name`, this._dataTypeName)}
 					${umbFocus()}></uui-input>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

@@ -1,6 +1,5 @@
 /**
- * @export
- * @method jsonStringComparison
+ * @function jsonStringComparison
  * @param {unknown} a - The first object to compare.
  * @param {unknown} b - The second object to compare.
  * @returns {boolean} - Returns true if the JSON strings are identical.

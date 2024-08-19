@@ -3,4 +3,6 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 export interface UmbPropertyEditorUiElement extends HTMLElement {
 	value?: unknown;
 	config?: UmbPropertyEditorConfigCollection;
+	mandatory?: boolean;
+	mandatoryMessage?: string;
 }

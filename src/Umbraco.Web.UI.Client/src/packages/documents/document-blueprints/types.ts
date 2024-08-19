@@ -32,5 +32,6 @@ export interface UmbDocumentBlueprintValueModel<ValueType = unknown> {
 	value: ValueType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentBlueprintVariantOptionModel
 	extends UmbVariantOptionModel<UmbDocumentBlueprintVariantModel> {}

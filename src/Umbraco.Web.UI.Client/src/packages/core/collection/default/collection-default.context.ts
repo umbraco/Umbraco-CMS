@@ -68,7 +68,11 @@ export class UmbDefaultCollectionContext<
 	#initialized = false;
 
 	#init = new Promise<void>((resolve) => {
-		this.#initialized ? resolve() : (this.#initResolver = resolve);
+		if (this.#initialized) {
+			resolve();
+		} else {
+			this.#initResolver = resolve;
+		}
 	});
 
 	#actionEventContext: UmbActionEventContext | undefined;
@@ -197,7 +201,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Requests the collection from the repository.
-	 * @return {*}
+	 * @returns {*}
 	 * @memberof UmbCollectionContext
 	 */
 	public async requestCollection() {
@@ -270,7 +274,7 @@ export class UmbDefaultCollectionContext<
 		}
 	};
 
-	destroy(): void {
+	override destroy(): void {
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadStructureForEntityEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,
@@ -300,7 +304,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Returns the manifest for the collection.
-	 * @return {ManifestCollection}
+	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use get the `.manifest` property instead.
 	 */

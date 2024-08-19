@@ -14,6 +14,8 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+
 	@property({ type: Array })
 	public set value(value: Array<string>) {
 		if (!value) return;
@@ -28,15 +30,13 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
-
 	#onChange(event: CustomEvent) {
 		const target = event.target as UmbStylesheetInputElement;
 		this.#value = target.selection ?? [];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-stylesheet-input @change=${this.#onChange} .selection=${this.#value}></umb-stylesheet-input>`;
 	}
 }
