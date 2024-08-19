@@ -15,16 +15,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
-type UmbDocumentVariantOption = {
-	culture: string | null;
-	segment: string | null;
-	title: string;
-	displayName: string;
-	state: DocumentVariantStateModel;
-};
-
-type UmbDocumentVariantOptions = Array<UmbDocumentVariantOption>;
-
 const elementName = 'umb-workspace-split-view-variant-selector';
 @customElement(elementName)
 export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
@@ -55,12 +45,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	@state()
 	private _variantId?: UmbVariantId;
-
-	@state()
-	private _variantDisplayName = '';
-
-	@state()
-	private _variantTitleName = '';
 
 	@state()
 	private _variantSelectorOpen = false;
@@ -150,17 +134,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as unknown as UmbDocumentWorkspaceContext;
 		if (!workspaceContext) return;
 
-		const variantId = this.#datasetContext.getVariantId();
 		this._variantId = this.#datasetContext.getVariantId();
-		// Find the variant option matching this, to get the language name...
-
-		const culture = this._variantId.culture;
-		const segment = this._variantId.segment;
 
 		this.observe(
 			workspaceContext.variantOptions,
 			(options) => {
-				const option = options.find((option) => option.language.unique === variantId.culture);
+				const option = options.find((option) => option.language.unique === this._variantId?.culture);
 				this._activeVariant = option;
 			},
 			'_currentLanguage',
