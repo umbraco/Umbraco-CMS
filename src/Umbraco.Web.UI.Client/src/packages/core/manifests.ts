@@ -16,7 +16,6 @@ import { manifests as propertyTypeManifests } from './property-type/manifests.js
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
-import { manifests as settingsManifests } from './settings/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
@@ -42,7 +41,6 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...recycleBinManifests,
 	...sectionManifests,
 	...serverFileSystemManifests,
-	...settingsManifests,
 	...themeManifests,
 	...treeManifests,
 	...workspaceManifests,
