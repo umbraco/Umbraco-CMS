@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Globalization;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -101,14 +102,11 @@ public class ContentEditingBuilder
 
     public ContentEditingBuilder WithInvariantProperty(string alias, object value)
     {
-        if (_invariantProperties is null)
-        {
-            _invariantProperties = new List<PropertyValueModel>();
-        }
-
         var property = new PropertyValueModel { Alias = alias, Value = value };
 
-        (_invariantProperties as List<PropertyValueModel>)?.Add(property);
+        // Ensure _invariantProperties is always treated as IEnumerable and append the new property
+        _invariantProperties = (_invariantProperties ?? Enumerable.Empty<PropertyValueModel>())
+            .Concat(new[] { property });
 
         return this;
     }
@@ -148,51 +146,16 @@ public class ContentEditingBuilder
         return this;
     }
 
-    public ContentEditingBuilder WithCultureName(string culture, string name = "")
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            if (_cultureNames.TryGetValue(culture, out _))
-            {
-                _cultureNames.Remove(culture);
-            }
-        }
-        else
-        {
-            _cultureNames[culture] = name;
-        }
-
-        return this;
-    }
-
-    public GenericDictionaryBuilder<ContentEditingBuilder, string, object> AddPropertyData()
-    {
-        var builder = new GenericDictionaryBuilder<ContentEditingBuilder, string, object>(this);
-        _propertyDataBuilder = builder;
-        return builder;
-    }
-
-    // public ContentCultureInfosCollectionBuilder AddContentCultureInfosCollection()
-    // {
-    //     _contentCultureInfosCollection = null;
-    //     var builder = new ContentCultureInfosCollectionBuilder(this);
-    //     _contentCultureInfosCollectionBuilder = builder;
-    //     return builder;
-    // }
-
     public override ContentCreateModel Build()
     {
         var key = _key ?? Guid.NewGuid();
         var parentKey = _parentKey;
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
         // var name = _name ?? Guid.NewGuid().ToString();
         var invariantName = _invariantName ?? Guid.NewGuid().ToString();
         // var creatorId = _creatorId ?? 0;
         // var level = _level ?? 1;
         // var sortOrder = _sortOrder ?? 0;
         // var trashed = _trashed ?? false;
-        var culture = _cultureInfo?.Name;
         var invariantProperties = _invariantProperties;
         var variants = _variants;
         // var propertyValuesCulture = _propertyValuesCulture;
@@ -214,25 +177,27 @@ public class ContentEditingBuilder
             content.ParentKey = parentKey;
         }
         content.ContentTypeKey = contentType.Key;
-        // content.Variants.First().Name = culture;
+
+
 
         content.Key = key;
+        // content.Key = null;
 
-        content.InvariantProperties = invariantProperties.ToList();
+        content.InvariantProperties = invariantProperties;
 
-        content.Variants = variants.ToList();
+        content.Variants = [];
 
-        if (contentType.DefaultTemplate?.Key != null)
-        {
-            content.TemplateKey = contentType.DefaultTemplate.Key;
-        }
+        // if (contentType.DefaultTemplate?.Key != null)
+        // {
+        //     content.TemplateKey = contentType.DefaultTemplate.Key;
+        // }
 
         return content;
     }
 
     public static ContentCreateModel CreateBasicContent(IContentType contentType, Guid? key) =>
         new ContentEditingBuilder()
-            .WithKey(key)
+            // .WithKey(key)
             .WithContentType(contentType)
             .WithInvariantName("Home")
             .Build();
@@ -242,6 +207,7 @@ public class ContentEditingBuilder
             .WithContentType(contentType)
             .WithInvariantName("Home")
             .WithInvariantProperty("title", "Welcome to our Home page")
+            // .WithParentKey(Constants.System.RootKey)
             .Build();
 
     public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name, Guid? parentKey,
@@ -296,4 +262,5 @@ public class ContentEditingBuilder
 //                     description = "This is the meta description for a textpage"
 //                 })
 //             .Build();
+
  }

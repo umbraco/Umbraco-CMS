@@ -19,7 +19,8 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 
     private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<IPublishedContentHybridCache>();
 
-    private ContentEditingService ContentEditingService => (ContentEditingService)GetRequiredService<IContentEditingService>();
+    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
 
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
@@ -32,7 +33,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     //Act
     var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
 
-    var test = ContentService.GetById(Textpage.Key.Value);
+    // var test = ContentService.GetById(Textpage.Key.Value);
 
     var tester = await ContentEditingService.GetAsync(Textpage.Key.Value);
 
@@ -42,7 +43,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     }
 
     // [Test]
-    // public async Task Can_Get_Draft_Content_By_Key()
+    // public async Task Can_Get_Draft_Content_By_Key()-
     // {
     //     // Act
     //     var textPage = await PublishedContentHybridCache.GetById(Textpage.Key, true);
