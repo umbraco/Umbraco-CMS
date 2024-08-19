@@ -24,6 +24,8 @@ export interface UmbDocumentTypeAvailableCompositionRequestModel
 	isElement: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentTypeCompositionCompatibleModel extends UmbContentTypeCompositionCompatibleModel {}
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentTypeCompositionReferenceModel extends UmbContentTypeCompositionReferenceModel {}

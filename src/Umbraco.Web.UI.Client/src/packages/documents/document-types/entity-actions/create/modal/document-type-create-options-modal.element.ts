@@ -73,7 +73,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 					await this.#createFolderAction?.execute();
 					this._submitModal();
 					return;
-				} catch (error) {
+				} catch {
 					//console.error(error);
 				}
 

@@ -10,7 +10,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the log saved searches
- * @export
  * @class UmbLogSearchesServerDataSource
  * @implements {TemplateDetailDataSource}
  */
@@ -19,7 +18,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 
 	/**
 	 * Creates an instance of UmbLogSearchesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -69,7 +68,6 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 }
 /**
  * A data source for the log messages and levels
- * @export
  * @class UmbLogMessagesServerDataSource
  * @implements {LogMessagesDataSource}
  */
@@ -78,7 +76,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 
 	/**
 	 * Creates an instance of UmbLogMessagesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

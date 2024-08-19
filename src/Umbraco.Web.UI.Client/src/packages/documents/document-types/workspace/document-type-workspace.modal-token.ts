@@ -3,6 +3,7 @@ import { UMB_WORKSPACE_MODAL, UmbModalToken } from '@umbraco-cms/backoffice/moda
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentTypeWorkspaceData extends UmbWorkspaceModalData {}
 
 export const UMB_DOCUMENT_TYPE_WORKSPACE_MODAL = new UmbModalToken<

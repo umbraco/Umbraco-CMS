@@ -9,7 +9,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the User that fetches data from the server
- * @export
  * @class UmbUserServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 	/**
 	 * Creates an instance of UmbUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -150,6 +149,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Updates a User on the server
 	 * @param {UmbUserDetailModel} User
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbUserServerDataSource
 	 */

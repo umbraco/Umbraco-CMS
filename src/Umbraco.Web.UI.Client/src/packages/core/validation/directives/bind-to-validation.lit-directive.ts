@@ -77,7 +77,6 @@ class UmbBindToValidationDirective extends AsyncDirective {
  * ```js
  * html`<input ${umbBindToValidation(this, '$.headline', this.headlineValue)}>`;
  * ```
- *
  */
 export const umbBindToValidation = directive(UmbBindToValidationDirective);
 

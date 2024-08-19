@@ -54,8 +54,8 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 				this._unique = values[0];
 				this._entityType = values[1];
 			},
-		),
-			'_observeEntityModel';
+			'_observeEntityModel',
+		);
 	}
 
 	#closeContextMenu() {

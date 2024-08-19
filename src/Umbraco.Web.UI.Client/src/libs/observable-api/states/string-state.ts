@@ -3,7 +3,6 @@ import { createObservablePart, strictEqualityMemoization } from '../utils/index.
 import { UmbBasicState } from './basic-state.js';
 
 /**
- * @export
  * @class UmbStringState
  * @augments {UmbBasicState<T>}
  * @description - A state holding string data, this ensures the data is unique, not updating any Observes unless there is an actual change of the value, by using `===`.

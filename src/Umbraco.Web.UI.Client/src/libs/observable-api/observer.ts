@@ -59,9 +59,9 @@ export class UmbObserver<T> {
 	destroy(): void {
 		if (this.#subscription) {
 			this.#subscription.unsubscribe();
-			(this.#callback as any) = undefined;
-			(this.#subscription as any) = undefined;
+			(this.#callback as unknown) = undefined;
+			(this.#subscription as unknown) = undefined;
 		}
-		(this.#source as any) = undefined;
+		(this.#source as unknown) = undefined;
 	}
 }

@@ -6,7 +6,6 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Repository for the Media audit log
- * @export
  * @class UmbMediaAuditLogRepository
  * @augments {UmbRepositoryBase}
  */
@@ -18,7 +17,7 @@ export class UmbMediaAuditLogRepository
 
 	/**
 	 * Creates an instance of UmbMediaAuditLogRepository.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaAuditLogRepository
 	 */
 	constructor(host: UmbControllerHost) {

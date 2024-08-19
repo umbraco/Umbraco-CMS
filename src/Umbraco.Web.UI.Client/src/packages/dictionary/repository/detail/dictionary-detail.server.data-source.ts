@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Dictionary that fetches data from the server
- * @export
  * @class UmbDictionaryServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Creates an instance of UmbDictionaryServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -73,6 +72,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Inserts a new Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
@@ -104,6 +104,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Updates a Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} Dictionary
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */

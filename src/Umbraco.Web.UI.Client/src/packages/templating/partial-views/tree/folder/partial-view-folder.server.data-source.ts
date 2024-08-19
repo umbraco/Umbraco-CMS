@@ -7,7 +7,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Partial View folders that fetches data from the server
- * @export
  * @class UmbPartialViewFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 
 	/**
 	 * Creates an instance of UmbPartialViewFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

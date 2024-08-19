@@ -7,7 +7,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Stylesheet folders that fetches data from the server
- * @export
  * @class UmbStylesheetFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 	/**
 	 * Creates an instance of UmbStylesheetFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

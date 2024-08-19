@@ -6,7 +6,6 @@ import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * The default data of notifications
- * @export
  * @interface UmbNotificationDefaultData
  */
 export interface UmbNotificationDefaultData {
@@ -16,7 +15,6 @@ export interface UmbNotificationDefaultData {
 }
 
 /**
- * @export
  * @interface UmbNotificationOptions
  * @template UmbNotificationData
  */

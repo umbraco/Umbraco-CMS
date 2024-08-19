@@ -7,6 +7,7 @@ export interface UmbSortChildrenOfModalData extends UmbEntityModel {
 	sortChildrenOfRepositoryAlias: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbSortChildrenOfModalValue {}
 
 export const UMB_SORT_CHILDREN_OF_MODAL = new UmbModalToken<UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue>(

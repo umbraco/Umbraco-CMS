@@ -4,6 +4,7 @@ export interface UmbDocumentTypeImportModalData {
 	unique: string | null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentTypeImportModalValue {}
 
 export const UMB_DOCUMENT_TYPE_IMPORT_MODAL = new UmbModalToken<

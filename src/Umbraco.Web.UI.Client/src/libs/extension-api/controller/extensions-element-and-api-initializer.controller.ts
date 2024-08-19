@@ -94,6 +94,6 @@ export class UmbExtensionsElementAndApiInitializer<
 		this.#constructorArgs = undefined;
 		this.#elProps = undefined;
 		this.#apiProps = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 	}
 }

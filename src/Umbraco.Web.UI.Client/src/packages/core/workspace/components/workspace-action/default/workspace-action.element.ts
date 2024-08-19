@@ -103,7 +103,7 @@ export class UmbWorkspaceActionElement<
 			if (!this.#api) throw new Error('No api defined');
 			await this.#api.execute();
 			this._buttonState = 'success';
-		} catch (error) {
+		} catch {
 			this._buttonState = 'failed';
 		}
 
@@ -188,6 +188,7 @@ declare global {
 /**
  *
  * @param manifest
+ * @returns An array of arguments to pass to the extension API initializer.
  */
 function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
 	return [{ meta: manifest.meta }];

@@ -30,7 +30,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 
 	/**
 	 * Creates an instance of UmbContentTypeStructureServerDataSourceBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param args
 	 * @memberof UmbItemServerDataSourceBase
 	 */

@@ -7,7 +7,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the dictionary collection data from the server.
- * @export
  * @class UmbDictionaryCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbDictionaryCollectionServerDataSource implements UmbCollectionDat
 
 	/**
 	 * Creates an instance of UmbDictionaryCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDictionaryCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

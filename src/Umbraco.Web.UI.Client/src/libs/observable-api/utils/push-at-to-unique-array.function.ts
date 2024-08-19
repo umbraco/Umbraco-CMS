@@ -1,5 +1,4 @@
 /**
- * @export
  * @function pushToUniqueArray
  * @param {T[]} data - An array of objects.
  * @param index

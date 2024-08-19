@@ -15,7 +15,6 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Base class for a tree repository.
- * @export
  * @abstract
  * @class UmbTreeRepositoryBase
  * @augments {UmbRepositoryBase}
@@ -48,7 +47,7 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Creates an instance of UmbTreeRepositoryBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor
 	 * @param {(string | UmbContextToken<any, any>)} treeStoreContextAlias
 	 * @memberof UmbTreeRepositoryBase
@@ -75,6 +74,7 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests root items of a tree
+	 * @param args
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
@@ -93,6 +93,7 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests tree items of a given parent
 	 * @param {(string | null)} parentUnique
+	 * @param args
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */

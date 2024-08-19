@@ -6,7 +6,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A server data source for Webhook items
- * @export
  * @class UmbWebhookItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbWebhookItemServerDataSource extends UmbItemServerDataSourceBase<
 > {
 	/**
 	 * Creates an instance of UmbWebhookItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbWebhookItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

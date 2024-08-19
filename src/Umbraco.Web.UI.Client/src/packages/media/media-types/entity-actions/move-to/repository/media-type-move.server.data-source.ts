@@ -5,7 +5,6 @@ import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backo
 
 /**
  * Move Media Type Server Data Source
- * @export
  * @class UmbMoveMediaTypeServerDataSource
  */
 export class UmbMoveMediaTypeServerDataSource implements UmbMoveDataSource {
@@ -13,7 +12,7 @@ export class UmbMoveMediaTypeServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Creates an instance of UmbMoveMediaTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMoveMediaTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -11,6 +11,7 @@ export interface ManifestWorkspaceAction<MetaType extends MetaWorkspaceAction = 
 	meta: MetaType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaWorkspaceAction {}
 
 export interface ManifestWorkspaceActionDefaultKind extends ManifestWorkspaceAction<MetaWorkspaceActionDefaultKind> {
@@ -19,7 +20,7 @@ export interface ManifestWorkspaceActionDefaultKind extends ManifestWorkspaceAct
 }
 
 export interface MetaWorkspaceActionDefaultKind extends MetaWorkspaceAction {
-	label?: string; //TODO: Use or implement additional label-key
+	label?: string;
 	look?: UUIInterfaceLook;
 	color?: UUIInterfaceColor;
 }

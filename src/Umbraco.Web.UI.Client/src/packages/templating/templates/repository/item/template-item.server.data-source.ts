@@ -7,7 +7,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A server data source for Template items
- * @export
  * @class UmbTemplateItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbTemplateItemServerDataSource extends UmbItemServerDataSourceBase
 > {
 	/**
 	 * Creates an instance of UmbTemplateItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemplateItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

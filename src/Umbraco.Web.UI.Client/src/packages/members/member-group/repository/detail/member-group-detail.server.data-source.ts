@@ -9,7 +9,6 @@ import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api
 
 /**
  * A data source for the Member Group that fetches data from the server
- * @export
  * @class UmbMemberGroupServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Creates an instance of UmbMemberGroupServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -99,6 +98,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Updates a MemberGroup on the server
 	 * @param {UmbMemberGroupDetailModel} MemberGroup
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbMemberGroupServerDataSource
 	 */

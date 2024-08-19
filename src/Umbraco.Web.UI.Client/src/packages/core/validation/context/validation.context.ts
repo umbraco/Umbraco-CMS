@@ -290,7 +290,7 @@ export class UmbValidationContext extends UmbControllerBase implements UmbValida
 		this.#parent = undefined;
 		this.#destroyValidators();
 		this.messages?.destroy();
-		(this.messages as any) = undefined;
+		(this.messages as unknown) = undefined;
 		super.destroy();
 	}
 }

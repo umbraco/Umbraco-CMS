@@ -11,7 +11,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * ```ts
  * const controller = new UmbExtensionElementController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the element: ", ctrl.component) }));
  * ```
- * @export
  * @class UmbExtensionElementController
  */
 export class UmbExtensionElementInitializer<
