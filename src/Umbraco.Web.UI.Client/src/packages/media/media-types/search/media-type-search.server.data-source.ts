@@ -15,7 +15,7 @@ export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<U
 
 	/**
 	 * Creates an instance of UmbMediaTypeSearchServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeSearchServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

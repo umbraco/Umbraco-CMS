@@ -22,7 +22,7 @@ export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 > {
 	/**
 	 * Creates an instance of UmbScriptTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbScriptTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

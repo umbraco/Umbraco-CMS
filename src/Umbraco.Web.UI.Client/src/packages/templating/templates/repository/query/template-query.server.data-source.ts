@@ -16,7 +16,7 @@ export class UmbTemplateQueryServerDataSource {
 
 	/**
 	 * Creates an instance of UmbTemplateQueryServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

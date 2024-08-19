@@ -21,7 +21,7 @@ export class UmbMediaRecycleBinTreeServerDataSource extends UmbTreeServerDataSou
 > {
 	/**
 	 * Creates an instance of UmbMediaRecycleBinTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaRecycleBinTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

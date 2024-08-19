@@ -11,7 +11,7 @@ export class UmbUserSetGroupsServerDataSource {
 
 	/**
 	 * Creates an instance of UmbUserSetGroupsServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserSetGroupsServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

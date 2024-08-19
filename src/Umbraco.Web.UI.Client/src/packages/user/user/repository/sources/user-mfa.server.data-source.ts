@@ -11,7 +11,7 @@ export class UmbUserMfaServerDataSource {
 
 	/**
 	 * Creates an instance of UmbMfaServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMfaServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

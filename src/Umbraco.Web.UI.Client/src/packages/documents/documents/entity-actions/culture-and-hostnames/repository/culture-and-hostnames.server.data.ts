@@ -13,7 +13,7 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentCultureAndHostnamesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentCultureAndHostnamesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

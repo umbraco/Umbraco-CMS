@@ -20,7 +20,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 
 	/**
 	 * Creates an instance of UmbWebhookDetailServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

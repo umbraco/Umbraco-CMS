@@ -24,7 +24,7 @@ export class UmbMediaTypeCompositionServerDataSource
 
 	/**
 	 * Creates an instance of UmbMediaTypeCompositionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

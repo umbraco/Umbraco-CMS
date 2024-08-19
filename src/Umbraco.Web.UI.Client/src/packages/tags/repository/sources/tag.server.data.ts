@@ -12,7 +12,7 @@ export class UmbTagServerDataSource {
 
 	/**
 	 * Creates an instance of UmbTagServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTagServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -16,7 +16,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 	/**
 	 * Creates an instance of UmbStylesheetFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

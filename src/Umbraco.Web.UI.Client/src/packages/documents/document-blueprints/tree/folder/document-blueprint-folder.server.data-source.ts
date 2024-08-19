@@ -13,7 +13,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 
 	/**
 	 * Creates an instance of UmbDocumentBlueprintFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

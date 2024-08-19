@@ -13,7 +13,7 @@ export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOf
 
 	/**
 	 * Creates an instance of UmbSortChildrenOfMediaServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbSortChildrenOfMediaServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -16,7 +16,7 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Creates an instance of UmbLanguageCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

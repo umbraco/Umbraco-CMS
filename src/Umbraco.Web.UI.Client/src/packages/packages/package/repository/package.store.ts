@@ -45,7 +45,7 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of PackageStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof PackageStore
 	 */
 	constructor(host: UmbControllerHost) {

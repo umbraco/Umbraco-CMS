@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
- 
+
  * @class UmbMediaTypeTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for Media Types
@@ -11,7 +11,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 export class UmbMediaTypeTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbMediaTypeTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeTreeStore
 	 */
 	constructor(host: UmbControllerHost) {

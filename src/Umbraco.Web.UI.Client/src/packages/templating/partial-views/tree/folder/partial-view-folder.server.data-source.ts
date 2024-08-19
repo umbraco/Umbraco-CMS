@@ -16,7 +16,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 
 	/**
 	 * Creates an instance of UmbPartialViewFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

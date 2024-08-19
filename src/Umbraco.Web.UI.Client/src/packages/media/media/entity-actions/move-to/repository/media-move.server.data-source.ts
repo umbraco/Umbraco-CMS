@@ -12,7 +12,7 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Creates an instance of UmbMoveMediaServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMoveMediaServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

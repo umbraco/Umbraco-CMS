@@ -3,7 +3,7 @@ import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- 
+
  * @class UmbDataTypeReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -12,7 +12,7 @@ export class UmbDataTypeReferenceServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDataTypeReferenceServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeReferenceServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

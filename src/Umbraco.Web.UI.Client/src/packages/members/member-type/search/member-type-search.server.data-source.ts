@@ -15,7 +15,7 @@ export class UmbMemberTypeSearchServerDataSource implements UmbSearchDataSource<
 
 	/**
 	 * Creates an instance of UmbMemberTypeSearchServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeSearchServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

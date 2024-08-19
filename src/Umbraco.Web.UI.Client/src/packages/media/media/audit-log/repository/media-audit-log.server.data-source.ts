@@ -15,7 +15,7 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 
 	/**
 	 * Creates an instance of UmbAuditLogServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbAuditLogServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

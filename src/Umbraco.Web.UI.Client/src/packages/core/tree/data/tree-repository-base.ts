@@ -47,7 +47,7 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Creates an instance of UmbTreeRepositoryBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor
 	 * @param {(string | UmbContextToken<any, any>)} treeStoreContextAlias
 	 * @memberof UmbTreeRepositoryBase

@@ -17,7 +17,7 @@ export class UmbDocumentValidationServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentPublishingServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	// TODO: [v15]: ignoring unused var here here to prevent a breaking change

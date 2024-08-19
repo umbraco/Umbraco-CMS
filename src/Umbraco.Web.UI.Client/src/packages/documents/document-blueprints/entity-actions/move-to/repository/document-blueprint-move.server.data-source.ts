@@ -12,7 +12,7 @@ export class UmbMoveDocumentBlueprintServerDataSource implements UmbMoveDataSour
 
 	/**
 	 * Creates an instance of UmbMoveDocumentBlueprintServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMoveDocumentBlueprintServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

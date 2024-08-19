@@ -22,7 +22,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 > {
 	/**
 	 * Creates an instance of UmbMediaTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

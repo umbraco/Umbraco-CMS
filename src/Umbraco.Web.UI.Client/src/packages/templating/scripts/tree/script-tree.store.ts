@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
- 
+
  * @class UmbScriptTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Scripts
@@ -11,7 +11,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbScriptTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbScriptTreeStore
 	 */
 	constructor(host: UmbControllerHost) {

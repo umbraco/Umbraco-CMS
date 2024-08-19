@@ -16,7 +16,7 @@ export class UmbMediaTypeItemServerDataSource extends UmbItemServerDataSourceBas
 > {
 	/**
 	 * Creates an instance of UmbMediaTypeItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

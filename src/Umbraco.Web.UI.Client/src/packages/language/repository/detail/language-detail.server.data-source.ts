@@ -19,7 +19,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Creates an instance of UmbLanguageServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

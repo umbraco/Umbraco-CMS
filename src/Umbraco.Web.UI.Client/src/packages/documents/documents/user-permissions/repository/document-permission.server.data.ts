@@ -2,7 +2,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- 
+
  * @class UmbUserGroupCollectionServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -11,7 +11,7 @@ export class UmbDocumentPermissionServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentPermissionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentPermissionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

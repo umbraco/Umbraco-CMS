@@ -17,7 +17,7 @@ export class UmbScriptItemServerDataSource implements UmbItemDataSource<UmbScrip
 
 	/**
 	 * Creates an instance of UmbScriptItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbScriptItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -17,7 +17,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 
 	/**
 	 * Creates an instance of UmbStylesheetItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

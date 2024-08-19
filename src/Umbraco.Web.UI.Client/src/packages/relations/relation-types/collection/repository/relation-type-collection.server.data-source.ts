@@ -16,7 +16,7 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 
 	/**
 	 * Creates an instance of UmbRelationTypeCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbRelationTypeCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

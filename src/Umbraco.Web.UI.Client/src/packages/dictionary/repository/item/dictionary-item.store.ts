@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
- 
+
  * @class UmbDictionaryItemStore
  * @augments {UmbStoreBase}
  * @description - Data Store for Dictionary items
@@ -13,7 +13,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 export class UmbDictionaryItemStore extends UmbItemStoreBase<UmbDictionaryItemModel> {
 	/**
 	 * Creates an instance of UmbDictionaryItemStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDictionaryItemStore
 	 */
 	constructor(host: UmbControllerHost) {

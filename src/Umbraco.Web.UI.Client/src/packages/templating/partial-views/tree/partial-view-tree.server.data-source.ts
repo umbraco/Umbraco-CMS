@@ -26,7 +26,7 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 > {
 	/**
 	 * Creates an instance of UmbPartialViewTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbPartialViewTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

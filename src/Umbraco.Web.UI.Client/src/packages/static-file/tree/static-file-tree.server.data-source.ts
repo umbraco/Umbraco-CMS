@@ -28,7 +28,7 @@ export class UmbStaticFileTreeServerDataSource extends UmbTreeServerDataSourceBa
 > {
 	/**
 	 * Creates an instance of UmbStylesheetTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

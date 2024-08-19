@@ -12,7 +12,7 @@ export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
 
 	/**
 	 * Creates an instance of UmbUnlockUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUnlockUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -16,7 +16,7 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 > {
 	/**
 	 * Creates an instance of UmbDocumentItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

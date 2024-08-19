@@ -12,7 +12,7 @@ export class UmbNewUserPasswordRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Creates an instance of UmbNewUserPasswordRepository.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbNewUserPasswordRepository
 	 */
 	constructor(host: UmbControllerHost) {

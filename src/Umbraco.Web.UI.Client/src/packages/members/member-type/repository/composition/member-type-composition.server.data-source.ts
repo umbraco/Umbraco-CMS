@@ -27,7 +27,7 @@ export class UmbMemberTypeCompositionServerDataSource
 
 	/**
 	 * Creates an instance of UmbMemberTypeCompositionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

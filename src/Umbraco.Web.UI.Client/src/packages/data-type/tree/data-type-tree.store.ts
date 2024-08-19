@@ -3,7 +3,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- 
+
  * @class UmbDataTypeTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for Data Types
@@ -11,7 +11,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbDataTypeTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeTreeStore
 	 */
 	constructor(host: UmbControllerHost) {

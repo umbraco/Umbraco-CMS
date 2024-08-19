@@ -12,7 +12,7 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Creates an instance of UmbCurrentUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

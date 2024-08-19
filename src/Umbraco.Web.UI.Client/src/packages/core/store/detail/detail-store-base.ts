@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- 
+
  * @class UmbDetailStoreBase
  * @augments {UmbStoreBase}
  * @description - Data Store for Data Type items
@@ -16,7 +16,7 @@ export abstract class UmbDetailStoreBase<T extends { unique: string }>
 {
 	/**
 	 * Creates an instance of UmbDetailStoreBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param storeAlias
 	 * @memberof UmbDetailStoreBase
 	 */

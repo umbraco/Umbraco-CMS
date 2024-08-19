@@ -20,7 +20,7 @@ export class UmbDocumentPublishingServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentPublishingServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

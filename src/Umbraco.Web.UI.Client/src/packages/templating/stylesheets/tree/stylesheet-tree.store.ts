@@ -3,7 +3,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- 
+
  * @class UmbStylesheetTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Stylesheets
@@ -11,7 +11,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbStylesheetTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbStylesheetTreeStore
 	 */
 	constructor(host: UmbControllerHost) {

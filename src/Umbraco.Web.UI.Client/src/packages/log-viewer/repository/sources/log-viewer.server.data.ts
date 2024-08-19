@@ -18,7 +18,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 
 	/**
 	 * Creates an instance of UmbLogSearchesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -76,7 +76,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 
 	/**
 	 * Creates an instance of UmbLogMessagesServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

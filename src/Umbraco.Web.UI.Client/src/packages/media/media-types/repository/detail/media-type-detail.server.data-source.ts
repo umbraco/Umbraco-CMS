@@ -21,7 +21,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 	/**
 	 * Creates an instance of UmbMediaTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

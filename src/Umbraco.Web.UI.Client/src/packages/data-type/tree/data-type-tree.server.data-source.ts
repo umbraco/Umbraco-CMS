@@ -28,7 +28,7 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 > {
 	/**
 	 * Creates an instance of UmbDataTypeTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

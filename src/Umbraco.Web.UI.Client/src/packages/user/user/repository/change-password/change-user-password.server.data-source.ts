@@ -11,7 +11,7 @@ export class UmbChangeUserPasswordServerDataSource {
 
 	/**
 	 * Creates an instance of UmbChangeUserPasswordServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

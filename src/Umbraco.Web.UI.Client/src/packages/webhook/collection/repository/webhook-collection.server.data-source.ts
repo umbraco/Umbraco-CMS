@@ -15,7 +15,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 
 	/**
 	 * Creates an instance of UmbWebhookCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

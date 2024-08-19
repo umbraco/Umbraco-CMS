@@ -20,7 +20,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 	/**
 	 * Creates an instance of UmbDataTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

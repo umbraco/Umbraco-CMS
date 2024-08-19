@@ -13,7 +13,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates an instance of UmbDataTypeFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

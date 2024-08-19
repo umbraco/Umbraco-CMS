@@ -15,7 +15,7 @@ export class UmbDictionaryCollectionServerDataSource implements UmbCollectionDat
 
 	/**
 	 * Creates an instance of UmbDictionaryCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDictionaryCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

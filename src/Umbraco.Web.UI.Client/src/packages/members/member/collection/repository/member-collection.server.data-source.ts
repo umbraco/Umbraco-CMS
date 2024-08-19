@@ -18,7 +18,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 
 	/**
 	 * Creates an instance of UmbMemberCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

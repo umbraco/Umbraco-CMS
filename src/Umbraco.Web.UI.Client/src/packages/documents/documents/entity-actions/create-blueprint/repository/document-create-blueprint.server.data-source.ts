@@ -13,7 +13,7 @@ export class UmbDocumentCreateBlueprintServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentCreateBlueprintServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentCreateBlueprintServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

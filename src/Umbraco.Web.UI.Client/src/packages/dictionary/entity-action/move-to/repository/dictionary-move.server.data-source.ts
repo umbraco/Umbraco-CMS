@@ -12,7 +12,7 @@ export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Creates an instance of UmbMoveDictionaryServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMoveDictionaryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

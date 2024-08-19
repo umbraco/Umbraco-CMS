@@ -24,7 +24,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Creates an instance of UmbRecycleBinRepositoryBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param {UmbRecycleBinDataSourceConstructor} recycleBinSource
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */

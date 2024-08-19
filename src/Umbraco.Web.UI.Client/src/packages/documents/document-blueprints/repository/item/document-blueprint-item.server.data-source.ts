@@ -18,7 +18,7 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 	#host: UmbControllerHost;
 	/**
 	 * Creates an instance of UmbDocumentBlueprintItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentBlueprintItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

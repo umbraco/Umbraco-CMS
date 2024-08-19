@@ -15,7 +15,7 @@ export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataS
 
 	/**
 	 * Creates an instance of UmbRelationTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -12,7 +12,7 @@ export class UmbTemporaryFileServerDataSource {
 
 	/**
 	 * Creates an instance of UmbTemporaryFileServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

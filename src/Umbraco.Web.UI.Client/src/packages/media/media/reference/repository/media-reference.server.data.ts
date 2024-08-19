@@ -3,7 +3,7 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- 
+
  * @class UmbMediaReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -12,7 +12,7 @@ export class UmbMediaReferenceServerDataSource {
 
 	/**
 	 * Creates an instance of UmbMediaReferenceServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaReferenceServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

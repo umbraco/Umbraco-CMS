@@ -14,7 +14,7 @@ export class UmbMediaUrlServerDataSource extends UmbItemServerDataSourceBase<
 > {
 	/**
 	 * Creates an instance of UmbMediaUrlServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaUrlServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

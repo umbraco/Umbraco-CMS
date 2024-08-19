@@ -13,7 +13,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates an instance of UmbMediaTypeFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

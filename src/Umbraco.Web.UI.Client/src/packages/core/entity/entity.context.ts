@@ -17,7 +17,7 @@ export class UmbEntityContext extends UmbContextBase<UmbEntityContext> {
 
 	/**
 	 * Creates an instance of UmbEntityContext.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbEntityContext
 	 */
 	constructor(host: UmbControllerHost) {

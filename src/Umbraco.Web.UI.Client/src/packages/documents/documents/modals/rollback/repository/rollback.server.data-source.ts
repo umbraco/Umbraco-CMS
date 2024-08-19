@@ -12,7 +12,7 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Creates an instance of UmbRollbackServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
