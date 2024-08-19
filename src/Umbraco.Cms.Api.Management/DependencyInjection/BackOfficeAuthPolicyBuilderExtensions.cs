@@ -29,6 +29,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, AllowedApplicationHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, BackOfficeHandler>();
 
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
@@ -46,7 +47,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.RequireAuthenticatedUser();
+            policy.Requirements.Add(new BackOfficeRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.RequireAdminAccess, policy =>
