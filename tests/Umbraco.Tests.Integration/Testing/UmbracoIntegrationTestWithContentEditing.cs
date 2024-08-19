@@ -55,7 +55,10 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentEditingBuilder.CreateSimpleContent(ContentType);
         Textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-        await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
+        var createContentResultTextPage =
+            await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(createContentResultTextPage.Success);
 
         if (!Textpage.Key.HasValue)
         {
@@ -71,7 +74,11 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
             CulturesToPublishImmediately = Subpage.Variants.Select(x => x.Culture).ToHashSet(),
             Schedules = contentSchedule
         };
-        await ContentEditingService.CreateAsync(Subpage, Constants.Security.SuperUserKey);
+        var createContentResultSubPage =
+            await ContentEditingService.CreateAsync(Subpage, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(createContentResultSubPage.Success);
+
         if (!Subpage.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");

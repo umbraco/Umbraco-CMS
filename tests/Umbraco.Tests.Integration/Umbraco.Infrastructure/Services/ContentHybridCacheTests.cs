@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -18,6 +19,9 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 
     private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<IPublishedContentHybridCache>();
 
+    private ContentEditingService ContentEditingService => (ContentEditingService)GetRequiredService<IContentEditingService>();
+
+
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
     // Create CRUD Tests for Content, Also cultures.
@@ -25,11 +29,12 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     [Test]
     public async Task Can_Get_Draft_Content_By_Id()
     {
-
-
+    //Act
     var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
 
     var test = ContentService.GetById(Textpage.Key.Value);
+
+    var tester = await ContentEditingService.GetAsync(Textpage.Key.Value);
 
 
     //Assert

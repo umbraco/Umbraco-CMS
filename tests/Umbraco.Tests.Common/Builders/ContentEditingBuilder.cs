@@ -6,43 +6,39 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces.ContentCreateModel;
 using Umbraco.Cms.Tests.Common.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class ContentEditingBuilder
     : BuilderBase<ContentCreateModel>,
-        IBuildContentTypes,
-        IBuildContentCultureInfosCollection,
-        IWithIdBuilder,
+        IWithInvariantNameBuilder,
+        IWithInvariantPropertiesBuilder,
+        IWithVariantsBuilder,
         IWithKeyBuilder,
-        IWithCreatorIdBuilder,
-        IWithCreateDateBuilder,
-        IWithUpdateDateBuilder,
-        IWithNameBuilder,
-        IWithTrashedBuilder,
-        IWithLevelBuilder,
-        IWithPathBuilder,
-        IWithSortOrderBuilder,
-        IWithCultureInfoBuilder,
-        IWithPropertyValues,
-        IWithParentKeyBuilder
+        IWithContentTypeKeyBuilder,
+        IWithParentKeyBuilder,
+        IWithTemplateKeyBuilder
 {
     private readonly IDictionary<string, string> _cultureNames = new Dictionary<string, string>();
-    private ContentCultureInfosCollection _contentCultureInfosCollection;
-    private ContentCultureInfosCollectionBuilder _contentCultureInfosCollectionBuilder;
     private IContentType _contentType;
     private ContentTypeBuilder _contentTypeBuilder;
     private DateTime? _createDate;
     private int? _creatorId;
     private CultureInfo _cultureInfo;
+    private IEnumerable<PropertyValueModel> _invariantProperties;
+    private IEnumerable<VariantModel> _variants;
+    private Guid _contentTypeKey;
+    private Guid? _parentKey;
+    private Guid? _templateKey;
 
     private int? _id;
     private Guid? _key;
     private int? _level;
     private string _name;
+    private string _invariantName;
     private IContent _parent;
-    private Guid? _parentKey;
     private string _path;
     private GenericDictionaryBuilder<ContentEditingBuilder, string, object> _propertyDataBuilder;
     private object _propertyValues;
@@ -52,30 +48,8 @@ public class ContentEditingBuilder
     private bool? _trashed;
     private DateTime? _updateDate;
     private int? _versionId;
+    private IWithContentTypeKeyBuilder _withContentTypeKeyBuilderImplementation;
 
-    DateTime? IWithCreateDateBuilder.CreateDate
-    {
-        get => _createDate;
-        set => _createDate = value;
-    }
-
-    int? IWithCreatorIdBuilder.CreatorId
-    {
-        get => _creatorId;
-        set => _creatorId = value;
-    }
-
-    CultureInfo IWithCultureInfoBuilder.CultureInfo
-    {
-        get => _cultureInfo;
-        set => _cultureInfo = value;
-    }
-
-    int? IWithIdBuilder.Id
-    {
-        get => _id;
-        set => _id = value;
-    }
 
     Guid? IWithKeyBuilder.Key
     {
@@ -83,16 +57,22 @@ public class ContentEditingBuilder
         set => _key = value;
     }
 
-    int? IWithLevelBuilder.Level
+    string IWithInvariantNameBuilder.InvariantName
     {
-        get => _level;
-        set => _level = value;
+        get => _invariantName;
+        set => _invariantName = value;
     }
 
-    string IWithNameBuilder.Name
+    IEnumerable<PropertyValueModel> IWithInvariantPropertiesBuilder.InvariantProperties
     {
-        get => _name;
-        set => _name = value;
+        get => _invariantProperties;
+        set => _invariantProperties = value;
+    }
+
+    IEnumerable<VariantModel> IWithVariantsBuilder.Variants
+    {
+        get => _variants;
+        set => _variants = value;
     }
 
     Guid? IWithParentKeyBuilder.ParentKey
@@ -101,47 +81,52 @@ public class ContentEditingBuilder
         set => _parentKey = value;
     }
 
-    string IWithPathBuilder.Path
+    Guid IWithContentTypeKeyBuilder.ContentTypeKey
     {
-        get => _path;
-        set => _path = value;
+        get => _contentTypeKey;
+        set => _contentTypeKey = value;
     }
 
-    object IWithPropertyValues.PropertyValues
+    Guid? IWithTemplateKeyBuilder.TemplateKey
     {
-        get => _propertyValues;
-        set => _propertyValues = value;
+        get => _templateKey;
+        set => _templateKey = value;
     }
 
-    string IWithPropertyValues.PropertyValuesCulture
+    public ContentEditingBuilder WithInvariantName(string name)
     {
-        get => _propertyValuesCulture;
-        set => _propertyValuesCulture = value;
+        _name = name;
+        return this;
     }
 
-    string IWithPropertyValues.PropertyValuesSegment
+    public ContentEditingBuilder WithInvariantProperty(string alias, object value)
     {
-        get => _propertyValuesSegment;
-        set => _propertyValuesSegment = value;
+        if (_invariantProperties is null)
+        {
+            _invariantProperties = new List<PropertyValueModel>();
+        }
+
+        var property = new PropertyValueModel { Alias = alias, Value = value };
+
+        (_invariantProperties as List<PropertyValueModel>)?.Add(property);
+
+        return this;
     }
 
-    int? IWithSortOrderBuilder.SortOrder
-    {
-        get => _sortOrder;
-        set => _sortOrder = value;
-    }
+    // public ContentEditingBuilder AddVariant(string culture, string segment, string name)
+    // {
+    //     if (_variants is null)
+    //     {
+    //         _variants = new List<VariantModel>();
+    //     }
+    //
+    //     var variant = new VariantModel { Culture = culture, Segment = segment, Name = name };
+    //
+    //     (_variants as List<VariantModel>).Add(variant);
+    //
+    //     return this;
+    // }
 
-    bool? IWithTrashedBuilder.Trashed
-    {
-        get => _trashed;
-        set => _trashed = value;
-    }
-
-    DateTime? IWithUpdateDateBuilder.UpdateDate
-    {
-        get => _updateDate;
-        set => _updateDate = value;
-    }
 
     public ContentEditingBuilder WithVersionId(int versionId)
     {
@@ -160,14 +145,6 @@ public class ContentEditingBuilder
     {
         _contentTypeBuilder = null;
         _contentType = contentType;
-        return this;
-    }
-
-    public ContentEditingBuilder WithContentCultureInfosCollection(
-        ContentCultureInfosCollection contentCultureInfosCollection)
-    {
-        _contentCultureInfosCollectionBuilder = null;
-        _contentCultureInfosCollection = contentCultureInfosCollection;
         return this;
     }
 
@@ -205,23 +182,21 @@ public class ContentEditingBuilder
 
     public override ContentCreateModel Build()
     {
-        var id = _id ?? 0;
-        var versionId = _versionId ?? 0;
         var key = _key ?? Guid.NewGuid();
         var parentKey = _parentKey;
-        var parent = _parent;
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
-        var name = _name ?? Guid.NewGuid().ToString();
-        var creatorId = _creatorId ?? 0;
-        var level = _level ?? 1;
-        var path = _path ?? $"-1,{id}";
-        var sortOrder = _sortOrder ?? 0;
-        var trashed = _trashed ?? false;
+        // var name = _name ?? Guid.NewGuid().ToString();
+        var invariantName = _invariantName ?? Guid.NewGuid().ToString();
+        // var creatorId = _creatorId ?? 0;
+        // var level = _level ?? 1;
+        // var sortOrder = _sortOrder ?? 0;
+        // var trashed = _trashed ?? false;
         var culture = _cultureInfo?.Name;
-        var propertyValues = _propertyValues;
-        var propertyValuesCulture = _propertyValuesCulture;
-        var propertyValuesSegment = _propertyValuesSegment;
+        var invariantProperties = _invariantProperties;
+        var variants = _variants;
+        // var propertyValuesCulture = _propertyValuesCulture;
+        // var propertyValuesSegment = _propertyValuesSegment;
 
         if (_contentTypeBuilder is null && _contentType is null)
         {
@@ -232,16 +207,20 @@ public class ContentEditingBuilder
         var contentType = _contentType ?? _contentTypeBuilder.Build();
 
         var content = new ContentCreateModel();
-        content.InvariantName = name;
+        content.InvariantName = invariantName;
 
-        // if( parent.Key != Guid.Empty)
-        // {
-        //     content.ParentKey = parent.Key;
-        // }
+        if( parentKey != Guid.Empty)
+        {
+            content.ParentKey = parentKey;
+        }
         content.ContentTypeKey = contentType.Key;
         // content.Variants.First().Name = culture;
 
         content.Key = key;
+
+        content.InvariantProperties = invariantProperties.ToList();
+
+        content.Variants = variants.ToList();
 
         if (contentType.DefaultTemplate?.Key != null)
         {
@@ -251,80 +230,70 @@ public class ContentEditingBuilder
         return content;
     }
 
-    public static ContentCreateModel CreateBasicContent(IContentType contentType, int id = 0) =>
+    public static ContentCreateModel CreateBasicContent(IContentType contentType, Guid? key) =>
         new ContentEditingBuilder()
-            .WithId(id)
+            .WithKey(key)
             .WithContentType(contentType)
-            .WithName("Home")
+            .WithInvariantName("Home")
             .Build();
 
     public static ContentCreateModel CreateSimpleContent(IContentType contentType) =>
         new ContentEditingBuilder()
             .WithContentType(contentType)
-            .WithName("Home")
-            .WithPropertyValues(new
-            {
-                title = "Welcome to our Home page",
-                bodyText = "This is the welcome message on the first page",
-                author = "John Doe"
-            })
+            .WithInvariantName("Home")
+            .WithInvariantProperty("title", "Welcome to our Home page")
             .Build();
 
-    public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name, Guid? parentKey, string? culture = null, string? segment = null) =>
+    public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name, Guid? parentKey,
+        string? culture = null, string? segment = null) =>
         new ContentEditingBuilder()
             .WithContentType(contentType)
-            .WithName(name)
+            .WithInvariantName(name)
             .WithParentKey(parentKey)
-            .WithPropertyValues(
-                new
-                {
-                    title = "Welcome to our Home page",
-                    bodyText = "This is the welcome message on the first page",
-                    author = "John Doe"
-                },
-                culture,
-                segment)
+            .WithInvariantProperty("title", "Welcome to our Home page")
+
             .Build();
 
-    public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name, IContent parent,
-        string? culture = null, string? segment = null, bool setPropertyValues = true)
-    {
-        var builder = new ContentEditingBuilder()
-            .WithContentType(contentType)
-            .WithName(name)
-            .WithParent(parent);
 
-        if (!(culture is null))
-        {
-            builder = builder.WithCultureName(culture, name);
-        }
-
-        if (setPropertyValues)
-        {
-            builder = builder.WithPropertyValues(
-                new { title = name + " Subpage", bodyText = "This is a subpage", author = "John Doe" },
-                culture,
-                segment);
-        }
-
-        var content = builder.Build();
-
-        return content;
-    }
-
-    public static ContentCreateModel CreateTextpageContent(IContentType contentType, string name, Guid? parentKey) =>
-        new ContentEditingBuilder()
-            .WithId(0)
-            .WithContentType(contentType)
-            .WithName(name)
-            .WithParentKey(parentKey)
-            .WithPropertyValues(
-                new
-                {
-                    title = name + " textpage",
-                    bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
-                    keywords = "text,page,meta",
-                    description = "This is the meta description for a textpage"
-                })
-            .Build();
-}
+//     public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name, IContent parent,
+//         string? culture = null, string? segment = null, bool setPropertyValues = true)
+//     {
+//         var builder = new ContentEditingBuilder()
+//             .WithContentType(contentType)
+//             .WithName(name)
+//             .WithParent(parent);
+//
+//         if (!(culture is null))
+//         {
+//             builder = builder.WithCultureName(culture, name);
+//         }
+//
+//         if (setPropertyValues)
+//         {
+//             builder = builder.WithPropertyValues(
+//                 new { title = name + " Subpage", bodyText = "This is a subpage", author = "John Doe" },
+//                 culture,
+//                 segment);
+//         }
+//
+//         var content = builder.Build();
+//
+//         return content;
+//     }
+//
+//     public static ContentCreateModel CreateTextpageContent(IContentType contentType, string name, Guid? parentKey) =>
+//         new ContentEditingBuilder()
+//             .WithId(0)
+//             .WithContentType(contentType)
+//             .WithName(name)
+//             .WithParentKey(parentKey)
+//             .WithPropertyValues(
+//                 new
+//                 {
+//                     title = name + " textpage",
+//                     bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
+//                     keywords = "text,page,meta",
+//                     description = "This is the meta description for a textpage"
+//                 })
+//             .Build();
+ }
