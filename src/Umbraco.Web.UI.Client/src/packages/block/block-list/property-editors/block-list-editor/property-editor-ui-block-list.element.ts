@@ -1,9 +1,9 @@
+import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
 import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
-import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
@@ -15,9 +15,14 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import {
+	UmbBlockElementDataValidationPathTranslator,
+	type UmbBlockLayoutBaseModel,
+} from '@umbraco-cms/backoffice/block';
 
 import '../../components/block-list-entry/index.js';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -35,7 +40,10 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryE
  * @element umb-property-editor-ui-block-list
  */
 @customElement('umb-property-editor-ui-block-list')
-export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIBlockListElement
+	extends UmbFormControlMixin<UmbBlockListValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	//
 	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbBlockListEntryElement>(this, {
 		...SORTER_CONFIG,
@@ -43,6 +51,10 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this.#entriesContext.setLayouts(model);
 		},
 	});
+
+	#validationContext = new UmbValidationContext(this).provide();
+	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
+	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
 	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
@@ -53,7 +65,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	};
 
 	@property({ attribute: false })
-	public set value(value: UmbBlockListValueModel | undefined) {
+	public override set value(value: UmbBlockListValueModel | undefined) {
 		const buildUpValue: Partial<UmbBlockListValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
@@ -64,7 +76,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.#managerContext.setContents(buildUpValue.contentData);
 		this.#managerContext.setSettings(buildUpValue.settingsData);
 	}
-	public get value(): UmbBlockListValueModel {
+	public override get value(): UmbBlockListValueModel | undefined {
 		return this._value;
 	}
 
@@ -121,6 +133,44 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context.dataPath,
+				(dataPath) => {
+					// Translate paths for content elements:
+					this.#contentDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
+					}
+
+					// Translate paths for settings elements:
+					this.#settingsDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					}
+				},
+				'observeDataPath',
+			);
+		});
+
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.localize.term('validation_entriesShort'),
+			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
+		);
+
+		this.addValidator(
+			'rangeOverflow',
+			() => this.localize.term('validation_entriesExceed'),
+			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
+		);
+
 		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
 			this._layouts = layouts;
 			// Update sorter.
@@ -155,6 +205,10 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	};
 
+	protected override getFormElement() {
+		return undefined;
+	}
+
 	override render() {
 		let createPath: string | undefined;
 		if (this._blocks?.length === 1) {
@@ -171,7 +225,10 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 					html`<uui-button-inline-create
 							label=${this._createButtonLabel}
 							href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>
-						<umb-block-list-entry .contentUdi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
+						<umb-block-list-entry
+							.contentUdi=${layoutEntry.contentUdi}
+							.layout=${layoutEntry}
+							${umbDestroyOnDisconnect()}>
 						</umb-block-list-entry> `,
 			)}
 			<uui-button-group>

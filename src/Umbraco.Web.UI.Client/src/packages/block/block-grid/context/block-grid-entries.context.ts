@@ -89,6 +89,20 @@ export class UmbBlockGridEntriesContext
 		return this.#layoutColumns.getValue();
 	}
 
+	getMinAllowed() {
+		if (this.#areaKey) {
+			return this.#areaType?.minAllowed ?? 0;
+		}
+		return this._manager?.getMinAllowed() ?? 0;
+	}
+
+	getMaxAllowed() {
+		if (this.#areaKey) {
+			return this.#areaType?.maxAllowed ?? Infinity;
+		}
+		return this._manager?.getMaxAllowed() ?? Infinity;
+	}
+
 	getLayoutContainerElement() {
 		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container') as
 			| HTMLElement
@@ -131,7 +145,7 @@ export class UmbBlockGridEntriesContext
 					data: {
 						entityType: 'block',
 						preset: {},
-						originData: { areaKey: this.#areaKey, parentUnique: this.#parentUnique },
+						originData: { areaKey: this.#areaKey, parentUnique: this.#parentUnique, baseDataPath: this._dataPath },
 					},
 					modal: { size: 'medium' },
 				};
