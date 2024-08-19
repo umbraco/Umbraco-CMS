@@ -1,5 +1,5 @@
 import {test} from "@umbraco/playwright-testhelpers";
-import {expect, } from "@playwright/test";
+import {expect} from "@playwright/test";
 
 const blockGridEditorName = 'TestBlockGridEditor';
 const elementTypeName = 'BlockGridElement';
