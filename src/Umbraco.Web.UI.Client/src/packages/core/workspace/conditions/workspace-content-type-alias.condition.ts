@@ -36,7 +36,7 @@ export class UmbWorkspaceContentTypeAliasCondition
 				this.observe(
 					context.structure.contentTypeAliases,
 					(contentTypeAliases) => {
-						this.permitted = contentTypeAliases ? permissionCheck(contentTypeAliases) : false;
+						this.permitted = contentTypeAliases ? permissionCheck!(contentTypeAliases) : false;
 					},
 					ObserveSymbol,
 				);
