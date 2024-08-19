@@ -10,8 +10,11 @@ export interface UmbMemberTypeDetailModel extends UmbContentTypeModel {
 	entityType: UmbMemberTypeEntityType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMemberTypeAvailableCompositionRequestModel extends UmbContentTypeAvailableCompositionRequestModel {}
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMemberTypeCompositionCompatibleModel extends UmbContentTypeCompositionCompatibleModel {}
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMemberTypeCompositionReferenceModel extends UmbContentTypeCompositionReferenceModel {}
