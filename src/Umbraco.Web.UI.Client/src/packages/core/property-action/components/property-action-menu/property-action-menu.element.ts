@@ -10,6 +10,7 @@ import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffi
 /**
  *
  * @param manifest
+ * @returns
  */
 function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<MetaPropertyAction>] {
 	return [{ meta: manifest.meta }];

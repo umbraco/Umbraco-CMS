@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template that fetches data from the server
- * @export
  * @class UmbTemplateServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Creates an instance of UmbTemplateServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -113,6 +112,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Updates a Template on the server
 	 * @param {UmbTemplateDetailModel} Template
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbTemplateServerDataSource
 	 */

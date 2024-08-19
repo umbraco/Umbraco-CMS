@@ -29,6 +29,7 @@ export interface ManifestCurrentUserAction<MetaType extends MetaCurrentUserActio
 	meta: MetaType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaCurrentUserAction {}
 
 export interface ManifestCurrentUserActionDefaultKind<

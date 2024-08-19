@@ -10,7 +10,6 @@ import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-c
 
 /**
  * A data source that fetches the data-type collection data from the server.
- * @export
  * @class UmbDataTypeCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
@@ -20,7 +19,7 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Creates an instance of UmbDataTypeCollectionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @DataTypeof UmbDataTypeCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

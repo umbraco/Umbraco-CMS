@@ -7,7 +7,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Script folders that fetches data from the server
- * @export
  * @class UmbScriptFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates an instance of UmbScriptFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

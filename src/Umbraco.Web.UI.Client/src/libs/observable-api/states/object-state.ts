@@ -1,7 +1,6 @@
 import { UmbDeepState } from './deep-state.js';
 
 /**
- * @export
  * @class UmbObjectState
  * @augments {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.

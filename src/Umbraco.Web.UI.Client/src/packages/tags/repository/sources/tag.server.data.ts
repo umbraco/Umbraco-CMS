@@ -4,7 +4,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Tag that fetches data from the server
- * @export
  * @class UmbTagServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -13,7 +12,7 @@ export class UmbTagServerDataSource {
 
 	/**
 	 * Creates an instance of UmbTagServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbTagServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -22,6 +21,12 @@ export class UmbTagServerDataSource {
 
 	/**
 	 * Get a list of tags on the server
+	 * @param root0
+	 * @param root0.query
+	 * @param root0.skip
+	 * @param root0.take
+	 * @param root0.tagGroup
+	 * @param root0.culture
 	 * @returns {*}
 	 * @memberof UmbTagServerDataSource
 	 */

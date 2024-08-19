@@ -22,7 +22,11 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
 			onChange: () => {
-				condition.permitted ? this.enable() : this.disable();
+				if (condition.permitted) {
+					this.enable();
+				} else {
+					this.disable();
+				}
 			},
 		});
 	}

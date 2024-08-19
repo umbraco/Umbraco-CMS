@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for disabling users
- * @export
  * @class UmbDisableUserServerDataSource
  */
 export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource {
@@ -13,7 +12,7 @@ export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource 
 
 	/**
 	 * Creates an instance of UmbDisableUserServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDisableUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

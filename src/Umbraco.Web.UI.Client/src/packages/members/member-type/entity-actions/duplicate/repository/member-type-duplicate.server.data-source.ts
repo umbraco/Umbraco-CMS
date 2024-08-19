@@ -5,7 +5,6 @@ import type { UmbDuplicateDataSource, UmbDuplicateRequestArgs } from '@umbraco-c
 
 /**
  * Duplicate Document Server Data Source
- * @export
  * @class UmbDuplicateMemberTypeServerDataSource
  */
 export class UmbDuplicateMemberTypeServerDataSource implements UmbDuplicateDataSource {
@@ -13,7 +12,7 @@ export class UmbDuplicateMemberTypeServerDataSource implements UmbDuplicateDataS
 
 	/**
 	 * Creates an instance of UmbDuplicateMemberTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDuplicateMemberTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

@@ -3,7 +3,6 @@ import type { UmbWorkspaceContext } from '../../workspace/contexts/tokens/worksp
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 
-// TODO: Missing Extension API Interface:
 export interface ManifestWorkspace<
 	MetaType extends MetaWorkspace = MetaWorkspace,
 	ElementType extends UmbControllerHostElement = UmbControllerHostElement,
@@ -23,4 +22,5 @@ export interface ManifestWorkspaceRoutableKind
 	kind: 'routable';
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaWorkspaceRoutableKind extends MetaWorkspace {}

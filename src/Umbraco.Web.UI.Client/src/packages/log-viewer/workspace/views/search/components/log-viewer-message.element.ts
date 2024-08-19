@@ -43,7 +43,11 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('open')) {
-			this.open ? this.details.setAttribute('open', 'true') : this.details.removeAttribute('open');
+			if (this.open) {
+				this.details.setAttribute('open', 'true');
+			} else {
+				this.details.removeAttribute('open');
+			}
 		}
 	}
 

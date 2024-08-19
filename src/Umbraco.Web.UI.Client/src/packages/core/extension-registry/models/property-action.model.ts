@@ -11,6 +11,7 @@ export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = Me
 	meta: MetaType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaPropertyAction {}
 
 export interface ManifestPropertyActionDefaultKind<

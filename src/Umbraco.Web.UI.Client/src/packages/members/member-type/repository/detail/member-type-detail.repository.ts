@@ -6,14 +6,13 @@ import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for the Member Type detail
- * @export
  * @class UmbMemberTypeDetailRepository
  * @augments {UmbDetailRepositoryBase<UmbMemberTypeDetailModel>}
  */
 export class UmbMemberTypeDetailRepository extends UmbDetailRepositoryBase<UmbMemberTypeDetailModel> {
 	/**
 	 * Creates an instance of UmbMemberTypeDetailRepository.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeDetailRepository
 	 */
 	constructor(host: UmbControllerHost) {

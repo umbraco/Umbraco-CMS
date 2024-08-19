@@ -4,7 +4,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
-export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<any> {
+export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');

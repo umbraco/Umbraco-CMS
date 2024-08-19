@@ -6,7 +6,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A server data source for Language items
- * @export
  * @class UmbLanguageItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbLanguageItemServerDataSource extends UmbItemServerDataSourceBase
 > {
 	/**
 	 * Creates an instance of UmbLanguageItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

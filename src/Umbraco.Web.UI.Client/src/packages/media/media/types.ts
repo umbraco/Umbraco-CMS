@@ -20,6 +20,7 @@ export interface UmbMediaUrlInfoModel {
 	url: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMediaVariantModel extends UmbVariantModel {}
 
 export interface UmbMediaValueModel<ValueType = unknown> {
@@ -29,6 +30,7 @@ export interface UmbMediaValueModel<ValueType = unknown> {
 	value: ValueType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMediaVariantOptionModel extends UmbVariantOptionModel<UmbVariantModel> {}
 
 export type * from './property-editors/types.js';

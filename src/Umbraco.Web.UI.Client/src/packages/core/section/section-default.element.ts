@@ -21,7 +21,6 @@ import {
 import { aliasToPath } from '@umbraco-cms/backoffice/utils';
 
 /**
- * @export
  * @class UmbBaseSectionElement
  * @description - Element hosting sections and section navigation.
  */

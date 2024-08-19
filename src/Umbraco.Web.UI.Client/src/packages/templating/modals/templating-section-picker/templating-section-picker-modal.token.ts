@@ -1,5 +1,6 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbTemplatingSectionPickerModalData {}
 
 export type UmbTemplatingSectionPickerModalValue = {

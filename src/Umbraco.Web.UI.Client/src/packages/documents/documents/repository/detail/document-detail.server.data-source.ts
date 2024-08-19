@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document that fetches data from the server
- * @export
  * @class UmbDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -21,7 +20,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Creates an instance of UmbDocumentServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -30,6 +29,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Creates a new Document scaffold
+	 * @param preset
 	 * @returns { UmbDocumentDetailModel }
 	 * @memberof UmbDocumentServerDataSource
 	 */
@@ -129,6 +129,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	/**
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */

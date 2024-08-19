@@ -65,7 +65,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (this._loading) nothing;
+		if (this._loading) return nothing;
 		return html`
 			<div id="user-grid">
 				${repeat(

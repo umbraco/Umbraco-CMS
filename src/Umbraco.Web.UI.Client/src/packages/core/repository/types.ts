@@ -6,7 +6,9 @@ export interface UmbPagedModel<T> {
 	items: Array<T>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbRepositoryResponse<T> extends UmbDataSourceResponse<T> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbRepositoryErrorResponse extends UmbDataSourceErrorResponse {}
 
 export interface UmbRepositoryResponseWithAsObservable<T> extends UmbRepositoryResponse<T> {
