@@ -16,7 +16,6 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -65,10 +64,67 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         };
         Mock.Get(HttpContextAccessor).Setup(x => x.HttpContext).Returns(httpContext);
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        IPublishedContent value = (IPublishedContent)contentPickerPage.Value("contentPicker");
-        Assert.AreEqual(textPage.Key, value.Key);
-        Assert.AreEqual(textPage.Id, value.Id);
-        Assert.AreEqual(textPage.Name, value.Name);
+        IPublishedContent contentPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
+        Assert.AreEqual(textPage.Key, contentPickerValue.Key);
+        Assert.AreEqual(textPage.Id, contentPickerValue.Id);
+        Assert.AreEqual(textPage.Name, contentPickerValue.Name);
+        Assert.AreEqual("The title value", contentPickerValue.Properties.First(x => x.Alias == "title").GetValue());
+    }
+
+    [Test]
+    public async Task Can_Get_Value_From_Updated_ContentPicker()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var textPage = await CreateTextPageDocument(template.Id);
+        var contentPickerDocument = await CreateContentPickerDocument(template.Id, textPage.Key);
+
+        // Get for caching
+        var notUpdatedContent = await PublishedContentHybridCache.GetById(contentPickerDocument.Id);
+        
+        var httpContext = new DefaultHttpContext()
+        {
+            Request = { Path = "/", Host = new HostString("localhost", 80), Scheme = "https"},
+
+        };
+        Mock.Get(HttpContextAccessor).Setup(x => x.HttpContext).Returns(httpContext);
+        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        IPublishedContent contentPickerValue = (IPublishedContent)notUpdatedContent.Value("contentPicker");
+        Assert.AreEqual("The title value", contentPickerValue.Properties.First(x => x.Alias == "title").GetValue());
+
+        // Update content
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantName = "Root Create",
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = "Updated title" },
+                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
+            },
+        };
+
+        var updateResult = await ContentEditingService.UpdateAsync(textPage.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+
+        var publishResult = await ContentPublishingService.PublishAsync(
+            updateResult.Result.Content!.Key,
+            new CultureAndScheduleModel()
+            {
+                CulturesToPublishImmediately = new HashSet<string> {"*"},
+                Schedules = new ContentScheduleCollection(),
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(publishResult);
+
+        var contentPickerPage = await PublishedContentHybridCache.GetById(contentPickerDocument.Id);
+        IPublishedContent updatedPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
+
+   
+        Assert.AreEqual(textPage.Key, updatedPickerValue.Key);
+        Assert.AreEqual(textPage.Id, updatedPickerValue.Id);
+        Assert.AreEqual(textPage.Name, updatedPickerValue.Name);
+        Assert.AreEqual("Updated title", updatedPickerValue.Properties.First(x => x.Alias == "title").GetValue());
     }
 
     private async Task<IContent> CreateContentPickerDocument(int templateId, Guid textPageKey)
