@@ -1,29 +1,37 @@
 import type { UmbManifestViewerModalData, UmbManifestViewerModalValue } from './manifest-viewer-modal.token.js';
-import { css, html, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-
-// JSON parser for the manifest viewer modal
-// Enabling us to view JS code, but it is not optimal, but currently better than nothing [NL]
-// Ideally we should have a JS code stringify that can print the manifest as JS. [NL]
-function JsonParser(key: string, value: any) {
-	if (typeof value === 'function' && value !== null && value.toString) {
-		return Function.prototype.toString.call(value);
-	}
-	return value;
-}
 
 @customElement('umb-manifest-viewer-modal')
 export class UmbManifestViewerModalElement extends UmbModalBaseElement<
 	UmbManifestViewerModalData,
 	UmbManifestViewerModalValue
 > {
+	// Code adapted from https://stackoverflow.com/a/57668208/12787
+	// Licensed under the permissions of the CC BY-SA 4.0 DEED
+	#stringify(obj: any): string {
+		let output = '{';
+		for (const key in obj) {
+			let value = obj[key];
+			if (typeof value === 'function') {
+				value = value.toString();
+			} else if (value instanceof Array) {
+				value = JSON.stringify(value);
+			} else if (typeof value === 'object') {
+				value = this.#stringify(value);
+			} else {
+				value = `"${value}"`;
+			}
+			output += `\n  ${key}: ${value},`;
+		}
+		return output + '\n}';
+	}
+
 	override render() {
 		return html`
-			<umb-body-layout headline="${this.localize.term('general_manifest')}" main-no-padding>
+			<umb-body-layout headline=${this.localize.term('general_manifest')} main-no-padding>
 				${this.data
-					? html`<umb-code-block language="json" copy style="height:100%; border: none;"
-							>${JSON.stringify(this.data, JsonParser, 2)}</umb-code-block
-						>`
+					? html`<umb-code-block language="JSON" copy>${this.#stringify(this.data)}</umb-code-block>`
 					: nothing}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
@@ -32,7 +40,14 @@ export class UmbManifestViewerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static override styles = [css``];
+	static override styles = [
+		css`
+			umb-code-block {
+				border: none;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbManifestViewerModalElement;

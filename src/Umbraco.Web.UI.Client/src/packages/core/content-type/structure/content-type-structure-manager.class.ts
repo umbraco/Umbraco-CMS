@@ -112,12 +112,14 @@ export class UmbContentTypeStructureManager<
 		if (!contentType || !contentType.unique) throw new Error('Could not find the Content Type to save');
 
 		const { error, data } = await this.#repository.save(contentType);
-		if (error || !data) return { error, data };
+		if (error || !data) {
+			throw error?.message ?? 'Repository did not return data after save.';
+		}
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
-		return { error, data };
+		return data;
 	}
 
 	/**

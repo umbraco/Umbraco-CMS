@@ -22,6 +22,7 @@
 		"umbraco",
 		"Uncategorized",
 		"uninitialize",
+		"unprovide",
 		"variantable"
 	],
 	"exportall.config.folderListener": [],

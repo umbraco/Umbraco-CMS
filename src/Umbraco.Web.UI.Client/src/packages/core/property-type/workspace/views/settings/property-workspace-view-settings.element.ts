@@ -7,6 +7,7 @@ import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/cont
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-property-type-workspace-view-settings')
 export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -54,9 +55,13 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
-			this.observe(instance.data, (data) => {
-				this._data = data;
-			});
+			this.observe(
+				instance.data,
+				(data) => {
+					this._data = data;
+				},
+				'observeData',
+			);
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
@@ -176,27 +181,34 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		return html`
 			<uui-box class="uui-text">
 				<div class="container">
-					<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
-					<uui-input
-						id="name-input"
-						name="name"
-						label=${this.localize.term('placeholders_entername')}
-						placeholder=${this.localize.term('placeholders_entername')}
-						.value=${this._data?.name}
-						@input=${this.#onNameChange}
-						${umbFocus()}>
-						<!-- TODO: validation for bad characters -->
-					</uui-input>
-					<uui-input-lock
-						id="alias-input"
-						name="alias"
-						label=${this.localize.term('placeholders_enterAlias')}
-						placeholder=${this.localize.term('placeholders_enterAlias')}
-						.value=${this._data?.alias}
-						?locked=${this._aliasLocked}
-						@input=${this.#onAliasChange}
-						@lock-change=${this.#onToggleAliasLock}>
-					</uui-input-lock>
+					<uui-form-validation-message>
+						<uui-input
+							id="name-input"
+							name="name"
+							label=${this.localize.term('placeholders_entername')}
+							placeholder=${this.localize.term('placeholders_entername')}
+							.value=${this._data?.name}
+							@input=${this.#onNameChange}
+							required
+							${umbBindToValidation(this, '$.name')}
+							${umbFocus()}>
+							<!-- TODO: validation for bad characters -->
+						</uui-input>
+					</uui-form-validation-message>
+					<uui-form-validation-message>
+						<uui-input-lock
+							id="alias-input"
+							name="alias"
+							label=${this.localize.term('placeholders_enterAlias')}
+							placeholder=${this.localize.term('placeholders_enterAlias')}
+							.value=${this._data?.alias}
+							?locked=${this._aliasLocked}
+							required
+							${umbBindToValidation(this, '$.alias')}
+							@input=${this.#onAliasChange}
+							@lock-change=${this.#onToggleAliasLock}>
+						</uui-input-lock>
+					</uui-form-validation-message>
 					<uui-textarea
 						id="description-input"
 						name="description"
@@ -205,9 +217,13 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						placeholder=${this.localize.term('placeholders_enterDescription')}
 						.value=${this._data?.description}></uui-textarea>
 				</div>
-				<umb-data-type-flow-input
-					.value=${this._data?.dataType?.unique ?? ''}
-					@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
+				<uui-form-validation-message>
+					<umb-data-type-flow-input
+						.value=${this._data?.dataType?.unique ?? ''}
+						@change=${this.#onDataTypeIdChange}
+						required
+						${umbBindToValidation(this, '$.dataType.unique')}></umb-data-type-flow-input>
+				</uui-form-validation-message>
 				<hr />
 				<div class="container">
 					<b><umb-localize key="validation_validation">Validation</umb-localize></b>
@@ -426,14 +442,11 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			uui-input {
 				width: 100%;
 			}
-			#alias-lock {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
+			uui-input:focus-within {
+				z-index: 1;
 			}
-			#alias-lock uui-icon {
-				margin-bottom: 2px;
+			uui-input-lock:focus-within {
+				z-index: 1;
 			}
 			.container {
 				display: flex;

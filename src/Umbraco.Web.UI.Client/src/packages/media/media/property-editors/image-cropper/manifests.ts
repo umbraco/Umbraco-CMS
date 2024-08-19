@@ -9,7 +9,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Image Cropper',
 		icon: 'icon-crop',
-		group: 'pickers',
+		group: 'media',
 		propertyEditorSchemaAlias: 'Umbraco.ImageCropper',
 	},
 };

@@ -8,8 +8,8 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Code Editor',
 		propertyEditorSchemaAlias: 'Umbraco.Plain.String',
-		icon: 'icon-code',
-		group: 'common',
+		icon: 'icon-brackets',
+		group: 'richContent',
 		settings: {
 			properties: [
 				{

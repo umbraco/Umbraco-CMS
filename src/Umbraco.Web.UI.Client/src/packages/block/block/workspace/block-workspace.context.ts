@@ -47,11 +47,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
 	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
 
-	readonly content = new UmbBlockElementManager(this);
+	readonly content = new UmbBlockElementManager(this, 'contentData');
 
-	readonly settings = new UmbBlockElementManager(this);
+	readonly settings = new UmbBlockElementManager(this, 'settingsData');
 
-	// TODO: Get the name of the contentElementType..
+	// TODO: Get the name from the content element type. Or even better get the Label, but that has to be re-actively updated.
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
 
@@ -59,6 +59,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		this.addValidationContext(this.content.validation);
+		this.addValidationContext(this.settings.validation);
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;

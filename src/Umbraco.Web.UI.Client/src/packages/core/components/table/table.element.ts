@@ -204,7 +204,7 @@ export class UmbTableElement extends LitElement {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
 		return html`
-			<uui-table-head-cell style="--uui-table-cell-padding: 0">
+			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
 					this.config.allowSelection,
 					() =>
@@ -236,7 +236,7 @@ export class UmbTableElement extends LitElement {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
 		return html`
-			<uui-table-cell>
+			<uui-table-cell style="text-align: center;">
 				${when(!this.config.hideIcon, () => html`<umb-icon name="${ifDefined(item.icon ?? undefined)}"></umb-icon>`)}
 				${when(
 					this.config.allowSelection,
