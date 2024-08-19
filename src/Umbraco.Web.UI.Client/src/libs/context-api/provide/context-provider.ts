@@ -107,6 +107,6 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		// We want to call a destroy method on the instance, if it has one.
 		(this.#instance as any)?.destroy?.();
 		this.#instance = undefined;
-		(this.#eventTarget as any) = undefined;
+		(this.#eventTarget as unknown) = undefined;
 	}
 }

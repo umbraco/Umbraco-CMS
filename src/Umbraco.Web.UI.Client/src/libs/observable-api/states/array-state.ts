@@ -248,6 +248,6 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	override destroy() {
 		super.destroy();
 		this.#sortMethod = undefined;
-		(this.getUniqueMethod as any) = undefined;
+		(this.getUniqueMethod as unknown) = undefined;
 	}
 }

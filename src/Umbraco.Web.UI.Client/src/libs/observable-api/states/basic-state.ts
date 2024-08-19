@@ -54,7 +54,7 @@ export class UmbBasicState<T> {
 	 */
 	public destroy(): void {
 		this._subject?.complete();
-		(this._subject as any) = undefined;
+		(this._subject as unknown) = undefined;
 	}
 
 	/**

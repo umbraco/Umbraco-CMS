@@ -86,6 +86,6 @@ export class UmbExtensionsApiInitializer<
 	public override destroy(): void {
 		super.destroy();
 		this.#constructorArgs = undefined;
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 	}
 }
