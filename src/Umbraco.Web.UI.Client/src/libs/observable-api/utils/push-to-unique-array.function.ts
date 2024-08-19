@@ -1,5 +1,5 @@
 /**
-
+ 
  * @function pushToUniqueArray
  * @param {T[]} data - An array of objects.
  * @param {T} entry - The object to insert or replace with.

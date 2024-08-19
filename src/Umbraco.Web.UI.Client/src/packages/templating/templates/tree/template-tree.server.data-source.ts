@@ -12,7 +12,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Template tree that fetches data from the server
-
  * @class UmbTemplateTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */

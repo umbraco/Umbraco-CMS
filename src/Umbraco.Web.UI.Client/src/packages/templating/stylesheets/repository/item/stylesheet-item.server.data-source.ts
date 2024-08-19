@@ -8,7 +8,6 @@ import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api'
 
 /**
  * A data source for stylesheet items that fetches data from the server
-
  * @class UmbStylesheetItemServerDataSource
  * @implements {UmbItemDataSource}
  */

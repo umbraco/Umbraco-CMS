@@ -14,7 +14,6 @@ export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('Umb
 
 /**
  * Store for Packages
-
  * @augments {UmbStoreBase}
  */
 export class UmbPackageStore extends UmbStoreBase {

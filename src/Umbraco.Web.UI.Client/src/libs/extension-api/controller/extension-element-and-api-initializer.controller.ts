@@ -18,7 +18,6 @@ import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/b
  * ```ts
  * const controller = new UmbExtensionApiAndElementInitializer(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the element: ", ctrl.component) }));
  * ```
-
  * @class UmbExtensionElementAndApiInitializer
  */
 export class UmbExtensionElementAndApiInitializer<

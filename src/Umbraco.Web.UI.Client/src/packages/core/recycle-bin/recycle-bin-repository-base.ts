@@ -14,7 +14,6 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Base class for recycle bin repositories.
-
  * @abstract
  * @class UmbRecycleBinRepositoryBase
  * @augments {UmbRepositoryBase}

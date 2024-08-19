@@ -5,7 +5,6 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 
 /**
  * A server data source for Media Urls
-
  * @class UmbMediaUrlServerDataSource
  * @implements {DocumentTreeDataSource}
  */

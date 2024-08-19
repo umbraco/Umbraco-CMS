@@ -5,7 +5,6 @@ import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backo
 
 /**
  * Move DocumentBlueprint Server Data Source
-
  * @class UmbMoveDocumentBlueprintServerDataSource
  */
 export class UmbMoveDocumentBlueprintServerDataSource implements UmbMoveDataSource {

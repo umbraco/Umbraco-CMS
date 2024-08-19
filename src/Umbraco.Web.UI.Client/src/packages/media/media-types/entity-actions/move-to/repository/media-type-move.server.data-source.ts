@@ -5,7 +5,6 @@ import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backo
 
 /**
  * Move Media Type Server Data Source
-
  * @class UmbMoveMediaTypeServerDataSource
  */
 export class UmbMoveMediaTypeServerDataSource implements UmbMoveDataSource {

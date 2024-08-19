@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for enabling users
-
  * @class UmbEnableUserServerDataSource
  */
 export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {

@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Server data source for the Media audit log
-
  * @class UmbAuditLogServerDataSource
  */
 export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<UmbMediaAuditLogModel> {

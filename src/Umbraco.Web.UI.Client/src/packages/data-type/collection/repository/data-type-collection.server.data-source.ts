@@ -10,7 +10,6 @@ import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-c
 
 /**
  * A data source that fetches the data-type collection data from the server.
-
  * @class UmbDataTypeCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */

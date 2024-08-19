@@ -9,7 +9,6 @@ export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType 
 
 /**
  * A data source base for items that fetches items from the server
-
  * @class UmbItemServerDataSourceBase
  * @implements {DocumentTreeDataSource}
  */

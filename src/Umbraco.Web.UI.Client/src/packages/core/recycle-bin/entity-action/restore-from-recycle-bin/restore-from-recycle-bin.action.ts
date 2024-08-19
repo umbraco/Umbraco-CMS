@@ -7,7 +7,6 @@ import type { MetaEntityActionRestoreFromRecycleBinKind } from '@umbraco-cms/bac
 
 /**
  * Entity action for restoring an item from the recycle bin.
-
  * @class UmbRestoreFromRecycleBinEntityAction
  * @augments {UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind>}
  */

@@ -7,7 +7,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Stylesheet folders that fetches data from the server
-
  * @class UmbStylesheetFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

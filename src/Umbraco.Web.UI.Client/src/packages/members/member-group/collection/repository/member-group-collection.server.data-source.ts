@@ -9,7 +9,6 @@ import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api
 
 /**
  * A data source that fetches the member collection data from the server.
-
  * @class UmbMemberGroupCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */

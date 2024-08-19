@@ -1,7 +1,6 @@
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 /**
  * This component is used to display a single slice of a donut chart. It only makes sense insice the donut chart
-
  * @class UmbDonutSliceElement
  * @fires slice-update - This event is fired when the slice is updated
  * @augments {LitElement}

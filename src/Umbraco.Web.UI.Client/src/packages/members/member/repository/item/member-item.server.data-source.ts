@@ -7,7 +7,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A server data source for Member items
-
  * @class UmbMemberItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */

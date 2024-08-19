@@ -12,7 +12,6 @@ import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '
 
 /**
  * A data source for a data type tree that fetches data from the server
-
  * @class UmbDocumentBlueprintTreeServerDataSource
  * @implements {DocumentTreeDataSource}
  */

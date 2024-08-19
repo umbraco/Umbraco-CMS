@@ -4,7 +4,7 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
-
+ 
  * @class UmbMediaTypeStore
  * @augments {UmbDetailStoreBase}
  * @description - Data Store for Media Types

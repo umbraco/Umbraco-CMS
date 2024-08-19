@@ -3,7 +3,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
-
+ 
  * @class UmbDataTypeTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for Data Types

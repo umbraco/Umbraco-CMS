@@ -19,7 +19,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Static File tree that fetches data from the server
-
  * @class UmbStaticFileTreeServerDataSource
  * @implements {UmbTreeServerDataSourceBase}
  */

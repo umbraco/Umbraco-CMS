@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Media items that fetches data from the server
-
  * @class UmbMediaItemServerDataSource
  * @implements {MediaTreeDataSource}
  */

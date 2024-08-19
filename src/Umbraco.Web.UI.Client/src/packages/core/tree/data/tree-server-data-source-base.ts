@@ -24,7 +24,6 @@ export interface UmbTreeServerDataSourceBaseArgs<
 
 /**
  * A data source for a tree that fetches data from the server
-
  * @class UmbTreeServerDataSourceBase
  * @implements {UmbTreeDataSource}
  */

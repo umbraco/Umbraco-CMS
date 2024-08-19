@@ -6,7 +6,6 @@ import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for fetching member group details.
-
  * @class UmbMemberGroupDetailRepository
  * @augments {UmbDetailRepositoryBase<UmbMemberGroupDetailModel>}
  */

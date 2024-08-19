@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for unlocking users
-
  * @class UmbUnlockUserServerDataSource
  */
 export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {

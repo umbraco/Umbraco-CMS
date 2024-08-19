@@ -3,7 +3,7 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
-
+ 
  * @class UmbMediaReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

@@ -8,7 +8,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the relation collection data from the server.
-
  * @class UmbRelationCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */

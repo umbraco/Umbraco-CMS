@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: remove Unique from name when we have switched to uniques
 /**
-
+ 
  * @class UmbUniqueTreeStore
  * @augments {UmbStoreBase}
  * @description - Entity Tree Store

@@ -4,7 +4,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Export Document Server Data Source
-
  * @class UmbExportDocumentTypeServerDataSource
  */
 export class UmbExportDocumentTypeServerDataSource {

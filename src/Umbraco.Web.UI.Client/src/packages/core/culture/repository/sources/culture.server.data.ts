@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Language that fetches data from the server
-
  * @class UmbLanguageServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

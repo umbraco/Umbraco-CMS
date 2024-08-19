@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Dictionary that fetches data from the server
-
  * @class UmbDictionaryServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

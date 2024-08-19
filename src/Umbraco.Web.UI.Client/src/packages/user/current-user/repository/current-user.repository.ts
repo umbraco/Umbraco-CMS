@@ -5,7 +5,6 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for the current user
-
  * @class UmbCurrentUserRepository
  * @augments {UmbRepositoryBase}
  */

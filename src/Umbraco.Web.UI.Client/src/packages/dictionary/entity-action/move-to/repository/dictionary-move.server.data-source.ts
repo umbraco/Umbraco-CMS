@@ -5,7 +5,6 @@ import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backo
 
 /**
  * Move Dictionary Server Data Source
-
  * @class UmbMoveDictionaryServerDataSource
  */
 export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {

@@ -4,7 +4,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Data Type items that fetches data from the server
-
  * @class UmbUserSetGroupsServerDataSource
  */
 export class UmbUserSetGroupsServerDataSource {

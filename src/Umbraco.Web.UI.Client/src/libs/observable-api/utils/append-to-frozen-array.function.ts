@@ -1,5 +1,5 @@
 /**
-
+ 
  * @function appendToFrozenArray
  * @param {Array<T>} source - An Array which is frozen and should be updated.
  * @param data

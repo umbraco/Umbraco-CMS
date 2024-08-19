@@ -5,7 +5,6 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
 
 /**
  * Manages the selection of items.
-
  * @class UmbSelectionManager
  */
 export class UmbSelectionManager<ValueType extends string | null = string | null> extends UmbControllerBase {

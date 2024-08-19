@@ -10,7 +10,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the log saved searches
-
  * @class UmbLogSearchesServerDataSource
  * @implements {TemplateDetailDataSource}
  */
@@ -69,7 +68,6 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 }
 /**
  * A data source for the log messages and levels
-
  * @class UmbLogMessagesServerDataSource
  * @implements {LogMessagesDataSource}
  */

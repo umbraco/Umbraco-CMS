@@ -6,7 +6,7 @@ import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  *
-
+ 
  * @class UmbMediaTypeStructureServerDataSource
  * @augments {UmbContentTypeStructureServerDataSourceBase}
  */

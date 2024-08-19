@@ -1,7 +1,7 @@
 import { jsonStringComparison } from './json-string-comparison.function.js';
 
 /**
-
+ 
  * @function defaultMemoization
  * @param {any} previousValue - The previous value to compare.
  * @param {any} currentValue - The current value to compare.

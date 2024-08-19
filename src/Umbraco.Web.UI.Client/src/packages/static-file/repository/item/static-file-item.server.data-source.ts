@@ -7,7 +7,6 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 
 /**
  * A server data source for Static File items
-
  * @class UmbStaticFileItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */

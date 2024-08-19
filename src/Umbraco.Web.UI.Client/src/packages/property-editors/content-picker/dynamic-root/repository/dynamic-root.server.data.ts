@@ -5,7 +5,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * UmbContentPickerDynamicRootServerDataSource
-
  * @class UmbContentPickerDynamicRootServerDataSource
  */
 export class UmbContentPickerDynamicRootServerDataSource {

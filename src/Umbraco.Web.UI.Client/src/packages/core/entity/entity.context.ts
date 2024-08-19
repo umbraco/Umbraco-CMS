@@ -5,7 +5,6 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Provides the entity context
-
  * @class UmbEntityContext
  * @augments {UmbContextBase<UmbEntityContext>}
  */

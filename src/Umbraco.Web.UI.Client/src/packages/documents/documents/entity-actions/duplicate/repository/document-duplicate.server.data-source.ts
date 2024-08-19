@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Duplicate Document Server Data Source
-
  * @class UmbDuplicateDocumentServerDataSource
  */
 export class UmbDuplicateDocumentServerDataSource {

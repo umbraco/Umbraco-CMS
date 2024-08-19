@@ -12,7 +12,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document that fetches data from the server
-
  * @class UmbDocumentBlueprintServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

@@ -28,7 +28,6 @@ interface CircleWithCommands extends Circle {
 //TODO: maybe move to UI Library
 /**
  * This is a donut chart component that can be used to display data in a circular way.
-
  * @class UmbDonutChartElement
  * @augments {LitElement}
  */

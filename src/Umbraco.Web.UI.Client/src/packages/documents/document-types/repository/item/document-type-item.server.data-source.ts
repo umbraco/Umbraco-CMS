@@ -7,7 +7,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for Document Type items that fetches data from the server
-
  * @class UmbDocumentTypeItemServerDataSource
  * @augments {UmbItemServerDataSourceBase<DocumentTypeItemResponseModel, UmbDocumentTypeItemModel>}
  */

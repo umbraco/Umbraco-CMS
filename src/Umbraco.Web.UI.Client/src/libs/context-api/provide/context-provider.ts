@@ -4,7 +4,7 @@ import { UMB_CONTENT_REQUEST_EVENT_TYPE, UMB_DEBUG_CONTEXT_EVENT_TYPE } from '..
 import { UmbContextProvideEventImplementation } from './context-provide.event.js';
 
 /**
-
+ 
  * @class UmbContextProvider
  */
 export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType = BaseType> {

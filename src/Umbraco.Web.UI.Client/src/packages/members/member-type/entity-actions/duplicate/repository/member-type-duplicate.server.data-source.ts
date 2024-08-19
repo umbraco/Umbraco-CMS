@@ -5,7 +5,6 @@ import type { UmbDuplicateDataSource, UmbDuplicateRequestArgs } from '@umbraco-c
 
 /**
  * Duplicate Document Server Data Source
-
  * @class UmbDuplicateMemberTypeServerDataSource
  */
 export class UmbDuplicateMemberTypeServerDataSource implements UmbDuplicateDataSource {

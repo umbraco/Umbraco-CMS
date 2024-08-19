@@ -4,7 +4,6 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A repository for uploading temporary files
-
  * @class UmbTemporaryFileRepository
  * @augments {UmbRepositoryBase}
  */

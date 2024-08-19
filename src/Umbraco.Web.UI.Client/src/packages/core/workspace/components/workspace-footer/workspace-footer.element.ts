@@ -24,7 +24,6 @@ function ExtensionApiArgsMethod(
  * @description Uses the alias to insert extensions that targets this workspace-alias.
  * @slot - Slot for workspace footer items
  * @slot actions - Slot for workspace actions
-
  * @class UmbWorkspaceFooterLayout
  * @augments {UmbLitElement}
  */

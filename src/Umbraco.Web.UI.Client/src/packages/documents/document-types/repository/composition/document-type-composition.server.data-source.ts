@@ -13,7 +13,6 @@ import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffic
 
 /**
  * A data source for the Document Type Composition that fetches data from the server
-
  * @class UmbDocumentTypeCompositionServerDataSource
  */
 export class UmbDocumentTypeCompositionServerDataSource

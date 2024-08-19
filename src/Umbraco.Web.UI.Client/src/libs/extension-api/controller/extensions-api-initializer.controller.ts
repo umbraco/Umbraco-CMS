@@ -20,7 +20,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 TODO: Correct this, start using builder pattern:
  * const controller = new UmbExtensionsApiInitializer(host, extensionRegistry, type, ['constructor argument 1', 'constructor argument '], filter?, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
  * ```
-
  * @class UmbExtensionsApiInitializer
  */
 export class UmbExtensionsApiInitializer<

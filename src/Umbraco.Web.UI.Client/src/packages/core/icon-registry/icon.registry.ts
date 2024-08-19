@@ -3,7 +3,7 @@ import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { type UUIIconHost, UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
 
 /**
-
+ 
  * @class UmbIconRegistry
  * @augments {UUIIconRegistry}
  * @description - Icon Registry. Provides icons from the icon manifest. Icons are loaded on demand. All icons are prefixed with 'icon-'

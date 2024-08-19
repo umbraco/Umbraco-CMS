@@ -3,7 +3,7 @@ import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
-
+ 
  * @class UmbDataTypeReferenceServerDataSource
  * @implements {RepositoryDetailDataSource}
  */

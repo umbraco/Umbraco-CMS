@@ -8,7 +8,7 @@ export interface UmbClassStateData {
 }
 
 /**
-
+ 
  * @class UmbClassState
  * @augments {UmbBasicState<T>}
  * @description - This state can hold class instance which has a equal method to compare in coming instances for changes.
@@ -19,7 +19,7 @@ export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbB
 	}
 
 	/**
-
+	 
 	 * @function createObservablePart
 	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
 	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.

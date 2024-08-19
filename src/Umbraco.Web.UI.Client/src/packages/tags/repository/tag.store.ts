@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export const UMB_TAG_STORE_CONTEXT = new UmbContextToken<UmbTagStore>('UmbTagStore');
 /**
-
+ 
  * @class UmbTagStore
  * @augments {UmbStoreBase}
  * @description - Data Store for Template Details
