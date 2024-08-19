@@ -71,6 +71,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	 * Allows the user to pick a media type option if multiple types are allowed.
 	 * @param files
 	 * @param parentUnique
+	 * @returns Promise<void>
 	 */
 	public async createFilesAsMedia(files: Array<File>, parentUnique: string | null) {
 		if (!files.length) return;
@@ -118,11 +119,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		}
 
 		notAllowedFiles.forEach((file) => {
-			try {
-				throw new Error(`File ${file.name} of type ${file.type} is not allowed here.`);
-			} catch (e) {
-				undefined;
-			}
+			// TODO: It seems like some implementation(user feedback) is missing here? [NL]
+			console.error(`File ${file.name} of type ${file.type} is not allowed here.`);
 		});
 
 		if (!uploadableFiles.length) return;

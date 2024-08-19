@@ -7,7 +7,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for Media Type items that fetches data from the server
- * @export
  * @class UmbMediaTypeItemServerDataSource
  * @implements {UmbItemDataSource}
  */
@@ -17,7 +16,7 @@ export class UmbMediaTypeItemServerDataSource extends UmbItemServerDataSourceBas
 > {
 	/**
 	 * Creates an instance of UmbMediaTypeItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

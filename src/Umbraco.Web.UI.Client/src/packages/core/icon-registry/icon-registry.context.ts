@@ -30,12 +30,12 @@ export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContex
 				if (this.#manifestMap.has(manifest.alias)) return;
 				this.#manifestMap.set(manifest.alias, manifest);
 				// TODO: Should we unInit a entry point if is removed?
-				this.instantiateEntryPoint(manifest);
+				this.instantiateIcons(manifest);
 			});
 		});
 	}
 
-	async instantiateEntryPoint(manifest: ManifestIcons) {
+	async instantiateIcons(manifest: ManifestIcons) {
 		if (manifest.js) {
 			const js = await loadManifestPlainJs<{ default?: any }>(manifest.js);
 			if (!js || !js.default || !Array.isArray(js.default)) {

@@ -1,18 +1,23 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { type PropertyValueMap, css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-with-alias')
-export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof UmbLitElement>(UmbLitElement) {
+export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+) {
 	@property({ type: String })
 	label: string = '';
 
 	@property({ type: String, reflect: false })
 	alias?: string;
+
+	@property({ type: Boolean, reflect: true })
+	required: boolean = false;
 
 	@property({ type: Boolean, reflect: true, attribute: 'alias-readonly' })
 	aliasReadonly = false;
@@ -23,7 +28,15 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@state()
 	private _aliasLocked = true;
 
-	override firstUpdated() {
+	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this.addValidator(
+			'valueMissing',
+			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => this.required && !this.value,
+		);
+
 		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
 	}
 
@@ -64,6 +77,13 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
+	#onAliasBlur() {
+		// If the alias is empty, then try to generate one [NL]
+		if (!this.alias && this._aliasLocked === false) {
+			this.alias = generateAlias(this.value ?? '');
+			this.dispatchEvent(new UmbChangeEvent());
+		}
+	}
 
 	#onToggleAliasLock(event: CustomEvent) {
 		this._aliasLocked = !this._aliasLocked;
@@ -82,7 +102,8 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				placeholder=${nameLabel}
 				label=${nameLabel}
 				.value=${this.value}
-				@input=${this.#onNameChange}>
+				@input=${this.#onNameChange}
+				?required=${this.required}>
 				<uui-input-lock
 					auto-width
 					name="alias"
@@ -92,7 +113,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 					.value=${this.alias}
 					?locked=${this._aliasLocked && !this.aliasReadonly}
 					?readonly=${this.aliasReadonly}
+					?required=${this.required}
 					@input=${this.#onAliasChange}
+					@blur=${this.#onAliasBlur}
 					@lock-change=${this.#onToggleAliasLock}>
 				</uui-input-lock>
 			</uui-input>

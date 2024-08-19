@@ -49,6 +49,6 @@ export class UmbExtensionsManifestInitializer<
 
 	public override destroy(): void {
 		super.destroy();
-		(this.#extensionRegistry as any) = undefined;
+		(this.#extensionRegistry as unknown) = undefined;
 	}
 }

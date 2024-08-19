@@ -13,6 +13,17 @@ import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
+import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+
+type UmbDocumentVariantOption = {
+	culture: string | null;
+	segment: string | null;
+	title: string;
+	displayName: string;
+	state: DocumentVariantStateModel;
+};
+
+type UmbDocumentVariantOptions = Array<UmbDocumentVariantOption>;
 
 const elementName = 'umb-workspace-split-view-variant-selector';
 @customElement(elementName)
@@ -41,6 +52,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 
 	@state()
 	private _activeVariant?: UmbDocumentVariantOptionModel;
+
+	@state()
+	private _variantId?: UmbVariantId;
+
+	@state()
+	private _variantDisplayName = '';
+
+	@state()
+	private _variantTitleName = '';
 
 	@state()
 	private _variantSelectorOpen = false;
@@ -131,6 +151,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		if (!workspaceContext) return;
 
 		const variantId = this.#datasetContext.getVariantId();
+		this._variantId = this.#datasetContext.getVariantId();
+		// Find the variant option matching this, to get the language name...
+
+		const culture = this._variantId.culture;
+		const segment = this._variantId.segment;
 
 		this.observe(
 			workspaceContext.variantOptions,
@@ -213,12 +238,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
+		return this._variantId
+			? html`
 			<uui-input
 				id="name-input"
 				label=${this.localize.term('placeholders_entername')}
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
+				required
+				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${umbFocus()}
 			>
 				${
@@ -264,7 +292,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 					: nothing
 			}
 		</div>
-		`;
+		`
+			: nothing;
 	}
 
 	#renderListItem(variantOption: UmbDocumentVariantOptionModel) {

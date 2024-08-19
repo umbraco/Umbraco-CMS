@@ -203,7 +203,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
- * @export
+ 
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
@@ -375,7 +375,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				: this.#containerElement;
 
 			containerElement.removeEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
-			(this.#containerElement as any) = undefined;
+			(this.#containerElement as unknown) = undefined;
 		}
 	}
 

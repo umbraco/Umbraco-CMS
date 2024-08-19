@@ -9,7 +9,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 /**
  * Entity action for trashing an item.
- * @export
  * @class UmbTrashEntityAction
  * @augments {UmbEntityActionBase<MetaEntityActionTrashKind>}
  */

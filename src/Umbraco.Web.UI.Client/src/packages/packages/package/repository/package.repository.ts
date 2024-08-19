@@ -10,7 +10,7 @@ import type { UmbApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api
 
 /**
  * A repository for Packages which mimics a tree store.
- * @export
+ 
  */
 export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<void>;

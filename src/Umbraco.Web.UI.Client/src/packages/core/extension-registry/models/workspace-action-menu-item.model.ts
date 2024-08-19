@@ -20,6 +20,7 @@ export interface ManifestWorkspaceActionMenuItem<
 	meta: MetaType;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaWorkspaceActionMenuItem {}
 
 export interface ManifestWorkspaceActionMenuItemDefaultKind<

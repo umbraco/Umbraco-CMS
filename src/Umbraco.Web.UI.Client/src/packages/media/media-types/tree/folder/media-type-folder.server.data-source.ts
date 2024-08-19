@@ -5,7 +5,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for a Media Type folder that fetches data from the server
- * @export
  * @class UmbMediaTypeFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -14,7 +13,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates an instance of UmbMediaTypeFolderServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

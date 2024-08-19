@@ -14,7 +14,6 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Base class for recycle bin repositories.
- * @export
  * @abstract
  * @class UmbRecycleBinRepositoryBase
  * @augments {UmbRepositoryBase}
@@ -25,7 +24,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Creates an instance of UmbRecycleBinRepositoryBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @param {UmbRecycleBinDataSourceConstructor} recycleBinSource
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */

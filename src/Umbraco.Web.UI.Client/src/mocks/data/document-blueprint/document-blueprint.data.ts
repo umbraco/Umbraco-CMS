@@ -1,6 +1,7 @@
 import type { UmbMockDocumentModel } from '../document/document.data.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMockDocumentBlueprintModel extends UmbMockDocumentModel {}
 
 export const data: Array<UmbMockDocumentBlueprintModel> = [

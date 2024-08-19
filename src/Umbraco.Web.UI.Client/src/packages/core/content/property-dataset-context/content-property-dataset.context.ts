@@ -132,16 +132,12 @@ export class UmbContentPropertyDatasetContext<
 	/**
 	 * @function setPropertyValueByVariant
 	 * @param {string} propertyAlias
-	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @param {UmbVariantId} propertyVariantId - The variant id for the value to be set for.
 	 * @returns {Promise<unknown>}
 	 * @description Get the value of this property.
 	 */
-	setPropertyValueByVariant(
-		propertyAlias: string,
-		value: PromiseLike<unknown>,
-		propertyVariantId: UmbVariantId,
-	): Promise<void> {
+	setPropertyValueByVariant(propertyAlias: string, value: unknown, propertyVariantId: UmbVariantId): Promise<void> {
 		return this.#workspace.setPropertyValue(propertyAlias, value, propertyVariantId);
 	}
 

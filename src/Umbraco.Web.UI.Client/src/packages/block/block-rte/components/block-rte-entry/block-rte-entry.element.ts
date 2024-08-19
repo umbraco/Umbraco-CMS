@@ -11,8 +11,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../ref-rte-block/index.js';
 
 /**
- * @element umb-rte-block
- * @element umb-rte-block-inline
+ * @class UmbBlockRteEntryElement
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {

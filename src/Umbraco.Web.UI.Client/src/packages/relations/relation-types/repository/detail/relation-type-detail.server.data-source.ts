@@ -7,7 +7,6 @@ import type { UmbReadDetailDataSource } from '@umbraco-cms/backoffice/repository
 
 /**
  * A data source for the Relation Type that fetches data from the server
- * @export
  * @class UmbRelationTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataS
 
 	/**
 	 * Creates an instance of UmbRelationTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

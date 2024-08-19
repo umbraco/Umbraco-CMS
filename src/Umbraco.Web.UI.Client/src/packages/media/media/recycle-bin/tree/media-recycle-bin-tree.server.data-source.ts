@@ -12,7 +12,6 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Media Recycle Bin tree that fetches data from the server
- * @export
  * @class UmbMediaRecycleBinTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbMediaRecycleBinTreeServerDataSource extends UmbTreeServerDataSou
 > {
 	/**
 	 * Creates an instance of UmbMediaRecycleBinTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaRecycleBinTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

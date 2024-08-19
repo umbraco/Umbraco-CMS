@@ -8,7 +8,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the MemberType tree that fetches data from the server
- * @export
  * @class UmbMemberTypeTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbMemberTypeTreeServerDataSource extends UmbTreeServerDataSourceBa
 > {
 	/**
 	 * Creates an instance of UmbMemberTypeTreeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

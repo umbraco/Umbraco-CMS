@@ -1,4 +1,3 @@
-import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
@@ -65,7 +64,11 @@ export class UmbDefaultTreeContext<
 	#initialized = false;
 
 	#init = new Promise<void>((resolve) => {
-		this.#initialized ? resolve() : (this.#initResolver = resolve);
+		if (this.#initialized) {
+			resolve();
+		} else {
+			this.#initResolver = resolve;
+		}
 	});
 
 	constructor(host: UmbControllerHost) {
@@ -146,6 +149,7 @@ export class UmbDefaultTreeContext<
 	/**
 	 * Reloads the tree
 	 * @memberof UmbDefaultTreeContext
+	 * @returns {void}
 	 */
 	public loadMore = () => this.#debouncedLoadTree(true);
 
@@ -216,7 +220,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the hideTreeRoot config
-	 * @param {boolean} hideTreeRoot
+	 * @param {boolean} hideTreeRoot - Whether to hide the tree root
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setHideTreeRoot(hideTreeRoot: boolean) {
@@ -249,7 +253,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the startNode config
-	 * @returns {UmbTreeStartNode}
+	 * @returns {UmbTreeStartNode} - The start node
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getStartNode() {
@@ -258,7 +262,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the foldersOnly config
-	 * @param {boolean} foldersOnly
+	 * @param {boolean} foldersOnly - Whether to show only folders
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setFoldersOnly(foldersOnly: boolean) {
@@ -270,7 +274,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the foldersOnly config
-	 * @returns {boolean}
+	 * @returns {boolean} - Whether to show only folders
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getFoldersOnly() {
@@ -302,7 +306,7 @@ export class UmbDefaultTreeContext<
 			this.#actionEventContext = instance;
 
 			this.#actionEventContext.removeEventListener(
-				UmbRequestReloadTreeItemChildrenEvent.TYPE,
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -312,7 +316,7 @@ export class UmbDefaultTreeContext<
 			);
 
 			this.#actionEventContext.addEventListener(
-				UmbRequestReloadTreeItemChildrenEvent.TYPE,
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -355,7 +359,7 @@ export class UmbDefaultTreeContext<
 
 	override destroy(): void {
 		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadTreeItemChildrenEvent.TYPE,
+			UmbRequestReloadChildrenOfEntityEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
 

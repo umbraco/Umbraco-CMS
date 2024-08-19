@@ -4,7 +4,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Webhook that fetches data from the server
- * @export
  * @class UmbWebhookEventServerDataSource
  * @implements {RepositoryEventDataSource}
  */
@@ -13,7 +12,7 @@ export class UmbWebhookEventServerDataSource {
 
 	/**
 	 * Creates an instance of UmbWebhookEventServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbWebhookEventServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

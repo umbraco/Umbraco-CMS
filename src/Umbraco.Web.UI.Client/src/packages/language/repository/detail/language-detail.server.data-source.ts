@@ -11,7 +11,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Language that fetches data from the server
- * @export
  * @class UmbLanguageServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -20,7 +19,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Creates an instance of UmbLanguageServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -113,6 +112,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Updates a Language on the server
 	 * @param {UmbLanguageDetailModel} Language
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */

@@ -230,6 +230,13 @@ export class UmbMemberWorkspaceContext
 		return this.structure.propertyStructureById(propertyId);
 	}
 
+	/**
+	 * @function propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @param {UmbVariantId} variantId
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
+	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#currentData.asObservablePart(
 			(data) =>

@@ -40,11 +40,10 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	}
 
 	/**
-	 * Gets the value of a property.
-	 * @template ReturnType
+	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias
-	 * @returns {*}
-	 * @memberof UmbBlockGridInlinePropertyDatasetContext
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		// TODO: Investigate how I do that with the workspaces..
@@ -52,11 +51,11 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	}
 
 	/**
-	 * Sets the value of a property.
+	 * @function setPropertyValue
 	 * @param {string} propertyAlias
-	 * @param {unknown} value
-	 * @returns {*}
-	 * @memberof UmbBlockGridInlinePropertyDatasetContext
+	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		// TODO: Investigate how I do that with the workspaces..

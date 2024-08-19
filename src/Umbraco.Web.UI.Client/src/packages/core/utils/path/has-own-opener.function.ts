@@ -27,7 +27,7 @@ export function hasOwnOpener(pathname?: string, windowLike: Window = globalThis.
 		}
 
 		return true;
-	} catch (e) {
+	} catch {
 		// If there is a security error, it means that the opener is from a different origin, so we let it fall through
 		return false;
 	}

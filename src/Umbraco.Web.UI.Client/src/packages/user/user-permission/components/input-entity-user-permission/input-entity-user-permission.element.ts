@@ -53,7 +53,11 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 	#onChangeUserPermission(event: UmbChangeEvent, permissionVerbs: Array<string>) {
 		event.stopPropagation();
 		const target = event.target as UmbUserPermissionVerbElement;
-		target.allowed ? this.#addUserPermission(permissionVerbs) : this.#removeUserPermission(permissionVerbs);
+		if (target.allowed) {
+			this.#addUserPermission(permissionVerbs);
+		} else {
+			this.#removeUserPermission(permissionVerbs);
+		}
 	}
 
 	#addUserPermission(permissionVerbs: Array<string>) {

@@ -13,7 +13,6 @@ import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-
 
 /**
  * A data source for the Media Type that fetches data from the server
- * @export
  * @class UmbMediaTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -22,7 +21,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 	/**
 	 * Creates an instance of UmbMediaTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -130,6 +129,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Inserts a new Media Type on the server
 	 * @param {UmbMediaTypeDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
@@ -197,6 +197,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	/**
 	 * Updates a MediaType on the server
 	 * @param {UmbMediaTypeDetailModel} MediaType
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */

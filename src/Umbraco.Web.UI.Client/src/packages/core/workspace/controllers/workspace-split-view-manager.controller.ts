@@ -8,7 +8,6 @@ export type ActiveVariant = {
 };
 
 /**
- * @export
  * @class UmbWorkspaceSplitViewManager
  * @description - Class managing the split view state for a workspace context.
  */

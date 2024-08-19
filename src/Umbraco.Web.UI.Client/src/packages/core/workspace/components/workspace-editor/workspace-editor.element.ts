@@ -15,11 +15,9 @@ import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from 
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
  * @slot - slot for main content
- * @export
  * @class UmbWorkspaceEditor
  * @augments {UmbLitElement}
  */
-// TODO: This element has a bug in the tabs. After the url changes - for example a new entity/file is chosen in the tree and loaded to the workspace the links in the tabs still point to the previous url and therefore views do not change correctly
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()

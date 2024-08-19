@@ -133,7 +133,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		try {
 			const value = await this.#entityUserPermissionModalContext?.onSubmit();
 			return value?.allowedVerbs;
-		} catch (error) {
+		} catch {
 			throw new Error();
 		}
 	}

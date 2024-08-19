@@ -9,7 +9,6 @@ export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType 
 
 /**
  * A data source base for items that fetches items from the server
- * @export
  * @class UmbItemServerDataSourceBase
  * @implements {DocumentTreeDataSource}
  */
@@ -22,7 +21,8 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 
 	/**
 	 * Creates an instance of UmbItemServerDataSourceBase.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
+	 * @param args
 	 * @memberof UmbItemServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost, args: UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType>) {

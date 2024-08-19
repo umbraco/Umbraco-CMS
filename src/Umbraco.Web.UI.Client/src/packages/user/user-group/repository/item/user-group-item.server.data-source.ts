@@ -6,7 +6,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A server data source for User Group items
- * @export
  * @class UmbUserGroupItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -16,7 +15,7 @@ export class UmbUserGroupItemServerDataSource extends UmbItemServerDataSourceBas
 > {
 	/**
 	 * Creates an instance of UmbUserGroupItemServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbUserGroupItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

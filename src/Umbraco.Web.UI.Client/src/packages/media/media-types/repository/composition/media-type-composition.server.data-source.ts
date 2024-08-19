@@ -10,7 +10,6 @@ import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffic
 
 /**
  * A data source for the Media Type Composition that fetches data from the server
- * @export
  * @class UmbMediaTypeCompositionServerDataSource
  */
 export class UmbMediaTypeCompositionServerDataSource
@@ -25,7 +24,7 @@ export class UmbMediaTypeCompositionServerDataSource
 
 	/**
 	 * Creates an instance of UmbMediaTypeCompositionServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {

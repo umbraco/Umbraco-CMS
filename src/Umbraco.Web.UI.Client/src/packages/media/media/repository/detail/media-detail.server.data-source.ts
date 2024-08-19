@@ -9,7 +9,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Media that fetches data from the server
- * @export
  * @class UmbMediaServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 
 	/**
 	 * Creates an instance of UmbMediaServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -101,6 +100,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Inserts a new Media on the server
 	 * @param {UmbMediaDetailModel} model
+	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
@@ -138,6 +138,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Updates a Media on the server
 	 * @param {UmbMediaDetailModel} Media
+	 * @param model
 	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */

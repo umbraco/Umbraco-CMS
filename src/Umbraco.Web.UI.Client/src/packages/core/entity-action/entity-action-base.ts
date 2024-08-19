@@ -4,7 +4,6 @@ import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 
 /**
  * Base class for an entity action.
- * @export
  * @abstract
  * @class UmbEntityActionBase
  * @augments {UmbActionBase}

@@ -9,7 +9,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for Document Validation
- * @export
  * @class UmbDocumentPublishingServerDataSource
  * @implements {DocumentTreeDataSource}
  */
@@ -18,7 +17,7 @@ export class UmbDocumentValidationServerDataSource {
 
 	/**
 	 * Creates an instance of UmbDocumentPublishingServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
@@ -30,6 +29,7 @@ export class UmbDocumentValidationServerDataSource {
 	/**
 	 * Validate a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param parentUnique
 	 * @returns {*}
 	 */
 	async validateCreate(model: UmbDocumentDetailModel, parentUnique: string | null = null) {

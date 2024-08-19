@@ -7,6 +7,7 @@ export interface UmbContextSaveSearchModalData {
 	query: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContextSaveSearchModalValue extends SavedLogSearchResponseModel {}
 
 @customElement('umb-log-viewer-save-search-modal')
