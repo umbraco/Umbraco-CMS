@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.DateTime',
 			icon: 'icon-time',
 			group: 'pickers',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{
