@@ -36,6 +36,7 @@ export default defineConfig({
 			'notification/index': './notification/index.ts',
 			'object-type/index': './object-type/index.ts',
 			'picker-input/index': './picker-input/index.ts',
+			'picker/index': './picker/index.ts',
 			'property-action/index': './property-action/index.ts',
 			'property-editor/index': './property-editor/index.ts',
 			'property-type/index': './property-type/index.ts',

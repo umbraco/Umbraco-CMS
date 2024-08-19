@@ -1,9 +1,12 @@
 import type { UmbMemberItemModel } from '../../repository/index.js';
+import { UMB_MEMBER_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
+import type { UmbPickerModalSearchConfig } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbMemberPickerModalData {
 	multiple?: boolean;
 	filter?: (member: UmbMemberItemModel) => boolean;
+	search?: UmbPickerModalSearchConfig;
 }
 
 export interface UmbMemberPickerModalValue {
@@ -16,6 +19,11 @@ export const UMB_MEMBER_PICKER_MODAL = new UmbModalToken<UmbMemberPickerModalDat
 		modal: {
 			type: 'sidebar',
 			size: 'small',
+		},
+		data: {
+			search: {
+				providerAlias: UMB_MEMBER_SEARCH_PROVIDER_ALIAS,
+			},
 		},
 	},
 );
