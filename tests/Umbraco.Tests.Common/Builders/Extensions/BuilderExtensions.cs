@@ -87,6 +87,13 @@ public static class BuilderExtensions
         return builder;
     }
 
+    public static T WithParentKey<T>(this T builder, Guid? parentKey)
+        where T : IWithParentKeyBuilder
+    {
+        builder.ParentKey = parentKey;
+        return builder;
+    }
+
     public static T WithParentContentType<T>(this T builder, IContentTypeComposition parent)
         where T : IWithParentContentTypeBuilder
     {
