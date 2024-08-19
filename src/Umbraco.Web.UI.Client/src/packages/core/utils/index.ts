@@ -12,6 +12,7 @@ export * from './path/path-decode.function.js';
 export * from './path/path-encode.function.js';
 export * from './path/path-folder-name.function.js';
 export * from './path/remove-initial-slash-from-path.function.js';
+export * from './path/remove-last-slash-from-path.function.js';
 export * from './path/stored-path.function.js';
 export * from './path/transform-server-path-to-client-path.function.js';
 export * from './path/umbraco-path.function.js';
