@@ -225,6 +225,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
 				required
+				?readonly=${this.#isReadOnly(this._activeVariant?.culture || null)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${umbFocus()}
 			>
