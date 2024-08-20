@@ -294,6 +294,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		});
 	}
 
+	/**
+	 * Enables the sorter, this will allow sorting to happen.
+	 * @return {*}  {void}
+	 * @memberof UmbSorterController
+	 */
 	enable(): void {
 		if (this.#enabled) return;
 		this.#enabled = true;
@@ -301,6 +306,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#initialize();
 		}
 	}
+
+	/**
+	 * Disables the sorter, this will prevent any sorting to happen.
+	 * @return {*}  {void}
+	 * @memberof UmbSorterController
+	 */
 	disable(): void {
 		if (!this.#enabled) return;
 		this.#enabled = false;
