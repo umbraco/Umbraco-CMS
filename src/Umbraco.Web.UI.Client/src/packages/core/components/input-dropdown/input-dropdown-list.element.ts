@@ -16,6 +16,15 @@ export class UmbInputDropdownListElement extends UUIFormControlMixin(UmbLitEleme
 	@property({ type: Boolean })
 	public multiple?: boolean;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@query('uui-select')
 	private selectEle!: HTMLInputElement;
 
@@ -34,7 +43,8 @@ export class UmbInputDropdownListElement extends UUIFormControlMixin(UmbLitEleme
 			label=${this.localize.term('formProviderFieldTypes_dropdownName')}
 			.placeholder=${this.placeholder ?? ''}
 			.options=${this.options ?? []}
-			@change=${this.#onChange}></uui-select>`;
+			@change=${this.#onChange}
+			?readonly=${this.readonly}></uui-select>`;
 	}
 
 	static override styles = [

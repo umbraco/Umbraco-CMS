@@ -4,6 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbInvariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A property dataset context that hooks directly into the workspace context.
@@ -14,6 +15,9 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	extends UmbContextBase<UmbPropertyDatasetContext>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
+	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
+	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
+
 	#workspace: WorkspaceType;
 
 	name;
@@ -60,5 +64,9 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this.#workspace.setPropertyValue(propertyAlias, value);
+	}
+
+	getCurrentVariantCultureIsReadOnly() {
+		return this.#currentVariantCultureIsReadOnly.getValue();
 	}
 }

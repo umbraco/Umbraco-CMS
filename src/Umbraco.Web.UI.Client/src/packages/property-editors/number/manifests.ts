@@ -13,6 +13,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.Decimal',
 			icon: 'icon-autofill',
 			group: 'common',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{
@@ -41,6 +42,7 @@ export const manifests: Array<ManifestTypes> = [
 			icon: 'icon-autofill',
 			group: 'common',
 			propertyEditorSchemaAlias: 'Umbraco.Integer',
+			supportsReadOnly: true,
 		},
 	},
 	...decimalSchemaManifests,

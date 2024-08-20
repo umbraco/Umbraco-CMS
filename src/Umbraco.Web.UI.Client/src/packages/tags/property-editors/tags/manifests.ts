@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.Tags',
 			icon: 'icon-tags',
 			group: 'common',
+			supportsReadOnly: true,
 		},
 	},
 	schemaManifest,

@@ -18,6 +18,15 @@ export class UmbInputDateElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly: boolean = false;
+
+	/**
 	 * Specifies the type of input that will be rendered.
 	 * @type {'date'| 'time'| 'datetime-local'}
 	 * @attr
@@ -49,7 +58,8 @@ export class UmbInputDateElement extends UUIFormControlMixin(UmbLitElement, '') 
 			.step=${this.step}
 			.type=${this.type}
 			value=${ifDefined(this.value)}
-			@change=${this.#onChange}>
+			@change=${this.#onChange}
+			?readonly=${this.readonly}>
 		</uui-input>`;
 	}
 }

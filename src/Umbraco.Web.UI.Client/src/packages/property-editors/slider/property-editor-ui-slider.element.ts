@@ -15,6 +15,15 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	@property({ type: Object })
 	value: UmbSliderValue | undefined;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	_enableRange = false;
 
@@ -82,7 +91,8 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 				.min=${this._min}
 				.max=${this._max}
 				?enable-range=${this._enableRange}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-slider>
 		`;
 	}

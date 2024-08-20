@@ -33,6 +33,7 @@ import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/var
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 
 type EntityType = UmbDocumentBlueprintDetailModel;
 
@@ -58,6 +59,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
+
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
 		return this.#getDataPromise;

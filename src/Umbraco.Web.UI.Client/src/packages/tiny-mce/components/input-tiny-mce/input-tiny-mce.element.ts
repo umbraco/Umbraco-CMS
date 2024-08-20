@@ -75,6 +75,24 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return super.value;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+		const editor = this.getEditor();
+		const mode = value ? 'readonly' : 'design';
+		editor?.mode.set(mode);
+	}
+	#readonly = false;
+
 	@query('.editor', true)
 	private _editorElement?: HTMLElement;
 
@@ -84,7 +102,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	constructor() {
 		super();
-
 		this.#loadEditor();
 	}
 
@@ -246,6 +263,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			language: this.#getLanguage(),
 			promotion: false,
 			convert_unsafe_embeds: true, // [JOV] Workaround for CVE-2024-29881
+			readonly: this.#readonly,
 
 			// Extend with configuration options
 			...configurationOptions,
