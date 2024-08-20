@@ -119,7 +119,14 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+		this.#readonly ? this.#sorter.disable() : this.#sorter.enable();
+	}
+	#readonly = false;
 
 	@state()
 	private _editDocumentPath = '';
