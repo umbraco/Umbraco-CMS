@@ -25,6 +25,9 @@ export interface UmbPropertyDatasetContext extends UmbContext {
 	getName(): string | undefined;
 	readonly name: Observable<string | undefined>;
 
+	getCurrentVariantCultureIsReadOnly(): boolean;
+	readonly currentVariantCultureIsReadOnly: Observable<boolean>;
+
 	// Should it be possible to get the properties as a list of property aliases?
 	//readonly properties: Observable<Array<string>>;
 

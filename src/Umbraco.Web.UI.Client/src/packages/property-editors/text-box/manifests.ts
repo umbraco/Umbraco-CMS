@@ -21,6 +21,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
 			icon: 'icon-autofill',
 			group: 'common',
+			supportsReadOnly: true,
 			settings: {
 				properties: [inputTypeConfig],
 				defaultData: [
@@ -42,6 +43,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.EmailAddress',
 			icon: 'icon-message',
 			group: 'common',
+			supportsReadOnly: true,
 			settings: {
 				properties: [inputTypeConfig],
 				defaultData: [

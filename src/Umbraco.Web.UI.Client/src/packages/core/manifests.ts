@@ -12,6 +12,7 @@ import { manifests as localizationManifests } from './localization/manifests.js'
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
+import { manifests as propertyManifests } from './property/manifests.js';
 import { manifests as propertyTypeManifests } from './property-type/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
@@ -38,6 +39,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...modalManifests,
 	...pickerManifests,
 	...propertyActionManifests,
+	...propertyManifests,
 	...propertyTypeManifests,
 	...recycleBinManifests,
 	...sectionManifests,

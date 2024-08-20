@@ -22,6 +22,7 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
@@ -40,6 +41,8 @@ export class UmbMemberWorkspaceContext
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
+
+	readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
 		return this.#getDataPromise;

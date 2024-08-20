@@ -4,7 +4,7 @@ import type { UmbPropertyDatasetContext } from './property-dataset-context.inter
 import type { UmbNameablePropertyDatasetContext } from './nameable-property-dataset-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
@@ -23,6 +23,9 @@ export class UmbPropertyDatasetContextBase
 	public readonly values = this.#values.asObservable();
 	private _entityType!: string;
 	private _unique!: string;
+
+	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
+	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
 
 	getEntityType() {
 		return this._entityType;
@@ -75,5 +78,14 @@ export class UmbPropertyDatasetContextBase
 	}
 	setValues(map: Array<UmbPropertyValueData>) {
 		this.#values.setValue(map);
+	}
+
+	/**
+	 * Gets the read-only state of the current variant culture.
+	 * @return {*}  {boolean}
+	 * @memberof UmbBlockGridInlinePropertyDatasetContext
+	 */
+	getCurrentVariantCultureIsReadOnly(): boolean {
+		return this.#currentVariantCultureIsReadOnly.getValue();
 	}
 }
