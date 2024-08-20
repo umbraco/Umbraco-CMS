@@ -21,6 +21,15 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		return this.#selection;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -68,6 +77,10 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	}
 
 	#renderDropdownMultiple() {
+		if (this.readonly) {
+			return html`<div>${this.value?.join(', ')}</div>`;
+		}
+
 		return html`
 			<select id="native" multiple @change=${this.#onChangeMulitple}>
 				${map(
@@ -80,7 +93,10 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 
 	#renderDropdownSingle() {
 		return html`
-			<umb-input-dropdown-list .options=${this._options} @change=${this.#onChange}></umb-input-dropdown-list>
+			<umb-input-dropdown-list
+				.options=${this._options}
+				@change=${this.#onChange}
+				?readonly=${this.readonly}></umb-input-dropdown-list>
 		`;
 	}
 
