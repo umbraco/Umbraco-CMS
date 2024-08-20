@@ -21,4 +21,7 @@ public enum ContentTypeOperationStatus
     NotFound,
     NotAllowed,
     CancelledByNotification,
+    InvalidElementFlagDocumentHasContent,
+    InvalidElementFlagElementIsUsedInPropertyEditorConfiguration,
+    InvalidElementFlagComparedToParent,
 }
