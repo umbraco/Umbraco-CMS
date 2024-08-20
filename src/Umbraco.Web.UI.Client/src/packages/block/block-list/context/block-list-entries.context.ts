@@ -14,7 +14,10 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	UmbBlockListLayoutModel
 > {
 	//
-	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
+	#catalogueModal: UmbModalRouteRegistrationController<
+		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
+		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
+	>;
 	#workspaceModal: UmbModalRouteRegistrationController;
 
 	// We will just say its always allowed for list for now: [NL]
@@ -26,8 +29,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias', 'variantId'])
 			.addAdditionalPath(':view/:index')
-			.onSetup((routingInfo) => {
-				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
+			.onSetup(async (routingInfo) => {
+				await this._retrieveManager;
+				if (!this._manager) return false;
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
@@ -35,8 +39,15 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						blockOriginData: { index: index },
+						createBlockInWorkspace: this._manager.getLiveEditingMode() === false,
 					},
 				};
+			})
+			.onSubmit((value, data) => {
+				if (value?.create && data) {
+					console.log('create block', value.create.contentElementTypeKey, this.#catalogueModal);
+					this.create(value.create.contentElementTypeKey, undefined, data.originData);
+				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._catalogueRouteBuilderState.setValue(routeBuilder);

@@ -67,7 +67,7 @@ export class UmbModalRouteRegistrationController<
 		| Promise<UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> | false>
 		| UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue>
 		| false;
-	#onSubmitCallback?: (data: UmbModalTokenValue) => void;
+	#onSubmitCallback?: (value: UmbModalTokenValue, data?: UmbModalTokenData) => void;
 	#onRejectCallback?: () => void;
 
 	#modalContext: UmbModalContext<UmbModalTokenData, UmbModalTokenValue> | undefined;
@@ -78,7 +78,7 @@ export class UmbModalRouteRegistrationController<
 	 * Creates an instance of UmbModalRouteRegistrationController.
 	 * @param {UmbControllerHost} host - The host element of the modal, this determine the ownership of the modal and the origin of it.
 	 * @param {UmbModalToken} alias - The alias of the modal, this is used to identify the modal.
-	 * @param ctrlAlias
+	 * @param {UmbControllerAlias} ctrlAlias - The alias for this controller, this is used to identify the controller.
 	 * @memberof UmbModalRouteRegistrationController
 	 */
 	constructor(
@@ -104,9 +104,8 @@ export class UmbModalRouteRegistrationController<
 	 * This can help specify the URL for this modal, or used to add a parameter to the URL like this: "/modal/my-modal/:index/"
 	 * A folder name starting with a colon ":" will be interpreted as a parameter. Then this modal can open with any value in that location.
 	 * When modal is being setup the value of the parameter can be read from the route params. See the example:
-	 * @param additionalPath
-	 * @returns UmbModalRouteRegistrationController
-	 * @memberof UmbContextConsumer
+	 * @param {string} additionalPath - The additional path to be appended to the modal route
+	 * @returns {UmbModalRouteRegistrationController} this
 	 * @example <caption>Example of adding an additional path to the modal route</caption>
 	 * const modalRegistration = new UmbModalRouteRegistrationController(this, MY_MODAL_TOKEN)
 	 * modalRegistration.addAdditionalPath(':index')
@@ -129,9 +128,8 @@ export class UmbModalRouteRegistrationController<
 	 * Making the URL unique to this modal registration: /modal/my-modal/my-unique-value/
 	 *
 	 * Notice the modal will only be available when all unique paths have a value.
-	 * @param {Array<string>} uniquePathNames
-	 * @returns UmbModalRouteRegistrationController
-	 * @memberof UmbContextConsumer
+	 * @param {Array<string>} uniquePathNames - the unique path names
+	 * @returns {UmbModalRouteRegistrationController} this
 	 * @example <caption>Example of adding an additional unique path to the modal route</caption>
 	 * const modalRegistration = new UmbModalRouteRegistrationController(this, MY_MODAL_TOKEN)
 	 * modalRegistration.addUniquePaths(['myAliasForIdentifyingThisPartOfThePath'])
@@ -150,10 +148,8 @@ export class UmbModalRouteRegistrationController<
 
 	/**
 	 * Set or change the value of a unique path part.
-	 * @param {string} identifier
-	 * @param {value | undefined} value
-	 * @returns UmbModalRouteRegistrationController
-	 * @memberof UmbContextConsumer
+	 * @param {string} identifier - the unique path part identifier
+	 * @param {value | undefined} value - the new value for the unique path part
 	 * @example <caption>Example of adding an additional unique path to the modal route</caption>
 	 * const modalRegistration = new UmbModalRouteRegistrationController(this, MY_MODAL_TOKEN)
 	 * modalRegistration.addUniquePaths(['first-one', 'another-one'])
@@ -256,6 +252,7 @@ export class UmbModalRouteRegistrationController<
 
 	/**
 	 * Returns true if the modal is currently active.
+	 * @returns {boolean} - true if the modal is currently active, false otherwise.
 	 */
 	public get active() {
 		return !!this.#modalContext;
@@ -268,7 +265,8 @@ export class UmbModalRouteRegistrationController<
 	}
 
 	/**
-	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
+	 * Returns the modal context if the modal is currently active. Otherwise its undefined.
+	 * @returns {UmbModalContext | undefined} - modal context if the modal is active, otherwise undefined.
 	 */
 	public get modalContext() {
 		return this.#modalContext;
@@ -294,7 +292,7 @@ export class UmbModalRouteRegistrationController<
 		this.#onSetupCallback = callback;
 		return this;
 	}
-	public onSubmit(callback: (value: UmbModalTokenValue) => void) {
+	public onSubmit(callback: (value: UmbModalTokenValue, data?: UmbModalTokenData) => void) {
 		this.#onSubmitCallback = callback;
 		return this;
 	}
@@ -303,8 +301,8 @@ export class UmbModalRouteRegistrationController<
 		return this;
 	}
 
-	#onSubmit = (data: UmbModalTokenValue) => {
-		this.#onSubmitCallback?.(data);
+	#onSubmit = (value: UmbModalTokenValue) => {
+		this.#onSubmitCallback?.(value, this.#modalContext?.data);
 		this.#modalContext = undefined;
 	};
 	#onReject = () => {
