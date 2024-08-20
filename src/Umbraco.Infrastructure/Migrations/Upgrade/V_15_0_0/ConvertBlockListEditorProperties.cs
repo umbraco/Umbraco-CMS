@@ -9,6 +9,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
 public class ConvertBlockListEditorProperties : ConvertBlockEditorPropertiesBase
 {
+    /// <summary>
+    /// Setting this property to true will cause the migration to be skipped.
+    /// </summary>
+    /// <remarks>
+    /// If you choose to skip the migration, you're responsible for performing the content migration for Block Lists after the V15 upgrade has completed.
+    /// </remarks>
+    public static bool SkipMigration { get; set; } = false;
+
+    protected override bool SkipThisMigration() => SkipMigration;
+
     protected override IEnumerable<string> PropertyEditorAliases
         => new[] { Constants.PropertyEditors.Aliases.BlockList };
 

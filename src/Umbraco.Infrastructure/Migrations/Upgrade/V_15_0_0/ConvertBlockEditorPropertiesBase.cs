@@ -25,6 +25,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
     protected abstract EditorValueHandling DetermineEditorValueHandling(object editorValue);
 
+    protected abstract bool SkipThisMigration();
+
     protected enum EditorValueHandling
     {
         IgnoreConversion,
@@ -52,6 +54,12 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
     protected override void Migrate()
     {
+        if (SkipThisMigration())
+        {
+            _logger.LogInformation("Migration was skipped due to configuration.");
+            return;
+        }
+
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
         var languagesById = _languageService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(language => language.Id);
         IContentType[] allContentTypes = _contentTypeService.GetAll().ToArray();
