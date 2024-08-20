@@ -76,6 +76,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, Constants.Applications.Translation, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocuments, Constants.Applications.Content);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, Constants.Applications.Content, Constants.Applications.Settings);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentOrMediaOrContentTypes, Constants.Applications.Content, Constants.Applications.Settings, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessLanguages, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessMediaTypes, Constants.Applications.Settings);
