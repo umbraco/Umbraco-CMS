@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Models.Entities;
 namespace Umbraco.Extensions;
 
 /// <summary>
-/// Provides extension methods that return udis for Umbraco entities.
+/// Provides extension methods that return UDIs for Umbraco entities.
 /// </summary>
 public static class UdiGetterExtensions
 {
@@ -19,11 +19,177 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
-    public static GuidUdi GetUdi(this ITemplate entity)
+    public static Udi GetUdi(this IEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        return new GuidUdi(Constants.UdiEntityType.Template, entity.Key).EnsureClosed();
+        return entity switch
+        {
+            // Concrete types
+            EntityContainer container => container.GetUdi(),
+            Script script => script.GetUdi(),
+            Stylesheet stylesheet => stylesheet.GetUdi(),
+            // Interfaces
+            IContentBase contentBase => contentBase.GetUdi(),
+            IContentTypeComposition contentTypeComposition => contentTypeComposition.GetUdi(),
+            IDataType dataType => dataType.GetUdi(),
+            IDictionaryItem dictionaryItem => dictionaryItem.GetUdi(),
+            ILanguage language => language.GetUdi(),
+            IMemberGroup memberGroup => memberGroup.GetUdi(),
+            IPartialView partialView => partialView.GetUdi(),
+            IRelationType relationType => relationType.GetUdi(),
+            ITemplate template => template.GetUdi(),
+            IWebhook webhook => webhook.GetUdi(),
+            _ => throw new NotSupportedException($"Entity type {entity.GetType().FullName} is not supported."),
+        };
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this EntityContainer entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        string entityType;
+        if (entity.ContainedObjectType == Constants.ObjectTypes.DataType)
+        {
+            entityType = Constants.UdiEntityType.DataTypeContainer;
+        }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentType)
+        {
+            entityType = Constants.UdiEntityType.DocumentTypeContainer;
+        }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.MediaType)
+        {
+            entityType = Constants.UdiEntityType.MediaTypeContainer;
+        }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentBlueprint)
+        {
+            entityType = Constants.UdiEntityType.DocumentBlueprintContainer;
+        }
+        else
+        {
+            throw new NotSupportedException($"Contained object type {entity.ContainedObjectType} is not supported.");
+        }
+
+        return new GuidUdi(entityType, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static StringUdi GetUdi(this Script entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return GetUdiFromPath(Constants.UdiEntityType.Script, entity.Path);
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static StringUdi GetUdi(this Stylesheet entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return GetUdiFromPath(Constants.UdiEntityType.Stylesheet, entity.Path);
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IContentBase entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return entity switch
+        {
+            IContent content => content.GetUdi(),
+            IMedia media => media.GetUdi(),
+            IMember member => member.GetUdi(),
+            _ => throw new NotSupportedException($"Content base type {entity.GetType().FullName} is not supported."),
+        };
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IContent entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        string entityType = entity.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document;
+
+        return new GuidUdi(entityType, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IMedia entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.Media, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IMember entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.Member, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IContentTypeComposition entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return entity switch
+        {
+            IContentType contentType => contentType.GetUdi(),
+            IMediaType mediaType => mediaType.GetUdi(),
+            IMemberType memberType => memberType.GetUdi(),
+            _ => throw new NotSupportedException($"Composition type {entity.GetType().FullName} is not supported."),
+        };
     }
 
     /// <summary>
@@ -75,170 +241,11 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
-    public static GuidUdi GetUdi(this IMemberGroup entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return new GuidUdi(Constants.UdiEntityType.MemberGroup, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static GuidUdi GetUdi(this IContentTypeComposition entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        string entityType = entity switch
-        {
-            IContentType => Constants.UdiEntityType.DocumentType,
-            IMediaType => Constants.UdiEntityType.MediaType,
-            IMemberType => Constants.UdiEntityType.MemberType,
-            _ => throw new NotSupportedException(string.Format("Composition type {0} is not supported.", entity.GetType().FullName)),
-        };
-
-        return new GuidUdi(entityType, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
     public static GuidUdi GetUdi(this IDataType entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         return new GuidUdi(Constants.UdiEntityType.DataType, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static GuidUdi GetUdi(this EntityContainer entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        string entityType;
-        if (entity.ContainedObjectType == Constants.ObjectTypes.DataType)
-        {
-            entityType = Constants.UdiEntityType.DataTypeContainer;
-        }
-        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentType)
-        {
-            entityType = Constants.UdiEntityType.DocumentTypeContainer;
-        }
-        else if (entity.ContainedObjectType == Constants.ObjectTypes.MediaType)
-        {
-            entityType = Constants.UdiEntityType.MediaTypeContainer;
-        }
-        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentBlueprint)
-        {
-            entityType = Constants.UdiEntityType.DocumentBlueprintContainer;
-        }
-        else
-        {
-            throw new NotSupportedException(string.Format("Contained object type {0} is not supported.", entity.ContainedObjectType));
-        }
-
-        return new GuidUdi(entityType, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static GuidUdi GetUdi(this IMedia entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return new GuidUdi(Constants.UdiEntityType.Media, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static GuidUdi GetUdi(this IContent entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        string entityType = entity.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document;
-
-        return new GuidUdi(entityType, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static GuidUdi GetUdi(this IMember entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return new GuidUdi(Constants.UdiEntityType.Member, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static StringUdi GetUdi(this Stylesheet entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return GetUdiFromPath(Constants.UdiEntityType.Stylesheet, entity.Path);
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static StringUdi GetUdi(this Script entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return GetUdiFromPath(Constants.UdiEntityType.Script, entity.Path);
-    }
-
-    /// <summary>
-    /// Gets the UDI from a path.
-    /// </summary>
-    /// <param name="entityType">The type of the entity.</param>
-    /// <param name="path">The path.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    private static StringUdi GetUdiFromPath(string entityType, string path)
-    {
-        string id = path.TrimStart(Constants.CharArrays.ForwardSlash).Replace("\\", "/");
-
-        return new StringUdi(entityType, id).EnsureClosed();
     }
 
     /// <summary>
@@ -262,11 +269,11 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
-    public static StringUdi GetUdi(this IPartialView entity)
+    public static StringUdi GetUdi(this ILanguage entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        return GetUdiFromPath(Constants.UdiEntityType.PartialView, entity.Path);
+        return new StringUdi(Constants.UdiEntityType.Language, entity.IsoCode).EnsureClosed();
     }
 
     /// <summary>
@@ -276,17 +283,25 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
-    public static GuidUdi GetUdi(this IContentBase entity)
+    public static GuidUdi GetUdi(this IMemberGroup entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        return entity switch
-        {
-            IContent content => content.GetUdi(),
-            IMedia media => media.GetUdi(),
-            IMember member => member.GetUdi(),
-            _ => throw new NotSupportedException($"Content base type {entity.GetType().FullName} is not supported."),
-        };
+        return new GuidUdi(Constants.UdiEntityType.MemberGroup, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static StringUdi GetUdi(this IPartialView entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return GetUdiFromPath(Constants.UdiEntityType.PartialView, entity.Path);
     }
 
     /// <summary>
@@ -310,6 +325,20 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
+    public static GuidUdi GetUdi(this ITemplate entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.Template, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
     public static GuidUdi GetUdi(this IWebhook entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -318,56 +347,17 @@ public static class UdiGetterExtensions
     }
 
     /// <summary>
-    /// Gets the entity identifier of the entity.
+    /// Gets the UDI from a path.
     /// </summary>
-    /// <param name="entity">The entity.</param>
+    /// <param name="entityType">The type of the entity.</param>
+    /// <param name="path">The path.</param>
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
-    public static StringUdi GetUdi(this ILanguage entity)
+    private static StringUdi GetUdiFromPath(string entityType, string path)
     {
-        ArgumentNullException.ThrowIfNull(entity);
+        string id = path.TrimStart(Constants.CharArrays.ForwardSlash).Replace("\\", "/");
 
-        return new StringUdi(Constants.UdiEntityType.Language, entity.IsoCode).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static Udi GetUdi(this IEntity entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return entity switch
-        {
-            // Concrete types
-            EntityContainer container => container.GetUdi(),
-            Stylesheet stylesheet => stylesheet.GetUdi(),
-            Script script => script.GetUdi(),
-            // Content types
-            IContentType contentType => contentType.GetUdi(),
-            IMediaType mediaType => mediaType.GetUdi(),
-            IMemberType memberType => memberType.GetUdi(),
-            IContentTypeComposition contentTypeComposition => contentTypeComposition.GetUdi(),
-            // Content
-            IContent content => content.GetUdi(),
-            IMedia media => media.GetUdi(),
-            IMember member => member.GetUdi(),
-            IContentBase contentBase => contentBase.GetUdi(),
-            // Other
-            IDataType dataTypeComposition => dataTypeComposition.GetUdi(),
-            IDictionaryItem dictionaryItem => dictionaryItem.GetUdi(),
-            ILanguage language => language.GetUdi(),
-            IMemberGroup memberGroup => memberGroup.GetUdi(),
-            IPartialView partialView => partialView.GetUdi(),
-            IRelationType relationType => relationType.GetUdi(),
-            ITemplate template => template.GetUdi(),
-            IWebhook webhook => webhook.GetUdi(),
-            _ => throw new NotSupportedException(string.Format("Entity type {0} is not supported.", entity.GetType().FullName)),
-        };
+        return new StringUdi(entityType, id).EnsureClosed();
     }
 }
