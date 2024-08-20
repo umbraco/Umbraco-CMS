@@ -26,6 +26,15 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
  */
 @customElement('umb-property-editor-ui-date-picker')
 export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly: boolean = false;
+
 	@state()
 	private _inputType: UmbInputDateElement['type'] = 'datetime-local';
 
@@ -141,7 +150,8 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 				.max=${this._max}
 				.step=${this._step}
 				.type=${this._inputType}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-date>
 		`;
 	}
