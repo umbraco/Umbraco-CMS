@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Item;
 
 [ApiVersion("1.0")]
+[ApiVersion("1.1")]
 public class SearchDocumentItemController : DocumentItemControllerBase
 {
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
@@ -25,23 +26,14 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-    {
-        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, skip, take);
-        var result = new PagedModel<DocumentItemResponseModel>
-        {
-            Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
-            Total = searchResult.Total,
-        };
+        => await Search1_1(cancellationToken, query, skip, take);
 
-        return await Task.FromResult(Ok(result));
-    }
-
-    [HttpGet("{id:guid}/search")]
-    [MapToApiVersion("1.0")]
+    [HttpGet("search")]
+    [MapToApiVersion("1.1")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, Guid id, int skip = 0, int take = 100)
+    public async Task<IActionResult> Search1_1(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
     {
-        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, id, skip, take);
+        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, parentId, skip, take);
         var result = new PagedModel<DocumentItemResponseModel>
         {
             Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),

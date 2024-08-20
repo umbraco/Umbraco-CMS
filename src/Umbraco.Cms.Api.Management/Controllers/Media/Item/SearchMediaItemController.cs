@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 
 [ApiVersion("1.0")]
+[ApiVersion("1.1")]
 public class SearchMediaItemController : MediaItemControllerBase
 {
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
@@ -24,7 +25,13 @@ public class SearchMediaItemController : MediaItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search2(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
+    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+        => await Search1_1(cancellationToken, query, skip, take, null);
+
+    [HttpGet("search")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Search1_1(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
     {
         PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Media, query, parentId, skip, take);
         var result = new PagedModel<MediaItemResponseModel>
@@ -35,7 +42,4 @@ public class SearchMediaItemController : MediaItemControllerBase
 
         return await Task.FromResult(Ok(result));
     }
-
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-        => await Search2(cancellationToken, query, skip, take, null);
 }
