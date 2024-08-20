@@ -280,15 +280,13 @@ public static class UdiGetterExtensions
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        string type = entity switch
+        return entity switch
         {
-            IContent => Constants.UdiEntityType.Document,
-            IMedia => Constants.UdiEntityType.Media,
-            IMember => Constants.UdiEntityType.Member,
-            _ => throw new NotSupportedException(string.Format("Content base type {0} is not supported.", entity.GetType().FullName)),
+            IContent content => content.GetUdi(),
+            IMedia media => media.GetUdi(),
+            IMember member => member.GetUdi(),
+            _ => throw new NotSupportedException($"Content base type {entity.GetType().FullName} is not supported."),
         };
-
-        return new GuidUdi(type, entity.Key).EnsureClosed();
     }
 
     /// <summary>
