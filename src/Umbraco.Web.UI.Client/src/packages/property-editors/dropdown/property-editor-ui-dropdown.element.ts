@@ -77,6 +77,10 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	}
 
 	#renderDropdownMultiple() {
+		if (this.readonly) {
+			return html`<div>${this.value?.join(', ')}</div>`;
+		}
+
 		return html`
 			<select id="native" multiple @change=${this.#onChangeMulitple}>
 				${map(
