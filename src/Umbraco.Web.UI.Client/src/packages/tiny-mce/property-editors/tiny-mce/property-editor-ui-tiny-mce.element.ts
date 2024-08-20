@@ -59,6 +59,15 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		return this._value;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	_config?: UmbPropertyEditorConfigCollection;
 
@@ -138,7 +147,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 
 	override render() {
 		return html`
-			<umb-input-tiny-mce .configuration=${this._config} .value=${this._markup} @change=${this.#onChange}>
+			<umb-input-tiny-mce
+				.configuration=${this._config}
+				.value=${this._markup}
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-tiny-mce>
 		`;
 	}
