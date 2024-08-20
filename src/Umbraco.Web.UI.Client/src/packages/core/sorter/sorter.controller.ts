@@ -260,6 +260,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#dragX = 0;
 	#dragY = 0;
 
+	#items = Array<ElementType>();
+
 	public get identifier() {
 		return this.#config.identifier;
 	}
@@ -313,6 +315,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	 * @memberof UmbSorterController
 	 */
 	disable(): void {
+		console.log(this.#items);
 		if (!this.#enabled) return;
 		this.#enabled = false;
 		if (this.#isConnected) {
@@ -341,12 +344,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			requestAnimationFrame(this.#initialize);
 		}
 	}
+
 	override hostDisconnected() {
 		this.#isConnected = false;
 		if (this.#enabled) {
 			this.#uninitialize();
 		}
 	}
+
 	#initialize = () => {
 		const containerEl =
 			(this.#config.containerSelector
@@ -376,6 +381,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			subtree: false,
 		});
 	};
+
 	#uninitialize() {
 		// TODO: Is there more clean up to do??
 		this.#observer.disconnect();
@@ -388,6 +394,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			containerElement.removeEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
 			(this.#containerElement as unknown) = undefined;
 		}
+
+		this.#items.forEach((item) => this.destroyItem(item));
 	}
 
 	_itemDraggedOver = (e: DragEvent) => {
@@ -453,6 +461,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				}
 			}
 		}
+
+		this.#items.push(element);
+		this.#items = Array.from(new Set(this.#items));
 	}
 
 	destroyItem(element: HTMLElement) {
@@ -464,6 +475,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
 		//draggableElement.removeEventListener('dragend', this.#handleDragEnd);
+
+		(draggableElement as HTMLElement).draggable = false;
+
+		this.#items = this.#items.filter((x) => x !== element);
 	}
 
 	#setupPlaceholderStyle() {
