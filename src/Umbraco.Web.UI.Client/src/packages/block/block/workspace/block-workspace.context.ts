@@ -157,7 +157,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#observeBlockData(unique);
 
 		if (this.#liveEditingMode) {
-			this.#establishLiveSync();
+			this.establishLiveSync();
 		}
 	}
 
@@ -209,7 +209,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			const unique = blockCreated.layout.contentUdi;
 
 			this.#observeBlockData(unique);
-			this.#establishLiveSync();
+			this.establishLiveSync();
 		}
 	}
 
@@ -273,7 +273,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 	}
 
-	#establishLiveSync() {
+	/**
+	 * Establishes live synchronization of the block's layout, content, and settings data.
+	 * This method observes local changes in the layout, content, and settings data and pushes those updates to the block manager.
+	 * This method is used in live editing mode to ensure that changes made to the block's data are immediately reflected
+	 * in the backoffice UI.
+	 */
+	establishLiveSync() {
 		this.observe(this.layout, (layoutData) => {
 			if (layoutData) {
 				this.#blockManager?.setOneLayout(layoutData, this.#modalContext?.data as UmbBlockWorkspaceData);
@@ -309,8 +315,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property to get the value of.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - The value of the property.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<propertyAliasType extends keyof LayoutDataType>(propertyAlias: propertyAliasType) {
@@ -326,7 +332,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} alias
+	 * @param {string} alias - The alias of the property to set the value of.
 	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.
@@ -386,7 +392,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					this.#blockEntries?.delete(contentUdi);
 				}
 			} else {
-				// TODO: Revert the layout, content & settings data to the original state.
+				// Revert the layout, content & settings data to the original state: [NL]
 				if (this.#initialLayout) {
 					this.#blockManager?.setOneLayout(this.#initialLayout, this.#modalContext?.data as UmbBlockWorkspaceData);
 				}
