@@ -34,7 +34,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#retrieveBlockEntries;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
-	#editorConfigPromise?: Promise<unknown>;
 
 	#entityType: string;
 
@@ -75,16 +74,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
 			this.#blockManager = context;
-			this.#editorConfigPromise = this.observe(
-				context.editorConfiguration,
-				(editorConfigs) => {
-					if (editorConfigs) {
-						const value = editorConfigs.getValueByAlias<boolean>('useLiveEditing');
-						this.#liveEditingMode = value;
-					}
+			this.observe(
+				context.liveEditingMode,
+				(liveEditingMode) => {
+					this.#liveEditingMode = liveEditingMode;
 				},
-				'observeEditorConfig',
-			).asPromise();
+				'observeLiveEditingMode',
+			);
 		}).asPromise();
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
@@ -145,7 +141,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
-		await this.#editorConfigPromise;
 		if (!this.#blockManager || !this.#blockEntries) {
 			throw new Error('Block manager not found');
 		}
