@@ -4,16 +4,16 @@ import * as fs from 'fs';
 
 const packageName = 'TestPackage';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.package.ensureNameNotExists(packageName);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.package.goToSection(ConstantHelper.sections.packages);
-  await umbracoUi.package.clickCreatedTab();
-});
-
-test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.package.ensureNameNotExists(packageName);
-});
+// test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+//   await umbracoApi.package.ensureNameNotExists(packageName);
+//   await umbracoUi.goToBackOffice();
+//   await umbracoUi.package.goToSection(ConstantHelper.sections.packages);
+//   await umbracoUi.package.clickCreatedTab();
+// });
+//
+// test.afterEach(async ({umbracoApi}) => {
+//   await umbracoApi.package.ensureNameNotExists(packageName);
+// });
 
 test.skip('can create a empty package', {tag: '@smoke'}, async ({umbracoUi}) => {
   // Act

@@ -5,7 +5,7 @@
     "postinstall": "node postinstall.js",
     "config": "node config.js",
     "ui": "npx playwright test --headed DefaultConfig",
-    "test": "npx playwright test DefaultConfig/LogViewer",
+    "test": "npx playwright test DefaultConfig/Packages/CreatedPackages.spec.ts",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
     "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\""
