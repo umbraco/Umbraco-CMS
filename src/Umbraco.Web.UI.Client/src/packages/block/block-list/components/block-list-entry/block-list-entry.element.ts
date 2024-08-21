@@ -1,7 +1,7 @@
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
@@ -259,10 +259,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
 							${this._contentInvalid
-								? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
-								: ''}
+								? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+								: nothing}
 						</uui-button>`
-					: ''}
+					: nothing}
 				${this._hasSettings && this._workspaceEditSettingsPath
 					? html`<uui-button
 							label="Edit settings"
@@ -272,13 +272,16 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							<uui-icon name="icon-settings"></uui-icon>
 							${this._settingsInvalid
 								? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
-								: ''}
+								: nothing}
 						</uui-button>`
-					: ''}
+					: nothing}
 				<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
+			${!this._showContentEdit && this._contentInvalid
+				? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+				: nothing}
 		`;
 	}
 
