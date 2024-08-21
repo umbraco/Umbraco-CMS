@@ -1,5 +1,9 @@
 import { manifest as schemaManifest } from './Umbraco.UploadField.js';
-import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestFileUploadPreview,
+	ManifestPropertyEditorUi,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -14,4 +18,13 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests: Array<ManifestTypes> = [manifest, schemaManifest];
+/** Testing */
+const previews: ManifestFileUploadPreview = {
+	type: 'fileUploadPreview',
+	alias: 'My PDF Showcase',
+	name: 'PDF Showcase',
+	element: () => import('./test.element.js'),
+	forMimeTypes: ['application/pdf'],
+};
+
+export const manifests: Array<ManifestTypes> = [manifest, schemaManifest, previews];
