@@ -5,25 +5,49 @@ import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
 	private _dictionary?: UmbDictionaryDetailModel;
 
-	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
-
 	@state()
 	private _languages: Array<UmbLanguageDetailModel> = [];
 
-	#workspaceContext!: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
+	@state()
+	private _currentUserLanguageAccess?: Array<string> = [];
 
-	override async connectedCallback() {
-		super.connectedCallback();
+	@state()
+	private _currentUserHasAccessToAllLanguages?: boolean = false;
+
+	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
+	#workspaceContext!: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+
+	constructor() {
+		super();
 
 		this.consumeContext(UMB_DICTIONARY_WORKSPACE_CONTEXT, (_instance) => {
 			this.#workspaceContext = _instance;
 			this.#observeDictionary();
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.#currentUserContext = context;
+			this.#observeCurrentUserLanguageAccess();
+		});
+	}
+
+	#observeCurrentUserLanguageAccess() {
+		if (!this.#currentUserContext) return;
+
+		this.observe(this.#currentUserContext.languages, (languages) => {
+			this._currentUserLanguageAccess = languages;
+		});
+
+		this.observe(this.#currentUserContext.hasAccessToAllLanguages, (hasAccess) => {
+			this._currentUserHasAccessToAllLanguages = hasAccess;
 		});
 	}
 
@@ -40,19 +64,11 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 		});
 	}
 
-	#renderTranslation(language: UmbLanguageDetailModel) {
-		if (!language.unique) return;
-
-		const translation = this._dictionary?.translations?.find((x) => x.isoCode === language.unique);
-
-		return html` <umb-property-layout label=${language.name ?? language.unique}>
-			<uui-textarea
-				slot="editor"
-				name=${language.unique}
-				label="translation"
-				@change=${this.#onTextareaChange}
-				value=${ifDefined(translation?.translation)}></uui-textarea>
-		</umb-property-layout>`;
+	#isReadOnly(culture: string | null) {
+		if (!this.#currentUserContext) return true;
+		if (!culture) return false;
+		if (this._currentUserHasAccessToAllLanguages) return false;
+		return !this._currentUserLanguageAccess?.includes(culture);
 	}
 
 	#onTextareaChange(e: Event) {
@@ -76,6 +92,22 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 				)}
 			</uui-box>
 		`;
+	}
+
+	#renderTranslation(language: UmbLanguageDetailModel) {
+		if (!language.unique) return;
+
+		const translation = this._dictionary?.translations?.find((x) => x.isoCode === language.unique);
+
+		return html` <umb-property-layout label=${language.name ?? language.unique}>
+			<uui-textarea
+				slot="editor"
+				name=${language.unique}
+				label="translation"
+				@change=${this.#onTextareaChange}
+				value=${ifDefined(translation?.translation)}
+				?readonly=${this.#isReadOnly(language.unique)}></uui-textarea>
+		</umb-property-layout>`;
 	}
 
 	static override styles = [
