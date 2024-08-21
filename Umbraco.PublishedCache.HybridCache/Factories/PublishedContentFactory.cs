@@ -7,18 +7,18 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 internal class PublishedContentFactory : IPublishedContentFactory
 {
     private readonly PublishedContentTypeCache _contentTypeCache;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IElementsCache _elementsCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
 
     public PublishedContentFactory(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor,
-        IPublishedContentCacheAccessor publishedContentCacheAccessor)
+        IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _elementsCache = elementsCache;
         _variationContextAccessor = variationContextAccessor;
-        _contentTypeCache = publishedContentCacheAccessor.Get();
+        _contentTypeCache = publishedContentTypeCacheAccessor.Get();
     }
 
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
@@ -53,7 +53,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             member.CreateDate,
             member.CreatorId);
 
-        return new PublishedMember(member, n, d, _publishedSnapshotAccessor, _variationContextAccessor);
+        return new PublishedMember(member, n, d, _elementsCache, _variationContextAccessor);
     }
 
     private Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
@@ -96,7 +96,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             : new PublishedContent(
                 node,
                 contentData,
-                _publishedSnapshotAccessor,
+                _elementsCache,
                 _variationContextAccessor);
 
     private IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>

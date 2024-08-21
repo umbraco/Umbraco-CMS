@@ -1,11 +1,13 @@
 ﻿
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
@@ -28,18 +30,29 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddUmbracoHybridCache(this IUmbracoBuilder builder)
     {
         builder.Services.AddHybridCache();
-        builder.Services.AddUnique<IPublishedContentCacheAccessor, PublishedContentCacheAccessor>();
+        builder.Services.AddUnique<IPublishedContentTypeCacheAccessor, PublishedContentTypeTypeCacheAccessor>();
+        builder.Services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
         builder.Services.AddSingleton<IPublishedContentCache, ContentCache>();
         builder.Services.AddSingleton<IPublishedMediaCache, MediaCache>();
         builder.Services.AddTransient<IPublishedMemberCache, MemberCache>();
-        builder.Services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
+        builder.Services.AddSingleton<IDomainCache>(serviceProvider =>
+        {
+            IDefaultCultureAccessor defaultCultureAccessor = serviceProvider.GetRequiredService<IDefaultCultureAccessor>();
+            var domainStore = new SnapDictionary<int, Domain>();
+
+            // TODO: Remove all this snapshotting stuff from domain cache.
+            SnapDictionary<int, Domain>.Snapshot domainSnap = domainStore.CreateSnapshot();
+            var defaultCulture = defaultCultureAccessor.DefaultCulture;
+            return new DomainCache(domainSnap, defaultCulture);
+        });
+
+        builder.Services.AddSingleton<IElementsCache, ElementsDictionaryAppCache>();
         builder.Services.AddSingleton<IContentCacheService, ContentCacheService>();
         builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
         builder.Services.AddTransient<IMemberCacheService, MemberCacheService>();
         builder.Services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
         builder.Services.AddTransient<ICacheNodeFactory, CacheNodeFactory>();
-        builder.Services.AddUnique<IPublishedSnapshotElementsFactory, PublishedSnapshotElementsFactory>();
-        builder.Services.AddUnique<IPublishedSnapshotService, PublishedSnapshotService>();
+        builder.Services.AddSingleton<ICacheManager, CacheManager>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
             IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();

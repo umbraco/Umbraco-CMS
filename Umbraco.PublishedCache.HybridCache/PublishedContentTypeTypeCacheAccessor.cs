@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public class PublishedContentCacheAccessor : IPublishedContentCacheAccessor
+public class PublishedContentTypeTypeCacheAccessor : IPublishedContentTypeCacheAccessor
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IMemberTypeService _memberTypeService;
@@ -14,7 +14,7 @@ public class PublishedContentCacheAccessor : IPublishedContentCacheAccessor
     private readonly ILoggerFactory _loggerFactory;
     private PublishedContentTypeCache? _contentTypeCache;
 
-    public PublishedContentCacheAccessor(IContentTypeService contentTypeService,
+    public PublishedContentTypeTypeCacheAccessor(IContentTypeService contentTypeService,
         IMemberTypeService memberTypeService,
         IMediaTypeService mediaTypeService,
         IPublishedContentTypeFactory publishedContentTypeFactory,

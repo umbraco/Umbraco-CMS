@@ -10,10 +10,10 @@ public class MemberCache : IPublishedMemberCache
     private readonly IMemberCacheService _memberCacheService;
     private readonly PublishedContentTypeCache _publishedContentTypeCache;
 
-    public MemberCache(IMemberCacheService memberCacheService, IPublishedContentCacheAccessor publishedContentCacheAccessor)
+    public MemberCache(IMemberCacheService memberCacheService, IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
     {
         _memberCacheService = memberCacheService;
-        _publishedContentTypeCache = publishedContentCacheAccessor.Get();
+        _publishedContentTypeCache = publishedContentTypeCacheAccessor.Get();
     }
 
     public async Task<IPublishedMember?> GetAsync(IMember member) =>

@@ -25,15 +25,15 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
+    // protected override void ConfigureTestServices(IServiceCollection services)
+    // {
+    //
+    //     // Remove all locking implementations to ensure we only use EFCoreDistributedLockingMechanisms
+    //     services.RemoveAll(x => x.ServiceType == typeof(IPublishedSnapshotService));
+    //     services.AddSingleton<IPublishedSnapshotService, PublishedSnapshotService >();
+    // }
 
-        // Remove all locking implementations to ensure we only use EFCoreDistributedLockingMechanisms
-        services.RemoveAll(x => x.ServiceType == typeof(IPublishedSnapshotService));
-        services.AddSingleton<IPublishedSnapshotService, PublishedSnapshotService >();
-    }
-
-    private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
+    private ICacheManager CacheManager => GetRequiredService<ICacheManager>();
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
@@ -55,16 +55,8 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         var textPage = await CreateTextPageDocument(template.Id);
         var contentPickerDocument = await CreateContentPickerDocument(template.Id, textPage.Key);
 
-        var contentPickerPage = await PublishedContentHybridCache.GetByIdAsync(contentPickerDocument.Id);
+        var contentPickerPage = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
 
-        var httpContext = new DefaultHttpContext()
-        {
-            Request = { Path = "/", Host = new HostString("localhost", 80), Scheme = "https"},
-
-        };
-        Mock.Get(HttpContextAccessor).Setup(x => x.HttpContext).Returns(httpContext);
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        
         IPublishedContent contentPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
         Assert.AreEqual(textPage.Key, contentPickerValue.Key);
         Assert.AreEqual(textPage.Id, contentPickerValue.Id);
@@ -81,15 +73,8 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         var contentPickerDocument = await CreateContentPickerDocument(template.Id, textPage.Key);
 
         // Get for caching
-        var notUpdatedContent = await PublishedContentHybridCache.GetByIdAsync(contentPickerDocument.Id);
-        
-        var httpContext = new DefaultHttpContext()
-        {
-            Request = { Path = "/", Host = new HostString("localhost", 80), Scheme = "https"},
+        var notUpdatedContent = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
 
-        };
-        Mock.Get(HttpContextAccessor).Setup(x => x.HttpContext).Returns(httpContext);
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
         IPublishedContent contentPickerValue = (IPublishedContent)notUpdatedContent.Value("contentPicker");
         Assert.AreEqual("The title value", contentPickerValue.Properties.First(x => x.Alias == "title").GetValue());
 
@@ -118,7 +103,7 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
 
         Assert.IsTrue(publishResult);
 
-        var contentPickerPage = await PublishedContentHybridCache.GetByIdAsync(contentPickerDocument.Id);
+        var contentPickerPage = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
         IPublishedContent updatedPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
 
    

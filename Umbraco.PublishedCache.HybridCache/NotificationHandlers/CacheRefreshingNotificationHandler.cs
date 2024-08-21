@@ -18,18 +18,18 @@ internal sealed class CacheRefreshingNotificationHandler :
 {
     private readonly IContentCacheService _contentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IElementsCache _elementsCache;
     private readonly IRelationService _relationService;
 
     public CacheRefreshingNotificationHandler(
         IContentCacheService contentCacheService,
         IMediaCacheService mediaCacheService,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IElementsCache elementsCache,
         IRelationService relationService)
     {
         _contentCacheService = contentCacheService;
         _mediaCacheService = mediaCacheService;
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _elementsCache = elementsCache;
         _relationService = relationService;
     }
 
@@ -91,10 +91,7 @@ internal sealed class CacheRefreshingNotificationHandler :
                     continue;
                 }
 
-                if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? snapshot))
-                {
-                    snapshot.ElementsCache?.ClearByKey(property.ValuesCacheKey);
-                }
+                _elementsCache.ClearByKey(property.ValuesCacheKey);
 
             }
         }

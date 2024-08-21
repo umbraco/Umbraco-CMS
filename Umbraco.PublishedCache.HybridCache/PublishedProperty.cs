@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -17,7 +16,7 @@ internal class PublishedProperty : PublishedPropertyBase
 {
     private readonly PublishedContent _content;
     private readonly bool _isPreviewing;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IElementsCache _elementsCache;
     private readonly bool _isMember;
     private string? _valuesCacheKey;
 
@@ -39,9 +38,9 @@ internal class PublishedProperty : PublishedPropertyBase
     public PublishedProperty(
         IPublishedPropertyType propertyType,
         PublishedContent content,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IElementsCache elementsCache,
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
-        : this(propertyType, content, null, publishedSnapshotAccessor, referenceCacheLevel)
+        : this(propertyType, content, null, elementsCache, referenceCacheLevel)
     {
     }
 
@@ -50,7 +49,7 @@ internal class PublishedProperty : PublishedPropertyBase
         IPublishedPropertyType propertyType,
         PublishedContent content,
         PropertyData[]? sourceValues,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IElementsCache elementsElementsCache,
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
         : base(propertyType, referenceCacheLevel)
     {
@@ -80,7 +79,7 @@ internal class PublishedProperty : PublishedPropertyBase
         _content = content;
         _isPreviewing = content.IsPreviewing;
         _isMember = content.ContentType.ItemType == PublishedItemType.Member;
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _elementsCache = elementsElementsCache;
 
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
@@ -202,10 +201,7 @@ internal class PublishedProperty : PublishedPropertyBase
                 // elements cache (if we don't want to pollute the elements cache with short-lived
                 // data) depending on settings
                 // for members, always cache in the snapshot cache - never pollute elements cache
-                publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-                cache = publishedSnapshot == null ? null : _isMember == false
-                        ? publishedSnapshot.ElementsCache
-                        : null;
+                cache = _isMember == false ? _elementsCache : null;
                 cacheValues = GetCacheValues(cache);
                 break;
             default:

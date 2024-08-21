@@ -10,10 +10,10 @@ public sealed class ContentCache : IPublishedContentCache
     private readonly IContentCacheService _contentCacheService;
     private readonly PublishedContentTypeCache _contentTypeCache;
 
-    public ContentCache(IContentCacheService contentCacheService, IPublishedContentCacheAccessor publishedContentCacheAccessor)
+    public ContentCache(IContentCacheService contentCacheService, IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
     {
         _contentCacheService = contentCacheService;
-        _contentTypeCache = publishedContentCacheAccessor.Get();
+        _contentTypeCache = publishedContentTypeCacheAccessor.Get();
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false) => await _contentCacheService.GetByIdAsync(id, preview);
