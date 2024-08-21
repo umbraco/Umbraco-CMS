@@ -11,6 +11,10 @@
     <PackageVersion Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageVersion Include="System.Data.Odbc" Version="9.0.0-preview.5.24306.7" />
     <PackageVersion Include="System.Data.OleDb" Version="9.0.0-preview.5.24306.7" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0-preview.5.24306.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0-preview.5.24306.7" />
+    <PackageVersion Include="System.Data.Odbc" Version="9.0.0-preview.5.24306.7" />
+    <PackageVersion Include="System.Data.OleDb" Version="9.0.0-preview.5.24306.7" />
     <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
