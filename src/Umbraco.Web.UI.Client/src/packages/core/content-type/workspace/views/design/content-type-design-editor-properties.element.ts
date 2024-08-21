@@ -107,8 +107,14 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		this.#editPropertyModal?.setUniquePathValue('container-id', value === null ? 'root' : value);
 	}
 
-	#addPropertyModal?: UmbModalRouteRegistrationController;
-	#editPropertyModal?: UmbModalRouteRegistrationController;
+	#addPropertyModal?: UmbModalRouteRegistrationController<
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.VALUE
+	>;
+	#editPropertyModal?: UmbModalRouteRegistrationController<
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_PROPERTY_TYPE_WORKSPACE_MODAL.VALUE
+	>;
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 

@@ -41,7 +41,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		identifier: 'Umb.SorterIdentifier.InputRichMedia',
 		itemSelector: 'uui-card-media',
 		containerSelector: '.container',
-		/** TODO: This component probably needs some grid-like logic for resolve placement... [LI] */
+		// TODO: This component probably needs some grid-like logic for resolve placement... [LI]
+		// TODO: You can also use verticalDirection? [NL]
 		resolvePlacement: () => false,
 		onChange: ({ model }) => {
 			this.#items = model;
@@ -157,7 +158,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 	#itemRepository = new UmbMediaItemRepository(this);
 
-	#modalRouter: UmbModalRouteRegistrationController;
+	#modalRouter;
 	#modalManager?: UmbModalManagerContext;
 
 	constructor() {

@@ -37,7 +37,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
 					.onSetup(() => {
 						return {
-							data: { preset: {}, originData: (modalContext.data as UmbBlockCatalogueModalData).blockOriginData },
+							data: { preset: {}, originData: (modalContext.data as UmbBlockCatalogueModalData).originData },
 						};
 					})
 					.onSubmit(() => {

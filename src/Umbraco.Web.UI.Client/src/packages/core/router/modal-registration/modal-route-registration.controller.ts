@@ -42,7 +42,7 @@ export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = Um
 			};
 export class UmbModalRouteRegistrationController<
 		UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
-		UmbModalTokenValue = any,
+		UmbModalTokenValue = unknown,
 	>
 	extends UmbControllerBase
 	implements UmbModalRouteRegistration<UmbModalTokenData, UmbModalTokenValue>

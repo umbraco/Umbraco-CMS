@@ -1,5 +1,5 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import type { UmbBlockGridWorkspaceData } from '../index.js';
+import type { UmbBlockGridWorkspaceData, UmbBlockGridWorkspaceOriginData } from '../index.js';
 import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
 import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -16,7 +16,7 @@ export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css
  */
 export class UmbBlockGridManagerContext<
 	BlockLayoutType extends UmbBlockGridLayoutModel = UmbBlockGridLayoutModel,
-> extends UmbBlockManagerContext<UmbBlockGridTypeModel, UmbBlockGridLayoutModel> {
+> extends UmbBlockManagerContext<UmbBlockGridTypeModel, UmbBlockGridLayoutModel, UmbBlockGridWorkspaceOriginData> {
 	//
 	#initAppUrl: Promise<void>;
 	#appUrl?: string;
@@ -74,9 +74,9 @@ export class UmbBlockGridManagerContext<
 	create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		// TODO: [v15] Ignore unused parameter to avoid breaking changes
+		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		modalData?: UmbBlockGridWorkspaceData,
+		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
 		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
@@ -165,24 +165,24 @@ export class UmbBlockGridManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockGridWorkspaceData,
+		originData: UmbBlockGridWorkspaceOriginData,
 	) {
-		this.setOneLayout(layoutEntry, modalData);
-		this.insertBlockData(layoutEntry, content, settings, modalData);
+		this.setOneLayout(layoutEntry, originData);
+		this.insertBlockData(layoutEntry, content, settings, originData);
 
 		return true;
 	}
 
-	override setOneLayout(layoutEntry: BlockLayoutType, modalData?: UmbBlockGridWorkspaceData) {
-		const index = modalData?.originData.index ?? -1;
+	override setOneLayout(layoutEntry: BlockLayoutType, originData?: UmbBlockGridWorkspaceOriginData) {
+		const index = originData?.index ?? -1;
 
-		if (modalData?.originData.parentUnique && modalData?.originData.areaKey) {
+		if (originData?.parentUnique && originData?.areaKey) {
 			// Find layout entry based on parentUnique, recursively, as it needs to check layout of areas as well:
 			const layoutEntries = this.#appendLayoutEntryToArea(
 				layoutEntry,
 				this._layouts.getValue(),
-				modalData.originData.parentUnique,
-				modalData.originData.areaKey,
+				originData?.parentUnique,
+				originData?.areaKey,
 				index,
 			);
 

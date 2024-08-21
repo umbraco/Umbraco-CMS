@@ -1,4 +1,4 @@
-import type { UmbBlockWorkspaceData } from '../workspace/block-workspace.modal-token.js';
+import type { UmbBlockWorkspaceData, UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
 import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
@@ -11,11 +11,18 @@ import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 export abstract class UmbBlockEntriesContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
-	BlockManagerContextType extends UmbBlockManagerContext<BlockType, BlockLayoutType>,
+	BlockManagerContextType extends UmbBlockManagerContext<BlockType, BlockLayoutType, BlockOriginData>,
 	BlockType extends UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel,
+	BlockOriginData extends UmbBlockWorkspaceOriginData,
 > extends UmbContextBase<
-	UmbBlockEntriesContext<BlockManagerContextTokenType, BlockManagerContextType, BlockType, BlockLayoutType>
+	UmbBlockEntriesContext<
+		BlockManagerContextTokenType,
+		BlockManagerContextType,
+		BlockType,
+		BlockLayoutType,
+		BlockOriginData
+	>
 > {
 	//
 	_manager?: BlockManagerContextType;
@@ -81,14 +88,14 @@ export abstract class UmbBlockEntriesContext<
 	public abstract create(
 		contentElementTypeKey: string,
 		layoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		modalData?: UmbBlockWorkspaceData,
+		originData?: BlockOriginData,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
 	abstract insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockWorkspaceData,
+		originData: BlockOriginData,
 	): Promise<boolean>;
 	//edit?
 	//editSettings

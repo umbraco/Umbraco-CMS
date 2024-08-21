@@ -8,7 +8,7 @@ export interface UmbBlockCatalogueModalData {
 	blockGroups?: Array<UmbBlockTypeGroup>;
 	createBlockInWorkspace?: boolean;
 	openClipboard?: boolean;
-	blockOriginData: UmbBlockWorkspaceData['originData'];
+	originData: UmbBlockWorkspaceData['originData'];
 }
 
 export type UmbBlockCatalogueModalValue =
