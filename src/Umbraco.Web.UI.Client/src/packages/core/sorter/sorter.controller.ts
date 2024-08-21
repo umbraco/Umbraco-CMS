@@ -329,6 +329,15 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 
+	/**
+	 * Returns the model of the sorter.
+	 * @return {Array<T>}
+	 * @memberof UmbSorterController
+	 */
+	getModel(): Array<T> {
+		return this.#model;
+	}
+
 	hasItem(unique: UniqueType) {
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique) !== undefined;
 	}
