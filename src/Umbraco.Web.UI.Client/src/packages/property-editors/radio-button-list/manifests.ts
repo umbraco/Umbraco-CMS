@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.RadioButtonList',
 			icon: 'icon-target',
 			group: 'lists',
+			supportsReadOnly: true,
 		},
 	},
 	radioButtonListSchemaManifest,

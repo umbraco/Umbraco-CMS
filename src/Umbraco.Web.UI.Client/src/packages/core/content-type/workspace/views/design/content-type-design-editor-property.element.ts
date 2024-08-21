@@ -12,7 +12,7 @@ import type {
 	UmbPropertyTypeModel,
 	UmbPropertyTypeScaffoldModel,
 } from '@umbraco-cms/backoffice/content-type';
-import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement, UUIInputLockElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -24,6 +24,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#context = new UmbPropertyTypeContext(this);
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#dataTypeUnique?: string;
+	#propertyUnique?: string;
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -52,6 +53,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._property = value;
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
+		this.#checkAliasAutoGenerate(this._property?.id);
 		this.#checkInherited();
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
@@ -81,6 +83,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	@state()
 	private _aliasLocked = true;
+
+	#autoGenerateAlias = true;
+
+	#checkAliasAutoGenerate(unique: string | undefined) {
+		if (unique === this.#propertyUnique) return;
+		this.#propertyUnique = unique;
+
+		if (this.#context.getAlias()) {
+			this.#autoGenerateAlias = false;
+		}
+	}
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
@@ -114,6 +127,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 
 	#onToggleAliasLock(event: CustomEvent) {
+		if (!this.property?.alias && (event.target as UUIInputLockElement).locked) {
+			this.#autoGenerateAlias = true;
+		} else {
+			this.#autoGenerateAlias = false;
+		}
+
 		this._aliasLocked = !this._aliasLocked;
 		if (!this._aliasLocked) {
 			(event.target as UUIInputElement)?.focus();
@@ -152,15 +171,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 
 	#onNameChanged(event: UUIInputEvent) {
-		const oldName = this.property?.name ?? '';
-		const oldAlias = this.property?.alias ?? '';
 		const newName = event.target.value.toString();
-		if (this._aliasLocked) {
-			const expectedOldAlias = generateAlias(oldName ?? '');
-			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
-			if (expectedOldAlias === oldAlias) {
-				this.#singleValueUpdate('alias', generateAlias(newName ?? ''));
-			}
+		if (this.#autoGenerateAlias) {
+			this.#singleValueUpdate('alias', generateAlias(newName ?? ''));
 		}
 		this.#singleValueUpdate('name', newName);
 	}

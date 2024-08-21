@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.Slider',
 			icon: 'icon-navigation-horizontal',
 			group: 'common',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{

@@ -1,6 +1,7 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SETTINGS_SECTION_ALIAS } from '../section/index.js';
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.SettingsWelcome',
@@ -14,7 +15,7 @@ export const manifests: Array<ManifestTypes> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				match: 'Umb.Section.Settings',
+				match: UMB_SETTINGS_SECTION_ALIAS,
 			},
 		],
 	},

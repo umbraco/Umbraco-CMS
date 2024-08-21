@@ -6,9 +6,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase implements UmbPropertyDatasetContext {
 	#elementManager: UmbBlockElementManager;
+
+	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
+	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
 
 	// default data:
 
@@ -58,5 +62,14 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	 */
 	async setPropertyValue(alias: string, value: unknown) {
 		return this.#elementManager.setPropertyValue(alias, value);
+	}
+
+	/**
+	 * Gets the read-only state of the current variant culture.
+	 * @returns {*}  {boolean}
+	 * @memberof UmbBlockGridInlinePropertyDatasetContext
+	 */
+	getCurrentVariantCultureIsReadOnly(): boolean {
+		return this.#currentVariantCultureIsReadOnly.getValue();
 	}
 }

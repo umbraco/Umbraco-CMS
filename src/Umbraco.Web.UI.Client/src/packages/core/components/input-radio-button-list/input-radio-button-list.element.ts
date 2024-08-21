@@ -21,6 +21,15 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 	@property({ type: Array })
 	public list: Array<UmbRadioButtonItem> = [];
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -36,7 +45,7 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 		if (!this.list) return nothing;
 
 		return html`
-			<uui-radio-group .value=${this.value} @change=${this.#onChange}>
+			<uui-radio-group .value=${this.value} @change=${this.#onChange} ?readonly=${this.readonly}>
 				${repeat(
 					this.list,
 					(item) => item,

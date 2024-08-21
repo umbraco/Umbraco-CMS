@@ -25,6 +25,7 @@ import {
 } from '../paths.js';
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
+import { sortVariants } from '../utils.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -45,7 +46,7 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { type Observable, firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -66,6 +67,7 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -101,6 +103,8 @@ export class UmbDocumentWorkspaceContext
 	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
 	/*#blueprint = new UmbObjectState<UmbDocumentBlueprintDetailModel | undefined>(undefined);
 	public readonly blueprint = this.#blueprint.asObservable();*/
+
+	readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -157,7 +161,7 @@ export class UmbDocumentWorkspaceContext
 			}
 			return [] as Array<UmbDocumentVariantOptionModel>;
 		},
-	);
+	).pipe(map((results) => results.sort(sortVariants)));
 
 	// TODO: this should be set up for all entity workspace contexts in a base class
 	#entityContext = new UmbEntityContext(this);

@@ -13,6 +13,15 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 	@property()
 	value?: string = '';
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -39,7 +48,8 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 			<umb-input-radio-button-list
 				.list=${this._list}
 				.value=${this.value ?? ''}
-				@change=${this.#onChange}></umb-input-radio-button-list>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}></umb-input-radio-button-list>
 		`;
 	}
 }

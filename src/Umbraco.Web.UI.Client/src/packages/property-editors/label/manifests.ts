@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			icon: 'icon-readonly',
 			group: 'common',
 			propertyEditorSchemaAlias: 'Umbraco.Label',
+			supportsReadOnly: true,
 		},
 	},
 	labelSchemaManifest,
