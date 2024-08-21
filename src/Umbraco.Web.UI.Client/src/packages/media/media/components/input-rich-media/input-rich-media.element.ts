@@ -117,15 +117,6 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	@property({ type: Boolean })
 	multiple = false;
 
-	/**
-	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
-
 	@property()
 	public override get value() {
 		return this.items?.map((item) => item.mediaKey).join(',');
@@ -158,6 +149,27 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	public get variantId(): string | undefined {
 		return this.#modalRouter.getUniquePathValue('variantId');
 	}
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
 
 	@state()
 	private _cards: Array<UmbRichMediaCardModel> = [];
