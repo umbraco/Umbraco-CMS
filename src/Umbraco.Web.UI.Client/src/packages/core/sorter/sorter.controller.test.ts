@@ -55,9 +55,70 @@ describe('UmbSorterController', () => {
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbSorterTestElement);
+		expect(element.sorter).to.be.instanceOf(UmbSorterController);
 	});
 
-	describe('Set up', () => {
+	describe('Public API', () => {
+		describe('methods', () => {
+			it('has a enable method', () => {
+				expect(element.sorter).to.have.property('enable').that.is.a('function');
+			});
+
+			it('has a disable method', () => {
+				expect(element.sorter).to.have.property('disable').that.is.a('function');
+			});
+
+			it('has a setModel method', () => {
+				expect(element.sorter).to.have.property('setModel').that.is.a('function');
+			});
+
+			it('has a hasItem method', () => {
+				expect(element.sorter).to.have.property('hasItem').that.is.a('function');
+			});
+
+			it('has a getItem method', () => {
+				expect(element.sorter).to.have.property('getItem').that.is.a('function');
+			});
+
+			it('has a setupItem method', () => {
+				expect(element.sorter).to.have.property('setupItem').that.is.a('function');
+			});
+
+			it('has a destroyItem method', () => {
+				expect(element.sorter).to.have.property('destroyItem').that.is.a('function');
+			});
+
+			it('has a hasOtherItemsThan method', () => {
+				expect(element.sorter).to.have.property('hasOtherItemsThan').that.is.a('function');
+			});
+
+			it('has a moveItemInModel method', () => {
+				expect(element.sorter).to.have.property('moveItemInModel').that.is.a('function');
+			});
+
+			it('has a updateAllowIndication method', () => {
+				expect(element.sorter).to.have.property('updateAllowIndication').that.is.a('function');
+			});
+
+			it('has a removeAllowIndication method', () => {
+				expect(element.sorter).to.have.property('removeAllowIndication').that.is.a('function');
+			});
+
+			it('has a notifyDisallowed method', () => {
+				expect(element.sorter).to.have.property('notifyDisallowed').that.is.a('function');
+			});
+
+			it('has a notifyRequestDrop method', () => {
+				expect(element.sorter).to.have.property('notifyRequestDrop').that.is.a('function');
+			});
+
+			it('has a destroy method', () => {
+				expect(element.sorter).to.have.property('destroy').that.is.a('function');
+			});
+		});
+	});
+
+	describe('Init', () => {
 		it('should find all items', () => {
 			const items = element.getAllItems();
 			expect(items.length).to.equal(4);
