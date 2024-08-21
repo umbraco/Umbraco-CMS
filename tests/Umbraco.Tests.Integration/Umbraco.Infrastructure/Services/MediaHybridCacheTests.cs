@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class MediaHybridCacheTests : UmbracoIntegrationTest
 {
-    private IPublishedMediaHybridCache PublishedMediaHybridCache => GetRequiredService<IPublishedMediaHybridCache>();
+    private IPublishedMediaCache PublishedMediaHybridCache => GetRequiredService<IPublishedMediaCache>();
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 

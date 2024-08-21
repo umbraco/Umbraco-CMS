@@ -33,7 +33,7 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         services.AddSingleton<IPublishedSnapshotService, PublishedSnapshotService >();
     }
 
-    private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<IPublishedContentHybridCache>();
+    private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
@@ -64,6 +64,7 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         };
         Mock.Get(HttpContextAccessor).Setup(x => x.HttpContext).Returns(httpContext);
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
+        
         IPublishedContent contentPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
         Assert.AreEqual(textPage.Key, contentPickerValue.Key);
         Assert.AreEqual(textPage.Id, contentPickerValue.Id);

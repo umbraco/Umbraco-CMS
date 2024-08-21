@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public class MediaCache : IPublishedMediaHybridCache
+public class MediaCache : IPublishedMediaCache
 {
     private readonly IMediaCacheService _mediaCacheService;
     private readonly PublishedContentTypeCache _publishedContentTypeCache;

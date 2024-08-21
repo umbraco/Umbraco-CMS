@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
 
 public class PublishedSnapshotElements
 {
-    public IPublishedContentHybridCache? ContentCache;
-    public IPublishedMediaHybridCache? MediaCache;
-    public IPublishedMemberHybridCache? MemberCache;
+    public IPublishedContentCache? ContentCache;
+    public IPublishedMediaCache? MediaCache;
+    public IPublishedMemberCache? MemberCache;
     public DomainCache? DomainCache;
     public IAppCache? ElementsCache;
 }

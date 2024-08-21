@@ -40,7 +40,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
-    private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<IPublishedContentHybridCache>();
+    private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
     private IContent VariantPage { get; set; }
 

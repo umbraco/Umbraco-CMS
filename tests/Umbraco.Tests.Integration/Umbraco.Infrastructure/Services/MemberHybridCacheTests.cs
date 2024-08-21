@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class MemberHybridCacheTests : UmbracoIntegrationTest
 {
-    private IPublishedMemberHybridCache PublishedMemberHybridCache => GetRequiredService<IPublishedMemberHybridCache>();
+    private IPublishedMemberCache PublishedMemberHybridCache => GetRequiredService<IPublishedMemberCache>();
 
     private IMemberEditingService MemberEditingService => GetRequiredService<IMemberEditingService>();
 
@@ -42,10 +42,10 @@ public class MemberHybridCacheTests : UmbracoIntegrationTest
     public async Task Can_Get_Member_By_Key()
     {
         Guid key = Guid.NewGuid();
-        await CreateMemberAsync(key);
+        var createdMember = await CreateMemberAsync(key);
 
         // Act
-        var member = await PublishedMemberHybridCache.GetByIdAsync(key);
+        var member = await PublishedMemberHybridCache.GetAsync(createdMember);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
@@ -57,7 +57,7 @@ public class MemberHybridCacheTests : UmbracoIntegrationTest
         Assert.AreEqual("T. Est", member.Name);
     }
 
-    private async Task CreateMemberAsync(Guid? key = null, bool titleIsSensitive = false)
+    private async Task<IMember> CreateMemberAsync(Guid? key = null, bool titleIsSensitive = false)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.SetIsSensitiveProperty("title", titleIsSensitive);
@@ -84,6 +84,7 @@ public class MemberHybridCacheTests : UmbracoIntegrationTest
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
         Assert.IsTrue(result.Success);
+        return result.Result.Content;
     }
 
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();

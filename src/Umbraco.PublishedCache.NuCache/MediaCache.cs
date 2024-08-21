@@ -99,4 +99,10 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
     public override IPublishedContentType? GetContentType(Guid key) => _snapshot.GetContentType(key);
 
     #endregion
+
+    public Task<IPublishedContent?> GetByIdAsync(int id) => throw new NotImplementedException();
+
+    public Task<IPublishedContent?> GetByKeyAsync(Guid key) => throw new NotImplementedException();
+
+    public Task<bool> HasByIdAsync(int id) => throw new NotImplementedException();
 }

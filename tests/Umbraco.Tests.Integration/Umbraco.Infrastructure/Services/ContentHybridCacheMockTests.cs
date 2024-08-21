@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 {
-    private IPublishedContentHybridCache _mockedCache;
+    private IPublishedContentCache _mockedCache;
     private Mock<INuCacheContentRepository> _mockedNucacheRepository;
     private IContentCacheService _mockContentCacheService;
 
@@ -81,7 +81,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>());
 
-        _mockedCache = new ContentCache(_mockContentCacheService, GetRequiredService<IIdKeyMap>(), GetRequiredService<IPublishedContentCacheAccessor>());
+        _mockedCache = new ContentCache(_mockContentCacheService, GetRequiredService<IPublishedContentCacheAccessor>());
     }
 
     [Test]

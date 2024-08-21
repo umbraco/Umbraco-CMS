@@ -6,17 +6,17 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
 
 internal class PublishedSnapshotElementsFactory : IPublishedSnapshotElementsFactory
 {
-    private readonly IPublishedContentHybridCache _contentHybridCache;
-    private readonly IPublishedMediaHybridCache _mediaHybridCache;
-    private readonly IPublishedMemberHybridCache _memberHybridCache;
+    private readonly IPublishedContentCache _contentHybridCache;
+    private readonly IPublishedMediaCache _mediaHybridCache;
+    private readonly IPublishedMemberCache _memberHybridCache;
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
     private IAppCache? _elementsCache;
     private SnapDictionary<int, Domain> _domainStore;
 
     public PublishedSnapshotElementsFactory(
-        IPublishedContentHybridCache contentHybridCache,
-        IPublishedMediaHybridCache mediaHybridCache,
-        IPublishedMemberHybridCache memberHybridCache,
+        IPublishedContentCache contentHybridCache,
+        IPublishedMediaCache mediaHybridCache,
+        IPublishedMemberCache memberHybridCache,
         IDefaultCultureAccessor defaultCultureAccessor)
     {
         _contentHybridCache = contentHybridCache;
