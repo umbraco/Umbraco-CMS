@@ -1,6 +1,15 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
-import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -131,7 +140,19 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
@@ -257,7 +278,8 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 				id="btn-add"
 				look="placeholder"
 				label=${this.localize.term('general_add')}
-				.href=${this._modalRoute?.({ index: -1 })}></uui-button>
+				.href=${this._modalRoute?.({ index: -1 })}
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 
@@ -276,22 +298,32 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#renderItem(link: UmbLinkPickerLink, index: number) {
 		const unique = this.#getUnique(link);
-		const href = this._modalRoute?.({ index }) ?? '#';
+		const href = this.readonly ? undefined : (this._modalRoute?.({ index }) ?? undefined);
 		return html`
 			<uui-ref-node
 				id=${unique}
-				href=${href}
+				href=${ifDefined(href)}
 				name=${link.name || ''}
-				detail=${(link.url || '') + (link.queryString || '')}>
+				detail=${(link.url || '') + (link.queryString || '')}
+				?readonly=${this.readonly}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
 				<uui-action-bar slot="actions">
-					<uui-button href=${href} label=${this.localize.term('general_edit')}></uui-button>
-					<uui-button
-						@click=${() => this.#requestRemoveItem(index)}
-						label=${this.localize.term('general_remove')}></uui-button>
+					${this.#renderEditAction(href)} ${this.#renderRemoveAction(index)}
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
+	}
+
+	#renderEditAction(href?: string) {
+		if (this.readonly || !href) return nothing;
+		return html` <uui-button href=${href} label=${this.localize.term('general_edit')}></uui-button> `;
+	}
+
+	#renderRemoveAction(index: number) {
+		if (this.readonly) return nothing;
+		return html` <uui-button
+			@click=${() => this.#requestRemoveItem(index)}
+			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
 	static override styles = [
