@@ -5,7 +5,7 @@ import { UmbLitElement } from '../lit-element/lit-element.element.js';
 
 @customElement('test-my-sorter')
 class UmbSorterTestElement extends UmbLitElement {
-	model: Array<string> = ['1', '2', '3'];
+	model: Array<string> = ['1', '2', '3', '4'];
 
 	sorter = new UmbSorterController<string, HTMLElement>(this, {
 		getUniqueOfElement: (element) => {
@@ -15,23 +15,33 @@ class UmbSorterTestElement extends UmbLitElement {
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.Test',
-		itemSelector: 'li',
-		containerSelector: 'ul',
+		itemSelector: '.item',
+		containerSelector: '#container',
+		disabledItemSelector: '.disabled',
 		onChange: ({ model }) => {
 			this.model = model;
 		},
 	});
 
 	getAllItems() {
-		return Array.from(this.shadowRoot!.querySelectorAll('li'));
+		return Array.from(this.shadowRoot!.querySelectorAll('.item')) as HTMLElement[];
+	}
+
+	getSortableItems() {
+		return Array.from(this.shadowRoot!.querySelectorAll('.item:not(.disabled')) as HTMLElement[];
+	}
+
+	getDisabledItems() {
+		return Array.from(this.shadowRoot!.querySelectorAll('.item.disabled')) as HTMLElement[];
 	}
 
 	override render() {
-		return html`<ul>
-			<li id="1">Item 1</li>
-			<li id="2">Item 2</li>
-			<li id="3">Item 3</li>
-		</ul>`;
+		return html`<div id="container">
+			<div id="1" class="item">Item 1</div>
+			<div id="2" class="item">Item 2</div>
+			<div id="3" class="item disabled">Item 3</div>
+			<div id="4" class="item">Item 4</div>
+		</div>`;
 	}
 }
 
@@ -50,13 +60,22 @@ describe('UmbSorterController', () => {
 	describe('Set up', () => {
 		it('should find all items', () => {
 			const items = element.getAllItems();
-			expect(items.length).to.equal(3);
+			expect(items.length).to.equal(4);
 		});
 
 		it('sets all allowed draggable items to draggable', () => {
-			const items = element.getAllItems();
+			const items = element.getSortableItems();
+			expect(items.length).to.equal(3);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.true;
+			});
+		});
+
+		it('sets all disabled items non draggable', () => {
+			const items = element.getDisabledItems();
+			expect(items.length).to.equal(1);
+			items.forEach((item) => {
+				expect(item.draggable).to.be.false;
 			});
 		});
 	});
@@ -72,10 +91,19 @@ describe('UmbSorterController', () => {
 	});
 
 	describe('enable', () => {
-		it('sets all items to draggable', () => {
-			const items = element.getAllItems();
+		it('sets all allowed items to draggable', () => {
+			const items = element.getSortableItems();
+			expect(items.length).to.equal(3);
 			items.forEach((item) => {
 				expect(item.draggable).to.be.true;
+			});
+		});
+
+		it('sets all disabled items non draggable', () => {
+			const items = element.getDisabledItems();
+			expect(items.length).to.equal(1);
+			items.forEach((item) => {
+				expect(item.draggable).to.be.false;
 			});
 		});
 	});
