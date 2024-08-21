@@ -17,7 +17,7 @@ export class UmbBlockListManagerContext<
 	setInlineEditingMode(inlineEditingMode: boolean | undefined) {
 		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);
 	}
-	getLiveEditingMode(): boolean | undefined {
+	getInlineEditingMode(): boolean | undefined {
 		return this.#inlineEditingMode.getValue();
 	}
 
