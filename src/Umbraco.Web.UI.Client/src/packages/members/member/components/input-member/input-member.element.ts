@@ -209,11 +209,11 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	#renderItem(item: UmbMemberItemModel) {
 		if (!item.unique) return nothing;
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique} ?readonly=${this.readonly}>
+			<uui-ref-node-member name=${item.name} id=${item.unique} ?readonly=${this.readonly}>
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
 				</uui-action-bar>
-			</uui-ref-node>
+			</uui-ref-node-member>
 		`;
 	}
 
