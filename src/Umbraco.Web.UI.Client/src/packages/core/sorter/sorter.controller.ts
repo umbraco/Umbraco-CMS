@@ -315,7 +315,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	 * @memberof UmbSorterController
 	 */
 	disable(): void {
-		console.log(this.#items);
 		if (!this.#enabled) return;
 		this.#enabled = false;
 		if (this.#isConnected) {
