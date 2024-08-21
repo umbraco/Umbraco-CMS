@@ -213,6 +213,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
 					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
+					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -226,6 +227,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 				label="${this.localize.term('general_open')} ${item.name}">
 				${this.localize.term('general_open')}
 			</uui-button>
+		`;
+	}
+
+	#renderRemoveButton(item: UmbMemberItemModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
 		`;
 	}
 
