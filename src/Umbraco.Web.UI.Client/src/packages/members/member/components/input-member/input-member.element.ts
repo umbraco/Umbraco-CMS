@@ -102,6 +102,27 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	@property({ type: Object, attribute: false })
 	public filter: (member: UmbMemberItemModel) => boolean = () => true;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
+
 	@state()
 	private _editMemberPath = '';
 
