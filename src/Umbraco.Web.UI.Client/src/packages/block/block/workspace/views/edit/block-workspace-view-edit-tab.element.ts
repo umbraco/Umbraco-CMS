@@ -83,17 +83,22 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 						class="properties"
 						.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`
 				: ''}
-			${repeat(
-				this._groups,
-				(group) => group.id,
-				(group) =>
-					html` <uui-box .headline=${group.name || ''}
-						><umb-block-workspace-view-edit-properties
-							.managerName=${this.#managerName}
-							class="properties"
-							.containerId=${group.id}></umb-block-workspace-view-edit-properties
-					></uui-box>`,
-			)}
+			${this.hideSingleGroup && this._groups.length === 1
+				? this.renderGroup(this._groups[0])
+				: repeat(
+						this._groups,
+						(group) => group.id,
+						(group) => html` <uui-box .headline=${group.name}>${this.renderGroup(group)}</uui-box>`,
+					)}
+		`;
+	}
+
+	renderGroup(group: UmbPropertyTypeContainerModel) {
+		return html`
+			<umb-block-workspace-view-edit-properties
+				.managerName=${this.#managerName}
+				class="properties"
+				.containerId=${group.id}></umb-block-workspace-view-edit-properties>
 		`;
 	}
 

@@ -1,5 +1,7 @@
+import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
+import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
@@ -8,8 +10,6 @@ import type {
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
-import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 
@@ -234,11 +234,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block .label=${this._label}></umb-ref-list-block>`;
+		return html`<umb-ref-list-block .label=${this._label} .icon=${this._icon}></umb-ref-list-block>`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block .label=${this._label}></umb-inline-list-block>`;
+		return html`<umb-inline-list-block .label=${this._label} .icon=${this._icon}></umb-inline-list-block>`;
 	}
 
 	#renderBlock() {
@@ -259,10 +259,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
 							${this._contentInvalid
-								? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
-								: ''}
+								? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+								: nothing}
 						</uui-button>`
-					: ''}
+					: nothing}
 				${this._hasSettings && this._workspaceEditSettingsPath
 					? html`<uui-button
 							label="Edit settings"
@@ -272,13 +272,16 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							<uui-icon name="icon-settings"></uui-icon>
 							${this._settingsInvalid
 								? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
-								: ''}
+								: nothing}
 						</uui-button>`
-					: ''}
+					: nothing}
 				<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
+			${!this._showContentEdit && this._contentInvalid
+				? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+				: nothing}
 		`;
 	}
 

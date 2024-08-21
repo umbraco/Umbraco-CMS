@@ -28,6 +28,7 @@ export function GetPropertyNameFromPath(path: string): string {
  *
  * @param data
  * @param path
+ * @returns {any}
  */
 function GetNextPropertyValueFromPath(data: any, path: string): any {
 	if (!data) return undefined;
@@ -56,7 +57,6 @@ function GetNextPropertyValueFromPath(data: any, path: string): any {
 		// check if the entryPointer is a JSON Path Filter ( starting with ?( and ending with ) ):
 		if (entryPointer.startsWith('?(') && entryPointer.endsWith(')')) {
 			// get the filter from the entryPointer:
-			console.log('query', entryPointer);
 			// get the filter as a function:
 			const jsFilter = JsFilterFromJsonPathFilter(entryPointer);
 			// find the index of the value that matches the filter:
@@ -90,10 +90,10 @@ function GetNextPropertyValueFromPath(data: any, path: string): any {
 }
 
 /**
- *
  * @param filter
+ * @returns {Array<(queryFilter: any) => boolean>} - array of methods that returns true if the given items property value matches the value of the query.
  */
-function JsFilterFromJsonPathFilter(filter: string): any {
+function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolean> {
 	// strip ?( and ) from the filter
 	const jsFilter = filter.slice(2, -1);
 	// split the filter into parts by splitting at ' && '

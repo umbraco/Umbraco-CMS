@@ -3,6 +3,7 @@ import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/i
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import {
 	UMB_BLOCK_RTE_WORKSPACE_MODAL,
+	type UmbBlockRteWorkspaceOriginData,
 	type UmbBlockRteWorkspaceData,
 } from '../workspace/block-rte-workspace.modal-token.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
@@ -14,11 +15,15 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT.TYPE,
 	UmbBlockRteTypeModel,
-	UmbBlockRteLayoutModel
+	UmbBlockRteLayoutModel,
+	UmbBlockRteWorkspaceOriginData
 > {
 	//
-	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
-	#workspaceModal: UmbModalRouteRegistrationController;
+	#catalogueModal: UmbModalRouteRegistrationController<
+		typeof UMB_BLOCK_CATALOGUE_MODAL.DATA,
+		typeof UMB_BLOCK_CATALOGUE_MODAL.VALUE
+	>;
+	#workspaceModal;
 
 	// We will just say its always allowed for RTE for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
@@ -35,7 +40,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						blocks: this._manager?.getBlockTypes() ?? [],
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
-						blockOriginData: {},
+						originData: {},
 					},
 				};
 			})

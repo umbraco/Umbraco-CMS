@@ -15,16 +15,16 @@ export class UmbValidationMessagesManager {
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
 	messages = this.#messages.asObservable();
 
-	/*constructor() {
-		this.#messages.asObservable().subscribe((x) => console.log('all messages:', x));
-	}*/
+	debug(logName: string) {
+		this.#messages.asObservable().subscribe((x) => console.log(logName, x, this.#translators));
+	}
 
 	getHasAnyMessages(): boolean {
 		return this.#messages.getValue().length !== 0;
 	}
 
 	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
-		path = path.toLowerCase();
+		//path = path.toLowerCase();
 		// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. using a more performant way than Regex:
 		return this.#messages.asObservablePart((msgs) =>
 			msgs.filter(
@@ -36,13 +36,13 @@ export class UmbValidationMessagesManager {
 	}
 
 	messagesOfTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
-		path = path.toLowerCase();
+		//path = path.toLowerCase();
 		// Find messages that matches the given type and path.
 		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => x.type === type && x.path === path));
 	}
 
 	hasMessagesOfPathAndDescendant(path: string): Observable<boolean> {
-		path = path.toLowerCase();
+		//path = path.toLowerCase();
 		return this.#messages.asObservablePart((msgs) =>
 			// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. Using a more performant way than Regex: [NL]
 			msgs.some(
@@ -53,7 +53,7 @@ export class UmbValidationMessagesManager {
 		);
 	}
 	getHasMessagesOfPathAndDescendant(path: string): boolean {
-		path = path.toLowerCase();
+		//path = path.toLowerCase();
 		return this.#messages
 			.getValue()
 			.some(
@@ -64,7 +64,8 @@ export class UmbValidationMessagesManager {
 	}
 
 	addMessage(type: UmbValidationMessageType, path: string, body: string, key: string = UmbId.new()): void {
-		path = this.#translatePath(path.toLowerCase()) ?? path.toLowerCase();
+		//path = this.#translatePath(path.toLowerCase()) ?? path.toLowerCase();
+		path = this.#translatePath(path) ?? path;
 		// check if there is an existing message with the same path and type, and append the new messages: [NL]
 		if (this.#messages.getValue().find((x) => x.type === type && x.path === path && x.body === body)) {
 			return;
@@ -73,7 +74,8 @@ export class UmbValidationMessagesManager {
 	}
 
 	addMessages(type: UmbValidationMessageType, path: string, bodies: Array<string>): void {
-		path = this.#translatePath(path.toLowerCase()) ?? path.toLowerCase();
+		//path = this.#translatePath(path.toLowerCase()) ?? path.toLowerCase();
+		path = this.#translatePath(path) ?? path;
 		// filter out existing messages with the same path and type, and append the new messages: [NL]
 		const existingMessages = this.#messages.getValue();
 		const newBodies = bodies.filter(
@@ -86,7 +88,7 @@ export class UmbValidationMessagesManager {
 		this.#messages.removeOne(key);
 	}
 	removeMessagesByTypeAndPath(type: UmbValidationMessageType, path: string): void {
-		path = path.toLowerCase();
+		//path = path.toLowerCase();
 		this.#messages.filter((x) => !(x.type === type && x.path === path));
 	}
 	removeMessagesByType(type: UmbValidationMessageType): void {
@@ -94,6 +96,7 @@ export class UmbValidationMessagesManager {
 	}
 
 	#translatePath(path: string): string | undefined {
+		//path = path.toLowerCase();
 		for (const translator of this.#translators) {
 			const newPath = translator.translate(path);
 			// If not undefined or false, then it was a valid translation: [NL]
