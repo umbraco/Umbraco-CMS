@@ -124,7 +124,12 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 	public set readonly(value) {
 		this.#readonly = value;
-		this.#readonly ? this.#sorter.disable() : this.#sorter.enable();
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
 	}
 	#readonly = false;
 
