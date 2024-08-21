@@ -89,8 +89,8 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     {
         var hybridCache = GetRequiredService<HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
-        var textPage = await _mockedCache.GetById(Textpage.Key, true);
-        var textPage2 = await _mockedCache.GetById(Textpage.Key, true);
+        var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
+        var textPage2 = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         AssertTextPage(textPage);
         AssertTextPage(textPage2);
         _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
@@ -101,8 +101,8 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     {
         var hybridCache = GetRequiredService<HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
-        var textPage = await _mockedCache.GetById(Textpage.Id, true);
-        var textPage2 = await _mockedCache.GetById(Textpage.Id, true);
+        var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
+        var textPage2 = await _mockedCache.GetByIdAsync(Textpage.Id, true);
         AssertTextPage(textPage);
         AssertTextPage(textPage2);
         _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
@@ -114,7 +114,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
 
         await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentTypeId});
-        var textPage = await _mockedCache.GetById(Textpage.Id, true);
+        var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
         AssertTextPage(textPage);
 
         _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(0));
@@ -126,7 +126,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
 
         await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentTypeId});
-        var textPage = await _mockedCache.GetById(Textpage.Key, true);
+        var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         AssertTextPage(textPage);
 
         _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(0));

@@ -11,5 +11,5 @@ public interface IPublishedMemberHybridCache : IPublishedMemberCache
     /// <param name="key">The key of the member to fetch</param>
     /// <param name="preview">Will fetch draft if this is set to true</param>
     /// <returns></returns>
-    Task<IPublishedMember?> GetById(Guid key);
+    Task<IPublishedMember?> GetByIdAsync(Guid key);
 }

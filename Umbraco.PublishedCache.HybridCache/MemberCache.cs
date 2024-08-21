@@ -16,11 +16,11 @@ public class MemberCache : IPublishedMemberHybridCache
         _publishedContentTypeCache = publishedContentCacheAccessor.Get();
     }
 
-    public async Task<IPublishedMember?> GetById(Guid key) =>
+    public async Task<IPublishedMember?> GetByIdAsync(Guid key) =>
         await _memberCacheService.GetByKey(key);
 
     // FIXME - these need to be refactored when removing nucache
-    public IPublishedContent? Get(IMember member) => GetById(member.Key).GetAwaiter().GetResult();
+    public IPublishedContent? Get(IMember member) => GetByIdAsync(member.Key).GetAwaiter().GetResult();
 
     public IPublishedContentType GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Member, id);
 

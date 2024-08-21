@@ -55,7 +55,7 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         var textPage = await CreateTextPageDocument(template.Id);
         var contentPickerDocument = await CreateContentPickerDocument(template.Id, textPage.Key);
 
-        var contentPickerPage = await PublishedContentHybridCache.GetById(contentPickerDocument.Id);
+        var contentPickerPage = await PublishedContentHybridCache.GetByIdAsync(contentPickerDocument.Id);
 
         var httpContext = new DefaultHttpContext()
         {
@@ -80,7 +80,7 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         var contentPickerDocument = await CreateContentPickerDocument(template.Id, textPage.Key);
 
         // Get for caching
-        var notUpdatedContent = await PublishedContentHybridCache.GetById(contentPickerDocument.Id);
+        var notUpdatedContent = await PublishedContentHybridCache.GetByIdAsync(contentPickerDocument.Id);
         
         var httpContext = new DefaultHttpContext()
         {
@@ -117,7 +117,7 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
 
         Assert.IsTrue(publishResult);
 
-        var contentPickerPage = await PublishedContentHybridCache.GetById(contentPickerDocument.Id);
+        var contentPickerPage = await PublishedContentHybridCache.GetByIdAsync(contentPickerDocument.Id);
         IPublishedContent updatedPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
 
    

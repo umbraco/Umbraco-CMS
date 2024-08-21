@@ -45,7 +45,7 @@ public class MemberHybridCacheTests : UmbracoIntegrationTest
         await CreateMemberAsync(key);
 
         // Act
-        var member = await PublishedMemberHybridCache.GetById(key);
+        var member = await PublishedMemberHybridCache.GetByIdAsync(key);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();

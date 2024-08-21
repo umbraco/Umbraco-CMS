@@ -20,7 +20,7 @@ public sealed class ContentCache : IPublishedContentHybridCache
         _contentTypeCache = publishedContentCacheAccessor.Get();
     }
 
-    public async Task<IPublishedContent?> GetById(int id, bool preview = false)
+    public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false)
     {
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         if (keyAttempt.Success is false)
@@ -32,23 +32,23 @@ public sealed class ContentCache : IPublishedContentHybridCache
     }
 
 
-    public async Task<IPublishedContent?> GetById(Guid key, bool preview = false) => await _contentCacheService.GetByKeyAsync(key, preview);
+    public async Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false) => await _contentCacheService.GetByKeyAsync(key, preview);
 
-    public async Task<bool> HasById(int id, bool preview = false) => await _contentCacheService.HasContentByIdAsync(id, preview);
+    public async Task<bool> HasByIdAsync(int id, bool preview = false) => await _contentCacheService.HasContentByIdAsync(id, preview);
 
-    public IPublishedContent? GetById(bool preview, int contentId) => GetById(contentId, preview).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
 
-    public IPublishedContent? GetById(bool preview, Guid contentId) => GetById(contentId, preview).GetAwaiter().GetResult();
-
-
-    public IPublishedContent? GetById(int contentId) => GetById(contentId, false).GetAwaiter().GetResult();
-
-    public IPublishedContent? GetById(Guid contentId) => GetById(contentId, false).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(bool preview, Guid contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
 
 
-    public bool HasById(bool preview, int contentId) => HasById(contentId, preview).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId, false).GetAwaiter().GetResult();
 
-    public bool HasById(int contentId) => HasById(contentId, false).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId, false).GetAwaiter().GetResult();
+
+
+    public bool HasById(bool preview, int contentId) => HasByIdAsync(contentId, preview).GetAwaiter().GetResult();
+
+    public bool HasById(int contentId) => HasByIdAsync(contentId, false).GetAwaiter().GetResult();
 
     public IPublishedContentType? GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Content, id);
 
