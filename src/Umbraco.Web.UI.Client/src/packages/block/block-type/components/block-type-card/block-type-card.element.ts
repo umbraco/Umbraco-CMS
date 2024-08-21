@@ -7,6 +7,7 @@ import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { UUICardEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
@@ -89,11 +90,16 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		});
 	}
 
+	#onOpen = () => {
+		this.dispatchEvent(new UUICardEvent(UUICardEvent.OPEN));
+	};
+
 	// TODO: Support image files instead of icons.
 	override render() {
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(this.href)}
+				@open=${this.#onOpen}
 				.name=${this._name ?? 'Unknown'}
 				.description=${this._description}
 				.background=${this.backgroundColor}>

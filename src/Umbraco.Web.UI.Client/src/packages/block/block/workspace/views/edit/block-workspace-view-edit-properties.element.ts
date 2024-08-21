@@ -4,7 +4,7 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -70,7 +70,8 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 				html`<umb-property-type-based-property
 					class="property"
 					data-path=${this._dataPaths![index]}
-					.property=${property}></umb-property-type-based-property> `,
+					.property=${property}
+					${umbDestroyOnDisconnect()}></umb-property-type-based-property>`,
 		);
 	}
 

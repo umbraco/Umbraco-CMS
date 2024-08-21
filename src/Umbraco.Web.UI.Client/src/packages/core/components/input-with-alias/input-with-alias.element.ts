@@ -14,7 +14,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	label: string = '';
 
 	@property({ type: String, reflect: false })
-	alias?: string;
+	alias = '';
 
 	@property({ type: Boolean, reflect: true })
 	required: boolean = false;
@@ -50,16 +50,10 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		const target = e.composedPath()[0] as UUIInputElement;
 
 		if (typeof target?.value === 'string') {
-			const oldName = this.value;
-			const oldAlias = this.alias ?? '';
 			this.value = e.target.value.toString();
 			if (this.autoGenerateAlias && this._aliasLocked) {
-				// If locked we will update the alias, but only if it matches the generated alias of the old name [NL]
-				const expectedOldAlias = generateAlias(oldName ?? '');
-				// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.) [NL]
-				if (expectedOldAlias === oldAlias) {
-					this.alias = generateAlias(this.value);
-				}
+				// Generate alias if it's locked and auto-generate is enabled
+				this.alias = generateAlias(this.value);
 			}
 
 			this.dispatchEvent(new UmbChangeEvent());
@@ -87,6 +81,13 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 
 	#onToggleAliasLock(event: CustomEvent) {
 		this._aliasLocked = !this._aliasLocked;
+		if (!this.alias && this._aliasLocked) {
+			// Reenable auto-generate if alias is empty and locked.
+			this.autoGenerateAlias = true;
+		} else {
+			this.autoGenerateAlias = false;
+		}
+
 		if (!this._aliasLocked) {
 			(event.target as UUIInputElement)?.focus();
 		}
@@ -105,12 +106,12 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				@input=${this.#onNameChange}
 				?required=${this.required}>
 				<uui-input-lock
-					auto-width
 					name="alias"
 					slot="append"
 					label=${aliasLabel}
 					placeholder=${aliasLabel}
 					.value=${this.alias}
+					?auto-width=${!!this.value}
 					?locked=${this._aliasLocked && !this.aliasReadonly}
 					?readonly=${this.aliasReadonly}
 					?required=${this.required}

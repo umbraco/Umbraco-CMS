@@ -36,6 +36,5 @@ export type ConditionTypes =
 	| UmbMultipleAppLanguageConditionConfig
 	| UmbSectionUserPermissionConditionConfig
 	| WorkspaceAliasConditionConfig
-	| WorkspaceEntityTypeConditionConfig
 	| WorkspaceContentTypeAliasConditionConfig
-	| UmbConditionConfigBase;
+	| WorkspaceEntityTypeConditionConfig;

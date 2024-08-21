@@ -72,7 +72,10 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		},
 	});
 
-	#workspaceModal?: UmbModalRouteRegistrationController;
+	#workspaceModal?: UmbModalRouteRegistrationController<
+		typeof UMB_WORKSPACE_MODAL.DATA,
+		typeof UMB_WORKSPACE_MODAL.VALUE
+	>;
 	#containerId?: string | null;
 
 	@property({ type: String })

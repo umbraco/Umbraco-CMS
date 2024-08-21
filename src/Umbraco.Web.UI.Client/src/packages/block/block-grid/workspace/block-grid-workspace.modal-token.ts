@@ -1,8 +1,8 @@
-import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockWorkspaceData, UmbBlockWorkspaceOriginData } from '@umbraco-cms/backoffice/block';
 import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbBlockGridWorkspaceOriginData {
+export interface UmbBlockGridWorkspaceOriginData extends UmbBlockWorkspaceOriginData {
 	index: number;
 	parentUnique: string | null;
 	areaKey?: string;
