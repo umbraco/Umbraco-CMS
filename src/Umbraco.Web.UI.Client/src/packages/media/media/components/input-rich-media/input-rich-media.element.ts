@@ -372,16 +372,19 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 					unique=${item.media}
 					alt=${item.name}
 					icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
-				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions">
-					<uui-button
-						label=${this.localize.term('general_remove')}
-						look="secondary"
-						@click=${() => this.#onRemove(item)}>
-						<uui-icon name="icon-trash"></uui-icon>
-					</uui-button>
-				</uui-action-bar>
+				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
+		`;
+	}
+
+	#renderActions(item: UmbRichMediaCardModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-action-bar slot="actions">
+				<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(item)}>
+					<uui-icon name="icon-trash"></uui-icon>
+				</uui-button>
+			</uui-action-bar>
 		`;
 	}
 
