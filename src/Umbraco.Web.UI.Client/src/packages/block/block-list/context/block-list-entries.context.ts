@@ -45,14 +45,23 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 					},
 				};
 			})
-			.onSubmit((value, data) => {
+			.onSubmit(async (value, data) => {
 				if (value?.create && data) {
-					console.log('create block', value.create.contentElementTypeKey, this.#catalogueModal);
-					this.create(
+					const created = await this.create(
 						value.create.contentElementTypeKey,
-						undefined,
+						{},
 						data.originData as UmbBlockListWorkspaceOriginData,
 					);
+					if (created) {
+						this.insert(
+							created.layout,
+							created.content,
+							created.settings,
+							data.originData as UmbBlockListWorkspaceOriginData,
+						);
+					} else {
+						throw new Error('Failed to create block');
+					}
 				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
