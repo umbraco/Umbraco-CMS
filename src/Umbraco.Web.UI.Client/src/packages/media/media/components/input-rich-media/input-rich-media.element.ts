@@ -355,7 +355,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}>
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}>
 				<uui-icon name="icon-add"></uui-icon>
 				${this.localize.term('general_choose')}
 			</uui-button>
