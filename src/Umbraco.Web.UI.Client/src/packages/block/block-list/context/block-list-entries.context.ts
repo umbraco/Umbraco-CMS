@@ -41,7 +41,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						originData: { index: index },
-						createBlockInWorkspace: this._manager.getLiveEditingMode() === false,
+						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,
 					},
 				};
 			})
