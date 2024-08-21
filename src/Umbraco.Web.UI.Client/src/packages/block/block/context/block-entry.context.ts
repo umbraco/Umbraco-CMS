@@ -1,4 +1,4 @@
-import type { UmbBlockManagerContext } from '../index.js';
+import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -25,10 +25,12 @@ export abstract class UmbBlockEntryContext<
 		BlockManagerContextTokenType,
 		BlockManagerContextType,
 		BlockType,
-		BlockLayoutType
+		BlockLayoutType,
+		BlockOriginData
 	>,
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase<any> {
 	//
 	_manager?: BlockManagerContextType;

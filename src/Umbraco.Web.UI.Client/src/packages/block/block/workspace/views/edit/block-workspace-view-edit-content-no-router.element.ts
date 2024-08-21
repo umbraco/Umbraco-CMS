@@ -47,7 +47,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#blockWorkspace = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
-			workspaceContext.content.createPropertyDatasetContext(this);
+
+			workspaceContext.content.setup(this);
 			this._observeRootGroups();
 		});
 	}
@@ -118,11 +119,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				? html`<umb-block-workspace-view-edit-tab
 						.managerName=${'content'}
 						.hideSingleGroup=${true}
-						.ownerTabId=${this._activeTabId && this.#tabsStructureHelper.isOwnerChildContainer(this._activeTabId)
-							? this._activeTabId
-							: null}
-						.noTabName=${this._hasRootGroups && this._activeTabName === null}
-						.tabName=${this._activeTabName ?? undefined}>
+						.containerId=${this._activeTabId}>
 					</umb-block-workspace-view-edit-tab>`
 				: ''}
 		`;
@@ -135,6 +132,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				display: block;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
+
+				padding: calc(var(--uui-size-layout-1));
 			}
 		`,
 	];

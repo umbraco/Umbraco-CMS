@@ -34,9 +34,9 @@ export class UmbBlockRteManagerContext<
 	create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		// TODO: [v15] ignoring unused modalData parameter to avoid breaking changes
+		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		modalData?: UmbBlockRteWorkspaceData,
+		originData?: UmbBlockRteWorkspaceData,
 	) {
 		const data = super.createBlockData(contentElementTypeKey, partialLayoutEntry);
 

@@ -39,7 +39,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 		return super.value?.toString() ?? '';
 	}
 
-	#editDataTypeModal?: UmbModalRouteRegistrationController;
+	#editDataTypeModal;
 
 	@state()
 	private _createRoute?: string;

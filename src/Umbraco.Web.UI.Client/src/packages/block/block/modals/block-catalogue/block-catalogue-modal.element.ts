@@ -32,20 +32,22 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		super();
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
-			new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
-				//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
-				.onSetup(() => {
-					return {
-						data: { preset: {}, originData: (modalContext.data as UmbBlockCatalogueModalData).blockOriginData },
-					};
-				})
-				.onSubmit(() => {
-					// When workspace is submitted, we want to close this modal.
-					this.modalContext?.submit();
-				})
-				.observeRouteBuilder((routeBuilder) => {
-					this._workspacePath = routeBuilder({});
-				});
+			if (modalContext.data.createBlockInWorkspace) {
+				new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
+					//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
+					.onSetup(() => {
+						return {
+							data: { preset: {}, originData: (modalContext.data as UmbBlockCatalogueModalData).originData },
+						};
+					})
+					.onSubmit(() => {
+						// When workspace is submitted, we want to close this modal.
+						this.modalContext?.submit();
+					})
+					.observeRouteBuilder((routeBuilder) => {
+						this._workspacePath = routeBuilder({});
+					});
+			}
 		});
 	}
 
@@ -82,6 +84,15 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	#onSearch(e: UUIInputEvent) {
 		this._search = e.target.value as string;
 		this.#updateFiltered();
+	}
+
+	#chooseBlock(contentElementTypeKey: string) {
+		this.value = {
+			create: {
+				contentElementTypeKey,
+			},
+		};
+		this.modalContext?.submit();
 	}
 
 	override render() {
@@ -128,7 +139,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 									.iconColor=${block.iconColor}
 									.backgroundColor=${block.backgroundColor}
 									.contentElementTypeKey=${block.contentElementTypeKey}
-									.href="${this._workspacePath}create/${block.contentElementTypeKey}">
+									@open=${() => this.#chooseBlock(block.contentElementTypeKey)}
+									?href=${this._workspacePath
+										? `${this._workspacePath}create/${block.contentElementTypeKey}`
+										: undefined}>
 								</umb-block-type-card>
 							`,
 						)}

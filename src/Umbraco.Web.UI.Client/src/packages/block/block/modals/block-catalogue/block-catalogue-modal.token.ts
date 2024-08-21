@@ -6,13 +6,20 @@ import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 export interface UmbBlockCatalogueModalData {
 	blocks: Array<UmbBlockTypeBaseModel>;
 	blockGroups?: Array<UmbBlockTypeGroup>;
+	createBlockInWorkspace?: boolean;
 	openClipboard?: boolean;
-	blockOriginData: UmbBlockWorkspaceData['originData'];
+	originData: UmbBlockWorkspaceData['originData'];
 }
 
-export type UmbBlockCatalogueModalValue = never;
+export type UmbBlockCatalogueModalValue =
+	| {
+			create?: {
+				contentElementTypeKey: string;
+			};
+	  }
+	| undefined;
 
-export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModalData, undefined>(
+export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue>(
 	'Umb.Modal.BlockCatalogue',
 	{
 		modal: {
