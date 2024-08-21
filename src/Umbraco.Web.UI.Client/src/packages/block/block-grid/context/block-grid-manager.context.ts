@@ -1,5 +1,5 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import type { UmbBlockGridWorkspaceData, UmbBlockGridWorkspaceOriginData } from '../index.js';
+import type { UmbBlockGridWorkspaceOriginData } from '../index.js';
 import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
 import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

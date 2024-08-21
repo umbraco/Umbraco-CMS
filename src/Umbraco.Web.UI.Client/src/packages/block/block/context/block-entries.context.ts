@@ -1,4 +1,4 @@
-import type { UmbBlockWorkspaceData, UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
+import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
 import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
