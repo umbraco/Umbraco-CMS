@@ -1,3 +1,5 @@
+import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
+import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
@@ -8,8 +10,6 @@ import type {
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
-import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 
