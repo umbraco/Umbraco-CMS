@@ -17,6 +17,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import './input-upload-field-file.element.js';
+import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { type ManifestFileUploadPreview, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
@@ -56,6 +59,17 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#manager = new UmbTemporaryFileManager(this);
 
+	#previewers = new UmbArrayState(<Array<ManifestFileUploadPreview>>[], (x) => x.alias);
+
+	constructor() {
+		super();
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (previews) => {
+			previews.forEach((preview) => {
+				this.#previewers.appendOne(preview.manifest);
+			});
+		});
+	}
+
 	#setExtensions(extensions: Array<string>) {
 		if (!extensions?.length) {
 			this._extensions = undefined;
@@ -71,6 +85,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			temporaryUnique: UmbId.new(),
 			file: e.detail.files[0],
 		};
+
 		const upload = this.#manager.uploadOne(item);
 
 		const reader = new FileReader();
@@ -111,6 +126,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#renderFile(src: string, file?: File) {
 		const extension = this.#getFileExtensionFromPath(src);
+		const element = this.#getElementFromFilePath(src);
+		console.log('element', element);
 
 		return html`
 			<div id="wrapper">
@@ -125,7 +142,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		`;
 
 		/**
-		 *
+		 * @returns {string} The template for the file extension.
 		 */
 		function getElementTemplate() {
 			switch (extension) {
@@ -141,6 +158,34 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 					return html`<umb-input-upload-field-file .path=${src} .file=${file}></umb-input-upload-field-file>`;
 			}
 		}
+	}
+
+	#getElementFromFilePath(path: string) {
+		const previews = this.#previewers.getValue();
+		const fallbackElement = previews.find((preview) => !preview.forMimeTypes?.length)?.element;
+
+		// Extract the the MIME type from the data url and get corresponding previewer.
+		if (path.startsWith('data:')) {
+			const mimeType = path.substring(5, path.indexOf(';'));
+
+			const manifest = previews.find((preview) => {
+				return preview.forMimeTypes?.find((type) => {
+					const snippet = type.replace('*', '');
+					if (mimeType.startsWith(snippet)) return preview;
+					if (mimeType.endsWith(snippet)) return preview;
+					return undefined;
+				});
+			});
+
+			if (manifest) return manifest.element;
+			return fallbackElement;
+		}
+
+		// Extract the file extension from the path
+		const extension = path.split('.').pop()?.toLowerCase();
+		if (!extension) return fallbackElement;
+
+		return fallbackElement;
 	}
 
 	#getFileExtensionFromPath(path: string): 'audio' | 'video' | 'image' | 'svg' | 'file' {
