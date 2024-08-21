@@ -61,7 +61,7 @@ test('can publish content with the upload article data type', async ({umbracoApi
 });
 
 const uploadFiles = [
-  {fileExtension: 'pdf', fileName: 'ArticlePDF.pdf'},
+  {fileExtension: 'pdf', fileName: 'Article.pdf'},
   {fileExtension: 'docx', fileName: 'ArticleDOCX.docx'},
   {fileExtension: 'doc', fileName: 'ArticleDOC.doc'}
 ];
@@ -92,9 +92,10 @@ for (const uploadFile of uploadFiles) {
 test.skip('can remove an article file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'Article.pdf';
+  const mimeType = 'application/pdf';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithUploadArticle(contentName, documentTypeId, uploadFileName);
+  await umbracoApi.document.createDocumentWithUploadFile(contentName, documentTypeId, dataTypeName, uploadFileName, mimeType);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
