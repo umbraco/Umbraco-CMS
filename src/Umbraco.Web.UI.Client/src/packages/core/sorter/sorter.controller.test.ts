@@ -5,8 +5,6 @@ import { UmbLitElement } from '../lit-element/lit-element.element.js';
 
 @customElement('test-my-sorter')
 class UmbSorterTestElement extends UmbLitElement {
-	model: Array<string> = ['1', '2', '3', '4'];
-
 	sorter = new UmbSorterController<string, HTMLElement>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -166,6 +164,42 @@ describe('UmbSorterController', () => {
 			items.forEach((item) => {
 				expect(item.draggable).to.be.false;
 			});
+		});
+	});
+
+	describe('setModel & getModel', () => {
+		it('it sets the model', () => {
+			const model = ['1', '2', '3', '4'];
+			element.sorter.setModel(model);
+			expect(element.sorter.getModel()).to.deep.equal(model);
+		});
+	});
+
+	describe('hasItem', () => {
+		beforeEach(() => {
+			element.sorter.setModel(['1', '2', '3', '4']);
+		});
+
+		it('returns true if item exists', () => {
+			expect(element.sorter.hasItem('1')).to.be.true;
+		});
+
+		it('returns false if item does not exist', () => {
+			expect(element.sorter.hasItem('5')).to.be.false;
+		});
+	});
+
+	describe('getItem', () => {
+		beforeEach(() => {
+			element.sorter.setModel(['1', '2', '3', '4']);
+		});
+
+		it('returns the item if it exists', () => {
+			expect(element.sorter.getItem('1')).to.equal('1');
+		});
+
+		it('returns undefined if item does not exist', () => {
+			expect(element.sorter.getItem('5')).to.be.undefined;
 		});
 	});
 });
