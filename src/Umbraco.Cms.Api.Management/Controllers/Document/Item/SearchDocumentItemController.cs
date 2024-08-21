@@ -22,14 +22,13 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _documentPresentationFactory = documentPresentationFactory;
     }
 
-    [HttpGet("search")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
+    [NonAction]
+    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
     public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
         => await Search1_1(cancellationToken, query, skip, take);
 
     [HttpGet("search")]
-    [MapToApiVersion("1.1")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Search1_1(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
     {
