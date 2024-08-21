@@ -26,6 +26,15 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		this._showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _min = 0;
 
@@ -57,7 +66,8 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.startNode=${startNode}
 				.value=${this.value}
 				?showOpenButton=${this._showOpenButton}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-document>
 		`;
 	}
