@@ -1,7 +1,16 @@
 import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
-import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -13,7 +22,6 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import '@umbraco-cms/backoffice/imaging';
 
 const elementName = 'umb-input-media';
-
 @customElement(elementName)
 export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement) {
 	#sorter = new UmbSorterController<string>(this, {
@@ -116,6 +124,27 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
+
 	@state()
 	private _editMediaPath = '';
 
@@ -182,7 +211,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderItems() {
-		if (!this._cards?.length) return;
+		if (!this._cards?.length) return nothing;
 		return html`
 			${repeat(
 				this._cards,
@@ -199,7 +228,8 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}>
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}>
 				<uui-icon name="icon-add"></uui-icon>
 				${this.localize.term('general_choose')}
 			</uui-button>
@@ -207,30 +237,34 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderItem(item: UmbMediaCardItemModel) {
+		const href = this.readonly ? undefined : `${this._editMediaPath}edit/${item.unique}`;
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
-				href="${this._editMediaPath}edit/${item.unique}">
+				href="${ifDefined(href)}"
+				?readonly=${this.readonly}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${item.name}
 					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions">
-					<uui-button
-						label=${this.localize.term('general_remove')}
-						look="secondary"
-						@click=${() => this.#onRemove(item)}>
-						<uui-icon name="icon-trash"></uui-icon>
-					</uui-button>
-				</uui-action-bar>
+				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
 	}
 
+	#renderRemoveAction(item: UmbMediaCardItemModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(item)}>
+				<uui-icon name="icon-trash"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderIsTrashed(item: UmbMediaCardItemModel) {
-		if (!item.isTrashed) return;
+		if (!item.isTrashed) return nothing;
 		return html`
 			<uui-tag size="s" slot="tag" color="danger">
 				<umb-localize key="mediaPicker_trashed">Trashed</umb-localize>
