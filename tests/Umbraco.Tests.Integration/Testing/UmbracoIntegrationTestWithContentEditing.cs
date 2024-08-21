@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -14,11 +13,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrationTest
 {
-    protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    protected IFileService FileService => GetRequiredService<IFileService>();
-
-    // protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
+    protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private ContentEditingService ContentEditingService =>
         (ContentEditingService)GetRequiredService<IContentEditingService>();
@@ -26,7 +23,6 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
     private ContentPublishingService ContentPublishingService =>
         (ContentPublishingService)GetRequiredService<IContentPublishingService>();
 
-    protected ContentCreateModel Trashed { get; private set; }
 
     protected ContentCreateModel Subpage2 { get; private set; }
     protected ContentCreateModel Subpage3 { get; private set; }
@@ -35,78 +31,82 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
     protected ContentCreateModel Textpage { get; private set; }
 
+    protected ContentScheduleCollection contentSchedule { get; private set; }
+
+    protected CultureAndScheduleModel cultureAndSchedule { get; private set; }
+
+    protected int TextpageId { get; private set; }
+
     protected ContentType ContentType { get; private set; }
 
     [SetUp]
-    public void Setup() => CreateTestData();
+    public new void Setup() => CreateTestData();
 
-    private async void CreateTestData()
+    protected async void CreateTestData()
     {
         // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
         ContentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         ContentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
         ContentType.AllowedAsRoot = true;
+        ContentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias) };
         var contentTypeResult = await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeResult.Success);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentEditingBuilder.CreateSimpleContent(ContentType);
         Textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-        var createContentResultTextPage =
-            await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
-
-        // Assert.IsTrue(createContentResultTextPage.Success);
+        var createContentResultTextPage = await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createContentResultTextPage.Success);
 
         if (!Textpage.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");
         }
 
+        if (createContentResultTextPage.Result.Content != null)
+        {
+            TextpageId = createContentResultTextPage.Result.Content.Id;
+        }
+
+        // Sets the culture and schedule for the content, in this case, we are publishing immediately for all cultures
+        contentSchedule = new ContentScheduleCollection();
+        cultureAndSchedule = new CultureAndScheduleModel
+        {
+            CulturesToPublishImmediately = new HashSet<string> { "*" }, Schedules = contentSchedule,
+        };
+
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         Subpage = ContentEditingBuilder.CreateSimpleContent(ContentType, "Text Page 1", Textpage.Key);
-        ContentScheduleCollection contentSchedule =
-            ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
-        CultureAndScheduleModel cultureAndSchedule = new CultureAndScheduleModel
-        {
-            CulturesToPublishImmediately = Subpage.Variants.Select(x => x.Culture).ToHashSet(),
-            Schedules = contentSchedule
-        };
-        var createContentResultSubPage =
-            await ContentEditingService.CreateAsync(Subpage, Constants.Security.SuperUserKey);
-
-        // Assert.IsTrue(createContentResultSubPage.Success);
+        var createContentResultSubPage = await ContentEditingService.CreateAsync(Subpage, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createContentResultSubPage.Success);
 
         if (!Subpage.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");
         }
 
-        await ContentPublishingService.PublishAsync(Subpage.Key.Value, cultureAndSchedule,
-            Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Subpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055
         Subpage2 = ContentEditingBuilder.CreateSimpleContent(ContentType, "Text Page 2", Textpage.Key);
-        var createContentResultSubPage2  = await ContentEditingService.CreateAsync(Subpage2, Constants.Security.SuperUserKey);
-
+        var createContentResultSubPage2 = await ContentEditingService.CreateAsync(Subpage2, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createContentResultSubPage2.Success);
         if (!Subpage2.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");
         }
 
         Subpage3 = ContentEditingBuilder.CreateSimpleContent(ContentType, "Text Page 3", Textpage.Key);
-        var createContentResultSubPage3  = await ContentEditingService.CreateAsync(Subpage3, Constants.Security.SuperUserKey);
-
+        var createContentResultSubPage3 = await ContentEditingService.CreateAsync(Subpage3, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createContentResultSubPage3.Success);
         if (!Subpage3.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");
         }
-        // // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
-        // Trashed = ContentEditingBuilder.CreateSimpleContent(ContentType, "Text Page Deleted", -20);
-        // Trashed.Trashed = true;
-        // ContentEditingService.CreateAsync(Trashed, -1);
     }
 }
