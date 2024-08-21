@@ -157,7 +157,7 @@ test('can add a min and max amount to a block list editor', {tag: '@smoke'}, asy
   expect(dataTypeData.values[0].value.max).toBe(maxAmount);
 });
 
-test('max can not be less than min', async ({page, umbracoApi, umbracoUi}) => {
+test('max can not be less than min', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 2;
   const oldMaxAmount = 2;
@@ -172,8 +172,7 @@ test('max can not be less than min', async ({page, umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible(false);
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
-  console.log(await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value'))
-  await expect(await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value')).toBeTruthy();
+  await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not be exceed the high value');
   expect(dataTypeData.values[0].value.min).toBe(minAmount);
   // The max value should not be updated
   expect(dataTypeData.values[0].value.max).toBe(oldMaxAmount);
