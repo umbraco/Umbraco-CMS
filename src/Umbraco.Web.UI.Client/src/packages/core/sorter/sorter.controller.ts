@@ -260,6 +260,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#dragX = 0;
 	#dragY = 0;
 
+	#items = Array<ElementType>();
+
 	public get identifier() {
 		return this.#config.identifier;
 	}
@@ -294,6 +296,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		});
 	}
 
+	/**
+	 * Enables the sorter, this will allow sorting to happen.
+	 * @return {*}  {void}
+	 * @memberof UmbSorterController
+	 */
 	enable(): void {
 		if (this.#enabled) return;
 		this.#enabled = true;
@@ -301,6 +308,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#initialize();
 		}
 	}
+
+	/**
+	 * Disables the sorter, this will prevent any sorting to happen.
+	 * @return {*}  {void}
+	 * @memberof UmbSorterController
+	 */
 	disable(): void {
 		if (!this.#enabled) return;
 		this.#enabled = false;
@@ -314,6 +327,15 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			// TODO: Some updates might need to be done, as the model is about to change? Do make the changes after setting the model?.. [NL]
 			this.#model = model;
 		}
+	}
+
+	/**
+	 * Returns the model of the sorter.
+	 * @return {Array<T>}
+	 * @memberof UmbSorterController
+	 */
+	getModel(): Array<T> {
+		return this.#model;
 	}
 
 	hasItem(unique: UniqueType) {
@@ -330,12 +352,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			requestAnimationFrame(this.#initialize);
 		}
 	}
+
 	override hostDisconnected() {
 		this.#isConnected = false;
 		if (this.#enabled) {
 			this.#uninitialize();
 		}
 	}
+
 	#initialize = () => {
 		const containerEl =
 			(this.#config.containerSelector
@@ -365,6 +389,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			subtree: false,
 		});
 	};
+
 	#uninitialize() {
 		// TODO: Is there more clean up to do??
 		this.#observer.disconnect();
@@ -377,6 +402,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			containerElement.removeEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
 			(this.#containerElement as unknown) = undefined;
 		}
+
+		this.#items.forEach((item) => this.destroyItem(item));
 	}
 
 	_itemDraggedOver = (e: DragEvent) => {
@@ -442,6 +469,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				}
 			}
 		}
+
+		this.#items.push(element);
+		this.#items = Array.from(new Set(this.#items));
 	}
 
 	destroyItem(element: HTMLElement) {
@@ -453,6 +483,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
 		//draggableElement.removeEventListener('dragend', this.#handleDragEnd);
+
+		(draggableElement as HTMLElement).draggable = false;
+
+		this.#items = this.#items.filter((x) => x !== element);
 	}
 
 	#setupPlaceholderStyle() {

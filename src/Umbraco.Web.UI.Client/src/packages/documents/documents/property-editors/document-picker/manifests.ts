@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
 			group: 'pickers',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{
