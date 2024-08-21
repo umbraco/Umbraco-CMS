@@ -1,4 +1,5 @@
 import type { UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
 import type { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbBlockEntryContext } from './block-entry.context.js';
@@ -15,7 +16,8 @@ export const UMB_BLOCK_ENTRY_CONTEXT = new UmbContextToken<
 			typeof UMB_BLOCK_MANAGER_CONTEXT,
 			typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE,
 			UmbBlockTypeBaseModel,
-			UmbBlockLayoutBaseModel
+			UmbBlockLayoutBaseModel,
+			UmbBlockWorkspaceOriginData
 		>,
 		UmbBlockTypeBaseModel,
 		UmbBlockLayoutBaseModel

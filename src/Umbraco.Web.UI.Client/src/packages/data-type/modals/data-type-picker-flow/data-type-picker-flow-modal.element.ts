@@ -47,7 +47,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	#collectionRepository;
 
-	#createDataTypeModal!: UmbModalRouteRegistrationController;
+	#createDataTypeModal!: UmbModalRouteRegistrationController<
+		typeof UMB_DATATYPE_WORKSPACE_MODAL.DATA,
+		typeof UMB_DATATYPE_WORKSPACE_MODAL.VALUE
+	>;
 
 	#currentFilterQuery = '';
 

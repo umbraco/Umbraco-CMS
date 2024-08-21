@@ -1,9 +1,9 @@
-import type { UmbBlockWorkspaceData } from '../workspace/index.js';
+import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -14,8 +14,9 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  *
- * @param entityType
- * @param guid
+ * @param {string} entityType - The entity type
+ * @param {string} guid - The entity
+ * @returns {string} UDI in the format `umb://<entityType>/<guid>`
  */
 function buildUdi(entityType: string, guid: string) {
 	return `umb://${entityType}/${guid.replace(/-/g, '')}`;
@@ -29,6 +30,7 @@ export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseMo
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+	BlockOriginDataType extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
 	get contentTypesLoaded() {
@@ -52,6 +54,9 @@ export abstract class UmbBlockManagerContext<
 	protected _editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
 	public readonly editorConfiguration = this._editorConfiguration.asObservable();
 
+	protected _liveEditingMode = new UmbBooleanState(undefined);
+	public readonly liveEditingMode = this._liveEditingMode.asObservable();
+
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
 	public readonly layouts = this._layouts.asObservable();
 
@@ -61,17 +66,11 @@ export abstract class UmbBlockManagerContext<
 	#settings = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
 	public readonly settings = this.#settings.asObservable();
 
-	// TODO: maybe its bad to consume Property Context, and instead wire this up manually in the property editor? With these: (and one for variant-id..)
-	/*setPropertyAlias(alias: string) {
-		this.#propertyAlias.setValue(alias);
-		this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
-	}
-	getPropertyAlias() {
-		this.#propertyAlias.value;
-	}*/
-
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this._editorConfiguration.setValue(configs);
+		if (this._liveEditingMode.getValue() === undefined) {
+			this._liveEditingMode.setValue(configs.getValueByAlias<boolean>('liveEditingMode'));
+		}
 	}
 	getEditorConfiguration(): UmbPropertyEditorConfigCollection | undefined {
 		return this._editorConfiguration.getValue();
@@ -173,7 +172,7 @@ export abstract class UmbBlockManagerContext<
 	}
 	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	setOneLayout(layoutData: BlockLayoutType, modalData?: UmbBlockWorkspaceData) {
+	setOneLayout(layoutData: BlockLayoutType, originData?: BlockOriginDataType) {
 		this._layouts.appendOne(layoutData);
 	}
 	setOneContent(contentData: UmbBlockDataType) {
@@ -207,7 +206,7 @@ export abstract class UmbBlockManagerContext<
 	abstract create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		modalData?: UmbBlockWorkspaceData,
+		originData?: BlockOriginDataType,
 	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
 
 	public createBlockSettingsData(contentElementTypeKey: string) {
@@ -263,16 +262,16 @@ export abstract class UmbBlockManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockWorkspaceData,
+		originData: BlockOriginDataType,
 	): boolean;
 
-	protected insertBlockData<ModalDataType extends UmbBlockWorkspaceData>(
+	protected insertBlockData(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
 		// TODO: [v15]: ignoring unused var here here to prevent a breaking change
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		modalData: ModalDataType,
+		originData: BlockOriginDataType,
 	) {
 		// Create content entry:
 		if (layoutEntry.contentUdi) {
