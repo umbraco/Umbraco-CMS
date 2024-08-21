@@ -117,6 +117,15 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	@property({ type: Boolean })
 	multiple = false;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@property()
 	public override get value() {
 		return this.items?.map((item) => item.mediaKey).join(',');
