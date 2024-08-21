@@ -377,9 +377,9 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 	#renderItem(item: UmbRichMediaCardModel) {
 		if (!item.unique) return nothing;
-		const href = this._routeBuilder?.({ key: item.unique });
+		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 		return html`
-			<uui-card-media id=${item.unique} name=${item.name} .href=${href}>
+			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
 				<umb-imaging-thumbnail
 					unique=${item.media}
 					alt=${item.name}
