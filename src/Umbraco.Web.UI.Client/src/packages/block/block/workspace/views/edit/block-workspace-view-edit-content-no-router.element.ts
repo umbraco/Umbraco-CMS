@@ -48,8 +48,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			this.#blockWorkspace = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
 
-			// TODO: Switch to use .setup when Validation is merged. [NL]
-			workspaceContext.content.createPropertyDatasetContext(this);
+			workspaceContext.content.setup(this);
 			this._observeRootGroups();
 		});
 	}
