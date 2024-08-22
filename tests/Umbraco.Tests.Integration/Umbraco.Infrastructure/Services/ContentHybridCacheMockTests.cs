@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Caching.Hybrid;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
@@ -24,6 +26,8 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     private IContentCacheService _mockContentCacheService;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
+
+    private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
 
     [SetUp]
     public void SetUp()
@@ -67,7 +71,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
                     SortOrder = 0,
                     Path = Textpage.Path,
                     Data = contentData,
-                    IsDraft = true,
+                    IsDraft = false,
                 },
             });
 
@@ -109,19 +113,60 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public async Task Content_Is_Seeded_By_ContentType_By_Id()
+    public async Task Content_Is_Seeded_By_Id()
     {
+        var schedule = new CultureAndScheduleModel
+        {
+            CulturesToPublishImmediately = new HashSet<string> { "*" }, Schedules = new ContentScheduleCollection(),
+        };
+
+        var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+        Textpage.Published = true;
         await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
 
         await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentTypeId});
-        var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
+        var textPage = await _mockedCache.GetByIdAsync(Textpage.Id);
         AssertTextPage(textPage);
 
         _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(0));
     }
 
     [Test]
-    public async Task Content_Is_Seeded_By_ContentType_By_Key()
+    public async Task Content_Is_Seeded_By_Key()
+    {
+        var schedule = new CultureAndScheduleModel
+        {
+            CulturesToPublishImmediately = new HashSet<string> { "*" }, Schedules = new ContentScheduleCollection(),
+        };
+
+        var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+        Textpage.Published = true;
+        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+
+        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentTypeId});
+        var textPage = await _mockedCache.GetByIdAsync(Textpage.Key);
+        AssertTextPage(textPage);
+
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(0));
+    }
+
+    [Test]
+    public async Task Content_Is_Not_Seeded_If_Unpublished_By_Id()
+    {
+
+        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+
+        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentTypeId});
+        var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
+        AssertTextPage(textPage);
+
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
+    }
+
+    [Test]
+    public async Task Content_Is_Not_Seeded_If_Unpublished_By_Key()
     {
         await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
 
@@ -129,7 +174,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         AssertTextPage(textPage);
 
-        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(0));
+        _mockedNucacheRepository.Verify(x => x.GetContentSource(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     private void AssertTextPage(IPublishedContent textPage)

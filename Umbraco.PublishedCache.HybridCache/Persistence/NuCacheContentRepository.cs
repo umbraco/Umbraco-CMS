@@ -65,6 +65,9 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
+        // always refresh the edited data
+        OnRepositoryRefreshed(serializer, contentCacheNode, false);
+
         switch (publishedState)
         {
             case PublishedState.Publishing:
@@ -72,9 +75,6 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
                 break;
             case PublishedState.Unpublishing:
                 Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = contentCacheNode.Id });
-                break;
-            default:
-                OnRepositoryRefreshed(serializer, contentCacheNode, false);
                 break;
         }
     }

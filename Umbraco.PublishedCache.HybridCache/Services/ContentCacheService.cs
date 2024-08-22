@@ -75,6 +75,11 @@ internal sealed class ContentCacheService : IContentCacheService
         IEnumerable<ContentCacheNode> contentCacheNodes = _nuCacheContentRepository.GetContentByContentTypeId(contentTypeIds);
         foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
         {
+            if (contentCacheNode.IsDraft)
+            {
+                continue;
+            }
+
             // Never expire seeded values
             var entryOptions = new HybridCacheEntryOptions
             {
