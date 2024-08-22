@@ -245,15 +245,7 @@ export class UmbPropertyEditorUIBlockListElement
 					</umb-block-list-entry>
 				`,
 			)}
-			<uui-button-group>
-				${this.#renderCreateButton()}
-				<uui-button
-					label=${this.localize.term('content_createFromClipboard')}
-					look="placeholder"
-					href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}>
-					<uui-icon name="icon-paste-in"></uui-icon>
-				</uui-button>
-			</uui-button-group>`;
+			<uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group>`;
 	}
 
 	#renderInlineCreateButton(index: number) {
@@ -277,6 +269,18 @@ export class UmbPropertyEditorUIBlockListElement
 
 		return html`
 			<uui-button look="placeholder" label=${this._createButtonLabel} href=${createPath ?? ''}></uui-button>
+		`;
+	}
+
+	#renderPasteButton() {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button
+				label=${this.localize.term('content_createFromClipboard')}
+				look="placeholder"
+				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}>
+				<uui-icon name="icon-paste-in"></uui-icon>
+			</uui-button>
 		`;
 	}
 
