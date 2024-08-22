@@ -10,7 +10,7 @@ import { UmbClassState, UmbObjectState, UmbStringState } from '@umbraco-cms/back
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
+import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
@@ -58,6 +58,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
+
+	#readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readonly readOnlyState = this.#readOnlyState;
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
