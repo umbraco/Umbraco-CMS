@@ -301,6 +301,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderDeleteAction() {
+		if (this.readonly) return nothing;
 		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 			<uui-icon name="icon-remove"></uui-icon>
 		</uui-button>`;
