@@ -240,4 +240,11 @@ public interface IDataTypeService : IService
     /// <param name="dataType">The data type whose configuration to validate.</param>
     /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
     IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType);
+
+    /// <summary>
+    ///     Gets all <see cref="IDataType" /> for a set of property editors
+    /// </summary>
+    /// <param name="propertyEditorAlias">Aliases of the property editors</param>
+    /// <returns>Collection of <see cref="IDataType" /> configured for the property editors</returns>
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias);
 }

@@ -114,6 +114,15 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         MapBlockItemDataToEditor(property, blockValue.SettingsData);
     }
 
+    protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)
+    {
+        yield return configuration.ContentElementTypeKey;
+        if (configuration.SettingsElementTypeKey is not null)
+        {
+            yield return configuration.SettingsElementTypeKey.Value;
+        }
+    }
+
     private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
     {
         var valEditors = new Dictionary<Guid, IDataValueEditor>();
