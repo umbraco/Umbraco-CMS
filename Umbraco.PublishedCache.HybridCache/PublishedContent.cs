@@ -135,7 +135,27 @@ internal class PublishedContent : PublishedContentBase
         return property;
     }
 
-    public override bool IsDraft(string? culture = null) => throw new NotImplementedException();
+    public override bool IsDraft(string? culture = null)
+    {
+        // if this is the 'published' published content, nothing can be draft
+        if (_contentData.Published)
+        {
+            return false;
+        }
+
+        // not the 'published' published content, and does not vary = must be draft
+        if (!ContentType.VariesByCulture())
+        {
+            return true;
+        }
+
+        // handle context culture
+        culture ??= VariationContextAccessor?.VariationContext?.Culture ?? string.Empty;
+
+        // not the 'published' published content, and varies
+        // = depends on the culture
+        return _contentData.CultureInfos is not null && _contentData.CultureInfos.TryGetValue(culture, out CultureVariation? cvar) && cvar.IsDraft;
+    }
 
     public override bool IsPublished(string? culture = null)
     {
