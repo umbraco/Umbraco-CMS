@@ -53,7 +53,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   //expect(contentData.values[0].value[0].name).toEqual(linkedDocumentId);
 
   // Clean
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName );
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
   await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });
 
@@ -220,7 +220,7 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -243,7 +243,7 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(1);
+  await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
