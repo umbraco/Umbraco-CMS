@@ -233,14 +233,6 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	override render() {
-		let createPath: string | undefined;
-		if (this._blocks?.length === 1) {
-			const elementKey = this._blocks[0].contentElementTypeKey;
-			createPath =
-				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
-		} else {
-			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
-		}
 		return html` ${repeat(
 				this._layouts,
 				(x) => x.contentUdi,
@@ -254,7 +246,7 @@ export class UmbPropertyEditorUIBlockListElement
 				`,
 			)}
 			<uui-button-group>
-				<uui-button look="placeholder" label=${this._createButtonLabel} href=${createPath ?? ''}></uui-button>
+				${this.#renderCreateButton()}
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"
@@ -269,6 +261,23 @@ export class UmbPropertyEditorUIBlockListElement
 		return html`<uui-button-inline-create
 			label=${this._createButtonLabel}
 			href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>`;
+	}
+
+	#renderCreateButton() {
+		if (this.readonly) return nothing;
+
+		let createPath: string | undefined;
+		if (this._blocks?.length === 1) {
+			const elementKey = this._blocks[0].contentElementTypeKey;
+			createPath =
+				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		} else {
+			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
+		}
+
+		return html`
+			<uui-button look="placeholder" label=${this._createButtonLabel} href=${createPath ?? ''}></uui-button>
+		`;
 	}
 
 	static override styles = [
