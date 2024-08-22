@@ -4,7 +4,7 @@ import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../type
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -244,15 +244,14 @@ export class UmbPropertyEditorUIBlockListElement
 		return html` ${repeat(
 				this._layouts,
 				(x) => x.contentUdi,
-				(layoutEntry, index) =>
-					html`<uui-button-inline-create
-							label=${this._createButtonLabel}
-							href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>
-						<umb-block-list-entry
-							.contentUdi=${layoutEntry.contentUdi}
-							.layout=${layoutEntry}
-							${umbDestroyOnDisconnect()}>
-						</umb-block-list-entry> `,
+				(layoutEntry, index) => html`
+					${this.#renderInlineCreateButton(index)}
+					<umb-block-list-entry
+						.contentUdi=${layoutEntry.contentUdi}
+						.layout=${layoutEntry}
+						${umbDestroyOnDisconnect()}>
+					</umb-block-list-entry>
+				`,
 			)}
 			<uui-button-group>
 				<uui-button look="placeholder" label=${this._createButtonLabel} href=${createPath ?? ''}></uui-button>
@@ -263,6 +262,13 @@ export class UmbPropertyEditorUIBlockListElement
 					<uui-icon name="icon-paste-in"></uui-icon>
 				</uui-button>
 			</uui-button-group>`;
+	}
+
+	#renderInlineCreateButton(index: number) {
+		if (this.readonly) return nothing;
+		return html`<uui-button-inline-create
+			label=${this._createButtonLabel}
+			href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>`;
 	}
 
 	static override styles = [
