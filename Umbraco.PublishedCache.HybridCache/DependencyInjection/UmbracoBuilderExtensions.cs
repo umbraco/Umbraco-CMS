@@ -7,14 +7,12 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
-using Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
 
 
 namespace Umbraco.Extensions;
@@ -35,21 +33,13 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPublishedContentCache, ContentCache>();
         builder.Services.AddSingleton<IPublishedMediaCache, MediaCache>();
         builder.Services.AddTransient<IPublishedMemberCache, MemberCache>();
-        builder.Services.AddSingleton<IDomainCache>(serviceProvider =>
-        {
-            IDefaultCultureAccessor defaultCultureAccessor = serviceProvider.GetRequiredService<IDefaultCultureAccessor>();
-            var domainStore = new SnapDictionary<int, Domain>();
-
-            // TODO: Remove all this snapshotting stuff from domain cache.
-            SnapDictionary<int, Domain>.Snapshot domainSnap = domainStore.CreateSnapshot();
-            var defaultCulture = defaultCultureAccessor.DefaultCulture;
-            return new DomainCache(domainSnap, defaultCulture);
-        });
+        builder.Services.AddSingleton<IDomainCache, DomainCache>();
 
         builder.Services.AddSingleton<IElementsCache, ElementsDictionaryAppCache>();
         builder.Services.AddSingleton<IContentCacheService, ContentCacheService>();
         builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
         builder.Services.AddTransient<IMemberCacheService, MemberCacheService>();
+        builder.Services.AddSingleton<IDomainCacheService, DomainCacheService>();
         builder.Services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
         builder.Services.AddTransient<ICacheNodeFactory, CacheNodeFactory>();
         builder.Services.AddSingleton<ICacheManager, CacheManager>();
