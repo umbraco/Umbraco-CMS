@@ -1,4 +1,5 @@
-import type { ManifestElementWithElementName, ManifestKind, ManifestBase } from '../types/index.js';
+import { WorkspaceAliasConditionConfig } from '@umbraco-cms/backoffice/workspace';
+import type { ManifestElementWithElementName, ManifestKind, ManifestBase, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import { UmbExtensionRegistry } from './extension.registry.js';
 import { expect } from '@open-wc/testing';
 
@@ -451,5 +452,85 @@ describe('UmbExtensionRegistry with exclusions', () => {
 			},
 		});
 		expect(extensionRegistry.isRegistered('Umb.Test.Section.Late')).to.be.false;
+	});
+});
+
+describe('Append Conditions', () => {
+	let extensionRegistry: UmbExtensionRegistry<any>;
+	let manifests: Array<
+		ManifestWithDynamicConditions
+	>;
+
+	beforeEach(() => {
+		extensionRegistry = new UmbExtensionRegistry<ManifestWithDynamicConditions>();
+		manifests = [
+			{
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				weight: 1,
+				conditions: [
+					{
+						alias: "Umb.Test.Condition.Valid"
+					}
+				]
+			},
+			{
+				type: 'section',
+				name: 'test-section-2',
+				alias: 'Umb.Test.Section.2',
+				weight: 200
+			},
+		];
+
+		manifests.forEach((manifest) => extensionRegistry.register(manifest));
+
+		extensionRegistry.register({
+			type: 'condition',
+			name: 'test-condition-invalid',
+			alias: 'Umb.Test.Condition.Invalid'
+		});
+	});
+
+
+	it('allows an extension condition to be updated', () => {
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Section.2')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Condition.Invalid')).to.be.true;
+		expect(extensionRegistry.isRegistered('Umb.Test.Condition.Valid')).to.be.false;
+
+		const ext = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+		expect(ext.conditions?.length).to.equal(1);
+
+		// Register new condition as if I was in my own entrypoint
+		extensionRegistry.register({
+			type: 'condition',
+			name: 'test-condition-valid',
+			alias: 'Umb.Test.Condition.Valid'
+		});
+
+		// Add the new condition to the extension
+		const conditionToAdd:UmbConditionConfigBase = {
+			alias: 'Umb.Test.Condition.Valid'
+		};
+		extensionRegistry.appendCondition('Umb.Test.Section.1', conditionToAdd);
+
+		// Check new condition is registered
+		expect(extensionRegistry.isRegistered('Umb.Test.Condition.Valid')).to.be.true;
+
+		// Verify the extension now has two conditions
+		const updatedExt = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+		expect(updatedExt.conditions?.length).to.equal(2);
+
+		// Add a condition with a specific config to Section2
+		const workspaceCondition:WorkspaceAliasConditionConfig = {
+			alias: 'Umb.Condition.WorkspaceAlias',
+			match: 'Umb.Workspace.Document'
+
+		};
+		extensionRegistry.appendCondition('Umb.Test.Section.2', workspaceCondition);
+
+		const updatedWorkspaceExt = extensionRegistry.getByAlias('Umb.Test.Section.2') as ManifestWithDynamicConditions;
+		expect(updatedWorkspaceExt.conditions?.length).to.equal(1);
 	});
 });

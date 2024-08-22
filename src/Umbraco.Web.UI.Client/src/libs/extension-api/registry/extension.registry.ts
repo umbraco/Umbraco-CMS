@@ -1,4 +1,4 @@
-import type { ManifestBase, ManifestKind } from '../types/index.js';
+import type { ManifestBase, ManifestKind, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
@@ -429,5 +429,32 @@ export class UmbExtensionRegistry<
 			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
+	}
+	
+	/**
+	 * Appends a new condition to an existing extension
+	 * Useful to add a condition for example the Save And Publish workspace action shipped by core
+	 * As overwriting the whole extension to simply add an extra condition is not ideal as it causes a lot of duplicated code
+	 * and could easily get out of sync from the CMS core implementation if a 3rd party dev was to try and overwrite it
+	 * @param alias {string} - The alias of the extension to get.
+	 * @param newCondition {UmbConditionConfigBase} - The condition to append to the extension.
+	 */
+	appendCondition(alias: string, newCondition: UmbConditionConfigBase) {
+		const allExtensions = this._extensions.getValue();
+		const extensionToUpdate = allExtensions.find((ext) => ext.alias === alias) as ManifestWithDynamicConditions;
+
+		if(extensionToUpdate === undefined) {
+			console.error(`Extension with alias ${alias} not found`);
+		}
+
+		// Append the condition to the extensions conditions array
+		if (extensionToUpdate.conditions){
+			extensionToUpdate.conditions.push(newCondition);
+		} else {
+			extensionToUpdate.conditions = [newCondition];
+		}
+
+		// Update the extensions observable
+		this._extensions.setValue(allExtensions);
 	}
 }
