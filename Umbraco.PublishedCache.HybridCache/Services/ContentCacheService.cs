@@ -131,11 +131,15 @@ internal sealed class ContentCacheService : IContentCacheService
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 
-    public Task DeleteItemAsync(int id)
+    public async Task DeleteItemAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _nuCacheContentRepository.DeleteContentItem(id);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, true));
+        await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, false));
+        _idKeyMap.ClearCache(keyAttempt.Result);
+        _idKeyMap.ClearCache(id);
         scope.Complete();
-        return Task.CompletedTask;
     }
 }

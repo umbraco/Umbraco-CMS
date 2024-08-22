@@ -110,6 +110,9 @@ internal class MediaCacheService : IMediaCacheService
             await _hybridCache.RemoveAsync(keyAttempt.Result.ToString());
         }
 
+        _idKeyMap.ClearCache(keyAttempt.Result);
+        _idKeyMap.ClearCache(id);
+
         scope.Complete();
     }
 
