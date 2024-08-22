@@ -94,6 +94,25 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.observe(context.variantId, (variantId) => {
 				this.#variantId.setValue(variantId);
 			});
+
+			// If the current property is readonly all inner block content should also be readonly.
+			this.observe(context.isReadOnly, (isReadOnly) => {
+				const unique = 'UMB_PROPERTY';
+				const variantId = this.#variantId.getValue();
+				if (variantId === undefined) return;
+
+				if (isReadOnly) {
+					const state = {
+						unique,
+						variantId,
+						message: '',
+					};
+
+					this.#readOnlyState?.addState(state);
+				} else {
+					this.#readOnlyState?.removeState(unique);
+				}
+			});
 		});
 
 		this.observe(this.variantId, (variantId) => {
