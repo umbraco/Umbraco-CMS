@@ -129,7 +129,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     ///     Executes the task.
     /// </summary>
     /// <param name="state">The task state.</param>
-    public async void ExecuteAsync(object? state)
+    public virtual async void ExecuteAsync(object? state)
     {
         try
         {

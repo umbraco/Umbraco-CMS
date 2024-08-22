@@ -36,6 +36,8 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     {
     }
 
+    public override bool SupportsConfigurableElements => true;
+
     #region Pre Value Editor
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
