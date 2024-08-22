@@ -48,6 +48,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 	private _contentUdi?: string | undefined;
 
+	/**
+	 * Sets the element to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public readonly = false;
+
 	#context = new UmbBlockListEntryContext(this);
 
 	@state()
