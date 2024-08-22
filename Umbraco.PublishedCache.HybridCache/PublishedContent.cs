@@ -16,7 +16,7 @@ internal class PublishedContent : PublishedContentBase
     public PublishedContent(
         ContentNode contentNode,
         ContentData contentData,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor)
         : base(variationContextAccessor)
     {
@@ -33,7 +33,7 @@ internal class PublishedContent : PublishedContentBase
             // add one property per property type - this is required, for the indexing to work
             // if contentData supplies pdatas, use them, else use null
             contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? pdatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, pdatas, publishedSnapshotAccessor, propertyType.CacheLevel);
+            properties[i++] = new PublishedProperty(propertyType, this, pdatas, elementsCache, propertyType.CacheLevel);
         }
 
         _properties = properties;

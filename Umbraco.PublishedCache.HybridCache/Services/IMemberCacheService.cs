@@ -1,8 +1,9 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 public interface IMemberCacheService
 {
-    Task<IPublishedMember?> GetByKey(Guid key);
+    Task<IPublishedMember?> Get(IMember member);
 }

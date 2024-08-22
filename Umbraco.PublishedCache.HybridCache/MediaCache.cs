@@ -5,15 +5,15 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public class MediaCache : IPublishedMediaHybridCache
+public class MediaCache : IPublishedMediaCache
 {
     private readonly IMediaCacheService _mediaCacheService;
     private readonly PublishedContentTypeCache _publishedContentTypeCache;
 
-    public MediaCache(IMediaCacheService mediaCacheService, IPublishedContentCacheAccessor publishedContentCacheAccessor)
+    public MediaCache(IMediaCacheService mediaCacheService, IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
     {
         _mediaCacheService = mediaCacheService;
-        _publishedContentTypeCache = publishedContentCacheAccessor.Get();
+        _publishedContentTypeCache = publishedContentTypeCacheAccessor.Get();
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id) => await _mediaCacheService.GetByIdAsync(id);

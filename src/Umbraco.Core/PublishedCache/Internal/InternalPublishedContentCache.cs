@@ -14,6 +14,12 @@ public sealed class InternalPublishedContentCache : PublishedCacheBase, IPublish
     {
     }
 
+    public Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false) => throw new NotImplementedException();
+
+    public Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false) => throw new NotImplementedException();
+
+    public Task<bool> HasByIdAsync(int id, bool preview = false) => throw new NotImplementedException();
+
     public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
 
     public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) =>
@@ -49,4 +55,9 @@ public sealed class InternalPublishedContentCache : PublishedCacheBase, IPublish
 
     // public void Add(InternalPublishedContent content) => _content[content.Id] = content.CreateModel(Mock.Of<IPublishedModelFactory>());
     public void Clear() => _content.Clear();
+    public Task<IPublishedContent?> GetByIdAsync(int id) => throw new NotImplementedException();
+
+    public Task<IPublishedContent?> GetByKeyAsync(Guid key) => throw new NotImplementedException();
+
+    public Task<bool> HasByIdAsync(int id) => throw new NotImplementedException();
 }

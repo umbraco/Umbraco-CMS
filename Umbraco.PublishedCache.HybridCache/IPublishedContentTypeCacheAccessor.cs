@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public interface IPublishedContentCacheAccessor
+public interface IPublishedContentTypeCacheAccessor
 {
     PublishedContentTypeCache Get();
 }

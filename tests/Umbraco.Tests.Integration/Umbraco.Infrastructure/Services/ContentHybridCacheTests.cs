@@ -17,7 +17,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
-    private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<IPublishedContentHybridCache>();
+    private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
@@ -31,6 +31,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Content_By_Id()
     {
         //Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, true);
 
         //Assert
@@ -41,6 +42,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Content_By_Key()
     {
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
 
         // Assert
@@ -55,6 +57,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
             Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId);
 
         // Assert
@@ -68,6 +71,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value);
 
         // Assert
@@ -79,6 +83,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     {
         // Act
         var hasContent = await PublishedContentHybridCache.HasById(TextpageId);
+        var hasContent = await PublishedContentHybridCache.HasByIdAsync(Textpage.Id);
 
         // Assert
         Assert.IsFalse(hasContent);
@@ -88,6 +93,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Has_Content_By_Id_Returns_True_If_In_Cache()
     {
         // Act
+        var hasContent = await PublishedContentHybridCache.HasByIdAsync(Textpage.Id, true);
         var hasContent = await PublishedContentHybridCache.HasById(TextpageId, true);
 
         // Assert
@@ -101,11 +107,14 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
         var hybridCache = GetRequiredService<HybridCache>();
         await hybridCache.RemoveAsync(Textpage.Key.ToString());
+        var hasContent = await PublishedContentHybridCache.HasByIdAsync(Textpage.Id);
         var hasContent = await PublishedContentHybridCache.HasById(TextpageId);
         Assert.IsFalse(hasContent);
+        await PublishedContentHybridCache.GetByIdAsync(Textpage.Id);
         await PublishedContentHybridCache.GetById(TextpageId);
 
         // Act
+        var hasContent2 = await PublishedContentHybridCache.HasByIdAsync(Textpage.Id);
         var hasContent2 = await PublishedContentHybridCache.HasById(TextpageId);
 
         // Assert
@@ -119,6 +128,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, true);
 
         // Assert
@@ -133,6 +143,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
 
         // Assert
@@ -159,6 +170,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
 
         // Act
+        var updatedPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
         var updatedPage = await PublishedContentHybridCache.GetById(TextpageId, true);
 
         // Assert
@@ -184,6 +196,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
 
         // Act
+        var updatedPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
         var updatedPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
 
         // Assert
@@ -213,6 +226,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, preview);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, preview);
 
         // Assert
@@ -242,6 +256,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, preview);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, preview);
 
         // Assert
@@ -255,6 +270,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, true);
 
         // Assert
@@ -269,6 +285,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
 
         // Assert
@@ -284,6 +301,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId);
 
         // Assert
@@ -300,6 +318,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 
         // Act
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value);
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
@@ -314,6 +333,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, true);
 
         // Assert
@@ -330,6 +350,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 
         // Act
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
@@ -354,6 +375,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, true);
 
         // Assert
@@ -405,6 +427,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId);
 
         // Assert
@@ -431,6 +454,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value);
 
         // Assert
@@ -459,6 +483,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, preview);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, preview);
 
         // Assert
@@ -487,6 +512,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, preview);
 
         // Assert
@@ -498,12 +524,15 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Not_Get_Deleted_Content_By_Id()
     {
         // Arrange
+        var content = await PublishedContentHybridCache.GetByIdAsync(Subpage3.Id, true);
+
         var content = await PublishedContentHybridCache.GetById(Subpage3.Key.Value, true);
         Assert.IsNotNull(content);
         await ContentEditingService.DeleteAsync(Textpage.Key.Value, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, true);
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, true);
 
         // Assert
         Assert.IsNull(textPage);
@@ -517,8 +546,11 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 
         Assert.IsNotNull(content);
         await ContentEditingService.DeleteAsync(Textpage.Key.Value, Constants.Security.SuperUserKey);
+        await PublishedContentHybridCache.GetByIdAsync(Subpage3.Key, true);
+        ContentService.Delete(Textpage);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, true);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, true);
 
         // Assert
@@ -535,6 +567,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.DeleteAsync(Textpage.Key.Value, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Id, preview);
         var textPage = await PublishedContentHybridCache.GetById(TextpageId, preview);
 
         // Assert
@@ -551,6 +584,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         await ContentEditingService.DeleteAsync(Textpage.Key.Value, Constants.Security.SuperUserKey);
 
         // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key, preview);
         var textPage = await PublishedContentHybridCache.GetById(Textpage.Key.Value, preview);
 
         // Assert

@@ -5,22 +5,21 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public class MemberCache : IPublishedMemberHybridCache
+public class MemberCache : IPublishedMemberCache
 {
     private readonly IMemberCacheService _memberCacheService;
     private readonly PublishedContentTypeCache _publishedContentTypeCache;
 
-    public MemberCache(IMemberCacheService memberCacheService, IPublishedContentCacheAccessor publishedContentCacheAccessor)
+    public MemberCache(IMemberCacheService memberCacheService, IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
     {
         _memberCacheService = memberCacheService;
-        _publishedContentTypeCache = publishedContentCacheAccessor.Get();
+        _publishedContentTypeCache = publishedContentTypeCacheAccessor.Get();
     }
 
-    public async Task<IPublishedMember?> GetById(Guid key) =>
-        await _memberCacheService.GetByKey(key);
+    public async Task<IPublishedMember?> GetAsync(IMember member) =>
+        await _memberCacheService.Get(member);
 
-    // FIXME - these need to be refactored when removing nucache
-    public IPublishedContent? Get(IMember member) => GetById(member.Key).GetAwaiter().GetResult();
+    public IPublishedMember? Get(IMember member) => GetAsync(member).GetAwaiter().GetResult();
 
     public IPublishedContentType GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Member, id);
 

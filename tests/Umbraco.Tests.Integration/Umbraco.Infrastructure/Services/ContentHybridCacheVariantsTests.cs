@@ -40,7 +40,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
 
     private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
-    private IPublishedContentHybridCache PublishedContentHybridCache => GetRequiredService<IPublishedContentHybridCache>();
+    private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
     private IContent VariantPage { get; set; }
 
@@ -53,7 +53,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
     public async Task Can_Set_Invariant_Title()
     {
         // Arrange
-        await PublishedContentHybridCache.GetById(VariantPage.Id, true);
+        await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Variant Title";
 
@@ -91,7 +91,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
 
         // Act
-        var textPage = await PublishedContentHybridCache.GetById(VariantPage.Id, true);
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
@@ -104,7 +104,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
     public async Task Can_Set_Invariant_Title_On_One_Culture()
     {
         // Arrange
-        await PublishedContentHybridCache.GetById(VariantPage.Id, true);
+        await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
         var updatedInvariantTitle = "Updated Invariant Title";
         var updatedVariantTitle = "Updated Invariant Title";
 
@@ -133,7 +133,7 @@ public class HybridCachingDocumentVariantsTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
 
         // Act
-        var textPage = await PublishedContentHybridCache.GetById(VariantPage.Id, true);
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
