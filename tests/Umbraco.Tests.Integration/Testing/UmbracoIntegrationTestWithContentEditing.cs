@@ -37,6 +37,12 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
     protected int TextpageId { get; private set; }
 
+    protected int SubpageId { get; private set; }
+
+    protected int Subpage2Id { get; private set; }
+
+    protected int Subpage3Id { get; private set; }
+
     protected ContentType ContentType { get; private set; }
 
     [SetUp]
@@ -90,6 +96,11 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
             throw new InvalidOperationException("The content page key is null.");
         }
 
+        if (createContentResultSubPage.Result.Content != null)
+        {
+            SubpageId = createContentResultSubPage.Result.Content.Id;
+        }
+
         await ContentPublishingService.PublishAsync(Subpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055
@@ -101,12 +112,22 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
             throw new InvalidOperationException("The content page key is null.");
         }
 
+        if (createContentResultSubPage2.Result.Content != null)
+        {
+            Subpage2Id = createContentResultSubPage2.Result.Content.Id;
+        }
+
         Subpage3 = ContentEditingBuilder.CreateSimpleContent(ContentType, "Text Page 3", Textpage.Key);
         var createContentResultSubPage3 = await ContentEditingService.CreateAsync(Subpage3, Constants.Security.SuperUserKey);
         Assert.IsTrue(createContentResultSubPage3.Success);
         if (!Subpage3.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");
+        }
+
+        if (createContentResultSubPage3.Result.Content != null)
+        {
+            Subpage3Id = createContentResultSubPage3.Result.Content.Id;
         }
     }
 }
