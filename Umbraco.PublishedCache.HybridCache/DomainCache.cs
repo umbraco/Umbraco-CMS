@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Infrastructure.HybridCache.Snapshot;
+using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -9,48 +9,26 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 /// </summary>
 public class DomainCache : IDomainCache
 {
-    private readonly SnapDictionary<int, Domain>.Snapshot _snapshot;
+    private readonly IDomainCacheService _domainCacheService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DomainCache" /> class.
     /// </summary>
-    public DomainCache(SnapDictionary<int, Domain>.Snapshot snapshot, string defaultCulture)
+    public DomainCache(IDefaultCultureAccessor defaultCultureAccessor, IDomainCacheService domainCacheService)
     {
-        _snapshot = snapshot;
-        DefaultCulture = defaultCulture;
+        _domainCacheService = domainCacheService;
+        DefaultCulture = defaultCultureAccessor.DefaultCulture;
     }
 
     /// <inheritdoc />
     public string DefaultCulture { get; }
 
     /// <inheritdoc />
-    public IEnumerable<Domain> GetAll(bool includeWildcards)
-    {
-        IEnumerable<Domain> list = _snapshot.GetAll();
-        if (includeWildcards == false)
-        {
-            list = list.Where(x => x.IsWildcard == false);
-        }
-
-        return list.OrderBy(x => x.SortOrder);
-    }
+    public IEnumerable<Domain> GetAll(bool includeWildcards) => _domainCacheService.GetAll(includeWildcards);
 
     /// <inheritdoc />
-    public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false)
-    {
-        // probably this could be optimized with an index
-        // but then we'd need a custom DomainStore of some sort
-        IEnumerable<Domain> list = _snapshot.GetAll();
-        list = list.Where(x => x.ContentId == documentId);
-        if (includeWildcards == false)
-        {
-            list = list.Where(x => x.IsWildcard == false);
-        }
-
-        return list.OrderBy(x => x.SortOrder);
-    }
+    public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false) => _domainCacheService.GetAssigned(documentId, includeWildcards);
 
     /// <inheritdoc />
-    public bool HasAssigned(int documentId, bool includeWildcards = false)
-        => documentId > 0 && GetAssigned(documentId, includeWildcards).Any();
+    public bool HasAssigned(int documentId, bool includeWildcards = false) => _domainCacheService.HasAssigned(documentId, includeWildcards);
 }

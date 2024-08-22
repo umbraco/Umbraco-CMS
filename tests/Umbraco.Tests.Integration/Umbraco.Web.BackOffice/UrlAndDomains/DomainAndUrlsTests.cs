@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
 public class DomainAndUrlsTests : UmbracoIntegrationTest
 {
+    
     [SetUp]
     public void Setup()
     {
@@ -66,6 +67,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IVariationContextAccessor>(_variationContextAccessor);
+        builder.AddUmbracoHybridCache();
         builder.AddNuCache();
     }
 
