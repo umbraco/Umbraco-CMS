@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -183,7 +182,6 @@ internal class PublishedProperty : PublishedPropertyBase
     private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
     {
         CacheValues cacheValues;
-        IPublishedSnapshot publishedSnapshot;
         IAppCache? cache;
         switch (cacheLevel)
         {
