@@ -13,6 +13,6 @@ internal sealed class DocumentNavigationService : ContentNavigationServiceBase, 
     public override async Task RebuildAsync()
         => await HandleRebuildAsync(Constants.Locks.ContentTree, Constants.ObjectTypes.Document, false);
 
-    public async Task RebuildBinAsync()
+    public override async Task RebuildBinAsync()
         => await HandleRebuildAsync(Constants.Locks.ContentTree, Constants.ObjectTypes.Document, true);
 }

@@ -990,4 +990,7 @@ internal class TestContentNavigationService : ContentNavigationServiceBase
 
     // Not needed for testing here
     public override Task RebuildAsync() => Task.CompletedTask;
+
+    // Not needed for testing here
+    public override Task RebuildBinAsync() => Task.CompletedTask;
 }

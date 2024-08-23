@@ -18,7 +18,15 @@ internal abstract class ContentNavigationServiceBase
         _navigationRepository = navigationRepository;
     }
 
+    /// <summary>
+    ///     Rebuilds the entire main navigation structure. Implementations should define how the structure is rebuilt.
+    /// </summary>
     public abstract Task RebuildAsync();
+
+    /// <summary>
+    ///     Rebuilds the recycle bin navigation structure. Implementations should define how the bin structure is rebuilt.
+    /// </summary>
+    public abstract Task RebuildBinAsync();
 
     public bool TryGetParentKey(Guid childKey, out Guid? parentKey)
         => TryGetParentKeyFromStructure(_navigationStructure, childKey, out parentKey);
