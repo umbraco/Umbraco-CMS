@@ -440,7 +440,7 @@ export class UmbExtensionRegistry<
 	 * Useful to add a condition for example the Save And Publish workspace action shipped by core
 	 * As overwriting the whole extension to simply add an extra condition is not ideal as it causes a lot of duplicated code
 	 * and could easily get out of sync from the CMS core implementation if a 3rd party dev was to try and overwrite it
-	 * @param alias {string} - The alias of the extension to get.
+	 * @param alias {string} - The alias of the extension to append the condition to
 	 * @param newCondition {UmbConditionConfigBase} - The condition to append to the extension.
 	 */
 	appendCondition(alias: string, newCondition: UmbConditionConfigBase) {
@@ -460,5 +460,14 @@ export class UmbExtensionRegistry<
 
 		// Update the extensions observable
 		this._extensions.setValue(allExtensions);
+	}
+
+	/**
+	 * Appends a collection of conditions to an exsiting extension
+	 * @param alias {string} - The alias of the extension to append the condition to
+	 * @param newConditions {Array<UmbConditionConfigBase>} - A collection of conditions to append to an extension.
+	 */
+	appendConditions(alias: string, newConditions: Array<UmbConditionConfigBase>){
+		newConditions.forEach((condition) => this.appendCondition(alias, condition));
 	}
 }

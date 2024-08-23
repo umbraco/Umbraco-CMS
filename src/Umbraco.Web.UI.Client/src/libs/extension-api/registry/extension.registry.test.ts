@@ -533,4 +533,24 @@ describe('Append Conditions', () => {
 		const updatedWorkspaceExt = extensionRegistry.getByAlias('Umb.Test.Section.2') as ManifestWithDynamicConditions;
 		expect(updatedWorkspaceExt.conditions?.length).to.equal(1);
 	});
+
+	it('allows an extension to update with multiple conditions', () => {
+		const ext = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+		expect(ext.conditions?.length).to.equal(1);
+
+		const conditions:Array<UmbConditionConfigBase> = [
+			{
+				alias: 'Umb.Test.Condition.Valid'
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Document'
+			} as WorkspaceAliasConditionConfig
+		]
+
+		extensionRegistry.appendConditions('Umb.Test.Section.1', conditions);
+
+		const extUpdated = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+		expect(ext.conditions?.length).to.equal(3);
+	});
 });
