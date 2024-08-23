@@ -98,7 +98,7 @@ test('can choose start node for the content picker in the content', async ({umbr
   await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
   const contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
-  const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);  
+  const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with start node
   const customDataTypeId = await umbracoApi.dataType.createContentPickerDataTypeWithStartNode(customDataTypeName, contentPickerId);
@@ -129,7 +129,7 @@ test.skip('can ignore user start node for the content picker in the content', as
   await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
   const childContentPickerDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childContentPickerDocumentTypeName);
   const contentPickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(contentPickerName, childContentPickerDocumentTypeId);
-  const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);  
+  const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(childContentPickerName, childContentPickerDocumentTypeId, contentPickerId);
   // Create a custom content picker with the setting "ignore user start node" is enable
   const customDataTypeId = await umbracoApi.dataType.createContentPickerDataTypeWithIgnoreUserStartNodes(customDataTypeName, contentPickerId);
@@ -161,7 +161,7 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.openContent(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeContentPicker(contentPickerName);
   await umbracoUi.content.clickSaveButton();
 
