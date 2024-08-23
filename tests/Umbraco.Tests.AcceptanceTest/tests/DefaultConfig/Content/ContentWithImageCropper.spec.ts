@@ -24,6 +24,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create content with the image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -40,6 +41,7 @@ test('can create content with the image cropper data type', {tag: '@smoke'}, asy
   await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(imageFileName));
   expect(contentData.values[0].value.crops).toEqual([]);
@@ -48,15 +50,14 @@ test('can create content with the image cropper data type', {tag: '@smoke'}, asy
 
 test('can publish content with the image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
   await umbracoUi.content.clickSaveAndPublishButton();
 
@@ -64,6 +65,7 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(imageFileName));
   expect(contentData.values[0].value.crops).toEqual([]);
@@ -75,14 +77,12 @@ test('can create content with the custom image cropper data type', {tag: '@smoke
   const customDataTypeName = 'CustomImageCropper';
   const cropValue = ['TestCropLabel', 100, 50];
   const customDataTypeId = await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropValue[0], cropValue[1], cropValue[2]);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
   await umbracoUi.content.clickSaveAndPublishButton();
 

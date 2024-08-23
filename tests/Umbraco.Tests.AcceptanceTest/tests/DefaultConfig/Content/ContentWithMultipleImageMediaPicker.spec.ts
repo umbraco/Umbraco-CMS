@@ -1,13 +1,12 @@
 ﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Multiple Media Picker';
+const dataTypeName = 'Multiple Image Media Picker';
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const firstMediaFileName = 'TestFirstMedia';
 const secondMediaFileName = 'TestSecondMedia';
-const firstMediaTypeName = 'File';
-const secondMediaTypeName = 'Image';
+const mediaTypeName = 'Image';
 let firstMediaFileId = '';
 let secondMediaFileId = '';
 
@@ -15,7 +14,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
-  firstMediaFileId = await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
+  firstMediaFileId = await umbracoApi.media.createDefaultMediaWithImage(firstMediaFileName);
   await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
   secondMediaFileId = await umbracoApi.media.createDefaultMediaWithImage(secondMediaFileName);
   await umbracoUi.goToBackOffice();
@@ -28,7 +27,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with multiple media picker data type', async ({umbracoApi, umbracoUi}) => {
+test('can create content with multiple image media picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft'; 
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -50,7 +49,7 @@ test('can create content with multiple media picker data type', async ({umbracoA
   expect(contentData.values).toEqual([]);
 });
 
-test('can publish content with multiple media picker data type', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with multiple image media picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published'; 
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -70,7 +69,7 @@ test('can publish content with multiple media picker data type', async ({umbraco
   expect(contentData.values).toEqual([]);
 });
 
-test('can add multiple media files to the multiple media picker', async ({umbracoApi, umbracoUi}) => {
+test('can add multiple images to the multiple image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -92,9 +91,9 @@ test('can add multiple media files to the multiple media picker', async ({umbrac
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.length).toBe(2);
   expect(contentData.values[0].value[0].mediaKey).toEqual(firstMediaFileId);
-  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(firstMediaTypeName);
+  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(mediaTypeName);
   expect(contentData.values[0].value[1].mediaKey).toEqual(secondMediaFileId);
-  expect(contentData.values[0].value[1].mediaTypeAlias).toEqual(secondMediaTypeName);
+  expect(contentData.values[0].value[1].mediaTypeAlias).toEqual(mediaTypeName);
 });
 
 test('can remove a media picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -116,7 +115,6 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.length).toBe(1);
   expect(contentData.values[0].value[0].mediaKey).toEqual(secondMediaFileId);
-  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(secondMediaTypeName);
+  expect(contentData.values[0].value[0].mediaTypeAlias).toEqual(mediaTypeName);
 });
-
 
