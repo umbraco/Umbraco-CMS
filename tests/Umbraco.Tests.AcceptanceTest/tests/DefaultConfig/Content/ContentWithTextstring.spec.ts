@@ -3,11 +3,14 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Radiobox';
+const dataTypeName = 'Textstring';
+const text = 'This is the content with textstring';
+const customDataTypeName = 'Custom Textstring';
 
-test.beforeEach(async ({umbracoApi}) => {
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -15,12 +18,11 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the radiobox data type', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the textstring data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const expectedState = 'Draft'; 
+  const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -38,13 +40,12 @@ test('can create content with the radiobox data type', async ({umbracoApi, umbra
   expect(contentData.values).toEqual([]);
 });
 
-test('can publish content with the radiobox data type', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with the textstring data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -59,29 +60,45 @@ test('can publish content with the radiobox data type', async ({umbracoApi, umbr
   expect(contentData.values).toEqual([]);
 });
 
-test('can create content with the custom radiobox data type', async ({umbracoApi, umbracoUi}) => {
+test('can input text into the textstring', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeName = 'CustomRadiobox';
-  const optionValues = ['testOption1', 'testOption2'];
-  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
+  await umbracoUi.content.enterTextstring(text);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(optionValues[0]);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value).toEqual(text);
+});
+
+test('cannot input the text that exceeds the allowed amount of characters', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const maxChars = 20;
+  const textExceedMaxChars = 'Lorem ipsum dolor sit';
+  const warningMessage = 'This field exceeds the allowed amount of characters';
+  const dataTypeId = await umbracoApi.dataType.createTextstringDataType(customDataTypeName, maxChars);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(textExceedMaxChars);
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
-

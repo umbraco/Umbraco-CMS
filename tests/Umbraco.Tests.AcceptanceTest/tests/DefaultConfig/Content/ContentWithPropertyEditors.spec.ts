@@ -47,30 +47,6 @@ test('can create content with the Rich Text Editor datatype', {tag: '@smoke'}, a
   expect(contentData.values[0].value).toEqual(expectedContentValue);
 });
 
-test('can create content with the text area datatype', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const dataTypeName = 'Textarea';
-  const contentText = 'This is Textarea content!';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
-  await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.enterTextArea(contentText);
-  await umbracoUi.content.clickSaveAndPublishButton();
-
-  // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toEqual(contentText);
-});
-
 // TODO: Remove skip when the front-end is ready. Currently it returns error when publishing a content
 test.skip('can create content with the upload file datatype', async ({umbracoApi, umbracoUi}) => {
   // Arrange
