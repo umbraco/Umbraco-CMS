@@ -1,4 +1,5 @@
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
 import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -16,6 +17,23 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
+
+	@state()
+	_readOnlyCultures: Array<string | null> = [];
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				context.readOnlyState.states,
+				(states) => {
+					this._readOnlyCultures = states.map((s) => s.variantId.culture);
+				},
+				'umbObserveReadOnlyStates',
+			);
+		});
+	}
 
 	override firstUpdated() {
 		this.#configureSelectionManager();
