@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
@@ -16,6 +17,23 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
+
+	@state()
+	_readOnlyCultures: Array<string | null> = [];
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				context.readOnlyState.states,
+				(states) => {
+					this._readOnlyCultures = states.map((s) => s.variantId.culture);
+				},
+				'umbObserveReadOnlyStates',
+			);
+		});
+	}
 
 	override firstUpdated() {
 		this.#configureSelectionManager();
@@ -46,6 +64,10 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		});
 	}
 
+	#userCanPickLanguageVariant = (option: UmbDocumentVariantOptionModel) => {
+		return this._readOnlyCultures.includes(option.culture) === false;
+	};
+
 	#submit() {
 		this.value = { selection: this.#selectionManager.getSelection() };
 		this.modalContext?.submit();
@@ -62,7 +84,8 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 			</p>
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
+				.variantLanguageOptions=${this._options}
+				.pickableFilter=${this.#userCanPickLanguageVariant}></umb-document-variant-language-picker>
 
 			<p><umb-localize key="content_variantsWillBeSaved">All new variants will be saved.</umb-localize></p>
 
