@@ -66,9 +66,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 
 	static renderLabel(option: UmbDocumentVariantOptionModel) {
 		return html`<div class="label" slot="label">
-			<strong>
-				${option.variant?.segment ? option.variant.segment + ' - ' : ''}${option.variant?.name ?? option.language.name}
-			</strong>
+			<strong> ${option.language.name} </strong>
 			<div class="label-status">${UmbDocumentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
 			${option.language.isMandatory && option.variant?.state !== UmbDocumentVariantState.PUBLISHED
 				? html`<div class="label-status">
