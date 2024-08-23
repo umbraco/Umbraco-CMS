@@ -1,4 +1,4 @@
-﻿import { expect } from '@playwright/test';
+﻿import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 let documentTypeId = '';
