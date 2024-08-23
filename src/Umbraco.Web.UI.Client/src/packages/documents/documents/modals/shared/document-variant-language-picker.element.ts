@@ -29,26 +29,39 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	@state()
 	_selection: Array<string> = [];
 
+	/**
+	 * A filter function that determines if an item is pickableFilter or not.
+	 * @memberof UmbDocumentVariantLanguagePickerElement
+	 * @returns {boolean} - True if the item is pickableFilter, false otherwise.
+	 */
+	public pickableFilter: (item: UmbDocumentVariantOptionModel) => boolean = () => true;
+
 	override render() {
 		return this.variantLanguageOptions.length
 			? repeat(
 					this.variantLanguageOptions,
 					(option) => option.unique,
-					(option) => html`
-						<uui-menu-item
-							selectable
-							label=${option.variant?.name ?? option.language.name}
-							@selected=${() => this.selectionManager.select(option.unique)}
-							@deselected=${() => this.selectionManager.deselect(option.unique)}
-							?selected=${this._selection.includes(option.unique)}>
-							<uui-icon slot="icon" name="icon-globe"></uui-icon>
-							${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
-						</uui-menu-item>
-					`,
+					(option) => html` ${this.#renderItem(option)} `,
 				)
 			: html`<uui-box>
 					<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
 				</uui-box>`;
+	}
+
+	#renderItem(option: UmbDocumentVariantOptionModel) {
+		const pickable = this.pickableFilter(option);
+		return html`
+			<uui-menu-item
+				?selectable=${pickable}
+				?disabled=${!pickable}
+				label=${option.variant?.name ?? option.language.name}
+				@selected=${() => this.selectionManager.select(option.unique)}
+				@deselected=${() => this.selectionManager.deselect(option.unique)}
+				?selected=${this._selection.includes(option.unique)}>
+				<uui-icon slot="icon" name="icon-globe"></uui-icon>
+				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
+			</uui-menu-item>
+		`;
 	}
 
 	static renderLabel(option: UmbDocumentVariantOptionModel) {
