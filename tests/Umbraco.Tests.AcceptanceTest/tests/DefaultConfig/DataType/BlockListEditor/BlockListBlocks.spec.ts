@@ -293,7 +293,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.selectBlockIconColor("");
+  await umbracoUi.dataType.selectBlockIconColor('');
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
