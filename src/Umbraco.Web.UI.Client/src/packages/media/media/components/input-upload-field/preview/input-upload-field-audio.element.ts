@@ -2,7 +2,7 @@ import { html, customElement, property, css } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-upload-field-audio')
-export class UmbInputUploadFieldAudioElement extends UmbLitElement {
+export default class UmbInputUploadFieldAudioElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 

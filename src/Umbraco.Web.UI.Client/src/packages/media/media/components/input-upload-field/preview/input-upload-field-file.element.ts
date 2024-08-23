@@ -4,7 +4,7 @@ import { html, customElement, property, state, css } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-upload-field-file')
-export class UmbInputUploadFieldFileElement extends UmbLitElement {
+export default class UmbInputUploadFieldFileElement extends UmbLitElement {
 	@property({ type: String })
 	path: string = '';
 

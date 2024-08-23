@@ -2,7 +2,7 @@ import { html, customElement, property, css } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-upload-field-video')
-export class UmbInputUploadFieldVideoElement extends UmbLitElement {
+export default class UmbInputUploadFieldVideoElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 

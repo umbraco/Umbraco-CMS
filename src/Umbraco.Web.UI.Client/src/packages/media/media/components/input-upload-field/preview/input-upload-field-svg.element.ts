@@ -1,18 +1,15 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-pdf-preview')
-export class UmbPDFPreviewElement extends UmbLitElement {
-	@property({ attribute: false })
-	file?: File;
-
+@customElement('umb-input-upload-field-svg')
+export default class UmbInputUploadFieldSvgElement extends UmbLitElement {
 	@property({ type: String })
-	path?: string;
+	path = '';
 
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
-		return html`This is the path: ${this.path} & the file is named ${this.file?.name}`;
+		return html`<img src=${this.path} alt="svg" />`;
 	}
 
 	static override styles = [
@@ -43,6 +40,6 @@ export class UmbPDFPreviewElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-pdf-preview': UmbPDFPreviewElement;
+		'umb-input-upload-field-svg': UmbInputUploadFieldSvgElement;
 	}
 }
