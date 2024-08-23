@@ -6,11 +6,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class NavigationFactory
 {
-/// <summary>
-///     Builds a dictionary of NavigationNode objects from a given dataset.
-/// </summary>
-/// <param name="dataset">The dataset of <see cref="NavigationDto" /> objects used to build the navigation nodes dictionary.</param>
-/// <returns>A dictionary of <see cref="NavigationNode" /> objects with key corresponding to their unique guid.</returns>
+    /// <summary>
+    ///     Builds a dictionary of NavigationNode objects from a given dataset.
+    /// </summary>
+    /// <param name="dataset">The dataset of <see cref="NavigationDto" /> objects used to build the navigation nodes dictionary.</param>
+    /// <returns>A dictionary of <see cref="NavigationNode" /> objects with key corresponding to their unique guid.</returns>
     public static ConcurrentDictionary<Guid, NavigationNode> BuildNavigationDictionary(IEnumerable<NavigationDto> dataset)
     {
         var nodesStructure = new ConcurrentDictionary<Guid, NavigationNode>();
