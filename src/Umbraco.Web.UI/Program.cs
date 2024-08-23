@@ -25,9 +25,9 @@ app.UseUmbraco()
     })
     .WithEndpoints(u =>
     {
-        #if (UmbracoRelease = 'LTS')
+        /*#if (UmbracoRelease = 'LTS')
         u.UseInstallerEndpoints();
-        #endif
+        #endif */
         u.UseBackOfficeEndpoints();
         u.UseWebsiteEndpoints();
     });
