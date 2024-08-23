@@ -81,11 +81,11 @@ internal sealed class ContentCacheService : IContentCacheService
                 continue;
             }
 
-            // Never expire seeded values
+            // Never expire seeded values, we cannot do TimeSpan.MaxValue sadly, so best we can do is a year.
             var entryOptions = new HybridCacheEntryOptions
             {
-                Expiration = TimeSpan.MaxValue,
-                LocalCacheExpiration = TimeSpan.MaxValue,
+                Expiration = TimeSpan.FromDays(365),
+                LocalCacheExpiration = TimeSpan.FromDays(365),
             };
 
             await _hybridCache.SetAsync(
