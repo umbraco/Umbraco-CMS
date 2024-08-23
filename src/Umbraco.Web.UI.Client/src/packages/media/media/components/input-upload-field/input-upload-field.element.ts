@@ -1,4 +1,5 @@
 import type { MediaValueType } from '../../property-editors/upload-field/types.js';
+import { getMimeTypeFromExtension } from './utils.js';
 import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -16,7 +17,6 @@ import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-import './input-upload-field-file.element.js';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { type ManifestFileUploadPreview, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -26,7 +26,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	@property({ type: Object })
 	set value(value: MediaValueType) {
 		if (!value?.src) return;
-		this._src = value.src;
+		this.src = value.src;
 	}
 	get value(): MediaValueType {
 		return !this.temporaryFile ? { src: this._src } : { temporaryFileId: this.temporaryFile.temporaryUnique };
@@ -48,11 +48,22 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	@state()
 	public temporaryFile?: UmbTemporaryFileModel;
 
+	public set src(src: string) {
+		this._src = src;
+		this._previewAlias = this.#getPreviewElementAlias();
+	}
+	public get src() {
+		return this._src;
+	}
+
 	@state()
 	private _src = '';
 
 	@state()
 	private _extensions?: string[];
+
+	@state()
+	private _previewAlias = '';
 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
@@ -79,6 +90,41 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this._extensions = extensions?.map((extension) => `.${extension}`);
 	}
 
+	#getPreviewElementAlias() {
+		const previews = this.#previewers.getValue();
+		const fallbackAlias = previews.find((preview) => !preview.forMimeTypes?.length)?.alias ?? '';
+
+		const mimeType = this.#getMimeTypeFromPath(this._src);
+		if (!mimeType) return fallbackAlias;
+
+		const manifest = previews.find((preview) => {
+			return preview.forMimeTypes?.find((type) => {
+				if (mimeType === type) preview.alias;
+
+				const snippet = type.replace('*', '');
+				if (mimeType.startsWith(snippet)) return preview.alias;
+				if (mimeType.endsWith(snippet)) return preview.alias;
+				return undefined;
+			});
+		});
+
+		if (manifest) return manifest.alias;
+		return fallbackAlias;
+	}
+
+	#getMimeTypeFromPath(path: string) {
+		// Extract the the MIME type from the data url
+		if (path.startsWith('data:')) {
+			const mimeType = path.substring(5, path.indexOf(';'));
+			return mimeType;
+		}
+
+		// Extract the file extension from the path
+		const extension = path.split('.').pop()?.toLowerCase();
+		if (!extension) return null;
+		return getMimeTypeFromExtension('.' + extension);
+	}
+
 	async #onUpload(e: UUIFileDropzoneEvent) {
 		//Property Editor for Upload field will always only have one file.
 		const item: UmbTemporaryFileModel = {
@@ -90,7 +136,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		const reader = new FileReader();
 		reader.onload = () => {
-			this._src = reader.result as string;
+			this.src = reader.result as string;
 		};
 		reader.readAsDataURL(item.file);
 
@@ -108,7 +154,11 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`${this._src ? this.#renderFile(this._src, this.temporaryFile?.file) : this.#renderDropzone()}`;
+		if (this.src && this._previewAlias) {
+			return this.#renderFile(this.src, this._previewAlias, this.temporaryFile?.file);
+		} else {
+			return this.#renderDropzone();
+		}
 	}
 
 	#renderDropzone() {
@@ -124,15 +174,16 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		`;
 	}
 
-	#renderFile(src: string, file?: File) {
-		const extension = this.#getFileExtensionFromPath(src);
-		const element = this.#getElementFromFilePath(src);
-		console.log('element', element);
-
+	#renderFile(src: string, previewAlias: string, file?: File) {
+		if (!previewAlias) return 'An error occurred. No previewer found for the file type.';
 		return html`
 			<div id="wrapper">
 				<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
-					${getElementTemplate()}
+					<umb-extension-slot
+						type="fileUploadPreview"
+						.props=${{ path: src, file: file }}
+						.filter=${(manifest: ManifestFileUploadPreview) => manifest.alias === previewAlias}>
+					</umb-extension-slot>
 					${this.temporaryFile?.status === TemporaryFileStatus.WAITING
 						? html`<umb-temporary-file-badge></umb-temporary-file-badge>`
 						: nothing}
@@ -140,73 +191,6 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			</div>
 			${this.#renderButtonRemove()}
 		`;
-
-		/**
-		 * @returns {string} The template for the file extension.
-		 */
-		function getElementTemplate() {
-			switch (extension) {
-				case 'audio':
-					return html`<umb-input-upload-field-audio .path=${src}></umb-input-upload-field-audio>`;
-				case 'video':
-					return html`<umb-input-upload-field-video .path=${src}></umb-input-upload-field-video>`;
-				case 'image':
-					return html`<umb-input-upload-field-image .path=${src}></umb-input-upload-field-image>`;
-				case 'svg':
-					return html`<umb-input-upload-field-svg .path=${src}></umb-input-upload-field-svg>`;
-				default:
-					return html`<umb-input-upload-field-file .path=${src} .file=${file}></umb-input-upload-field-file>`;
-			}
-		}
-	}
-
-	#getElementFromFilePath(path: string) {
-		const previews = this.#previewers.getValue();
-		const fallbackElement = previews.find((preview) => !preview.forMimeTypes?.length)?.element;
-
-		// Extract the the MIME type from the data url and get corresponding previewer.
-		if (path.startsWith('data:')) {
-			const mimeType = path.substring(5, path.indexOf(';'));
-
-			const manifest = previews.find((preview) => {
-				return preview.forMimeTypes?.find((type) => {
-					const snippet = type.replace('*', '');
-					if (mimeType.startsWith(snippet)) return preview;
-					if (mimeType.endsWith(snippet)) return preview;
-					return undefined;
-				});
-			});
-
-			if (manifest) return manifest.element;
-			return fallbackElement;
-		}
-
-		// Extract the file extension from the path
-		const extension = path.split('.').pop()?.toLowerCase();
-		if (!extension) return fallbackElement;
-
-		return fallbackElement;
-	}
-
-	#getFileExtensionFromPath(path: string): 'audio' | 'video' | 'image' | 'svg' | 'file' {
-		// Extract the MIME type from the data URL
-		if (path.startsWith('data:')) {
-			const mimeType = path.substring(5, path.indexOf(';'));
-			if (mimeType === 'image/svg+xml') return 'svg';
-			if (mimeType.startsWith('image/')) return 'image';
-			if (mimeType.startsWith('audio/')) return 'audio';
-			if (mimeType.startsWith('video/')) return 'video';
-		}
-
-		// Extract the file extension from the path
-		const extension = path.split('.').pop()?.toLowerCase();
-		if (!extension) return 'file';
-		if (['svg'].includes(extension)) return 'svg';
-		if (['mp3', 'weba', 'oga', 'opus'].includes(extension)) return 'audio';
-		if (['mp4', 'mov', 'webm', 'ogv'].includes(extension)) return 'video';
-		if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) return 'image';
-
-		return 'file';
 	}
 
 	#renderButtonRemove() {
@@ -216,7 +200,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#handleRemove() {
-		this._src = '';
+		this.src = '';
 		this.temporaryFile = undefined;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
