@@ -72,6 +72,7 @@ internal sealed class ContentCacheService : IContentCacheService
 
     public async Task SeedAsync(IReadOnlyCollection<int>? contentTypeIds)
     {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         IEnumerable<ContentCacheNode> contentCacheNodes = _nuCacheContentRepository.GetContentByContentTypeId(contentTypeIds);
         foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
         {
@@ -84,6 +85,7 @@ internal sealed class ContentCacheService : IContentCacheService
             var entryOptions = new HybridCacheEntryOptions
             {
                 Expiration = TimeSpan.MaxValue,
+                LocalCacheExpiration = TimeSpan.MaxValue,
             };
 
             await _hybridCache.SetAsync(
@@ -91,6 +93,8 @@ internal sealed class ContentCacheService : IContentCacheService
                 contentCacheNode,
                 entryOptions);
         }
+
+        scope.Complete();
     }
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)
