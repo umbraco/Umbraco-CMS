@@ -285,7 +285,7 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
 });
 
 // TODO: There is no frontend validation for min and max values
-test.skip('min can not be more than max an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
   const minAllowed = 6;
@@ -310,7 +310,7 @@ test.skip('min can not be more than max an area in a block', async ({page, umbra
 });
 
 // TODO: It is currently not possible to add a specified allowance
-test.skip('can add specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -332,25 +332,25 @@ test.skip('can add specified allowance for an area in a block', async ({page, um
 });
 
 // TODO: It is currently not possible to add a specified allowance
-test.skip('can update specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can update specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
 
 });
 
 // TODO: It is currently not possible to add a specified allowance
-test.skip('can remove specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
 
 });
 
 // TODO: It is currently not possible to add a specified allowance
-test.skip('can add multiple specified allowances for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add multiple specified allowances for an area in a block', async ({umbracoApi, umbracoUi}) => {
 
 });
 
 // TODO: It is currently not possible to add a specified allowance
-test.skip('can add specified allowance with min and max for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add specified allowance with min and max for an area in a block', async ({umbracoApi, umbracoUi}) => {
 });
 
 // TODO: It is currently not possible to add a specified allowance
-test.skip('can remove min and max from specified allowance for an area in a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove min and max from specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
 
 });

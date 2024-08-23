@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 //TODO: It is not possible to add a view to a block
-test.skip('can add a custom view to a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add a custom view to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -27,11 +27,10 @@ test.skip('can add a custom view to a block', async ({page, umbracoApi, umbracoU
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await page.pause();
 });
 
 //TODO: It is not possible to add a view to a block
-test.skip('can remove a custom view from a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -44,7 +43,7 @@ test.skip('can remove a custom view from a block', async ({page, umbracoApi, umb
 });
 
 // TODO: Stylesheets are currently saved as arrays
-test.skip('can remove a custom stylesheet from a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'
   const stylesheetPath = '/wwwroot/css/' + stylesheetName;
@@ -242,7 +241,7 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
 });
 
 // TODO: Thumbnails are not showing correctly
-test.skip('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -250,12 +249,12 @@ test.skip('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+  const mediaUrl = await umbracoApi.media.getMediaPathByName(mediaName);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  const mediaUrl = await umbracoApi.media.getMediaPathByName(mediaName);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl.fileName, mediaUrl.mediaPath);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
@@ -265,7 +264,7 @@ test.skip('can add a thumbnail to a block', async ({page, umbracoApi, umbracoUi}
 });
 
 // TODO: Thumbnails are not showing correctly
-test.skip('can remove a thumbnail from a block', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);

@@ -393,8 +393,8 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
 });
 
 // TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
-test.skip('can add a stylesheet a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
 });
 
-test.skip('can remove a stylesheet in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test.skip('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
 });
