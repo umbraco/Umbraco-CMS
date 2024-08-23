@@ -25,7 +25,7 @@ import {
 } from '../paths.js';
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { sortVariants } from '../utils.js';
+
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -104,7 +104,7 @@ export class UmbDocumentWorkspaceContext
 	/*#blueprint = new UmbObjectState<UmbDocumentBlueprintDetailModel | undefined>(undefined);
 	public readonly blueprint = this.#blueprint.asObservable();*/
 
-	readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	public readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -161,7 +161,7 @@ export class UmbDocumentWorkspaceContext
 			}
 			return [] as Array<UmbDocumentVariantOptionModel>;
 		},
-	).pipe(map((results) => results.sort(sortVariants)));
+	);
 
 	// TODO: this should be set up for all entity workspace contexts in a base class
 	#entityContext = new UmbEntityContext(this);
@@ -637,6 +637,11 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
+	#readOnlyLanguageVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
+		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
+		return readOnlyCultures.includes(option.culture) === false;
+	};
+
 	async #handleSaveAndPreview() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
@@ -681,6 +686,7 @@ export class UmbDocumentWorkspaceContext
 				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 					data: {
 						options,
+						pickableFilter: this.#readOnlyLanguageVariantsFilter,
 					},
 					value: { selection: selected },
 				})
@@ -786,6 +792,7 @@ export class UmbDocumentWorkspaceContext
 				.open(this, UMB_DOCUMENT_SAVE_MODAL, {
 					data: {
 						options,
+						pickableFilter: this.#readOnlyLanguageVariantsFilter,
 					},
 					value: { selection: selected },
 				})
@@ -833,6 +840,7 @@ export class UmbDocumentWorkspaceContext
 			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 				data: {
 					options,
+					pickableFilter: this.#readOnlyLanguageVariantsFilter,
 				},
 				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
 			})
@@ -873,6 +881,7 @@ export class UmbDocumentWorkspaceContext
 			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
 				data: {
 					options,
+					pickableFilter: this.#readOnlyLanguageVariantsFilter,
 				},
 				value: { selection: selected },
 			})
