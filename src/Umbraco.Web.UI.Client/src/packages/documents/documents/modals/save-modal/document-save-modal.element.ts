@@ -63,6 +63,10 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
+	#userCanPickLanguageVariant = (option: UmbDocumentVariantOptionModel) => {
+		return this._readOnlyCultures.includes(option.culture) === false;
+	};
+
 	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_readyToSave')}>
 			<p id="subtitle">
@@ -71,7 +75,8 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
+				.variantLanguageOptions=${this._options}
+				.pickableFilter=${this.#userCanPickLanguageVariant}></umb-document-variant-language-picker>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
