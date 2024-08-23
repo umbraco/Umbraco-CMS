@@ -1,5 +1,4 @@
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
 import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -17,23 +16,6 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
-
-	@state()
-	_readOnlyCultures: Array<string | null> = [];
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				context.readOnlyState.states,
-				(states) => {
-					this._readOnlyCultures = states.map((s) => s.variantId.culture);
-				},
-				'umbObserveReadOnlyStates',
-			);
-		});
-	}
 
 	override firstUpdated() {
 		this.#configureSelectionManager();
@@ -63,10 +45,6 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	#userCanPickLanguageVariant = (option: UmbDocumentVariantOptionModel) => {
-		return this._readOnlyCultures.includes(option.culture) === false;
-	};
-
 	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_readyToSave')}>
 			<p id="subtitle">
@@ -76,7 +54,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this._options}
-				.pickableFilter=${this.#userCanPickLanguageVariant}></umb-document-variant-language-picker>
+				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
