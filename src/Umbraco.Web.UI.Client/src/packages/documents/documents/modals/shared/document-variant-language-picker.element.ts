@@ -34,7 +34,22 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	 * @memberof UmbDocumentVariantLanguagePickerElement
 	 * @returns {boolean} - True if the item is pickableFilter, false otherwise.
 	 */
-	public pickableFilter: (item: UmbDocumentVariantOptionModel) => boolean = () => true;
+
+	@property({ attribute: false })
+	public get pickableFilter(): ((item: UmbDocumentVariantOptionModel) => boolean) | undefined {
+		return this.#pickableFilter;
+	}
+	public set pickableFilter(value: ((item: UmbDocumentVariantOptionModel) => boolean) | undefined) {
+		this.#pickableFilter = value;
+
+		if (this.#pickableFilter) {
+			this.#pickableFilter;
+		} else {
+			this.#pickableFilter = () => true;
+		}
+	}
+
+	#pickableFilter: ((item: UmbDocumentVariantOptionModel) => boolean) | undefined;
 
 	override render() {
 		return this.variantLanguageOptions.length
@@ -49,7 +64,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	}
 
 	#renderItem(option: UmbDocumentVariantOptionModel) {
-		const pickable = this.pickableFilter(option);
+		const pickable = this.#pickableFilter(option);
 		return html`
 			<uui-menu-item
 				?selectable=${pickable}
