@@ -205,8 +205,7 @@ test('can delete a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-// THIS TEST IS CURRENTLY FLAKY.
-test('can move a block from a group to another group in a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+test('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'MoveToHereGroup';
@@ -219,8 +218,8 @@ test('can move a block from a group to another group in a block grid editor', as
   await umbracoUi.dataType.clickAddGroupButton();
   await umbracoUi.dataType.enterGroupName(secondGroupName, 1);
   // Drag and Drop
-  const dragFromLocator = page.getByRole('link', {name: elementTypeName});
-  const dragToLocator = page.locator('.group').filter({hasText: secondGroupName}).locator('#add-button');
+  const dragFromLocator = await umbracoUi.dataType.getLinkWithName(elementTypeName);
+  const dragToLocator = await umbracoUi.dataType.getAddButtonInGroupWithName(secondGroupName);
   await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
   await umbracoUi.dataType.clickSaveButton();
 
@@ -230,7 +229,7 @@ test('can move a block from a group to another group in a block grid editor', as
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeFalsy();
 });
 
-// When deleting a group should there not be a confirmation button? and should the block be moved another group when the group it was in is deleted?
+// TODO: When deleting a group should there not be a confirmation button? and should the block be moved another group when the group it was in is deleted?
 test.skip('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
