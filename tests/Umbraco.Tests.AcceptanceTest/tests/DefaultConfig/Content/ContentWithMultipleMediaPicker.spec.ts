@@ -1,4 +1,4 @@
-﻿import { ConstantHelper, test, AliasHelper } from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Multiple Media Picker';
