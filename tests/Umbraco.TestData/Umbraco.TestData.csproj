@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+  <PropertyGroup>
+    <!--  TODO: [CS0618] handle member obsolete appropriately, [IDE1006] fix naming rule violation,
+      [IDE0057] simplify substring and remove this override -->
+    <WarningsNotAsErrors>CS0618,IDE1006,IDE0057</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" />

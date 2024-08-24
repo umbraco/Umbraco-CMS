@@ -3,13 +3,10 @@
     <Title>Umbraco CMS - Delivery API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Delivery API.</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+  <PropertyGroup>
+    <!--  TODO: [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers and remove this override -->
+    <WarningsNotAsErrors>ASP0019</WarningsNotAsErrors>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />

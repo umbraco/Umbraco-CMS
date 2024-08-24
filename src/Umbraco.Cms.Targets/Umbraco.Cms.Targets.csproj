@@ -5,7 +5,11 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998] remove async or make method synchronous,
+          and remove this override -->
+    <WarningsNotAsErrors>IDE0270,CS0108,CS1998</WarningsNotAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
@@ -21,12 +25,6 @@
     <_UmbracoCmsJsonSchemaReference>appsettings-schema.Umbraco.Cms.json</_UmbracoCmsJsonSchemaReference>
     <_UmbracoCmsPackageSchemaReference>umbraco-package-schema.json</_UmbracoCmsPackageSchemaReference>
     <NoWarn>NU5100;NU5128</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />

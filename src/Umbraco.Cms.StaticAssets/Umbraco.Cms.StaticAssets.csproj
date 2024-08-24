@@ -18,14 +18,6 @@
     <LoginPath>$(BasePath)\login</LoginPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
   <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="Build">
     <Message Text="Skip BuildBellissima target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip BuildBellissima target because '$(BellissimaPath)' already exists" Importance="high" Condition="Exists('$(BellissimaPath)')" />
