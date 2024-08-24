@@ -3,6 +3,7 @@
     <Title>Umbraco CMS - API Common</Title>
     <Description>Contains the bits and pieces that are shared between the Umbraco CMS APIs.</Description>
   </PropertyGroup>
+  
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

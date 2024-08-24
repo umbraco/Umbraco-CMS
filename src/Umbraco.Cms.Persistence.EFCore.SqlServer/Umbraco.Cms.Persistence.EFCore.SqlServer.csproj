@@ -3,6 +3,7 @@
     <Title>Umbraco CMS - Persistence - Entity Framework Core - SQL Server migrations</Title>
     <Description>Adds support for Entity Framework Core SQL Server migrations to Umbraco CMS.</Description>
   </PropertyGroup>
+  
   <ItemGroup>
     <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageReference Include="Azure.Identity" />
