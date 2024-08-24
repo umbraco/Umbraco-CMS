@@ -223,7 +223,42 @@ internal class PublishedProperty : PublishedPropertyBase
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
-        return PropertyType.ConvertInterToDeliveryApiObject(_content, PropertyCacheLevel.None, GetInterValue(culture, segment), _isPreviewing, expanding);
+
+        object? value;
+        CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
+
+
+        // initial reference cache level always is .Content
+        const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
+
+        object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing, expanding);
+        value = expanding
+            ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
+            : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
+
+        return value;
+    }
+
+    private object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiDefaultObjectValue = getValue();
+            cacheValues.DeliveryApiDefaultObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiDefaultObjectValue;
+    }
+
+    private object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiExpandedObjectValue = getValue();
+            cacheValues.DeliveryApiExpandedObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiExpandedObjectValue;
     }
 
     private class SourceInterValue
