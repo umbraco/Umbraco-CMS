@@ -1,5 +1,4 @@
 using System.Globalization;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -534,11 +533,6 @@ public static class ImageCropperTemplateCoreExtensions
             var cropperValue = mediaItem.Value(publishedValueFallback, propertyAlias);
 
             var mediaCrops = cropperValue as ImageCropperValue;
-
-            if (mediaCrops == null && cropperValue is JObject jobj)
-            {
-                mediaCrops = jobj.ToObject<ImageCropperValue>();
-            }
 
             if (mediaCrops == null && cropperValue is string imageCropperValue &&
                 string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson())

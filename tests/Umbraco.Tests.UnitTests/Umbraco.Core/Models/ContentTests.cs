@@ -1,15 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
@@ -241,7 +238,7 @@ public class ContentTests
         return new ProfilingLogger(logger, profiler);
     }
 
-    [Ignore("fixme - ignored test")]
+    [Ignore("TODO - ignored test")]
     [Test]
     public void Can_Deep_Clone_Perf_Test()
     {
@@ -503,7 +500,7 @@ public class ContentTests
         content.UpdateDate = DateTime.Now;
         content.WriterId = 23;
 
-        var json = JsonConvert.SerializeObject(content);
+        var json = JsonSerializer.Serialize(content);
         Debug.Print(json);
     }
 

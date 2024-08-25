@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -88,14 +88,14 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
-        var valueEditor = (BlockValuePropertyValueEditorBase)editor.GetValueEditor();
+        var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
 
         var elementId = Guid.NewGuid();
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
                 Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
-                Blocks = JsonSerializer.Deserialize<BlockValue>($$"""
+                Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
@@ -104,7 +104,7 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
-                                                                  			"contentTypeKey": "{{elementType.Key:B}}",
+                                                                  			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"udi": "umb://element/{{elementId:N}}",
                                                                   			"contentPicker": "umb://document/{{pickedContent.Key:N}}"
                                                                   		}
@@ -139,14 +139,14 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
-        var valueEditor = (BlockValuePropertyValueEditorBase)editor.GetValueEditor();
+        var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
 
         var elementId = Guid.NewGuid();
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
                 Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
-                Blocks = JsonSerializer.Deserialize<BlockValue>($$"""
+                Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
@@ -155,9 +155,9 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
-                                                                  			"contentTypeKey": "{{elementType.Key:B}}",
+                                                                  			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"udi": "umb://element/{{elementId:N}}",
-                                                                  			"tags": "['Tag One', 'Tag Two', 'Tag Three']"
+                                                                  			"tags": "[\"Tag One\", \"Tag Two\", \"Tag Three\"]"
                                                                   		}
                                                                   	],
                                                                   	"settingsData": []

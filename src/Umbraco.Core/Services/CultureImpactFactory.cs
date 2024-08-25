@@ -18,12 +18,6 @@ public class CultureImpactFactory : ICultureImpactFactory
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
-    [Obsolete("Use constructor that takes IOptionsMonitor<SecuritySettings> instead. Scheduled for removal in V12")]
-    public CultureImpactFactory(IOptionsMonitor<SecuritySettings> securitySettings)
-        : this(StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
-    {
-    }
-
     /// <inheritdoc/>
     public CultureImpact? Create(string? culture, bool isDefault, IContent content)
     {

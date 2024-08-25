@@ -26,7 +26,7 @@ public static class PropertyTagsExtensions
 
         var configurationObject = property.PropertyType is null
             ? null
-            : dataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
+            : dataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
         TagConfiguration? configuration = configurationObject as TagConfiguration;
 
         if (configuration is not null && configuration.Delimiter == default)

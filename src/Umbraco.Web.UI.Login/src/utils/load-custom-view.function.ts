@@ -1,5 +1,4 @@
-import { html } from 'lit';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { html, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * Try to load a custom view.

@@ -211,9 +211,10 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
         // The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
         xml.Add(new XAttribute("Id", dataType.EditorAlias));
+        xml.Add(new XAttribute("EditorUiAlias", dataType.EditorUiAlias ?? dataType.EditorAlias));
         xml.Add(new XAttribute("Definition", dataType.Key));
         xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-        xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.Configuration)));
+        xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationObject)));
 
         var folderNames = string.Empty;
         var folderKeys = string.Empty;
@@ -396,7 +397,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             foreach (ContentTypeSort allowedType in mediaType.AllowedContentTypes)
             {
-                structure.Add(new XElement("MediaType", allowedType.Alias));
+                structure.Add(new XElement(IEntityXmlSerializer.MediaTypeElementName, allowedType.Alias));
             }
         }
 
@@ -409,57 +410,11 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             SerializePropertyGroups(mediaType.PropertyGroups)); // TODO Rename to PropertyGroups
 
         var xml = new XElement(
-            "MediaType",
+            IEntityXmlSerializer.MediaTypeElementName,
             info,
             structure,
             genericProperties,
             tabs);
-
-        return xml;
-    }
-
-    /// <summary>
-    ///     Exports a list of <see cref="IMacro" /> items to xml as an <see cref="XElement" />
-    /// </summary>
-    /// <param name="macros">Macros to export</param>
-    /// <returns><see cref="XElement" /> containing the xml representation of the IMacro objects</returns>
-    public XElement Serialize(IEnumerable<IMacro> macros)
-    {
-        var xml = new XElement("Macros");
-        foreach (IMacro item in macros)
-        {
-            xml.Add(Serialize(item));
-        }
-
-        return xml;
-    }
-
-    public XElement Serialize(IMacro macro)
-    {
-        var xml = new XElement("macro");
-        xml.Add(new XElement("name", macro.Name));
-        xml.Add(new XElement("key", macro.Key));
-        xml.Add(new XElement("alias", macro.Alias));
-        xml.Add(new XElement("macroSource", macro.MacroSource));
-        xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
-        xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
-        xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
-        xml.Add(new XElement("cacheByMember", macro.CacheByMember.ToString()));
-        xml.Add(new XElement("cacheByPage", macro.CacheByPage.ToString()));
-
-        var properties = new XElement("properties");
-        foreach (IMacroProperty property in macro.Properties)
-        {
-            properties.Add(new XElement(
-                "property",
-                new XAttribute("key", property.Key),
-                new XAttribute("name", property.Name!),
-                new XAttribute("alias", property.Alias),
-                new XAttribute("sortOrder", property.SortOrder),
-                new XAttribute("propertyType", property.EditorAlias)));
-        }
-
-        xml.Add(properties);
 
         return xml;
     }
@@ -475,7 +430,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             new XElement("Thumbnail", contentType.Thumbnail),
             new XElement("Description", contentType.Description),
             new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
-            new XElement("IsListView", contentType.IsContainer.ToString()),
+            new XElement("ListView", contentType.ListView.ToString()),
             new XElement("IsElement", contentType.IsElement.ToString()),
             new XElement("Variations", contentType.Variations.ToString()));
 
@@ -520,7 +475,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             foreach (ContentTypeSort allowedType in contentType.AllowedContentTypes)
             {
-                structure.Add(new XElement("DocumentType", allowedType.Alias));
+                structure.Add(new XElement(IEntityXmlSerializer.DocumentTypeElementName, allowedType.Alias));
             }
         }
 
@@ -533,7 +488,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             SerializePropertyGroups(contentType.PropertyGroups)); // TODO Rename to PropertyGroups
 
         var xml = new XElement(
-            "DocumentType",
+            IEntityXmlSerializer.DocumentTypeElementName,
             info,
             structure,
             genericProperties,
@@ -578,8 +533,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             xml.Add(new XElement(
                 "Value",
-                new XAttribute("LanguageId", translation.Language!.Id),
-                new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
+                new XAttribute("LanguageCultureAlias", translation.LanguageIsoCode),
                 new XCData(translation.Value)));
         }
 

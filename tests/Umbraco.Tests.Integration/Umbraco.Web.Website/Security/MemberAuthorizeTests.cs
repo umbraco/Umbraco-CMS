@@ -68,7 +68,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
             Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
         }
 
-
         [Test]
         [LongRunning]
         public async Task Secure_ApiController_Should_Return_Unauthorized_WhenNotLoggedIn()
@@ -88,7 +87,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
             _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
             _memberManagerMock.Setup(x => x.IsMemberAuthorizedAsync(
                      It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<IEnumerable<string>>(),
+                     It.IsAny<IEnumerable<string>>(),
                      It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(false);
 

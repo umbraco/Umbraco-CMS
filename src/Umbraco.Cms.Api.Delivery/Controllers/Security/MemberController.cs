@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -15,13 +15,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
-using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Security;
 
 [ApiVersion("1.0")]
-[ApiController]
 [VersionedDeliveryApiRoute(Common.Security.Paths.MemberApi.EndpointTemplate)]
 [ApiExplorerSettings(IgnoreApi = true)]
 public class MemberController : DeliveryApiControllerBase
@@ -160,11 +159,12 @@ public class MemberController : DeliveryApiControllerBase
             claim.SetDestinations(OpenIddictConstants.Destinations.AccessToken);
         }
 
-        if (request.GetScopes().Contains(OpenIddictConstants.Scopes.OfflineAccess))
-        {
-            // "offline_access" scope is required to use refresh tokens
-            memberPrincipal.SetScopes(OpenIddictConstants.Scopes.OfflineAccess);
-        }
+        // "openid" and "offline_access" are the only scopes allowed for members; explicitly ensure we only add those
+        // NOTE: the "offline_access" scope is required to use refresh tokens
+        IEnumerable<string> allowedScopes = request
+            .GetScopes()
+            .Intersect(new[] { OpenIddictConstants.Scopes.OpenId, OpenIddictConstants.Scopes.OfflineAccess });
+        memberPrincipal.SetScopes(allowedScopes);
 
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, memberPrincipal);
     }

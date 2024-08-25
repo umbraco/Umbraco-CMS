@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders;
 
 public class AllowedContentTypeDetail
 {
-    public int Id { get; set; }
+    public Guid Key { get; set; }
 
     public string Alias { get; set; }
 

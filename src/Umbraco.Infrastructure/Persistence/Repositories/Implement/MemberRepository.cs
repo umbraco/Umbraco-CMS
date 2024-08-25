@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -200,6 +201,100 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             .Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments));
 
         return Database.ExecuteScalar<int>(fullSql);
+    }
+
+    public async Task<PagedModel<IMember>> GetPagedByFilterAsync(MemberFilter memberFilter, int skip, int take, Ordering? ordering = null)
+    {
+        Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .InnerJoin<MemberDto>().On<NodeDto, MemberDto>((n, m) => n.NodeId == m.NodeId);
+
+        if (memberFilter.MemberTypeId.HasValue)
+        {
+            sql = sql
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((memberNode, memberContent) => memberContent.NodeId == memberNode.NodeId)
+                .InnerJoin<NodeDto>("mtn").On<NodeDto, ContentDto>((memberTypeNode, memberContent) => memberContent.ContentTypeId == memberTypeNode.NodeId && memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
+        }
+
+        if (memberFilter.MemberGroupName.IsNullOrWhiteSpace() is false)
+        {
+            sql = sql
+                .InnerJoin<Member2MemberGroupDto>().On<MemberDto, Member2MemberGroupDto>((m, memberToGroup) => m.NodeId == memberToGroup.Member)
+                .InnerJoin<NodeDto>("mgn").On<NodeDto, Member2MemberGroupDto>((memberGroupNode, memberToGroup) => memberToGroup.MemberGroup == memberGroupNode.NodeId && memberGroupNode.Text == memberFilter.MemberGroupName, "mgn");
+        }
+
+        if (memberFilter.IsApproved is not null)
+        {
+            sql = sql.Where<MemberDto>(member => member.IsApproved == memberFilter.IsApproved);
+        }
+
+        if (memberFilter.IsLockedOut is not null)
+        {
+            sql = sql.Where<MemberDto>(member => member.IsLockedOut == memberFilter.IsLockedOut);
+        }
+
+        if (memberFilter.Filter is not null)
+        {
+            var whereClauses = new List<Func<Sql<ISqlContext>, Sql<ISqlContext>>>()
+            {
+                (x) => x.Where<NodeDto>(memberNode => memberNode.Text != null && memberNode.Text.Contains(memberFilter.Filter)),
+                (x) => x.Where<MemberDto>(memberNode => memberNode.Email.Contains(memberFilter.Filter)),
+                (x) => x.Where<MemberDto>(memberNode => memberNode.LoginName.Contains(memberFilter.Filter)),
+            };
+
+            if (int.TryParse(memberFilter.Filter, out int filterAsIntId))
+            {
+                whereClauses.Add((x) => x.Where<NodeDto>(memberNode => memberNode.NodeId == filterAsIntId));
+            }
+
+            if (Guid.TryParse(memberFilter.Filter, out Guid filterAsGuid))
+            {
+                whereClauses.Add((x) => x.Where<NodeDto>(memberNode => memberNode.UniqueId == filterAsGuid));
+            }
+
+            sql = sql.WhereAny(whereClauses.ToArray());
+        }
+
+        if (ordering is not null)
+        {
+            ApplyOrdering(ref sql, ordering);
+        }
+
+        var pageIndex = skip / take;
+        Page<MemberDto>? pageResult = await Database.PageAsync<MemberDto>(pageIndex+1, take, sql);
+
+        // shortcut so our join is not too big, but we also hope these are cached, so we don't have to map them again.
+        var nodeIds = pageResult.Items.Select(x => x.NodeId).ToArray();
+
+        return new PagedModel<IMember>(pageResult.TotalItems, nodeIds.Any() ? GetMany(nodeIds) : Array.Empty<IMember>());
+    }
+
+    private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
+    {
+        ArgumentNullException.ThrowIfNull(sql);
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        if (ordering.OrderBy.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        var orderBy = ordering.OrderBy.ToLowerInvariant() switch
+        {
+            "username" => sql.GetAliasedField(SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName)),
+            "name" => sql.GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text)),
+            "email" => sql.GetAliasedField(SqlSyntax.GetFieldName<MemberDto>(x => x.Email)),
+            _ => throw new NotSupportedException("Ordering not supported"),
+        };
+
+        if (ordering.Direction == Direction.Ascending)
+        {
+            sql.OrderBy(orderBy);
+        }
+        else
+        {
+            sql.OrderByDescending(orderBy);
+        }
     }
 
     /// <summary>
@@ -540,8 +635,9 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         var list = new List<string>
         {
             "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
+
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM umbracoRelation WHERE parentId = @id",
             "DELETE FROM umbracoRelation WHERE childId = @id",
             "DELETE FROM cmsTagRelationship WHERE nodeId = @id",

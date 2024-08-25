@@ -1,5 +1,10 @@
+using System.Globalization;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -8,9 +13,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Decimal,
-    EditorType.PropertyValue | EditorType.MacroParameter,
-    "Decimal",
-    "decimal",
     ValueType = ValueTypes.Decimal,
     ValueEditorIsReusable = true)]
 public class DecimalPropertyEditor : DataEditor
@@ -25,12 +27,32 @@ public class DecimalPropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
-    {
-        IDataValueEditor editor = base.CreateValueEditor();
-        editor.Validators.Add(new DecimalValidator());
-        return editor;
-    }
+        => DataValueEditorFactory.Create<DecimalPropertyValueEditor>(Attribute!);
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() => new DecimalConfigurationEditor();
+
+    internal class DecimalPropertyValueEditor : DataValueEditor
+    {
+        public DecimalPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+            Validators.Add(new DecimalValidator());
+
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+            => TryParsePropertyValue(property.GetValue(culture, segment));
+
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+            => TryParsePropertyValue(editorValue.Value);
+
+        private decimal? TryParsePropertyValue(object? value)
+            => value is decimal decimalValue
+                ? decimalValue
+                : decimal.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out var parsedDecimalValue)
+                    ? parsedDecimalValue
+                    : null;
+    }
 }

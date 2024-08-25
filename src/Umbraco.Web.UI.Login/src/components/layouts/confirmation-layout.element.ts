@@ -1,8 +1,8 @@
-import { CSSResultGroup, LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { CSSResultGroup, css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
 @customElement('umb-confirmation-layout')
-export default class UmbConfirmationLayoutElement extends LitElement {
+export default class UmbConfirmationLayoutElement extends UmbLitElement {
   @property({ type: String })
   header = '';
 

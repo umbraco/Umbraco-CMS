@@ -45,7 +45,7 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
         // (cleanup in v8)
         new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
-    protected override int PerformCount(IQuery<IServerRegistration> query) =>
+    protected override int PerformCount(IQuery<IServerRegistration>? query) =>
         throw new NotSupportedException("This repository does not support this method.");
 
     protected override bool PerformExists(int id) =>

@@ -4,7 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridConfiguration.BlockGridBlockConfiguration>
+internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridConfiguration.BlockGridBlockConfiguration, BlockGridValue>
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly BlockGridPropertyValueConstructorCache _constructorCache;
@@ -57,7 +57,7 @@ internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
         return blockModel;
     }
 
-    protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockGridEditorDataConverter(_jsonSerializer);
+    protected override BlockEditorDataConverter<BlockGridValue, BlockGridLayoutItem> CreateBlockEditorDataConverter() => new BlockGridEditorDataConverter(_jsonSerializer);
 
     protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter, _constructorCache);
 

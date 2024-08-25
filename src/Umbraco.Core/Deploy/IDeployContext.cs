@@ -53,9 +53,4 @@ public interface IDeployContext
     /// </returns>
     T? Item<T>(string key)
         where T : class;
-
-    ///// <summary>
-    ///// Gets the global deployment cancellation token.
-    ///// </summary>
-    // CancellationToken CancellationToken { get; }
 }

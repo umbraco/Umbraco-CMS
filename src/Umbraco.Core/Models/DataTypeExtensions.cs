@@ -12,15 +12,12 @@ public static class DataTypeExtensions
     {
         Constants.DataTypes.Guids.ContentPickerGuid,
         Constants.DataTypes.Guids.MemberPickerGuid,
-        Constants.DataTypes.Guids.MediaPickerGuid,
-        Constants.DataTypes.Guids.MultipleMediaPickerGuid,
         Constants.DataTypes.Guids.RelatedLinksGuid,
         Constants.DataTypes.Guids.MemberGuid,
         Constants.DataTypes.Guids.ImageCropperGuid,
         Constants.DataTypes.Guids.TagsGuid,
         Constants.DataTypes.Guids.ListViewContentGuid,
         Constants.DataTypes.Guids.ListViewMediaGuid,
-        Constants.DataTypes.Guids.ListViewMembersGuid,
         Constants.DataTypes.Guids.DatePickerWithTimeGuid,
         Constants.DataTypes.Guids.ApprovedColorGuid,
         Constants.DataTypes.Guids.DropdownMultipleGuid,
@@ -42,8 +39,22 @@ public static class DataTypeExtensions
         Constants.DataTypes.Guids.LabelDecimalGuid,
         Constants.DataTypes.Guids.LabelDateTimeGuid,
         Constants.DataTypes.Guids.LabelBigIntGuid,
+        Constants.DataTypes.Guids.LabelIntGuid,
         Constants.DataTypes.Guids.LabelTimeGuid,
         Constants.DataTypes.Guids.LabelDateTimeGuid,
+    };
+
+    private static readonly ISet<Guid> IdsOfNonDeletableDataTypes = new HashSet<Guid>
+    {
+        // these data types are required by PublishedContentType when creating system properties for members
+        // (e.g. username, last login date, approval status)
+        Constants.DataTypes.Guids.CheckboxGuid,
+        Constants.DataTypes.Guids.TextstringGuid,
+        Constants.DataTypes.Guids.LabelDateTimeGuid,
+
+        // these data types are required for default list view handling
+        Constants.DataTypes.Guids.ListViewContentGuid,
+        Constants.DataTypes.Guids.ListViewMediaGuid,
     };
 
     /// <summary>
@@ -60,7 +71,7 @@ public static class DataTypeExtensions
             throw new ArgumentNullException(nameof(dataType));
         }
 
-        var configuration = dataType.Configuration;
+        var configuration = dataType.ConfigurationObject;
 
         switch (configuration)
         {
@@ -75,14 +86,26 @@ public static class DataTypeExtensions
     }
 
     /// <summary>
-    ///     Returns true if this date type is build-in/default.
+    ///     Returns true if this data type is build-in/default.
     /// </summary>
     /// <param name="dataType">The data type definition.</param>
     /// <returns></returns>
     public static bool IsBuildInDataType(this IDataType dataType) => IsBuildInDataType(dataType.Key);
 
     /// <summary>
-    ///     Returns true if this date type is build-in/default.
+    ///     Returns true if this data type is build-in/default.
     /// </summary>
     public static bool IsBuildInDataType(Guid key) => IdsOfBuildInDataTypes.Contains(key);
+
+    /// <summary>
+    ///     Returns true if this data type can be deleted.
+    /// </summary>
+    /// <param name="dataType">The data type definition.</param>
+    /// <returns></returns>
+    public static bool IsDeletableDataType(this IDataType dataType) => IsDeletableDataType(dataType.Key);
+
+    /// <summary>
+    ///     Returns true if this data type can be deleted.
+    /// </summary>
+    public static bool IsDeletableDataType(Guid key) => IdsOfNonDeletableDataTypes.Contains(key) is false;
 }

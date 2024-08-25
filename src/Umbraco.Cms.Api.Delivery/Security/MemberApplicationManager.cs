@@ -1,4 +1,4 @@
-﻿using OpenIddict.Abstractions;
+using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
@@ -36,7 +36,7 @@ public class MemberApplicationManager : OpenIdDictApplicationManagerBase, IMembe
         {
             DisplayName = "Umbraco member access",
             ClientId = Constants.OAuthClientIds.Member,
-            Type = OpenIddictConstants.ClientTypes.Public,
+            ClientType = OpenIddictConstants.ClientTypes.Public,
             Permissions =
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,

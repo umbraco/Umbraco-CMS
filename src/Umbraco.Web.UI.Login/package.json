@@ -1,27 +1,26 @@
 {
 	"name": "login",
 	"private": true,
-  "type": "module",
+	"type": "module",
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"watch": "tsc && vite build --watch",
 		"preview": "vite preview"
 	},
-    "engines": {
-      "node": ">=20.8",
-      "npm": ">=10.1"
-    },
+	"engines": {
+		"node": ">=20.8",
+		"npm": ">=10.1"
+	},
 	"dependencies": {
-		"lit": "^3.1.2",
-		"msw": "^2.2.0",
-		"rxjs": "^7.8.1"
 	},
 	"devDependencies": {
-    "@umbraco-ui/uui": "1.7.1",
-    "@umbraco-ui/uui-css": "1.7.0",
-		"typescript": "^5.3.3",
-		"vite": "^5.1.1"
+    "@umbraco-cms/backoffice": "^14.0.0",
+    "@umbraco-ui/uui-css": "^1.8.0",
+    "msw": "^2.3.0",
+		"typescript": "^5.4.5",
+		"vite": "^5.2.11",
+		"vite-tsconfig-paths": "^4.3.2"
 	},
 	"msw": {
 		"workerDirectory": "public"

@@ -2,18 +2,26 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration>
+internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
 {
+    private readonly IJsonSerializer _jsonSerializer;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
 
-    public RichTextBlockPropertyValueCreator(BlockEditorConverter blockEditorConverter, RichTextBlockPropertyValueConstructorCache constructorCache)
+    public RichTextBlockPropertyValueCreator(
+        BlockEditorConverter blockEditorConverter,
+        IJsonSerializer jsonSerializer,
+        RichTextBlockPropertyValueConstructorCache constructorCache)
         : base(blockEditorConverter)
-        => _constructorCache = constructorCache;
+    {
+        _jsonSerializer = jsonSerializer;
+        _constructorCache = constructorCache;
+    }
 
-    public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, BlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
+    public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
         RichTextBlockModel CreateEmptyModel() => RichTextBlockModel.Empty;
 
@@ -24,7 +32,7 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
         return blockModel;
     }
 
-    protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new RichTextEditorBlockDataConverter();
+    protected override BlockEditorDataConverter<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorDataConverter() => new RichTextEditorBlockDataConverter(_jsonSerializer);
 
     protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter, _constructorCache);
 

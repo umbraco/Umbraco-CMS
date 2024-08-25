@@ -8,17 +8,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration>
+internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration, TBlockValue>
     where TBlockModel : BlockModelCollection<TBlockItemModel>
     where TBlockItemModel : class, IBlockReference<IPublishedElement, IPublishedElement>
-    where TBlockLayoutItem : IBlockLayoutItem
+    where TBlockLayoutItem : class, IBlockLayoutItem, new()
     where TBlockConfiguration : IBlockConfiguration
+    where TBlockValue : BlockValue<TBlockLayoutItem>, new()
 {
     /// <summary>
     /// Creates a specific data converter for the block property implementation.
     /// </summary>
     /// <returns></returns>
-    protected abstract BlockEditorDataConverter CreateBlockEditorDataConverter();
+    protected abstract BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> CreateBlockEditorDataConverter();
 
     /// <summary>
     /// Creates a specific block item activator for the block property implementation.
@@ -75,28 +76,28 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             return createEmptyModel();
         }
 
-        BlockEditorDataConverter blockEditorDataConverter = CreateBlockEditorDataConverter();
-        BlockEditorData converted = blockEditorDataConverter.Deserialize(intermediateBlockModelValue);
+        BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
+        BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Deserialize(intermediateBlockModelValue);
         return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     protected TBlockModel CreateBlockModel(
         PropertyCacheLevel referenceCacheLevel,
-        BlockValue blockValue,
+        TBlockValue blockValue,
         bool preview,
         IEnumerable<TBlockConfiguration> blockConfigurations,
         CreateEmptyBlockModel createEmptyModel,
         CreateBlockModelFromItems createModelFromItems,
         EnrichBlockItemModelFromConfiguration? enrichBlockItem = null)
     {
-        BlockEditorDataConverter blockEditorDataConverter = CreateBlockEditorDataConverter();
-        BlockEditorData converted = blockEditorDataConverter.Convert(blockValue);
+        BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
+        BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Convert(blockValue);
         return CreateBlockModel(referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
     private TBlockModel CreateBlockModel(
         PropertyCacheLevel referenceCacheLevel,
-        BlockEditorData converted,
+        BlockEditorData<TBlockValue, TBlockLayoutItem> converted,
         bool preview,
         IEnumerable<TBlockConfiguration> blockConfigurations,
         CreateEmptyBlockModel createEmptyModel,
@@ -108,8 +109,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             return createEmptyModel();
         }
 
-        IEnumerable<TBlockLayoutItem>? layout = converted.Layout?.ToObject<IEnumerable<TBlockLayoutItem>>();
-        if (layout is null)
+        if (converted.Layout is null)
         {
             return createEmptyModel();
         }
@@ -210,7 +210,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             return blockItem;
         }
 
-        var blockItems = layout.Select(CreateBlockItem).WhereNotNull().ToList();
+        var blockItems = converted.Layout.Select(CreateBlockItem).WhereNotNull().ToList();
         return createModelFromItems(blockItems);
     }
 

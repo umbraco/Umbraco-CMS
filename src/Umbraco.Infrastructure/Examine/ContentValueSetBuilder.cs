@@ -1,14 +1,11 @@
 using Examine;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -52,72 +49,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _logger = logger;
     }
 
-    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
-    public ContentValueSetBuilder(
-        PropertyEditorCollection propertyEditors,
-        UrlSegmentProviderCollection urlSegmentProviders,
-        IUserService userService,
-        IShortStringHelper shortStringHelper,
-        ICoreScopeProvider scopeProvider,
-        bool publishedValuesOnly,
-        ILocalizationService localizationService,
-        IContentTypeService contentTypeService)
-        : this(
-            propertyEditors,
-            urlSegmentProviders,
-            userService,
-            shortStringHelper,
-            scopeProvider,
-            publishedValuesOnly,
-            localizationService,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
-    {
-    }
-
-    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
-    public ContentValueSetBuilder(
-        PropertyEditorCollection propertyEditors,
-        UrlSegmentProviderCollection urlSegmentProviders,
-        IUserService userService,
-        IShortStringHelper shortStringHelper,
-        IScopeProvider scopeProvider,
-        bool publishedValuesOnly,
-        ILocalizationService localizationService)
-        : this(
-            propertyEditors,
-            urlSegmentProviders,
-            userService,
-            shortStringHelper,
-            scopeProvider,
-            publishedValuesOnly,
-            localizationService,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
-    {
-    }
-
-    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
-    public ContentValueSetBuilder(
-        PropertyEditorCollection propertyEditors,
-        UrlSegmentProviderCollection urlSegmentProviders,
-        IUserService userService,
-        IShortStringHelper shortStringHelper,
-        IScopeProvider scopeProvider,
-        bool publishedValuesOnly)
-        : this(
-            propertyEditors,
-            urlSegmentProviders,
-            userService,
-            shortStringHelper,
-            scopeProvider,
-            publishedValuesOnly,
-            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
-    {
-    }
-
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
     {
@@ -128,9 +59,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         // processing below instead of one by one.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).ToArray())
+            creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).Distinct().ToArray())
                 .ToDictionary(x => x.Id, x => x);
-            writerIds = _userService.GetProfilesById(content.Select(x => x.WriterId).ToArray())
+            writerIds = _userService.GetProfilesById(content.Select(x => x.WriterId).Distinct().ToArray())
                 .ToDictionary(x => x.Id, x => x);
             scope.Complete();
         }
@@ -222,7 +153,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                     {
                         AddPropertyValue(property, null, null, values, availableCultures, contentTypeDictionary);
                     }
-                    catch (JsonSerializationException ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId}", property.Alias, c.Id);
                         throw;
@@ -236,7 +167,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                         {
                             AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures, contentTypeDictionary);
                         }
-                        catch (JsonSerializationException ex)
+                        catch (Exception ex)
                         {
                             _logger.LogError(
                                 ex,

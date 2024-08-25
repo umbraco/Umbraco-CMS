@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -11,6 +12,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
     protected IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
 
     protected IPublishedUrlProvider PublishedUrlProvider { get; private set; }
+
+    protected IApiContentPathProvider ApiContentPathProvider { get; private set; }
 
     protected IPublishedContent PublishedContent { get; private set; }
 
@@ -69,6 +72,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Setup(p => p.GetMediaUrl(publishedMedia.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns("the-media-url");
         PublishedUrlProvider = PublishedUrlProviderMock.Object;
+        ApiContentPathProvider = new ApiContentPathProvider(PublishedUrlProvider);
 
         var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
         var publishedSnapshotObject = publishedSnapshot.Object;

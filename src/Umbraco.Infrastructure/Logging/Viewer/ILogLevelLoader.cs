@@ -3,6 +3,7 @@ using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
+[Obsolete("Use ILogViewerService instead. Scheduled for removal in Umbraco 15.")]
 public interface ILogLevelLoader
 {
     /// <summary>

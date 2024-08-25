@@ -15,4 +15,5 @@ internal class DataTypeContainerRepository : EntityContainerRepository, IDataTyp
         : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DataTypeContainer)
     {
     }
+
 }

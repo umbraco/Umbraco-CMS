@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Services.Changes;
@@ -19,8 +19,8 @@ public class RefresherTests
             new MediaCacheRefresher.JsonPayload(1234, Guid.NewGuid(), TreeChangeTypes.None),
         };
 
-        var json = JsonConvert.SerializeObject(source);
-        var payload = JsonConvert.DeserializeObject<MediaCacheRefresher.JsonPayload[]>(json);
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<MediaCacheRefresher.JsonPayload[]>(json);
 
         Assert.AreEqual(source[0].Id, payload[0].Id);
         Assert.AreEqual(source[0].Key, payload[0].Key);
@@ -40,8 +40,8 @@ public class RefresherTests
             }
         };
 
-        var json = JsonConvert.SerializeObject(source);
-        var payload = JsonConvert.DeserializeObject<ContentCacheRefresher.JsonPayload[]>(json);
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<ContentCacheRefresher.JsonPayload[]>(json);
 
         Assert.AreEqual(source[0].Id, payload[0].Id);
         Assert.AreEqual(source[0].Key, payload[0].Key);
@@ -57,8 +57,8 @@ public class RefresherTests
             new ContentTypeCacheRefresher.JsonPayload("xxx", 1234, ContentTypeChangeTypes.None),
         };
 
-        var json = JsonConvert.SerializeObject(source);
-        var payload = JsonConvert.DeserializeObject<ContentTypeCacheRefresher.JsonPayload[]>(json);
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<ContentTypeCacheRefresher.JsonPayload[]>(json);
 
         Assert.AreEqual(source[0].ItemType, payload[0].ItemType);
         Assert.AreEqual(source[0].Id, payload[0].Id);
@@ -73,8 +73,8 @@ public class RefresherTests
             new DataTypeCacheRefresher.JsonPayload(1234, Guid.NewGuid(), true),
         };
 
-        var json = JsonConvert.SerializeObject(source);
-        var payload = JsonConvert.DeserializeObject<DataTypeCacheRefresher.JsonPayload[]>(json);
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<DataTypeCacheRefresher.JsonPayload[]>(json);
 
         Assert.AreEqual(source[0].Id, payload[0].Id);
         Assert.AreEqual(source[0].Key, payload[0].Key);
@@ -89,8 +89,8 @@ public class RefresherTests
             new DomainCacheRefresher.JsonPayload(1234, DomainChangeTypes.None)
         };
 
-        var json = JsonConvert.SerializeObject(source);
-        var payload = JsonConvert.DeserializeObject<DomainCacheRefresher.JsonPayload[]>(json);
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<DomainCacheRefresher.JsonPayload[]>(json);
 
         Assert.AreEqual(source[0].Id, payload[0].Id);
         Assert.AreEqual(source[0].ChangeType, payload[0].ChangeType);

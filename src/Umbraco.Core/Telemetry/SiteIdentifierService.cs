@@ -65,7 +65,7 @@ internal class SiteIdentifierService : ISiteIdentifierService
 
         try
         {
-            _configManipulator.SetGlobalId(createdGuid.ToString());
+            _configManipulator.SetGlobalIdAsync(createdGuid.ToString()).GetAwaiter().GetResult();
         }
         catch (Exception ex)
         {

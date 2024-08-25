@@ -158,7 +158,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         return rules;
     }
 
-    protected override int PerformCount(IQuery<IRedirectUrl> query) =>
+    protected override int PerformCount(IQuery<IRedirectUrl>? query) =>
         throw new NotSupportedException("This repository does not support this method.");
 
     protected override bool PerformExists(Guid id) => PerformGet(id) != null;

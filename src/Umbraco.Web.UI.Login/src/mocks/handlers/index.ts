@@ -1,6 +1,6 @@
-import { handlers as backofficeHandlers } from './backoffice.handlers.js';
 import { handlers as loginHandlers } from './login.handlers.js';
+import type { HttpHandler } from "msw";
 
-const handlers = [...backofficeHandlers, ...loginHandlers];
+const handlers: HttpHandler[] = [...loginHandlers];
 
 export { handlers };

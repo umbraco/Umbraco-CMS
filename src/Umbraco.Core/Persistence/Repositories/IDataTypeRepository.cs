@@ -5,6 +5,9 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>
 {
+
+    IDataType? Get(Guid key);
+
     IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container);
 
     /// <summary>

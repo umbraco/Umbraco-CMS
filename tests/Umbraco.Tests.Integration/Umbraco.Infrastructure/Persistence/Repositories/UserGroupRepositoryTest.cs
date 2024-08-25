@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -19,8 +20,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class UserGroupRepositoryTest : UmbracoIntegrationTest
 {
+    private IEnumerable<IPermissionMapper> PermissionMappers => GetRequiredService<IEnumerable<IPermissionMapper>>();
+
+
     private UserGroupRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper, PermissionMappers);
 
     [Test]
     public void Can_Perform_Add_On_UserGroupRepository()
@@ -103,7 +107,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
             // Act
             var resolved = repository.Get(userGroup.Id);
             resolved.Name = "New Name";
-            resolved.Permissions = new[] { "Z", "Y", "X" };
+            resolved.Permissions = new[] { "Z", "Y", "X" }.ToHashSet();
             repository.Save(resolved);
             scope.Complete();
             var updatedItem = repository.Get(userGroup.Id);
@@ -130,7 +134,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
 
             var id = userGroup.Id;
 
-            var repository2 = new UserGroupRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+            var repository2 = new UserGroupRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper, PermissionMappers);
             repository2.Delete(userGroup);
             scope.Complete();
 

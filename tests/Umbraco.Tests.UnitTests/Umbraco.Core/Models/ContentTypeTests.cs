@@ -2,8 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -55,7 +54,7 @@ public class ContentTypeTests
         var clone = (ContentTypeSort)contentType.DeepClone();
         Assert.AreNotSame(clone, contentType);
         Assert.AreEqual(clone, contentType);
-        Assert.AreEqual(clone.Id.Value, contentType.Id.Value);
+        Assert.AreEqual(clone.Key, contentType.Key);
         Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
         Assert.AreEqual(clone.Alias, contentType.Alias);
     }
@@ -64,7 +63,7 @@ public class ContentTypeTests
     {
         var builder = new ContentTypeSortBuilder();
         return builder
-            .WithId(3)
+            .WithKey(new Guid("4CAE063E-0BE1-4972-B10C-A3D9BB7DE856"))
             .WithSortOrder(4)
             .WithAlias("test")
             .Build();
@@ -146,7 +145,7 @@ public class ContentTypeTests
         Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
         Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
         Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
+        Assert.AreEqual(clone.ListView, contentType.ListView);
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
@@ -178,7 +177,7 @@ public class ContentTypeTests
         // Arrange
         var contentType = BuildContentType();
 
-        var json = JsonConvert.SerializeObject(contentType);
+        var json = JsonSerializer.Serialize(contentType);
         Debug.Print(json);
     }
 
@@ -225,7 +224,7 @@ public class ContentTypeTests
         Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
         Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
         Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
+        Assert.AreEqual(clone.ListView, contentType.ListView);
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
@@ -241,7 +240,7 @@ public class ContentTypeTests
         // Arrange
         var contentType = BuildMediaType();
 
-        var json = JsonConvert.SerializeObject(contentType);
+        var json = JsonSerializer.Serialize(contentType);
         Debug.Print(json);
     }
 
@@ -288,7 +287,7 @@ public class ContentTypeTests
         Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
         Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
         Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
+        Assert.AreEqual(clone.ListView, contentType.ListView);
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
@@ -304,7 +303,7 @@ public class ContentTypeTests
         // Arrange
         var contentType = BuildMemberType();
 
-        var json = JsonConvert.SerializeObject(contentType);
+        var json = JsonSerializer.Serialize(contentType);
         Debug.Print(json);
     }
 

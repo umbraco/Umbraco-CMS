@@ -40,8 +40,6 @@ public class DatabaseSchemaCreator
         typeof(LanguageTextDto),
         typeof(DomainDto),
         typeof(LogDto),
-        typeof(MacroDto),
-        typeof(MacroPropertyDto),
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),
@@ -66,8 +64,9 @@ public class DatabaseSchemaCreator
         typeof(LockDto),
         typeof(UserGroupDto),
         typeof(User2UserGroupDto),
-        typeof(UserGroup2NodePermissionDto),
         typeof(UserGroup2AppDto),
+        typeof(UserGroup2PermissionDto),
+        typeof(UserGroup2GranularPermissionDto),
         typeof(UserStartNodeDto),
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
@@ -80,7 +79,6 @@ public class DatabaseSchemaCreator
         typeof(ContentScheduleDto),
         typeof(LogViewerQueryDto),
         typeof(ContentVersionCleanupPolicyDto),
-        typeof(UserGroup2NodeDto),
         typeof(CreatedPackageSchemaDto),
         typeof(UserGroup2LanguageDto),
         typeof(WebhookDto),
@@ -89,6 +87,7 @@ public class DatabaseSchemaCreator
         typeof(Webhook2HeadersDto),
         typeof(WebhookLogDto),
         typeof(WebhookRequestDto),
+        typeof(UserDataDto),
     };
 
     private readonly IUmbracoDatabase _database;

@@ -15,7 +15,7 @@ public class FurthestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
         _nodeFilterRepository = nodeFilterRepository;
     }
 
-    protected virtual string SupportedDirectionAlias { get; set; } = "FurthestAncestorOrSelf";
+    public virtual string SupportedDirectionAlias { get; set; } = "FurthestAncestorOrSelf";
 
     public async Task<Attempt<ICollection<Guid>>> ExecuteAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
     {

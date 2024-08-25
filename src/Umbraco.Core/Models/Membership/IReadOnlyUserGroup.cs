@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models.Membership.Permissions;
+
 namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
@@ -11,6 +13,8 @@ public interface IReadOnlyUserGroup
 
     int Id { get; }
 
+    Guid Key => Guid.Empty;
+
     int? StartContentId { get; }
 
     int? StartMediaId { get; }
@@ -23,14 +27,9 @@ public interface IReadOnlyUserGroup
     // This is set to return true as default to avoid breaking changes.
     bool HasAccessToAllLanguages => true;
 
-    /// <summary>
-    ///     The set of default permissions
-    /// </summary>
-    /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
-    /// </remarks>
-    IEnumerable<string>? Permissions { get; set; }
+    ISet<string> Permissions { get; }
+
+    ISet<IGranularPermission> GranularPermissions { get; }
 
     IEnumerable<string> AllowedSections { get; }
 

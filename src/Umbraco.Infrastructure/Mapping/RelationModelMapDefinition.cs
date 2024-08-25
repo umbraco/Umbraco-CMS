@@ -22,5 +22,7 @@ public class RelationModelMapDefinition : IMapDefinition
         target.ContentTypeAlias = source.ChildContentTypeAlias;
         target.ContentTypeIcon = source.ChildContentTypeIcon;
         target.ContentTypeName = source.ChildContentTypeName;
+
+        target.NodePublished = source.ChildNodePublished;
     }
 }

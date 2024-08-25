@@ -22,7 +22,6 @@ public class ClearCsrfCookieHandler : INotificationHandler<UmbracoPlanExecutedNo
             return;
         }
 
-        _cookieManager.ExpireCookie(Constants.Web.AngularCookieName);
         _cookieManager.ExpireCookie(Constants.Web.CsrfValidationCookieName);
     }
 }

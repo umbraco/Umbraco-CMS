@@ -2,12 +2,14 @@
 // See LICENSE for more details.
 
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Core.Events;
 
@@ -21,21 +23,35 @@ public sealed class RelateOnTrashNotificationHandler :
     private readonly IAuditService _auditService;
     private readonly IEntityService _entityService;
     private readonly IRelationService _relationService;
-    private readonly IScopeProvider _scopeProvider;
+    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly ILocalizedTextService _textService;
 
+    [Obsolete("Use the new constructor instead, will be removed in V16")]
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,
         IEntityService entityService,
         ILocalizedTextService textService,
         IAuditService auditService,
         IScopeProvider scopeProvider)
+    : this(relationService, entityService, textService, auditService, scopeProvider, StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
+    {
+    }
+
+    public RelateOnTrashNotificationHandler(
+        IRelationService relationService,
+        IEntityService entityService,
+        ILocalizedTextService textService,
+        IAuditService auditService,
+        IScopeProvider scopeProvider,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _relationService = relationService;
         _entityService = entityService;
         _textService = textService;
         _auditService = auditService;
         _scopeProvider = scopeProvider;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     public void Handle(ContentMovedNotification notification)
@@ -56,7 +72,7 @@ public sealed class RelateOnTrashNotificationHandler :
 
     public void Handle(ContentMovedToRecycleBinNotification notification)
     {
-        using (IScope scope = _scopeProvider.CreateScope())
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
@@ -71,7 +87,7 @@ public sealed class RelateOnTrashNotificationHandler :
                 _relationService.Save(relationType);
             }
 
-            foreach (MoveEventInfo<IContent> item in notification.MoveInfoCollection)
+            foreach (MoveToRecycleBinEventInfo<IContent> item in notification.MoveInfoCollection)
             {
                 IList<string> originalPath = item.OriginalPath.ToDelimitedList();
                 var originalParentId = originalPath.Count > 2
@@ -90,7 +106,7 @@ public sealed class RelateOnTrashNotificationHandler :
 
                     _auditService.Add(
                         AuditType.Delete,
-                        item.Entity.WriterId,
+                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Document.GetName(),
                         string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id, originalParentId));
@@ -118,7 +134,7 @@ public sealed class RelateOnTrashNotificationHandler :
 
     public void Handle(MediaMovedToRecycleBinNotification notification)
     {
-        using (IScope scope = _scopeProvider.CreateScope())
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
             IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
@@ -132,7 +148,7 @@ public sealed class RelateOnTrashNotificationHandler :
                 _relationService.Save(relationType);
             }
 
-            foreach (MoveEventInfo<IMedia> item in notification.MoveInfoCollection)
+            foreach (MoveToRecycleBinEventInfo<IMedia> item in notification.MoveInfoCollection)
             {
                 IList<string> originalPath = item.OriginalPath.ToDelimitedList();
                 var originalParentId = originalPath.Count > 2
@@ -150,7 +166,7 @@ public sealed class RelateOnTrashNotificationHandler :
                     _relationService.Save(relation);
                     _auditService.Add(
                         AuditType.Delete,
-                        item.Entity.CreatorId,
+                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Media.GetName(),
                         string.Format(_textService.Localize("recycleBin", "mediaTrashed"), item.Entity.Id, originalParentId));

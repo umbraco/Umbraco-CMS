@@ -76,6 +76,28 @@ public class PublishedContentVarianceTests
         Assert.AreEqual(expectedValue, value);
     }
 
+    [TestCase(DaCulture, Segment1, "DaDk property value")]
+    [TestCase(DaCulture, Segment2, "DaDk property value")]
+    [TestCase(EnCulture, Segment1, "EnUs property value")]
+    [TestCase(EnCulture, Segment2, "EnUs property value")]
+    public void Content_Culture_And_Segment_Variation_Can_Get_Culture_Variant_Property(string culture, string segment, string expectedValue)
+    {
+        var content = CreatePublishedContent(ContentVariation.CultureAndSegment, ContentVariation.Culture, variationContextCulture: culture, variationContextSegment: segment);
+        var value = GetPropertyValue(content);
+        Assert.AreEqual(expectedValue, value);
+    }
+
+    [TestCase(DaCulture, Segment1, "Segment1 property value")]
+    [TestCase(DaCulture, Segment2, "Segment2 property value")]
+    [TestCase(EnCulture, Segment1, "Segment1 property value")]
+    [TestCase(EnCulture, Segment2, "Segment2 property value")]
+    public void Content_Culture_And_Segment_Variation_Can_Get_Segment_Variant_Property(string culture, string segment, string expectedValue)
+    {
+        var content = CreatePublishedContent(ContentVariation.CultureAndSegment, ContentVariation.Segment, variationContextCulture: culture, variationContextSegment: segment);
+        var value = GetPropertyValue(content);
+        Assert.AreEqual(expectedValue, value);
+    }
+
     private object? GetPropertyValue(IPublishedContent content) => content.GetProperty(PropertyTypeAlias)!.GetValue();
 
     private IPublishedContent CreatePublishedContent(ContentVariation contentTypeVariation, ContentVariation propertyTypeVariation, string? variationContextCulture = null, string? variationContextSegment = null)

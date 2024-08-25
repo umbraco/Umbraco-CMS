@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+using System.Text.Json.Nodes;
+using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -25,14 +25,14 @@ public class RichTextPropertyEditorHelperTests
     [Test]
     public void Can_Parse_JObject()
     {
-        var input = JObject.Parse(""""
+        var input = JsonNode.Parse(""""
                                   {
                                    "markup": "<p>this is some markup</p><umb-rte-block data-content-udi=\"umb://element/36cc710ad8a645d0a07f7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>",
                                    "blocks": {
                                        "layout": {
                                            "Umbraco.TinyMCE": [{
                                                    "contentUdi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02",
-                                                   "settingsUdi": "umb://element/d2eeef66411142f4a1647a523eaffbc2",
+                                                   "settingsUdi": "umb://element/d2eeef66411142f4a1647a523eaffbc2"
                                                }
                                            ]
                                        },
@@ -86,7 +86,7 @@ public class RichTextPropertyEditorHelperTests
                                   "layout": {
                                       "Umbraco.TinyMCE": [{
                                               "contentUdi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02",
-                                              "settingsUdi": "umb://element/d2eeef66411142f4a1647a523eaffbc2",
+                                              "settingsUdi": "umb://element/d2eeef66411142f4a1647a523eaffbc2"
                                           }
                                       ]
                                   },
@@ -172,7 +172,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(0, value.Blocks.SettingsData.Count);
     }
 
-    private IJsonSerializer JsonSerializer() => new JsonNetSerializer();
+    private IJsonSerializer JsonSerializer() => new SystemTextJsonSerializer();
 
     private ILogger Logger() => Mock.Of<ILogger>();
 }

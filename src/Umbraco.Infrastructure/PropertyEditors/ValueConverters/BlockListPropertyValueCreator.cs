@@ -1,14 +1,22 @@
 ﻿using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class BlockListPropertyValueCreator : BlockPropertyValueCreatorBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockListConfiguration.BlockConfiguration>
+internal class BlockListPropertyValueCreator : BlockPropertyValueCreatorBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockListConfiguration.BlockConfiguration, BlockListValue>
 {
+    private readonly IJsonSerializer _jsonSerializer;
     private readonly BlockListPropertyValueConstructorCache _constructorCache;
 
-    public BlockListPropertyValueCreator(BlockEditorConverter blockEditorConverter, BlockListPropertyValueConstructorCache constructorCache)
-        : base(blockEditorConverter) =>
+    public BlockListPropertyValueCreator(
+        BlockEditorConverter blockEditorConverter,
+        IJsonSerializer jsonSerializer,
+        BlockListPropertyValueConstructorCache constructorCache)
+        : base(blockEditorConverter)
+    {
+        _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
+    }
 
     public BlockListModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
@@ -21,7 +29,7 @@ internal class BlockListPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
         return blockModel;
     }
 
-    protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
+    protected override BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> CreateBlockEditorDataConverter() => new BlockListEditorDataConverter(_jsonSerializer);
 
     protected override BlockItemActivator<BlockListItem> CreateBlockItemActivator() => new BlockListItemActivator(BlockEditorConverter, _constructorCache);
 

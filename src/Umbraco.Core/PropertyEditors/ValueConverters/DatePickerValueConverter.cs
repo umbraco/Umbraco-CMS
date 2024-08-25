@@ -1,4 +1,3 @@
-using System.Xml;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -19,43 +18,21 @@ public class DatePickerValueConverter : PropertyValueConverterBase
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => ParseDateTimeValue(source);
 
-    // default ConvertSourceToObject just returns source ie a DateTime value
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object? ConvertIntermediateToXPath(
-        IPublishedElement owner,
-        IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel,
-        object? inter,
-        bool preview)
-    {
-        // source should come from ConvertSource and be a DateTime already
-        if (inter is null)
-        {
-            return null;
-        }
-
-        return XmlConvert.ToString((DateTime)inter, XmlDateTimeSerializationMode.Unspecified);
-    }
-
     internal static DateTime ParseDateTimeValue(object? source)
     {
-        if (source == null)
+        if (source is null)
         {
             return DateTime.MinValue;
         }
 
-        // in XML a DateTime is: string - format "yyyy-MM-ddTHH:mm:ss"
-        // Actually, not always sometimes it is formatted in UTC style with 'Z' suffixed on the end but that is due to this bug:
-        // http://issues.umbraco.org/issue/U4-4145, http://issues.umbraco.org/issue/U4-3894
-        // We should just be using TryConvertTo instead.
-        if (source is string sourceString)
+        if (source is DateTime dateTimeValue)
         {
-            Attempt<DateTime> attempt = sourceString.TryConvertTo<DateTime>();
-            return attempt.Success == false ? DateTime.MinValue : attempt.Result;
+            return dateTimeValue;
         }
 
-        // in the database a DateTime is: DateTime
-        // default value is: DateTime.MinValue
-        return source is DateTime dateTimeValue ? dateTimeValue : DateTime.MinValue;
+        Attempt<DateTime> attempt = source.TryConvertTo<DateTime>();
+        return attempt.Success
+            ? attempt.Result
+            : DateTime.MinValue;
     }
 }

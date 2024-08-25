@@ -13,20 +13,28 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFactoryBase<RichTextEditorValue, BlockItemData>, IRichTextPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly IContentTypeService _contentTypeService;
     private readonly ILogger<RichTextPropertyIndexValueFactory> _logger;
 
     public RichTextPropertyIndexValueFactory(
         PropertyEditorCollection propertyEditorCollection,
         IJsonSerializer jsonSerializer,
         IOptionsMonitor<IndexingSettings> indexingSettings,
-        IContentTypeService contentTypeService,
         ILogger<RichTextPropertyIndexValueFactory> logger)
         : base(propertyEditorCollection, jsonSerializer, indexingSettings)
     {
         _jsonSerializer = jsonSerializer;
-        _contentTypeService = contentTypeService;
         _logger = logger;
+    }
+
+    [Obsolete("Use constructor that doesn't take IContentTypeService, scheduled for removal in V15")]
+    public RichTextPropertyIndexValueFactory(
+        PropertyEditorCollection propertyEditorCollection,
+        IJsonSerializer jsonSerializer,
+        IOptionsMonitor<IndexingSettings> indexingSettings,
+        IContentTypeService contentTypeService,
+        ILogger<RichTextPropertyIndexValueFactory> logger)
+        : this(propertyEditorCollection, jsonSerializer, indexingSettings, logger)
+    {
     }
 
     public new IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
@@ -59,16 +67,8 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
             $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] { richTextEditorValue.Markup });
     }
 
-    [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
-        => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
-
     protected override IContentType? GetContentTypeOfNestedItem(BlockItemData nestedItem, IDictionary<Guid, IContentType> contentTypeDictionary)
         => contentTypeDictionary.TryGetValue(nestedItem.ContentTypeKey, out var result) ? result : null;
-
-    [Obsolete("Use non-obsolete overload. Scheduled for removal in Umbraco 14.")]
-    protected override IContentType? GetContentTypeOfNestedItem(BlockItemData nestedItem)
-        => _contentTypeService.Get(nestedItem.ContentTypeKey);
 
     protected override IDictionary<string, object?> GetRawProperty(BlockItemData blockItemData)
         => blockItemData.RawPropertyValues;

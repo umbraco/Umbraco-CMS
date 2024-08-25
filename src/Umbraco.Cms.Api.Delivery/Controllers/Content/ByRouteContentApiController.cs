@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
@@ -16,34 +15,16 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 [ApiVersion("2.0")]
 public class ByRouteContentApiController : ContentApiItemControllerBase
 {
-    private readonly IRequestRoutingService _requestRoutingService;
+    private readonly IApiContentPathResolver _apiContentPathResolver;
     private readonly IRequestRedirectService _requestRedirectService;
     private readonly IRequestPreviewService _requestPreviewService;
     private readonly IRequestMemberAccessService _requestMemberAccessService;
+    private const string PreviewContentRequestPathPrefix = $"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}";
 
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
+    [Obsolete($"Please use the constructor that accepts {nameof(IApiContentPathResolver)}. Will be removed in V15.")]
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService,
-        IRequestRoutingService requestRoutingService,
-        IRequestRedirectService requestRedirectService,
-        IRequestPreviewService requestPreviewService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            requestRoutingService,
-            requestRedirectService,
-            requestPreviewService,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
-    {
-    }
-
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
-    public ByRouteContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService,
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService,
         IRequestPreviewService requestPreviewService,
@@ -51,10 +32,30 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         : this(
             apiPublishedContentCache,
             apiContentResponseBuilder,
-            requestRoutingService,
             requestRedirectService,
             requestPreviewService,
-            requestMemberAccessService)
+            requestMemberAccessService,
+            StaticServiceProvider.Instance.GetRequiredService<IApiContentPathResolver>())
+    {
+    }
+
+    [Obsolete($"Please use the non-obsolete constructor. Will be removed in V15.")]
+    public ByRouteContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IPublicAccessService publicAccessService,
+        IRequestRoutingService requestRoutingService,
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberAccessService requestMemberAccessService,
+        IApiContentPathResolver apiContentPathResolver)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestRedirectService,
+            requestPreviewService,
+            requestMemberAccessService,
+            apiContentPathResolver)
     {
     }
 
@@ -62,16 +63,16 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
-        IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService,
         IRequestPreviewService requestPreviewService,
-        IRequestMemberAccessService requestMemberAccessService)
+        IRequestMemberAccessService requestMemberAccessService,
+        IApiContentPathResolver apiContentPathResolver)
         : base(apiPublishedContentCache, apiContentResponseBuilder)
     {
-        _requestRoutingService = requestRoutingService;
         _requestRedirectService = requestRedirectService;
         _requestPreviewService = requestPreviewService;
         _requestMemberAccessService = requestMemberAccessService;
+        _apiContentPathResolver = apiContentPathResolver;
     }
 
     [HttpGet("item/{*path}")]
@@ -105,8 +106,6 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     private async Task<IActionResult> HandleRequest(string path)
     {
         path = DecodePath(path);
-
-        path = path.TrimStart("/");
         path = path.Length == 0 ? "/" : path;
 
         IPublishedContent? contentItem = GetContent(path);
@@ -128,17 +127,12 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     }
 
     private IPublishedContent? GetContent(string path)
-        => path.StartsWith(Constants.DeliveryApi.Routing.PreviewContentPathPrefix)
+        => path.StartsWith(PreviewContentRequestPathPrefix)
             ? GetPreviewContent(path)
             : GetPublishedContent(path);
 
     private IPublishedContent? GetPublishedContent(string path)
-    {
-        var contentRoute = _requestRoutingService.GetContentRoute(path);
-
-        IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
-        return contentItem;
-    }
+        => _apiContentPathResolver.ResolveContentPath(path);
 
     private IPublishedContent? GetPreviewContent(string path)
     {
@@ -147,7 +141,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             return null;
         }
 
-        if (Guid.TryParse(path.AsSpan(Constants.DeliveryApi.Routing.PreviewContentPathPrefix.Length).TrimEnd("/"), out Guid contentId) is false)
+        if (Guid.TryParse(path.AsSpan(PreviewContentRequestPathPrefix.Length).TrimEnd("/"), out Guid contentId) is false)
         {
             return null;
         }
