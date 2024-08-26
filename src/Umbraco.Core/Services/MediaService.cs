@@ -1064,7 +1064,6 @@ namespace Umbraco.Cms.Core.Services
                 MoveToRecycleBinEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2)).ToArray();
                 scope.Notifications.Publish(new MediaMovedToRecycleBinNotification(moveInfo, messages).WithStateFrom(movingToRecycleBinNotification));
                 Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
-
                 scope.Complete();
             }
 

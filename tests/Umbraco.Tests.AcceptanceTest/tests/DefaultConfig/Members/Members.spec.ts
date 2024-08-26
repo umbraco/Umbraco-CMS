@@ -106,7 +106,7 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.clickChangePasswordButton();
-  await umbracoUi.member.enterPassword(updatedPassword);
+  await umbracoUi.member.enterNewPassword(updatedPassword);
   await umbracoUi.member.enterConfirmNewPassword(updatedPassword);
   await umbracoUi.member.clickSaveButton();
 

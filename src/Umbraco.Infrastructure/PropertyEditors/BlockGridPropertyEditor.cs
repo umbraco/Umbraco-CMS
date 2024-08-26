@@ -22,6 +22,7 @@ public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
         : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory)
         => _ioHelper = ioHelper;
 
+    public override bool SupportsConfigurableElements => true;
 
     #region Pre Value Editor
 
