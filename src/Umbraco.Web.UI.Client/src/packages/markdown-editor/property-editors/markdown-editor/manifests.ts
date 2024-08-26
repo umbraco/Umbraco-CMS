@@ -11,6 +11,7 @@ const manifest: ManifestPropertyEditorUi = {
 		propertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
 		icon: 'icon-code',
 		group: 'richContent',
+		supportsReadOnly: true,
 		settings: {
 			properties: [
 				{
