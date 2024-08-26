@@ -3,10 +3,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-// TODO: test that it is added to its new parent - check parent's children
-// TODO: test that it has the same amount of descendants - depending on value of includeDescendants param
-// TODO: test that the number of target parent descendants updates when copying node with descendants
-// TODO: test that copied node descendants have different keys than source node descendants
 public partial class DocumentNavigationServiceTests
 {
     [Test]
@@ -41,6 +37,78 @@ public partial class DocumentNavigationServiceTests
 
             Assert.AreEqual(targetParentKey, copiedItemParentKey);
             Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
+        });
+    }
+
+    [Test]
+    public async Task Structure_Updates_When_Copying_Content_To_Root()
+    {
+        // Arrange
+        DocumentNavigationQueryService.TryGetParentKey(Grandchild2.Key, out Guid? sourceParentKey);
+        DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> beforeCopySiblingsKeys);
+
+        // Act
+        var copyAttempt = await ContentEditingService.CopyAsync(Grandchild2.Key, null, false, false, Constants.Security.SuperUserKey);
+        Guid copiedItemKey = copyAttempt.Result.Key;
+
+        // Assert
+        Assert.AreNotEqual(Grandchild2.Key, copiedItemKey);
+        DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
+        DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> afterCopySiblingsKeys);
+        DocumentNavigationQueryService.TryGetChildrenKeys((Guid)sourceParentKey, out IEnumerable<Guid> sourceParentChildrenKeys);
+
+        Assert.Multiple(() =>
+        {
+            // Verifies that the node actually has been copied
+            Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
+            Assert.IsNull(copiedItemParentKey);
+            // Verifies that the siblings amount has been updated after copying
+            Assert.AreEqual(beforeCopySiblingsKeys.Count(), 0);
+            Assert.AreEqual(afterCopySiblingsKeys.Count(), 1);
+            Assert.IsTrue(afterCopySiblingsKeys.Contains(copiedItemKey));
+            // Verifies that the node was copied and not moved
+            Assert.IsTrue(sourceParentChildrenKeys.Contains(Grandchild2.Key));
+        });
+    }
+
+    [Test]
+    public async Task Structure_Updates_When_Copying_Content_With_Descendants()
+    {
+        // Arrange
+        DocumentNavigationQueryService.TryGetParentKey(Grandchild3.Key, out Guid? sourceParentKey);
+        DocumentNavigationQueryService.TryGetDescendantsKeys(Grandchild3.Key, out IEnumerable<Guid> beforeCopyGrandChild1Descendents);
+        DocumentNavigationQueryService.TryGetChildrenKeys(Child3.Key, out IEnumerable<Guid> beforeCopyChild3ChildrenKeys);
+
+        // TODO: this variable should not be needed, the beforeCopyParentChildrenKeys starts as 1, but is updated after the CopyAsync, I do not know why.
+        var child3ChildrenCount = beforeCopyChild3ChildrenKeys.Count();
+
+        // Act
+        var copyAttempt = await ContentEditingService.CopyAsync(Grandchild3.Key, Child3.Key, false, true, Constants.Security.SuperUserKey);
+        Guid copiedItemKey = copyAttempt.Result.Key;
+
+        // Assert
+        Assert.AreNotEqual(Grandchild3.Key, copiedItemKey);
+        DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
+        DocumentNavigationQueryService.TryGetChildrenKeys(Child3.Key, out IEnumerable<Guid> afterCopyChild3ChildrenKeys);
+        DocumentNavigationQueryService.TryGetChildrenKeys(copiedItemKey, out IEnumerable<Guid> afterCopyGrandChild1Descendents);
+
+        // Retrieves the child of the copied item to check its content
+        var copiedGreatGrandChild1 = await ContentEditingService.GetAsync(afterCopyGrandChild1Descendents.First());
+
+        Assert.Multiple(() =>
+        {
+            // Verifies that the node actually has been copied
+            Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
+            Assert.AreEqual(Child3.Key, copiedItemParentKey);
+            Assert.AreEqual(child3ChildrenCount, 1);
+            Assert.AreEqual(child3ChildrenCount + 1, afterCopyChild3ChildrenKeys.Count());
+
+            // Verifies that the descendant amount is the same for the original and the moved GrandChild1 node
+            Assert.AreEqual(beforeCopyGrandChild1Descendents.Count(), afterCopyGrandChild1Descendents.Count());
+
+            // Verifies that the keys are not the same
+            Assert.AreEqual(GreatGrandchild1.Name, copiedGreatGrandChild1.Name);
+            Assert.AreNotEqual(GreatGrandchild1.Key, copiedGreatGrandChild1.Key);
         });
     }
 }
