@@ -8,21 +8,21 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 /// </summary>
 public sealed class NavigationInitializationService : IHostedLifecycleService
 {
-    private readonly IDocumentNavigationService _documentNavigationService;
-    private readonly IMediaNavigationService _mediaNavigationService;
+    private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
+    private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
 
-    public NavigationInitializationService(IDocumentNavigationService documentNavigationService, IMediaNavigationService mediaNavigationService)
+    public NavigationInitializationService(IDocumentNavigationManagementService documentNavigationManagementService, IMediaNavigationManagementService mediaNavigationManagementService)
     {
-        _documentNavigationService = documentNavigationService;
-        _mediaNavigationService = mediaNavigationService;
+        _documentNavigationManagementService = documentNavigationManagementService;
+        _mediaNavigationManagementService = mediaNavigationManagementService;
     }
 
     public async Task StartingAsync(CancellationToken cancellationToken)
     {
-        await _documentNavigationService.RebuildAsync();
-        await _documentNavigationService.RebuildBinAsync();
-        await _mediaNavigationService.RebuildAsync();
-        await _mediaNavigationService.RebuildBinAsync();
+        await _documentNavigationManagementService.RebuildAsync();
+        await _documentNavigationManagementService.RebuildBinAsync();
+        await _mediaNavigationManagementService.RebuildAsync();
+        await _mediaNavigationManagementService.RebuildBinAsync();
     }
 
     public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
