@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 
-namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
 internal class RichTextRequiredValidator : RequiredValidator, IRichTextRequiredValidator
 {
