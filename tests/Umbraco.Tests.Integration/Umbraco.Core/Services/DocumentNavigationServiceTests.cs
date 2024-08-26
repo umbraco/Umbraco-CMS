@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -74,13 +73,8 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
         // Arrange
         Guid notCreatedRootKey = new Guid("516927E5-8574-497B-B45B-E27EFAB47DE4");
 
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = ContentType.Key,
-            ParentKey = Constants.System.RootKey, // Create node at content root
-            InvariantName = "Root 2",
-            Key = notCreatedRootKey,
-        };
+        // Create node at content root
+        var createModel = CreateContentCreateModel("Root 2", notCreatedRootKey);
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
