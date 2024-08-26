@@ -434,13 +434,13 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    public void Cannot_Remove_Node_With_Non_Existing_Content_Key()
+    public void Cannot_Move_Node_To_Bin_When_Non_Existing_Content_Key()
     {
         // Arrange
         var nonExistingKey = Guid.NewGuid();
 
         // Act
-        var result = _navigationService.Remove(nonExistingKey);
+        var result = _navigationService.MoveToBin(nonExistingKey);
 
         // Assert
         Assert.IsFalse(result);
@@ -456,10 +456,10 @@ public class ContentNavigationServiceBaseTests
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
-    public void Can_Remove_Node(Guid keyOfNodeToRemove)
+    public void Can_Move_Node_To_Bin(Guid keyOfNodeToRemove)
     {
         // Act
-        var result = _navigationService.Remove(keyOfNodeToRemove);
+        var result = _navigationService.MoveToBin(keyOfNodeToRemove);
 
         // Assert
         Assert.IsTrue(result);
@@ -477,13 +477,13 @@ public class ContentNavigationServiceBaseTests
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
-    public void Removing_Node_Removes_Its_Descendants_As_Well(Guid keyOfNodeToRemove)
+    public void Moving_Node_To_Bin_Removes_Its_Descendants_As_Well(Guid keyOfNodeToRemove)
     {
         // Arrange
         _navigationService.TryGetDescendantsKeys(keyOfNodeToRemove, out IEnumerable<Guid> initialDescendantsKeys);
 
         // Act
-        var result = _navigationService.Remove(keyOfNodeToRemove);
+        var result = _navigationService.MoveToBin(keyOfNodeToRemove);
 
         // Assert
         Assert.IsTrue(result);
@@ -512,10 +512,10 @@ public class ContentNavigationServiceBaseTests
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
-    public void Removing_Node_Adds_It_To_Recycle_Bin_Root(Guid keyOfNodeToRemove)
+    public void Moving_Node_To_Bin_Adds_It_To_Recycle_Bin_Root(Guid keyOfNodeToRemove)
     {
         // Act
-        _navigationService.Remove(keyOfNodeToRemove);
+        _navigationService.MoveToBin(keyOfNodeToRemove);
 
         // Assert
         var nodeExistsInBin = _navigationService.TryGetParentKeyInBin(keyOfNodeToRemove, out Guid? parentKeyInBin);
@@ -532,14 +532,14 @@ public class ContentNavigationServiceBaseTests
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF")] // Child 3
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7")] // Great-grandchild 1
-    public void Removing_Node_Adds_Its_Descendants_To_Recycle_Bin_As_Well(Guid keyOfNodeToRemove)
+    public void Moving_Node_To_Bin_Adds_Its_Descendants_To_Recycle_Bin_As_Well(Guid keyOfNodeToRemove)
     {
         // Arrange
         _navigationService.TryGetDescendantsKeys(keyOfNodeToRemove, out IEnumerable<Guid> initialDescendantsKeys);
         List<Guid> initialDescendantsList = initialDescendantsKeys.ToList();
 
         // Act
-        _navigationService.Remove(keyOfNodeToRemove);
+        _navigationService.MoveToBin(keyOfNodeToRemove);
 
         // Assert
         var nodeExistsInBin = _navigationService.TryGetDescendantsKeysInBin(keyOfNodeToRemove, out IEnumerable<Guid> descendantsKeysInBin);
@@ -840,7 +840,7 @@ public class ContentNavigationServiceBaseTests
         // Arrange
         Guid nodeToRestore = Grandchild1;
         var nonExistentTargetParentKey = Guid.NewGuid();
-        _navigationService.Remove(nodeToRestore);
+        _navigationService.MoveToBin(nodeToRestore);
 
         // Act
         var result = _navigationService.RestoreFromBin(nodeToRestore, nonExistentTargetParentKey);
@@ -876,7 +876,7 @@ public class ContentNavigationServiceBaseTests
     public void Can_Restore_Node_To_Existing_Target_Parent(Guid nodeToRestore, Guid? targetParentKey)
     {
         // Arrange
-        _navigationService.Remove(nodeToRestore);
+        _navigationService.MoveToBin(nodeToRestore);
 
         // Act
         var result = _navigationService.RestoreFromBin(nodeToRestore, targetParentKey);
@@ -909,7 +909,7 @@ public class ContentNavigationServiceBaseTests
     public void Restored_Node_Is_Added_To_Its_Target_Parent(Guid nodeToRestore, Guid targetParentKey)
     {
         // Arrange
-        _navigationService.Remove(nodeToRestore);
+        _navigationService.MoveToBin(nodeToRestore);
         _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> targetParentChildrenKeys);
         var targetParentChildrenCount = targetParentChildrenKeys.Count();
 
@@ -938,7 +938,7 @@ public class ContentNavigationServiceBaseTests
     public void Restored_Node_And_Its_Descendants_Are_Removed_From_Bin(Guid nodeToRestore)
     {
         // Arrange
-        _navigationService.Remove(nodeToRestore);
+        _navigationService.MoveToBin(nodeToRestore);
         _navigationService.TryGetDescendantsKeysInBin(nodeToRestore, out IEnumerable<Guid> descendantsKeysInBin);
 
         // Act
@@ -967,7 +967,7 @@ public class ContentNavigationServiceBaseTests
     public void Restored_Node_Has_The_Same_Amount_Of_Descendants(Guid nodeToRestore, Guid? targetParentKey, int initialDescendantsCount)
     {
         // Arrange
-        _navigationService.Remove(nodeToRestore);
+        _navigationService.MoveToBin(nodeToRestore);
 
         // Act
         _navigationService.RestoreFromBin(nodeToRestore, targetParentKey);

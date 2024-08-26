@@ -21,7 +21,7 @@ public interface INavigationManagementService
     ///     <c>true</c> if the node and its descendants were successfully removed from the
     ///     main navigation structure and added to the recycle bin; otherwise, <c>false</c>.
     /// </returns>
-    bool Remove(Guid key);
+    bool MoveToBin(Guid key);
 
     /// <summary>
     ///     Adds a new node to the main navigation structure. If a parent key is provided,
