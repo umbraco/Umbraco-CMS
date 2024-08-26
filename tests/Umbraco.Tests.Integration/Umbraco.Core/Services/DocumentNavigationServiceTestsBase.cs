@@ -20,7 +20,7 @@ public abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTes
 
     protected IDocumentNavigationService DocumentNavigationService => GetRequiredService<IDocumentNavigationService>();
 
-    protected ContentType ContentType { get; set; }
+    protected IContentType ContentType { get; set; }
 
     protected IContent Root { get; set; }
 
