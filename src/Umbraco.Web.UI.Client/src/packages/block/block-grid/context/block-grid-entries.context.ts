@@ -137,6 +137,26 @@ export class UmbBlockGridEntriesContext
 					},
 				};
 			})
+			.onSubmit(async (value, data) => {
+				if (value?.create && data) {
+					const created = await this.create(
+						value.create.contentElementTypeKey,
+						// We can parse an empty object, cause the rest will be filled in by others.
+						{} as any,
+						data.originData as UmbBlockGridWorkspaceOriginData,
+					);
+					if (created) {
+						this.insert(
+							created.layout,
+							created.content,
+							created.settings,
+							data.originData as UmbBlockGridWorkspaceOriginData,
+						);
+					} else {
+						throw new Error('Failed to create block');
+					}
+				}
+			})
 			.observeRouteBuilder((routeBuilder) => {
 				// TODO: Does it make any sense that this is a state? Check usage and confirm. [NL]
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
