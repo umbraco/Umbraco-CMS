@@ -1,5 +1,9 @@
 namespace Umbraco.Cms.Core.Services.Navigation;
 
+/// <summary>
+///     Placeholder for sharing logic between the document and media navigation services
+///     for querying the recycle bin navigation structure.
+/// </summary>
 public interface IRecycleBinNavigationQueryService
 {
     bool TryGetParentKeyInBin(Guid childKey, out Guid? parentKey);
