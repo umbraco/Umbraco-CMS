@@ -14,11 +14,11 @@ public partial class MediaNavigationServiceTests
         Guid nodeKey = Album.Key;
 
         // Capture original built state of MediaNavigationService
-        MediaNavigationService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
-        MediaNavigationService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
-        MediaNavigationService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
-        MediaNavigationService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
-        MediaNavigationService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
+        MediaNavigationQueryService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
+        MediaNavigationQueryService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
+        MediaNavigationQueryService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
+        MediaNavigationQueryService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
+        MediaNavigationQueryService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
 
         // Im-memory navigation structure is empty here
         var newMediaNavigationService = new MediaNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());

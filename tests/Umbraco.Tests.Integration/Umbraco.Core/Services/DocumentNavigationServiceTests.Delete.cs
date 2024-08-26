@@ -13,7 +13,7 @@ public partial class DocumentNavigationServiceTests
     public async Task Structure_Updates_When_Deleting_Content(Guid nodeToDelete)
     {
         // Arrange
-        DocumentNavigationService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);
+        DocumentNavigationQueryService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);
 
         // Act
         // Deletes the item whether it is in the recycle bin or not
@@ -21,8 +21,8 @@ public partial class DocumentNavigationServiceTests
         Guid deletedItemKey = deleteAttempt.Result.Key;
 
         // Assert
-        var nodeExists = DocumentNavigationService.TryGetDescendantsKeys(deletedItemKey, out _);
-        var nodeExistsInRecycleBin = DocumentNavigationService.TryGetDescendantsKeysInBin(nodeToDelete, out _);
+        var nodeExists = DocumentNavigationQueryService.TryGetDescendantsKeys(deletedItemKey, out _);
+        var nodeExistsInRecycleBin = DocumentNavigationQueryService.TryGetDescendantsKeysInBin(nodeToDelete, out _);
 
         Assert.Multiple(() =>
         {
@@ -32,10 +32,10 @@ public partial class DocumentNavigationServiceTests
 
             foreach (Guid descendant in initialDescendantsKeys)
             {
-                var descendantExists = DocumentNavigationService.TryGetParentKey(descendant, out _);
+                var descendantExists = DocumentNavigationQueryService.TryGetParentKey(descendant, out _);
                 Assert.IsFalse(descendantExists);
 
-                var descendantExistsInRecycleBin = DocumentNavigationService.TryGetParentKeyInBin(descendant, out _);
+                var descendantExistsInRecycleBin = DocumentNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
                 Assert.IsFalse(descendantExistsInRecycleBin);
             }
         });

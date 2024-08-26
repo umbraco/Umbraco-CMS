@@ -14,11 +14,11 @@ public partial class DocumentNavigationServiceTests
         Guid nodeKey = Root.Key;
 
         // Capture original built state of DocumentNavigationService
-        DocumentNavigationService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
-        DocumentNavigationService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
-        DocumentNavigationService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
-        DocumentNavigationService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
-        DocumentNavigationService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
+        DocumentNavigationQueryService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
+        DocumentNavigationQueryService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
+        DocumentNavigationQueryService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
+        DocumentNavigationQueryService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
+        DocumentNavigationQueryService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
 
         // Im-memory navigation structure is empty here
         var newDocumentNavigationService = new DocumentNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());

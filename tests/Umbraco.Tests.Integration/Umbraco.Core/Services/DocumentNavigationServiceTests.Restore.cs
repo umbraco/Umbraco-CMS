@@ -18,16 +18,16 @@ public partial class DocumentNavigationServiceTests
         // Move nodes to recycle bin
         await ContentEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
         await ContentEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
-        DocumentNavigationService.TryGetParentKeyInBin(nodeToRestore, out Guid? initialParentKey);
-        DocumentNavigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
+        DocumentNavigationQueryService.TryGetParentKeyInBin(nodeToRestore, out Guid? initialParentKey);
+        DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
 
         // Act
         var restoreAttempt = await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey);
         Guid restoredItemKey = restoreAttempt.Result.Key;
 
         // Assert
-        DocumentNavigationService.TryGetParentKey(restoredItemKey, out Guid? restoredItemParentKey);
-        DocumentNavigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
+        DocumentNavigationQueryService.TryGetParentKey(restoredItemKey, out Guid? restoredItemParentKey);
+        DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
 
         Assert.Multiple(() =>
         {

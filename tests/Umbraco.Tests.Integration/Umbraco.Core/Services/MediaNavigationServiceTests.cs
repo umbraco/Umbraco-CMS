@@ -71,7 +71,7 @@ public partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBa
         }
 
         // Act
-        var nodeExists = MediaNavigationService.TryGetParentKey(notCreatedAlbumKey, out _);
+        var nodeExists = MediaNavigationQueryService.TryGetParentKey(notCreatedAlbumKey, out _);
 
         // Assert
         Assert.IsFalse(nodeExists);

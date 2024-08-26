@@ -13,11 +13,11 @@ public partial class DocumentNavigationServiceTests
         Guid nodeToUpdate = Root.Key;
 
         // Capture initial state
-        DocumentNavigationService.TryGetParentKey(nodeToUpdate, out Guid? initialParentKey);
-        DocumentNavigationService.TryGetChildrenKeys(nodeToUpdate, out IEnumerable<Guid> initialChildrenKeys);
-        DocumentNavigationService.TryGetDescendantsKeys(nodeToUpdate, out IEnumerable<Guid> initialDescendantsKeys);
-        DocumentNavigationService.TryGetAncestorsKeys(nodeToUpdate, out IEnumerable<Guid> initialAncestorsKeys);
-        DocumentNavigationService.TryGetSiblingsKeys(nodeToUpdate, out IEnumerable<Guid> initialSiblingsKeys);
+        DocumentNavigationQueryService.TryGetParentKey(nodeToUpdate, out Guid? initialParentKey);
+        DocumentNavigationQueryService.TryGetChildrenKeys(nodeToUpdate, out IEnumerable<Guid> initialChildrenKeys);
+        DocumentNavigationQueryService.TryGetDescendantsKeys(nodeToUpdate, out IEnumerable<Guid> initialDescendantsKeys);
+        DocumentNavigationQueryService.TryGetAncestorsKeys(nodeToUpdate, out IEnumerable<Guid> initialAncestorsKeys);
+        DocumentNavigationQueryService.TryGetSiblingsKeys(nodeToUpdate, out IEnumerable<Guid> initialSiblingsKeys);
 
         var updateModel = new ContentUpdateModel
         {
@@ -29,11 +29,11 @@ public partial class DocumentNavigationServiceTests
         Guid updatedItemKey = updateAttempt.Result.Content!.Key;
 
         // Capture updated state
-        var nodeExists = DocumentNavigationService.TryGetParentKey(updatedItemKey, out Guid? updatedParentKey);
-        DocumentNavigationService.TryGetChildrenKeys(updatedItemKey, out IEnumerable<Guid> childrenKeysAfterUpdate);
-        DocumentNavigationService.TryGetDescendantsKeys(updatedItemKey, out IEnumerable<Guid> descendantsKeysAfterUpdate);
-        DocumentNavigationService.TryGetAncestorsKeys(updatedItemKey, out IEnumerable<Guid> ancestorsKeysAfterUpdate);
-        DocumentNavigationService.TryGetSiblingsKeys(updatedItemKey, out IEnumerable<Guid> siblingsKeysAfterUpdate);
+        var nodeExists = DocumentNavigationQueryService.TryGetParentKey(updatedItemKey, out Guid? updatedParentKey);
+        DocumentNavigationQueryService.TryGetChildrenKeys(updatedItemKey, out IEnumerable<Guid> childrenKeysAfterUpdate);
+        DocumentNavigationQueryService.TryGetDescendantsKeys(updatedItemKey, out IEnumerable<Guid> descendantsKeysAfterUpdate);
+        DocumentNavigationQueryService.TryGetAncestorsKeys(updatedItemKey, out IEnumerable<Guid> ancestorsKeysAfterUpdate);
+        DocumentNavigationQueryService.TryGetSiblingsKeys(updatedItemKey, out IEnumerable<Guid> siblingsKeysAfterUpdate);
 
         // Assert
         Assert.Multiple(() =>

@@ -12,14 +12,14 @@ public partial class DocumentNavigationServiceTests
     {
         // Arrange
         Guid nodeToMoveToRecycleBin = Child3.Key;
-        DocumentNavigationService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? originalParentKey);
+        DocumentNavigationQueryService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? originalParentKey);
 
         // Act
         await ContentEditingService.MoveToRecycleBinAsync(nodeToMoveToRecycleBin, Constants.Security.SuperUserKey);
 
         // Assert
-        var nodeExists = DocumentNavigationService.TryGetParentKey(nodeToMoveToRecycleBin, out _); // Verify that the item is no longer in the document structure
-        var nodeExistsInRecycleBin = DocumentNavigationService.TryGetParentKeyInBin(nodeToMoveToRecycleBin, out Guid? updatedParentKeyInRecycleBin);
+        var nodeExists = DocumentNavigationQueryService.TryGetParentKey(nodeToMoveToRecycleBin, out _); // Verify that the item is no longer in the document structure
+        var nodeExistsInRecycleBin = DocumentNavigationQueryService.TryGetParentKeyInBin(nodeToMoveToRecycleBin, out Guid? updatedParentKeyInRecycleBin);
 
         Assert.Multiple(() =>
         {

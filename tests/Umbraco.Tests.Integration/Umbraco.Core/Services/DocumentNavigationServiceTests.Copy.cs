@@ -16,7 +16,7 @@ public partial class DocumentNavigationServiceTests
     public async Task Structure_Updates_When_Copying_Content(Guid nodeToCopy, Guid? targetParentKey)
     {
         // Arrange
-        DocumentNavigationService.TryGetParentKey(nodeToCopy, out Guid? sourceParentKey);
+        DocumentNavigationQueryService.TryGetParentKey(nodeToCopy, out Guid? sourceParentKey);
 
         // Act
         var copyAttempt = await ContentEditingService.CopyAsync(nodeToCopy, targetParentKey, false, false, Constants.Security.SuperUserKey);
@@ -25,7 +25,7 @@ public partial class DocumentNavigationServiceTests
         // Assert
         Assert.AreNotEqual(nodeToCopy, copiedItemKey);
 
-        DocumentNavigationService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
+        DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
 
         Assert.Multiple(() =>
         {

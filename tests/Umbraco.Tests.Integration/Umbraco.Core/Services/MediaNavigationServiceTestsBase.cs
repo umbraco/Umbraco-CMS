@@ -18,7 +18,7 @@ public abstract class MediaNavigationServiceTestsBase : UmbracoIntegrationTest
     // Testing with IMediaEditingService as it calls IMediaService underneath
     protected IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
-    protected IMediaNavigationService MediaNavigationService => GetRequiredService<IMediaNavigationService>();
+    protected IMediaNavigationQueryService MediaNavigationQueryService => GetRequiredService<IMediaNavigationQueryService>();
 
     protected IMediaType FolderMediaType { get; set; }
 

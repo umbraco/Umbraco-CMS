@@ -10,7 +10,7 @@ public partial class DocumentNavigationServiceTests
     public async Task Structure_Updates_When_Creating_Content()
     {
         // Arrange
-        DocumentNavigationService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> initialSiblingsKeys);
+        DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> initialSiblingsKeys);
         var initialRootNodeSiblingsCount = initialSiblingsKeys.Count();
 
         var createModel = new ContentCreateModel
@@ -25,7 +25,7 @@ public partial class DocumentNavigationServiceTests
         Guid createdItemKey = createAttempt.Result.Content!.Key;
 
         // Verify that the structure has updated by checking the siblings list of the Root once again
-        DocumentNavigationService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> updatedSiblingsKeys);
+        DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> updatedSiblingsKeys);
         List<Guid> siblingsList = updatedSiblingsKeys.ToList();
 
         // Assert

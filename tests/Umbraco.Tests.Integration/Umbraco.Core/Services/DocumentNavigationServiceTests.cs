@@ -82,7 +82,7 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
         }
 
         // Act
-        var nodeExists = DocumentNavigationService.TryGetParentKey(notCreatedRootKey, out _);
+        var nodeExists = DocumentNavigationQueryService.TryGetParentKey(notCreatedRootKey, out _);
 
         // Assert
         Assert.IsFalse(nodeExists);

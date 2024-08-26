@@ -18,7 +18,7 @@ public abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTes
     // Testing with IContentEditingService as it calls IContentService underneath
     protected IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
-    protected IDocumentNavigationService DocumentNavigationService => GetRequiredService<IDocumentNavigationService>();
+    protected IDocumentNavigationQueryService DocumentNavigationQueryService => GetRequiredService<IDocumentNavigationQueryService>();
 
     protected IContentType ContentType { get; set; }
 

@@ -12,13 +12,13 @@ public partial class DocumentNavigationServiceTests
     public async Task Structure_Updates_When_Moving_Content(Guid nodeToMove, Guid? targetParentKey)
     {
         // Arrange
-        DocumentNavigationService.TryGetParentKey(nodeToMove, out Guid? originalParentKey);
+        DocumentNavigationQueryService.TryGetParentKey(nodeToMove, out Guid? originalParentKey);
 
         // Act
         var moveAttempt = await ContentEditingService.MoveAsync(nodeToMove, targetParentKey, Constants.Security.SuperUserKey);
 
         // Verify the node's new parent is updated
-        DocumentNavigationService.TryGetParentKey(moveAttempt.Result!.Key, out Guid? updatedParentKey);
+        DocumentNavigationQueryService.TryGetParentKey(moveAttempt.Result!.Key, out Guid? updatedParentKey);
 
         // Assert
         Assert.Multiple(() =>
