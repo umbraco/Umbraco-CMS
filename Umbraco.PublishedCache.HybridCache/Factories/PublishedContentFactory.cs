@@ -23,7 +23,14 @@ internal class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
+        var contentNode = new ContentNode(
+            contentCacheNode.Id,
+            contentCacheNode.Key,
+            contentCacheNode.Path,
+            contentCacheNode.SortOrder,
+            contentCacheNode.CreateDate,
+            contentCacheNode.CreatorId);
+
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
         contentNode.SetContentTypeAndData(contentType, preview ? contentCacheNode.Data : null, preview ? null : contentCacheNode.Data);
 
@@ -42,9 +49,18 @@ internal class PublishedContentFactory : IPublishedContentFactory
     public IPublishedMember ToPublishedMember(IMember member)
     {
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
-        var d = new ContentData(member.Name, null, 0, member.UpdateDate, member.CreatorId, -1, false, GetPropertyValues(contentType, member), null);
+        var contentData = new ContentData(
+            member.Name,
+            null,
+            0,
+            member.UpdateDate,
+            member.CreatorId,
+            -1,
+            false,
+            GetPropertyValues(contentType, member),
+            null);
 
-        var n = new ContentNode(
+        var contentNode = new ContentNode(
             member.Id,
             member.Key,
             contentType,
@@ -53,7 +69,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             member.CreateDate,
             member.CreatorId);
 
-        return new PublishedMember(member, n, d, _elementsCache, _variationContextAccessor);
+        return new PublishedMember(member, contentNode, contentData, _elementsCache, _variationContextAccessor);
     }
 
     private Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
