@@ -1,5 +1,5 @@
 import type { UmbMediaTypeItemModel } from '../../repository/index.js';
-import { UmbMediaTypePickerContext } from './input-media-type.context.js';
+import { UmbMediaTypePickerInputContext } from './input-media-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -98,7 +98,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 	@state()
 	private _editPath = '';
 
-	#pickerContext = new UmbMediaTypePickerContext(this);
+	#pickerContext = new UmbMediaTypePickerInputContext(this);
 
 	constructor() {
 		super();

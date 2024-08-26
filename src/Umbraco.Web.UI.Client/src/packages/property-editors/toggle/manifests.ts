@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 			icon: 'icon-checkbox',
 			group: 'common',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{
