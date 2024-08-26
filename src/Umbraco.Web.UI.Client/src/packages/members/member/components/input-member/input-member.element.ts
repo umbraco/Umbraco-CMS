@@ -1,5 +1,5 @@
 import type { UmbMemberItemModel } from '../../repository/index.js';
-import { UmbMemberPickerContext } from './input-member.context.js';
+import { UmbMemberPickerInputContext } from './input-member.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -108,7 +108,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	@state()
 	private _items?: Array<UmbMemberItemModel>;
 
-	#pickerContext = new UmbMemberPickerContext(this);
+	#pickerContext = new UmbMemberPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -188,12 +188,18 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 		if (!item.unique) return nothing;
 		return html`
 			<uui-ref-node name=${item.name} id=${item.unique}>
+				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
 					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
+	}
+
+	#renderIcon(item: UmbMemberItemModel) {
+		if (!item.memberType.icon) return;
+		return html`<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>`;
 	}
 
 	#renderOpenButton(item: UmbMemberItemModel) {

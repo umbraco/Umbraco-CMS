@@ -1,7 +1,7 @@
 import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../workspace/document-type-workspace.modal-token.js';
 import type { UmbDocumentTypeTreeItemModel } from '../../tree/types.js';
-import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
+import { UmbDocumentTypePickerInputContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -117,7 +117,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	@state()
 	private _editPath = '';
 
-	#pickerContext = new UmbDocumentTypePickerContext(this);
+	#pickerContext = new UmbDocumentTypePickerInputContext(this);
 
 	constructor() {
 		super();

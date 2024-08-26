@@ -1,4 +1,4 @@
-import { UmbDocumentPickerContext } from './input-document.context.js';
+import { UmbDocumentPickerInputContext } from './input-document.context.js';
 import {
 	classMap,
 	css,
@@ -139,7 +139,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
 
-	#pickerContext = new UmbDocumentPickerContext(this);
+	#pickerContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
 		super();
