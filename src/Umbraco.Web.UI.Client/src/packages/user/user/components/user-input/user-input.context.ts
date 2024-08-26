@@ -4,8 +4,11 @@ import { UMB_USER_PICKER_MODAL } from '../../modals/user-picker/user-picker-moda
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbUserPickerContext extends UmbPickerInputContext<UmbUserDetailModel> {
+export class UmbUserPickerInputContext extends UmbPickerInputContext<UmbUserDetailModel> {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_ITEM_REPOSITORY_ALIAS, UMB_USER_PICKER_MODAL);
 	}
 }
+
+/** @deprecated Use `UmbUserPickerInputContext` instead. This method will be removed in Umbraco 15. */
+export { UmbUserPickerInputContext as UmbUserPickerContext };

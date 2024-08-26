@@ -1,5 +1,5 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
-import { UmbUserPickerContext } from './user-input.context.js';
+import { UmbUserPickerInputContext } from './user-input.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -92,7 +92,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	@state()
 	private _items?: Array<UmbUserItemModel>;
 
-	#pickerContext = new UmbUserPickerContext(this);
+	#pickerContext = new UmbUserPickerInputContext(this);
 
 	constructor() {
 		super();

@@ -9,7 +9,7 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 
-export class UmbDictionaryPickerContext extends UmbPickerInputContext<
+export class UmbDictionaryPickerInputContext extends UmbPickerInputContext<
 	UmbDictionaryItemModel,
 	UmbDictionaryTreeItemModel,
 	UmbDictionaryPickerModalData,
@@ -19,3 +19,6 @@ export class UmbDictionaryPickerContext extends UmbPickerInputContext<
 		super(host, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS, UMB_DICTIONARY_PICKER_MODAL);
 	}
 }
+
+/** @deprecated Use `UmbDictionaryPickerInputContext` instead. This method will be removed in Umbraco 15. */
+export { UmbDictionaryPickerInputContext as UmbDictionaryPickerContext };
