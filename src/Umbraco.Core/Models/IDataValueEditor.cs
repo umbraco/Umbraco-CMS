@@ -27,7 +27,6 @@ public interface IDataValueEditor
     /// </summary>
     bool SupportsReadOnly => false;
 
-
     /// <summary>
     ///     Gets the validators to use to validate the edited value.
     /// </summary>
@@ -75,4 +74,6 @@ public interface IDataValueEditor
     XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
     string ConvertDbToString(IPropertyType propertyType, object? value);
+
+    IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 }

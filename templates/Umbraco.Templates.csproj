@@ -19,6 +19,7 @@
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
     <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="UmbracoDockerCompose\**" Exclude="bin;obj"/>
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
@@ -47,7 +48,7 @@
       </_TemplateJsonFiles>
     </ItemGroup>
     <Copy SourceFiles="@(_TemplateJsonFiles)" DestinationFiles="%(DestinationFile)" />
-    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
+    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.FinalVersion.parameters.cases.[0].value" Value="&quot;$(PackageVersion)&quot;" />
     <ItemGroup>
       <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
         <PackagePath>%(_TemplateJsonFiles.RelativeDir)</PackagePath>
