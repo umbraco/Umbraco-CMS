@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.Models.Navigation;
 
-public class NavigationNode
+public sealed class NavigationNode
 {
     private List<NavigationNode> _children;
 
