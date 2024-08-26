@@ -11,6 +11,7 @@ const manifest: ManifestPropertyEditorUi = {
 		propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
 		icon: 'icon-picture',
 		group: 'media',
+		supportsReadOnly: true,
 	},
 };
 

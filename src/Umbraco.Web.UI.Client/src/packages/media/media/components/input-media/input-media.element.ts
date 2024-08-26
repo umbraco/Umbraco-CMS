@@ -1,6 +1,6 @@
 import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
-import { UmbMediaPickerContext } from './input-media.context.js';
+import { UmbMediaPickerInputContext } from './input-media.context.js';
 import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -122,7 +122,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@state()
 	private _cards: Array<UmbMediaCardItemModel> = [];
 
-	#pickerContext = new UmbMediaPickerContext(this);
+	#pickerContext = new UmbMediaPickerInputContext(this);
 
 	constructor() {
 		super();
