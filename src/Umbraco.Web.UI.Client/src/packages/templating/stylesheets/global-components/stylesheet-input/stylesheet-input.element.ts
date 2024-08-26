@@ -1,5 +1,5 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
-import { UmbStylesheetPickerContext } from './stylesheet-input.context.js';
+import { UmbStylesheetPickerInputContext } from './stylesheet-input.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -73,7 +73,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 	@state()
 	private _items: Array<UmbStylesheetItemModel> = [];
 
-	#pickerContext = new UmbStylesheetPickerContext(this);
+	#pickerContext = new UmbStylesheetPickerInputContext(this);
 
 	constructor() {
 		super();

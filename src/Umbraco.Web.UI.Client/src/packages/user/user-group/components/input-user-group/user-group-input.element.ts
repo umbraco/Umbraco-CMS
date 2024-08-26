@@ -1,6 +1,6 @@
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from '../../repository/index.js';
-import { UmbUserGroupPickerContext } from './user-group-input.context.js';
+import { UmbUserGroupPickerInputContext } from './user-group-input.context.js';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -75,7 +75,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	@state()
 	private _items?: Array<UmbUserGroupItemModel>;
 
-	#pickerContext = new UmbUserGroupPickerContext(this);
+	#pickerContext = new UmbUserGroupPickerInputContext(this);
 
 	@state()
 	private _editUserGroupPath = '';
