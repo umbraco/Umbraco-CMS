@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     Placeholder for sharing logic between the document and media navigation services
 ///     for managing the navigation structure.
 /// </summary>
-public interface INavigationManagementService : IRecycleBinNavigationManagementService
+public interface INavigationManagementService
 {
     /// <summary>
     ///     Rebuilds the entire navigation structure by refreshing the navigation tree based
