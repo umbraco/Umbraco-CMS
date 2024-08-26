@@ -63,7 +63,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	private _extensions?: string[];
 
 	@state()
-	private _previewAlias = '';
+	private _previewAlias?: string;
 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
@@ -92,7 +92,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#getPreviewElementAlias() {
 		const previews = this.#previewers.getValue();
-		const fallbackAlias = previews.find((preview) => !preview.forMimeTypes?.length)?.alias ?? '';
+		const fallbackAlias = previews.find((preview) => preview.forMimeTypes.includes('*/*'))?.alias;
 
 		const mimeType = this.#getMimeTypeFromPath(this._src);
 		if (!mimeType) return fallbackAlias;
@@ -101,7 +101,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			return preview.forMimeTypes?.find((type) => {
 				if (mimeType === type) preview.alias;
 
-				const snippet = type.replace('*', '');
+				const snippet = type.replace(/\*/g, '');
+
 				if (mimeType.startsWith(snippet)) return preview.alias;
 				if (mimeType.endsWith(snippet)) return preview.alias;
 				return undefined;
@@ -174,7 +175,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		`;
 	}
 
-	#renderFile(src: string, previewAlias: string, file?: File) {
+	#renderFile(src: string, previewAlias?: string, file?: File) {
 		if (!previewAlias) return 'An error occurred. No previewer found for the file type.';
 		return html`
 			<div id="wrapper">

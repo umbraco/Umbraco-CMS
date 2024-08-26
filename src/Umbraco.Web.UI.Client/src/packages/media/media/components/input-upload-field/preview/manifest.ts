@@ -13,6 +13,7 @@ const previews: Array<ManifestFileUploadPreview> = [
 		alias: 'Umb.FileUploadPreview.File',
 		name: 'File File Upload Preview',
 		element: () => import('./input-upload-field-file.element.js'),
+		forMimeTypes: ['*/*'],
 	},
 	{
 		type: 'fileUploadPreview',

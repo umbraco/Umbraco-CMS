@@ -3,5 +3,5 @@ import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestFileUploadPreview extends ManifestElement<UmbFileUploadPreviewElement> {
 	type: 'fileUploadPreview';
-	forMimeTypes?: Array<string>;
+	forMimeTypes: Array<string>;
 }
