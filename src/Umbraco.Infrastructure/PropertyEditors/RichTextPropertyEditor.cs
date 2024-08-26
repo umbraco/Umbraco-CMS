@@ -19,7 +19,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Macros;
-using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 

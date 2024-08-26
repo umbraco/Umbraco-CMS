@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 internal class RichTextEditorBlockValidator : BlockEditorValidatorBase
 {
