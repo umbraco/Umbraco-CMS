@@ -34,7 +34,7 @@ public class ContentService : RepositoryService, IContentService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IDocumentNavigationService _documentNavigationService;
+    private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -53,7 +53,7 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        IDocumentNavigationService documentNavigationService)
+        IDocumentNavigationManagementService documentNavigationManagementService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -66,7 +66,7 @@ public class ContentService : RepositoryService, IContentService
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
-        _documentNavigationService = documentNavigationService;
+        _documentNavigationManagementService = documentNavigationManagementService;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
@@ -99,7 +99,7 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
     {
     }
 
@@ -131,7 +131,7 @@ public class ContentService : RepositoryService, IContentService
             shortStringHelper,
             cultureImpactFactory,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
     {
     }
 
@@ -1075,7 +1075,7 @@ public class ContentService : RepositoryService, IContentService
             // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.Save-with-contentSchedule",
-                () => _documentNavigationService.Add(content.Key, GetParent(content)?.Key));
+                () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
 
             if (contentSchedule != null)
             {
@@ -1144,7 +1144,7 @@ public class ContentService : RepositoryService, IContentService
                 // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.ContentService.Save",
-                    () => _documentNavigationService.Add(content.Key, GetParent(content)?.Key));
+                    () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
             }
 
             scope.Notifications.Publish(
@@ -2342,7 +2342,7 @@ public class ContentService : RepositoryService, IContentService
             // Updates in-memory navigation structure for recycle bin items
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.DeleteLocked-trashed",
-                () => _documentNavigationService.RemoveFromBin(content.Key));
+                () => _documentNavigationManagementService.RemoveFromBin(content.Key));
         }
         else
         {
@@ -2352,8 +2352,8 @@ public class ContentService : RepositoryService, IContentService
                 "Umbraco.Cms.Core.Services.ContentService.DeleteLocked",
                 () =>
                 {
-                    _documentNavigationService.Remove(content.Key);
-                    _documentNavigationService.RemoveFromBin(content.Key);
+                    _documentNavigationManagementService.MoveToBin(content.Key);
+                    _documentNavigationManagementService.RemoveFromBin(content.Key);
                 });
         }
     }
@@ -2637,7 +2637,7 @@ public class ContentService : RepositoryService, IContentService
             // as we are moving to recycle bin
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-to-recycle-bin",
-                () => _documentNavigationService.Remove(content.Key));
+                () => _documentNavigationManagementService.MoveToBin(content.Key));
         }
         else
         {
@@ -2647,14 +2647,14 @@ public class ContentService : RepositoryService, IContentService
                 // as we are restoring from recycle bin
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-restore",
-                    () => _documentNavigationService.RestoreFromBin(content.Key, parent?.Key));
+                    () => _documentNavigationManagementService.RestoreFromBin(content.Key, parent?.Key));
             }
             else
             {
                 // Updates in-memory navigation structure
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked",
-                    () => _documentNavigationService.Move(content.Key, parent?.Key));
+                    () => _documentNavigationManagementService.Move(content.Key, parent?.Key));
             }
         }
     }
@@ -2871,7 +2871,7 @@ public class ContentService : RepositoryService, IContentService
                     {
                         foreach (Tuple<Guid, Guid?> update in navigationUpdates)
                         {
-                            _documentNavigationService.Add(update.Item1, update.Item2);
+                            _documentNavigationManagementService.Add(update.Item1, update.Item2);
                         }
                     });
             }

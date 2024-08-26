@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
-        private readonly IMediaNavigationService _mediaNavigationService;
+        private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
 
         private readonly MediaFileManager _mediaFileManager;
 
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Services
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
             IUserIdKeyResolver userIdKeyResolver,
-            IMediaNavigationService mediaNavigationService)
+            IMediaNavigationManagementService mediaNavigationManagementService)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileManager = mediaFileManager;
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Services
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
             _userIdKeyResolver = userIdKeyResolver;
-            _mediaNavigationService = mediaNavigationService;
+            _mediaNavigationManagementService = mediaNavigationManagementService;
         }
 
         [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Services
                 entityRepository,
                 shortStringHelper,
                 userIdKeyResolver,
-                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationService>())
+                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationManagementService>())
         {
         }
 
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Core.Services
                 entityRepository,
                 shortStringHelper,
                 StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationService>())
+                StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationManagementService>())
         {
         }
 
@@ -804,7 +804,7 @@ namespace Umbraco.Cms.Core.Services
                 // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.MediaService.Save",
-                    () => _mediaNavigationService.Add(media.Key, GetParent(media)?.Key));
+                    () => _mediaNavigationManagementService.Add(media.Key, GetParent(media)?.Key));
 
                 scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service
@@ -851,7 +851,7 @@ namespace Umbraco.Cms.Core.Services
                     // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
                     UpdateInMemoryNavigationStructure(
                         "Umbraco.Cms.Core.Services.ContentService.Save-collection",
-                        () => _mediaNavigationService.Add(media.Key, GetParent(media)?.Key));
+                        () => _mediaNavigationManagementService.Add(media.Key, GetParent(media)?.Key));
                 }
 
                 scope.Notifications.Publish(new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
@@ -929,7 +929,7 @@ namespace Umbraco.Cms.Core.Services
                 // Updates in-memory navigation structure for recycle bin items
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.MediaService.DeleteLocked-trashed",
-                    () => _mediaNavigationService.RemoveFromBin(media.Key));
+                    () => _mediaNavigationManagementService.RemoveFromBin(media.Key));
             }
             else
             {
@@ -939,8 +939,8 @@ namespace Umbraco.Cms.Core.Services
                     "Umbraco.Cms.Core.Services.MediaService.DeleteLocked",
                     () =>
                     {
-                        _mediaNavigationService.Remove(media.Key);
-                        _mediaNavigationService.RemoveFromBin(media.Key);
+                        _mediaNavigationManagementService.MoveToBin(media.Key);
+                        _mediaNavigationManagementService.RemoveFromBin(media.Key);
                     });
             }
         }
@@ -1184,7 +1184,7 @@ namespace Umbraco.Cms.Core.Services
                 // as we are moving to recycle bin
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.MediaService.PerformMoveLocked-to-recycle-bin",
-                    () => _mediaNavigationService.Remove(media.Key));
+                    () => _mediaNavigationManagementService.MoveToBin(media.Key));
             }
             else
             {
@@ -1194,14 +1194,14 @@ namespace Umbraco.Cms.Core.Services
                     // as we are restoring from recycle bin
                     UpdateInMemoryNavigationStructure(
                         "Umbraco.Cms.Core.Services.MediaService.PerformMoveLocked-restore",
-                        () => _mediaNavigationService.RestoreFromBin(media.Key, parent?.Key));
+                        () => _mediaNavigationManagementService.RestoreFromBin(media.Key, parent?.Key));
                 }
                 else
                 {
                     // Updates in-memory navigation structure
                     UpdateInMemoryNavigationStructure(
                         "Umbraco.Cms.Core.Services.MediaService.PerformMoveLocked",
-                        () => _mediaNavigationService.Move(media.Key, parent?.Key));
+                        () => _mediaNavigationManagementService.Move(media.Key, parent?.Key));
                 }
             }
         }
