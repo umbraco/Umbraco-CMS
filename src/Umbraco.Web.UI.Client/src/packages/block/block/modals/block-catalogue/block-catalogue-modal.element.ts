@@ -140,7 +140,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 									.backgroundColor=${block.backgroundColor}
 									.contentElementTypeKey=${block.contentElementTypeKey}
 									@open=${() => this.#chooseBlock(block.contentElementTypeKey)}
-									?href=${this._workspacePath
+									.href=${this._workspacePath
 										? `${this._workspacePath}create/${block.contentElementTypeKey}`
 										: undefined}>
 								</umb-block-type-card>

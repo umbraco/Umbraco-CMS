@@ -133,6 +133,7 @@ export class UmbBlockGridEntriesContext
 						blockGroups: this._manager?.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						originData: { index: index, areaKey: this.#areaKey, parentUnique: this.#parentUnique },
+						createBlockInWorkspace: true,
 					},
 				};
 			})

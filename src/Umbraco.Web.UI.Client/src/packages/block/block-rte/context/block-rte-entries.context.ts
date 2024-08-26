@@ -41,6 +41,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						originData: {},
+						createBlockInWorkspace: true,
 					},
 				};
 			})
