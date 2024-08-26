@@ -5,7 +5,7 @@ import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from '../../mo
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbMediaPickerContext extends UmbPickerInputContext<
+export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	UmbMediaItemModel,
 	UmbMediaItemModel,
 	UmbMediaPickerModalData<UmbMediaItemModel>,
@@ -15,3 +15,6 @@ export class UmbMediaPickerContext extends UmbPickerInputContext<
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
 	}
 }
+
+/** @deprecated Use `UmbMediaPickerInputContext` instead. This method will be removed in Umbraco 15. */
+export { UmbMediaPickerInputContext as UmbMediaPickerContext };
