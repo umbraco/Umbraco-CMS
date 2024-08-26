@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
-internal sealed class MediaNavigationService : ContentNavigationServiceBase, IMediaNavigationService
+internal sealed class MediaNavigationService : ContentNavigationServiceBase, IMediaNavigationQueryService, IMediaNavigationManagementService
 {
     public MediaNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
         : base(coreScopeProvider, navigationRepository)
