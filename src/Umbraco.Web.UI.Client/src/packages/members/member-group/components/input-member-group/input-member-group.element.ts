@@ -201,10 +201,12 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	#renderItem(item: UmbMemberGroupItemModel) {
 		if (!item.unique) return nothing;
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique} ?readonly=${this.readonly}>
-				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
-				</uui-action-bar>
+			<uui-ref-node
+				name=${item.name}
+				id=${item.unique}
+				href="${this._editMemberGroupPath}edit/${item.unique}"
+				?readonly=${this.readonly}>
+				<uui-action-bar slot="actions"> ${this.#renderRemoveButton(item)} </uui-action-bar>
 				<umb-icon slot="icon" name="icon-users"></umb-icon>
 			</uui-ref-node>
 		`;
@@ -215,18 +217,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 		return html`<uui-button
 			@click=${() => this.#removeItem(item)}
 			label=${this.localize.term('general_remove')}></uui-button>`;
-	}
-
-	#renderOpenButton(item: UmbMemberGroupItemModel) {
-		if (!this.showOpenButton) return nothing;
-		if (this.readonly) return nothing;
-		return html`
-			<uui-button
-				href="${this._editMemberGroupPath}edit/${item.unique}"
-				label="${this.localize.term('general_open')} ${item.name}">
-				${this.localize.term('general_open')}
-			</uui-button>
-		`;
 	}
 
 	static override styles = [
