@@ -1,4 +1,4 @@
-import { UmbMemberTypePickerContext } from './input-member-type.context.js';
+import { UmbMemberTypePickerInputContext } from './input-member-type.context.js';
 import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -73,7 +73,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 	@state()
 	private _items?: Array<UmbUniqueItemModel>;
 
-	#pickerContext = new UmbMemberTypePickerContext(this);
+	#pickerContext = new UmbMemberTypePickerInputContext(this);
 
 	constructor() {
 		super();

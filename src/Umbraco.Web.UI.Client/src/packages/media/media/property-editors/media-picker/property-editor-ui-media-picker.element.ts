@@ -34,6 +34,15 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._max = minMax?.max ?? Infinity;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _startNode: string = '';
 
@@ -88,7 +97,8 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 				.startNode=${this._startNode}
 				.variantId=${this._variantId}
 				?multiple=${this._multiple}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-rich-media>
 		`;
 	}

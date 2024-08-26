@@ -1,5 +1,5 @@
 import type { UmbStaticFileItemModel } from '../../repository/item/types.js';
-import { UmbStaticFilePickerContext } from './input-static-file.context.js';
+import { UmbStaticFilePickerInputContext } from './input-static-file.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -79,7 +79,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	@state()
 	private _items?: Array<UmbStaticFileItemModel>;
 
-	#pickerContext = new UmbStaticFilePickerContext(this);
+	#pickerContext = new UmbStaticFilePickerInputContext(this);
 
 	constructor() {
 		super();
