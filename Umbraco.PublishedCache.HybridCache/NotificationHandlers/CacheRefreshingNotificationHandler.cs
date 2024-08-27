@@ -34,7 +34,7 @@ internal sealed class CacheRefreshingNotificationHandler :
 
     public async Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken)
     {
-        await RefreshAsync(notification.Entity);
+        await RefreshElementsCacheAsync(notification.Entity);
 
         await _contentCacheService.RefreshContentAsync(notification.Entity);
     }
@@ -43,14 +43,14 @@ internal sealed class CacheRefreshingNotificationHandler :
     {
         foreach (IContent deletedEntity in notification.DeletedEntities)
         {
-            await RefreshAsync(deletedEntity);
+            await RefreshElementsCacheAsync(deletedEntity);
             await _contentCacheService.DeleteItemAsync(deletedEntity.Id);
         }
     }
 
     public async Task HandleAsync(MediaRefreshNotification notification, CancellationToken cancellationToken)
     {
-        await RefreshAsync(notification.Entity);
+        await RefreshElementsCacheAsync(notification.Entity);
         await _mediaCacheService.RefreshMediaAsync(notification.Entity);
     }
 
@@ -58,12 +58,12 @@ internal sealed class CacheRefreshingNotificationHandler :
     {
         foreach (IMedia deletedEntity in notification.DeletedEntities)
         {
-            await RefreshAsync(deletedEntity);
+            await RefreshElementsCacheAsync(deletedEntity);
             await _mediaCacheService.DeleteItemAsync(deletedEntity.Id);
         }
     }
 
-    private async Task RefreshAsync(IUmbracoEntity content)
+    private async Task RefreshElementsCacheAsync(IUmbracoEntity content)
     {
         IEnumerable<IRelation> parentRelations = _relationService.GetByParent(content)!;
         IEnumerable<IRelation> childRelations = _relationService.GetByChild(content);
@@ -91,7 +91,6 @@ internal sealed class CacheRefreshingNotificationHandler :
                 }
 
                 _elementsCache.ClearByKey(property.ValuesCacheKey);
-
             }
         }
     }

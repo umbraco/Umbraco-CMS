@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Xml.Serialization;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;

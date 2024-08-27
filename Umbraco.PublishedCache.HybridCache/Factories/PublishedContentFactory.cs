@@ -89,7 +89,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
                 x => new[] { new PropertyData { Value = x.GetValue(), Culture = string.Empty, Segment = string.Empty } },
                 StringComparer.OrdinalIgnoreCase);
 
-        // see also PublishedContentType
+        // Add member properties
         AddIf(contentType, properties, nameof(IMember.Email), member.Email);
         AddIf(contentType, properties, nameof(IMember.Username), member.Username);
         AddIf(contentType, properties, nameof(IMember.Comments), member.Comments);
