@@ -1,5 +1,5 @@
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
-import type { UmbBlockRteWorkspaceData } from '../index.js';
+import type { UmbBlockRteWorkspaceOriginData } from '../index.js';
 import type { UmbBlockDataType } from '../../block/types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
@@ -36,7 +36,7 @@ export class UmbBlockRteManagerContext<
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
 		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		originData?: UmbBlockRteWorkspaceData,
+		originData?: UmbBlockRteWorkspaceOriginData,
 	) {
 		const data = super.createBlockData(contentElementTypeKey, partialLayoutEntry);
 
@@ -57,13 +57,13 @@ export class UmbBlockRteManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockRteWorkspaceData,
+		originData: UmbBlockRteWorkspaceOriginData,
 	) {
 		if (!this.#editor) return false;
 
 		this._layouts.appendOne(layoutEntry);
 
-		this.insertBlockData(layoutEntry, content, settings, modalData);
+		this.insertBlockData(layoutEntry, content, settings, originData);
 
 		if (layoutEntry.displayInline) {
 			this.#editor.selection.setContent(

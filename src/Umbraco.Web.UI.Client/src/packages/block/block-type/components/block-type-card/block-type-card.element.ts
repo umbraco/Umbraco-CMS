@@ -21,7 +21,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		(x) => x.unique,
 	);
 
-	@property({ type: String, attribute: false })
+	@property({ type: String })
 	href?: string;
 
 	@property({ type: String, attribute: false })
