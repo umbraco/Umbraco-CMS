@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 // represents a content "node" ie a pair of draft + published versions
 // internal, never exposed, to be accessed from ContentStore (only!)
-internal class ContentNode
+internal sealed class ContentNode
 {
     // everything that is common to both draft and published versions
     // keep this as small as possible
