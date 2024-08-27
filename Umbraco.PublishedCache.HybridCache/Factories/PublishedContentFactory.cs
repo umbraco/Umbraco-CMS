@@ -6,24 +6,24 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
 internal class PublishedContentFactory : IPublishedContentFactory
 {
-    private readonly PublishedContentTypeCache _contentTypeCache;
     private readonly IElementsCache _elementsCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
 
     public PublishedContentFactory(
         IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor,
-        IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
+        IPublishedContentTypeCache publishedContentTypeCache)
     {
         _elementsCache = elementsCache;
         _variationContextAccessor = variationContextAccessor;
-        _contentTypeCache = publishedContentTypeCacheAccessor.Get();
+        _publishedContentTypeCache = publishedContentTypeCache;
     }
 
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
+        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
         var contentNode = new ContentNode(
             contentCacheNode.Id,
             contentCacheNode.Key,
@@ -39,7 +39,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
-        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
+        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
         var contentNode = new ContentNode(
             contentCacheNode.Id,
             contentCacheNode.Key,
@@ -55,7 +55,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedMember ToPublishedMember(IMember member)
     {
-        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
+        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
 
         // Members are only "mapped" never cached, so these default values are a bit wierd, but they are not used.
         var contentData = new ContentData(

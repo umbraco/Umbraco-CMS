@@ -59,7 +59,7 @@ public class MemberCache : IPublishedMemberCache, IDisposable
         {
             if (disposing)
             {
-                _contentTypeCache.Dispose();
+                // _contentTypeCache.Dispose();
             }
 
             _disposedValue = true;

@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 public sealed class ContentCache : IPublishedContentCache
 {
     private readonly IContentCacheService _contentCacheService;
-    private readonly PublishedContentTypeCache _contentTypeCache;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
-    public ContentCache(IContentCacheService contentCacheService, IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
+    public ContentCache(IContentCacheService contentCacheService, IPublishedContentTypeCache publishedContentTypeCache)
     {
         _contentCacheService = contentCacheService;
-        _contentTypeCache = publishedContentTypeCacheAccessor.Get();
+        _publishedContentTypeCache = publishedContentTypeCache;
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false) => await _contentCacheService.GetByIdAsync(id, preview);
@@ -30,12 +30,12 @@ public sealed class ContentCache : IPublishedContentCache
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId, false).GetAwaiter().GetResult();
 
-    public IPublishedContentType? GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Content, id);
+    public IPublishedContentType? GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Content, id);
 
-    public IPublishedContentType? GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Content, alias);
+    public IPublishedContentType? GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Content, alias);
 
 
-    public IPublishedContentType? GetContentType(Guid key) => _contentTypeCache.Get(PublishedItemType.Content, key);
+    public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Content, key);
 
     // FIXME: These need to be refactored when removing nucache
     // Thats the time where we can change the IPublishedContentCache interface.
