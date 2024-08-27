@@ -81,6 +81,7 @@ internal sealed class ContentCacheService : IContentCacheService
                 continue;
             }
 
+            // TODO: Make these expiration dates configurable.
             // Never expire seeded values, we cannot do TimeSpan.MaxValue sadly, so best we can do is a year.
             var entryOptions = new HybridCacheEntryOptions
             {
