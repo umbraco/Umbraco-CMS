@@ -1,3 +1,5 @@
+using Umbraco.Cms.Web.UI;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
@@ -5,6 +7,7 @@ builder.CreateUmbracoBuilder()
     .AddWebsite()
     .AddDeliveryApi()
     .AddComposers()
+    .SetCustomMemberLoginPath()
     .Build();
 
 WebApplication app = builder.Build();

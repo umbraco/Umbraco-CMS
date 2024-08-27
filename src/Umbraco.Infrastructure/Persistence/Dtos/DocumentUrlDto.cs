@@ -16,7 +16,7 @@ public class DocumentUrlDto
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]
     public int NodeId { get; set; }
 
-    [Index(IndexTypes.UniqueClustered, ForColumns = "uniqueId, languageId", Name = "IX_" + TableName)]
+    [Index(IndexTypes.UniqueClustered, ForColumns = "uniqueId, languageId, isDraft", Name = "IX_" + TableName)]
     [Column("uniqueId")]
     [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
     public Guid UniqueId { get; set; }

@@ -1,7 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
@@ -12,8 +13,8 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
-public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
+public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestWithContent
 {
     protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
@@ -26,61 +27,18 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
             .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
             .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
 
-    }
-    //
-    // [Test]
-    // [LongRunning]
-    // public async Task InitAsync()
-    // {
-    //     // ContentService.PublishBranch(Textpage, true, []);
-    //     //
-    //     // for (int i = 3; i < 10; i++)
-    //     // {
-    //     //     var unusedSubPage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page " + i, Textpage.Id);
-    //     //     unusedSubPage.Key = Guid.NewGuid();
-    //     //     ContentService.Save(unusedSubPage);
-    //     //     ContentService.Publish(unusedSubPage, new string[0]);
-    //     // }
-    //     //
-    //     // await DocumentUrlService.InitAsync(CancellationToken.None);
-    //
-    // }
-
-    [Test]
-    public async Task Trashed_documents_do_not_have_a_url_segment()
-    {
-        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-
-        var actual = DocumentUrlService.GetUrlSegment(Trashed.Key, isoCode, true);
-
-        Assert.IsNull(actual);
-    }
-
-    //TODO test with the urlsegment property value!
-
-    [Test]
-    public async Task Deleted_documents_do_not_have_a_url_segment()
-    {
-        ContentService.PublishBranch(Textpage, true, new[] { "*" });
-
-        ContentService.Delete(Subpage2);
-
-        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-
-        var actual = DocumentUrlService.GetUrlSegment(Subpage2.Key, isoCode, false);
-
-        Assert.IsNull(actual);
+        builder.Services.Configure<GlobalSettings>(x => x.HideTopLevelNodeFromPath = false);
     }
 
     [Test]
-    [TestCase("/", "en-US", true, ExpectedResult = TextpageKey)]
-    [TestCase("/text-page-1", "en-US", true, ExpectedResult = SubPageKey)]
-    [TestCase("/text-page-2", "en-US", true, ExpectedResult = SubPage2Key)]
-    [TestCase("/text-page-3", "en-US", true, ExpectedResult = SubPage3Key)]
-    [TestCase("/", "en-US", false, ExpectedResult = TextpageKey)]
-    [TestCase("/text-page-1", "en-US", false, ExpectedResult = SubPageKey)]
-    [TestCase("/text-page-2", "en-US", false, ExpectedResult = SubPage2Key)]
-    [TestCase("/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
+    [TestCase("/textpage/", "en-US", true, ExpectedResult = TextpageKey)]
+    [TestCase("/textpage/text-page-1", "en-US", true, ExpectedResult = SubPageKey)]
+    [TestCase("/textpage/text-page-2", "en-US", true, ExpectedResult = SubPage2Key)]
+    [TestCase("/textpage/text-page-3", "en-US", true, ExpectedResult = SubPage3Key)]
+    [TestCase("/textpage/", "en-US", false, ExpectedResult = TextpageKey)]
+    [TestCase("/textpage/text-page-1", "en-US", false, ExpectedResult = SubPageKey)]
+    [TestCase("/textpage/text-page-2", "en-US", false, ExpectedResult = SubPage2Key)]
+    [TestCase("/textpage/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
     public string? Expected_Routes(string route, string isoCode, bool loadDraft)
     {
         if (loadDraft is false)
@@ -88,19 +46,13 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
             ContentService.PublishBranch(Textpage, true, new[] { "*" });
         }
 
+
         return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [Test]
-    public void No_Published_Route_when_not_published()
-    {
-        Assert.IsNull(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1", "en-US", null, false));
-    }
-
-
-    [Test]
-    [TestCase("/text-page-1/sub-page-1", "en-US", true, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
-    [TestCase("/text-page-1/sub-page-1", "en-US", false, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
+    [TestCase("/textpage/text-page-1/sub-page-1", "en-US", true, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
+    [TestCase("/textpage/text-page-1/sub-page-1", "en-US", false, ExpectedResult = "DF49F477-12F2-4E33-8563-91A7CC1DCDBB")]
     public string? Expected_Routes_with_subpages(string route, string isoCode, bool loadDraft)
     {
         // Create a subpage
@@ -138,8 +90,8 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    [TestCase("/child-of-second-root", "en-US", true, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
-    [TestCase("/child-of-second-root", "en-US", false, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
+    [TestCase("/second-root/child-of-second-root", "en-US", true, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
+    [TestCase("/second-root/child-of-second-root", "en-US", false, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
     public string? Child_of_second_root_do_not_have_parents_url_as_prefix(string route, string isoCode, bool loadDraft)
     {
         // Create a second root

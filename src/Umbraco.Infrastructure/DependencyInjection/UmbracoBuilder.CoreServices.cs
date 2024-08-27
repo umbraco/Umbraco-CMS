@@ -414,7 +414,10 @@ public static partial class UmbracoBuilderExtensions
 
         // Handlers for routing
         builder
-            .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>();
+            .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentUnpublishedNotification, RoutingNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
 
         return builder;
     }

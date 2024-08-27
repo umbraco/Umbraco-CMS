@@ -39,11 +39,11 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
         IEnumerable<Guid> documentKeys = publishedDocumentUrlSegments.Select(x => x.DocumentKey).Distinct();
 
-        Dictionary<(Guid UniqueId, int LanguageId), DocumentUrlDto> dtoDictionary = publishedDocumentUrlSegments.Select(BuildDto).ToDictionary(x=> (x.UniqueId, x.LanguageId));
+        Dictionary<(Guid UniqueId, int LanguageId, bool isDraft), DocumentUrlDto> dtoDictionary = publishedDocumentUrlSegments.Select(BuildDto).ToDictionary(x=> (x.UniqueId, x.LanguageId, x.IsDraft));
 
         var toUpdate = new List<DocumentUrlDto>();
         var toDelete = new List<int>();
-        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.LanguageId));
+        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft));
 
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
@@ -58,7 +58,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             foreach (DocumentUrlDto existing in existingUrlsInBatch)
             {
 
-                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId), out DocumentUrlDto? found))
+                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.IsDraft), out DocumentUrlDto? found))
                 {
                     found.NodeId = existing.NodeId;
 
@@ -69,7 +69,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
                     }
 
                     // if it's an update then it's not an insert
-                    toInsert.Remove((found.UniqueId, found.LanguageId));
+                    toInsert.Remove((found.UniqueId, found.LanguageId, found.IsDraft));
                 }
                 else
                 {
@@ -105,6 +105,14 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         return dtos.Select(BuildModel);
     }
 
+    public void DeleteByDocumentKey(IEnumerable<Guid> documentKeys)
+    {
+        foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Database.Execute(Database.SqlContext.Sql().Delete<DocumentUrlDto>().WhereIn<DocumentUrlDto>(x => x.UniqueId, group));
+        }
+    }
+
     private PublishedDocumentUrlSegment BuildModel(DocumentUrlDto dto) =>
         new()
         {
@@ -120,7 +128,8 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         {
             UrlSegment = model.UrlSegment,
             UniqueId = model.DocumentKey,
-            LanguageId = model.LanguageId
+            LanguageId = model.LanguageId,
+            IsDraft = model.IsDraft
         };
     }
 }
