@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Item;
 
 [ApiVersion("1.0")]
-[ApiVersion("1.1")]
 public class SearchDocumentItemController : DocumentItemControllerBase
 {
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
@@ -25,12 +24,12 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [NonAction]
     [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
     public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-        => await Search1_1(cancellationToken, query, skip, take);
+        => await SearchFromParent(cancellationToken, query, skip, take);
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search1_1(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
+    public async Task<IActionResult> SearchFromParent(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, Guid? parentId = null)
     {
         PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, parentId, skip, take);
         var result = new PagedModel<DocumentItemResponseModel>
