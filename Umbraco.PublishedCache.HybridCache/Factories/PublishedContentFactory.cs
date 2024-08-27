@@ -56,14 +56,16 @@ internal class PublishedContentFactory : IPublishedContentFactory
     public IPublishedMember ToPublishedMember(IMember member)
     {
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
+
+        // Members are only "mapped" never cached, so these default values are a bit wierd, but they are not used.
         var contentData = new ContentData(
             member.Name,
             null,
             0,
             member.UpdateDate,
             member.CreatorId,
-            -1,
-            false,
+            null,
+            true,
             GetPropertyValues(contentType, member),
             null);
 
