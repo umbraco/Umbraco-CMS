@@ -29,6 +29,15 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 		return this.selection.join(',');
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -64,7 +73,11 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 	}
 
 	#renderCheckbox(item: (typeof this.list)[0]) {
-		return html`<uui-checkbox ?checked=${item.checked} label=${item.label} value=${item.value}></uui-checkbox>`;
+		return html`<uui-checkbox
+			?checked=${item.checked}
+			label=${item.label}
+			value=${item.value}
+			?readonly=${this.readonly}></uui-checkbox>`;
 	}
 
 	static override styles = [

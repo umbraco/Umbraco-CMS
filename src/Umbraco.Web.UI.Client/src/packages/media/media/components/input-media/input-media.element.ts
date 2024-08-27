@@ -1,6 +1,6 @@
 import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
-import { UmbMediaPickerContext } from './input-media.context.js';
+import { UmbMediaPickerInputContext } from './input-media.context.js';
 import {
 	css,
 	customElement,
@@ -128,7 +128,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
 	 * @attr
-	 * @default false
+	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
 	public get readonly() {
@@ -151,7 +151,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@state()
 	private _cards: Array<UmbMediaCardItemModel> = [];
 
-	#pickerContext = new UmbMediaPickerContext(this);
+	#pickerContext = new UmbMediaPickerInputContext(this);
 
 	constructor() {
 		super();
