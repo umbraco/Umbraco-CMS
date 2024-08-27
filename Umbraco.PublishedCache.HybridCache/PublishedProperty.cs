@@ -9,8 +9,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-[Serializable]
-[XmlType(Namespace = "http://umbraco.org/webservices/")]
 internal class PublishedProperty : PublishedPropertyBase
 {
     private readonly PublishedContent _content;
@@ -32,16 +30,6 @@ internal class PublishedProperty : PublishedPropertyBase
     // the variant source and inter values
     private readonly object _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
-
-    // initializes a published content property with no value
-    public PublishedProperty(
-        IPublishedPropertyType propertyType,
-        PublishedContent content,
-        IElementsCache elementsCache,
-        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
-        : this(propertyType, content, null, elementsCache, referenceCacheLevel)
-    {
-    }
 
     // initializes a published content property with a value
     public PublishedProperty(
@@ -314,10 +302,6 @@ internal class PublishedProperty : PublishedPropertyBase
         public bool ObjectInitialized { get; set; }
 
         public object? ObjectValue { get; set; }
-
-        public bool XPathInitialized { get; set; }
-
-        public object? XPathValue { get; set; }
 
         public bool DeliveryApiDefaultObjectInitialized { get; set; }
 
