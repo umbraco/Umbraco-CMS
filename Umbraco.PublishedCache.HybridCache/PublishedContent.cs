@@ -32,8 +32,8 @@ internal class PublishedContent : PublishedContentBase
         {
             // add one property per property type - this is required, for the indexing to work
             // if contentData supplies pdatas, use them, else use null
-            contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? pdatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, pdatas, elementsCache, propertyType.CacheLevel);
+            contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas); // else will be null
+            properties[i++] = new PublishedProperty(propertyType, this, propertyDatas, elementsCache, propertyType.CacheLevel);
         }
 
         _properties = properties;
