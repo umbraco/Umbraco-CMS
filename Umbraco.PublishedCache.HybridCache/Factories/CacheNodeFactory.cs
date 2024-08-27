@@ -17,7 +17,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
 
     public ContentCacheNode ToContentCacheNode(IContent content, bool preview)
     {
-        ContentData contentData = GetContentData(content, !preview);
+        ContentData contentData = GetContentData(content, !preview, preview ? content.PublishTemplateId : content.TemplateId);
         return new ContentCacheNode
         {
             Id = content.Id,
@@ -33,7 +33,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
 
     public ContentCacheNode ToContentCacheNode(IMedia media)
     {
-        ContentData contentData = GetContentData(media, false);
+        ContentData contentData = GetContentData(media, false, null);
         return new ContentCacheNode
         {
             Id = media.Id,
@@ -47,7 +47,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
         };
     }
 
-    private ContentData GetContentData(IContentBase content, bool published)
+    private ContentData GetContentData(IContentBase content, bool published, int? templateId)
     {
         var propertyData = new Dictionary<string, PropertyData[]>();
         foreach (IProperty prop in content.Properties)
@@ -112,7 +112,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
             content.VersionId,
             content.UpdateDate,
             content.CreatorId,
-            -1,
+            templateId,
             published,
             propertyData,
             cultureData);

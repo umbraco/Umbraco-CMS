@@ -636,18 +636,6 @@ WHERE cmsContentNu.nodeId IN (
         return sql;
     }
 
-    private Sql<ISqlContext> SqlWhereNodeIdX(ISqlContext sqlContext, int id)
-    {
-        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
-
-        SqlTemplate sqlTemplate = sqlContext.Templates.Get(
-            Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeIdX, s =>
-                s.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id"), "x"));
-
-        Sql<ISqlContext> sql = sqlTemplate.Sql(id);
-        return sql;
-    }
-
     private Sql<ISqlContext> SqlOrderByLevelIdSortOrder(ISqlContext sqlContext)
     {
         ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
@@ -784,7 +772,7 @@ WHERE cmsContentNu.nodeId IN (
                     dto.VersionId,
                     dto.EditVersionDate,
                     dto.CreatorId,
-                    -1,
+                    dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
                     published,
                     deserializedDraftContent?.PropertyData,
                     deserializedDraftContent?.CultureData);
@@ -823,7 +811,7 @@ WHERE cmsContentNu.nodeId IN (
             dto.VersionId,
             dto.PubVersionDate,
             dto.CreatorId,
-            -1,
+            dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
             true,
             deserializedContent?.PropertyData,
             deserializedContent?.CultureData);
@@ -856,7 +844,7 @@ WHERE cmsContentNu.nodeId IN (
             dto.VersionId,
             dto.EditVersionDate,
             dto.CreatorId,
-            -1,
+            dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
             true,
             deserializedMedia?.PropertyData,
             deserializedMedia?.CultureData);
