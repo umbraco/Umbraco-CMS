@@ -13,6 +13,8 @@ import { UMB_BLOCK_GRID, type UmbBlockGridLayoutModel } from '@umbraco-cms/backo
 import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
 import '../block-scale-handler/index.js';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 /**
  * @element umb-block-grid-entry
  */
@@ -37,6 +39,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this._blockViewProps.contentUdi = value;
 		this.setAttribute('data-element-udi', value);
 		this.#context.setContentUdi(value);
+
+		new UmbObserveValidationStateController(
+			this,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ udi: value })}]`,
+			(hasMessages) => {
+				this._contentInvalid = hasMessages;
+				this._blockViewProps.contentInvalid = hasMessages;
+			},
+			'observeMessagesForContent',
+		);
 	}
 	private _contentUdi?: string | undefined;
 	//
@@ -88,6 +100,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_showInlineCreateAfter?: boolean;
 	@state()
 	_inlineCreateAboveWidth?: string;
+
+	// 'content-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	_contentInvalid?: boolean;
+
+	// 'settings-invalid' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	_settingsInvalid?: boolean;
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
@@ -178,6 +198,20 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.settings,
 			(settings) => {
 				this.#updateBlockViewProps({ settings });
+
+				this.removeUmbControllerByAlias('observeMessagesForSettings');
+				if (settings) {
+					// Observe settings validation state:
+					new UmbObserveValidationStateController(
+						this,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery(settings)}]`,
+						(hasMessages) => {
+							this._settingsInvalid = hasMessages;
+							this._blockViewProps.settingsInvalid = hasMessages;
+						},
+						'observeMessagesForSettings',
+					);
+				}
 			},
 			null,
 		);
@@ -340,20 +374,34 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
 							type="blockEditorCustomView"
-							default-element="umb-block-grid-block"
+							default-element=${this._inlineEditingMode ? '<umb-block-grid-block-inline' : 'umb-block-grid-block'}
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
 							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
 						<uui-action-bar>
 							${this._showContentEdit && this._workspaceEditContentPath
-								? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
+								? html`<uui-button
+										label="edit"
+										look="secondary"
+										color=${this._contentInvalid ? 'danger' : ''}
+										href=${this._workspaceEditContentPath}>
 										<uui-icon name="icon-edit"></uui-icon>
+										${this._contentInvalid
+											? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+											: nothing}
 									</uui-button>`
 								: nothing}
 							${this._hasSettings && this._workspaceEditSettingsPath
-								? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
+								? html`<uui-button
+										label="Edit settings"
+										look="secondary"
+										color=${this._settingsInvalid ? 'danger' : ''}
+										href=${this._workspaceEditSettingsPath}>
 										<uui-icon name="icon-settings"></uui-icon>
+										${this._settingsInvalid
+											? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+											: nothing}
 									</uui-button>`
 								: nothing}
 							<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
@@ -361,6 +409,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							</uui-button>
 						</uui-action-bar>
 
+						${!this._showContentEdit && this._contentInvalid
+							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							: nothing}
 						${this._canScale
 							? html` <umb-block-scale-handler
 									@mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
@@ -387,11 +438,21 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host {
 				position: relative;
 				display: block;
+				--umb-block-grid-entry-actions-opacity: 0;
 			}
+			:host([settings-invalid]),
+			:host([content-invalid]),
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-block-list-entry-actions-opacity: 1;
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
+				opacity: var(--umb-block-list-entry-actions-opacity, 0);
+				transition: opacity 120ms;
 			}
 			uui-button-inline-create {
 				top: 0px;
@@ -424,7 +485,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				display: none;
 				inset: 0;
 				border: 1px solid transparent;
-				border-radius: 3px;
+				border-radius: var(--uui-border-radius);
 				box-shadow:
 					0 0 0 1px rgba(255, 255, 255, 0.7),
 					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
@@ -441,6 +502,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			.umb-block-grid__block {
 				height: 100%;
+			}
+
+			:host([settings-invalid])::after,
+			:host([content-invalid])::after {
+				border-color: var(--uui-color-danger);
+			}
+
+			uui-badge {
+				z-index: 2;
 			}
 		`,
 	];
