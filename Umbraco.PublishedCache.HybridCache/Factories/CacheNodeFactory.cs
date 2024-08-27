@@ -22,7 +22,6 @@ internal class CacheNodeFactory : ICacheNodeFactory
         {
             Id = content.Id,
             Key = content.Key,
-            Path = content.Path,
             SortOrder = content.SortOrder,
             CreateDate = content.CreateDate,
             CreatorId = content.CreatorId,
@@ -39,7 +38,6 @@ internal class CacheNodeFactory : ICacheNodeFactory
         {
             Id = media.Id,
             Key = media.Key,
-            Path = media.Path,
             SortOrder = media.SortOrder,
             CreateDate = media.CreateDate,
             CreatorId = media.CreatorId,

@@ -26,7 +26,6 @@ internal class PublishedContentFactory : IPublishedContentFactory
         var contentNode = new ContentNode(
             contentCacheNode.Id,
             contentCacheNode.Key,
-            contentCacheNode.Path,
             contentCacheNode.SortOrder,
             contentCacheNode.CreateDate,
             contentCacheNode.CreatorId);
@@ -39,7 +38,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
-        var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.Path, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
+        var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
         contentNode.SetContentTypeAndData(contentType, null, contentCacheNode.Data);
 
@@ -64,7 +63,6 @@ internal class PublishedContentFactory : IPublishedContentFactory
             member.Id,
             member.Key,
             contentType,
-            member.Path,
             member.SortOrder,
             member.CreateDate,
             member.CreatorId);

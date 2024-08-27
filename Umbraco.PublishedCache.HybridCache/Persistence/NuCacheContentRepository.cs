@@ -793,7 +793,6 @@ WHERE cmsContentNu.nodeId IN (
                 {
                     Id = dto.Id,
                     Key = dto.Key,
-                    Path = dto.Path,
                     SortOrder = dto.SortOrder,
                     CreateDate = dto.CreateDate,
                     CreatorId = dto.CreatorId,
@@ -833,7 +832,6 @@ WHERE cmsContentNu.nodeId IN (
         {
             Id = dto.Id,
             Key = dto.Key,
-            Path = dto.Path,
             SortOrder = dto.SortOrder,
             CreateDate = dto.CreateDate,
             CreatorId = dto.CreatorId,
@@ -867,7 +865,6 @@ WHERE cmsContentNu.nodeId IN (
         {
             Id = dto.Id,
             Key = dto.Key,
-            Path = dto.Path,
             SortOrder = dto.SortOrder,
             CreateDate = dto.CreateDate,
             CreatorId = dto.CreatorId,

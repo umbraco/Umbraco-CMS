@@ -39,7 +39,7 @@ internal class PublishedContent : PublishedContentBase
         _properties = properties;
 
         Id = contentNode.Id;
-        Key = contentNode.Uid;
+        Key = contentNode.Key;
         CreatorId = contentNode.CreatorId;
         CreateDate = contentNode.CreateDate;
         SortOrder = contentNode.SortOrder;
@@ -58,7 +58,8 @@ internal class PublishedContent : PublishedContentBase
 
     public override int SortOrder { get; }
 
-    public override string Path => _contentNode.Path;
+    // TODO: Remove path.
+    public override string Path => string.Empty;
 
     public override int? TemplateId { get; }
 

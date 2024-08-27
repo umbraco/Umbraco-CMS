@@ -10,8 +10,6 @@ internal sealed class ContentCacheNode
 
     public Guid Key { get; set; }
 
-    public string Path { get; set; } = string.Empty;
-
     public int SortOrder { get; set; }
 
     public DateTime CreateDate { get; set; }

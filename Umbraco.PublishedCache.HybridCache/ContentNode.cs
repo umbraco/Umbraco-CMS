@@ -12,33 +12,24 @@ internal sealed class ContentNode
 #pragma warning disable IDE1006 // Naming Styles
     public readonly int Id;
 
-    private ContentData? _draftData;
 
     // draft and published version (either can be null, but not both)
     // are models not direct PublishedContent instances
-    private IPublishedContent? _draftModel;
+    private ContentData? _draftData;
     private ContentData? _publishedData;
-    private IPublishedContent? _publishedModel;
-    private IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
-
-    // special ctor for root pseudo node
-    public ContentNode() => Path = string.Empty;
 
     // special ctor with no content data - for members
     public ContentNode(
         int id,
-        Guid uid,
+        Guid key,
         IPublishedContentType contentType,
-        string path,
         int sortOrder,
         DateTime createDate,
         int creatorId)
-        : this()
     {
         Id = id;
-        Uid = uid;
+        Key = key;
         ContentType = contentType;
-        Path = path;
         SortOrder = sortOrder;
         CreateDate = createDate;
         CreatorId = creatorId;
@@ -47,15 +38,13 @@ internal sealed class ContentNode
     // 2-phases ctor, phase 1
     public ContentNode(
         int id,
-        Guid uid,
-        string path,
+        Guid key,
         int sortOrder,
         DateTime createDate,
         int creatorId)
     {
         Id = id;
-        Uid = uid;
-        Path = path;
+        Key = key;
         SortOrder = sortOrder;
         CreateDate = createDate;
         CreatorId = creatorId;
@@ -67,9 +56,8 @@ internal sealed class ContentNode
 
     public ContentData? PublishedModel => _publishedData;
 
-    public readonly Guid Uid;
+    public readonly Guid Key;
     public IPublishedContentType ContentType = null!;
-    public readonly string Path;
     public readonly int SortOrder;
     public readonly DateTime CreateDate;
     public readonly int CreatorId;

@@ -53,7 +53,6 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
                 Id = Textpage.Id,
                 Key = Textpage.Key,
                 SortOrder = 0,
-                Path = Textpage.Path,
                 Data = contentData,
                 IsDraft = true,
             });
@@ -69,7 +68,6 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
                     Id = Textpage.Id,
                     Key = Textpage.Key,
                     SortOrder = 0,
-                    Path = Textpage.Path,
                     Data = contentData,
                     IsDraft = false,
                 },
