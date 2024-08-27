@@ -74,12 +74,6 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
             return BlockEditorData<TValue, TLayout>.Empty;
         }
 
-        foreach (TLayout layout in layouts.Where(l => l.ContentKey == Guid.Empty))
-        {
-            layout.ContentKey = (layout.ContentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(value));
-            layout.SettingsKey = (layout.SettingsUdi as GuidUdi)?.Guid;
-        }
-
         IEnumerable<ContentAndSettingsReference> references = GetBlockReferences(layouts);
 
         return new BlockEditorData<TValue, TLayout>(references, value!);
