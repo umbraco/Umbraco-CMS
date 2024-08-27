@@ -81,6 +81,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         {
             var isVariant = c.ContentType.VariesByCulture();
 
+            //TODO use documentUrlService
             var urlValue = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders); // Always add invariant urlName
             var values = new Dictionary<string, IEnumerable<object?>>
             {

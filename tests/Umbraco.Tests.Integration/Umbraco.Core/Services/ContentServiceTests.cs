@@ -2186,7 +2186,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act
@@ -2211,7 +2211,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act

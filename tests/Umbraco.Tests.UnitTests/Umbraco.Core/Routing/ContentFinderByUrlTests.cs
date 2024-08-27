@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Tests.Common.Published;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
@@ -33,7 +34,7 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
         var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
-        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
+        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
         return (lookup, frequest);
     }
 

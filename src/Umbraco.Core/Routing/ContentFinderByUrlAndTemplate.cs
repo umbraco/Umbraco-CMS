@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -31,6 +33,18 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
     private readonly ILogger<ContentFinderByUrlAndTemplate> _logger;
     private WebRoutingSettings _webRoutingSettings;
 
+    [Obsolete("Use Non-obsolete constructor. This will be removed in Umbraco 16.")]
+    public ContentFinderByUrlAndTemplate(
+        ILogger<ContentFinderByUrlAndTemplate> logger,
+        IFileService fileService,
+        IContentTypeService contentTypeService,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
+        : this(logger, fileService, contentTypeService, umbracoContextAccessor, webRoutingSettings, StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
+
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAndTemplate" /> class.
     /// </summary>
@@ -39,8 +53,9 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
         IFileService fileService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
-        : base(logger, umbracoContextAccessor)
+        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+        IDocumentUrlService documentUrlService)
+        : base(logger, umbracoContextAccessor, documentUrlService)
     {
         _logger = logger;
         _fileService = fileService;

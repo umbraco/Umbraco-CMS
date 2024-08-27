@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -13,13 +16,22 @@ namespace Umbraco.Cms.Core.Routing;
 public class ContentFinderByUrl : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrl> _logger;
+    private readonly IDocumentUrlService _documentUrlService;
+
+    [Obsolete("Use non-obsoleted constructor. This will be removed in Umbraco 16.")]
+    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor)
+    : this(logger, umbracoContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
+
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
     /// </summary>
-    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor)
+    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor, IDocumentUrlService documentUrlService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _documentUrlService = documentUrlService;
         UmbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
     }
@@ -77,6 +89,15 @@ public class ContentFinderByUrl : IContentFinder
             _logger.LogDebug("Test route {Route}", route);
         }
 
+
+        // TODO find better way to strip the id from the route
+        var documentKey = _documentUrlService.GetDocumentKeyByRoute(
+            docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length),
+            docreq.Culture ?? "en-US",
+            docreq.Domain?.ContentId,
+            umbracoContext.InPreviewMode
+            ); //TODO default culture
+
         IPublishedContent? node =
             umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
         if (node != null)
@@ -93,6 +114,12 @@ public class ContentFinderByUrl : IContentFinder
             {
                 _logger.LogDebug("No match.");
             }
+        }
+
+        // TODO remove this check
+        if (node?.Key != documentKey)
+        {
+            throw new InvalidOperationException("For some reason the routing was different. Investigate!!");
         }
 
         return node;
