@@ -75,13 +75,15 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "key": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f",
                                                     "values": [
-                                                        { "alias": "title", "value": "Invalid nested content" }
+                                                        { "alias": "title", "value": "Invalid nested content title (ref #4)" },
+                                                        { "alias": "text", "value": "Valid nested content text" }
                                                     ]
                                                   }, {
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "key": "b8173e4a-0618-475c-8277-c3c6af68bee6",
                                                     "values": [
-                                                        { "alias": "title", "value": "Valid nested content" }
+                                                        { "alias": "title", "value": "Valid nested content title" },
+                                                        { "alias": "text", "value": "Invalid nested content text (ref #5)" }
                                                     ]
                                                   }
                                                 ],
@@ -89,13 +91,15 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "key": "c9129a46-71bb-4b4e-8f0a-d525ad4a5de3",
                                                     "values": [
-                                                        { "alias": "title", "value": "Valid nested setting" }
+                                                        { "alias": "title", "value": "Valid nested setting title" },
+                                                        { "alias": "text", "value": "Invalid nested setting text (ref #6)" }
                                                     ]
                                                   }, {
                                                     "contentTypeKey": "{{setup.ElementType.Key}}",
                                                     "key": "77f7ea35-0766-4395-bf7f-0c9df04530f7",
                                                     "values": [
-                                                        { "alias": "title", "value": "Invalid nested setting" }
+                                                        { "alias": "title", "value": "Invalid nested setting title (ref #7)" },
+                                                        { "alias": "text", "value": "Valid nested setting text)" }
                                                     ]
                                                   }
                                                 ]
@@ -106,7 +110,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                       "contentTypeKey": "{{setup.ElementType.Key}}",
                                       "key": "3af93b5b-5e40-4c64-b142-2564309fc4c7",
                                       "values": [
-                                          { "alias": "title", "value": "Invalid root content" }
+                                          { "alias": "title", "value": "Invalid root content title (ref #1)" },
+                                          { "alias": "text", "value": "Valid root content text" }
                                       ]
                                     }
                                   ],
@@ -114,13 +119,15 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
                                         "key": "65db1ecd-78e0-41a5-84f0-7296123a0a73",
                                         "values": [
-                                            { "alias": "title", "value": "Invalid root setting" }
+                                            { "alias": "title", "value": "Invalid root setting title (ref #2)" },
+                                            { "alias": "text", "value": "Valid root setting text" }
                                         ]
                                       }, {
                                         "contentTypeKey": "{{setup.ElementType.Key}}",
                                         "key": "efb9583c-e670-43f2-82fb-2a0cb0f3e736",
                                         "values": [
-                                            { "alias": "title", "value": "Valid root setting" }
+                                            { "alias": "title", "value": "Valid root setting title" },
+                                            { "alias": "text", "value": "Invalid root setting text (ref #3)" }
                                         ]
                                       }
                                   ]

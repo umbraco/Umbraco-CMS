@@ -220,12 +220,13 @@ public class BlockEditorBackwardsCompatibilityTests : UmbracoIntegrationTest
         var toEditor = blockGridDataType.Editor!.GetValueEditor().ToEditor(content.Properties["blocks"]!) as BlockGridValue;
         Assert.IsNotNull(toEditor);
 
+        Assert.AreEqual(4, toEditor.ContentData.Count);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(4, toEditor.ContentData.Count);
-
             Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.ContentData[0].Key.ToString("N"));
             Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.ContentData[1].Key.ToString("N"));
+            Assert.AreEqual("5fc866c590be4d01a28a979472a1ffee", toEditor.ContentData[2].Key.ToString("N"));
+            Assert.AreEqual("264536b65b0f4641aa43d4bfb515831d", toEditor.ContentData[3].Key.ToString("N"));
 
             AssertValueEquals(toEditor.ContentData[0], "title", "Content Title One");
             AssertValueEquals(toEditor.ContentData[0], "text", "Content Text One");
@@ -242,10 +243,9 @@ public class BlockEditorBackwardsCompatibilityTests : UmbracoIntegrationTest
             Assert.IsFalse(toEditor.ContentData[3].RawPropertyValues.Any());
         });
 
+        Assert.AreEqual(2, toEditor.SettingsData.Count);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, toEditor.SettingsData.Count);
-
             Assert.AreEqual("1f613e26ce274898908a561437af5100", toEditor.SettingsData[0].Key.ToString("N"));
             Assert.AreEqual("63027539b0db45e7b70459762d4e83dd", toEditor.SettingsData[1].Key.ToString("N"));
 

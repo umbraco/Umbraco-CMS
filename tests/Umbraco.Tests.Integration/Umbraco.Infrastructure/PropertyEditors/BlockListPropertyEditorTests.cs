@@ -161,7 +161,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
 
         var blockListContentType = await CreateBlockListContentType(elementType);
 
-        var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var contentElementKey = Guid.NewGuid();
         var blockListValue = new BlockListValue
         {
             Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
@@ -170,7 +170,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
                     Constants.PropertyEditors.Aliases.BlockList,
                     new IBlockLayoutItem[]
                     {
-                        new BlockListLayoutItem { ContentUdi = contentElementUdi }
+                        new BlockListLayoutItem { ContentKey = contentElementKey }
                     }
                 }
             },
@@ -178,7 +178,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
             [
                 new()
                 {
-                    Udi = contentElementUdi,
+                    Key = contentElementKey,
                     ContentTypeAlias = elementType.Alias,
                     ContentTypeKey = elementType.Key,
                     Values =

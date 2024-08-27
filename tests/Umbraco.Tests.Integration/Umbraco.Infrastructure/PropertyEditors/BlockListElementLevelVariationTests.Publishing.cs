@@ -244,8 +244,8 @@ public partial class BlockListElementLevelVariationTests
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
         var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
-        var nestedElementContentUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var nestedElementSettingsUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var nestedElementContentKey = Guid.NewGuid();
+        var nestedElementSettingsKey = Guid.NewGuid();
         var content = CreateContent(
             contentType,
             rootElementType,
@@ -256,8 +256,8 @@ public partial class BlockListElementLevelVariationTests
                     Alias = "nestedBlocks",
                     Value = BlockListPropertyValue(
                         nestedElementType,
-                        nestedElementContentUdi,
-                        nestedElementSettingsUdi,
+                        nestedElementContentKey,
+                        nestedElementSettingsKey,
                         new BlockProperty(
                             new List<BlockPropertyValue>
                             {
@@ -312,8 +312,8 @@ public partial class BlockListElementLevelVariationTests
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
         blockListValue.ContentData[0].Values[0].Value = BlockListPropertyValue(
             nestedElementType,
-            nestedElementContentUdi,
-            nestedElementSettingsUdi,
+            nestedElementContentKey,
+            nestedElementSettingsKey,
             new BlockProperty(
                 new List<BlockPropertyValue>
                 {
@@ -445,10 +445,10 @@ public partial class BlockListElementLevelVariationTests
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
         var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
-        var nestedElementContentUdiEnUs = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var nestedElementSettingsUdiEnUs = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var nestedElementContentUdiDaDk = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var nestedElementSettingsUdiDaDk = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var nestedElementContentKeyEnUs = Guid.NewGuid();
+        var nestedElementSettingsKeyEnUs = Guid.NewGuid();
+        var nestedElementContentKeyDaDk = Guid.NewGuid();
+        var nestedElementSettingsKeyDaDk = Guid.NewGuid();
         var content = CreateContent(
             contentType,
             rootElementType,
@@ -459,8 +459,8 @@ public partial class BlockListElementLevelVariationTests
                     Alias = "nestedBlocks",
                     Value = BlockListPropertyValue(
                         nestedElementType,
-                        nestedElementContentUdiEnUs,
-                        nestedElementSettingsUdiEnUs,
+                        nestedElementContentKeyEnUs,
+                        nestedElementSettingsKeyEnUs,
                         new BlockProperty(
                             new List<BlockPropertyValue>
                             {
@@ -481,8 +481,8 @@ public partial class BlockListElementLevelVariationTests
                     Alias = "nestedBlocks",
                     Value = BlockListPropertyValue(
                         nestedElementType,
-                        nestedElementContentUdiDaDk,
-                        nestedElementSettingsUdiDaDk,
+                        nestedElementContentKeyDaDk,
+                        nestedElementSettingsKeyDaDk,
                         new BlockProperty(
                             new List<BlockPropertyValue>
                             {
@@ -536,8 +536,8 @@ public partial class BlockListElementLevelVariationTests
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
         blockListValue.ContentData[0].Values[0].Value = BlockListPropertyValue(
             nestedElementType,
-            nestedElementContentUdiEnUs,
-            nestedElementSettingsUdiEnUs,
+            nestedElementContentKeyEnUs,
+            nestedElementSettingsKeyEnUs,
             new BlockProperty(
                 new List<BlockPropertyValue>
                 {
@@ -553,8 +553,8 @@ public partial class BlockListElementLevelVariationTests
                 null));
         blockListValue.ContentData[0].Values[1].Value = BlockListPropertyValue(
             nestedElementType,
-            nestedElementContentUdiDaDk,
-            nestedElementSettingsUdiDaDk,
+            nestedElementContentKeyDaDk,
+            nestedElementSettingsKeyDaDk,
             new BlockProperty(
                 new List<BlockPropertyValue>
                 {
@@ -819,8 +819,8 @@ public partial class BlockListElementLevelVariationTests
             elementType,
             [
                 (
-                    new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid()),
-                    new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid()),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
                     new BlockProperty(
                         new List<BlockPropertyValue> {
                             new() { Alias = "invariantText", Value = "#1: The first invariant content value" },
@@ -833,8 +833,8 @@ public partial class BlockListElementLevelVariationTests
                     )
                 ),
                 (
-                    new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid()),
-                    new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid()),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
                     new BlockProperty(
                         new List<BlockPropertyValue> {
                             new() { Alias = "invariantText", Value = "#2: The first invariant content value" },
@@ -847,8 +847,8 @@ public partial class BlockListElementLevelVariationTests
                     )
                 ),
                 (
-                    new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid()),
-                    new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid()),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
                     new BlockProperty(
                         new List<BlockPropertyValue> {
                             new() { Alias = "invariantText", Value = "#3: The first invariant content value" },
