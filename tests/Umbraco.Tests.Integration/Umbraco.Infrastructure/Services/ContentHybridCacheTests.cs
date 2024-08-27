@@ -76,44 +76,6 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     }
 
     [Test]
-    public async Task Has_Content_By_Id_Returns_False_If_Not_In_Cache()
-    {
-        // Act
-        var hasContent = await PublishedContentHybridCache.HasByIdAsync(TextpageId);
-
-        // Assert
-        Assert.IsFalse(hasContent);
-    }
-
-    [Test]
-    public async Task Has_Content_By_Id_Returns_True_If_In_Cache()
-    {
-        // Act
-        var hasContent = await PublishedContentHybridCache.HasByIdAsync(TextpageId, true);
-
-        // Assert
-        Assert.IsTrue(hasContent);
-    }
-
-    [Test]
-    public async Task Has_Content_By_Id_Has_Content_After_Load()
-    {
-        // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
-        var hybridCache = GetRequiredService<HybridCache>();
-        await hybridCache.RemoveAsync(Textpage.Key.ToString());
-        var hasContent = await PublishedContentHybridCache.HasByIdAsync(TextpageId);
-        Assert.IsFalse(hasContent);
-        await PublishedContentHybridCache.GetByIdAsync(TextpageId);
-
-        // Act
-        var hasContent2 = await PublishedContentHybridCache.HasByIdAsync(TextpageId);
-
-        // Assert
-        Assert.IsTrue(hasContent2);
-    }
-
-    [Test]
     public async Task Can_Get_Draft_Of_Published_Content_By_Id()
     {
         // Arrange
@@ -484,8 +446,6 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     {
         // Arrange
         await PublishedContentHybridCache.GetByIdAsync(Subpage3.Key.Value, true);
-        var hasContent = await PublishedContentHybridCache.HasByIdAsync(Subpage3Id, true);
-        Assert.IsTrue(hasContent);
         var result = await ContentEditingService.DeleteAsync(Subpage3.Key.Value, Constants.Security.SuperUserKey);
 
         // Act

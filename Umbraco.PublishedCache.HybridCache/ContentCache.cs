@@ -21,8 +21,6 @@ public sealed class ContentCache : IPublishedContentCache
 
     public async Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false) => await _contentCacheService.GetByKeyAsync(key, preview);
 
-    public async Task<bool> HasByIdAsync(int id, bool preview = false) => await _contentCacheService.HasContentByIdAsync(id, preview);
-
     public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
 
     public IPublishedContent? GetById(bool preview, Guid contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
@@ -31,11 +29,6 @@ public sealed class ContentCache : IPublishedContentCache
     public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId, false).GetAwaiter().GetResult();
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId, false).GetAwaiter().GetResult();
-
-
-    public bool HasById(bool preview, int contentId) => HasByIdAsync(contentId, preview).GetAwaiter().GetResult();
-
-    public bool HasById(int contentId) => HasByIdAsync(contentId, false).GetAwaiter().GetResult();
 
     public IPublishedContentType? GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Content, id);
 

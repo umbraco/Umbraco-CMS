@@ -7,22 +7,22 @@ public interface ICacheManager
     /// <summary>
     ///     Gets the <see cref="IPublishedContentCache" />.
     /// </summary>
-    IPublishedContentCache? Content { get; }
+    IPublishedContentCache Content { get; }
 
     /// <summary>
     ///     Gets the <see cref="IPublishedMediaCache" />.
     /// </summary>
-    IPublishedMediaCache? Media { get; }
+    IPublishedMediaCache Media { get; }
 
     /// <summary>
     ///     Gets the <see cref="IPublishedMemberCache" />.
     /// </summary>
-    IPublishedMemberCache? Members { get; }
+    IPublishedMemberCache Members { get; }
 
     /// <summary>
     ///     Gets the <see cref="IDomainCache" />.
     /// </summary>
-    IDomainCache? Domains { get; }
+    IDomainCache Domains { get; }
 
     /// <summary>
     ///     Gets the elements-level cache.
@@ -33,5 +33,5 @@ public interface ICacheManager
     ///         ie all snapshots built on top of unchanging content / media / etc.
     ///     </para>
     /// </remarks>
-    IAppCache? ElementsCache { get; }
+    IAppCache ElementsCache { get; }
 }

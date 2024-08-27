@@ -26,6 +26,8 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
+    // TODO: make test with MediaWithCrops
+
     [Test]
     public async Task Can_Get_Media_By_Key()
     {
@@ -140,20 +142,6 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
         Assert.IsNotNull(publishedMedia);
         Assert.AreEqual("Image", publishedMedia.Name);
         Assert.AreEqual("NewTitle", publishedMedia.Value("title"));
-    }
-
-    [Test]
-    public async Task Has_Media_By_Id_Returns_True_If_In_Cache()
-    {
-        // Arrange
-        var media = await CreateMedia();
-        await PublishedMediaHybridCache.GetByIdAsync(media.Id);
-
-        // Act
-        var hasMedia = await PublishedMediaHybridCache.HasByIdAsync(media.Id);
-
-        // Assert
-        Assert.IsTrue(hasMedia);
     }
 
     [Test]

@@ -19,11 +19,4 @@ public interface IPublishedMediaCache : IPublishedCache
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
     Task<IPublishedContent?> GetByKeyAsync(Guid key);
-
-    /// <summary>
-    ///     Gets a value indicating whether the cache contains a specified content.
-    /// </summary>
-    /// <param name="id">The content unique identifier.</param>
-    /// <returns>A value indicating whether to the cache contains the specified content.</returns>
-    Task<bool> HasByIdAsync(int id);
 }
