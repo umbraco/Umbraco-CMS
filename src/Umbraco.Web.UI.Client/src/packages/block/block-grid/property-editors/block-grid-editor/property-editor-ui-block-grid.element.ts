@@ -39,11 +39,6 @@ export class UmbPropertyEditorUIBlockGridElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		/*const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
-
-		this.#limitMin = validationLimit?.min;
-		this.#limitMax = validationLimit?.max;*/
-
 		const blocks = config.getValueByAlias<Array<UmbBlockGridTypeModel>>('blocks') ?? [];
 		this.#context.setBlockTypes(blocks);
 

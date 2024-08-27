@@ -100,6 +100,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
  * @param {object} superClass - superclass to be extended.
  * @param defaultValue
  * @mixin
+ * @returns {Class} - The mixin class.
  */
 export function UmbFormControlMixin<
 	ValueType = FormData | FormDataEntryValue,
@@ -217,8 +218,9 @@ export function UmbFormControlMixin<
 		 * );
 		 * @function addValidator
 		 * @param {FlagTypes} flagKey the type of validation.
-		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
-		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
+		 * @param {function} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
+		 * @param {function} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
+		 * @returns {UmbFormControlValidatorConfig} - The validator configuration.
 		 */
 		addValidator(
 			flagKey: FlagTypes,
@@ -252,7 +254,8 @@ export function UmbFormControlMixin<
 		/**
 		 * @function addFormControlElement
 		 * @description Important notice if adding a native form control then ensure that its value and thereby validity is updated when value is changed from the outside.
-		 * @param element {UmbNativeFormControlElement} - element to validate and include as part of this form association.
+		 * @param {UmbNativeFormControlElement} element - element to validate and include as part of this form association.
+		 * @returns {void}
 		 */
 		protected addFormControlElement(element: UmbNativeFormControlElement) {
 			this.#formCtrlElements.push(element);
@@ -275,7 +278,7 @@ export function UmbFormControlMixin<
 		/**
 		 * @function setCustomValidity
 		 * @description Set custom validity state, set to empty string to remove the custom message.
-		 * @param message {string} - The message to be shown
+		 * @param {string} message - The message to be shown
 		 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity|HTMLObjectElement:setCustomValidity}
 		 */
 		protected setCustomValidity(message: string | null) {
