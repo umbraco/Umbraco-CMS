@@ -2,7 +2,9 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -34,6 +36,16 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
         IJsonSerializer jsonSerializer)
         : this(dataValueEditorFactory, ioHelper, blockValuePropertyIndexValueFactory, jsonSerializer)
     {
+    }
+
+    /// <inheritdoc />
+    public override bool ShouldPublishPartialValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+
+    /// <inheritdoc />
+    public override object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.PublishPartialValueForCulture(editedValue, publishedValue, culture);
     }
 
     #region Pre Value Editor

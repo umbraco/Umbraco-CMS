@@ -72,6 +72,8 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
+        protected override BlockListValue CreateWithLayout(IEnumerable<BlockListLayoutItem> layout) => new(layout);
+
         private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
         {
             private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockEditorValues;

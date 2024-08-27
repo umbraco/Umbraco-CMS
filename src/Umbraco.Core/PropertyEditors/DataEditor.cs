@@ -192,4 +192,10 @@ public class DataEditor : IDataEditor
     ///     Provides a summary of the PropertyEditor for use with the <see cref="DebuggerDisplayAttribute" />.
     /// </summary>
     protected virtual string DebuggerDisplay() => $"Alias: {Alias}";
+
+    /// <inheritdoc />
+    public virtual bool ShouldPublishPartialValues(IPropertyType propertyType) => false;
+
+    /// <inheritdoc />
+    public virtual object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture) => editedValue;
 }

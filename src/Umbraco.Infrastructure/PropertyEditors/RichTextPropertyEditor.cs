@@ -104,6 +104,8 @@ public class RichTextPropertyEditor : DataEditor
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), elementTypeCache, jsonSerializer, logger));
         }
 
+        protected override RichTextBlockValue CreateWithLayout(IEnumerable<RichTextBlockLayoutItem> layout) => new(layout);
+
         /// <inheritdoc />
         public override object? ConfigurationObject
         {

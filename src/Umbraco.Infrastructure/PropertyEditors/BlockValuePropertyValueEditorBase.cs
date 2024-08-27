@@ -18,8 +18,10 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ILogger _logger;
+    private readonly IJsonSerializer _jsonSerializer;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactoryCollection;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
 
     protected BlockValuePropertyValueEditorBase(
         DataEditorAttribute attribute,
@@ -37,12 +39,21 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         _propertyEditors = propertyEditors;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _logger = logger;
+        _jsonSerializer = jsonSerializer;
         _dataValueReferenceFactoryCollection = dataValueReferenceFactoryCollection;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
     }
 
     /// <inheritdoc />
     public abstract IEnumerable<UmbracoEntityReference> GetReferences(object? value);
+
+    protected abstract TValue CreateWithLayout(IEnumerable<TLayout> layout);
+
+    protected BlockEditorValues<TValue, TLayout> BlockEditorValues
+    {
+        get => _blockEditorValues ?? throw new NullReferenceException($"The property {nameof(BlockEditorValues)} must be initialized at value editor construction");
+        set => _blockEditorValues = value;
+    }
 
     protected IEnumerable<UmbracoEntityReference> GetBlockValueReferences(TValue blockValue)
     {
@@ -205,6 +216,91 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
 
                 // update the raw value since this is what will get serialized out
                 blockPropertyValue.Value = newValue;
+            }
+        }
+    }
+
+    internal object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture)
+    {
+        if (editedValue is null)
+        {
+            return null;
+        }
+
+        // parse the edited value as block editor data
+        BlockEditorData<TValue, TLayout>? editedBlockEditorValues = BlockEditorValues.DeserializeAndClean(editedValue);
+        if (editedBlockEditorValues?.Layout is null)
+        {
+            return null;
+        }
+
+        // parse the published value as block editor data (fallback to an empty set of block editor data)
+        BlockEditorData<TValue, TLayout> publishedBlockEditorValues =
+            (publishedValue is not null ? BlockEditorValues.DeserializeAndClean(publishedValue) : null)
+            ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(editedBlockEditorValues.Layout));
+
+        PublishPartialValueForCulture(editedBlockEditorValues.BlockValue.ContentData, publishedBlockEditorValues.BlockValue.ContentData, culture);
+        PublishPartialValueForCulture(editedBlockEditorValues.BlockValue.SettingsData, publishedBlockEditorValues.BlockValue.SettingsData, culture);
+
+        return _jsonSerializer.Serialize(publishedBlockEditorValues.BlockValue);
+    }
+
+    private void PublishPartialValueForCulture(List<BlockItemData> editedBlockItems, List<BlockItemData> publishedBlockItems, string? culture)
+    {
+        // remove all published blocks that are not part of the edited blocks (structure is global)
+        publishedBlockItems.RemoveAll(pb => editedBlockItems.Any(eb => eb.Udi == pb.Udi) is false);
+
+        // merge the edited values into the published values for culture
+        foreach (BlockItemData editedBlockItem in editedBlockItems)
+        {
+            BlockItemData? publishedBlockItem = publishedBlockItems.FirstOrDefault(i => i.Key == editedBlockItem.Key);
+            if (publishedBlockItem is null)
+            {
+                publishedBlockItem = new BlockItemData(
+                    editedBlockItem.Udi!,
+                    editedBlockItem.ContentTypeKey,
+                    editedBlockItem.ContentTypeAlias);
+
+                // NOTE: this only works because publishedBlockItems is by ref!
+                publishedBlockItems.Add(publishedBlockItem);
+            }
+
+            foreach (BlockPropertyValue editedBlockPropertyValue in editedBlockItem.Values)
+            {
+                // is this another editor that supports partial publishing? i.e. blocks within blocks.
+                IDataEditor? mergingDataEditor = null;
+                var shouldPerformPartialPublish = editedBlockPropertyValue.PropertyType is not null
+                                  && _propertyEditors.TryGet(editedBlockPropertyValue.PropertyType.PropertyEditorAlias, out mergingDataEditor)
+                                  && mergingDataEditor.ShouldPublishPartialValues(editedBlockPropertyValue.PropertyType);
+
+                if (shouldPerformPartialPublish is false && editedBlockPropertyValue.Culture != culture)
+                {
+                    // skip for now (irrelevant for the current culture, but might be included in the next pass)
+                    continue;
+                }
+
+                BlockPropertyValue? publishedBlockPropertyValue = publishedBlockItem
+                    .Values
+                    .FirstOrDefault(v =>
+                        v.Alias == editedBlockPropertyValue.Alias &&
+                        v.Culture == editedBlockPropertyValue.Culture &&
+                        v.Segment == editedBlockPropertyValue.Segment);
+
+                if (publishedBlockPropertyValue is null)
+                {
+                    publishedBlockPropertyValue = new BlockPropertyValue
+                    {
+                        Alias = editedBlockPropertyValue.Alias,
+                        Culture = editedBlockPropertyValue.Culture,
+                        Segment = editedBlockPropertyValue.Segment
+                    };
+                    publishedBlockItem.Values.Add(publishedBlockPropertyValue);
+                }
+
+                // assign edited value to published value (or perform partial publish, depending on context)
+                publishedBlockPropertyValue.Value = shouldPerformPartialPublish is false
+                    ? editedBlockPropertyValue.Value
+                    : mergingDataEditor!.PublishPartialValueForCulture(editedBlockPropertyValue.Value, publishedBlockPropertyValue.Value, culture);
             }
         }
     }

@@ -19,7 +19,6 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
     where TLayout : class, IBlockLayoutItem, new()
 {
     private readonly IJsonSerializer _jsonSerializer;
-    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
 
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -34,12 +33,6 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
         BlockEditorVarianceHandler blockEditorVarianceHandler)
         : base(attribute, propertyEditors, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories, blockEditorVarianceHandler) =>
         _jsonSerializer = jsonSerializer;
-
-    protected BlockEditorValues<TValue, TLayout> BlockEditorValues
-    {
-        get => _blockEditorValues ?? throw new NullReferenceException($"The property {nameof(BlockEditorValues)} must be initialized at value editor construction");
-        set => _blockEditorValues = value;
-    }
 
     /// <inheritdoc />
     public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
