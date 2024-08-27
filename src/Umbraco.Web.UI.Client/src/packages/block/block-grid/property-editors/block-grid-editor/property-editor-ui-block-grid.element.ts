@@ -81,21 +81,14 @@ export class UmbPropertyEditorUIBlockGridElement
 			this.observe(
 				context.dataPath,
 				(dataPath) => {
-					// Translate paths for content elements:
+					// Translate paths for content/settings:
 					this.#contentDataPathTranslator?.destroy();
-					if (dataPath) {
-						// Set the data path for the local validation context:
-						this.#validationContext.setDataPath(dataPath);
-
-						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					}
-
-					// Translate paths for settings elements:
 					this.#settingsDataPathTranslator?.destroy();
 					if (dataPath) {
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
 
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
 						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
 					}
 				},
