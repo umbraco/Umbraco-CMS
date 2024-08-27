@@ -23,24 +23,32 @@ internal class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
+        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
         var contentNode = new ContentNode(
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
             contentCacheNode.CreateDate,
-            contentCacheNode.CreatorId);
-
-        IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
-        contentNode.SetContentTypeAndData(contentType, preview ? contentCacheNode.Data : null, preview ? null : contentCacheNode.Data);
+            contentCacheNode.CreatorId,
+            contentType,
+            preview ? contentCacheNode.Data : null,
+            preview ? null : contentCacheNode.Data);
 
         return preview ? GetModel(contentNode, contentNode.DraftModel) ?? GetPublishedContentAsDraft(GetModel(contentNode, contentNode.PublishedModel)) : GetModel(contentNode, contentNode.PublishedModel);
     }
 
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
-        var contentNode = new ContentNode(contentCacheNode.Id, contentCacheNode.Key, contentCacheNode.SortOrder, contentCacheNode.CreateDate, contentCacheNode.CreatorId);
         IPublishedContentType contentType = _contentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
-        contentNode.SetContentTypeAndData(contentType, null, contentCacheNode.Data);
+        var contentNode = new ContentNode(
+            contentCacheNode.Id,
+            contentCacheNode.Key,
+            contentCacheNode.SortOrder,
+            contentCacheNode.CreateDate,
+            contentCacheNode.CreatorId,
+            contentType,
+            null,
+            contentCacheNode.Data);
 
         return GetModel(contentNode, contentNode.PublishedModel);
     }

@@ -35,39 +35,21 @@ internal sealed class ContentNode
         CreatorId = creatorId;
     }
 
-    // 2-phases ctor, phase 1
     public ContentNode(
         int id,
         Guid key,
         int sortOrder,
         DateTime createDate,
-        int creatorId)
+        int creatorId,
+        IPublishedContentType contentType,
+        ContentData? draftData,
+        ContentData? publishedData)
     {
         Id = id;
         Key = key;
         SortOrder = sortOrder;
         CreateDate = createDate;
         CreatorId = creatorId;
-    }
-
-    public bool HasPublished => _publishedData != null;
-
-    public ContentData? DraftModel => _draftData;
-
-    public ContentData? PublishedModel => _publishedData;
-
-    public readonly Guid Key;
-    public IPublishedContentType ContentType = null!;
-    public readonly int SortOrder;
-    public readonly DateTime CreateDate;
-    public readonly int CreatorId;
-
-    // two-phase ctor, phase 2
-    public void SetContentTypeAndData(
-        IPublishedContentType contentType,
-        ContentData? draftData,
-        ContentData? publishedData)
-    {
         ContentType = contentType;
 
         if (draftData == null && publishedData == null)
@@ -78,6 +60,18 @@ internal sealed class ContentNode
         _draftData = draftData;
         _publishedData = publishedData;
     }
+
+    public bool HasPublished => _publishedData != null;
+
+    public ContentData? DraftModel => _draftData;
+
+    public ContentData? PublishedModel => _publishedData;
+
+    public readonly Guid Key;
+    public IPublishedContentType ContentType;
+    public readonly int SortOrder;
+    public readonly DateTime CreateDate;
+    public readonly int CreatorId;
 
     public bool HasPublishedCulture(string culture) => _publishedData != null && (_publishedData.CultureInfos?.ContainsKey(culture) ?? false);
 #pragma warning restore IDE1006 // Naming Styles
