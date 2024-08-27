@@ -11,6 +11,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
 import {
+	UmbBindServerValidationToFormControl,
 	UmbFormControlMixin,
 	UmbFormControlValidator,
 	type UmbFormControlValidatorConfig,
@@ -169,6 +170,12 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	constructor() {
 		super();
+
+		// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
+		new UmbFormControlValidator(this, this);
+
+		//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias = 'my-input-alias')].value");
+
 		this.observe(
 			this.#context.layoutEntries,
 			(layoutEntries) => {
@@ -226,6 +233,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
 	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
+		console.log('setupRangeValidation', rangeLimit);
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
 			this.#rangeUnderflowValidator = undefined;
