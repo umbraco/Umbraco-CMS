@@ -17,8 +17,8 @@ internal sealed class AllowedApplicationHandler : MustSatisfyRequirementAuthoriz
 
     protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, AllowedApplicationRequirement requirement)
     {
-        IUser user = _authorizationHelper.GetUmbracoUser(context.User);
-        var allowed = user.AllowedSections.ContainsAny(requirement.Applications);
+        var allowed = _authorizationHelper.TryGetUmbracoUser(context.User, out IUser? user)
+                      && user.AllowedSections.ContainsAny(requirement.Applications);
         return Task.FromResult(allowed);
     }
 }

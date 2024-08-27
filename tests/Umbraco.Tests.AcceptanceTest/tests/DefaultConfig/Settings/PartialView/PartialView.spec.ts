@@ -30,7 +30,7 @@ test('can create an empty partial view', {tag: '@smoke'}, async ({umbracoApi, um
   expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
   // Verify the new partial view is displayed under the Partial Views section
   await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName);
-})
+});
 
 test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) => {
   // Arrange
@@ -278,4 +278,17 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+});
+
+test('cannot create a partial view with an empty name', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.partialView.clickActionsMenuAtRoot();
+  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickNewEmptyPartialViewButton();
+  await umbracoUi.partialView.clickSaveButton();
+
+  // Assert
+  // TODO: Uncomment this when the front-end is ready. Currently there is no error displays.
+  //await umbracoUi.partialView.isErrorNotificationVisible();
+  expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeFalsy();
 });
