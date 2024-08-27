@@ -2,14 +2,16 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
-internal interface INuCacheContentRepository
+internal interface IDatabaseCacheRepository
 {
     void DeleteContentItem(int id);
 
+    // FIXME: make async
     ContentCacheNode? GetContentSource(int id, bool preview = false);
 
     ContentCacheNode? GetMediaSource(int id);
 
+    // TODO: Refactor to use by key.
     IEnumerable<ContentCacheNode> GetContentByContentTypeId(IEnumerable<int>? ids);
 
     /// <summary>

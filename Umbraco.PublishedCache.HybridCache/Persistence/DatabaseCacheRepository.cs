@@ -21,11 +21,11 @@ using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
-internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContentRepository
+internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRepository
 {
     private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
     private readonly IDocumentRepository _documentRepository;
-    private readonly ILogger<NuCacheContentRepository> _logger;
+    private readonly ILogger<DatabaseCacheRepository> _logger;
     private readonly IMediaRepository _mediaRepository;
     private readonly IMemberRepository _memberRepository;
     private readonly IOptions<NuCacheSettings> _nucacheSettings;
@@ -33,12 +33,12 @@ internal sealed class NuCacheContentRepository : RepositoryBase, INuCacheContent
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="NuCacheContentRepository" /> class.
+    ///     Initializes a new instance of the <see cref="DatabaseCacheRepository" /> class.
     /// </summary>
-    public NuCacheContentRepository(
+    public DatabaseCacheRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
-        ILogger<NuCacheContentRepository> logger,
+        ILogger<DatabaseCacheRepository> logger,
         IMemberRepository memberRepository,
         IDocumentRepository documentRepository,
         IMediaRepository mediaRepository,

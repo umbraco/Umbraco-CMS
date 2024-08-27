@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 {
     private IPublishedContentCache _mockedCache;
-    private Mock<INuCacheContentRepository> _mockedNucacheRepository;
+    private Mock<IDatabaseCacheRepository> _mockedNucacheRepository;
     private IContentCacheService _mockContentCacheService;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
@@ -32,7 +32,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     [SetUp]
     public void SetUp()
     {
-        _mockedNucacheRepository = new Mock<INuCacheContentRepository>();
+        _mockedNucacheRepository = new Mock<IDatabaseCacheRepository>();
 
         var contentData = new ContentData(
             Textpage.Name,

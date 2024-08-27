@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 internal class MediaCacheService : IMediaCacheService
 {
-    private readonly INuCacheContentRepository _nuCacheContentRepository;
+    private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly IIdKeyMap _idKeyMap;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
@@ -18,14 +18,14 @@ internal class MediaCacheService : IMediaCacheService
     private readonly ICacheNodeFactory _cacheNodeFactory;
 
     public MediaCacheService(
-        INuCacheContentRepository nuCacheContentRepository,
+        IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
         ICoreScopeProvider scopeProvider,
         Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache,
         IPublishedContentFactory publishedContentFactory,
         ICacheNodeFactory cacheNodeFactory)
     {
-        _nuCacheContentRepository = nuCacheContentRepository;
+        _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
@@ -45,7 +45,7 @@ internal class MediaCacheService : IMediaCacheService
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             $"{key}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetMediaSource(idAttempt.Result)));
+            cancel => ValueTask.FromResult(_databaseCacheRepository.GetMediaSource(idAttempt.Result)));
 
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
@@ -62,7 +62,7 @@ internal class MediaCacheService : IMediaCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             $"{keyAttempt.Result}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetMediaSource(id)));
+            cancel => ValueTask.FromResult(_databaseCacheRepository.GetMediaSource(id)));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
     }
@@ -96,14 +96,14 @@ internal class MediaCacheService : IMediaCacheService
         // and thus we won't get too much data when retrieving from the cache.
         var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
         await _hybridCache.SetAsync(GetCacheKey(media.Key, false), cacheNode);
-        _nuCacheContentRepository.RefreshMedia(cacheNode);
+        _databaseCacheRepository.RefreshMedia(cacheNode);
         scope.Complete();
     }
 
     public async Task DeleteItemAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _nuCacheContentRepository.DeleteContentItem(id);
+        _databaseCacheRepository.DeleteContentItem(id);
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (keyAttempt.Success)
         {

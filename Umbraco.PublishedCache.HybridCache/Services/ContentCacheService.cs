@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 internal sealed class ContentCacheService : IContentCacheService
 {
-    private readonly INuCacheContentRepository _nuCacheContentRepository;
+    private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly IIdKeyMap _idKeyMap;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
@@ -20,14 +20,14 @@ internal sealed class ContentCacheService : IContentCacheService
 
 
     public ContentCacheService(
-        INuCacheContentRepository nuCacheContentRepository,
+        IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
         ICoreScopeProvider scopeProvider,
         Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache,
         IPublishedContentFactory publishedContentFactory,
         ICacheNodeFactory cacheNodeFactory)
     {
-        _nuCacheContentRepository = nuCacheContentRepository;
+        _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
@@ -48,7 +48,7 @@ internal sealed class ContentCacheService : IContentCacheService
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(key, preview), // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(idAttempt.Result)));
+            cancel => ValueTask.FromResult(_databaseCacheRepository.GetContentSource(idAttempt.Result)));
 
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
@@ -65,7 +65,7 @@ internal sealed class ContentCacheService : IContentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(keyAttempt.Result, preview), // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_nuCacheContentRepository.GetContentSource(id, preview)));
+            cancel => ValueTask.FromResult(_databaseCacheRepository.GetContentSource(id, preview)));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
@@ -73,7 +73,7 @@ internal sealed class ContentCacheService : IContentCacheService
     public async Task SeedAsync(IReadOnlyCollection<int>? contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        IEnumerable<ContentCacheNode> contentCacheNodes = _nuCacheContentRepository.GetContentByContentTypeId(contentTypeIds);
+        IEnumerable<ContentCacheNode> contentCacheNodes = _databaseCacheRepository.GetContentByContentTypeId(contentTypeIds);
         foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
         {
             if (contentCacheNode.IsDraft)
@@ -127,13 +127,13 @@ internal sealed class ContentCacheService : IContentCacheService
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
         await _hybridCache.SetAsync(GetCacheKey(content.Key, true), draftCacheNode);
-        _nuCacheContentRepository.RefreshContent(draftCacheNode, content.PublishedState);
+        _databaseCacheRepository.RefreshContent(draftCacheNode, content.PublishedState);
 
         if (content.PublishedState == PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
             await _hybridCache.SetAsync(GetCacheKey(content.Key, false), publishedCacheNode);
-            _nuCacheContentRepository.RefreshContent(publishedCacheNode, content.PublishedState);
+            _databaseCacheRepository.RefreshContent(publishedCacheNode, content.PublishedState);
         }
 
         scope.Complete();
@@ -144,7 +144,7 @@ internal sealed class ContentCacheService : IContentCacheService
     public async Task DeleteItemAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _nuCacheContentRepository.DeleteContentItem(id);
+        _databaseCacheRepository.DeleteContentItem(id);
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, true));
         await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, false));
