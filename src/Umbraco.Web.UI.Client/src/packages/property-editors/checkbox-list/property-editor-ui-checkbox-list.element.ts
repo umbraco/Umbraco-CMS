@@ -39,6 +39,15 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 		}
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _list: UmbInputCheckboxListElement['list'] = [];
 
@@ -52,6 +61,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 			<umb-input-checkbox-list
 				.list=${this._list}
 				.selection=${this.#selection}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-checkbox-list>
 		`;
 	}

@@ -27,6 +27,15 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
 		return !isNaN(num) && num > 0 ? num : fallback;
@@ -74,6 +83,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 				.urls=${this.value ?? []}
 				.variantId=${this._variantId}
 				?hide-anchor=${this._hideAnchor}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}>
 			</umb-input-multi-url>
 		`;
