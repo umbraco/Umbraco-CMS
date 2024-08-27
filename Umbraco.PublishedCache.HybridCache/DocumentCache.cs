@@ -5,12 +5,12 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public sealed class ContentCache : IPublishedContentCache
+public sealed class DocumentCache : IPublishedContentCache
 {
     private readonly IContentCacheService _contentCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
-    public ContentCache(IContentCacheService contentCacheService, IPublishedContentTypeCache publishedContentTypeCache)
+    public DocumentCache(IContentCacheService contentCacheService, IPublishedContentTypeCache publishedContentTypeCache)
     {
         _contentCacheService = contentCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;

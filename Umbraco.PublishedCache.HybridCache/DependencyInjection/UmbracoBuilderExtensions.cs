@@ -29,7 +29,7 @@ public static class UmbracoBuilderExtensions
     {
         builder.Services.AddHybridCache();
         builder.Services.AddSingleton<IDatabaseCacheRepository, DatabaseCacheRepository>();
-        builder.Services.AddSingleton<IPublishedContentCache, ContentCache>();
+        builder.Services.AddSingleton<IPublishedContentCache, DocumentCache>();
         builder.Services.AddSingleton<IPublishedMediaCache, MediaCache>();
         builder.Services.AddTransient<IPublishedMemberCache, MemberCache>();
         builder.Services.AddSingleton<IDomainCache, DomainCache>();
