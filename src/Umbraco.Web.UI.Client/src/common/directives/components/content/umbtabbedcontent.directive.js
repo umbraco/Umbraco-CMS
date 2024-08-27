@@ -15,7 +15,8 @@
 
             $scope.activeTabAlias = null;
             $scope.tabs = [];
-            $scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            //$scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            setAllowUpdate()
             $scope.allowEditInvariantFromNonDefault = Umbraco.Sys.ServerVariables.umbracoSettings.allowEditInvariantFromNonDefault;
 
             $scope.$watchCollection('content.tabs', (newValue) => {
@@ -43,6 +44,10 @@
                     scrollableNode.addEventListener("mousewheel", cancelScrollTween);
                 }
             });
+
+            function setAllowUpdate() {
+              $scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            }
 
             function onScroll(event) {
 
@@ -149,6 +154,17 @@
                     setActiveAnchor($args.anchor);
                     scrollTo($args.anchor.id);
                 }
+            });
+
+            $scope.$on("formSubmitting", function() {
+              $scope.allowUpdate = false;
+            });
+
+            $scope.$on("formSubmitted", function() {
+                setAllowUpdate();
+            });
+            $scope.$on("formSubmittedValidationFailed", function() {
+                setAllowUpdate();
             });
 
             //ensure to unregister from all dom-events
