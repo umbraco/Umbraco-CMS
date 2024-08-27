@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 /// <inheritdoc />
 public class CacheManager : ICacheManager
 {
-    public CacheManager(IPublishedContentCache? content, IPublishedMediaCache? media, IPublishedMemberCache? members, IDomainCache? domains, IElementsCache elementsCache)
+    public CacheManager(IPublishedContentCache content, IPublishedMediaCache media, IPublishedMemberCache members, IDomainCache domains, IElementsCache elementsCache)
     {
         ElementsCache = elementsCache;
         Content = content;
@@ -15,13 +15,13 @@ public class CacheManager : ICacheManager
         Domains = domains;
     }
 
-    public IPublishedContentCache? Content { get; }
+    public IPublishedContentCache Content { get; }
 
-    public IPublishedMediaCache? Media { get; }
+    public IPublishedMediaCache Media { get; }
 
-    public IPublishedMemberCache? Members { get; }
+    public IPublishedMemberCache Members { get; }
 
-    public IDomainCache? Domains { get; }
+    public IDomainCache Domains { get; }
 
-    public IAppCache? ElementsCache { get; }
+    public IAppCache ElementsCache { get; }
 }
