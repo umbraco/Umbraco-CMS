@@ -115,6 +115,12 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
                 return validationResults;
             }
         }
+
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
+        {
+            var configuration = ConfigurationObject as BlockGridConfiguration;
+            return configuration?.Blocks.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
+        }
     }
 
     #endregion

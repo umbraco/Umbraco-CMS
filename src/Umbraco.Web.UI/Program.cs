@@ -6,7 +6,9 @@ builder.Services.AddCors(opt =>
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
+#if UseDeliveryApi
     .AddDeliveryApi()
+#endif
     .AddComposers()
     .Build();
 
@@ -28,6 +30,9 @@ app.UseUmbraco()
     })
     .WithEndpoints(u =>
     {
+        /*#if (UmbracoRelease = 'LTS')
+        u.UseInstallerEndpoints();
+        #endif */
         u.UseBackOfficeEndpoints();
         u.UseWebsiteEndpoints();
     });

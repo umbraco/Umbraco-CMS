@@ -38,6 +38,8 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     {
     }
 
+    public override bool SupportsConfigurableElements => true;
+
     /// <inheritdoc />
     public override bool ShouldPublishPartialValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
 

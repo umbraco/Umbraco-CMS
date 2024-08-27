@@ -1,0 +1,102 @@
+services:
+  umb_database:
+    container_name: umbraco_image_database
+    build:
+      context: ./Database
+    environment:
+      SA_PASSWORD: ${DB_PASSWORD}
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+      - "1434:1434"
+    volumes:
+      - umb_database:/var/opt/mssql
+    networks:
+      - umbnet
+    healthcheck:
+      # This healthcheck is to make sure that the database is up and running before the umbraco container starts.
+      # It works by querying the database for the state of the umbracoDb database, ensuring it exists.
+      test: ./healthcheck.sh
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 15s # Bootstrap duration, for this duration failures does not count towards max retries.
+      start_interval: 5s # How long after the health check has started to run the healthcheck again.
+
+  umbraco_image:
+    image: umbraco_image
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true;
+        - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
+    volumes:
+      - umb_media:/app/wwwroot/media
+      - umb_scripts:/app/wwwroot/scripts
+      - umb_styles:/app/wwwroot/css
+      - umb_logs:/app/umbraco/Logs
+      - umb_views:/app/Views
+      - umb_data:/app/umbraco
+      - umb_models:/app/umbraco/models
+    build:
+      context: .
+      dockerfile: UmbracoProject/Dockerfile
+      args:
+        - BUILD_CONFIGURATION=Debug
+
+    depends_on:
+      umb_database:
+        condition: service_healthy
+    restart: always
+    ports:
+      - "TEMPLATE_PORT:8080"
+    networks:
+      - umbnet
+    develop:
+      # This allows you to run docker compose watch, after doing so the container will rebuild when the models are changed.
+      # Once a restart only feature is implemented (https://github.com/docker/compose/issues/11446)
+      # It would be really nice to add a restart only watch to \Views, since the file watchers for recompilation of Razor views does not work with docker.
+      watch:
+        - path: ./UmbracoProject/umbraco/models
+          action: rebuild
+
+# These volumes are all made as bind mounts, meaning that they are bound to the host machine's file system.
+# This is to better facilitate local development in the IDE, so the views, models, etc... are available in the IDE.
+# This can be changed by removing the driver and driver_opts from the volumes.
+volumes:
+  umb_media:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./UmbracoProject/wwwroot/media
+      o: bind
+  umb_scripts:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./UmbracoProject/wwwroot/scripts
+      o: bind
+  umb_styles:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./UmbracoProject/wwwroot/css
+      o: bind
+  umb_logs:
+  umb_views:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./UmbracoProject/Views
+      o: bind
+  umb_data:
+  umb_models:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./UmbracoProject/umbraco/models
+      o: bind
+  umb_database:
+
+networks:
+  umbnet:
+    driver: bridge
