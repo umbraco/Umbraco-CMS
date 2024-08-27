@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 public class MemberCache : IPublishedMemberCache
 {
     private readonly IMemberCacheService _memberCacheService;
-    private readonly PublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
-    public MemberCache(IMemberCacheService memberCacheService, IPublishedContentTypeCacheAccessor publishedContentTypeCacheAccessor)
+    public MemberCache(IMemberCacheService memberCacheService, IPublishedContentTypeCache publishedContentTypeCache)
     {
         _memberCacheService = memberCacheService;
-        _publishedContentTypeCache = publishedContentTypeCacheAccessor.Get();
+        _publishedContentTypeCache = publishedContentTypeCache;
     }
 
     public async Task<IPublishedMember?> GetAsync(IMember member) =>

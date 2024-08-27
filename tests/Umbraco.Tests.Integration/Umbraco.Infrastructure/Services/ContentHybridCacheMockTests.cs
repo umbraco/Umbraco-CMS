@@ -83,7 +83,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>());
 
-        _mockedCache = new ContentCache(_mockContentCacheService, GetRequiredService<IPublishedContentTypeCacheAccessor>());
+        _mockedCache = new ContentCache(_mockContentCacheService, GetRequiredService<IPublishedContentTypeCache>());
     }
 
     [Test]
