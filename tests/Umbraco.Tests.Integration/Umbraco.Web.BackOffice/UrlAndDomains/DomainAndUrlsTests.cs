@@ -334,6 +334,22 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         Assert.AreEqual(DomainOperationStatus.DuplicateDomainName, result.Status);
     }
 
+    [TestCase("https://*.umbraco.com")]
+    [TestCase("&#€%#€")]
+    [TestCase("¢”$¢”¢$≈{")]
+    public async Task Cannot_Assign_Invalid_Domains(string domainName)
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = new DomainModel { DomainName = domainName, IsoCode = Cultures.First() }.Yield()
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.InvalidDomainName, result.Status);
+    }
+
     [Test]
     public async Task Cannot_Assign_Already_Used_Domains()
     {
