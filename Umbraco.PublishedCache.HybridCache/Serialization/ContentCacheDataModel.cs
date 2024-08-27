@@ -25,22 +25,8 @@ public sealed class ContentCacheDataModel
     [MessagePackFormatter(typeof(MessagePackDictionaryStringInternIgnoreCaseFormatter<CultureVariation>))]
     public Dictionary<string, CultureVariation>? CultureData { get; set; }
 
+    // TODO: Remove this when routing cache is in place
     [DataMember(Order = 2)]
     [JsonPropertyName("us")]
     public string? UrlSegment { get; set; }
-
-    // Legacy properties used to deserialize existing nucache db entries
-    [IgnoreDataMember]
-    [JsonPropertyName("properties")]
-    [JsonConverter(typeof(JsonDictionaryStringIgnoreCaseConverter<PropertyData[]>))]
-    private Dictionary<string, PropertyData[]> LegacyPropertyData { set => PropertyData = value; }
-
-    [IgnoreDataMember]
-    [JsonPropertyName("cultureData")]
-    [JsonConverter(typeof(JsonDictionaryStringIgnoreCaseConverter<CultureVariation>))]
-    private Dictionary<string, CultureVariation> LegacyCultureData { set => CultureData = value; }
-
-    [IgnoreDataMember]
-    [JsonPropertyName("urlSegment")]
-    private string LegacyUrlSegment { set => UrlSegment = value; }
 }
