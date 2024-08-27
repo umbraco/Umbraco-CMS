@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorValidator
+public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorValidator
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
@@ -28,6 +28,8 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
             new { Path = nameof(BlockValue<TLayout>.SettingsData).ToFirstLowerInvariant(), Items = blockEditorData.BlockValue.SettingsData }
         };
 
+        var valuesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
+
         foreach (var group in itemDataGroups)
         {
             var allElementTypes = _elementTypeCache.GetAll(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
@@ -40,9 +42,13 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
                     throw new InvalidOperationException($"No element type found with key {item.ContentTypeKey}");
                 }
 
+                // NOTE: for now this only validates the property data actually sent by the client, not all element properties.
+                //       we need to ensure that all properties for all languages have a matching "item" entry here, to handle validation of
+                //       required properties (see comment in the top of this method). a separate task has been created, get in touch with KJA.
                 var elementValidation = new ElementTypeValidationModel(item.ContentTypeAlias, item.Key);
-                foreach (BlockPropertyValue blockPropertyValue in item.Properties)
+                for (var j = 0; j < item.Values.Count; j++)
                 {
+                    BlockPropertyValue blockPropertyValue = item.Values[j];
                     IPropertyType? propertyType = blockPropertyValue.PropertyType;
                     if (propertyType is null)
                     {
@@ -50,7 +56,7 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
                     }
 
                     elementValidation.AddPropertyTypeValidation(
-                        new PropertyTypeValidationModel(propertyType, blockPropertyValue.Value, $"{group.Path}[{i}].{propertyType.Alias}"));
+                        new PropertyTypeValidationModel(propertyType, blockPropertyValue.Value, $"{group.Path}[{i}].{valuesJsonPathPart}[{j}].value"));
                 }
 
                 yield return elementValidation;

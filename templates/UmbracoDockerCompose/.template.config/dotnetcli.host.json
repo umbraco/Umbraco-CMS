@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/dotnetcli.host.json",
+  "symbolInfo": {
+    "ProjectName": {
+      "longName": "ProjectName",
+      "shortName": "P"
+    },
+    "DatabasePassword": {
+      "longName": "DatabasePassword",
+      "shortName": "dbpw"
+    },
+    "Port":
+    {
+      "longName": "Port",
+      "shortName": "p"
+    }
+  },
+  "usageExamples": [
+    "dotnet new umbraco-compose -P MyProject",
+    "dotnet new umbraco-compose --ProjectName MyProject",
+    "dotnet new umbraco-compose -P -MyProject -dbpw MyStr0ngP@ssword",
+    "dotnet new umbraco-compose -P -MyProject --DatabasePassword MyStr0ngP@ssword"
+  ]
+}

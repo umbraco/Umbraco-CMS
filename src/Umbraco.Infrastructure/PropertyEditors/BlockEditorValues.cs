@@ -10,9 +10,9 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-/// Used to deserialize json values and clean up any values based on the existence of element types and layout structure
+/// Used to deserialize json values and clean up any values based on the existence of element types and layout structure.
 /// </summary>
-internal class BlockEditorValues<TValue, TLayout>
+public class BlockEditorValues<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
@@ -97,7 +97,7 @@ internal class BlockEditorValues<TValue, TLayout>
         }
 
         // resolve the actual property types for all block properties
-        foreach (BlockPropertyValue property in block.Properties)
+        foreach (BlockPropertyValue property in block.Values)
         {
             if (!propertyTypes.TryGetValue(property.Alias, out IPropertyType? propertyType))
             {
@@ -114,7 +114,7 @@ internal class BlockEditorValues<TValue, TLayout>
         }
 
         // remove all block properties that did not resolve a property type
-        block.Properties.RemoveAll(blockProperty => blockProperty.PropertyType is null);
+        block.Values.RemoveAll(blockProperty => blockProperty.PropertyType is null);
 
         block.ContentTypeAlias = contentType.Alias;
 

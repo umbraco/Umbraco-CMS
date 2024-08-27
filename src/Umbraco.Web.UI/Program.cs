@@ -1,9 +1,14 @@
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(opt =>
+    opt.AddPolicy("AllowAll", options => options.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
+
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
+#if UseDeliveryApi
     .AddDeliveryApi()
+#endif
     .AddComposers()
     .Build();
 
@@ -15,6 +20,8 @@ await app.BootUmbracoAsync();
 app.UseHttpsRedirection();
 #endif
 
+app.UseCors("AllowAll");
+
 app.UseUmbraco()
     .WithMiddleware(u =>
     {
@@ -23,6 +30,9 @@ app.UseUmbraco()
     })
     .WithEndpoints(u =>
     {
+        /*#if (UmbracoRelease = 'LTS')
+        u.UseInstallerEndpoints();
+        #endif */
         u.UseBackOfficeEndpoints();
         u.UseWebsiteEndpoints();
     });

@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -34,6 +35,8 @@ public interface IProperty : IEntity, IRememberBeingDirty
     void SetValue(object? value, string? culture = null, string? segment = null);
 
     void PublishValues(string? culture = "*", string segment = "*");
+
+    void PublishPartialValues(IDataEditor dataEditor, string? culture);
 
     void UnpublishValues(string? culture = "*", string segment = "*");
 }

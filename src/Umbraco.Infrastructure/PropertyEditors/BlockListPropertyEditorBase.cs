@@ -72,6 +72,8 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
+        protected override BlockListValue CreateWithLayout(IEnumerable<BlockListLayoutItem> layout) => new(layout);
+
         private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
         {
             private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockEditorValues;
@@ -94,6 +96,12 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
                 return ValidateNumberOfBlocks(blockEditorData, validationLimit.Min, validationLimit.Max);
             }
+        }
+
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
+        {
+            var configuration = ConfigurationObject as BlockListConfiguration;
+            return configuration?.Blocks.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
         }
     }
 

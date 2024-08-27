@@ -44,7 +44,7 @@ public class BlockItemData
 
     public Guid Key { get; set; }
 
-    public IList<BlockPropertyValue> Properties { get; set; } = new List<BlockPropertyValue>();
+    public IList<BlockPropertyValue> Values { get; set; } = new List<BlockPropertyValue>();
 
     [Obsolete("Use Properties instead. Will be removed in V18.")]
     [JsonExtensionData]

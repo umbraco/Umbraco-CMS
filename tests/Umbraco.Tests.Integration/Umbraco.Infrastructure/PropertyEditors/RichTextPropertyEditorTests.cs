@@ -106,7 +106,7 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"key": "{{elementId:D}}",
-                                                                  			"properties": [
+                                                                  			"values": [
                                                                                 { "alias": "contentPicker", "value": "umb://document/{{pickedContent.Key:N}}" }
                                                                   			]
                                                                   		}
@@ -159,7 +159,7 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
                                                                   			"key": "{{elementId:D}}",
-                                                                  			"properties": [
+                                                                  			"values": [
                                                                                 { "alias": "tags", "value": "[\"Tag One\", \"Tag Two\", \"Tag Three\"]" }
                                                                   			]
                                                                   		}

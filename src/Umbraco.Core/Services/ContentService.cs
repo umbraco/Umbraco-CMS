@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
@@ -33,40 +34,11 @@ public class ContentService : RepositoryService, IContentService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly PropertyEditorCollection _propertyEditorCollection;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
 
-    public ContentService(
-    ICoreScopeProvider provider,
-    ILoggerFactory loggerFactory,
-    IEventMessagesFactory eventMessagesFactory,
-    IDocumentRepository documentRepository,
-    IEntityRepository entityRepository,
-    IAuditRepository auditRepository,
-    IContentTypeRepository contentTypeRepository,
-    IDocumentBlueprintRepository documentBlueprintRepository,
-    ILanguageRepository languageRepository,
-    Lazy<IPropertyValidationService> propertyValidationService,
-    IShortStringHelper shortStringHelper,
-    ICultureImpactFactory cultureImpactFactory,
-    IUserIdKeyResolver userIdKeyResolver)
-    : base(provider, loggerFactory, eventMessagesFactory)
-    {
-        _documentRepository = documentRepository;
-        _entityRepository = entityRepository;
-        _auditRepository = auditRepository;
-        _contentTypeRepository = contentTypeRepository;
-        _documentBlueprintRepository = documentBlueprintRepository;
-        _languageRepository = languageRepository;
-        _propertyValidationService = propertyValidationService;
-        _shortStringHelper = shortStringHelper;
-        _cultureImpactFactory = cultureImpactFactory;
-        _userIdKeyResolver = userIdKeyResolver;
-        _logger = loggerFactory.CreateLogger<ContentService>();
-    }
-
-    [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -79,7 +51,40 @@ public class ContentService : RepositoryService, IContentService
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
         IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory)
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _documentRepository = documentRepository;
+        _entityRepository = entityRepository;
+        _auditRepository = auditRepository;
+        _contentTypeRepository = contentTypeRepository;
+        _documentBlueprintRepository = documentBlueprintRepository;
+        _languageRepository = languageRepository;
+        _propertyValidationService = propertyValidationService;
+        _shortStringHelper = shortStringHelper;
+        _cultureImpactFactory = cultureImpactFactory;
+        _userIdKeyResolver = userIdKeyResolver;
+        _propertyEditorCollection = propertyEditorCollection;
+        _logger = loggerFactory.CreateLogger<ContentService>();
+    }
+
+    [Obsolete("Use constructor that takes PropertyEditorCollection as a parameter, scheduled for removal in V17")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver)
         : this(
             provider,
             loggerFactory,
@@ -93,7 +98,8 @@ public class ContentService : RepositoryService, IContentService
             propertyValidationService,
             shortStringHelper,
             cultureImpactFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>())
     {
     }
 
@@ -1196,7 +1202,7 @@ public class ContentService : RepositoryService, IContentService
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
             foreach (CultureImpact? impact in impacts)
             {
-                content.PublishCulture(impact);
+                content.PublishCulture(impact, _propertyEditorCollection);
             }
 
             // Change state to publishing
@@ -1832,7 +1838,7 @@ public class ContentService : RepositoryService, IContentService
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
                         var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
-                        var tryPublish = d.PublishCulture(impact) &&
+                        var tryPublish = d.PublishCulture(impact, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
@@ -1914,12 +1920,12 @@ public class ContentService : RepositoryService, IContentService
             return culturesToPublish.All(culture =>
             {
                 var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
-                return content.PublishCulture(impact) &&
+                return content.PublishCulture(impact, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
+        return content.PublishCulture(_cultureImpactFactory.ImpactInvariant(), _propertyEditorCollection)
                && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
@@ -3080,7 +3086,7 @@ public class ContentService : RepositoryService, IContentService
                     .ToArray();
 
         // publish the culture(s)
-        if (!impactsToPublish.All(content.PublishCulture))
+        if (!impactsToPublish.All(impact => content.PublishCulture(impact, _propertyEditorCollection)))
         {
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
         }

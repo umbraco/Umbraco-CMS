@@ -264,7 +264,7 @@ public class BlockEditorComponentTests
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
             ""key"": """ + (contentGuid1.IsNullOrWhiteSpace() ? string.Empty : contentGuid1) + @""",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""featureName"", ""value"": ""Hello"" },
                 { ""alias"": ""featureDetails"", ""value"": ""World"" }
             ]
@@ -272,7 +272,7 @@ public class BlockEditorComponentTests
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
             ""key"": """ + contentGuid2 + @""",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""featureName"", ""value"": ""Another"" },
                 { ""alias"": ""featureDetails"", ""value"": ""Feature"" },
                 { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
@@ -283,7 +283,7 @@ public class BlockEditorComponentTests
         {
             ""contentTypeKey"": ""d6ce4a86-91a2-45b3-a99c-8691fc1fb020"",
             ""key"": """ + settingsGuid1 + @""",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""featureName"", ""value"": ""Setting 1"" },
                 { ""alias"": ""featureDetails"", ""value"": ""Setting 2"" }
             ]
@@ -413,38 +413,38 @@ public class BlockEditorComponentTests
     ""contentData"": [{
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""key"": ""fb0595b1-26e7-493f-86c7-bf2c42326850"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Element one - 12 cols"" }
             ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""key"": ""4852d9ef-ac8d-4d44-87c9-82d282aa0e7f"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Element one - 6 cols, left side"" }
             ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
             ""key"": ""1f778485-933e-40b4-91e2-9926857a5c81"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Element one - 6 cols, right side"" }
             ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""key"": ""2d5c6555-0dd8-4db2-b0c9-2d2eba29026d"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""One more element one - 12 cols"" },
                 { ""alias"": ""subFeatures"", ""value"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @" }
             ]
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
             ""key"": ""96a15ca9-3970-4e0a-9c66-18433bc23274"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Nested element two - left side"" }
             ]
         }, {
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""key"": ""3093f7f1-c931-4325-ba71-638eb2746c8d"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""title"", ""value"": ""Nested element one - right side"" }
             ]
         }
@@ -452,7 +452,7 @@ public class BlockEditorComponentTests
     ""settingsData"": [{
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
             ""key"": ""0183ae81-2b62-49b5-8ac6-88d66c33068c"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""enabled"", ""value"": 1 }
             ]
         }, {
@@ -464,7 +464,7 @@ public class BlockEditorComponentTests
         }, {
             ""contentTypeKey"": ""ef150524-7145-469e-8d99-166aad69a7ad"",
             ""key"": ""48a7b7da-673f-44d5-8bad-7d71d157fb3e"",
-            ""properties"": [
+            ""values"": [
                 { ""alias"": ""enabled"", ""value"": 1 }
             ]
         }

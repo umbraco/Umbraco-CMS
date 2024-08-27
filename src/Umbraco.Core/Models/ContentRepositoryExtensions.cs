@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Extensions;
 
@@ -292,11 +293,12 @@ public static class ContentRepositoryExtensions
     /// </summary>
     /// <param name="content"></param>
     /// <param name="impact"></param>
+    /// <param name="propertyEditorCollection"></param>
     /// <returns>
     ///     A value indicating whether it was possible to publish the names and values for the specified
     ///     culture(s). The method may fail if required names are not set, but it does NOT validate property data
     /// </returns>
-    public static bool PublishCulture(this IContent content, CultureImpact? impact)
+    public static bool PublishCulture(this IContent content, CultureImpact? impact, PropertyEditorCollection propertyEditorCollection)
     {
         if (impact == null)
         {
@@ -351,18 +353,34 @@ public static class ContentRepositoryExtensions
         foreach (IProperty property in content.Properties)
         {
             // for the specified culture (null or all or specific)
-            property.PublishValues(impact.Culture);
+            PublishPropertyValues(content, property, impact.Culture, propertyEditorCollection);
 
             // maybe the specified culture did not impact the invariant culture, so PublishValues
             // above would skip it, yet it *also* impacts invariant properties
             if (impact.ImpactsAlsoInvariantProperties && (property.PropertyType.VariesByCulture() is false || impact.ImpactsOnlyDefaultCulture))
             {
-                property.PublishValues(null);
+                PublishPropertyValues(content, property, null, propertyEditorCollection);
             }
         }
 
         content.PublishedState = PublishedState.Publishing;
         return true;
+    }
+
+    private static void PublishPropertyValues(IContent content, IProperty property, string? culture, PropertyEditorCollection propertyEditorCollection)
+    {
+        // if the content varies by culture, let data editor opt-in to perform partial property publishing (per culture)
+        if (content.ContentType.VariesByCulture()
+            && propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor)
+            && dataEditor.ShouldPublishPartialValues(property.PropertyType))
+        {
+            // perform partial publishing for the current culture
+            property.PublishPartialValues(dataEditor, culture);
+            return;
+        }
+
+        // for the specified culture (null or all or specific)
+        property.PublishValues(culture);
     }
 
     /// <summary>

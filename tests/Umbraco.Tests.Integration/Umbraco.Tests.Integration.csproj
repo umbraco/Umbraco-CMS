@@ -154,6 +154,12 @@
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetFolderMediaTypes.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Parsing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.Publishing.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

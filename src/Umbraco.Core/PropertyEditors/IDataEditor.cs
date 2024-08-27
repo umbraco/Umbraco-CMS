@@ -16,6 +16,8 @@ public interface IDataEditor : IDiscoverable
 
     bool SupportsReadOnly => false;
 
+    bool SupportsConfigurableElements => false;
+
     /// <summary>
     ///     Gets a value indicating whether the editor is deprecated.
     /// </summary>
@@ -49,4 +51,18 @@ public interface IDataEditor : IDiscoverable
     ///     <para>Is expected to throw if the editor does not support being configured, e.g. for most parameter editors.</para>
     /// </remarks>
     IConfigurationEditor GetConfigurationEditor();
+
+    /// <summary>
+    ///     Determines if the value editor needs to perform <see cref="PublishPartialValueForCulture"/> for a given property type.
+    /// </summary>
+    bool ShouldPublishPartialValues(IPropertyType propertyType) => false;
+
+    /// <summary>
+    ///     Partially published an edited property value into the published property value for a given culture.
+    /// </summary>
+    /// <param name="editedValue">The edited property value.</param>
+    /// <param name="publishedValue">The published property value.</param>
+    /// <param name="culture">The culture (or null for invariant).</param>
+    /// <returns>The result of the partial publishing operation.</returns>
+    object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture) => editedValue;
 }

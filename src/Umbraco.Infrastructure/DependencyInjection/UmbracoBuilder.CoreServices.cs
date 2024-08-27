@@ -408,6 +408,11 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
 
+        // Handlers for save warnings
+        builder
+            .AddNotificationAsyncHandler<ContentTypeSavingNotification, WarnDocumentTypeElementSwitchNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentTypeSavedNotification, WarnDocumentTypeElementSwitchNotificationHandler>();
+
         return builder;
     }
 

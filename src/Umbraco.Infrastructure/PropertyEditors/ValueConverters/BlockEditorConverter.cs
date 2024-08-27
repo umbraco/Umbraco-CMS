@@ -49,7 +49,7 @@ public sealed class BlockEditorConverter
             .ToDictionary(propertyType => propertyType.Alias);
 
         var propertyValues = new Dictionary<string, object?>();
-        foreach (BlockPropertyValue property in data.Properties)
+        foreach (BlockPropertyValue property in data.Values)
         {
             if (!propertyTypesByAlias.TryGetValue(property.Alias, out IPublishedPropertyType? propertyType))
             {
