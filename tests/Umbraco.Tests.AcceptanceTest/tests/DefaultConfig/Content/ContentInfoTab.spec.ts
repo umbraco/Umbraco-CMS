@@ -67,7 +67,7 @@ test('can open document type', async ({umbracoApi, umbracoUi}) => {
 
 test('can open template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const templateName = "TestTemplateForContent";
+  const templateName = 'TestTemplateForContent';
   await umbracoApi.template.ensureNameNotExists(templateName);
   const templateId = await umbracoApi.template.createDefaultTemplate(templateName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
@@ -88,8 +88,8 @@ test('can open template', async ({umbracoApi, umbracoUi}) => {
 
 test('can change template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const firstTemplateName = "TestTemplateOneForContent";
-  const secondTemplateName = "TestTemplateTwoForContent";
+  const firstTemplateName = 'TestTemplateOneForContent';
+  const secondTemplateName = 'TestTemplateTwoForContent';
   await umbracoApi.template.ensureNameNotExists(firstTemplateName);
   await umbracoApi.template.ensureNameNotExists(secondTemplateName);
   const firstTemplateId = await umbracoApi.template.createDefaultTemplate(firstTemplateName);
@@ -115,8 +115,8 @@ test('can change template', async ({umbracoApi, umbracoUi}) => {
 
 test('cannot change to a template that is not allowed in the document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const firstTemplateName = "TestTemplateOneForContent";
-  const secondTemplateName = "TestTemplateTwoForContent";
+  const firstTemplateName = 'TestTemplateOneForContent';
+  const secondTemplateName = 'TestTemplateTwoForContent';
   await umbracoApi.template.ensureNameNotExists(firstTemplateName);
   await umbracoApi.template.ensureNameNotExists(secondTemplateName);
   const firstTemplateId = await umbracoApi.template.createDefaultTemplate(firstTemplateName);
