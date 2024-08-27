@@ -11,7 +11,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
 import {
-	UmbBindServerValidationToFormControl,
 	UmbFormControlMixin,
 	UmbFormControlValidator,
 	type UmbFormControlValidatorConfig,
@@ -135,11 +134,20 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
+	#controlValidator?: UmbFormControlValidator;
 
 	@property({ attribute: false })
 	public set areaKey(value: string | null | undefined) {
 		this._areaKey = value;
 		this.#context.setAreaKey(value ?? null);
+		this.#controlValidator?.destroy();
+		if (this.areaKey) {
+			// Only when there is a area key we should create a validator, otherwise it is the root entries element, which is taking part of the Property Editor Form Control. [NL]
+			// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
+			this.#controlValidator = new UmbFormControlValidator(this, this);
+
+			//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias = 'my-input-alias')].value");
+		}
 	}
 	public get areaKey(): string | null | undefined {
 		return this._areaKey;
@@ -170,11 +178,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	constructor() {
 		super();
-
-		// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
-		new UmbFormControlValidator(this, this);
-
-		//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias = 'my-input-alias')].value");
 
 		this.observe(
 			this.#context.layoutEntries,
@@ -292,7 +295,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			<uui-form-validation-message .for=${this}></uui-form-validation-message>
+			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
 			${this._canCreate ? this.#renderCreateButton() : nothing}
 		`;
 	}

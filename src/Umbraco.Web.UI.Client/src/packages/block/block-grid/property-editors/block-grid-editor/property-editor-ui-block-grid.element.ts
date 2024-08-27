@@ -1,7 +1,15 @@
 import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	css,
+	type PropertyValueMap,
+	ref,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -99,8 +107,23 @@ export class UmbPropertyEditorUIBlockGridElement
 		});
 	}
 
+	#currentEntriesElement?: Element;
+	#gotRootEntriesElement(element: Element | undefined): void {
+		if (this.#currentEntriesElement === element) return;
+		if (this.#currentEntriesElement) {
+			throw new Error(
+				'Cannot re-render root entries element because we currently do not support removing form control elements.',
+			);
+			// TODO: If this become relevant we should implement this method: [NL]
+			//this.removeFormControlElement(this.#currentEntriesElement as any);
+		}
+		this.#currentEntriesElement = element;
+		this.addFormControlElement(element as any);
+	}
+
 	override render() {
 		return html` <umb-block-grid-entries
+			${ref(this.#gotRootEntriesElement)}
 			.areaKey=${null}
 			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
 	}

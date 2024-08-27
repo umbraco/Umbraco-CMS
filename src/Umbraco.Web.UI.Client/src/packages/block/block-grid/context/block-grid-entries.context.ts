@@ -184,8 +184,8 @@ export class UmbBlockGridEntriesContext
 	protected _gotBlockManager() {
 		if (!this._manager) return;
 
-		this.#getAllowedBlockTypes();
-		this.#getRangeLimits();
+		this.#setupAllowedBlockTypes();
+		this.#setupRangeLimits();
 
 		this.observe(
 			this._manager.propertyAlias,
@@ -250,8 +250,8 @@ export class UmbBlockGridEntriesContext
 			}
 
 			this.removeUmbControllerByAlias('observeAreaType');
-			this.#getAllowedBlockTypes();
-			this.#getRangeLimits();
+			this.#setupAllowedBlockTypes();
+			this.#setupRangeLimits();
 		} else {
 			if (!this.#parentEntry) return;
 
@@ -294,22 +294,43 @@ export class UmbBlockGridEntriesContext
 					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.columnSpan?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.columnSpan?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan?.toString() ?? '');
-					this.#getAllowedBlockTypes();
-					this.#getRangeLimits();
+					this.#setupAllowedBlockTypes();
+					this.#setupRangeLimits();
 				},
 				'observeAreaType',
 			);
 		}
 	}
 
-	#getAllowedBlockTypes() {
+	#setupAllowedBlockTypes() {
 		if (!this._manager) return;
 		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
 	}
-	#getRangeLimits() {
+	#setupRangeLimits() {
 		if (!this._manager) return;
-		const range = this.#retrieveRangeLimits();
-		this.#rangeLimits.setValue(range);
+		//const range = this.#retrieveRangeLimits();
+		if (this.#areaKey != null) {
+			this.removeUmbControllerByAlias('observeConfigurationRootLimits');
+			// Area entries:
+			if (!this.#areaType) return undefined;
+			// No need to observe as this method is called every time the area is changed.
+			this.#rangeLimits.setValue({
+				min: this.#areaType.minAllowed ?? 0,
+				max: this.#areaType.maxAllowed ?? Infinity,
+			});
+		} else if (this.#areaKey === null) {
+			if (!this._manager) return undefined;
+
+			this.observe(
+				this._manager.editorConfiguration,
+				(config) => {
+					const min = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
+					const max = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity;
+					this.#rangeLimits.setValue({ min, max });
+				},
+				'observeConfigurationRootLimits',
+			);
+		}
 	}
 
 	getPathForCreateBlock(index: number) {
@@ -402,28 +423,6 @@ export class UmbBlockGridEntriesContext
 		}
 
 		return [];
-	}
-
-	/**
-	 * @internal
-	 * @returns an NumberRange of the min and max allowed items in the current area. Or undefined if not ready jet.
-	 */
-	#retrieveRangeLimits(): UmbNumberRangeValueType | undefined {
-		if (this.#areaKey != null) {
-			// Area entries:
-			if (!this.#areaType) return undefined;
-
-			return { min: this.#areaType.minAllowed ?? 0, max: this.#areaType.maxAllowed ?? Infinity };
-		} else if (this.#areaKey === null) {
-			if (!this._manager) return undefined;
-
-			const config = this._manager.getEditorConfiguration();
-			const min = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
-			const max = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity;
-			return { min, max };
-		}
-
-		return undefined;
 	}
 
 	/**
