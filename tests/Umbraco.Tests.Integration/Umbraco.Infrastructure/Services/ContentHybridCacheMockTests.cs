@@ -44,7 +44,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             false,
             new Dictionary<string, PropertyData[]>(),
             null);
-        _mockedNucacheRepository.Setup(r => r.GetContentSource(It.IsAny<int>(), It.IsAny<bool>())).Returns(
+        _mockedNucacheRepository.Setup(r => r.GetContentSource(It.IsAny<int>(), It.IsAny<bool>())).ReturnsAsync(
             new ContentCacheNode()
             {
                 ContentTypeId = Textpage.ContentTypeId,

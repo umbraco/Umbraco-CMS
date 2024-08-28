@@ -48,7 +48,7 @@ internal sealed class ContentCacheService : IContentCacheService
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(key, preview), // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_databaseCacheRepository.GetContentSource(idAttempt.Result)));
+            async cancel => await _databaseCacheRepository.GetContentSource(idAttempt.Result));
 
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
@@ -65,7 +65,7 @@ internal sealed class ContentCacheService : IContentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(keyAttempt.Result, preview), // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_databaseCacheRepository.GetContentSource(id, preview)));
+            async cancel => await _databaseCacheRepository.GetContentSource(id, preview));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }

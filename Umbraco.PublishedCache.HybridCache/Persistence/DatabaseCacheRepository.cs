@@ -184,14 +184,14 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
-    public ContentCacheNode? GetContentSource(int id, bool preview = false)
+    public async Task<ContentCacheNode?> GetContentSource(int id, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
             .Append(SqlWhereNodeId(SqlContext, id))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        ContentSourceDto? dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
 
         if (dto == null)
         {
@@ -226,14 +226,14 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public ContentCacheNode? GetMediaSource(int id)
+    public async Task<ContentCacheNode?> GetMediaSource(int id)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
             .Append(SqlWhereNodeId(SqlContext, id))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        ContentSourceDto? dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
 
         if (dto is null)
         {
@@ -264,8 +264,7 @@ AND cmsContentNu.nodeId IS NULL
     }
 
     // assumes content tree lock
-    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize,
-        IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         Guid contentObjectType = Constants.ObjectTypes.Document;
 

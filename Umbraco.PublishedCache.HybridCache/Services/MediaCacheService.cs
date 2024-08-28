@@ -45,7 +45,7 @@ internal class MediaCacheService : IMediaCacheService
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             $"{key}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_databaseCacheRepository.GetMediaSource(idAttempt.Result)));
+            async cancel => await _databaseCacheRepository.GetMediaSource(idAttempt.Result));
 
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
@@ -62,7 +62,7 @@ internal class MediaCacheService : IMediaCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             $"{keyAttempt.Result}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult(_databaseCacheRepository.GetMediaSource(id)));
+            async cancel => await _databaseCacheRepository.GetMediaSource(id));
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedMedia(contentCacheNode);
     }
