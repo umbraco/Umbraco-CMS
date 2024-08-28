@@ -97,4 +97,6 @@ public interface ITrackedReferencesService
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take,
         bool filterMustBeIsDependency);
+
+    Task<PagedModel<Guid>> GetPagedKeysWithDependentReferencesAsync(ISet<Guid> keys, Guid nodeObjectTypeId, long skip, long take);
 }

@@ -22,7 +22,7 @@ public class ReferencedByDocumentController : DocumentControllerBase
     }
 
     /// <summary>
-    ///     Gets a page list of tracked references for the current item, so you can see where an item is being used.
+    ///     Gets a paged list of tracked references for the current item, so you can see where an item is being used.
     /// </summary>
     /// <remarks>
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.
