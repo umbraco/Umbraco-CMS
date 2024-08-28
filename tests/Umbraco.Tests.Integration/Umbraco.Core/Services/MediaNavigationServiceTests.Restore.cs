@@ -8,8 +8,8 @@ public partial class MediaNavigationServiceTests
  [Test]
     [TestCase("62BCE72F-8C18-420E-BCAC-112B5ECC95FD", "139DC977-E50F-4382-9728-B278C4B7AC6A")] // Image 4 to Sub-album 1
     [TestCase("DBCAFF2F-BFA4-4744-A948-C290C432D564", "1CD97C02-8534-4B72-AE9E-AE52EC94CF31")] // Sub-album 2 to Album
-    [TestCase("3E489C32-9315-42DA-95CE-823D154B09C8", null)] // Image 2 to content root
-    public async Task Structure_Updates_When_Restoring_Content(Guid nodeToRestore, Guid? targetParentKey)
+    [TestCase("3E489C32-9315-42DA-95CE-823D154B09C8", null)] // Image 2 to media root
+    public async Task Structure_Updates_When_Restoring_Media(Guid nodeToRestore, Guid? targetParentKey)
     {
         // Arrange
         Guid nodeInRecycleBin = Image3.Key;

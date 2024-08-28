@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 public partial class MediaNavigationServiceTests
 {
 [Test]
-    public async Task Structure_Does_Not_Update_When_Updating_Content()
+    public async Task Structure_Does_Not_Update_When_Updating_Media()
     {
         // Arrange
         Guid nodeToUpdate = Album.Key;

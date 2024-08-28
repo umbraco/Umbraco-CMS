@@ -9,7 +9,7 @@ public partial class MediaNavigationServiceTests
     [TestCase("1CD97C02-8534-4B72-AE9E-AE52EC94CF31")] // Album
     [TestCase("DBCAFF2F-BFA4-4744-A948-C290C432D564")] // Sub-album 2
     [TestCase("3E489C32-9315-42DA-95CE-823D154B09C8")] // Image 2
-    public async Task Structure_Updates_When_Deleting_Content(Guid nodeToDelete)
+    public async Task Structure_Updates_When_Deleting_Media(Guid nodeToDelete)
     {
         // Arrange
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);

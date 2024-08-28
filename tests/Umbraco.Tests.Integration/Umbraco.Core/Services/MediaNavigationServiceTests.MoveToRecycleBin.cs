@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 public partial class MediaNavigationServiceTests
 {
     [Test]
-    public async Task Structure_Updates_When_Moving_Content_To_Recycle_Bin()
+    public async Task Structure_Updates_When_Moving_Media_To_Recycle_Bin()
     {
         // Arrange
         Guid nodeToMoveToRecycleBin = Image3.Key;
