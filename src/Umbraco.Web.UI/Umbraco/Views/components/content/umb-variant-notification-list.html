@@ -1,8 +1,0 @@
-<span class="db" ng-repeat="notification in vm.notifications">
-    <!-- These are server side notifications for messages, generally success/warning, validation messages handled separately -->
-    <!-- Success = 3, Error = 2, Warning = 4 -->
-    <span class="db umb-list-item__description"
-          ng-class="{'text-success': notification.type === 3, 'text-error': notification.type === 2 || notification.type === 4}">
-        {{notification.message}}
-    </span>
-</span>
