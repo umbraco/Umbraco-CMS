@@ -45,7 +45,6 @@ public class WebhookService : IWebhookService
         var savingNotification = new WebhookSavingNotification(webhook, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
@@ -81,7 +80,6 @@ public class WebhookService : IWebhookService
         var savingNotification = new WebhookSavingNotification(webhook, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
@@ -114,7 +112,6 @@ public class WebhookService : IWebhookService
         var deletingNotification = new WebhookDeletingNotification(webhook, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus<IWebhook?, WebhookOperationStatus>(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 

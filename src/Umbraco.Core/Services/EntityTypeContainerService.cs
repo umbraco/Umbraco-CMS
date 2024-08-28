@@ -161,7 +161,6 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         var deletingEntityContainerNotification = new EntityContainerDeletingNotification(container, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(deletingEntityContainerNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 
@@ -196,7 +195,6 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         var savingEntityContainerNotification = new EntityContainerSavingNotification(container, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingEntityContainerNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 

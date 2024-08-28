@@ -46,7 +46,6 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -117,7 +116,6 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         var savingNotification = new MemberGroupSavingNotification(memberGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
         }
 
@@ -144,7 +142,6 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         var deletingNotification = new MemberGroupDeletingNotification(memberGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
         }
 
@@ -177,7 +174,6 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         var savingNotification = new MemberGroupSavingNotification(memberGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
         }
 

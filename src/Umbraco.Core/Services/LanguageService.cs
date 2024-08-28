@@ -150,7 +150,6 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             var deletingLanguageNotification = new LanguageDeletingNotification(language, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(deletingLanguageNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.CancelledByNotification, language);
             }
 
@@ -205,7 +204,6 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             var savingNotification = new LanguageSavingNotification(language, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
             }
 

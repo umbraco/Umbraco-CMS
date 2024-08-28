@@ -132,7 +132,6 @@ public class FileService : RepositoryService, IFileService
             var savingNotification = new StylesheetSavingNotification(stylesheet, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -163,7 +162,6 @@ public class FileService : RepositoryService, IFileService
             var deletingNotification = new StylesheetDeletingNotification(stylesheet, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return; // causes rollback
             }
 
@@ -275,7 +273,6 @@ public class FileService : RepositoryService, IFileService
             var savingNotification = new ScriptSavingNotification(script, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -305,7 +302,6 @@ public class FileService : RepositoryService, IFileService
             var deletingNotification = new ScriptDeletingNotification(script, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -535,7 +531,6 @@ public class FileService : RepositoryService, IFileService
             var savingNotification = new TemplateSavingNotification(templatesA, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -644,7 +639,6 @@ public class FileService : RepositoryService, IFileService
             var creatingNotification = new PartialViewCreatingNotification(partialView, eventMessages);
             if (scope.Notifications.PublishCancelable(creatingNotification))
             {
-                scope.Complete();
                 return Attempt<IPartialView?>.Fail();
             }
 
@@ -675,7 +669,6 @@ public class FileService : RepositoryService, IFileService
             var savingNotification = new PartialViewSavingNotification(partialView, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return Attempt<IPartialView?>.Fail();
             }
 
@@ -708,7 +701,6 @@ public class FileService : RepositoryService, IFileService
             var deletingNotification = new PartialViewDeletingNotification(partialView, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return false;
             }
 

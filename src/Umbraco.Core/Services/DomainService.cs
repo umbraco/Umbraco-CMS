@@ -131,7 +131,6 @@ public class DomainService : RepositoryService, IDomainService
             var savingNotification = new DomainSavingNotification(domains, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return OperationResult.Attempt.Cancel(eventMessages);
             }
 

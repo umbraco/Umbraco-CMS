@@ -190,7 +190,6 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             var deletingNotification = new DictionaryItemDeletingNotification(dictionaryItem, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 
@@ -252,7 +251,6 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             var movingNotification = new DictionaryItemMovingNotification(moveEventInfo, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(movingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 
@@ -313,7 +311,6 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
-                scope.Complete();
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 

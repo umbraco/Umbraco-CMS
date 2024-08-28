@@ -738,7 +738,6 @@ namespace Umbraco.Cms.Core.Services
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
-                    scope.Complete();
                     return OperationResult.Attempt.Cancel(eventMessages);
                 }
 
@@ -795,7 +794,6 @@ namespace Umbraco.Cms.Core.Services
                 var savingNotification = new MediaSavingNotification(mediasA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
-                    scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
@@ -840,7 +838,6 @@ namespace Umbraco.Cms.Core.Services
             {
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(media, messages)))
                 {
-                    scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
@@ -939,7 +936,6 @@ namespace Umbraco.Cms.Core.Services
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -992,7 +988,6 @@ namespace Umbraco.Cms.Core.Services
                 var movingToRecycleBinNotification = new MediaMovingToRecycleBinNotification(moveEventInfo, messages);
                 if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
                 {
-                    scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
@@ -1042,7 +1037,6 @@ namespace Umbraco.Cms.Core.Services
                 var movingNotification = new MediaMovingNotification(moveEventInfo, messages);
                 if (scope.Notifications.PublishCancelable(movingNotification))
                 {
-                    scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
@@ -1149,7 +1143,6 @@ namespace Umbraco.Cms.Core.Services
                 var emptyingRecycleBinNotification = new MediaEmptyingRecycleBinNotification(medias, messages);
                 if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
                 {
-                    scope.Complete();
                     return OperationResult.Cancel(messages);
                 }
 
@@ -1200,7 +1193,6 @@ namespace Umbraco.Cms.Core.Services
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
-                    scope.Complete();
                     return false;
                 }
 
@@ -1339,7 +1331,6 @@ namespace Umbraco.Cms.Core.Services
 
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(medias, messages)))
                 {
-                    scope.Complete();
                     return;
                 }
 

@@ -305,7 +305,6 @@ internal class UserService : RepositoryService, IUserService
             var savingNotification = new UserSavingNotification(user, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return user;
             }
 
@@ -396,7 +395,6 @@ internal class UserService : RepositoryService, IUserService
                 var deletingNotification = new UserDeletingNotification(user, evtMsgs);
                 if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
-                    scope.Complete();
                     return;
                 }
 
@@ -448,7 +446,6 @@ internal class UserService : RepositoryService, IUserService
             var savingNotification = new UserSavingNotification(entitiesA, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -2045,7 +2042,6 @@ internal class UserService : RepositoryService, IUserService
             var savingNotification = new UserGroupSavingNotification(userGroup, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -2054,7 +2050,6 @@ internal class UserService : RepositoryService, IUserService
                 new UserGroupWithUsersSavingNotification(userGroupWithUsers, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
             {
-                scope.Complete();
                 return;
             }
 
@@ -2084,7 +2079,6 @@ internal class UserService : RepositoryService, IUserService
             var deletingNotification = new UserGroupDeletingNotification(userGroup, evtMsgs);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                scope.Complete();
                 return;
             }
 
