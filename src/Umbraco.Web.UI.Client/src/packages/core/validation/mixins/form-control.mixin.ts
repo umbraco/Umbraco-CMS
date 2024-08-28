@@ -96,11 +96,11 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 }
 
 /**
+ * @mixin
  * The mixin allows a custom element to participate in HTML forms.
  * @param {object} superClass - superclass to be extended.
- * @param defaultValue
- * @mixin
- * @returns {Class} - The mixin class.
+ * @param {object} defaultValue - Default value for the form control.
+ * @returns {Function} - The mixin class.
  */
 export function UmbFormControlMixin<
 	ValueType = FormData | FormDataEntryValue,
@@ -173,7 +173,7 @@ export function UmbFormControlMixin<
 		 * Get internal form element.
 		 * This has to be implemented to provide a FormControl Element of choice for the given context. The element is used as anchor for validation-messages.
 		 * @function getFormElement
-		 * @returns {HTMLElement | undefined | null}
+		 * @returns {HTMLElement | undefined | null} - Returns the form element or undefined if not found.
 		 */
 		protected getFormElement(): HTMLElement | undefined | null {
 			return this.#formCtrlElements.find((el) => el.validity.valid === false);
@@ -182,7 +182,7 @@ export function UmbFormControlMixin<
 		/**
 		 * Focus first element that is invalid.
 		 * @function focusFirstInvalidElement
-		 * @returns {HTMLElement | undefined}
+		 * @returns {HTMLElement | undefined} - Returns the first invalid element or undefined if no invalid elements are found.
 		 */
 		focusFirstInvalidElement() {
 			const firstInvalid = this.#formCtrlElements.find((el) => el.validity.valid === false);
@@ -218,9 +218,9 @@ export function UmbFormControlMixin<
 		 * );
 		 * @function addValidator
 		 * @param {FlagTypes} flagKey the type of validation.
-		 * @param {function} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
-		 * @param {function} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
-		 * @returns {UmbFormControlValidatorConfig} - The validator configuration.
+		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
+		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
+		 * @returns {UmbFormControlValidatorConfig} - The added validator configuration.
 		 */
 		addValidator(
 			flagKey: FlagTypes,

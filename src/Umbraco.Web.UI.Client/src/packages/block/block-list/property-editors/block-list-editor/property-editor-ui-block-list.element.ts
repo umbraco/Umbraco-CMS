@@ -156,13 +156,13 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.localize.term('validation_entriesShort'),
+			() => '#validation_entriesShort',
 			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.localize.term('validation_entriesExceed'),
+			() => '#validation_entriesExceed',
 			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
 		);
 
