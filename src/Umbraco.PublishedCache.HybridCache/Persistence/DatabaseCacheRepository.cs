@@ -66,12 +66,12 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
         // always refresh the edited data
-        await OnRepositoryRefreshed(serializer, contentCacheNode, false);
+        await OnRepositoryRefreshed(serializer, contentCacheNode, true);
 
         switch (publishedState)
         {
             case PublishedState.Publishing:
-                await OnRepositoryRefreshed(serializer, contentCacheNode, true);
+                await OnRepositoryRefreshed(serializer, contentCacheNode, false);
                 break;
             case PublishedState.Unpublishing:
                 await Database.ExecuteAsync("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = contentCacheNode.Id });
@@ -194,6 +194,11 @@ AND cmsContentNu.nodeId IS NULL
         ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
 
         if (dto == null)
+        {
+            return null;
+        }
+
+        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
         {
             return null;
         }

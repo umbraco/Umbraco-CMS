@@ -48,7 +48,7 @@ internal sealed class ContentCacheService : IContentCacheService
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(key, preview), // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetContentSourceAsync(idAttempt.Result));
+            async cancel => await _databaseCacheRepository.GetContentSourceAsync(idAttempt.Result, preview));
 
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
@@ -126,13 +126,13 @@ internal sealed class ContentCacheService : IContentCacheService
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-        await _hybridCache.SetAsync(GetCacheKey(content.Key, true), draftCacheNode);
+        await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
         await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
 
         if (content.PublishedState == PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-            await _hybridCache.SetAsync(GetCacheKey(content.Key, false), publishedCacheNode);
+            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, false));
             await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
         }
 

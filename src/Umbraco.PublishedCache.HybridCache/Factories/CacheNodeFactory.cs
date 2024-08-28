@@ -27,7 +27,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
             CreatorId = content.CreatorId,
             ContentTypeId = content.ContentTypeId,
             Data = contentData,
-            IsDraft = !preview,
+            IsDraft = preview,
         };
     }
 
