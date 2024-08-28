@@ -5,29 +5,50 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     private Guid? _contentKey;
     private Guid? _settingsKey;
 
+    private Udi? _contentUdi;
+    private Udi? _settingsUdi;
+
     [Obsolete("Use ContentKey instead. Will be removed in V18.")]
-    public Udi? ContentUdi { get; set; }
+    public Udi? ContentUdi
+    {
+        get => _contentUdi;
+        set
+        {
+            if (_contentKey is not null)
+            {
+                return;
+            }
+
+            _contentUdi = value;
+            _contentKey = (value as GuidUdi)?.Guid;
+        }
+    }
 
     [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
-    public Udi? SettingsUdi { get; set; }
+    public Udi? SettingsUdi
+    {
+        get => _settingsUdi;
+        set
+        {
+            if (_settingsKey is not null)
+            {
+                return;
+            }
+
+            _settingsUdi = value;
+            _settingsKey = (value as GuidUdi)?.Guid;
+        }
+    }
 
     public Guid ContentKey
     {
-        get
-        {
-            _contentKey ??= (ContentUdi as GuidUdi)?.Guid;
-            return _contentKey ?? throw new InvalidOperationException("ContentKey has not yet been initialized");
-        }
+        get => _contentKey ?? throw new InvalidOperationException("ContentKey has not yet been initialized");
         set => _contentKey = value;
     }
 
     public Guid? SettingsKey
     {
-        get
-        {
-            _settingsKey ??= (SettingsUdi as GuidUdi)?.Guid;
-            return _settingsKey;
-        }
+        get => _settingsKey;
         set => _settingsKey = value;
     }
 
