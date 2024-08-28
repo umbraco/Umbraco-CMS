@@ -20,9 +20,7 @@ public partial class DocumentNavigationServiceTests
 
         // Assert
         Assert.AreNotEqual(nodeToCopy, copiedItemKey);
-
         DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
-
         Assert.Multiple(() =>
         {
             if (targetParentKey is null)
@@ -58,7 +56,6 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> afterCopyRootSiblingsKeys);
         DocumentNavigationQueryService.TryGetChildrenKeys((Guid)sourceParentKey, out IEnumerable<Guid> sourceParentChildrenKeys);
         List<Guid> rootSiblingsList = afterCopyRootSiblingsKeys.ToList();
-
         Assert.Multiple(() =>
         {
             // Verifies that the node actually has been copied
@@ -79,7 +76,6 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetParentKey(Grandchild3.Key, out Guid? sourceParentKey);
         DocumentNavigationQueryService.TryGetDescendantsKeys(Grandchild3.Key, out IEnumerable<Guid> beforeCopyGrandChild1Descendents);
         DocumentNavigationQueryService.TryGetChildrenKeys(Child3.Key, out IEnumerable<Guid> beforeCopyChild3ChildrenKeys);
-
         var initialChild3ChildrenCount = beforeCopyChild3ChildrenKeys.Count();
         var initialGrandChild1DescendentsCount = beforeCopyGrandChild1Descendents.Count();
 
@@ -94,10 +90,8 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetChildrenKeys(copiedItemKey, out IEnumerable<Guid> afterCopyGrandChild1Descendents);
         List<Guid> child3ChildrenList = afterCopyChild3ChildrenKeys.ToList();
         List<Guid> grandChild1DescendantsList = afterCopyGrandChild1Descendents.ToList();
-
         // Retrieves the child of the copied item to check its content
         var copiedGreatGrandChild1 = await ContentEditingService.GetAsync(grandChild1DescendantsList.First());
-
         Assert.Multiple(() =>
         {
             // Verifies that the node actually has been copied

@@ -25,7 +25,6 @@ public partial class DocumentNavigationServiceTests
 
         // Assert
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
-
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one

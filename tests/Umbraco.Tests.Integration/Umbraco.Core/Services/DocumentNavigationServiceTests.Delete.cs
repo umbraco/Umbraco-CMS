@@ -22,7 +22,6 @@ public partial class DocumentNavigationServiceTests
         // Assert
         var nodeExists = DocumentNavigationQueryService.TryGetDescendantsKeys(deletedItemKey, out _);
         var nodeExistsInRecycleBin = DocumentNavigationQueryService.TryGetDescendantsKeysInBin(nodeToDelete, out _);
-
         Assert.Multiple(() =>
         {
             Assert.AreEqual(nodeToDelete, deletedItemKey);

@@ -12,18 +12,11 @@ public partial class DocumentNavigationServiceTests
         // Arrange
         DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> initialSiblingsKeys);
         var initialRootNodeSiblingsCount = initialSiblingsKeys.Count();
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = ContentType.Key,
-            ParentKey = Constants.System.RootKey, // Create node at content root
-            InvariantName = "Root 2",
-        };
+        var createModel = CreateContentCreateModel("Root 2", Guid.NewGuid(), Constants.System.RootKey);
 
         // Act
         var createAttempt = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Guid createdItemKey = createAttempt.Result.Content!.Key;
-
         // Verify that the structure has updated by checking the siblings list of the Root once again
         DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> updatedSiblingsKeys);
         List<Guid> siblingsList = updatedSiblingsKeys.ToList();
@@ -43,13 +36,7 @@ public partial class DocumentNavigationServiceTests
         // Arrange
         DocumentNavigationQueryService.TryGetChildrenKeys(Child1.Key, out IEnumerable<Guid> initialChildrenKeys);
         var initialChild1ChildrenCount = initialChildrenKeys.Count();
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = ContentType.Key,
-            ParentKey = Child1.Key,
-            InvariantName = "Child1Child",
-        };
+        var createModel = CreateContentCreateModel("Child1Child", Guid.NewGuid(), Child1.Key);
 
         // Act
         var createAttempt = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
