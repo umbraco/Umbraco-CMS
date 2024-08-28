@@ -14,10 +14,9 @@ internal class PublishedMember : PublishedContent, IPublishedMember
     public PublishedMember(
         IMember member,
         ContentNode contentNode,
-        ContentData contentData,
         IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor)
-        : base(contentNode, contentData, elementsCache, variationContextAccessor) =>
+        : base(contentNode, true, elementsCache, variationContextAccessor) =>
         _member = member;
 
     public string Email => _member.Email;

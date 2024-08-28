@@ -34,7 +34,14 @@ internal class PublishedContentFactory : IPublishedContentFactory
             preview ? contentCacheNode.Data : null,
             preview ? null : contentCacheNode.Data);
 
-        return preview ? GetModel(contentNode, contentNode.DraftModel) ?? GetPublishedContentAsDraft(GetModel(contentNode, contentNode.PublishedModel)) : GetModel(contentNode, contentNode.PublishedModel);
+        IPublishedContent? model = GetModel(contentNode, preview);
+
+        if (preview)
+        {
+            return model ?? GetPublishedContentAsDraft(model);
+        }
+
+        return model;
     }
 
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
@@ -50,7 +57,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             null,
             contentCacheNode.Data);
 
-        return GetModel(contentNode, contentNode.PublishedModel);
+        return GetModel(contentNode, false);
     }
 
     public IPublishedMember ToPublishedMember(IMember member)
@@ -77,7 +84,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             member.CreateDate,
             member.CreatorId);
 
-        return new PublishedMember(member, contentNode, contentData, _elementsCache, _variationContextAccessor);
+        return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
     }
 
     private Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
@@ -114,14 +121,18 @@ internal class PublishedContentFactory : IPublishedContentFactory
         properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
-    private IPublishedContent? GetModel(ContentNode node, ContentData? contentData) =>
-        contentData == null
+    private IPublishedContent? GetModel(ContentNode node, bool preview)
+    {
+        ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
+        return contentData == null
             ? null
             : new PublishedContent(
                 node,
-                contentData,
+                preview,
                 _elementsCache,
                 _variationContextAccessor);
+    }
+
 
     private IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>
         content == null ? null :

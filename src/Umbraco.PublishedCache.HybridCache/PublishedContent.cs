@@ -6,26 +6,33 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 internal class PublishedContent : PublishedContentBase
 {
-    // TODO: We should refactor this, it doesn't make a lot of sense to have both content node and content data
-    // since content node contains the content data for both draft and published
     private IPublishedProperty[] _properties;
-    private readonly ContentData _contentData;
     private readonly ContentNode _contentNode;
     private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
     private readonly string? _urlSegment;
+    private readonly IReadOnlyDictionary<string, CultureVariation>? _cultureInfos;
+    private readonly string _contentName;
+    private readonly bool _published;
 
     public PublishedContent(
         ContentNode contentNode,
-        ContentData contentData,
+        bool preview,
         IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor)
         : base(variationContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
         _contentNode = contentNode;
+        ContentData? contentData = preview ? _contentNode.DraftModel : _contentNode.PublishedModel;
+        if (contentData is null)
+        {
+            throw new ArgumentNullException(nameof(contentData));
+        }
 
-        _contentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
-        _urlSegment = _contentData.UrlSegment;
+        _cultureInfos = contentData.CultureInfos;
+        _contentName = contentData.Name;
+        _urlSegment = contentData.UrlSegment;
+        _published = contentData.Published;
 
         var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
         var i = 0;
@@ -98,16 +105,17 @@ internal class PublishedContent : PublishedContentBase
             {
                 return _cultures = new Dictionary<string, PublishedCultureInfo>
                 {
-                    { string.Empty, new PublishedCultureInfo(string.Empty, _contentData.Name, _urlSegment, CreateDate) },
+                    { string.Empty, new PublishedCultureInfo(string.Empty, _contentName, _urlSegment, CreateDate) },
                 };
             }
 
-            if (_contentData.CultureInfos == null)
+            if (_cultureInfos == null)
             {
                 throw new PanicException("_contentDate.CultureInfos is null.");
             }
 
-            return _cultures = _contentData.CultureInfos
+
+            return _cultures = _cultureInfos
                 .ToDictionary(
                     x => x.Key,
                     x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date),
@@ -140,7 +148,7 @@ internal class PublishedContent : PublishedContentBase
     public override bool IsDraft(string? culture = null)
     {
         // if this is the 'published' published content, nothing can be draft
-        if (_contentData.Published)
+        if (_published)
         {
             return false;
         }
@@ -156,7 +164,7 @@ internal class PublishedContent : PublishedContentBase
 
         // not the 'published' published content, and varies
         // = depends on the culture
-        return _contentData.CultureInfos is not null && _contentData.CultureInfos.TryGetValue(culture, out CultureVariation? cvar) && cvar.IsDraft;
+        return _cultureInfos is not null && _cultureInfos.TryGetValue(culture, out CultureVariation? cvar) && cvar.IsDraft;
     }
 
     public override bool IsPublished(string? culture = null)
