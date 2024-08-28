@@ -120,6 +120,7 @@ public static partial class NPocoDatabaseExtensions
     ///         once T1 and T2 have completed. Whereas here, it could contain T1's value.
     ///     </para>
     /// </remarks>
+    [Obsolete("Use InsertOrUpdateAsync instead")]
     public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db, T poco)
         where T : class =>
         db.InsertOrUpdate(poco, null, null);

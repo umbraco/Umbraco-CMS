@@ -10,8 +10,7 @@ internal interface IDatabaseCacheRepository
 
     Task<ContentCacheNode?> GetMediaSourceAsync(int id);
 
-    // TODO: Refactor to use by key.
-    IEnumerable<ContentCacheNode> GetContentByContentTypeId(IEnumerable<int>? ids);
+    IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys);
 
     /// <summary>
     ///     Refreshes the nucache database row for the given cache node />

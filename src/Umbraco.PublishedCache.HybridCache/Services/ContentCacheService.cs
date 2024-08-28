@@ -70,10 +70,10 @@ internal sealed class ContentCacheService : IContentCacheService
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
 
-    public async Task SeedAsync(IReadOnlyCollection<int>? contentTypeIds)
+    public async Task SeedAsync(IReadOnlyCollection<Guid> contentTypeKeys)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        IEnumerable<ContentCacheNode> contentCacheNodes = _databaseCacheRepository.GetContentByContentTypeId(contentTypeIds);
+        IEnumerable<ContentCacheNode> contentCacheNodes = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeKeys);
         foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
         {
             if (contentCacheNode.IsDraft)

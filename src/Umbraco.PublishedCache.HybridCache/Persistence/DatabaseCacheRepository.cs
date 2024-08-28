@@ -203,16 +203,18 @@ AND cmsContentNu.nodeId IS NULL
         return CreateContentNodeKit(dto, serializer, preview);
     }
 
-    public IEnumerable<ContentCacheNode> GetContentByContentTypeId(IEnumerable<int>? ids)
+    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys)
     {
-        if (!ids?.Any() ?? false)
+        if (keys.Any() is false)
         {
             yield break;
         }
 
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+            .InnerJoin<NodeDto>("n")
+            .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.ContentTypeId, "n", "umbracoContent")
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
+            .WhereIn<NodeDto>(x => x.UniqueId, keys,"n")
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
         IContentCacheDataSerializer serializer =

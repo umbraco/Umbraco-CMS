@@ -17,5 +17,5 @@ internal class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApp
         _cacheSettings = cacheSettings.Value;
     }
 
-    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken) => await _contentCacheService.SeedAsync(_cacheSettings.ContentTypeIds);
+    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken) => await _contentCacheService.SeedAsync(_cacheSettings.ContentTypeKeys);
 }
