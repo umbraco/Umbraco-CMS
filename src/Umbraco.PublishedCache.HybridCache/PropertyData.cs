@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 // This is for cache performance reasons, see https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0#reuse-objects
 [ImmutableObject(true)]
 [DataContract] // NOTE: Use DataContract annotations here to control how MessagePack serializes/deserializes the data to use INT keys
-internal sealed class PropertyData
+public sealed class PropertyData
 {
     private string? _culture;
     private string? _segment;
