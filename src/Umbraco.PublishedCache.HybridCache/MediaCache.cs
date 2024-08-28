@@ -30,8 +30,7 @@ public class MediaCache : IPublishedMediaCache
 
     public IPublishedContent? GetById(Guid contentId) => GetByKeyAsync(contentId).GetAwaiter().GetResult();
 
-    // TODO: Remove thes when content type cache is DI'd as singleton
-    // obsolete first, do not remove to be friendly :)
+
     public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Media, key);
 
     public IPublishedContentType GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Media, id);

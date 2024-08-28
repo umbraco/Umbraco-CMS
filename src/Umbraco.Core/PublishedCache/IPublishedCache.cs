@@ -101,6 +101,7 @@ public interface IPublishedCache
     /// </summary>
     /// <param name="id">The content type unique identifier.</param>
     /// <returns>The content type, or null.</returns>
+    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
     IPublishedContentType? GetContentType(int id);
 
     /// <summary>
@@ -109,6 +110,7 @@ public interface IPublishedCache
     /// <param name="alias">The content type alias.</param>
     /// <returns>The content type, or null.</returns>
     /// <remarks>The alias is case-insensitive.</remarks>
+    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
     IPublishedContentType? GetContentType(string alias);
 
     /// <summary>
@@ -124,5 +126,6 @@ public interface IPublishedCache
     /// </summary>
     /// <param name="key">The content type key.</param>
     /// <returns>The content type, or null.</returns>
+    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
     IPublishedContentType? GetContentType(Guid key);
 }
