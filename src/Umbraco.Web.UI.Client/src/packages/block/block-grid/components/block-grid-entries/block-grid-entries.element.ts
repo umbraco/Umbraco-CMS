@@ -236,7 +236,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
 	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
-		console.log('setupRangeValidation', rangeLimit);
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
 			this.#rangeUnderflowValidator = undefined;
@@ -295,14 +294,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
 			${this._canCreate ? this.#renderCreateButton() : nothing}
+			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
 		`;
 	}
 
 	#renderCreateButton() {
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			return html`<uui-button-group>
+			return html`<uui-button-group id="createButton">
 				<uui-button
 					look="placeholder"
 					label=${this._singleBlockTypeName
@@ -354,18 +353,26 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				opacity: 0.2;
 				pointer-events: none;
 			}
+
 			> div {
 				display: flex;
 				flex-direction: column;
 				align-items: stretch;
 			}
 
-			uui-button-group {
+			#createButton {
 				padding-top: 1px;
 				grid-template-columns: 1fr auto;
 
 				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
 				display: var(--umb-block-grid--is-dragging--variable, grid);
+			}
+			:host(:not([pristine]):invalid) #createButton {
+				--uui-button-contrast: var(--uui-color-danger);
+				--uui-button-contrast-hover: var(--uui-color-danger);
+				--uui-color-default-emphasis: var(--uui-color-danger);
+				--uui-button-border-color: var(--uui-color-danger);
+				--uui-button-border-color-hover: var(--uui-color-danger);
 			}
 
 			.umb-block-grid__layout-container[data-area-length='0'] {

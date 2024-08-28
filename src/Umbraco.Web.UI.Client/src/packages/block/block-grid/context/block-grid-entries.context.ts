@@ -84,6 +84,10 @@ export class UmbBlockGridEntriesContext
 		this.#workspaceModal.setUniquePathValue('areaKey', areaKey ?? 'null');
 		this.#catalogueModal.setUniquePathValue('areaKey', areaKey ?? 'null');
 		this.#gotAreaKey();
+
+		// Idea: If we need to parse down a validation data path to target the specific layout object: [NL]
+		// If we have a areaKey, we want to inherit our layoutDataPath from nearest blockGridEntry context.
+		// If not, we want to set the layoutDataPath to a base one.
 	}
 
 	setLayoutColumns(columns: number | undefined) {
@@ -315,8 +319,8 @@ export class UmbBlockGridEntriesContext
 			if (!this.#areaType) return undefined;
 			// No need to observe as this method is called every time the area is changed.
 			this.#rangeLimits.setValue({
-				min: this.#areaType.minAllowed ?? 0,
-				max: this.#areaType.maxAllowed ?? Infinity,
+				min: this.#areaType.minAllowed ? parseInt(this.#areaType.minAllowed) : 0,
+				max: this.#areaType.maxAllowed ? parseInt(this.#areaType.maxAllowed) : Infinity,
 			});
 		} else if (this.#areaKey === null) {
 			if (!this._manager) return undefined;

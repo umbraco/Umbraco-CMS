@@ -26,8 +26,8 @@ export interface UmbBlockGridTypeAreaType {
 	alias: string;
 	columnSpan?: number;
 	rowSpan?: number;
-	minAllowed?: number;
-	maxAllowed?: number;
+	minAllowed?: string;
+	maxAllowed?: string;
 	specifiedAllowance?: Array<UmbBlockGridTypeAreaTypePermission>;
 }
 
