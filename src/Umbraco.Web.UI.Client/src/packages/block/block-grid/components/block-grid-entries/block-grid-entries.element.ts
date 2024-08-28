@@ -259,9 +259,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
 					);
 				},
-				() => {
-					return this._layoutEntries.length < (rangeLimit?.min ?? 0);
-				},
+				() => this._layoutEntries.length < (rangeLimit?.min ?? 0),
 			);
 		}
 
@@ -279,9 +277,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						this._layoutEntries.length - (rangeLimit!.max ?? this._layoutEntries.length),
 					);
 				},
-				() => {
-					return (this._layoutEntries.length ?? 0) > (rangeLimit?.max ?? Infinity);
-				},
+				() => this._layoutEntries.length > (rangeLimit?.max ?? Infinity),
 			);
 		}
 	}
@@ -292,7 +288,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.#typeLimitValidator = undefined;
 		}
 		if (hasTypeLimits) {
-			console.log('hasTypeLimits');
 			this.#typeLimitValidator = this.addValidator(
 				'patternMismatch',
 				() => {

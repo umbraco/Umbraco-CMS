@@ -511,7 +511,6 @@ export class UmbBlockGridEntriesContext
 					const contentTypeKey = this._manager!.getContentOf(entry.contentUdi)?.contentTypeKey;
 					return contentTypeKey === rule.elementTypeKey;
 				}).length;
-				console.log('amount', amount);
 				if (amount < minAllowed || (maxAllowed > 0 ? amount > maxAllowed : false)) {
 					this.#invalidBlockTypeLimits!.push({
 						key: rule.elementTypeKey,
