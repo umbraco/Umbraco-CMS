@@ -383,6 +383,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							${this._showContentEdit && this._workspaceEditContentPath
 								? html`<uui-button
 										label="edit"
+										look="secondary"
 										color=${this._contentInvalid ? 'danger' : ''}
 										href=${this._workspaceEditContentPath}>
 										<uui-icon name="icon-edit"></uui-icon>
@@ -394,6 +395,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							${this._hasSettings && this._workspaceEditSettingsPath
 								? html`<uui-button
 										label="Edit settings"
+										look="secondary"
 										color=${this._settingsInvalid ? 'danger' : ''}
 										href=${this._workspaceEditSettingsPath}>
 										<uui-icon name="icon-settings"></uui-icon>
@@ -402,7 +404,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 											: nothing}
 									</uui-button>`
 								: nothing}
-							<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
+							<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
 								<uui-icon name="icon-remove"></uui-icon>
 							</uui-button>
 						</uui-action-bar>
