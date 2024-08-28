@@ -24,7 +24,7 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 		const data = await modalContext.onSubmit();
 
 		const repository = new UmbChangeUserPasswordRepository(this);
-		await repository.changePassword(this.args.unique, data.newPassword);
+		await repository.changePassword(this.args.unique, data.newPassword, data.oldPassword, data.isCurrentUser);
 	}
 }
 

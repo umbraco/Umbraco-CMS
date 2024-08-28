@@ -10,12 +10,13 @@ export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 		this.#changePasswordSource = new UmbChangeUserPasswordServerDataSource(host);
 	}
 
-	async changePassword(userId: string, newPassword: string) {
+	async changePassword(userId: string, newPassword: string, oldPassword: string, isCurrentUser: boolean) {
 		if (!userId) throw new Error('User id is missing');
 		if (!newPassword) throw new Error('New password is missing');
+		if (isCurrentUser && !oldPassword) throw new Error('Old password is missing');
 		await this.init;
 
-		const { data, error } = await this.#changePasswordSource.changePassword(userId, newPassword);
+		const { data, error } = await this.#changePasswordSource.changePassword(userId, newPassword, oldPassword, isCurrentUser);
 
 		if (!error) {
 			const notification = { data: { message: `Password changed` } };
