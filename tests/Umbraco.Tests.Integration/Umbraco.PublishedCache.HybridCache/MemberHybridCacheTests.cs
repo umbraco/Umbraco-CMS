@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -26,8 +25,6 @@ public class MemberHybridCacheTests : UmbracoIntegrationTest
 
     private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
 
-    private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
-
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
     [Test]
@@ -40,7 +37,6 @@ public class MemberHybridCacheTests : UmbracoIntegrationTest
         var member = await PublishedMemberHybridCache.GetAsync(createdMember);
 
         // Assert
-        using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
         Assert.IsNotNull(member);
         Assert.AreEqual("The title value", member.Value("title"));
         Assert.AreEqual("test@test.com", member.Email);

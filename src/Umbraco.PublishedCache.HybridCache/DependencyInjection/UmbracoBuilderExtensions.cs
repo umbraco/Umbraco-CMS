@@ -31,17 +31,16 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDatabaseCacheRepository, DatabaseCacheRepository>();
         builder.Services.AddSingleton<IPublishedContentCache, DocumentCache>();
         builder.Services.AddSingleton<IPublishedMediaCache, MediaCache>();
-        // TODO: make this singleton.
-        builder.Services.AddTransient<IPublishedMemberCache, MemberCache>();
+        builder.Services.AddSingleton<IPublishedMemberCache, MemberCache>();
         builder.Services.AddSingleton<IDomainCache, DomainCache>();
         builder.Services.AddSingleton<IElementsCache, ElementsDictionaryAppCache>();
         builder.Services.AddSingleton<IPublishedContentTypeCache, PublishedContentTypeCache>();
         builder.Services.AddSingleton<IContentCacheService, ContentCacheService>();
         builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
-        builder.Services.AddTransient<IMemberCacheService, MemberCacheService>();
+        builder.Services.AddSingleton<IMemberCacheService, MemberCacheService>();
         builder.Services.AddSingleton<IDomainCacheService, DomainCacheService>();
-        builder.Services.AddTransient<IPublishedContentFactory, PublishedContentFactory>();
-        builder.Services.AddTransient<ICacheNodeFactory, CacheNodeFactory>();
+        builder.Services.AddSingleton<IPublishedContentFactory, PublishedContentFactory>();
+        builder.Services.AddSingleton<ICacheNodeFactory, CacheNodeFactory>();
         builder.Services.AddSingleton<ICacheManager, CacheManager>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
