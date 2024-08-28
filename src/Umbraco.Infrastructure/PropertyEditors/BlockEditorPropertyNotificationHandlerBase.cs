@@ -70,19 +70,6 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
                 }
 
                 return match.Value.Replace(match.Value, oldToNewKeys[oldKey].ToString("D"));
-                // var key = match.Groups["key"].Value;
-                // if (_keysToReplace.Contains(key) is false)
-                // {
-                //     return match.Value;
-                // }
-                //
-                // var oldKey = Guid.Parse(key);
-                // if (oldToNewKeys.ContainsKey(oldKey) == false)
-                // {
-                //     oldToNewKeys[oldKey] = createGuid(oldKey);
-                // }
-                //
-                // return match.Value.Replace(key, oldToNewKeys[oldKey].ToString("D"));
             });
 
         return rawJson;
