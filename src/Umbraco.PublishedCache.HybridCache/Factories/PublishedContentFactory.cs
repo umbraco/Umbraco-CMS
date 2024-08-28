@@ -79,11 +79,12 @@ internal class PublishedContentFactory : IPublishedContentFactory
         var contentNode = new ContentNode(
             member.Id,
             member.Key,
-            contentType,
             member.SortOrder,
-            member.CreateDate,
-            member.CreatorId);
-
+            member.UpdateDate,
+            member.CreatorId,
+            contentType,
+            null,
+            contentData);
         return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
     }
 

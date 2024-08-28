@@ -18,23 +18,6 @@ internal sealed class ContentNode
     private ContentData? _draftData;
     private ContentData? _publishedData;
 
-    // special ctor with no content data - for members
-    public ContentNode(
-        int id,
-        Guid key,
-        IPublishedContentType contentType,
-        int sortOrder,
-        DateTime createDate,
-        int creatorId)
-    {
-        Id = id;
-        Key = key;
-        ContentType = contentType;
-        SortOrder = sortOrder;
-        CreateDate = createDate;
-        CreatorId = creatorId;
-    }
-
     public ContentNode(
         int id,
         Guid key,
