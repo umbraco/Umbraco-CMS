@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 [DataContract] // NOTE: Use DataContract annotations here to control how MessagePack serializes/deserializes the data to use INT keys
 public sealed class ContentCacheDataModel
 {
-    // TODO: We don't want to allocate empty arrays
-    // dont serialize empty properties
     [DataMember(Order = 0)]
     [JsonPropertyName("pd")]
     [JsonConverter(typeof(JsonDictionaryStringInternIgnoreCaseConverter<PropertyData[]>))]
