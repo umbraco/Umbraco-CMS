@@ -136,7 +136,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	#context = new UmbBlockGridEntriesContext(this);
 	#controlValidator?: UmbFormControlValidator;
 
-	@property({ attribute: false })
+	@property({ type: String, attribute: 'area-key', reflect: true })
 	public set areaKey(value: string | null | undefined) {
 		this._areaKey = value;
 		this.#context.setAreaKey(value ?? null);
@@ -363,7 +363,11 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			#createButton {
 				padding-top: 1px;
 				grid-template-columns: 1fr auto;
+				display: grid;
+			}
 
+			// Only when we are n an area, we like to hide the button on drag
+			:host([area-key]) #createButton {
 				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
 				display: var(--umb-block-grid--is-dragging--variable, grid);
 			}
