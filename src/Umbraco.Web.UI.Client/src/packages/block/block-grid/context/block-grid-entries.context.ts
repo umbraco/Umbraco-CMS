@@ -327,8 +327,8 @@ export class UmbBlockGridEntriesContext
 			if (!this.#areaType) return undefined;
 			// No need to observe as this method is called every time the area is changed.
 			this.#rangeLimits.setValue({
-				min: this.#areaType.minAllowed ? parseInt(this.#areaType.minAllowed) : 0,
-				max: this.#areaType.maxAllowed ? parseInt(this.#areaType.maxAllowed) : Infinity,
+				min: this.#areaType.minAllowed ?? 0,
+				max: this.#areaType.maxAllowed ?? Infinity,
 			});
 		} else if (this.#areaKey === null) {
 			if (!this._manager) return undefined;
