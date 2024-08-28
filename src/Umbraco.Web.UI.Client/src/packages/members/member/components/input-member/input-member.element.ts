@@ -102,6 +102,27 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	@property({ type: Object, attribute: false })
 	public filter: (member: UmbMemberItemModel) => boolean = () => true;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
+
 	@state()
 	private _editMemberPath = '';
 
@@ -180,26 +201,20 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}></uui-button>
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 
 	#renderItem(item: UmbMemberItemModel) {
 		if (!item.unique) return nothing;
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique}>
-				${this.#renderIcon(item)}
+			<uui-ref-node-member name=${item.name} id=${item.unique} ?readonly=${this.readonly}>
 				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)}
-					<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
+					${this.#renderOpenButton(item)} ${this.#renderRemoveButton(item)}
 				</uui-action-bar>
-			</uui-ref-node>
+			</uui-ref-node-member>
 		`;
-	}
-
-	#renderIcon(item: UmbMemberItemModel) {
-		if (!item.memberType.icon) return;
-		return html`<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>`;
 	}
 
 	#renderOpenButton(item: UmbMemberItemModel) {
@@ -210,6 +225,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 				label="${this.localize.term('general_open')} ${item.name}">
 				${this.localize.term('general_open')}
 			</uui-button>
+		`;
+	}
+
+	#renderRemoveButton(item: UmbMemberItemModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
 		`;
 	}
 
