@@ -166,7 +166,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
     {
-        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey("data-content-key") is false || attributes["data-content-key"] is not string dataKey)
+        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey(BlockContentKeyAttribute) is false || attributes[BlockContentKeyAttribute] is not string dataKey)
         {
             return;
         }
@@ -177,7 +177,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         }
 
         attributes["content-id"] = key;
-        attributes.Remove("data-content-key");
+        attributes.Remove(BlockContentKeyAttribute);
     }
 
     private static void SanitizeAttributes(Dictionary<string, object> attributes)

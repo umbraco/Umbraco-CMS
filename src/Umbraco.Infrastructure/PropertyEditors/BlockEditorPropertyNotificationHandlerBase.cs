@@ -52,10 +52,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
 
         rawJson = Regex.Replace(
             rawJson,
-            // """
-            // "(content|settings)?[Kk]ey\\*":\s*\\*"(?<key>[^\"]*)"
-            // """,
-            "\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}",
+            @"\w{8}-\w{4}-\w{4}-\w{4}-\w{12}",
             match =>
             {
                 if (_keysToReplace.Contains(match.Value) is false)
