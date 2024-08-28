@@ -1,12 +1,13 @@
 ﻿using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 internal class PublishedContent : PublishedContentBase
 {
+    // TODO: We should refactor this, it doesn't make a lot of sense to have both content node and content data
+    // since content node contains the content data for both draft and published
     private IPublishedProperty[] _properties;
     private readonly ContentData _contentData;
     private readonly ContentNode _contentNode;
