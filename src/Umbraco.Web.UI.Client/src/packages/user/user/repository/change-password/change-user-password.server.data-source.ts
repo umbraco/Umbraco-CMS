@@ -25,30 +25,17 @@ export class UmbChangeUserPasswordServerDataSource {
 	 * @returns {*}
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
-	async changePassword(id: string, newPassword: string, oldPassword: string, isCurrentUser: boolean) {
+	async changePassword(id: string, newPassword: string) {
 		if (!id) throw new Error('User Id is missing');
 
-		if(isCurrentUser){
-			return tryExecuteAndNotify(
-				this.#host,
-				UserService.postCurrentUserByIdChangePassword({
-					requestBody: {
-						newPassword,
-						oldPassword
-					},
-				}),
-			);
-		}
-		else{
-			return tryExecuteAndNotify(
-				this.#host,
-				UserService.postUserByIdChangePassword({
-					id,
-					requestBody: {
-						newPassword
-					},
-				}),
-			);
-		}
+		return tryExecuteAndNotify(
+			this.#host,
+			UserService.postUserByIdChangePassword({
+				id,
+				requestBody: {
+					newPassword
+				},
+			}),
+		);
 	}
 }
