@@ -181,11 +181,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				.open=${!this.documentExpand}></uui-symbol-expand>
 			<uui-label for="document-expand">${this.localize.term('defaultdialogs_linkToPage')}</uui-label>
 			<div style="${styleMap({ display: !this.documentExpand ? 'block' : 'none' })}">
-				<uui-input
-					disabled
-					id="search-input"
-					placeholder=${this.localize.term('placeholders_search')}
-					label=${this.localize.term('placeholders_search')}></uui-input>
 				<umb-tree
 					alias=${UMB_DOCUMENT_TREE_ALIAS}
 					.props=${{

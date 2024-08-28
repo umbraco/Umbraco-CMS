@@ -1,5 +1,5 @@
 import type { UmbMemberGroupItemModel } from '../../repository/index.js';
-import { UmbMemberPickerContext } from './input-member-group.context.js';
+import { UmbMemberGroupPickerInputContext } from './input-member-group.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -106,7 +106,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	@state()
 	private _items?: Array<UmbMemberGroupItemModel>;
 
-	#pickerContext = new UmbMemberPickerContext(this);
+	#pickerContext = new UmbMemberGroupPickerInputContext(this);
 
 	constructor() {
 		super();

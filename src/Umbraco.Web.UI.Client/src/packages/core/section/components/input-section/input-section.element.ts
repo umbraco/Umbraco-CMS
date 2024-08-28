@@ -1,5 +1,5 @@
 import type { UmbSectionItemModel } from '../../repository/index.js';
-import { UmbSectionPickerContext } from './input-section.context.js';
+import { UmbSectionPickerInputContext } from './input-section.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -73,7 +73,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 	@state()
 	private _items?: Array<UmbSectionItemModel>;
 
-	#pickerContext = new UmbSectionPickerContext(this);
+	#pickerContext = new UmbSectionPickerInputContext(this);
 
 	constructor() {
 		super();
