@@ -3,8 +3,7 @@ import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbChangeCurrentUserPasswordRepository } from '../repository/index.js';
-
+import {UmbChangeUserPasswordRepository} from '../../../user/user/repository/change-password/change-user-password.repository.js'
 export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 	extends UmbActionBase<UmbCurrentUserActionArgs<ArgsMetaType>>
 	implements UmbCurrentUserAction<ArgsMetaType>
@@ -42,7 +41,7 @@ export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 		});
 
 		const data = await modalContext.onSubmit();
-		const repository = new UmbChangeCurrentUserPasswordRepository(this);
+		const repository = new UmbChangeUserPasswordRepository(this);
 		await repository.changePassword(this.#unique, data.newPassword, data.oldPassword, data.isCurrentUser);
 	}
 }

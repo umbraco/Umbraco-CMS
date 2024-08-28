@@ -1,1 +1,0 @@
-export { UmbChangeCurrentUserPasswordRepository } from './change-current-user-password.repository.js'
