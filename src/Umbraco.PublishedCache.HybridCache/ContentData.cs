@@ -1,8 +1,12 @@
-﻿namespace Umbraco.Cms.Infrastructure.HybridCache;
+﻿using System.ComponentModel;
+
+namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 /// <summary>
 /// Represents everything that is specific to an edited or published content version
 /// </summary>
+// This is for cache performance reasons, see https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0#reuse-objects
+[ImmutableObject(true)]
 internal sealed class ContentData
 {
     public ContentData(string? name, string? urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, Dictionary<string, PropertyData[]>? properties, IReadOnlyDictionary<string, CultureVariation>? cultureInfos)
