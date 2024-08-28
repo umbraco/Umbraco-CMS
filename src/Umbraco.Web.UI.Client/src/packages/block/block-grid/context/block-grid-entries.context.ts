@@ -8,7 +8,13 @@ import {
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import { UmbArrayState, UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbBooleanState,
+	UmbNumberState,
+	UmbObjectState,
+	UmbStringState,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
@@ -48,6 +54,9 @@ export class UmbBlockGridEntriesContext
 	public readonly allowedBlockTypes = this.#allowedBlockTypes.asObservable();
 	public readonly amountOfAllowedBlockTypes = this.#allowedBlockTypes.asObservablePart((x) => x.length);
 	public readonly canCreate = this.#allowedBlockTypes.asObservablePart((x) => x.length > 0);
+
+	#hasTypeLimits = new UmbBooleanState(undefined);
+	public readonly hasTypeLimits = this.#hasTypeLimits.asObservable();
 
 	firstAllowedBlockTypeName() {
 		if (!this._manager) {
@@ -241,8 +250,6 @@ export class UmbBlockGridEntriesContext
 				'observeThisLayouts',
 			);
 
-			this.removeUmbControllerByAlias('observeAreaType');
-
 			const hostEl = this.getHostElement() as HTMLElement | undefined;
 			if (hostEl) {
 				hostEl.removeAttribute('data-area-alias');
@@ -309,6 +316,7 @@ export class UmbBlockGridEntriesContext
 	#setupAllowedBlockTypes() {
 		if (!this._manager) return;
 		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
+		this.#setupAllowedBlockTypesLimits();
 	}
 	#setupRangeLimits() {
 		if (!this._manager) return;
@@ -427,6 +435,100 @@ export class UmbBlockGridEntriesContext
 		}
 
 		return [];
+	}
+
+	/**
+	 * @internal
+	 */
+	#setupAllowedBlockTypesLimits() {
+		if (!this._manager) return;
+
+		if (this.#areaKey) {
+			// Area entries:
+			if (!this.#areaType) return;
+
+			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance?.length > 0) {
+				this.#hasTypeLimits.setValue(true);
+			}
+		} else if (this.#areaKey === null) {
+			// RESET
+		}
+	}
+
+	#invalidBlockTypeLimits?: Array<{
+		groupKey?: string;
+		key?: string;
+		name: string;
+		amount: number;
+		minRequirement: number;
+		maxRequirement: number;
+	}>;
+
+	getInvalidBlockTypeLimits() {
+		return this.#invalidBlockTypeLimits ?? [];
+	}
+	/**
+	 * @internal
+	 * @returns {boolean} - True if the block type limits are valid, otherwise false.
+	 */
+	checkBlockTypeLimitsValidity(): boolean {
+		if (!this.#areaType || !this.#areaType.specifiedAllowance) return false;
+
+		const layoutEntries = this._layoutEntries.getValue();
+
+		this.#invalidBlockTypeLimits = [];
+
+		const hasInvalidRules = this.#areaType.specifiedAllowance.some((rule) => {
+			const minAllowed = rule.minAllowed || 0;
+			const maxAllowed = rule.maxAllowed || 0;
+
+			// For block groups:
+			if (rule.groupKey) {
+				const groupElementTypeKeys =
+					this._manager
+						?.getBlockTypes()
+						.filter((blockType) => blockType.groupKey === rule.groupKey && blockType.allowInAreas === true)
+						.map((x) => x.contentElementTypeKey) ?? [];
+				const groupAmount = layoutEntries.filter((entry) => {
+					const contentTypeKey = this._manager!.getContentTypeKeyOf(entry.contentUdi);
+					return contentTypeKey ? groupElementTypeKeys.indexOf(contentTypeKey) !== -1 : false;
+				}).length;
+
+				if (groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
+					this.#invalidBlockTypeLimits!.push({
+						groupKey: rule.groupKey,
+						name: this._manager!.getBlockGroupName(rule.groupKey) ?? '?',
+						amount: groupAmount,
+						minRequirement: minAllowed,
+						maxRequirement: maxAllowed,
+					});
+					return true;
+				}
+			}
+			// For specific elementTypes:
+			else if (rule.elementTypeKey) {
+				const amount = layoutEntries.filter((entry) => {
+					const contentTypeKey = this._manager!.getContentOf(entry.contentUdi)?.contentTypeKey;
+					return contentTypeKey === rule.elementTypeKey;
+				}).length;
+				console.log('amount', amount);
+				if (amount < minAllowed || (maxAllowed > 0 ? amount > maxAllowed : false)) {
+					this.#invalidBlockTypeLimits!.push({
+						key: rule.elementTypeKey,
+						name: this._manager!.getContentTypeNameOf(rule.elementTypeKey) ?? '?',
+						amount: amount,
+						minRequirement: minAllowed,
+						maxRequirement: maxAllowed,
+					});
+					return true;
+				}
+			}
+
+			// Lets fail cause the rule was bad.
+			console.error('Invalid block type limit rule.', rule);
+			return false;
+		});
+		return hasInvalidRules === false;
 	}
 
 	/**

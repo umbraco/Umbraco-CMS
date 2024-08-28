@@ -135,6 +135,9 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	#context = new UmbBlockGridEntriesContext(this);
 	#controlValidator?: UmbFormControlValidator;
+	#typeLimitValidator?: UmbFormControlValidatorConfig;
+	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
+	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 
 	@property({ type: String, attribute: 'area-key', reflect: true })
 	public set areaKey(value: string | null | undefined) {
@@ -217,6 +220,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			null,
 		);
 
+		this.observe(
+			this.#context.hasTypeLimits,
+			(hasTypeLimits) => {
+				this.#setupBlockTypeLimitValidation(hasTypeLimits);
+			},
+			null,
+		);
+
 		this.#context.getManager().then((manager) => {
 			this.observe(
 				manager.layoutStylesheet,
@@ -233,8 +244,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
-	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
-	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
@@ -272,6 +281,38 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				},
 				() => {
 					return (this._layoutEntries.length ?? 0) > (rangeLimit?.max ?? Infinity);
+				},
+			);
+		}
+	}
+
+	async #setupBlockTypeLimitValidation(hasTypeLimits: boolean | undefined) {
+		if (this.#typeLimitValidator) {
+			this.removeValidator(this.#typeLimitValidator);
+			this.#typeLimitValidator = undefined;
+		}
+		if (hasTypeLimits) {
+			console.log('hasTypeLimits');
+			this.#typeLimitValidator = this.addValidator(
+				'patternMismatch',
+				() => {
+					const invalids = this.#context.getInvalidBlockTypeLimits();
+					return invalids
+						.map((invalidRule) =>
+							this.localize.term(
+								invalidRule.amount < invalidRule.minRequirement
+									? 'blockEditor_areaValidationEntriesShort'
+									: 'blockEditor_areaValidationEntriesExceed',
+								invalidRule.name,
+								invalidRule.amount,
+								invalidRule.minRequirement,
+								invalidRule.maxRequirement,
+							),
+						)
+						.join(', ');
+				},
+				() => {
+					return !this.#context.checkBlockTypeLimitsValidity();
 				},
 			);
 		}
