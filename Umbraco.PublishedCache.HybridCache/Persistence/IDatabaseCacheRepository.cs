@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
 internal interface IDatabaseCacheRepository
 {
-    void DeleteContentItem(int id);
+    Task DeleteContentItemAsync(int id);
 
     Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false);
 
@@ -16,12 +16,14 @@ internal interface IDatabaseCacheRepository
     /// <summary>
     ///     Refreshes the nucache database row for the given cache node />
     /// </summary>
-    void RefreshContent(ContentCacheNode contentCacheNode, PublishedState publishedState);
+    /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+    Task RefreshContentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState);
 
     /// <summary>
     ///     Refreshes the nucache database row for the given cache node />
     /// </summary>
-    void RefreshMedia(ContentCacheNode contentCacheNode);
+    /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+    Task RefreshMediaAsync(ContentCacheNode contentCacheNode);
 
     /// <summary>
     ///     Rebuilds the caches for content, media and/or members based on the content type ids specified
@@ -43,7 +45,14 @@ internal interface IDatabaseCacheRepository
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null);
 
+    /// <summary>
+    ///     Verifies the content cache by asserting that every document should have a corresponding row for edited properties and if published,
+    ///     may have a corresponding row for published properties
+    /// </summary>
     bool VerifyContentDbCache();
 
+    /// <summary>
+    ///     Rebuilds the caches for content, media and/or members based on the content type ids specified
+    /// </summary>
     bool VerifyMediaDbCache();
 }

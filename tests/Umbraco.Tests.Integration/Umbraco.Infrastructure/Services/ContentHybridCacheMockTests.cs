@@ -73,7 +73,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
                 },
             });
 
-        _mockedNucacheRepository.Setup(r => r.DeleteContentItem(It.IsAny<int>()));
+        _mockedNucacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
 
         _mockContentCacheService = new ContentCacheService(
             _mockedNucacheRepository.Object,

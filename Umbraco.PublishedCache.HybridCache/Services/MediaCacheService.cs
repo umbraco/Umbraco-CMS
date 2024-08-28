@@ -96,14 +96,14 @@ internal class MediaCacheService : IMediaCacheService
         // and thus we won't get too much data when retrieving from the cache.
         var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
         await _hybridCache.SetAsync(GetCacheKey(media.Key, false), cacheNode);
-        _databaseCacheRepository.RefreshMedia(cacheNode);
+        await _databaseCacheRepository.RefreshMediaAsync(cacheNode);
         scope.Complete();
     }
 
     public async Task DeleteItemAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.DeleteContentItem(id);
+        await _databaseCacheRepository.DeleteContentItemAsync(id);
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (keyAttempt.Success)
         {

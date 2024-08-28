@@ -58,31 +58,31 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         _nucacheSettings = nucacheSettings;
     }
 
-    public void DeleteContentItem(int id)
-        => Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = id });
+    public async Task DeleteContentItemAsync(int id)
+        => await Database.ExecuteAsync("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = id });
 
-    public void RefreshContent(ContentCacheNode contentCacheNode, PublishedState publishedState)
+    public async Task RefreshContentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
         // always refresh the edited data
-        OnRepositoryRefreshed(serializer, contentCacheNode, false);
+        await OnRepositoryRefreshed(serializer, contentCacheNode, false);
 
         switch (publishedState)
         {
             case PublishedState.Publishing:
-                OnRepositoryRefreshed(serializer, contentCacheNode, true);
+                await OnRepositoryRefreshed(serializer, contentCacheNode, true);
                 break;
             case PublishedState.Unpublishing:
-                Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = contentCacheNode.Id });
+                await Database.ExecuteAsync("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = contentCacheNode.Id });
                 break;
         }
     }
 
-    public void RefreshMedia(ContentCacheNode contentCacheNode)
+    public async Task RefreshMediaAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-        OnRepositoryRefreshed(serializer, contentCacheNode, false);
+        await OnRepositoryRefreshed(serializer, contentCacheNode, false);
     }
 
     /// <inheritdoc/>
@@ -245,13 +245,13 @@ AND cmsContentNu.nodeId IS NULL
         return CreateMediaNodeKit(dto, serializer);
     }
 
-    private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
         // use a custom SQL to update row version on each update
         // db.InsertOrUpdate(dto);
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
-        Database.InsertOrUpdate(
+        await Database.InsertOrUpdateAsync(
             dto,
             "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
             new

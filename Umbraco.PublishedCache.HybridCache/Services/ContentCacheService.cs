@@ -127,13 +127,13 @@ internal sealed class ContentCacheService : IContentCacheService
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
         await _hybridCache.SetAsync(GetCacheKey(content.Key, true), draftCacheNode);
-        _databaseCacheRepository.RefreshContent(draftCacheNode, content.PublishedState);
+        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
 
         if (content.PublishedState == PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
             await _hybridCache.SetAsync(GetCacheKey(content.Key, false), publishedCacheNode);
-            _databaseCacheRepository.RefreshContent(publishedCacheNode, content.PublishedState);
+            await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
         }
 
         scope.Complete();
@@ -144,7 +144,7 @@ internal sealed class ContentCacheService : IContentCacheService
     public async Task DeleteItemAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.DeleteContentItem(id);
+        await _databaseCacheRepository.DeleteContentItemAsync(id);
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, true));
         await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, false));
