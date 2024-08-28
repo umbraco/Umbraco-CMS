@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Hybrid;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -15,7 +14,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -79,7 +78,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             _mockedNucacheRepository.Object,
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ICoreScopeProvider>(),
-            GetRequiredService<HybridCache>(),
+            GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>(),
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>());
 
@@ -89,7 +88,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Content_Is_Cached_By_Key()
     {
-        var hybridCache = GetRequiredService<HybridCache>();
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         var textPage2 = await _mockedCache.GetByIdAsync(Textpage.Key, true);
@@ -101,7 +100,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Content_Is_Cached_By_Id()
     {
-        var hybridCache = GetRequiredService<HybridCache>();
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
         var textPage2 = await _mockedCache.GetByIdAsync(Textpage.Id, true);

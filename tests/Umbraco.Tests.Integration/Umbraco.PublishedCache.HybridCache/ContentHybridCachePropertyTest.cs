@@ -12,7 +12,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -90,7 +90,7 @@ public class ContentHybridCachePropertyTest : UmbracoIntegrationTest
         var contentPickerPage = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
         IPublishedContent updatedPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
 
-   
+
         Assert.AreEqual(textPage.Key, updatedPickerValue.Key);
         Assert.AreEqual(textPage.Id, updatedPickerValue.Id);
         Assert.AreEqual(textPage.Name, updatedPickerValue.Name);
