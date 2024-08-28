@@ -21,7 +21,7 @@ public class ContentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEdi
     private ICoreScopeProvider ICoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     [Test]
-    public async Task Can_Get_Correct_Content_After_Rollback()
+    public async Task Can_Get_Correct_Content_After_Rollback_With_Id()
     {
         using (ICoreScopeProvider.CreateCoreScope())
         {
@@ -31,7 +31,54 @@ public class ContentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEdi
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId);
 
-        // Published page should be in cache, as we rolled scope back.
+        // Published page should not be in cache, as we rolled scope back.
         Assert.IsNull(textPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Correct_Content_After_Rollback_With_Key()
+    {
+        using (ICoreScopeProvider.CreateCoreScope())
+        {
+            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+        }
+
+        // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value);
+
+        // Published page should not be in cache, as we rolled scope back.
+        Assert.IsNull(textPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Document_After_Scope_Complete_With_Id()
+    {
+        using (var scope = ICoreScopeProvider.CreateCoreScope())
+        {
+            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            scope.Complete();
+        }
+
+        // Act
+        var publishedPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId);
+
+        // Published page should not be in cache, as we rolled scope back.
+        Assert.IsNotNull(publishedPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Document_After_Scope_Completes_With_Key()
+    {
+        using (var scope = ICoreScopeProvider.CreateCoreScope())
+        {
+            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            scope.Complete();
+        }
+
+        // Act
+        var publishedPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value);
+
+        // Published page should not be in cache, as we rolled scope back.
+        Assert.IsNotNull(publishedPage);
     }
 }
