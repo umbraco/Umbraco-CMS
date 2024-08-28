@@ -170,7 +170,6 @@ export class UmbBlockGridManagerContext<
 		settings: UmbBlockDataType | undefined,
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
-		console.log('originData', originData);
 		this.setOneLayout(layoutEntry, originData);
 		this.insertBlockData(layoutEntry, content, settings, originData);
 

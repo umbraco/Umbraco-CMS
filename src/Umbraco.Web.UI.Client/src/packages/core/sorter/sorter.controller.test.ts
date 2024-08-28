@@ -16,9 +16,7 @@ class UmbSorterTestElement extends UmbLitElement {
 		itemSelector: '.item',
 		containerSelector: '#container',
 		disabledItemSelector: '.disabled',
-		onChange: ({ model }) => {
-			this.model = model;
-		},
+		// TODO: In theory missing model change callback? [NL]
 	});
 
 	getAllItems() {
