@@ -94,18 +94,18 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
-                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
+                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-key=""{elementId:D}""><!--Umbraco-Block--></umb-rte-block>",
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
-                                                                  				"contentUdi": "umb://element/{{elementId:N}}"
+                                                                  				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
-                                                                  			"udi": "umb://element/{{elementId:N}}",
+                                                                  			"key": "{{elementId:D}}",
                                                                   			"values": [
                                                                                 { "alias": "contentPicker", "value": "umb://document/{{pickedContent.Key:N}}" }
                                                                   			]
@@ -147,18 +147,18 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
-                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
+                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-key=""{elementId:D}""><!--Umbraco-Block--></umb-rte-block>",
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
-                                                                  				"contentUdi": "umb://element/{{elementId:N}}"
+                                                                  				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
-                                                                  			"udi": "umb://element/{{elementId:N}}",
+                                                                  			"key": "{{elementId:D}}",
                                                                   			"values": [
                                                                                 { "alias": "tags", "value": "[\"Tag One\", \"Tag Two\", \"Tag Three\"]" }
                                                                   			]

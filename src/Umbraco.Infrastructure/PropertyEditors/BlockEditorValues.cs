@@ -62,7 +62,7 @@ public class BlockEditorValues<TValue, TLayout>
         IDictionary<Guid, IContentType> contentTypesDictionary = _elementTypeCache.GetAll(contentTypeKeys).ToDictionary(x=>x.Key);
 
         foreach (BlockItemData block in blockEditorData.BlockValue.ContentData.Where(x =>
-                     blockEditorData.References.Any(r => x.Udi is not null && r.ContentUdi == x.Udi)))
+                     blockEditorData.References.Any(r => r.ContentKey == x.Key)))
         {
             ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }
@@ -70,7 +70,7 @@ public class BlockEditorValues<TValue, TLayout>
         // filter out any settings that isn't referenced in the layout references
         foreach (BlockItemData block in blockEditorData.BlockValue.SettingsData.Where(x =>
                      blockEditorData.References.Any(r =>
-                         r.SettingsUdi is not null && x.Udi is not null && r.SettingsUdi == x.Udi)))
+                         r.SettingsKey.HasValue && r.SettingsKey.Value == x.Key)))
         {
             ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }

@@ -27,7 +27,7 @@ public class BlockGridEditorDataConverter : BlockEditorDataConverter<BlockGridVa
     {
         IList<ContentAndSettingsReference> ExtractContentAndSettingsReferences(BlockGridLayoutItem item)
         {
-            var references = new List<ContentAndSettingsReference> { new(item.ContentUdi, item.SettingsUdi) };
+            var references = new List<ContentAndSettingsReference> { new(item.ContentKey, item.SettingsKey) };
             references.AddRange(item.Areas.SelectMany(area => area.Items.SelectMany(ExtractContentAndSettingsReferences)));
             return references;
         }

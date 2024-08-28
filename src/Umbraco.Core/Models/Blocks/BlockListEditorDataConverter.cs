@@ -24,5 +24,5 @@ public class BlockListEditorDataConverter : BlockEditorDataConverter<BlockListVa
     }
 
     protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(IEnumerable<BlockListLayoutItem> layout)
-        => layout.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
+        => layout.Select(x => new ContentAndSettingsReference(x.ContentKey, x.SettingsKey)).ToList();
 }

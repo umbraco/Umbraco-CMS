@@ -145,11 +145,11 @@ public partial class BlockListElementLevelVariationTests : UmbracoIntegrationTes
 
         var content = contentBuilder.Build();
 
-        var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var settingsElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
         foreach (var blocksProperty in blocksProperties)
         {
-            var blockListValue = BlockListPropertyValue(elementType, contentElementUdi, settingsElementUdi, blocksProperty);
+            var blockListValue = BlockListPropertyValue(elementType, contentElementKey, settingsElementKey, blocksProperty);
             var propertyValue = JsonSerializer.Serialize(blockListValue);
             content.Properties["blocks"]!.SetValue(propertyValue, blocksProperty.Culture, blocksProperty.Segment);
         }
@@ -164,10 +164,10 @@ public partial class BlockListElementLevelVariationTests : UmbracoIntegrationTes
         return content;
     }
 
-    private BlockListValue BlockListPropertyValue(IContentType elementType, GuidUdi contentElementUdi, GuidUdi settingsElementUdi, BlockProperty blocksProperty)
-        => BlockListPropertyValue(elementType, [(contentElementUdi, settingsElementUdi, blocksProperty)]);
+    private BlockListValue BlockListPropertyValue(IContentType elementType, Guid contentElementKey, Guid settingsElementKey, BlockProperty blocksProperty)
+        => BlockListPropertyValue(elementType, [(contentElementKey, settingsElementKey, blocksProperty)]);
 
-    private BlockListValue BlockListPropertyValue(IContentType elementType, List<(GuidUdi ContentElementUdi, GuidUdi SettingsElementUdi, BlockProperty BlocksProperty)> blocks)
+    private BlockListValue BlockListPropertyValue(IContentType elementType, List<(Guid contentElementKey, Guid settingsElementKey, BlockProperty BlocksProperty)> blocks)
         => new()
         {
             Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
@@ -176,21 +176,21 @@ public partial class BlockListElementLevelVariationTests : UmbracoIntegrationTes
                     Constants.PropertyEditors.Aliases.BlockList,
                     blocks.Select(block => new BlockListLayoutItem
                     {
-                        ContentUdi = block.ContentElementUdi,
-                        SettingsUdi = block.SettingsElementUdi
+                        ContentKey = block.contentElementKey,
+                        SettingsKey = block.settingsElementKey
                     }).ToArray()
                 }
             },
             ContentData = blocks.Select(block => new BlockItemData
             {
-                Udi = block.ContentElementUdi,
+                Key = block.contentElementKey,
                 ContentTypeAlias = elementType.Alias,
                 ContentTypeKey = elementType.Key,
                 Values = block.BlocksProperty.BlockContentValues
             }).ToList(),
             SettingsData = blocks.Select(block => new BlockItemData
             {
-                Udi = block.SettingsElementUdi,
+                Key = block.settingsElementKey,
                 ContentTypeAlias = elementType.Alias,
                 ContentTypeKey = elementType.Key,
                 Values = block.BlocksProperty.BlockSettingsValues

@@ -46,18 +46,18 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
-                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
+                Markup = @$"<p>This is some markup</p><umb-rte-block data-content-key=""{elementId:D}""><!--Umbraco-Block--></umb-rte-block>",
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
                                                                   		"Umbraco.TinyMCE": [{
-                                                                  				"contentUdi": "umb://element/{{elementId:N}}"
+                                                                  				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
                                                                   	},
                                                                   	"contentData": [{
                                                                   			"contentTypeKey": "{{elementType.Key:D}}",
-                                                                  			"udi": "umb://element/{{elementId:N}}",
+                                                                  			"key": "{{elementId:D}}",
                                                                   			"values": [
                                                                   			    { "alias": "singleLineText", "value": "The single line of text in the block" },
                                                                                 { "alias": "bodyText", "value": "<p>The body text in the block</p>" }
@@ -172,15 +172,15 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 
         var editor = dataType.Editor!;
 
-        var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var contentElementKey = Guid.NewGuid();
         var blockListValue = new BlockListValue(
         [
-            new BlockListLayoutItem(contentElementUdi)
+            new BlockListLayoutItem(contentElementKey)
         ])
         {
             ContentData =
             [
-                new(contentElementUdi, elementType.Key, elementType.Alias)
+                new(contentElementKey, elementType.Key, elementType.Alias)
                 {
                     Values = new List<BlockPropertyValue>
                     {
@@ -273,11 +273,11 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 
         var editor = dataType.Editor!;
 
-        var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var contentAreaElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
+        var contentElementKey = Guid.NewGuid();
+        var contentAreaElementKey = Guid.NewGuid();
         var blockGridValue = new BlockGridValue(
         [
-            new BlockGridLayoutItem(contentElementUdi)
+            new BlockGridLayoutItem(contentElementKey)
             {
                 ColumnSpan = 12,
                 RowSpan = 1,
@@ -287,7 +287,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                     {
                         Items =
                         [
-                            new BlockGridLayoutItem(contentAreaElementUdi)
+                            new BlockGridLayoutItem(contentAreaElementKey)
                             {
                                 ColumnSpan = 12,
                                 RowSpan = 1,
@@ -300,22 +300,16 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         {
             ContentData =
             [
-                new(contentElementUdi, elementType.Key, elementType.Alias)
+                new(contentElementKey, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
                     Values = new List<BlockPropertyValue>
                     {
                         new() { Alias = "singleLineText", Value = "The single line of text in the grid root" },
                         new() { Alias = "bodyText", Value = "<p>The body text in the grid root</p>" },
                     }
                 },
-                new(contentAreaElementUdi, elementType.Key, elementType.Alias)
+                new(contentAreaElementKey, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentAreaElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
                     Values = new List<BlockPropertyValue>
                     {
                         new() { Alias = "singleLineText", Value = "The single line of text in the grid area" },

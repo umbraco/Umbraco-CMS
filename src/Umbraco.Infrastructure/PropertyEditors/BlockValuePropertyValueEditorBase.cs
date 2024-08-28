@@ -257,7 +257,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     private void PublishPartialValueForCulture(List<BlockItemData> editedBlockItems, List<BlockItemData> publishedBlockItems, string? culture)
     {
         // remove all published blocks that are not part of the edited blocks (structure is global)
-        publishedBlockItems.RemoveAll(pb => editedBlockItems.Any(eb => eb.Udi == pb.Udi) is false);
+        publishedBlockItems.RemoveAll(pb => editedBlockItems.Any(eb => eb.Key == pb.Key) is false);
 
         // merge the edited values into the published values for culture
         foreach (BlockItemData editedBlockItem in editedBlockItems)
@@ -266,7 +266,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             if (publishedBlockItem is null)
             {
                 publishedBlockItem = new BlockItemData(
-                    editedBlockItem.Udi!,
+                    editedBlockItem.Key,
                     editedBlockItem.ContentTypeKey,
                     editedBlockItem.ContentTypeAlias);
 

@@ -25,13 +25,31 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     ///     or
     ///     content
     /// </exception>
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public RichTextBlockItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
+        : this(
+            (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
+            content,
+            (settingsUdi as GuidUdi)?.Guid,
+            settings)
     {
-        ContentUdi = contentUdi ?? throw new ArgumentNullException(nameof(contentUdi));
+    }
+
+    public RichTextBlockItem(Guid contentKey, IPublishedElement content, Guid? settingsKey, IPublishedElement? settings)
+    {
+        ContentKey = contentKey;
+        ContentUdi = new GuidUdi(Constants.UdiEntityType.Element, contentKey);
         Content = content ?? throw new ArgumentNullException(nameof(content));
-        SettingsUdi = settingsUdi;
+        SettingsKey = settingsKey;
+        SettingsUdi = settingsKey.HasValue
+            ? new GuidUdi(Constants.UdiEntityType.Element, settingsKey.Value)
+            : null;
         Settings = settings;
     }
+
+    public Guid ContentKey { get; set; }
+
+    public Guid? SettingsKey { get; set; }
 
     /// <summary>
     ///     Gets the content.
@@ -39,7 +57,6 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     /// <value>
     ///     The content.
     /// </value>
-    [DataMember(Name = "content")]
     public IPublishedElement Content { get; }
 
     /// <summary>
@@ -48,8 +65,8 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     /// <value>
     ///     The settings UDI.
     /// </value>
-    [DataMember(Name = "settingsUdi")]
-    public Udi SettingsUdi { get; }
+    [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+    public Udi? SettingsUdi { get; }
 
     /// <summary>
     ///     Gets the content UDI.
@@ -57,7 +74,7 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     /// <value>
     ///     The content UDI.
     /// </value>
-    [DataMember(Name = "contentUdi")]
+    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
     public Udi ContentUdi { get; }
 
     /// <summary>
@@ -66,8 +83,7 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     /// <value>
     ///     The settings.
     /// </value>
-    [DataMember(Name = "settings")]
-    public IPublishedElement Settings { get; }
+    public IPublishedElement? Settings { get; }
 }
 
 /// <summary>
@@ -85,8 +101,13 @@ public class RichTextBlockItem<T> : RichTextBlockItem
     /// <param name="content">The content.</param>
     /// <param name="settingsUdi">The settings UDI.</param>
     /// <param name="settings">The settings.</param>
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public RichTextBlockItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
         : base(contentUdi, content, settingsUdi, settings) =>
+        Content = content;
+
+    public RichTextBlockItem(Guid contentKey, T content, Guid? settingsKey, IPublishedElement? settings)
+        : base(contentKey, content, settingsKey, settings) =>
         Content = content;
 
     /// <summary>
@@ -115,8 +136,13 @@ public class RichTextBlockItem<TContent, TSettings> : RichTextBlockItem<TContent
     /// <param name="content">The content.</param>
     /// <param name="settingsUdi">The settings udi.</param>
     /// <param name="settings">The settings.</param>
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public RichTextBlockItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
         : base(contentUdi, content, settingsUdi, settings) =>
+        Settings = settings;
+
+    public RichTextBlockItem(Guid contentKey, TContent content, Guid? settingsKey, TSettings? settings)
+        : base(contentKey, content, settingsKey, settings) =>
         Settings = settings;
 
     /// <summary>
@@ -125,5 +151,5 @@ public class RichTextBlockItem<TContent, TSettings> : RichTextBlockItem<TContent
     /// <value>
     ///     The settings.
     /// </value>
-    public new TSettings Settings { get; }
+    public new TSettings? Settings { get; }
 }
