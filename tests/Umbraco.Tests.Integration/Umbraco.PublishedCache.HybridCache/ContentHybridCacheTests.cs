@@ -51,7 +51,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Published_Content_By_Id()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId);
@@ -64,7 +64,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Published_Content_By_Key()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value);
@@ -77,7 +77,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Of_Published_Content_By_Id()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
@@ -91,7 +91,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Of_Published_Content_By_Key()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
@@ -150,7 +150,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Published_Content_By_Id(bool preview, bool result)
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         Textpage.InvariantName = NewName;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
@@ -175,7 +175,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Published_Content_By_Key(bool preview, bool result)
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         Textpage.InvariantName = NewName;
 
@@ -226,7 +226,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Published_Content_Property_By_Id()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
@@ -240,7 +240,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Published_Content_Property_By_Key()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
@@ -254,7 +254,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Of_Published_Content_Property_By_Id()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
@@ -268,7 +268,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Of_Published_Content_Property_By_Key()
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
 
         // Act
@@ -339,7 +339,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         };
 
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
@@ -363,7 +363,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
         };
 
         await ContentEditingService.UpdateAsync(Textpage.Key.Value, updateModel, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value);
@@ -378,7 +378,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Id(bool preview, string titleName)
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         Textpage.InvariantProperties.First(x => x.Alias == "title").Value = NewTitle;
 
         ContentUpdateModel updateModel = new ContentUpdateModel
@@ -404,7 +404,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Key(bool preview, string titleName)
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         Textpage.InvariantProperties.First(x => x.Alias == "title").Value = titleName;
 
         ContentUpdateModel updateModel = new ContentUpdateModel
@@ -459,7 +459,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Not_Get_Deleted_Published_Content_By_Id(bool preview)
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         await ContentEditingService.DeleteAsync(Textpage.Key.Value, Constants.Security.SuperUserKey);
 
         // Act
@@ -475,7 +475,7 @@ public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Not_Get_Deleted_Published_Content_By_Key(bool preview)
     {
         // Arrange
-        await ContentPublishingService.PublishAsync(Textpage.Key.Value, cultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         await ContentEditingService.DeleteAsync(Textpage.Key.Value, Constants.Security.SuperUserKey);
 
         // Act
