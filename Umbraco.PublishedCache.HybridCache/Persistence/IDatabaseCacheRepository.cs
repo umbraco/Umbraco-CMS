@@ -6,9 +6,9 @@ internal interface IDatabaseCacheRepository
 {
     void DeleteContentItem(int id);
 
-    Task<ContentCacheNode?> GetContentSource(int id, bool preview = false);
+    Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false);
 
-    Task<ContentCacheNode?> GetMediaSource(int id);
+    Task<ContentCacheNode?> GetMediaSourceAsync(int id);
 
     // TODO: Refactor to use by key.
     IEnumerable<ContentCacheNode> GetContentByContentTypeId(IEnumerable<int>? ids);

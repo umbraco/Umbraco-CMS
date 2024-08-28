@@ -184,7 +184,7 @@ AND cmsContentNu.nodeId IS NULL
         return count == 0;
     }
 
-    public async Task<ContentCacheNode?> GetContentSource(int id, bool preview = false)
+    public async Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -226,7 +226,7 @@ AND cmsContentNu.nodeId IS NULL
         }
     }
 
-    public async Task<ContentCacheNode?> GetMediaSource(int id)
+    public async Task<ContentCacheNode?> GetMediaSourceAsync(int id)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
