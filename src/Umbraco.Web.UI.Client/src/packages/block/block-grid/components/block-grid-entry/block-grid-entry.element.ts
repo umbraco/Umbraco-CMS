@@ -460,14 +460,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
-				--umb-block-list-entry-actions-opacity: 1;
+				--umb-block-grid-entry-actions-opacity: 1;
 			}
 
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
-				opacity: var(--umb-block-list-entry-actions-opacity, 0);
+				opacity: var(--umb-block-grid-entry-actions-opacity, 0);
 				transition: opacity 120ms;
 			}
 			uui-button-inline-create {
@@ -534,6 +534,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-danger);
+			}
+			:host([settings-invalid])::before,
+			:host([content-invalid])::before {
+				background-color: var(--uui-color-danger);
 			}
 
 			uui-badge {
