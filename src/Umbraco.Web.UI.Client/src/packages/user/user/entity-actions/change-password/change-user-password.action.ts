@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
-import { UmbCurrentUserRepository } from '@umbraco-cms/backoffice/current-user';
+import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserRepository } from '@umbraco-cms/backoffice/current-user';
 
 export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -24,15 +24,16 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 
 		const data = await modalContext.onSubmit();
 
-		if(data.isCurrentUser){
+		const currentUserContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		const isCurrentUser = await currentUserContext.isUserCurrentUser(this.args.unique);
+
+		if (isCurrentUser) {
 			const repository = new UmbCurrentUserRepository(this);
 			await repository.changePassword(data.newPassword, data.oldPassword);
-		}
-		else{
+		} else {
 			const repository = new UmbChangeUserPasswordRepository(this);
 			await repository.changePassword(this.args.unique, data.newPassword);
 		}
-		
 	}
 }
 
