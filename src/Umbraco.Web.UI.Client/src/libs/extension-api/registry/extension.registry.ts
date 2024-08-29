@@ -6,8 +6,8 @@ import type {
 } from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
+import { map, distinctUntilChanged, combineLatest, of, switchMap, filter } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  *
@@ -440,6 +440,37 @@ export class UmbExtensionRegistry<
 		) as Observable<Array<ExtensionTypes>>;
 	}
 
+
+	/**
+	 * Returns a promise that resolves when the extension with the specified alias is found.
+	 * @param alias {string} - The alias of the extension to wait for.
+	 * @returns {Promise<ManifestTypes>} - A promise that resolves with the extension.
+	 */
+	private _whenExtensionAliasIsRegistered(alias: string): Promise<ManifestBase> {
+		return new Promise((resolve, reject) => {
+			const subscription: Subscription = this.extensions
+				.pipe(filter((allExtensions) => allExtensions.some((ext) => ext.alias === alias)))
+				.subscribe({
+					next: (allExtensions) => {
+						console.log('I AM IN NEXT', allExtensions);
+						const extension = allExtensions.find((ext) => ext.alias === alias);
+						if (extension) {
+							subscription.unsubscribe();
+							resolve(extension as ManifestBase);
+						}
+					},
+					error: (error) => {
+						console.error('I AM IN ERROR', error);
+						reject(error);
+					},
+					complete: () => {
+						console.log('I AM IN COMPLETE');
+						reject(new Error(`Extension with alias ${alias} not found`));
+					},
+				});
+		});
+	}
+
 	/**
 	 * Appends a new condition to an existing extension
 	 * Useful to add a condition for example the Save And Publish workspace action shipped by core
@@ -448,23 +479,39 @@ export class UmbExtensionRegistry<
 	 * @param alias {string} - The alias of the extension to append the condition to
 	 * @param newCondition {UmbConditionConfigBase} - The condition to append to the extension.
 	 */
-	appendCondition(alias: string, newCondition: UmbConditionConfigBase) {
-		const allExtensions = this._extensions.getValue();
-		const extensionToUpdate = allExtensions.find((ext) => ext.alias === alias) as ManifestWithDynamicConditions;
+	async appendCondition(alias: string, newCondition: UmbConditionConfigBase): Promise<void> {
+		try {
 
-		if (extensionToUpdate === undefined) {
-			console.error(`Extension with alias ${alias} not found`);
+			// Wait for the extension to be registered (as it could be registered late)
+			const extensionToWaitFor = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
+
+			// Got it... now carry on & mutate it
+			console.log('got the extension to update/mutate', extensionToWaitFor);
+
+			// Append the condition to the extensions conditions array
+			if (extensionToWaitFor.conditions) {
+				extensionToWaitFor.conditions.push(newCondition);
+			} else {
+				extensionToWaitFor.conditions = [newCondition];
+			}
+
+			const allExtensions = this._extensions.getValue();
+			const extensionToUpdateIndex = allExtensions.findIndex((ext) => ext.alias === alias);
+			if (extensionToUpdateIndex !== -1) {
+				// Replace the existing extension with the updated one
+				allExtensions[extensionToUpdateIndex] = extensionToWaitFor as ManifestTypes;
+
+				// Update the main extensions collection/observable
+				this._extensions.setValue(allExtensions);
+
+				// Log the updated extensions for debugging
+				console.log('UPDATED extensions:', this._extensions.getValue());
+				console.table(this._extensions.getValue());
+			}
+		} catch (error) {
+			// TODO: [WB] Will this ever catch an error?
+			console.error(`Extension with alias ${alias} was never found and threw ${error}`);
 		}
-
-		// Append the condition to the extensions conditions array
-		if (extensionToUpdate.conditions) {
-			extensionToUpdate.conditions.push(newCondition);
-		} else {
-			extensionToUpdate.conditions = [newCondition];
-		}
-
-		// Update the extensions observable
-		this._extensions.setValue(allExtensions);
 	}
 
 	/**
@@ -472,7 +519,7 @@ export class UmbExtensionRegistry<
 	 * @param alias {string} - The alias of the extension to append the condition to
 	 * @param newConditions {Array<UmbConditionConfigBase>} - A collection of conditions to append to an extension.
 	 */
-	appendConditions(alias: string, newConditions: Array<UmbConditionConfigBase>) {
+	async appendConditions(alias: string, newConditions: Array<UmbConditionConfigBase>): Promise<void> {
 		newConditions.forEach((condition) => this.appendCondition(alias, condition));
 	}
 
@@ -481,23 +528,26 @@ export class UmbExtensionRegistry<
 	 * @param alias {string} - The alias of the extension to prepend the condition to
 	 * @param newCondition {UmbConditionConfigBase} - The condition to prepend to the extension.
 	 */
-	prependCondition(alias: string, newCondition: UmbConditionConfigBase) {
-		const allExtensions = this._extensions.getValue();
-		const extensionToUpdate = allExtensions.find((ext) => ext.alias === alias) as ManifestWithDynamicConditions;
+	async prependCondition(alias: string, newCondition: UmbConditionConfigBase): Promise<void> {
+		try {
 
-		if (extensionToUpdate === undefined) {
-			console.error(`Extension with alias ${alias} not found`);
+			// Wait for the extension to be registered (as it could be registered late)
+			const extensionToUpdate = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
+
+			// Got it... now carry on & mutate it
+			console.log('got the extension to update/mutate', extensionToUpdate);
+
+			// Append the condition to the extensions conditions array
+			if (extensionToUpdate.conditions) {
+				extensionToUpdate.conditions.unshift(newCondition);
+			} else {
+				extensionToUpdate.conditions = [newCondition];
+			}
+
+		} catch (error) {
+			// TODO: [WB] Will this ever catch an error?
+			console.error(`Extension with alias ${alias} was never found and threw ${error}`);
 		}
-
-		// Prepend the condition to the extensions conditions array
-		if (extensionToUpdate.conditions) {
-			extensionToUpdate.conditions.unshift(newCondition);
-		} else {
-			extensionToUpdate.conditions = [newCondition];
-		}
-
-		// Update the extensions observable
-		this._extensions.setValue(allExtensions);
 	}
 
 	/**
@@ -505,7 +555,7 @@ export class UmbExtensionRegistry<
 	 * @param alias {string} - The alias of the extension to prepend the conditions to
 	 * @param newConditions {Array<UmbConditionConfigBase>} - A collection of conditions to prepend to an extension.
 	 */
-	prependConditions(alias: string, newConditions: Array<UmbConditionConfigBase>) {
+	async prependConditions(alias: string, newConditions: Array<UmbConditionConfigBase>): Promise<void> {
 		newConditions.forEach((condition) => this.prependCondition(alias, condition));
 	}
 }
