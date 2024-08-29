@@ -1,4 +1,4 @@
-import { UmbChangeUserPasswordRepository } from '../../repository/index.js';
+import { UmbChangeUserPasswordRepository } from '@umbraco-cms/backoffice/user';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
