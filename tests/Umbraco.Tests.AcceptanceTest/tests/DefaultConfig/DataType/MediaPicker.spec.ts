@@ -15,8 +15,8 @@ for (const dataTypeName of dataTypes) {
 
     test.afterEach(async ({umbracoApi}) => {
       if (dataTypeDefaultData !== null) {
-        await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
-      }   
+        await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
+      }
     });
 
     test('can update pick multiple items', async ({umbracoApi, umbracoUi}) => {
@@ -123,7 +123,7 @@ for (const dataTypeName of dataTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can add accepted types', async ({umbracoApi, umbracoUi}) => {
+    test('can add accepted types', async ({page, umbracoApi, umbracoUi}) => {
       // Arrange
       const mediaTypeName = 'Audio';
       const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
@@ -133,10 +133,10 @@ for (const dataTypeName of dataTypes) {
         dataTypeName === "Multiple Image Media Picker"
           ? imageTypeData.id + "," + mediaTypeData.id
           : mediaTypeData.id;
-      const expectedDataTypeValues = {
+      const expectedDataTypeValues = [{
         "alias": "filter",
         "value": expectedFilterValue
-      };
+      }];
 
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
@@ -147,8 +147,8 @@ for (const dataTypeName of dataTypes) {
       dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
-    
-    test('can remove accepted types', async ({umbracoApi, umbracoUi}) => {
+
+    test('can remove accepted types', async ({page, umbracoApi, umbracoUi}) => {
       // Arrange
       const mediaTypeName = 'Audio';
       const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
@@ -156,19 +156,17 @@ for (const dataTypeName of dataTypes) {
         "alias": "filter",
         "value": mediaTypeData.id
       }];
-      const expectedDataTypeValues = [{
-        "alias": "filter",
-        "value": ""
-      }];
+      const expectedDataTypeValues = [];
 
       // Remove all existing options and add an option to remove
       dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       dataTypeData.values = removedDataTypeValues;
-      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);  
+      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
 
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
       await umbracoUi.dataType.removeAcceptedType(mediaTypeName);
+      await page.pause()
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -179,59 +177,57 @@ for (const dataTypeName of dataTypes) {
     test('can add start node', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       // Create media
-      const mediaTypeName = 'Article';
       const mediaName = 'TestStartNode';
       await umbracoApi.media.ensureNameNotExists(mediaName);
-      const mediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
+      const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
       expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
-  
+
       const expectedDataTypeValues = {
         "alias": "startNodeId",
         "value": mediaId
       };
-  
+
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
       await umbracoUi.dataType.clickChooseStartNodeButton();
       await umbracoUi.dataType.addMediaStartNode(mediaName);
       await umbracoUi.dataType.clickSaveButton();
-  
+
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-  
+
       // Clean
       await umbracoApi.media.ensureNameNotExists(mediaName);
     });
-  
+
     test('can remove start node', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       // Create media
-      const mediaTypeName = 'Article';
       const mediaName = 'TestStartNode';
       await umbracoApi.media.ensureNameNotExists(mediaName);
-      const mediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
+      const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
       expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
 
       const removedDataTypeValues = [{
         "alias": "startNodeId",
         "value": mediaId
       }];
-  
+
       // Remove all existing values and add a start node to remove
       dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       dataTypeData.values = removedDataTypeValues;
       await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
-  
+
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
       await umbracoUi.dataType.removeMediaStartNode(mediaName);
       await umbracoUi.dataType.clickSaveButton();
-  
+
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       expect(dataTypeData.values).toEqual([]);
-  
+
       // Clean
       await umbracoApi.media.ensureNameNotExists(mediaName);
     });
