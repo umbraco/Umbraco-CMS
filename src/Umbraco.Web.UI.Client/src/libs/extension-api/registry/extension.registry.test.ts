@@ -554,3 +554,92 @@ describe('Append Conditions', () => {
 		expect(ext.conditions?.length).to.equal(3);
 	});
 });
+
+describe('Prepend Conditions', () => {
+	let extensionRegistry: UmbExtensionRegistry<any>;
+	let manifests: Array<ManifestWithDynamicConditions>;
+
+	beforeEach(() => {
+			extensionRegistry = new UmbExtensionRegistry<ManifestWithDynamicConditions>();
+			manifests = [
+					{
+							type: 'section',
+							name: 'test-section-1',
+							alias: 'Umb.Test.Section.1',
+							weight: 1,
+							conditions: [
+									{
+											alias: "Umb.Test.Condition.Valid"
+									}
+							]
+					},
+					{
+							type: 'section',
+							name: 'test-section-2',
+							alias: 'Umb.Test.Section.2',
+							weight: 200
+					},
+			];
+
+			manifests.forEach((manifest) => extensionRegistry.register(manifest));
+
+			extensionRegistry.register({
+					type: 'condition',
+					name: 'test-condition-invalid',
+					alias: 'Umb.Test.Condition.Invalid'
+			});
+	});
+
+	it('allows an extension condition to be prepended', () => {
+			expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
+			expect(extensionRegistry.isRegistered('Umb.Test.Section.2')).to.be.true;
+			expect(extensionRegistry.isRegistered('Umb.Test.Condition.Invalid')).to.be.true;
+			expect(extensionRegistry.isRegistered('Umb.Test.Condition.Valid')).to.be.false;
+
+			const ext = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+			expect(ext.conditions?.length).to.equal(1);
+
+			// Register new condition as if I was in my own entrypoint
+			extensionRegistry.register({
+					type: 'condition',
+					name: 'test-condition-valid',
+					alias: 'Umb.Test.Condition.Valid'
+			});
+
+			// Prepend the new condition to the extension
+			const conditionToPrepend: UmbConditionConfigBase = {
+					alias: 'Umb.Test.Condition.Valid'
+			};
+			extensionRegistry.prependCondition('Umb.Test.Section.1', conditionToPrepend);
+
+			// Check new condition is registered
+			expect(extensionRegistry.isRegistered('Umb.Test.Condition.Valid')).to.be.true;
+
+			// Verify the extension now has two conditions and the new condition is prepended
+			const updatedExt = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+			expect(updatedExt.conditions?.length).to.equal(2);
+			expect(updatedExt.conditions?.[0]?.alias).to.equal('Umb.Test.Condition.Valid');
+	});
+
+	it('allows an extension to update with multiple prepended conditions', () => {
+			const ext = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+			expect(ext.conditions?.length).to.equal(1);
+
+			const conditions: Array<UmbConditionConfigBase> = [
+					{
+							alias: 'Umb.Test.Condition.Valid'
+					},
+					{
+							alias: 'Umb.Condition.WorkspaceAlias',
+							match: 'Umb.Workspace.Document'
+					} as WorkspaceAliasConditionConfig
+			];
+
+			extensionRegistry.prependConditions('Umb.Test.Section.1', conditions);
+
+			const extUpdated = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
+			expect(extUpdated.conditions?.length).to.equal(3);
+			expect(extUpdated.conditions?.[0]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
+			expect(extUpdated.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Valid');
+	});
+});
