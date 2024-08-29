@@ -98,10 +98,8 @@ public partial class DocumentNavigationServiceTests
             Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
             Assert.AreEqual(Child3.Key, copiedItemParentKey);
             Assert.AreEqual(initialChild3ChildrenCount + 1, child3ChildrenList.Count);
-
             // Verifies that the descendant amount is the same for the original and the moved GrandChild1 node
             Assert.AreEqual(initialGrandChild1DescendentsCount, grandChild1DescendantsList.Count);
-
             // Verifies that the keys are not the same
             Assert.AreEqual(GreatGrandchild1.Name, copiedGreatGrandChild1.Name);
             Assert.AreNotEqual(GreatGrandchild1.Key, copiedGreatGrandChild1.Key);

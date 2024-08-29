@@ -12,7 +12,6 @@ public partial class DocumentNavigationServiceTests
         Guid nodeToDelete = Child1.Key;
         Guid nodeInRecycleBin = Grandchild4.Key;
         DocumentNavigationQueryService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);
-
         // Move nodes to recycle bin
         await ContentEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey);
         await ContentEditingService.MoveToRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
@@ -33,9 +32,7 @@ public partial class DocumentNavigationServiceTests
             {
                 var descendantExists = DocumentNavigationQueryService.TryGetParentKey(descendant, out _);
                 Assert.IsFalse(descendantExists);
-
-                var descendantExistsInRecycleBin =
-                    DocumentNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
+                var descendantExistsInRecycleBin = DocumentNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
                 Assert.IsFalse(descendantExistsInRecycleBin);
             }
         });

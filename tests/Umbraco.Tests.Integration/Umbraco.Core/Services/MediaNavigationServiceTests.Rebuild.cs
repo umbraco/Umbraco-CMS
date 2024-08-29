@@ -19,7 +19,7 @@ public partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
         MediaNavigationQueryService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
         MediaNavigationQueryService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
-        // Im-memory navigation structure is empty here
+        // In-memory navigation structure is empty here
         var newMediaNavigationService = new MediaNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
         var initialNodeExists = newMediaNavigationService.TryGetParentKey(nodeKey, out _);
 
@@ -36,10 +36,8 @@ public partial class MediaNavigationServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(initialNodeExists);
-
             // Verify that the item is present in the navigation structure after a rebuild
             Assert.IsTrue(nodeExists);
-
             // Verify that we have the same items as in the original built state of MediaNavigationService
             Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
             CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);
@@ -61,7 +59,7 @@ public partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetDescendantsKeysInBin(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
         MediaNavigationQueryService.TryGetAncestorsKeysInBin(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
-        // Im-memory navigation structure is empty here
+        // In-memory navigation structure is empty here
         var newMediaNavigationService = new MediaNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
         var initialNodeExists = newMediaNavigationService.TryGetParentKeyInBin(nodeKey, out _);
 
@@ -78,10 +76,8 @@ public partial class MediaNavigationServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(initialNodeExists);
-
             // Verify that the item is present in the navigation structure after a rebuild
             Assert.IsTrue(nodeExists);
-
             // Verify that we have the same items as in the original built state of MediaNavigationService
             Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
             CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);

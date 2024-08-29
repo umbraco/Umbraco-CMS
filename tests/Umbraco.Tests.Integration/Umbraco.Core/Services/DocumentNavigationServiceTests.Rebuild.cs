@@ -13,21 +13,18 @@ public partial class DocumentNavigationServiceTests
     {
         // Arrange
         Guid nodeKey = Root.Key;
-
         // Capture original built state of DocumentNavigationService
         DocumentNavigationQueryService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
         DocumentNavigationQueryService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
         DocumentNavigationQueryService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
         DocumentNavigationQueryService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
-
-        // Im-memory navigation structure is empty here
+        // In-memory navigation structure is empty here
         var newDocumentNavigationService = new DocumentNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
         var initialNodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out _);
 
         // Act
         await newDocumentNavigationService.RebuildAsync();
-
         // Capture rebuilt state
         var nodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out Guid? parentKeyFromRebuild);
         newDocumentNavigationService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> childrenKeysFromRebuild);
@@ -39,10 +36,8 @@ public partial class DocumentNavigationServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(initialNodeExists);
-
             // Verify that the item is present in the navigation structure after a rebuild
             Assert.IsTrue(nodeExists);
-
             // Verify that we have the same items as in the original built state of DocumentNavigationService
             Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
             CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);
@@ -64,13 +59,12 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetDescendantsKeysInBin(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
         DocumentNavigationQueryService.TryGetAncestorsKeysInBin(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
-        // Im-memory navigation structure is empty here
+        // In-memory navigation structure is empty here
         var newDocumentNavigationService = new DocumentNavigationService(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<INavigationRepository>());
         var initialNodeExists = newDocumentNavigationService.TryGetParentKeyInBin(nodeKey, out _);
 
         // Act
         await newDocumentNavigationService.RebuildBinAsync();
-
         // Capture rebuilt state
         var nodeExists = newDocumentNavigationService.TryGetParentKeyInBin(nodeKey, out Guid? parentKeyFromRebuild);
         newDocumentNavigationService.TryGetChildrenKeysInBin(nodeKey, out IEnumerable<Guid> childrenKeysFromRebuild);

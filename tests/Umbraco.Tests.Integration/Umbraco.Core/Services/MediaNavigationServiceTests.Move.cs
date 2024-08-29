@@ -31,7 +31,6 @@ public partial class MediaNavigationServiceTests
         var afterMoveInitialParentDescendants = afterMoveInitialParentDescendantsKeys.ToList();
         MediaNavigationQueryService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> afterMoveTargetParentChildrenKeys);
         var afterMoveTargetParentChildren = afterMoveTargetParentChildrenKeys.ToList();
-
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(updatedParentKey);
@@ -51,7 +50,7 @@ public partial class MediaNavigationServiceTests
     {
         // Arrange
         Guid nodeToMove = SubAlbum2.Key;
-        Guid? targetParentKey = Constants.System.RootKey; // Root
+        Guid? targetParentKey = Constants.System.RootKey;
         MediaNavigationQueryService.TryGetParentKey(nodeToMove, out Guid? originalParentKey);
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeToMove, out IEnumerable<Guid> initialDescendantsKeys);
         var beforeMoveDescendants = initialDescendantsKeys.ToList();
@@ -63,7 +62,6 @@ public partial class MediaNavigationServiceTests
 
         // Act
         var moveAttempt = await MediaEditingService.MoveAsync(nodeToMove, targetParentKey, Constants.Security.SuperUserKey);
-
         // Verify the node's new parent is updated
         MediaNavigationQueryService.TryGetParentKey(moveAttempt.Result!.Key, out Guid? updatedParentKey);
 
@@ -74,17 +72,14 @@ public partial class MediaNavigationServiceTests
         var afterMoveInitialParentDescendants = afterMoveInitialParentDescendantsKeys.ToList();
         MediaNavigationQueryService.TryGetSiblingsKeys(Album.Key, out IEnumerable<Guid> afterMoveSiblingsKeys);
         var afterMoveRootSiblings = afterMoveSiblingsKeys.ToList();
-
         Assert.Multiple(() =>
         {
             Assert.IsNull(updatedParentKey);
             Assert.AreNotEqual(originalParentKey, updatedParentKey);
             Assert.AreEqual(targetParentKey, updatedParentKey);
-
             // Verifies that the parent's children have been updated
             Assert.AreEqual(beforeMoveInitialParentDescendants.Count - (afterMoveDescendants.Count + 1), afterMoveInitialParentDescendants.Count);
             Assert.AreEqual(beforeMoveRootSiblings.Count + 1, afterMoveRootSiblings.Count);
-
             // Verifies that the descendants are the same before and after the move
             Assert.AreEqual(beforeMoveDescendants.Count, afterMoveDescendants.Count);
             Assert.AreEqual(beforeMoveDescendants, afterMoveDescendants);

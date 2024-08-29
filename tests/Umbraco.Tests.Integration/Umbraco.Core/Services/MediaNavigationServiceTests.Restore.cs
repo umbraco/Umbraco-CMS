@@ -34,7 +34,6 @@ public partial class MediaNavigationServiceTests
         {
             // Verify siblings count has decreased by one
             Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
-
             if (targetParentKey is null)
             {
                 Assert.IsNull(restoredItemParentKey);

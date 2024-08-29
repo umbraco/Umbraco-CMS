@@ -32,9 +32,7 @@ public partial class MediaNavigationServiceTests
             {
                 var descendantExists = MediaNavigationQueryService.TryGetParentKey(descendant, out _);
                 Assert.IsFalse(descendantExists);
-
-                var descendantExistsInRecycleBin =
-                    MediaNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
+                var descendantExistsInRecycleBin = MediaNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
                 Assert.IsFalse(descendantExistsInRecycleBin);
             }
         });

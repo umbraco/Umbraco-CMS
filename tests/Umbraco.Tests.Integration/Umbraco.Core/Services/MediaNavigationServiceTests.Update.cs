@@ -37,9 +37,7 @@ public partial class MediaNavigationServiceTests
         {
             // Verify that the item is still present in the navigation structure
             Assert.IsTrue(nodeExists);
-
             Assert.AreEqual(nodeToUpdate, updatedItemKey);
-
             // Verify that nothing's changed
             Assert.AreEqual(initialParentKey, updatedParentKey);
             CollectionAssert.AreEquivalent(initialChildrenKeys, childrenKeysAfterUpdate);

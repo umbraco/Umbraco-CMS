@@ -23,7 +23,6 @@ public partial class DocumentNavigationServiceTests
 
         // Act
         var moveAttempt = await ContentEditingService.MoveAsync(nodeToMove, targetParentKey, Constants.Security.SuperUserKey);
-
         // Verify the node's new parent is updated
         DocumentNavigationQueryService.TryGetParentKey(moveAttempt.Result!.Key, out Guid? updatedParentKey);
 

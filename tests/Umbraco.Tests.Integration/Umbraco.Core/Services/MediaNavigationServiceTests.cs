@@ -61,10 +61,8 @@ public partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBa
     {
         // Arrange
         Guid notCreatedAlbumKey = new Guid("860EE748-BC7E-4A13-A1D9-C9160B25AD6E");
-
         // Create node at media root
         var createModel = CreateMediaCreateModel("Album 2", notCreatedAlbumKey, FolderMediaType.Key);
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
