@@ -2,11 +2,13 @@ using System.Globalization;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -34,6 +36,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly ITemplateContentParserService _templateContentParserService;
+        private readonly ITemplateService _templateService;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -52,7 +56,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IShortStringHelper shortStringHelper,
             IConfigurationEditorJsonSerializer serializer,
             IMediaService mediaService,
-            IMediaTypeService mediaTypeService)
+            IMediaTypeService mediaTypeService,
+            ITemplateContentParserService templateContentParserService,
+            ITemplateService templateService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -68,6 +74,43 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _serializer = serializer;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
+            _templateContentParserService = templateContentParserService;
+            _templateService = templateService;
+        }
+
+        public PackageDataInstallation(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILogger<PackageDataInstallation> logger,
+            IFileService fileService,
+            ILocalizationService localizationService,
+            IDataTypeService dataTypeService,
+            IEntityService entityService,
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            PropertyEditorCollection propertyEditors,
+            IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper,
+            IConfigurationEditorJsonSerializer serializer,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService)
+            : this(
+                dataValueEditorFactory,
+                logger,
+                fileService,
+                localizationService,
+                dataTypeService,
+                entityService,
+                contentTypeService,
+                contentService,
+                propertyEditors,
+                scopeProvider,
+                shortStringHelper,
+                serializer,
+                mediaService,
+                mediaTypeService,
+                StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
+                StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
+        {
         }
 
         // Also remove factory service registration when this constructor is removed
@@ -103,7 +146,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   shortStringHelper,
                   serializer,
                   mediaService,
-                  mediaTypeService)
+                  mediaTypeService,
+                  StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
+                  StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
         { }
 
         #region Install/Uninstall
@@ -1670,11 +1715,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 var dependencies = new List<string>();
                 XElement elementCopy = tempElement;
-                //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.
-                if (string.IsNullOrEmpty((string?)elementCopy.Element("Master")) == false &&
-                    templateElements.Any(x => (string?)x.Element("Alias") == (string?)elementCopy.Element("Master")))
+
+                //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.'
+                var masterTemplate = _templateContentParserService.MasterTemplateAlias(tempElement.Value);
+                if (masterTemplate is not null)
                 {
-                    dependencies.Add((string)elementCopy.Element("Master")!);
+                    dependencies.Add(masterTemplate);
                 }
                 else if (string.IsNullOrEmpty((string?)elementCopy.Element("Master")) == false &&
                          templateElements.Any(x =>
@@ -1700,9 +1746,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var design = templateElement.Element("Design")?.Value;
                 XElement? masterElement = templateElement.Element("Master");
 
-                var existingTemplate = _fileService.GetTemplate(alias) as Template;
+                var existingTemplate = _templateService.GetAsync(alias).GetAwaiter().GetResult() as Template;
 
-                Template? template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
+                Template template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
 
                 // For new templates, use the serialized key if avaialble.
                 if (existingTemplate == null && Guid.TryParse(templateElement.Element("Key")?.Value, out Guid key))
@@ -1725,9 +1771,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 templates.Add(template);
             }
 
-            if (templates.Any())
+            foreach (ITemplate template in templates)
             {
-                _fileService.SaveTemplate(templates, userId);
+                if (template.Id > 0)
+                {
+                    _templateService.UpdateAsync(template, Constants.Security.SuperUserKey);
+                }
+                else
+                {
+                    _templateService.CreateAsync(template, Constants.Security.SuperUserKey);
+                }
             }
 
             return templates;
