@@ -35,7 +35,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongMediaFileName = 'NotACorrectName';
   await umbracoApi.media.ensureNameNotExists(wrongMediaFileName);
-  await umbracoApi.media.createDefaultMedia(wrongMediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(wrongMediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
@@ -82,9 +82,10 @@ for (const mediaFileType of mediaFileTypes) {
   });
 }
 
-test('can delete a media file', async ({umbracoApi, umbracoUi}) => {
+// TODO: Currently there is no delete button for the media, only trash, is this correct?
+test.skip('can delete a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoApi.media.doesNameExist(mediaFileName);
 
@@ -117,7 +118,8 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.media.ensureNameNotExists(folderName);
 });
 
-test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+// TODO: Currently there is no delete button for the media, only trash, is this correct?
+test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.ensureNameNotExists(folderName);
   await umbracoApi.media.createDefaultMediaFolder(folderName);
@@ -144,7 +146,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.clickActionsMenuForName(parentFolderName);
   await umbracoUi.media.clickCreateModalButton();
-  await umbracoUi.media.clickExactLinkWithName('Folder');
+  await umbracoUi.media.clickMediaTypeName('Folder');
   await umbracoUi.media.enterMediaItemName(folderName);
   await umbracoUi.media.clickSaveButton();
 
@@ -162,8 +164,8 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondMediaFile = 'SecondMediaFile';
   await umbracoApi.media.ensureNameNotExists(secondMediaFile);
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
-  await umbracoApi.media.createDefaultMedia(secondMediaFile, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  await umbracoApi.media.createDefaultMediaFile(secondMediaFile);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
@@ -180,7 +182,7 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
 test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoApi.media.doesNameExist(mediaFileName);
 
@@ -201,7 +203,7 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
 test('can restore a media item from the recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoApi.media.trashMediaItem(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -219,11 +221,10 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
   await umbracoApi.media.emptyRecycleBin();
 });
 
-// TODO: unskip when the frontend is ready. Currently you are unable to delete a media item from the recycle bin. You have to empty the recycle bin.
-test.skip('can delete a media item from the recycle bin', async ({umbracoApi, umbracoUi}) => {
+test('can delete a media item from the recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoApi.media.trashMediaItem(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -232,7 +233,7 @@ test.skip('can delete a media item from the recycle bin', async ({umbracoApi, um
   await umbracoUi.media.deleteMediaItem(mediaFileName);
 
   // Assert
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName);
+  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });
@@ -240,7 +241,7 @@ test.skip('can delete a media item from the recycle bin', async ({umbracoApi, um
 test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoApi.media.trashMediaItem(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
