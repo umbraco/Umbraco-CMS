@@ -289,7 +289,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		}
 		if (hasTypeLimits) {
 			this.#typeLimitValidator = this.addValidator(
-				'patternMismatch',
+				'customError',
 				() => {
 					const invalids = this.#context.getInvalidBlockTypeLimits();
 					return invalids
