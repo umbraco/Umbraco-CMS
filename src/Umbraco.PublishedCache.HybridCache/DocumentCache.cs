@@ -7,19 +7,19 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 public sealed class DocumentCache : IPublishedContentCache
 {
-    private readonly IContentCacheService _contentCacheService;
+    private readonly IDocumentCacheService _documentCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
-    public DocumentCache(IContentCacheService contentCacheService, IPublishedContentTypeCache publishedContentTypeCache)
+    public DocumentCache(IDocumentCacheService documentCacheService, IPublishedContentTypeCache publishedContentTypeCache)
     {
-        _contentCacheService = contentCacheService;
+        _documentCacheService = documentCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
     }
 
-    public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false) => await _contentCacheService.GetByIdAsync(id, preview);
+    public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false) => await _documentCacheService.GetByIdAsync(id, preview);
 
 
-    public async Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false) => await _contentCacheService.GetByKeyAsync(key, preview);
+    public async Task<IPublishedContent?> GetByIdAsync(Guid key, bool preview = false) => await _documentCacheService.GetByKeyAsync(key, preview);
 
     public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
 

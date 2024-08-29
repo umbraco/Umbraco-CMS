@@ -15,18 +15,18 @@ internal sealed class CacheRefreshingNotificationHandler :
     INotificationAsyncHandler<MediaRefreshNotification>,
     INotificationAsyncHandler<MediaDeletedNotification>
 {
-    private readonly IContentCacheService _contentCacheService;
+    private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IElementsCache _elementsCache;
     private readonly IRelationService _relationService;
 
     public CacheRefreshingNotificationHandler(
-        IContentCacheService contentCacheService,
+        IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
         IElementsCache elementsCache,
         IRelationService relationService)
     {
-        _contentCacheService = contentCacheService;
+        _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
         _elementsCache = elementsCache;
         _relationService = relationService;
@@ -36,7 +36,7 @@ internal sealed class CacheRefreshingNotificationHandler :
     {
         await RefreshElementsCacheAsync(notification.Entity);
 
-        await _contentCacheService.RefreshContentAsync(notification.Entity);
+        await _documentCacheService.RefreshContentAsync(notification.Entity);
     }
 
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken)
@@ -44,7 +44,7 @@ internal sealed class CacheRefreshingNotificationHandler :
         foreach (IContent deletedEntity in notification.DeletedEntities)
         {
             await RefreshElementsCacheAsync(deletedEntity);
-            await _contentCacheService.DeleteItemAsync(deletedEntity.Id);
+            await _documentCacheService.DeleteItemAsync(deletedEntity.Id);
         }
     }
 
@@ -71,12 +71,12 @@ internal sealed class CacheRefreshingNotificationHandler :
         var ids = parentRelations.Select(x => x.ChildId).Concat(childRelations.Select(x => x.ParentId)).ToHashSet();
         foreach (var id in ids)
         {
-            if (await _contentCacheService.HasContentByIdAsync(id) is false)
+            if (await _documentCacheService.HasContentByIdAsync(id) is false)
             {
                 continue;
             }
 
-            IPublishedContent? publishedContent = await _contentCacheService.GetByIdAsync(id);
+            IPublishedContent? publishedContent = await _documentCacheService.GetByIdAsync(id);
             if (publishedContent is null)
             {
                 continue;

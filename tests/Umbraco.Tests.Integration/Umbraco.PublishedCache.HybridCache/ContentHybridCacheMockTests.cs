@@ -22,7 +22,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 {
     private IPublishedContentCache _mockedCache;
     private Mock<IDatabaseCacheRepository> _mockedNucacheRepository;
-    private IContentCacheService _mockContentCacheService;
+    private IDocumentCacheService _mockDocumentCacheService;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
@@ -74,7 +74,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 
         _mockedNucacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
 
-        _mockContentCacheService = new ContentCacheService(
+        _mockDocumentCacheService = new DocumentCacheService(
             _mockedNucacheRepository.Object,
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ICoreScopeProvider>(),
@@ -82,7 +82,7 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IPublishedContentFactory>(),
             GetRequiredService<ICacheNodeFactory>());
 
-        _mockedCache = new DocumentCache(_mockContentCacheService, GetRequiredService<IPublishedContentTypeCache>());
+        _mockedCache = new DocumentCache(_mockDocumentCacheService, GetRequiredService<IPublishedContentTypeCache>());
     }
 
     [Test]
@@ -120,9 +120,9 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
 
-        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
+        await _mockDocumentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Id);
         AssertTextPage(textPage);
 
@@ -140,9 +140,9 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
 
-        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
+        await _mockDocumentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key);
         AssertTextPage(textPage);
 
@@ -153,9 +153,9 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     public async Task Content_Is_Not_Seeded_If_Unpublished_By_Id()
     {
 
-        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
 
-        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
+        await _mockDocumentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
         AssertTextPage(textPage);
 
@@ -165,9 +165,9 @@ public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     [Test]
     public async Task Content_Is_Not_Seeded_If_Unpublished_By_Key()
     {
-        await _mockContentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
 
-        await _mockContentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
+        await _mockDocumentCacheService.SeedAsync(new [] {Textpage.ContentType.Key});
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         AssertTextPage(textPage);
 
