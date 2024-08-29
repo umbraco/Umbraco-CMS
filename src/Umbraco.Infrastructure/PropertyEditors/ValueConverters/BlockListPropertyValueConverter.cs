@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -12,7 +13,6 @@ using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Extensions;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -25,32 +25,29 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly BlockEditorConverter _blockConverter;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly BlockListPropertyValueConstructorCache _constructorCache;
 
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
-        : this(proflog, blockConverter, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
-    {
-    }
 
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService)
-        : this(proflog, blockConverter, contentTypeService, StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
+    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
+        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(), StaticServiceProvider.Instance.GetRequiredService<BlockListPropertyValueConstructorCache>())
     {
     }
 
     [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, BlockListPropertyValueConstructorCache constructorCache)
+        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(), constructorCache)
     {
     }
 
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer)
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer,  BlockListPropertyValueConstructorCache constructorCache)
     {
         _proflog = proflog;
         _blockConverter = blockConverter;
         _contentTypeService = contentTypeService;
         _apiElementBuilder = apiElementBuilder;
         _jsonSerializer = jsonSerializer;
+        _constructorCache = constructorCache;
     }
 
     /// <inheritdoc />
@@ -162,7 +159,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
                 return null;
             }
 
-            var creator = new BlockListPropertyValueCreator(_blockConverter, _jsonSerializer);
+            var creator = new BlockListPropertyValueCreator(_blockConverter, _jsonSerializer, _constructorCache);
             return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks);
         }
     }

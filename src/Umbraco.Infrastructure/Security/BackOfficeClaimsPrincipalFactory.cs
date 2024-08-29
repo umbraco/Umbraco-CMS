@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackOfficeIdentityUser>
 {
+    private readonly IOptions<BackOfficeAuthenticationTypeSettings> _backOfficeAuthenticationTypeSettings;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeClaimsPrincipalFactory" /> class.
     /// </summary>
@@ -17,12 +19,15 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
     /// <param name="optionsAccessor">The <see cref="BackOfficeIdentityOptions" /></param>
     public BackOfficeClaimsPrincipalFactory(
         UserManager<BackOfficeIdentityUser> userManager,
-        IOptions<BackOfficeIdentityOptions> optionsAccessor)
+        IOptions<BackOfficeIdentityOptions> optionsAccessor,
+        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings
+        )
         : base(userManager, optionsAccessor)
     {
+        _backOfficeAuthenticationTypeSettings = backOfficeAuthenticationTypeSettings;
     }
 
-    protected virtual string AuthenticationType { get; } = Constants.Security.BackOfficeAuthenticationType;
+    protected virtual string AuthenticationType => _backOfficeAuthenticationTypeSettings.Value.AuthenticationType;
 
     /// <inheritdoc />
     protected override async Task<ClaimsIdentity> GenerateClaimsAsync(BackOfficeIdentityUser user)
@@ -46,6 +51,7 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
         // ensure our required claims are there
         id.AddRequiredClaims(
             user.Id,
+            user.Key,
             user.UserName!,
             user.Name!,
             user.CalculatedContentStartNodeIds,

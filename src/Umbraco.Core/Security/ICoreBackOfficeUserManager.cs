@@ -17,6 +17,7 @@ public interface ICoreBackOfficeUserManager
     Task<IdentityCreationResult> CreateForInvite(UserCreateModel createModel);
 
     Task<Attempt<string, UserOperationStatus>> GenerateEmailConfirmationTokenAsync(IUser user);
+
     Task<Attempt<string, UserOperationStatus>> GeneratePasswordResetTokenAsync(IUser user);
 
     Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockUser(IUser user);
@@ -24,6 +25,10 @@ public interface ICoreBackOfficeUserManager
     Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLoginsAsync(IUser user);
 
     Task<bool> IsEmailConfirmationTokenValidAsync(IUser user, string token);
+
     Task<bool> IsResetPasswordTokenValidAsync(IUser user, string token);
+
     void NotifyForgotPasswordRequested(IPrincipal user, string toString);
+
+    public string GeneratePassword();
 }

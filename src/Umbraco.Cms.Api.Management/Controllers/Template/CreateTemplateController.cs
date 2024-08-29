@@ -29,16 +29,17 @@ public class CreateTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateTemplateRequestModel requestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateTemplateRequestModel requestModel)
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.CreateAsync(
             requestModel.Name,
             requestModel.Alias,
             requestModel.Content,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            requestModel.Id);
 
         return result.Success
-            ? CreatedAtAction<ByKeyTemplateController>(controller => nameof(controller.ByKey), result.Result.Key)
+            ? CreatedAtId<ByKeyTemplateController>(controller => nameof(controller.ByKey), result.Result.Key)
             : TemplateOperationStatusResult(result.Status);
     }
 }

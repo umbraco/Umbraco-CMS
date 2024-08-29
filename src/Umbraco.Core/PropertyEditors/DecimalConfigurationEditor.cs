@@ -11,26 +11,17 @@ public class DecimalConfigurationEditor : ConfigurationEditor
     {
         Fields.Add(new ConfigurationField(new DecimalValidator())
         {
-            Description = "Enter the minimum amount of number to be entered",
-            Key = "min",
-            View = "decimal",
-            Name = "Minimum",
+            Key = "min"
         });
 
         Fields.Add(new ConfigurationField(new DecimalValidator())
         {
-            Description = "Enter the intervals amount between each step of number to be entered",
             Key = "step",
-            View = "decimal",
-            Name = "Step Size",
         });
 
         Fields.Add(new ConfigurationField(new DecimalValidator())
         {
-            Description = "Enter the maximum amount of number to be entered",
             Key = "max",
-            View = "decimal",
-            Name = "Maximum",
         });
     }
 }

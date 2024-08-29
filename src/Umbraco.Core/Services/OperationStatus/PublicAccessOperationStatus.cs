@@ -9,4 +9,5 @@ public enum PublicAccessOperationStatus
     NoAllowedEntities,
     AmbiguousRule,
     CancelledByNotification,
+    EntryNotFound,
 }

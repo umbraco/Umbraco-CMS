@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Locking;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -64,10 +65,9 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
     { }
 
-    // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
+    protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 
-    protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
+    protected override int[] WriteLockIds => ContentTypeLocks.WriteLockIds;
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 
@@ -118,59 +118,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
             return Repository.GetAllContentTypeIds(aliases);
         }
-    }
-
-    /// <inheritdoc />
-    public Task<PagedModel<IContentType>> GetAllAllowedAsRootAsync(int skip, int take)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        // that one is special because it works across content, media and member types
-        scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
-
-        IQuery<IContentType> query = ScopeProvider.CreateQuery<IContentType>().Where(x => x.AllowedAsRoot);
-        IEnumerable<IContentType> contentTypes = Repository.Get(query).ToArray();
-
-        var pagedModel = new PagedModel<IContentType>
-        {
-            Total = contentTypes.Count(),
-            Items = contentTypes.Skip(skip).Take(take)
-        };
-
-        return Task.FromResult(pagedModel);
-    }
-
-    public Task<Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        IContentType? parent = Get(key);
-
-        if (parent?.AllowedContentTypes is null)
-        {
-            return Task.FromResult(Attempt.FailWithStatus<PagedModel<IContentType>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
-        }
-
-        PagedModel<IContentType> result;
-        if (parent.AllowedContentTypes.Any() is false)
-        {
-            // no content types allowed under parent
-            result = new PagedModel<IContentType>
-            {
-                Items = Array.Empty<IContentType>(),
-                Total = 0,
-            };
-        }
-        else
-        {
-            IContentType[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
-            result = new PagedModel<IContentType>
-            {
-                Items = allowedChildren.Take(take).Skip(skip),
-                Total = allowedChildren.Length,
-            };
-        }
-
-        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<IContentType>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
     }
 
     protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)

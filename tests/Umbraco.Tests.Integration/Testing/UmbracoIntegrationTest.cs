@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
@@ -133,8 +134,13 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
         services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
 
-        
         services.AddLogger(webHostEnvironment, Configuration);
+
+        // Register a keyed service to verify that all calls to ServiceDescriptor.ImplementationType
+        // are guarded by checking IsKeyedService first.
+        // Failure to check this when accessing a keyed service descriptor's ImplementationType property
+        // throws a InvalidOperationException.
+        services.AddKeyedSingleton<object>("key");
 
         // Add it!
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
@@ -150,7 +156,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         builder.AddConfiguration()
             .AddUmbracoCore()
             .AddWebComponents()
-            .AddRuntimeMinifier()
             .AddBackOfficeAuthentication()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
@@ -163,8 +168,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         {
             // TODO: Should these just be called from within AddUmbracoCore/AddWebComponents?
             builder
-                .AddCoreMappingProfiles()
-                .AddWebMappingProfiles();
+                .AddCoreMappingProfiles();
         }
 
         services.AddSignalR();

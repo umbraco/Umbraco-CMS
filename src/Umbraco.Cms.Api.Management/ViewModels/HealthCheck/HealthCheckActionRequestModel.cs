@@ -5,7 +5,7 @@ public class HealthCheckActionRequestModel
     /// <summary>
     ///     Gets or sets the health check key.
     /// </summary>
-    public Guid HealthCheckId { get; set; }
+    public required ReferenceByIdModel HealthCheck { get; set; }
 
     /// <summary>
     ///     Gets or sets the alias.
@@ -47,4 +47,9 @@ public class HealthCheckActionRequestModel
     ///     Gets or sets the regex to use when validating the provided value (if the value can be validated by a regex).
     /// </summary>
     public string? ProvidedValueValidationRegex { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the action parameters.
+    /// </summary>
+    public Dictionary<string, object>? ActionParameters { get; set; }
 }

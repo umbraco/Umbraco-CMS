@@ -43,6 +43,15 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     }
 
     /// <inheritdoc />
+    public async Task<ILanguage?> GetDefaultLanguageAsync()
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return await Task.FromResult(_languageRepository.GetByIsoCode(_languageRepository.GetDefaultIsoCode()));
+        }
+    }
+
+    /// <inheritdoc />
     public async Task<string> GetDefaultIsoCodeAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -58,6 +67,13 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         {
             return await Task.FromResult(_languageRepository.GetMany());
         }
+    }
+
+    public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
+
+        return await Task.FromResult(_languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true));
     }
 
     public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));

@@ -272,8 +272,6 @@ public class UmbracoTestDataController : SurfaceController
         {
             Name = "Review"
         });
-        docType.AddPropertyType(
-            new PropertyType(_shortStringHelper, GetOrCreateMediaPicker(), "media") { Name = "Media" });
         docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateText(), "desc") { Name = "Description" });
         Services.ContentTypeService.Save(docType);
         docType.AllowedContentTypes = new[] { new ContentTypeSort(docType.Key, 0, docType.Alias) };
@@ -283,9 +281,6 @@ public class UmbracoTestDataController : SurfaceController
 
     private IDataType GetOrCreateRichText() =>
         GetOrCreateDataType(RichTextDataTypeName, Constants.PropertyEditors.Aliases.RichText);
-
-    private IDataType GetOrCreateMediaPicker() =>
-        GetOrCreateDataType(MediaPickerDataTypeName, Constants.PropertyEditors.Aliases.MediaPicker);
 
     private IDataType GetOrCreateText() =>
         GetOrCreateDataType(TextDataTypeName, Constants.PropertyEditors.Aliases.TextBox);
@@ -304,7 +299,7 @@ public class UmbracoTestDataController : SurfaceController
             throw new InvalidOperationException($"No {editorAlias} editor found");
         }
 
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
 
         dt = new DataType(editor, serializer)
         {

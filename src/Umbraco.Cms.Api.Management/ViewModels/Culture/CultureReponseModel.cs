@@ -1,8 +1,12 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Culture;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Culture;
 
 public class CultureReponseModel
 {
-    public string Name { get; set; } = null!;
+    [Required]
+    public string Name { get; set; } = string.Empty;
 
-    public string EnglishName { get; set; } = null!;
+    [Required]
+    public string EnglishName { get; set; } = string.Empty;
 }

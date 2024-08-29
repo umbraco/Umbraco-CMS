@@ -18,10 +18,16 @@ public class Hulu : OEmbedProviderBase
 
     public override Dictionary<string, string> RequestParams => new();
 
+    [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
     public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
     {
+        return GeOEmbedDataAsync(url, maxWidth, maxHeight, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    public override async Task<string?> GeOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
+    {
         var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        OEmbedResponse? oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
+        OEmbedResponse? oembed = await base.GetJsonResponseAsync<OEmbedResponse>(requestUrl, cancellationToken);
 
         return oembed?.GetHtml();
     }

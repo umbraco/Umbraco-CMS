@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Core.Models.ContentEditing;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
 public abstract class ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
     : ContentModelBase<TValueResponseModelBase, TVariantResponseModel>
@@ -6,6 +8,4 @@ public abstract class ContentResponseModelBase<TValueResponseModelBase, TVariant
     where TVariantResponseModel : VariantResponseModelBase
 {
     public Guid Id { get; set; }
-
-    public Guid ContentTypeId { get; set; }
 }

@@ -1,19 +1,17 @@
 import { defineConfig } from 'vite';
+import viteTSConfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  plugins: [viteTSConfigPaths()],
 	build: {
 		lib: {
-			entry: ['src/index.ts', 'src/external.ts'],
-			formats: ['es'],
+			entry: 'src/index.ts',
+      formats: ['es'],
+      fileName: 'login'
 		},
     rollupOptions: {
-      output: {
-        manualChunks: {
-          'uui': ['@umbraco-ui/uui'],
-          'vendor': ['lit', 'rxjs'],
-        },
-      }
+      external: [/^@umbraco-cms/]
     },
 		target: 'esnext',
 		sourcemap: true,

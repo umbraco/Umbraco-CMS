@@ -1,6 +1,4 @@
-using System.Text.Json.Nodes;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,41 +18,19 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MediaPicker3,
-    EditorType.PropertyValue | EditorType.MacroParameter,
-    "Media Picker",
-    "mediapicker3",
     ValueType = ValueTypes.Json,
-    Group = Constants.PropertyEditors.Groups.Media,
-    Icon = Constants.Icons.MediaImage,
     ValueEditorIsReusable = true)]
 public class MediaPicker3PropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
-
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public MediaPicker3PropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        EditorType type = EditorType.PropertyValue)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaPicker3PropertyEditor" /> class.
     /// </summary>
-    public MediaPicker3PropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser,
-        EditorType type = EditorType.PropertyValue)
-        : base(dataValueEditorFactory, type)
+    public MediaPicker3PropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
+        : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
@@ -62,7 +38,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new MediaPicker3ConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new MediaPicker3ConfigurationEditor(_ioHelper);
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
@@ -72,7 +48,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
     internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private readonly IDataTypeService _dataTypeService;
+        private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IMediaImportService _mediaImportService;
         private readonly IMediaService _mediaService;
@@ -81,26 +57,25 @@ public class MediaPicker3PropertyEditor : DataEditor
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
         public MediaPicker3PropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IDataTypeService dataTypeService,
             IMediaImportService mediaImportService,
             IMediaService mediaService,
             ITemporaryFileService temporaryFileService,
             IScopeProvider scopeProvider,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IDataTypeConfigurationCache dataTypeReadCache)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            _dataTypeService = dataTypeService;
             _mediaImportService = mediaImportService;
             _mediaService = mediaService;
             _temporaryFileService = temporaryFileService;
             _scopeProvider = scopeProvider;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _dataTypeReadCache = dataTypeReadCache;
         }
 
         /// <remarks>
@@ -122,11 +97,9 @@ public class MediaPicker3PropertyEditor : DataEditor
             var dtos = Deserialize(_jsonSerializer, value).ToList();
             dtos = UpdateMediaTypeAliases(dtos);
 
-            IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-            if (dataType?.ConfigurationObject != null)
+            var configuration = _dataTypeReadCache.GetConfigurationAs<MediaPicker3Configuration>(property.PropertyType.DataTypeKey);
+            if (configuration is not null)
             {
-                MediaPicker3Configuration? configuration = dataType.ConfigurationAs<MediaPicker3Configuration>();
-
                 foreach (MediaWithCropsDto dto in dtos)
                 {
                     dto.ApplyConfiguration(configuration);
@@ -138,14 +111,8 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
-            if (editorValue.Value is not JsonArray jsonArray)
-            {
-                return base.FromEditor(editorValue, currentValue);
-            }
-
-            List<MediaWithCropsDto>? mediaWithCropsDtos = _jsonSerializer.Deserialize<List<MediaWithCropsDto>>(jsonArray.ToJsonString());
-            if (mediaWithCropsDtos is null)
+            if (editorValue.Value is null ||
+                _jsonSerializer.TryDeserialize(editorValue.Value, out List<MediaWithCropsDto>? mediaWithCropsDtos) is false)
             {
                 return base.FromEditor(editorValue, currentValue);
             }
@@ -241,7 +208,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                     continue;
                 }
 
-                GuidUdi? startNodeGuid = configuration.StartNodeId as GuidUdi ?? null;
+                Guid? startNodeGuid = configuration.StartNodeId;
 
                 // make sure we'll clean up the temporary file if the scope completes
                 using IScope scope = _scopeProvider.CreateScope();
@@ -251,7 +218,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                 // there are multiple allowed media types matching the file extension
                 using Stream fileStream = temporaryFile.OpenReadStream();
                 IMedia mediaFile = _mediaImportService
-                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid?.Guid, mediaWithCropsDto.MediaTypeAlias, userKey)
+                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid, mediaWithCropsDto.MediaTypeAlias, userKey)
                     .GetAwaiter()
                     .GetResult();
 

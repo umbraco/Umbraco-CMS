@@ -17,6 +17,6 @@ public class GetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     [MapToApiVersion("1.0")]
     [HttpGet("status")]
     [ProducesResponseType(typeof(RedirectUrlStatusResponseModel), 200)]
-    public Task<ActionResult<RedirectUrlStatusResponseModel>> GetStatus() =>
+    public Task<ActionResult<RedirectUrlStatusResponseModel>> GetStatus(CancellationToken cancellationToken) =>
         Task.FromResult<ActionResult<RedirectUrlStatusResponseModel>>(_redirectUrlStatusPresentationFactory.CreateViewModel());
 }

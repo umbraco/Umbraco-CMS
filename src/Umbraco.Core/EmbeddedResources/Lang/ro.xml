@@ -1,57 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="ro" intName="Romanian (Romania)" localName="romana (Romania)" lcid="" culture="ro-RO">
   <creator>
     <name>The Umbraco community</name>
     <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
-  <area alias="sections">
-    <key alias="content">Conţinut</key>
-    <key alias="forms">Formulare</key>
-    <key alias="media">Media</key>
-    <key alias="member">Membrii</key>
-    <key alias="packages">Pachete</key>
-    <key alias="marketplace">Marketplace</key>
-    <key alias="settings">Setări</key>
-    <key alias="translation">Traduceri</key>
-    <key alias="users">Utilizatori</key>
-  </area>
-  <area alias="treeHeaders">
-    <key alias="content">Conţinut</key>
-    <key alias="contentBlueprints">Șabloane de conținut</key>
-    <key alias="media">Media</key>
-    <key alias="cacheBrowser">Cache Browser</key>
-    <key alias="contentRecycleBin">Cos de gunoi</key>
-    <key alias="createdPackages">Pachete create</key>
-    <key alias="dataTypes">Tipuri de date</key>
-    <key alias="dictionary">Dicţionar</key>
-    <key alias="installedPackages">Pachete instalate</key>
-    <key alias="installSkin">Instalare skin</key>
-    <key alias="installStarterKit">Instalați trusa de pornire</key>
-    <key alias="languages">Limbi</key>
-    <key alias="localPackage">Instalați pachetul local</key>
-    <key alias="macros">Macros</key>
-    <key alias="mediaTypes">Tipuri media</key>
-    <key alias="member">Membrii</key>
-    <key alias="memberGroups">Grupuri de membri</key>
-    <key alias="memberRoles">Rolurile membrilor</key>
-    <key alias="memberTypes">Tipuri de membri</key>
-    <key alias="documentTypes">Tipuri de documente</key>
-    <key alias="relationTypes">Tipuri de relații</key>
-    <key alias="packager">Pachete</key>
-    <key alias="packages">Pachete</key>
-    <key alias="partialViews">Vizualizări parțiale</key>
-    <key alias="partialViewMacros">Vizualizare parțială fișiere macro</key>
-    <key alias="repositories">Instalați din depozit</key>
-    <key alias="runway">Instalați pista</key>
-    <key alias="runwayModules">Module piste</key>
-    <key alias="scripting">Fișiere de scriptare</key>
-    <key alias="scripts">Scripturi</key>
-    <key alias="stylesheets">Stylesheets</key>
-    <key alias="templates">Șabloane</key>
-    <key alias="logViewer">Vizualizator de jurnal</key>
-    <key alias="users">Utilizatori</key>
-    <key alias="settingsGroup">Setări</key>
-    <key alias="templatingGroup">Modelare</key>
-    <key alias="thirdPartyGroup">Terț</key>
-  </area>
 </language>

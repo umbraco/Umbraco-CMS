@@ -38,7 +38,9 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TemplateQueryResultResponseModel>> Execute(TemplateQueryExecuteModel query)
+    public async Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
+        CancellationToken cancellationToken,
+        TemplateQueryExecuteModel query)
     {
         var queryExpression = new StringBuilder();
         IEnumerable<IPublishedContent> contents = BuildQuery(query, queryExpression);
@@ -84,10 +86,10 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     {
         IPublishedContent? rootContent;
 
-        if (model.RootContentId != null && model.RootContentId != Guid.Empty)
+        if (model.RootDocument?.Id is not null)
         {
-            rootContent = _publishedContentQuery.Content(model.RootContentId);
-            queryExpression.Append($"Umbraco.Content(Guid.Parse(\"{model.RootContentId}\"))");
+            rootContent = _publishedContentQuery.Content(model.RootDocument.Id);
+            queryExpression.Append($"Umbraco.Content(Guid.Parse(\"{model.RootDocument.Id}\"))");
         }
         else
         {
@@ -102,12 +104,12 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     {
         queryExpression.Append(_indent);
 
-        if (model.ContentTypeAlias.IsNullOrWhiteSpace() == false)
+        if (model.DocumentTypeAlias.IsNullOrWhiteSpace() == false)
         {
-            queryExpression.Append($".ChildrenOfType(\"{model.ContentTypeAlias}\")");
+            queryExpression.Append($".ChildrenOfType(\"{model.DocumentTypeAlias}\")");
             return rootContent == null
                 ? Enumerable.Empty<IPublishedContent>()
-                : rootContent.ChildrenOfType(_variationContextAccessor, model.ContentTypeAlias);
+                : rootContent.ChildrenOfType(_variationContextAccessor, model.DocumentTypeAlias);
         }
 
         queryExpression.Append(".Children()");

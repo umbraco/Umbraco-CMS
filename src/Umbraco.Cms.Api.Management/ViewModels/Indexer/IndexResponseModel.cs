@@ -7,7 +7,7 @@ public class IndexResponseModel
     [Required]
     public string Name { get; init; } = null!;
 
-    public HealthStatus HealthStatus { get; init; }
+    public HealthStatusResponseModel HealthStatus { get; set; } = new();
 
     [Required]
     public bool CanRebuild { get; init; }

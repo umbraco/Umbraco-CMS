@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Web.Common.FileProviders;
 
-public class WebRootFileProviderFactory : ILegacyPackageManifestFileProviderFactory, IGridEditorsConfigFileProviderFactory
+public class WebRootFileProviderFactory : IGridEditorsConfigFileProviderFactory
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
 

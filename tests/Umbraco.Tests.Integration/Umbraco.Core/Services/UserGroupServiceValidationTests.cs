@@ -185,7 +185,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
         var result = await UserGroupService.DeleteAsync(key);
 
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.IsSystemUserGroup, result.Result);
+        Assert.AreEqual(UserGroupOperationStatus.CanNotDeleteIsSystemUserGroup, result.Result);
     }
 
     // these keys are not defined as "const" in Constants.Security but as "static readonly", so we have to hardcode

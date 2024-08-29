@@ -254,6 +254,34 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         }
     }
 
+    [Test]
+    public void CanUseCustomContentPathProvider()
+    {
+        var rootKey = Guid.NewGuid();
+        var root = SetupInvariantPublishedContent("The Root", rootKey, published: false);
+
+        var childKey = Guid.NewGuid();
+        var child = SetupInvariantPublishedContent("The Child", childKey, root);
+
+        var apiContentPathProvider = new Mock<IApiContentPathProvider>();
+        apiContentPathProvider
+            .Setup(p => p.GetContentPath(It.IsAny<IPublishedContent>(), It.IsAny<string?>()))
+            .Returns((IPublishedContent content, string? culture) => $"my-custom-path-for-{content.UrlSegment}");
+
+        var builder = CreateApiContentRouteBuilder(true, apiContentPathProvider: apiContentPathProvider.Object);
+        var result = builder.Build(root);
+        Assert.NotNull(result);
+        Assert.AreEqual("/my-custom-path-for-the-root", result.Path);
+        Assert.AreEqual(rootKey, result.StartItem.Id);
+        Assert.AreEqual("the-root", result.StartItem.Path);
+
+        result = builder.Build(child);
+        Assert.NotNull(result);
+        Assert.AreEqual("/my-custom-path-for-the-child", result.Path);
+        Assert.AreEqual(rootKey, result.StartItem.Id);
+        Assert.AreEqual("the-root", result.StartItem.Path);
+    }
+
     private IPublishedContent SetupInvariantPublishedContent(string name, Guid key, IPublishedContent? parent = null, bool published = true)
     {
         var publishedContentType = CreatePublishedContentType();
@@ -310,7 +338,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         return publishedUrlProvider.Object;
     }
 
-    private ApiContentRouteBuilder CreateApiContentRouteBuilder(bool hideTopLevelNodeFromPath, bool addTrailingSlash = false, bool isPreview = false, IPublishedSnapshotAccessor? publishedSnapshotAccessor = null)
+    private IApiContentPathProvider SetupApiContentPathProvider(bool hideTopLevelNodeFromPath)
+        => new ApiContentPathProvider(SetupPublishedUrlProvider(hideTopLevelNodeFromPath));
+
+    private ApiContentRouteBuilder CreateApiContentRouteBuilder(bool hideTopLevelNodeFromPath, bool addTrailingSlash = false, bool isPreview = false, IPublishedSnapshotAccessor? publishedSnapshotAccessor = null, IApiContentPathProvider? apiContentPathProvider = null)
     {
         var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = addTrailingSlash };
         var requestHandlerSettingsMonitorMock = new Mock<IOptionsMonitor<RequestHandlerSettings>>();
@@ -320,9 +351,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         requestPreviewServiceMock.Setup(m => m.IsPreview()).Returns(isPreview);
 
         publishedSnapshotAccessor ??= CreatePublishedSnapshotAccessorForRoute("#");
+        apiContentPathProvider ??= SetupApiContentPathProvider(hideTopLevelNodeFromPath);
 
         return CreateContentRouteBuilder(
-            SetupPublishedUrlProvider(hideTopLevelNodeFromPath),
+            apiContentPathProvider,
             CreateGlobalSettings(hideTopLevelNodeFromPath),
             requestHandlerSettingsMonitor: requestHandlerSettingsMonitorMock.Object,
             requestPreviewService: requestPreviewServiceMock.Object,
@@ -335,12 +367,13 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         publishedUrlProviderMock
             .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns(publishedUrl);
+        var contentPathProvider = new ApiContentPathProvider(publishedUrlProviderMock.Object);
 
         var publishedSnapshotAccessor = CreatePublishedSnapshotAccessorForRoute(routeById);
         var content = SetupVariantPublishedContent("The Content", Guid.NewGuid());
 
         var builder = CreateContentRouteBuilder(
-            publishedUrlProviderMock.Object,
+            contentPathProvider,
             CreateGlobalSettings(),
             publishedSnapshotAccessor: publishedSnapshotAccessor);
 

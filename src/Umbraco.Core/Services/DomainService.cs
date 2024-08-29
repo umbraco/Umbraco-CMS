@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -178,12 +179,12 @@ public class DomainService : RepositoryService, IDomainService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IEnumerable<IDomain>, DomainOperationStatus>> UpdateDomainsAsync(Guid contentKey, DomainsUpdateModel updateModel)
+    public async Task<Attempt<DomainUpdateResult, DomainOperationStatus>> UpdateDomainsAsync(Guid contentKey, DomainsUpdateModel updateModel)
     {
         IContent? content = _contentService.GetById(contentKey);
         if (content == null)
         {
-            return Attempt.FailWithStatus(DomainOperationStatus.ContentNotFound, Enumerable.Empty<IDomain>());
+            return Attempt.FailWithStatus(DomainOperationStatus.ContentNotFound, new DomainUpdateResult());
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -194,28 +195,36 @@ public class DomainService : RepositoryService, IDomainService
         // validate language ISO codes
         if (HasInvalidIsoCode(updateModel, languageIdByIsoCode.Keys))
         {
-            return Attempt.FailWithStatus(DomainOperationStatus.LanguageNotFound, Enumerable.Empty<IDomain>());
+            return Attempt.FailWithStatus(DomainOperationStatus.LanguageNotFound, new DomainUpdateResult());
         }
 
         // ensure all domain names in the update model are lowercased
         foreach (DomainModel domainModel in updateModel.Domains)
         {
             domainModel.DomainName = domainModel.DomainName.ToLowerInvariant();
+
+            if(Uri.IsWellFormedUriString(domainModel.DomainName, UriKind.RelativeOrAbsolute) is false)
+            {
+                return Attempt.FailWithStatus(DomainOperationStatus.InvalidDomainName, new DomainUpdateResult());
+            }
         }
 
         // make sure we're not attempting to assign duplicate domains
         if (updateModel.Domains.GroupBy(domain => domain.DomainName).Any(group => group.Count() > 1))
         {
-            return Attempt.FailWithStatus(DomainOperationStatus.DuplicateDomainName, Enumerable.Empty<IDomain>());
+            return Attempt.FailWithStatus(DomainOperationStatus.DuplicateDomainName, new DomainUpdateResult());
         }
 
         // grab all current domain assignments
         IDomain[] allDomains = (await GetAllAsync(true)).ToArray();
 
         // validate the domain names in the update model
-        if (HasDomainNameConflicts(content.Id, updateModel, allDomains))
+        IDomain[] conflicts = GetDomainNameConflicts(content.Id, updateModel, allDomains);
+        if (conflicts.Any())
         {
-            return Attempt.FailWithStatus(DomainOperationStatus.DuplicateDomainName, Enumerable.Empty<IDomain>());
+            return Attempt.FailWithStatus(
+                DomainOperationStatus.ConflictingDomainName,
+                new DomainUpdateResult { ConflictingDomains = conflicts });
         }
 
         // find the domains currently assigned to the content item
@@ -234,7 +243,7 @@ public class DomainService : RepositoryService, IDomainService
             scope.Complete();
 
             // this is the only error scenario in DeleteAll
-            return Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, newAssignedDomains.AsEnumerable());
+            return Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, new DomainUpdateResult());
         }
 
         // update all domain assignments (also current ones, in case sort order or ISO code has changed)
@@ -242,8 +251,13 @@ public class DomainService : RepositoryService, IDomainService
         scope.Complete();
 
         return result
-            ? Attempt.SucceedWithStatus(DomainOperationStatus.Success, newAssignedDomains.AsEnumerable())
-            : Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, newAssignedDomains.AsEnumerable());
+            ? Attempt.SucceedWithStatus(
+                DomainOperationStatus.Success,
+                new DomainUpdateResult
+                {
+                    Domains = newAssignedDomains.AsEnumerable()
+                })
+            : Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, new DomainUpdateResult());
     }
 
     /// <summary>
@@ -257,16 +271,19 @@ public class DomainService : RepositoryService, IDomainService
             .Any();
 
     /// <summary>
-    /// Tests if any of the domain names in the update model are assigned to other content items
+    /// Returns any current domain assignments in conflict with the updateModel domain names
     /// </summary>
-    private bool HasDomainNameConflicts(int contentId, DomainsUpdateModel updateModel, IEnumerable<IDomain> allDomains)
+    private IDomain[] GetDomainNameConflicts(int contentId, DomainsUpdateModel updateModel, IEnumerable<IDomain> allDomains)
     {
-        var domainNamesAssignedToOtherContent = allDomains
+        IDomain[] domainsAssignedToOtherContent = allDomains
             .Where(domain => domain.IsWildcard == false && domain.RootContentId != contentId)
-            .Select(domain => domain.DomainName.ToLowerInvariant())
             .ToArray();
 
-        return updateModel.Domains.Any(domainModel => domainNamesAssignedToOtherContent.InvariantContains(domainModel.DomainName));
+        var updateModelDomainNames = updateModel.Domains.Select(domain => domain.DomainName).ToArray();
+
+        return domainsAssignedToOtherContent
+            .Where(domain => updateModelDomainNames.InvariantContains(domain.DomainName))
+            .ToArray();
     }
 
     /// <summary>

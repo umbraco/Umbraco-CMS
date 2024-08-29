@@ -1,6 +1,9 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -12,8 +15,24 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
 {
     private readonly ITemplateService _templateService;
+    private readonly IElementSwitchValidator _elementSwitchValidator;
     private readonly IContentTypeService _contentTypeService;
 
+    public ContentTypeEditingService(
+        IContentTypeService contentTypeService,
+        ITemplateService templateService,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        IShortStringHelper shortStringHelper,
+        IElementSwitchValidator elementSwitchValidator)
+        : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
+    {
+        _contentTypeService = contentTypeService;
+        _templateService = templateService;
+        _elementSwitchValidator = elementSwitchValidator;
+    }
+
+    [Obsolete("Use the constructor that is not marked obsolete, will be removed in v16")]
     public ContentTypeEditingService(
         IContentTypeService contentTypeService,
         ITemplateService templateService,
@@ -24,6 +43,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
+        _elementSwitchValidator = StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidator>();
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
@@ -40,27 +60,55 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         UpdateTemplates(contentType, model);
 
         // save content type
-        await SaveAsync(contentType, userKey);
+        Attempt<ContentTypeOperationStatus> creationAttempt = await _contentTypeService.CreateAsync(contentType, userKey);
+
+        if(creationAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(creationAttempt.Result, contentType);
+        }
 
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> UpdateAsync(IContentType contentType, ContentTypeUpdateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await ValidateAndMapForUpdateAsync(contentType, model);
-        if (result.Success is false)
+        // this needs to happen before the base call as that one is not a pure function
+        ContentTypeOperationStatus elementValidationStatus = await ValidateElementStatusForUpdateAsync(contentType, model);
+        if (elementValidationStatus is not ContentTypeOperationStatus.Success)
         {
-            return result;
+            return Attempt<IContentType?, ContentTypeOperationStatus>.Fail(elementValidationStatus);
         }
 
-        contentType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
+        Attempt<IContentType?, ContentTypeOperationStatus> baseValidationAttempt = await ValidateAndMapForUpdateAsync(contentType, model);
+        if (baseValidationAttempt.Success is false)
+        {
+            return baseValidationAttempt;
+        }
+
+        contentType = baseValidationAttempt.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
 
         UpdateHistoryCleanup(contentType, model);
         UpdateTemplates(contentType, model);
 
-        await SaveAsync(contentType, userKey);
+        Attempt<ContentTypeOperationStatus> attempt = await _contentTypeService.UpdateAsync(contentType, userKey);
 
-        return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
+        return attempt.Success
+            ? Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType)
+            : Attempt.FailWithStatus<IContentType?, ContentTypeOperationStatus>(attempt.Result, null);
+    }
+
+    public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
+        Guid? key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases,
+        bool isElement) =>
+        await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases, isElement);
+
+    protected override async Task<ContentTypeOperationStatus> AdditionalCreateValidationAsync(
+        ContentTypeEditingModelBase<ContentTypePropertyTypeModel, ContentTypePropertyContainerModel> model)
+    {
+        // validate if the parent documentType (if set) has the same element status as the documentType being created
+        return await ValidateCreateParentElementStatusAsync(model);
     }
 
     // update content type history clean-up
@@ -86,15 +134,47 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         contentType.SetDefaultTemplate(allowedTemplates.FirstOrDefault(t => t.Key == model.DefaultTemplateKey));
     }
 
-    private async Task SaveAsync(IContentType contentType, Guid userKey)
-        => await _contentTypeService.SaveAsync(contentType, userKey);
+    private async Task<ContentTypeOperationStatus> ValidateElementStatusForUpdateAsync(IContentTypeBase contentType, ContentTypeModelBase model)
+    {
+        // no change, ignore rest of validation
+        if (contentType.IsElement == model.IsElement)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
 
-    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)
-        => _contentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, isElement: isElement)
-            .Results
-            .Where(x => x.Allowed)
-            .Select(x => x.Composition.Key)
-            .ToArray();
+        // this method should only contain blocking validation, warnings are handled by WarnDocumentTypeElementSwitchNotificationHandler
+
+        // => check whether the element was used in a block structure prior to updating
+        if (model.IsElement is false)
+        {
+            return await _elementSwitchValidator.ElementToDocumentNotUsedInBlockStructuresAsync(contentType)
+                ? ContentTypeOperationStatus.Success
+                : ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration;
+        }
+
+        return await _elementSwitchValidator.DocumentToElementHasNoContentAsync(contentType)
+            ? ContentTypeOperationStatus.Success
+            : ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent;
+    }
+
+    /// <summary>
+    /// Should be called after it has been established that the composition list is in a valid state and the (composition) parent exists
+    /// </summary>
+    private async Task<ContentTypeOperationStatus> ValidateCreateParentElementStatusAsync(
+        ContentTypeEditingModelBase<ContentTypePropertyTypeModel, ContentTypePropertyContainerModel> model)
+    {
+        Guid? parentId = model.Compositions
+            .SingleOrDefault(composition => composition.CompositionType == CompositionType.Inheritance)?.Key;
+        if (parentId is null)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
+        IContentType? parent = await _contentTypeService.GetAsync(parentId.Value);
+        return parent!.IsElement == model.IsElement
+            ? ContentTypeOperationStatus.Success
+            : ContentTypeOperationStatus.InvalidElementFlagComparedToParent;
+    }
 
     protected override IContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new ContentType(shortStringHelper, parentId);

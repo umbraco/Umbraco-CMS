@@ -30,7 +30,7 @@ public class CreateDataTypeController : DataTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateDataTypeRequestModel createDataTypeRequestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateDataTypeRequestModel createDataTypeRequestModel)
     {
         var attempt = await _dataTypePresentationFactory.CreateAsync(createDataTypeRequestModel);
         if (!attempt.Success)
@@ -41,12 +41,7 @@ public class CreateDataTypeController : DataTypeControllerBase
         Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(attempt.Result, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)
+            ? CreatedAtId<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)
             : DataTypeOperationStatusResult(result.Status);
-
-
-
-
-
     }
 }

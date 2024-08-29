@@ -2,14 +2,23 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
 {
-    public RichTextBlockPropertyValueCreator(BlockEditorConverter blockEditorConverter)
+    private readonly IJsonSerializer _jsonSerializer;
+    private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
+
+    public RichTextBlockPropertyValueCreator(
+        BlockEditorConverter blockEditorConverter,
+        IJsonSerializer jsonSerializer,
+        RichTextBlockPropertyValueConstructorCache constructorCache)
         : base(blockEditorConverter)
     {
+        _jsonSerializer = jsonSerializer;
+        _constructorCache = constructorCache;
     }
 
     public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
@@ -23,13 +32,14 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
         return blockModel;
     }
 
-    protected override BlockEditorDataConverter<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorDataConverter() => new RichTextEditorBlockDataConverter();
+    protected override BlockEditorDataConverter<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorDataConverter() => new RichTextEditorBlockDataConverter(_jsonSerializer);
 
-    protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter);
+    protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter, _constructorCache);
 
     private class RichTextBlockItemActivator : BlockItemActivator<RichTextBlockItem>
     {
-        public RichTextBlockItemActivator(BlockEditorConverter blockConverter) : base(blockConverter)
+        public RichTextBlockItemActivator(BlockEditorConverter blockConverter, RichTextBlockPropertyValueConstructorCache constructorCache)
+            : base(blockConverter, constructorCache)
         {
         }
 

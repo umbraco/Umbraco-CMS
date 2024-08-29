@@ -2,4 +2,5 @@
 
 public class CreateTemplateRequestModel : TemplateModelBase
 {
+    public Guid? Id { get; set; }
 }

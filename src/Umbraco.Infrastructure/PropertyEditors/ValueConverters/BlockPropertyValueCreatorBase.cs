@@ -216,17 +216,19 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
     // Cache constructors locally (it's tied to the current IPublishedSnapshot and IPublishedModelFactory)
     protected abstract class BlockItemActivator<T>
+        where T : IBlockReference<IPublishedElement, IPublishedElement>
     {
         protected abstract Type GenericItemType { get; }
 
         private readonly BlockEditorConverter _blockConverter;
 
-        private readonly
-            Dictionary<(Guid, Guid?), Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T>>
-            _constructorCache = new();
+        private readonly BlockEditorPropertyValueConstructorCacheBase<T> _constructorCache;
 
-        public BlockItemActivator(BlockEditorConverter blockConverter)
-            => _blockConverter = blockConverter;
+        public BlockItemActivator(BlockEditorConverter blockConverter, BlockEditorPropertyValueConstructorCacheBase<T> constructorCache)
+        {
+            _blockConverter = blockConverter;
+            _constructorCache = constructorCache;
+        }
 
         public T CreateInstance(Guid contentTypeKey, Guid? settingsTypeKey, Udi contentUdi, IPublishedElement contentData, Udi? settingsUdi, IPublishedElement? settingsData)
         {
@@ -234,8 +236,8 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 (contentTypeKey, settingsTypeKey),
                 out Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T>? constructor))
             {
-                constructor = _constructorCache[(contentTypeKey, settingsTypeKey)] =
-                    EmitConstructor(contentTypeKey, settingsTypeKey);
+                constructor = EmitConstructor(contentTypeKey, settingsTypeKey);
+                _constructorCache.SetValue((contentTypeKey, settingsTypeKey), constructor);
             }
 
             return constructor(contentUdi, contentData, settingsUdi, settingsData);

@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Core.Mapping;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.Relation;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.ViewModels.Relation;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -19,22 +19,24 @@ public class RelationPresentationFactory : IRelationPresentationFactory
 
     public RelationResponseModel Create(IRelation relation)
     {
-        var child = _entityService.Get(relation.ChildId)!;
-        var parent = _entityService.Get(relation.ParentId)!;
+        IEntitySlim child = _entityService.Get(relation.ChildId)!;
+        IEntitySlim parent = _entityService.Get(relation.ParentId)!;
 
-        RelationResponseModel relationResponseModel = new RelationResponseModel()
+        var relationResponseModel = new RelationResponseModel(
+            new ReferenceByIdModel(relation.RelationType.Key),
+            new RelationReferenceModel(parent.Key),
+            new RelationReferenceModel(child.Key))
         {
-            ChildId = child.Key,
+            Id = relation.Key,
             Comment = relation.Comment,
             CreateDate = relation.CreateDate,
-            ParentId = parent.Key,
         };
         Tuple<IUmbracoEntity, IUmbracoEntity>? entities = _relationService.GetEntitiesFromRelation(relation);
 
         if (entities is not null)
         {
-            relationResponseModel.ParentName = entities.Item1.Name;
-            relationResponseModel.ChildName = entities.Item2.Name;
+            relationResponseModel.Parent.Name = entities.Item1.Name;
+            relationResponseModel.Child.Name = entities.Item2.Name;
         }
 
         return relationResponseModel;

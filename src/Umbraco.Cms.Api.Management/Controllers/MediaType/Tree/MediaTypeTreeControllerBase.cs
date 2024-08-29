@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Controllers.Tree;
+using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Controllers.Tree;
-using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MediaType}")]
 [ApiExplorerSettings(GroupName = "Media Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMediaTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTreeItemResponseModel>
 {
     private readonly IMediaTypeService _mediaTypeService;
@@ -39,6 +39,7 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
             if (mediaTypes.TryGetValue(entity.Id, out IMediaType? mediaType))
             {
                 responseModel.Icon = mediaType.Icon ?? responseModel.Icon;
+                responseModel.IsDeletable = mediaType.IsSystemMediaType() is false;
             }
 
             return responseModel;

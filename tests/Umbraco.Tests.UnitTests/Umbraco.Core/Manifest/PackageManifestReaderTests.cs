@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -16,7 +17,7 @@ public class PackageManifestReaderTests
 {
     private IPackageManifestReader _reader;
     private Mock<IDirectoryContents> _rootDirectoryContentsMock;
-    private Mock<ILogger<AppPluginsFileProviderPackageManifestReader>> _loggerMock;
+    private Mock<ILogger<AppPluginsPackageManifestReader>> _loggerMock;
     private Mock<IFileProvider> _fileProviderMock;
 
     [SetUp]
@@ -30,8 +31,8 @@ public class PackageManifestReaderTests
         var fileProviderFactoryMock = new Mock<IPackageManifestFileProviderFactory>();
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
-        _loggerMock = new Mock<ILogger<AppPluginsFileProviderPackageManifestReader>>();
-        _reader = new AppPluginsFileProviderPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
+        _loggerMock = new Mock<ILogger<AppPluginsPackageManifestReader>>();
+        _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
     }
 
     [Test]
@@ -47,8 +48,61 @@ public class PackageManifestReaderTests
         var first = result.First();
         Assert.AreEqual("My Package", first.Name);
         Assert.AreEqual("1.2.3", first.Version);
-        Assert.AreEqual(2, first.Extensions.Count());
-        Assert.IsTrue(first.Extensions.All(e => e is JsonElement));
+        Assert.AreEqual(2, first.Extensions.Length);
+
+        Assert.NotNull(first.Importmap);
+        var importmap = first.Importmap;
+        Assert.AreEqual(1, importmap.Imports.Count());
+        Assert.AreEqual("./module/shapes/square.js", importmap.Imports["square"]);
+
+        Assert.NotNull(importmap.Scopes);
+        Assert.AreEqual(1, importmap.Scopes.Count());
+        var scope = importmap.Scopes.First();
+        Assert.AreEqual("/modules/customshapes", scope.Key);
+        Assert.NotNull(scope.Value);
+        var firstScope = scope.Value.First();
+        Assert.NotNull(firstScope);
+        Assert.AreEqual("square", firstScope.Key);
+        Assert.AreEqual("https://example.com/modules/shapes/square.js", firstScope.Value);
+    }
+
+    [Test]
+    public async Task Can_Deserialize_Extensions()
+    {
+        const string content = @"{
+    ""name"": ""My Package"",
+    ""version"": ""1.2.3"",
+    ""allowTelemetry"": true,
+    ""extensions"": [{
+            ""type"": ""tree"",
+            ""meta"": {
+                ""label"": ""My Tree"",
+                ""someArray"": [1, 2, 3]
+            }
+        }, {
+            ""type"": ""headerApp""
+        }
+    ]
+    }";
+        _rootDirectoryContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
+
+        var result = await _reader.ReadPackageManifestsAsync();
+        Assert.AreEqual(1, result.Count());
+
+        var first = result.First();
+
+        // Ensure that the extensions are deserialized as JsonElement
+        Assert.IsTrue(first.Extensions.All(e => e is JsonObject));
+
+        // Test the deserialization of the first extension to make sure we don't break the JSON parsing
+        JsonObject firstExtension = (JsonObject)first.Extensions.First();
+         Assert.AreEqual("tree", firstExtension["type"].GetValue<string>());
+         var meta = firstExtension["meta"];
+         Assert.AreEqual("My Tree", meta["label"].GetValue<string>());
+         var someArray = meta["someArray"];
+         Assert.AreEqual(1, someArray[0].GetValue<int>());
     }
 
     [Test]
@@ -64,21 +118,6 @@ public class PackageManifestReaderTests
         Assert.AreEqual(2, result.Count());
         Assert.AreEqual("Package One", result.First().Name);
         Assert.AreEqual("Package Two", result.Last().Name);
-    }
-
-    [Test]
-    public async Task Can_Read_PackageManifests_Recursively()
-    {
-        var childFolder = CreateDirectoryMock("/my-parent-folder/my-child-folder", CreatePackageManifestFile(DefaultPackageManifestContent("Nested Package")));
-        var parentFolder = CreateDirectoryMock("/my-parent-folder", childFolder);
-
-        _rootDirectoryContentsMock
-            .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { parentFolder }.GetEnumerator());
-
-        var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("Nested Package", result.First().Name);
     }
 
     [Test]
@@ -131,9 +170,9 @@ public class PackageManifestReaderTests
     }
 
     [Test]
-    public async Task Cannot_Read_PackageManifest_Without_Name()
+    public void Cannot_Read_PackageManifest_Without_Name()
     {
-        var content = @"{
+        const string content = @"{
     ""version"": ""1.2.3"",
     ""allowTelemetry"": true,
     ""extensions"": [{
@@ -152,9 +191,9 @@ public class PackageManifestReaderTests
     }
 
     [Test]
-    public async Task Cannot_Read_PackageManifest_Without_Extensions()
+    public void Cannot_Read_PackageManifest_Without_Extensions()
     {
-        var content = @"{
+        const string content = @"{
     ""name"": ""Something"",
     ""version"": ""1.2.3"",
     ""allowTelemetry"": true
@@ -167,9 +206,31 @@ public class PackageManifestReaderTests
         EnsureLogErrorWasCalled();
     }
 
+    [Test]
+    public void Cannot_Read_PackageManifest_Without_Importmap_Imports()
+    {
+        const string content = @"{
+    ""name"": ""Something"",
+    ""extensions"": [],
+    ""importmap"": {
+        ""scopes"": {
+            ""/modules/customshapes"": {
+                ""square"": ""https://example.com/modules/shapes/square.js""
+            }
+        }
+    }
+}";
+        _rootDirectoryContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
+
+        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
+        EnsureLogErrorWasCalled();
+    }
+
     [TestCase("This is not JSON")]
     [TestCase(@"{""name"": ""invalid-json"", ""version"": ")]
-    public async Task Cannot_Read_Invalid_PackageManifest(string content)
+    public void Cannot_Read_Invalid_PackageManifest(string content)
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
@@ -239,6 +300,16 @@ public class PackageManifestReaderTests
         }, {
             ""type"": ""headerApp""
         }
-    ]
+    ],
+    ""importmap"": {
+        ""imports"": {
+            ""square"": ""./module/shapes/square.js""
+        },
+        ""scopes"": {
+            ""/modules/customshapes"": {
+                ""square"": ""https://example.com/modules/shapes/square.js""
+            }
+        }
+    }
 }".Replace("##NAME##", name);
 }

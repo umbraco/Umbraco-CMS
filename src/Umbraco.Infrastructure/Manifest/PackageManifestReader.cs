@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Routing;
@@ -10,17 +9,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Manifest;
 
-internal sealed class AppPluginsFileProviderPackageManifestReader : IPackageManifestReader
+internal class PackageManifestReader : IPackageManifestReader
 {
+    private readonly string _appPluginsPath;
     private readonly IPackageManifestFileProviderFactory _packageManifestFileProviderFactory;
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly ILogger<AppPluginsFileProviderPackageManifestReader> _logger;
+    private readonly ILogger<PackageManifestReader> _logger;
 
-    public AppPluginsFileProviderPackageManifestReader(
+    public PackageManifestReader(
+        string appPluginsPath,
         IPackageManifestFileProviderFactory packageManifestFileProviderFactory,
         IJsonSerializer jsonSerializer,
-        ILogger<AppPluginsFileProviderPackageManifestReader> logger)
+        ILogger<PackageManifestReader> logger)
     {
+        _appPluginsPath = appPluginsPath;
         _packageManifestFileProviderFactory = packageManifestFileProviderFactory;
         _jsonSerializer = jsonSerializer;
         _logger = logger;
@@ -34,23 +36,26 @@ internal sealed class AppPluginsFileProviderPackageManifestReader : IPackageMani
             throw new ArgumentNullException(nameof(fileProvider));
         }
 
-        IFileInfo[] files = GetAllPackageManifestFiles(fileProvider, Constants.SystemDirectories.AppPlugins).ToArray();
+        IFileInfo[] files = GetAllPackageManifestFiles(fileProvider, _appPluginsPath).ToArray();
         return await ParsePackageManifestFiles(files);
     }
 
     private static IEnumerable<IFileInfo> GetAllPackageManifestFiles(IFileProvider fileProvider, string path)
     {
         const string extensionFileName = "umbraco-package.json";
+
         foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(path))
         {
             if (fileInfo.IsDirectory)
             {
+                // find all extension package configuration files one level deep
                 var virtualPath = WebPath.Combine(path, fileInfo.Name);
-
-                // find all extension package configuration files recursively
-                foreach (IFileInfo nested in GetAllPackageManifestFiles(fileProvider, virtualPath))
+                IDirectoryContents subDirectoryContents = fileProvider.GetDirectoryContents(virtualPath);
+                IFileInfo? subManifest = subDirectoryContents
+                    .FirstOrDefault(x => !x.IsDirectory && x.Name.InvariantEquals(extensionFileName));
+                if (subManifest != null)
                 {
-                    yield return nested;
+                    yield return subManifest;
                 }
             }
             else if (fileInfo.Name.InvariantEquals(extensionFileName))

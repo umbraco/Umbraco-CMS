@@ -2,12 +2,10 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Imaging - ImageSharp</Title>
     <Description>Adds imaging support using ImageSharp/ImageSharp.Web to Umbraco CMS.</Description>
-    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" />
-    <PackageReference Include="SixLabors.ImageSharp.Web"  />
+    <PackageReference Include="SixLabors.ImageSharp.Web" />
   </ItemGroup>
 
   <ItemGroup>

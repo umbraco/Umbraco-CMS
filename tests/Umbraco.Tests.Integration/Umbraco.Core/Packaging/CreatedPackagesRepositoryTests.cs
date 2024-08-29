@@ -45,8 +45,6 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private IFileService FileService => GetRequiredService<IFileService>();
 
-    private IMacroService MacroService => GetRequiredService<IMacroService>();
-
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
     private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
@@ -68,7 +66,6 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         ContentTypeService,
         DataTypeService,
         FileService,
-        MacroService,
         LocalizationService,
         HostingEnvironment,
         EntityXmlSerializer,
@@ -158,7 +155,6 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
             Assert.AreEqual(0, def.DataTypes.Count());
             Assert.AreEqual(0, def.DictionaryItems.Count());
             Assert.AreEqual(0, def.DocumentTypes.Count());
-            Assert.AreEqual(0, def.Macros.Count());
             Assert.AreEqual(0, def.MediaTypes.Count());
             Assert.AreEqual(0, def.MediaUdis.Count());
             Assert.AreEqual(0, def.PartialViews.Count());

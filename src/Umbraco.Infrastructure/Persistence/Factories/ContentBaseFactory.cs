@@ -45,14 +45,17 @@ internal class ContentBaseFactory
             content.Published = dto.Published;
             content.Edited = dto.Edited;
 
-            // TODO: shall we get published infos or not?
-            // if (dto.Published)
             if (publishedVersionDto != null)
             {
+                // We need this to get the proper versionId to match to unpublished values.
+                // This is only needed if the content has been published before.
                 content.PublishedVersionId = publishedVersionDto.Id;
-                content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
-                content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+                if (dto.Published)
+                {
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
+                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+                }
             }
 
             // templates = ignored, managed by the repository

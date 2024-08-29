@@ -30,34 +30,37 @@ public class ImportDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Import(ImportDictionaryRequestModel importDictionaryRequestModel)
+    public async Task<IActionResult> Import(
+        CancellationToken cancellationToken,
+        ImportDictionaryRequestModel importDictionaryRequestModel)
     {
         Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
             .ImportDictionaryItemFromUdtFileAsync(
-                importDictionaryRequestModel.TemporaryFileId,
-                importDictionaryRequestModel.ParentId,
+                importDictionaryRequestModel.TemporaryFile.Id,
+                importDictionaryRequestModel.Parent?.Id,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
-        return result.Status switch
-        {
-            DictionaryImportOperationStatus.Success => CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
-            DictionaryImportOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+        return result.Success
+            ? CreatedAtId<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            : OperationStatusResult(result.Status, problemDetailsBuilder => result.Status switch
+            {
+                DictionaryImportOperationStatus.ParentNotFound => NotFound(problemDetailsBuilder
                     .WithTitle("The parent dictionary item could not be found.")
                     .Build()),
-            DictionaryImportOperationStatus.TemporaryFileNotFound => NotFound(new ProblemDetailsBuilder()
+                DictionaryImportOperationStatus.TemporaryFileNotFound => NotFound(problemDetailsBuilder
                     .WithTitle("The temporary file with specified id could not be found.")
                     .Build()),
-            DictionaryImportOperationStatus.InvalidFileType => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid file type")
-                .WithDetail("The dictionary import only supports UDT files.")
-                .Build()),
-            DictionaryImportOperationStatus.InvalidFileContent => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid file content")
-                .WithDetail("The uploaded file could not be read as a valid UDT file.")
-                .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
-                .WithTitle("Unknown dictionary import operation status.")
-                .Build()),
-        };
+                DictionaryImportOperationStatus.InvalidFileType => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid file type")
+                    .WithDetail("The dictionary import only supports UDT files.")
+                    .Build()),
+                DictionaryImportOperationStatus.InvalidFileContent => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid file content")
+                    .WithDetail("The uploaded file could not be read as a valid UDT file.")
+                    .Build()),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                    .WithTitle("Unknown dictionary import operation status.")
+                    .Build()),
+            });
     }
 }

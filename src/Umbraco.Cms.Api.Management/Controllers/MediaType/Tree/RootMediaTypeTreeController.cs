@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
@@ -18,7 +18,11 @@ public class RootMediaTypeTreeController : MediaTypeTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<MediaTypeTreeItemResponseModel>>> Root(int skip = 0, int take = 100, bool foldersOnly = false)
+    public async Task<ActionResult<PagedViewModel<MediaTypeTreeItemResponseModel>>> Root(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100,
+        bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);
         return await GetRoot(skip, take);

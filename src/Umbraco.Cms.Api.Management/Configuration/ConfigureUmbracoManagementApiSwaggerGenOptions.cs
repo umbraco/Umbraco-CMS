@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
@@ -32,7 +33,11 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
         swaggerGenOptions.UseOneOfForPolymorphism();
-        swaggerGenOptions.UseAllOfForInheritance();
+
+        // Ensure all types that implements the IOpenApiDiscriminator have a $type property in the OpenApi schema with the default value (The class name) that is expected by the server
+        swaggerGenOptions.SelectDiscriminatorNameUsing(type => _umbracoJsonTypeInfoResolver.GetTypeDiscriminatorValue(type) is not null ? "$type" : null);
+        swaggerGenOptions.SelectDiscriminatorValueUsing(_umbracoJsonTypeInfoResolver.GetTypeDiscriminatorValue);
+
 
         swaggerGenOptions.AddSecurityDefinition(
             ManagementApiConfiguration.ApiSecurityName,
@@ -55,6 +60,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
         // Sets Security requirement on backoffice apis
         swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
+        swaggerGenOptions.OperationFilter<NotificationHeaderFilter>();
+        swaggerGenOptions.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
     }
-
 }

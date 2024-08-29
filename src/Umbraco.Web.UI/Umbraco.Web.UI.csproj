@@ -3,32 +3,28 @@
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--  TODO: [SA1119] Correct unnecessary parenthesis and remove this override -->
+    <WarningsNotAsErrors>SA1119</WarningsNotAsErrors>
+  </PropertyGroup>
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
-    <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
- </ItemGroup>
+    <!-- Add design/build time support for EF Core migrations -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+  </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\AuthorizeUpgrade.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Default.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Preview.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoInstall\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoLogin\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoWebsite\Maintenance.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoWebsite\NoNodes.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoWebsite\NotFound.cshtml" />
+    <!-- Ensure the AppLocalIcu setting is the same as the referenced ICU package version and changes are also done to the template project! -->
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" VersionOverride="72.1.0.3" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -41,6 +37,12 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="umbraco\UmbracoInstall\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="umbraco\UmbracoLogin\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Default.cshtml" />
+  </ItemGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
     <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />

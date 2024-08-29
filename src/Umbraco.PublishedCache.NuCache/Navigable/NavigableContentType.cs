@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Xml;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Xml.XPath;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 

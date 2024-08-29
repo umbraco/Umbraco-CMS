@@ -165,7 +165,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForExpiration(DateTime date);
@@ -175,7 +175,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForRelease(DateTime date);
@@ -441,7 +441,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
     ///     </para>
     /// </remarks>
-    PublishResult Unpublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
+    PublishResult Unpublish(IContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.
@@ -484,7 +484,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Assigns a permission to a document.
     /// </summary>
     /// <remarks>Adds the permission to existing permissions.</remarks>
-    void SetPermission(IContent entity, char permission, IEnumerable<int> groupIds);
+    void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds);
 
     #endregion
 
@@ -521,4 +521,6 @@ public interface IContentService : IContentServiceBase<IContent>
     IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     #endregion
+
+    Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
 }

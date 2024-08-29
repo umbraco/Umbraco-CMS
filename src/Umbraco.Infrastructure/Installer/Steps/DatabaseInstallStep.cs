@@ -7,7 +7,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
-public class DatabaseInstallStep : IInstallStep, IUpgradeStep
+public class DatabaseInstallStep : StepBase, IInstallStep, IUpgradeStep
 {
     private readonly IRuntimeState _runtime;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -18,11 +18,11 @@ public class DatabaseInstallStep : IInstallStep, IUpgradeStep
         _databaseBuilder = databaseBuilder;
     }
 
-    public Task ExecuteAsync(InstallData _) => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => Execute();
 
-    public Task ExecuteAsync() => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync() => Execute();
 
-    private Task Execute()
+    private Task<Attempt<InstallationResult>> Execute()
     {
 
         if (_runtime.Reason == RuntimeLevelReason.InstallMissingDatabase)
@@ -34,10 +34,10 @@ public class DatabaseInstallStep : IInstallStep, IUpgradeStep
 
         if (result?.Success == false)
         {
-            throw new InstallException("The database failed to install. ERROR: " + result.Message);
+            return Task.FromResult(FailWithMessage("The database failed to install. ERROR: " + result.Message));
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(Success());
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData _) => ShouldExecute();

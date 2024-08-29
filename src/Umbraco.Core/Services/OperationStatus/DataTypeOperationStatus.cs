@@ -11,5 +11,6 @@ public enum DataTypeOperationStatus
     NotFound,
     ParentNotFound,
     ParentNotContainer,
-    PropertyEditorNotFound
+    PropertyEditorNotFound,
+    NonDeletable
 }

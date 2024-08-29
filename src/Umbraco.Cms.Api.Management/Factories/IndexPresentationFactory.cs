@@ -26,7 +26,10 @@ public class IndexPresentationFactory : IIndexPresentationFactory
             return new IndexResponseModel
             {
                 Name = index.Name,
-                HealthStatus = HealthStatus.Rebuilding,
+                HealthStatus = new HealthStatusResponseModel
+                {
+                    Status = HealthStatus.Rebuilding,
+                },
                 SearcherName = index.Searcher.Name,
                 DocumentCount = 0,
                 FieldCount = 0,
@@ -35,7 +38,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
 
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(index);
 
-        Attempt<string?> isHealthy = indexDiag.IsHealthy();
+        Attempt<string?> isHealthyAttempt = indexDiag.IsHealthy();
 
         var properties = new Dictionary<string, object?>();
 
@@ -55,7 +58,11 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         var indexerModel = new IndexResponseModel
         {
             Name = index.Name,
-            HealthStatus = isHealthy.Success ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+            HealthStatus = new HealthStatusResponseModel
+            {
+                Status = isHealthyAttempt.Success ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                Message = isHealthyAttempt.Result,
+            },
             CanRebuild = _indexRebuilder.CanRebuild(index.Name),
             SearcherName = index.Searcher.Name,
             DocumentCount = indexDiag.GetDocumentCount(),

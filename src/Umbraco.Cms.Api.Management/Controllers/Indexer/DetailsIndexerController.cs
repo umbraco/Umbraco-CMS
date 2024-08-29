@@ -34,7 +34,7 @@ public class DetailsIndexerController : IndexerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(IndexResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IndexResponseModel?>> Details(string indexName)
+    public async Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {

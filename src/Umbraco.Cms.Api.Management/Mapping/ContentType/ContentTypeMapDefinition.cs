@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.ContentType;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
-using ContentTypeSort = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeSort;
 
 namespace Umbraco.Cms.Api.Management.Mapping.ContentType;
 
@@ -25,13 +25,13 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
                 {
                     Id = propertyType.Key,
                     SortOrder = propertyType.SortOrder,
-                    ContainerId = groupKeysByPropertyKeys.ContainsKey(propertyType.Key)
-                        ? groupKeysByPropertyKeys[propertyType.Key]
+                    Container = groupKeysByPropertyKeys.ContainsKey(propertyType.Key)
+                        ? new ReferenceByIdModel(groupKeysByPropertyKeys[propertyType.Key])
                         : null,
                     Name = propertyType.Name,
                     Alias = propertyType.Alias,
                     Description = propertyType.Description,
-                    DataTypeId = propertyType.DataTypeKey,
+                    DataType = new ReferenceByIdModel(propertyType.DataTypeKey),
                     VariesByCulture = propertyType.VariesByCulture(),
                     VariesBySegment = propertyType.VariesBySegment(),
                     Validation = new PropertyTypeValidation
@@ -56,12 +56,12 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
             .PropertyGroups
             .ToDictionary(propertyGroup => propertyGroup.Alias, propertyGroup => propertyGroup.Key);
 
-        Guid? ParentGroupKey(PropertyGroup group)
+        ReferenceByIdModel? ParentGroup(PropertyGroup group)
         {
             var path = group.Alias.Split(Constants.CharArrays.ForwardSlash);
             return path.Length == 1 || groupKeysByGroupAliases.TryGetValue(path.First(), out Guid parentGroupKey) == false
                 ? null
-                : parentGroupKey;
+                : new ReferenceByIdModel(parentGroupKey);
         }
 
         return source
@@ -70,7 +70,7 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
                 new TPropertyTypeContainerModel
                 {
                     Id = propertyGroup.Key,
-                    ParentId = ParentGroupKey(propertyGroup),
+                    Parent = ParentGroup(propertyGroup),
                     Type = propertyGroup.Type.ToString(),
                     SortOrder = propertyGroup.SortOrder,
                     Name = propertyGroup.Name ?? "-",
@@ -78,16 +78,29 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
             .ToArray();
     }
 
-    protected IEnumerable<ContentTypeSort> MapAllowedContentTypes(TContentType source)
-        => source.AllowedContentTypes?.Select(contentTypeSort => new ContentTypeSort { Id = contentTypeSort.Key, SortOrder = contentTypeSort.SortOrder }).ToArray()
-           ?? Array.Empty<ContentTypeSort>();
+    protected static CompositionType CalculateCompositionType(int contentTypeParentId, IContentTypeComposition contentTypeComposition)
+        => contentTypeComposition.Id == contentTypeParentId
+            ? CompositionType.Inheritance
+            : CompositionType.Composition;
 
-    protected IEnumerable<ContentTypeComposition> MapCompositions(TContentType source, IEnumerable<IContentTypeComposition> contentTypeComposition)
-        => contentTypeComposition.Select(contentType => new ContentTypeComposition
+    protected static IEnumerable<T> MapNestedCompositions<T>(IEnumerable<IContentTypeComposition> directCompositions, int contentTypeParentId, Func<ReferenceByIdModel, CompositionType, T> contentTypeCompositionFactory)
+    {
+        var allCompositions = new List<T>();
+
+        foreach (var composition in directCompositions)
         {
-            Id = contentType.Key,
-            CompositionType = contentType.Id == source.ParentId
-                ? ContentTypeCompositionType.Inheritance
-                : ContentTypeCompositionType.Composition
-        }).ToArray();
+            CompositionType compositionType = CalculateCompositionType(contentTypeParentId, composition);
+            T contentTypeComposition = contentTypeCompositionFactory(new ReferenceByIdModel(composition.Key), compositionType);
+            allCompositions.Add(contentTypeComposition);
+
+            // When we have composition inheritance, we have to find all ancestor compositions recursively
+            if (compositionType == CompositionType.Inheritance && composition.ContentTypeComposition.Any())
+            {
+                var nestedCompositions = MapNestedCompositions(composition.ContentTypeComposition, composition.ParentId, contentTypeCompositionFactory);
+                allCompositions.AddRange(nestedCompositions);
+            }
+        }
+
+        return allCompositions;
+    }
 }

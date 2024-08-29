@@ -1,6 +1,6 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -63,6 +63,19 @@ public interface IUserGroupService
     Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys);
 
     /// <summary>
+    /// Performs filtering for user groups
+    /// </summary>
+    /// <param name="userKey">The key of the performing (current) user.</param>
+    /// <param name="filter">The filter to apply.</param>
+    /// <param name="skip">The amount of user groups to skip.</param>
+    /// <param name="take">The amount of user groups to take.</param>
+    /// <returns>All matching user groups as an enumerable list of <see cref="IUserGroup"/>.</returns>
+    /// <remarks>
+    /// If the performing user is not an administrator, this method only returns groups that the performing user is a member of.
+    /// </remarks>
+    Task<Attempt<PagedModel<IUserGroup>, UserGroupOperationStatus>> FilterAsync(Guid userKey, string? filter, int skip, int take);
+
+    /// <summary>
     /// Persists a new user group.
     /// </summary>
     /// <param name="userGroup">The user group to create.</param>
@@ -85,7 +98,8 @@ public interface IUserGroupService
     /// <param name="userGroupKeys">The keys of the user groups to delete.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> userGroupKeys);
-    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid>(){userGroupKey});
+
+    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid> { userGroupKey });
 
     /// <summary>
     /// Updates the users to have the groups specified.
@@ -93,5 +107,8 @@ public interface IUserGroupService
     /// <param name="userGroupKeys">The user groups the users should be part of.</param>
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task UpdateUserGroupsOnUsers(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+
+    Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey);
+    Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey);
 }

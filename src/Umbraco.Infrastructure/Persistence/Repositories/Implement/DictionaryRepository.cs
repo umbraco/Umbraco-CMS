@@ -65,7 +65,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
     }
 
-    public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
+    public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId, string? filter = null)
     {
         IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
 
@@ -76,12 +76,15 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             return guids.InGroupsOf(Constants.Sql.MaxParameterCount)
                 .Select(group =>
                 {
-                    Sql<ISqlContext> sqlClause = GetBaseQuery(false)
+                    Sql<ISqlContext> sql = GetBaseQuery(false)
                         .Where<DictionaryDto>(x => x.Parent != null)
                         .WhereIn<DictionaryDto>(x => x.Parent, group);
 
-                    var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query<IDictionaryItem>());
-                    Sql<ISqlContext> sql = translator.Translate();
+                    if (filter.IsNullOrWhiteSpace() is false)
+                    {
+                        sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+                    }
+
                     sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 
                     return Database
@@ -93,14 +96,25 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         if (!parentId.HasValue)
         {
             Sql<ISqlContext> sql = GetBaseQuery(false)
-                .Where<DictionaryDto>(x => x.PrimaryKey > 0)
-                .OrderBy<DictionaryDto>(x => x.UniqueId);
+                .Where<DictionaryDto>(x => x.PrimaryKey > 0);
+
+            if (filter.IsNullOrWhiteSpace() is false)
+            {
+                sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+            }
+
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
-                .Select(dto => ConvertFromDto(dto, languageIsoCodeById));
+                .Select(dto => ConvertFromDto(dto, languageIsoCodeById))
+                .OrderBy(DictionaryItemOrdering);
         }
 
-        return getItemsFromParents(new[] { parentId.Value }).SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
+        return getItemsFromParents(new[] { parentId.Value })
+            .SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items)
+            .OrderBy(DictionaryItemOrdering);
+
+        // we're loading all descendants into memory, sometimes recursively... so we have to order them in memory too
+        string DictionaryItemOrdering(IDictionaryItem item) => item.ItemKey;
     }
 
     protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy()

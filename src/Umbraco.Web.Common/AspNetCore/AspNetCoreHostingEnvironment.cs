@@ -25,16 +25,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     private string? _applicationId;
     private string? _localTempPath;
 
-    [Obsolete("Please use an alternative constructor.")]
-    public AspNetCoreHostingEnvironment(
-        IServiceProvider serviceProvider,
-        IOptionsMonitor<HostingSettings> hostingSettings,
-        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
-        IWebHostEnvironment webHostEnvironment)
-        : this(hostingSettings, webRoutingSettings, webHostEnvironment, serviceProvider.GetService<IApplicationDiscriminator>()!)
-    {
-    }
-
     public AspNetCoreHostingEnvironment(
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
@@ -70,10 +60,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
             ApplicationMainUrl = new Uri(_webRoutingSettings.CurrentValue.UmbracoApplicationUrl);
         }
     }
-
-    // Scheduled for removal in v12
-    [Obsolete("This will never have a value")]
-    public Version? IISVersion { get; }
 
     /// <inheritdoc />
     public bool IsHosted { get; } = true;

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -90,7 +91,7 @@ public class MemberUserStoreTests
         _mockMemberService
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(mockMember);
-        _mockMemberService.Setup(x => x.Save(mockMember));
+        _mockMemberService.Setup(x => x.Save(mockMember, Constants.Security.SuperUserId));
 
         // act
         var actual = await sut.CreateAsync(null);
@@ -122,8 +123,9 @@ public class MemberUserStoreTests
         _mockMemberService
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(mockMember);
-        _mockMemberService.Setup(x => x.Save(mockMember));
-
+        _mockMemberService
+            .Setup(x => x.Save(mockMember, Constants.Security.SuperUserId))
+            .Returns(Attempt.Succeed<OperationResult?>(null));
         // act
         var identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
 
@@ -132,7 +134,7 @@ public class MemberUserStoreTests
         Assert.IsTrue(!identityResult.Errors.Any());
         _mockMemberService.Verify(x =>
             x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
-        _mockMemberService.Verify(x => x.Save(mockMember));
+        _mockMemberService.Verify(x => x.Save(mockMember, Constants.Security.SuperUserId));
     }
 
     [Test]
@@ -176,7 +178,7 @@ public class MemberUserStoreTests
             m.RawPasswordValue == "xyz" &&
             m.SecurityStamp == "xyz");
 
-        _mockMemberService.Setup(x => x.Save(mockMember));
+        _mockMemberService.Setup(x => x.Save(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.Setup(x => x.GetById(123)).Returns(mockMember);
 
         // act
@@ -199,7 +201,7 @@ public class MemberUserStoreTests
         Assert.AreEqual(fakeUser.SecurityStamp, mockMember.SecurityStamp);
         Assert.AreNotEqual(DateTime.MinValue, mockMember.EmailConfirmedDate.Value);
 
-        _mockMemberService.Verify(x => x.Save(mockMember));
+        _mockMemberService.Verify(x => x.Save(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.Verify(x => x.GetById(123));
         _mockMemberService.Verify(x => x.ReplaceRoles(new[] { 123 }, new[] { "role1", "role2" }));
     }
@@ -242,7 +244,7 @@ public class MemberUserStoreTests
 
         _mockMemberService.Setup(x => x.GetById(mockMember.Id)).Returns(mockMember);
         _mockMemberService.Setup(x => x.GetByKey(mockMember.Key)).Returns(mockMember);
-        _mockMemberService.Setup(x => x.Delete(mockMember));
+        _mockMemberService.Setup(x => x.Delete(mockMember, Constants.Security.SuperUserId));
 
         // act
         var identityResult = await sut.DeleteAsync(fakeUser, fakeCancellationToken);
@@ -251,7 +253,7 @@ public class MemberUserStoreTests
         Assert.IsTrue(identityResult.Succeeded);
         Assert.IsTrue(!identityResult.Errors.Any());
         _mockMemberService.Verify(x => x.GetByKey(mockMember.Key));
-        _mockMemberService.Verify(x => x.Delete(mockMember));
+        _mockMemberService.Verify(x => x.Delete(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.VerifyNoOtherCalls();
     }
 }

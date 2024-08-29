@@ -26,14 +26,16 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromForm] CreateTemporaryFileRequestModel model)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        [FromForm] CreateTemporaryFileRequestModel model)
     {
         CreateTemporaryFileModel createModel = _umbracoMapper.Map<CreateTemporaryFileRequestModel, CreateTemporaryFileModel>(model)!;
 
         Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result = await _temporaryFileService.CreateAsync(createModel);
 
         return result.Success
-            ? CreatedAtAction<ByKeyTemporaryFileController>(controller => nameof(controller.ByKey), new { id = result.Result!.Key })
+            ? CreatedAtId<ByKeyTemporaryFileController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : TemporaryFileStatusResult(result.Status);
     }
 }

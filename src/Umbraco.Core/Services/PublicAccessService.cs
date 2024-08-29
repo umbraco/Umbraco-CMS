@@ -375,7 +375,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
 
         if (entry is null)
         {
-            return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, null));
+            return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null));
         }
 
         return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
@@ -390,6 +390,11 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             if (attempt.Success is false)
             {
                 return Attempt.Fail(attempt.Status);
+            }
+
+            if (attempt.Result is null)
+            {
+                return Attempt.Fail(PublicAccessOperationStatus.EntryNotFound);
             }
 
             EventMessages evtMsgs = EventMessagesFactory.Get();

@@ -15,6 +15,7 @@ using Umbraco.Cms.Api.Delivery.Rendering;
 using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Api.Delivery.Security;
 using Umbraco.Cms.Api.Delivery.Services;
+using Umbraco.Cms.Api.Delivery.Services.QueryBuilders;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -55,6 +56,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, ApiContentQueryService>();
         builder.Services.AddSingleton<IApiContentQueryProvider, ApiContentQueryProvider>();
+        builder.Services.AddSingleton<IApiContentQueryFactory, ApiContentQueryFactory>();
         builder.Services.AddSingleton<IApiMediaQueryService, ApiMediaQueryService>();
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();

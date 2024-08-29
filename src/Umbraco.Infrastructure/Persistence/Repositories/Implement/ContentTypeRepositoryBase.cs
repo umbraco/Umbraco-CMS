@@ -1229,8 +1229,11 @@ AND umbracoNode.id <> @id",
     ///     If this is not done, then in some cases the "edited" value for a particular culture for a document will remain true
     ///     when it should be false
     ///     if the property was changed to invariant. In order to do this we need to recalculate this value based on the values
-    ///     stored for each
-    ///     property, culture and current/published version.
+    ///     stored for each property, culture and current/published version.
+    ///
+    ///     Some of the sql statements in this function have a tendency to take a lot of parameters (nodeIds)
+    ///     as the WhereIn Npoco method translates all the nodeIds being passed in as parameters when using the SqlClient provider.
+    ///     this results in to many parameters (>2100) error => We need to batch the calls
     /// </remarks>
     private void RenormalizeDocumentEditedFlags(
         IReadOnlyCollection<int> propertyTypeIds,
@@ -1386,16 +1389,19 @@ AND umbracoNode.id <> @id",
         // Now bulk update the table DocumentCultureVariationDto, once for edited = true, another for edited = false
         foreach (IGrouping<bool, DocumentCultureVariationDto> editValue in toUpdate.GroupBy(x => x.Edited))
         {
-            Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
-                .WhereIn<DocumentCultureVariationDto>(x => x.Id, editValue.Select(x => x.Id)));
+            // update in batches to account for maximum parameter count
+            foreach (IEnumerable<DocumentCultureVariationDto> batchedValues in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
+                    .WhereIn<DocumentCultureVariationDto>(x => x.Id, batchedValues.Select(x => x.Id)));
+            }
         }
 
         // Now bulk update the umbracoDocument table
-        // we need to do this in batches as the WhereIn Npoco method translates to all the nodeIds being passed in as parameters when using the SqlClient provider
-        // this results in to many parameters (>2100) being passed to the client when there are a lot of documents being normalized
         foreach (IGrouping<bool, KeyValuePair<int, bool>> groupByValue in editedDocument.GroupBy(x => x.Value))
         {
-            foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(2000))
+            // update in batches to account for maximum parameter count
+            foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, groupByValue.Key))
                     .WhereIn<DocumentDto>(x => x.NodeId, batch.Select(x => x.Key)));
@@ -1504,8 +1510,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         var sql = new Sql(
             $@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
-WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer",
-            new { ids, isContainer = true });
+WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.listView IS NULL", new { ids});
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
@@ -1528,8 +1533,8 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         var list = new List<string>
         {
             "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
             "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",
             "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",

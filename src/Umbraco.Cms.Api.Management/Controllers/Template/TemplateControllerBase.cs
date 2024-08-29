@@ -9,35 +9,44 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Template)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessTemplates)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
 public class TemplateControllerBase : ManagementApiControllerBase
 {
     protected IActionResult TemplateOperationStatusResult(TemplateOperationStatus status) =>
-        status switch
+        OperationStatusResult(status, problemDetailsBuilder => status switch
         {
             TemplateOperationStatus.TemplateNotFound => TemplateNotFound(),
-            TemplateOperationStatus.InvalidAlias => BadRequest(new ProblemDetailsBuilder()
+            TemplateOperationStatus.InvalidAlias => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid alias")
                 .WithDetail("The template alias is not valid.")
                 .Build()),
-            TemplateOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+            TemplateOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the template operation.")
                 .Build()),
-            TemplateOperationStatus.DuplicateAlias => BadRequest(new ProblemDetailsBuilder()
+            TemplateOperationStatus.DuplicateAlias => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate alias")
                 .WithDetail("A template with that alias already exists.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            TemplateOperationStatus.CircularMasterTemplateReference => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid master template")
+                .WithDetail("The master template referenced in the template leads to a circular reference.")
+                .Build()),
+            TemplateOperationStatus.MasterTemplateNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Master template not found")
+                .WithDetail("The master template referenced in the template was not found.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")
                 .Build()),
-        };
+        });
 
-    protected IActionResult TemplateNotFound() => NotFound(new ProblemDetailsBuilder()
+    protected IActionResult TemplateNotFound()
+        => OperationStatusResult(TemplateOperationStatus.TemplateNotFound, TemplateNotFound);
+
+    protected IActionResult TemplateNotFound(ProblemDetailsBuilder problemDetailsBuilder) => NotFound(problemDetailsBuilder
         .WithTitle("The template could not be found")
         .Build());
-
 }

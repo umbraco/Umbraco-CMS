@@ -3,8 +3,14 @@
     <Title>Umbraco CMS - Persistence - Entity Framework Core</Title>
     <Description>Adds support for Entity Framework Core to Umbraco CMS.</Description>
   </PropertyGroup>
-
-  <ItemGroup>
+  <PropertyGroup>
+    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998] remove async or make method synchronous,
+          and remove this override -->
+    <WarningsNotAsErrors>IDE0270,CS0108,CS1998</WarningsNotAsErrors>
+  </PropertyGroup>
+  <ItemGroup> 
+    <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
+    <PackageReference Include="Azure.Identity" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />

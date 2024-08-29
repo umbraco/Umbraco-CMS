@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.Mapping;
@@ -9,7 +10,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<HealthCheckActionRequestModel, HealthCheckAction>((_, _) => new HealthCheckAction(), Map);
-        mapper.Define<HealthCheckAction, HealthCheckActionRequestModel>((_, _) => new HealthCheckActionRequestModel { ValueRequired = false }, Map);
+        mapper.Define<HealthCheckAction, HealthCheckActionRequestModel>((_, _) => new HealthCheckActionRequestModel { ValueRequired = false, HealthCheck = new() }, Map);
         mapper.Define<HealthCheckStatus, HealthCheckResultResponseModel>((_, _) => new HealthCheckResultResponseModel { Message = string.Empty }, Map);
         mapper.Define<Core.HealthChecks.HealthCheck, HealthCheckViewModel>((_, _) => new HealthCheckViewModel { Name = string.Empty }, Map);
         mapper.Define<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupPresentationModel>(
@@ -22,27 +23,27 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         mapper.Define<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupResponseModel>((_, _) => new HealthCheckGroupResponseModel { Name = string.Empty }, Map);
     }
 
-    // Umbraco.Code.MapAll -ActionParameters
+    // Umbraco.Code.MapAll
     private static void Map(HealthCheckActionRequestModel source, HealthCheckAction target, MapperContext context)
     {
         target.Alias = source.Alias;
-        target.HealthCheckId = source.HealthCheckId;
+        target.HealthCheckId = source.HealthCheck.Id;
         target.Name = source.Name;
         target.Description = source.Description;
         target.ValueRequired = source.ValueRequired;
         target.ProvidedValueValidation = source.ProvidedValueValidation;
         target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
         target.ProvidedValue = source.ProvidedValue;
+        target.ActionParameters = source.ActionParameters;
     }
 
     // Umbraco.Code.MapAll
     private static void Map(HealthCheckAction source, HealthCheckActionRequestModel target, MapperContext context)
     {
-        if (source.HealthCheckId is not null)
-        {
-            target.HealthCheckId = (Guid)source.HealthCheckId;
-        }
+        Guid healthCheckId = source.HealthCheckId
+                             ?? throw new ArgumentException("Cannot map a health check action without a health check", nameof(source));
 
+        target.HealthCheck = new ReferenceByIdModel(healthCheckId);
         target.Alias = source.Alias;
         target.Name = source.Name;
         target.Description = source.Description;
@@ -50,6 +51,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         target.ProvidedValue = source.ProvidedValue;
         target.ProvidedValueValidation = source.ProvidedValueValidation;
         target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
+        target.ActionParameters = source.ActionParameters;
     }
 
     // Umbraco.Code.MapAll

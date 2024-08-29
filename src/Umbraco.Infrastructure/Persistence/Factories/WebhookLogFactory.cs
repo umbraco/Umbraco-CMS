@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+using System.Text.RegularExpressions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -21,6 +22,7 @@ internal static class WebhookLogFactory
             RequestHeaders = log.RequestHeaders,
             ResponseHeaders = log.ResponseHeaders,
             WebhookKey = log.WebhookKey,
+            ExceptionOccured = log.ExceptionOccured,
         };
 
     public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
@@ -32,11 +34,13 @@ internal static class WebhookLogFactory
             ResponseBody = dto.ResponseBody,
             RetryCount = dto.RetryCount,
             StatusCode = dto.StatusCode,
+            IsSuccessStatusCode = Regex.IsMatch(dto.StatusCode, "^.*\\(2(\\d{2})\\)$"),
             Key = dto.Key,
             Id = dto.Id,
             Url = dto.Url,
             RequestHeaders = dto.RequestHeaders,
             ResponseHeaders = dto.ResponseHeaders,
             WebhookKey = dto.WebhookKey,
+            ExceptionOccured = dto.ExceptionOccured,
         };
 }

@@ -48,6 +48,8 @@ public interface IEntityRepository : IRepository
 
     bool Exists(Guid key);
 
+    bool Exists(IEnumerable<Guid> keys);
+
     /// <summary>
     /// Asserts if an entity with the given object type exists.
     /// </summary>
@@ -82,5 +84,19 @@ public interface IEntityRepository : IRepository
         int pageSize,
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter,
+        Ordering? ordering) =>
+        GetPagedResultsByQuery(query, new HashSet<Guid>(){objectType}, pageIndex, pageSize, out totalRecords, filter, ordering);
+
+    IEnumerable<IEntitySlim> GetPagedResultsByQuery(
+        IQuery<IUmbracoEntity> query,
+        ISet<Guid> objectTypes,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter,
         Ordering? ordering);
+
+    int CountByQuery(IQuery<IUmbracoEntity> query, Guid objectType, IQuery<IUmbracoEntity>? filter) =>
+        CountByQuery(query, new HashSet<Guid>() { objectType }, filter);
+    int CountByQuery(IQuery<IUmbracoEntity> query, IEnumerable<Guid> objectTypes, IQuery<IUmbracoEntity>? filter);
 }

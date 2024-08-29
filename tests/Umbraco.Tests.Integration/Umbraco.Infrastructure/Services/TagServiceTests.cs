@@ -1,8 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -12,7 +11,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -83,7 +81,7 @@ public class TagServiceTests : UmbracoIntegrationTest
         // get it back
         content1 = ContentService.GetById(content1.Id);
         var tagsValue = content1.GetValue("tags").ToString();
-        var tagsValues = JsonConvert.DeserializeObject<string[]>(tagsValue);
+        var tagsValues = JsonSerializer.Deserialize<string[]>(tagsValue);
         Assert.AreEqual(3, tagsValues.Length);
         Assert.Contains("pig", tagsValues);
         Assert.Contains("goat", tagsValues);

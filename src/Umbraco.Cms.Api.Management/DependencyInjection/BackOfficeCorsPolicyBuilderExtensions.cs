@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Models.Configuration;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
@@ -12,10 +12,9 @@ internal static class BackOfficeCorsPolicyBuilderExtensions
 {
     internal static IUmbracoBuilder AddCorsPolicy(this IUmbracoBuilder builder)
     {
-        // FIXME: Get the correct settings once NewBackOfficeSettings is merged with relevant existing settings from Core
         Uri? backOfficeHost = builder.Config
-            .GetSection($"{Constants.Configuration.ConfigPrefix}NewBackOffice")
-            .Get<NewBackOfficeSettings>()?.BackOfficeHost;
+            .GetSection(Constants.Configuration.ConfigSecurity)
+            .Get<SecuritySettings>()?.BackOfficeHost;
 
         if (backOfficeHost is null)
         {
@@ -29,11 +28,13 @@ internal static class BackOfficeCorsPolicyBuilderExtensions
 
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(name: policyName,
+            options.AddPolicy(
+                name: policyName,
                 policy =>
                 {
                     policy
                         .WithOrigins(customOrigin)
+                        .WithExposedHeaders(Constants.Headers.Location, Constants.Headers.GeneratedResource, Constants.Headers.Notifications)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -42,9 +43,9 @@ internal static class BackOfficeCorsPolicyBuilderExtensions
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
         {
-            options.AddFilter(new UmbracoPipelineFilter("UmbracoManagementApiCustomHostCorsPolicy")
+            options.PipelineFilters.Insert(0, new UmbracoPipelineFilter("UmbracoManagementApiCustomHostCorsPolicy")
             {
-                PostRouting = app => app.UseCors(policyName)
+                PrePipeline = app => app.UseCors(policyName),
             });
         });
 

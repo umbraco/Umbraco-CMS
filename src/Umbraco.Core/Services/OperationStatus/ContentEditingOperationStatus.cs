@@ -16,5 +16,9 @@ public enum ContentEditingOperationStatus
     InTrash,
     NotInTrash,
     SortingInvalid,
-    Unknown
+    PropertyValidationError,
+    InvalidCulture,
+    DuplicateKey,
+    DuplicateName,
+    Unknown,
 }

@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -40,7 +42,9 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 true,
-                factory.GetRequiredService<ILocalizationService>()));
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>()));
         builder.Services.AddUnique<IContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),
@@ -49,14 +53,19 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 false,
-                factory.GetRequiredService<ILocalizationService>()));
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>()));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
-        builder.Services.AddSingleton<ExamineIndexRebuilder>();
+
+        builder.Services.AddSingleton<ExamineIndexRebuilder>();  //TODO remove in Umbraco 15. Only the interface should be in the service provider
+
+        builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, ContentIndexingNotificationHandler>();

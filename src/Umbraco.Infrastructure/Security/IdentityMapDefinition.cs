@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -9,7 +8,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
@@ -18,6 +16,7 @@ public class IdentityMapDefinition : IMapDefinition
 {
     private readonly AppCaches _appCaches;
     private readonly IEntityService _entityService;
+    private readonly SecuritySettings _securitySettings;
     private readonly GlobalSettings _globalSettings;
     private readonly ILocalizedTextService _textService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
@@ -26,29 +25,16 @@ public class IdentityMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         IEntityService entityService,
         IOptions<GlobalSettings> globalSettings,
+        IOptions<SecuritySettings> securitySettings,
         AppCaches appCaches,
         ITwoFactorLoginService twoFactorLoginService)
     {
         _textService = textService;
         _entityService = entityService;
         _globalSettings = globalSettings.Value;
+        _securitySettings = securitySettings.Value;
         _appCaches = appCaches;
         _twoFactorLoginService = twoFactorLoginService;
-    }
-
-    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V12")]
-    public IdentityMapDefinition(
-        ILocalizedTextService textService,
-        IEntityService entityService,
-        IOptions<GlobalSettings> globalSettings,
-        AppCaches appCaches)
-        : this(
-              textService,
-              entityService,
-              globalSettings,
-              appCaches,
-              StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
@@ -108,7 +94,8 @@ public class IdentityMapDefinition : IMapDefinition
             source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
-        target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+        DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.UserDefaultLockoutTimeInMinutes);
+        target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
     }
 
     // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
@@ -125,7 +112,8 @@ public class IdentityMapDefinition : IMapDefinition
         target.PasswordConfig = source.PasswordConfiguration;
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
-        target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+        DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.MemberDefaultLockoutTimeInMinutes);
+        target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
         target.Comments = source.Comments;
         target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue
             ? null

@@ -12,7 +12,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessLanguages)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
 public class DeleteLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;
@@ -29,7 +29,7 @@ public class DeleteLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(string isoCode)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, string isoCode)
     {
         Attempt<ILanguage?, LanguageOperationStatus> result = await _languageService.DeleteAsync(isoCode, CurrentUserKey(_backOfficeSecurityAccessor));
 

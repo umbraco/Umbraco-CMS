@@ -11,6 +11,7 @@ public enum UserOperationStatus
     UserNameIsNotEmail,
     EmailCannotBeChanged,
     NoUserGroup,
+    AdminUserGroupMustNotBeEmpty,
     DuplicateUserName,
     InvalidEmail,
     DuplicateEmail,
@@ -24,7 +25,7 @@ public enum UserOperationStatus
     CannotDisableSelf,
     CannotDeleteSelf,
     CannotDisableInvitedUser,
-    OldPasswordRequired,
+    SelfOldPasswordRequired,
     InvalidAvatar,
     InvalidIsoCode,
     InvalidInviteToken,
@@ -33,7 +34,10 @@ public enum UserOperationStatus
     MediaStartNodeNotFound,
     ContentNodeNotFound,
     MediaNodeNotFound,
+    NodeNotFound,
     UnknownFailure,
     CannotPasswordReset,
-    NotInInviteState
+    NotInInviteState,
+    SelfPasswordResetNotAllowed,
+    DuplicateId,
 }

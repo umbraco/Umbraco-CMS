@@ -13,6 +13,16 @@ If the answer is yes, please read on. Otherwise, make sure to head on over [to t
 
 ↖️ You can jump to any section by using the "table of contents" button ( ![Table of contents icon](img/tableofcontentsicon.svg) ) above.
 
+## Getting Started:
+To run umbraco, we first need to initialize the client git submodule:
+* Execute `git submodule update --init` to get the files into Umbraco.Web.UI.Client project
+* If you are going to work on the Backoffice, you can either go to the Umbraco.Web.UI.Client folder and check out a new branch or set it up in your IDE, which will allow you to commit to each repository simultaneously:
+  * **Rider**: Preferences -> Version Control -> Directory Mappings -> Click the '+' sign
+* If you get a white page delete Umbraco.Cms.StaticAssets\wwwroot\umbraco folder and run `npm ci && npm run build:for:cms` inside Umbraco.Web.UI.Client folder to clear out any leftover files from older versions.
+
+### Latest version
+* If you want to get the latest changes from the client repository, run `git submodule update` again which will pull the latest main branch.
+
 
 ## Debugging source locally
 
@@ -40,17 +50,21 @@ You can also run the tasks manually on the command line:
 
 ```
 cd src\Umbraco.Web.UI.Client
-npm install
+npm i
 npm run dev
 ```
 
-or
+If you just want to build the UI Client to `Umbraco.Web.UI` then instead of running `dev`, you can do: `npm run build`.
+
+The login screen is a different frontend build, for that one you can run it as follows:
 
 ```
-cd src\Umbraco.Web.UI.Client
-npm install
-gulp dev
+cd src\Umbraco.Web.UI.Login
+npm i
+npm run dev
 ```
+
+If you just want to build the Login screen to `Umbraco.Web.UI` then instead of running `dev`, you can do: `npm run build`.
 
 **The initial Gulp build might take a long time - don't worry, this will be faster on subsequent runs.**
 

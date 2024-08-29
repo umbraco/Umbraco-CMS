@@ -1,11 +1,10 @@
 using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -13,6 +12,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Extensions;
 using File = System.IO.File;
 
@@ -28,22 +28,46 @@ public class PackagingService : IPackagingService
     private readonly ICreatedPackagesRepository _createdPackages;
     private readonly IEventAggregator _eventAggregator;
     private readonly IKeyValueService _keyValueService;
-    private readonly ILegacyManifestParser _legacyManifestParser;
     private readonly IPackageInstallation _packageInstallation;
     private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+    private readonly IPackageManifestReader _packageManifestReader;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IUserService _userService;
+
+    [Obsolete("Use the constructor with IPackageManifestReader instead.")]
+    public PackagingService(
+        IAuditService auditService,
+        ICreatedPackagesRepository createdPackages,
+        IPackageInstallation packageInstallation,
+        IEventAggregator eventAggregator,
+        IKeyValueService keyValueService,
+        ICoreScopeProvider coreScopeProvider,
+        PackageMigrationPlanCollection packageMigrationPlans,
+        IHostEnvironment hostEnvironment,
+        IUserService userService)
+        : this(
+            auditService,
+            createdPackages,
+            packageInstallation,
+            eventAggregator,
+            keyValueService,
+            coreScopeProvider,
+            packageMigrationPlans,
+            StaticServiceProvider.Instance.GetRequiredService<IPackageManifestReader>(),
+            hostEnvironment,
+            userService)
+    { }
 
     public PackagingService(
         IAuditService auditService,
         ICreatedPackagesRepository createdPackages,
         IPackageInstallation packageInstallation,
         IEventAggregator eventAggregator,
-        ILegacyManifestParser legacyManifestParser,
         IKeyValueService keyValueService,
         ICoreScopeProvider coreScopeProvider,
         PackageMigrationPlanCollection packageMigrationPlans,
+        IPackageManifestReader packageManifestReader,
         IHostEnvironment hostEnvironment,
         IUserService userService)
     {
@@ -51,9 +75,9 @@ public class PackagingService : IPackagingService
         _createdPackages = createdPackages;
         _packageInstallation = packageInstallation;
         _eventAggregator = eventAggregator;
-        _legacyManifestParser = legacyManifestParser;
         _keyValueService = keyValueService;
         _packageMigrationPlans = packageMigrationPlans;
+        _packageManifestReader = packageManifestReader;
         _coreScopeProvider = coreScopeProvider;
         _hostEnvironment = hostEnvironment;
         _userService = userService;
@@ -63,9 +87,7 @@ public class PackagingService : IPackagingService
 
     public CompiledPackage GetCompiledPackageInfo(XDocument? xml) => _packageInstallation.ReadPackage(xml);
 
-    public InstallationSummary InstallCompiledPackageData(
-        XDocument? packageXml,
-        int userId = Constants.Security.SuperUserId)
+    public InstallationSummary InstallCompiledPackageData(XDocument? packageXml, int userId = Constants.Security.SuperUserId)
     {
         CompiledPackage compiledPackage = GetCompiledPackageInfo(packageXml);
 
@@ -91,9 +113,7 @@ public class PackagingService : IPackagingService
         return summary;
     }
 
-    public InstallationSummary InstallCompiledPackageData(
-        FileInfo packageXmlFile,
-        int userId = Constants.Security.SuperUserId)
+    public InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId)
     {
         XDocument xml;
         using (StreamReader streamReader = File.OpenText(packageXmlFile.FullName))
@@ -111,10 +131,14 @@ public class PackagingService : IPackagingService
     [Obsolete("Use DeleteCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
     public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        PackageDefinition? package = GetCreatedPackageById(id);
-        Guid key = package?.PackageId ?? Guid.Empty;
-        Guid currentUserKey = _userService.GetUserById(id)?.Key ?? Constants.Security.SuperUserKey;
+        Guid key, currentUserKey;
+
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            PackageDefinition? package = GetCreatedPackageById(id);
+            key = package?.PackageId ?? Guid.Empty;
+            currentUserKey = _userService.GetUserById(id)?.Key ?? Constants.Security.SuperUserKey;
+        }
 
         DeleteCreatedPackageAsync(key, currentUserKey).GetAwaiter().GetResult();
     }
@@ -129,7 +153,7 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.NotFound, null);
         }
 
-        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.Delete, currentUserId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
         _createdPackages.Delete(package.Id);
 
@@ -141,6 +165,7 @@ public class PackagingService : IPackagingService
     public IEnumerable<PackageDefinition?> GetAllCreatedPackages()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+
         return _createdPackages.GetAll();
     }
 
@@ -148,6 +173,7 @@ public class PackagingService : IPackagingService
     public PackageDefinition? GetCreatedPackageById(int id)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+
         return _createdPackages.GetById(id);
     }
 
@@ -157,7 +183,8 @@ public class PackagingService : IPackagingService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         PackageDefinition[] packages = _createdPackages.GetAll().WhereNotNull().ToArray();
         var pagedModel = new PagedModel<PackageDefinition>(packages.Length, packages.Skip(skip).Take(take));
-        return await Task.FromResult(pagedModel);
+
+        return pagedModel;
     }
 
     /// <inheritdoc/>
@@ -175,6 +202,7 @@ public class PackagingService : IPackagingService
 
         var success = _createdPackages.SavePackage(definition);
         scope.Complete();
+
         return success;
     }
 
@@ -192,11 +220,12 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.DuplicateItemName, package);
         }
 
-        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
-        scope.Complete();
-        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
 
+        scope.Complete();
+
+        return Attempt.SucceedWithStatus(PackageOperationStatus.Success, package);
     }
 
     /// <inheritdoc/>
@@ -208,22 +237,29 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
         }
 
-        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+
         scope.Complete();
-        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
+
+        return Attempt.SucceedWithStatus(PackageOperationStatus.Success, package);
     }
 
     public string ExportCreatedPackage(PackageDefinition definition)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+
         return _createdPackages.ExportPackage(definition);
     }
 
     public InstalledPackage? GetInstalledPackageByName(string packageName)
         => GetAllInstalledPackages().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
 
+    [Obsolete("Use GetAllInstalledPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
+        => GetAllInstalledPackagesAsync().GetAwaiter().GetResult();
+
+    public async Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -280,57 +316,56 @@ public class PackagingService : IPackagingService
         }
 
         // Collect and merge the packages from the manifests
-        foreach (LegacyPackageManifest package in _legacyManifestParser.GetManifests())
+        foreach (PackageManifest packageManifest in await _packageManifestReader.ReadPackageManifestsAsync().ConfigureAwait(false))
         {
-            if (package.PackageId is null && package.PackageName is null)
+            if (packageManifest.Id is null && string.IsNullOrEmpty(packageManifest.Name))
             {
                 continue;
             }
 
             InstalledPackage installedPackage;
-            if (package.PackageId is not null && installedPackages.FirstOrDefault(x => x.PackageId == package.PackageId) is InstalledPackage installedPackageById)
+            if (packageManifest.Id is not null && installedPackages.FirstOrDefault(x => x.PackageId == packageManifest.Id) is InstalledPackage installedPackageById)
             {
                 installedPackage = installedPackageById;
 
                 // Always use package name from manifest
-                installedPackage.PackageName = package.PackageName;
+                installedPackage.PackageName = packageManifest.Name;
             }
-            else if (installedPackages.FirstOrDefault(x => x.PackageName == package.PackageName) is InstalledPackage installedPackageByName)
+            else if (installedPackages.FirstOrDefault(x => x.PackageName == packageManifest.Name) is InstalledPackage installedPackageByName)
             {
                 installedPackage = installedPackageByName;
 
                 // Ensure package ID is set
-                installedPackage.PackageId ??= package.PackageId;
+                installedPackage.PackageId ??= packageManifest.Id;
             }
             else
             {
                 installedPackage = new InstalledPackage
                 {
-                    PackageId = package.PackageId,
-                    PackageName = package.PackageName,
+                    PackageId = packageManifest.Id,
+                    PackageName = packageManifest.Name,
                 };
 
                 installedPackages.Add(installedPackage);
             }
 
             // Set additional values
-            installedPackage.AllowPackageTelemetry = package.AllowPackageTelemetry;
-            installedPackage.PackageView = package.PackageView;
+            installedPackage.AllowPackageTelemetry = packageManifest.AllowTelemetry;
 
-            if (!string.IsNullOrEmpty(package.Version))
+            if (!string.IsNullOrEmpty(packageManifest.Version))
             {
-                installedPackage.Version = package.Version;
+                installedPackage.Version = packageManifest.Version;
             }
         }
 
-        // Return all packages with an ID or name in the package.manifest or package migrations
+        // Return all packages with an ID or name in the package manifest or package migrations
         return installedPackages;
     }
 
     #endregion
 
     /// <inheritdoc/>
-    public async Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
+    public Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
         IReadOnlyDictionary<string, string?>? keyValues =
             _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
@@ -357,7 +392,7 @@ public class PackagingService : IPackagingService
                 return package;
             }).ToArray();
 
-        return await Task.FromResult(new PagedModel<InstalledPackage>
+        return Task.FromResult(new PagedModel<InstalledPackage>
         {
             Total = installedPackages.Count(),
             Items = installedPackages.Skip(skip).Take(take),

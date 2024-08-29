@@ -13,9 +13,17 @@ public enum ContentPublishingOperationStatus
     AwaitingRelease,
     CultureAwaitingRelease,
     InTrash,
+    InvalidCulture,
+    CannotPublishInvariantWhenVariant,
+    CannotPublishVariantWhenNotVariant,
+    CultureMissing,
     PathNotPublished,
     ConcurrencyViolation,
     UnsavedChanges,
+    UnpublishTimeNeedsToBeAfterPublishTime,
+    UpublishTimeNeedsToBeInFuture,
+    PublishTimeNeedsToBeInFuture,
+    FailedBranch,
     Failed, // unspecified failure (can happen on unpublish at the time of writing)
-    Unknown
+    Unknown,
 }

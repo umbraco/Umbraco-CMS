@@ -1,12 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -23,7 +23,6 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 using Language = Umbraco.Cms.Core.Models.Language;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -48,6 +47,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+    private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -1250,8 +1250,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService,
-            TextService, ValueEditorCache);
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>());
         var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties,
             CultureImpact.Invariant);
         Assert.IsFalse(isValid);
@@ -1935,7 +1934,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(childPage);
 
         // assign explicit permissions to the child
-        ContentService.SetPermission(childPage, 'A', new[] { userGroup.Id });
+        ContentService.SetPermission(childPage, "A", new[] { userGroup.Id });
 
         // Ok, now copy, what should happen is the childPage will retain it's own permissions
         var parentPage2 = ContentBuilder.CreateSimpleContent(contentType);
@@ -1971,7 +1970,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
-        ContentService.SetPermission(parentPage, 'A', new[] { userGroup.Id });
+        ContentService.SetPermission(parentPage, "A", new[] { userGroup.Id });
 
         var childPage1 = ContentBuilder.CreateSimpleContent(contentType, "child1", parentPage);
         ContentService.Save(childPage1);
@@ -2003,7 +2002,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // create a new parent with a new permission structure
         var parentPage2 = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage2);
-        ContentService.SetPermission(parentPage2, 'B', new[] { userGroup.Id });
+        ContentService.SetPermission(parentPage2, "B", new[] { userGroup.Id });
 
         // Now copy, what should happen is the child pages will now have permissions inherited from the new parent
         var copy = ContentService.Copy(childPage1, parentPage2.Id, false, true);
@@ -2076,7 +2075,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 
-        ContentService.SetPermission(content1, 'A', new[] { userGroup.Id });
+        ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
             content1.Key,
             new DomainsUpdateModel
@@ -2708,9 +2707,6 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(sut.GetValue<Udi>("contentPicker"),
             Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document,
                 new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
-        Assert.That(sut.GetValue<Udi>("mediaPicker"),
-            Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media,
-                new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
         Assert.That(sut.GetValue<Udi>("memberPicker"),
             Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member,
                 new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
@@ -2878,7 +2874,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
-        Assert.AreEqual("foo", content.GetValue("title", published: true));
+        Assert.IsNull(content.GetValue("title", published: true));
         Assert.AreEqual("foo", content.GetValue("title"));
 
         var vpk = ((Content)content).VersionId;
@@ -3411,9 +3407,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
         Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-        Assert.AreEqual("name-fr2", content2.PublishName); // not null, see note above
+        Assert.IsNull(content2.PublishName);
         Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode)); // not null, see note above
+        Assert.IsNull(content2.GetPublishName(langUk.IsoCode));
 
         Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
         Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
@@ -3427,68 +3423,16 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
             (langDe, false));
 
-        // fr is not published anymore - uk still is, see note above
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
+        // Everything should be unpublished
+        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false), (langDe, false));
+        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false), (langDe, false));
 
         // and so, fr has to be edited - uk still is
         AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
         AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
-
-        // Act
-
-        // that HAS to be SavePublishing, because SaveAndPublish would just republish everything!
-        // TODO: This is using an internal API - the test can't pass without this but we want to keep the test here
-        // will need stephane to have a look at this test at some stage since there is a lot of logic here that we
-        // want to keep on testing but don't need the public API to do these more complicated things.
-        ContentService.CommitDocumentChanges(content);
-
-        // content has been re-published,
-        // everything is back to what it was before being unpublished
-        content2 = ContentService.GetById(content.Id);
-
-        Assert.IsTrue(content2.Published);
-
-        Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
-        Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
-
-        Assert.AreEqual("name-fr2", content2.PublishName);
-        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
-
-        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
-        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
-        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
-
-        // no change
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
-            (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
-            (langDe, false));
-
-        // no change, back to published
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
-
-        // no change, back to published
-        AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
-
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
+        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
         // Act
         ContentService.Publish(content, new[] { langUk.IsoCode });
@@ -3600,7 +3544,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // verify saved state
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
-        Assert.AreEqual(langEn.IsoCode.ToLowerInvariant(), content.PublishedCultures.First());
+        Assert.AreEqual(langEn.IsoCode, content.PublishedCultures.First());
     }
 
     private void AssertPerCulture<T>(IContent item, Func<IContent, string, T> getter,

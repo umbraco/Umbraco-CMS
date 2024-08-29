@@ -2,5 +2,11 @@
 
 public interface IPackageManifestService
 {
-    Task<IEnumerable<PackageManifest>> GetPackageManifestsAsync();
+    Task<IEnumerable<PackageManifest>> GetAllPackageManifestsAsync();
+
+    Task<IEnumerable<PackageManifest>> GetPublicPackageManifestsAsync();
+
+    Task<IEnumerable<PackageManifest>> GetPrivatePackageManifestsAsync();
+
+    Task<PackageManifestImportmap> GetPackageManifestImportmapAsync();
 }

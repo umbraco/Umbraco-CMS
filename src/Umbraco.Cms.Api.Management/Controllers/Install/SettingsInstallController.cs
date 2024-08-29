@@ -28,10 +28,9 @@ public class SettingsInstallController : InstallControllerBase
 
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(InstallSettingsResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<InstallSettingsResponseModel>> Settings()
+    public async Task<IActionResult> Settings(CancellationToken cancellationToken)
     {
         // Register that the install has started
         await _installHelper.SetInstallStatusAsync(false, string.Empty);
@@ -39,6 +38,6 @@ public class SettingsInstallController : InstallControllerBase
         InstallSettingsModel installSettings = _installSettingsFactory.GetInstallSettings();
         InstallSettingsResponseModel responseModel = _mapper.Map<InstallSettingsResponseModel>(installSettings)!;
 
-        return responseModel;
+        return Ok(responseModel);
     }
 }

@@ -5,10 +5,6 @@
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.PlainString,
-    EditorType.PropertyValue,
-    "Configuration-less string",
-    "not-applicable",
-    Icon = "umb:edit",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Text)] // NOTE: for ease of use it's called "String", but it's really stored as TEXT
 public class PlainStringPropertyEditor : DataEditor

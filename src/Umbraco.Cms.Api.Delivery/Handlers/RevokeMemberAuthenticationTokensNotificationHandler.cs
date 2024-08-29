@@ -73,7 +73,7 @@ internal sealed class RevokeMemberAuthenticationTokensNotificationHandler
             return;
         }
 
-        _logger.LogInformation("Deleting {count} active tokens for member with ID {id}", tokens.Length, member.Id);
+        _logger.LogInformation("Revoking {count} active tokens for member with ID {id}", tokens.Length, member.Id);
         foreach (var token in tokens)
         {
             await _tokenManager.DeleteAsync(token);

@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -383,15 +383,18 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
     internal PublishedElementPropertyBase CreateMediaPickerProperty(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
     {
-        MediaPickerValueConverter mediaPickerValueConverter = new MediaPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IPublishedModelFactory>(), mediaBuilder);
-        var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker, new MediaPickerConfiguration());
+        var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
+        var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
+
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(), apiMediaWithCropsBuilder);
+        var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
         return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString());
     }
 
     internal PublishedElementPropertyBase CreateMediaPicker3Property(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
     {
-        var serializer = new JsonNetSerializer();
+        var serializer = new SystemTextJsonSerializer();
         var value = serializer.Serialize(new[]
         {
             new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
@@ -403,7 +406,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
 
-        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new JsonNetSerializer(), apiMediaWithCropsBuilder);
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(), apiMediaWithCropsBuilder);
         var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
         return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, value);
@@ -452,5 +455,5 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);
     }
 
-    protected IApiContentRouteBuilder ApiContentRouteBuilder() => CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+    protected IApiContentRouteBuilder ApiContentRouteBuilder() => CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
 }

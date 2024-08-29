@@ -25,7 +25,7 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     // But maybe there is a valid use case for doing it on the fly.
     [HttpPost("status")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> SetStatus([FromQuery] RedirectStatus status)
+    public async Task<IActionResult> SetStatus(CancellationToken cancellationToken, [FromQuery] RedirectStatus status)
     {
         // TODO: uncomment this when auth is implemented.
         // var userIsAdmin = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin();
@@ -43,7 +43,7 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
         // For now I'm not gonna change this to limit breaking, but it's weird to have a "disabled" switch,
         // since you're essentially negating the boolean from the get go,
         // it's much easier to reason with enabled = false == disabled.
-        _configManipulator.SaveDisableRedirectUrlTracking(!enable);
+        await _configManipulator.SaveDisableRedirectUrlTrackingAsync(!enable);
 
         // Taken from the existing implementation in RedirectUrlManagementController
         // TODO this is ridiculous, but we need to ensure the configuration is reloaded, before this request is ended.

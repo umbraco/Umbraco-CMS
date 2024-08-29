@@ -26,12 +26,12 @@ public class ExportDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Export(Guid id, bool includeChildren = false)
+    public async Task<IActionResult> Export(CancellationToken cancellationToken, Guid id, bool includeChildren = false)
     {
         IDictionaryItem? dictionaryItem = await _dictionaryItemService.GetAsync(id);
         if (dictionaryItem is null)
         {
-            return DictionaryNotFound();
+            return DictionaryItemNotFound();
         }
 
         XElement xml = _entityXmlSerializer.Serialize(dictionaryItem, includeChildren);

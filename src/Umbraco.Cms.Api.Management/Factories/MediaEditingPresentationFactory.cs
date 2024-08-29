@@ -9,8 +9,8 @@ internal sealed class MediaEditingPresentationFactory : ContentEditingPresentati
     {
         MediaCreateModel model = MapContentEditingModel<MediaCreateModel>(createRequestModel);
         model.Key = createRequestModel.Id;
-        model.ContentTypeKey = createRequestModel.ContentTypeId;
-        model.ParentKey = createRequestModel.ParentId;
+        model.ContentTypeKey = createRequestModel.MediaType.Id;
+        model.ParentKey = createRequestModel.Parent?.Id;
 
         return model;
     }

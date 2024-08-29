@@ -1,4 +1,4 @@
-﻿using System.Net.Mime;
+using System.Net.Mime;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
@@ -15,11 +14,11 @@ public class WebhookFiring : IRecurringBackgroundJob
 {
     private readonly ILogger<WebhookFiring> _logger;
     private readonly IWebhookRequestService _webhookRequestService;
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly IWebhookLogFactory _webhookLogFactory;
     private readonly IWebhookLogService _webhookLogService;
     private readonly IWebhookService _webHookService;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IHttpClientFactory _httpClientFactory;
     private WebhookSettings _webhookSettings;
 
     public TimeSpan Period => _webhookSettings.Period;
@@ -32,20 +31,20 @@ public class WebhookFiring : IRecurringBackgroundJob
     public WebhookFiring(
         ILogger<WebhookFiring> logger,
         IWebhookRequestService webhookRequestService,
-        IJsonSerializer jsonSerializer,
         IWebhookLogFactory webhookLogFactory,
         IWebhookLogService webhookLogService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        ICoreScopeProvider coreScopeProvider)
+        ICoreScopeProvider coreScopeProvider,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _webhookRequestService = webhookRequestService;
-        _jsonSerializer = jsonSerializer;
         _webhookLogFactory = webhookLogFactory;
         _webhookLogService = webhookLogService;
         _webHookService = webHookService;
         _coreScopeProvider = coreScopeProvider;
+        _httpClientFactory = httpClientFactory;
         _webhookSettings = webhookSettings.CurrentValue;
         webhookSettings.OnChange(x => _webhookSettings = x);
     }
@@ -72,8 +71,7 @@ public class WebhookFiring : IRecurringBackgroundJob
                         return;
                     }
 
-                    HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
-
+                    using HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
                     if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
                     {
                         await _webhookRequestService.DeleteAsync(request);
@@ -90,33 +88,40 @@ public class WebhookFiring : IRecurringBackgroundJob
 
     private async Task<HttpResponseMessage?> SendRequestAsync(IWebhook webhook, string eventName, string? serializedObject, int retryCount, CancellationToken cancellationToken)
     {
-        using var httpClient = new HttpClient();
+        using HttpClient httpClient = _httpClientFactory.CreateClient(Constants.HttpClients.WebhookFiring);
 
-        var stringContent = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
-        stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
-
-        foreach (KeyValuePair<string, string> header in webhook.Headers)
+        using var request = new HttpRequestMessage(HttpMethod.Post, webhook.Url)
         {
-            stringContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
-        }
+            Version = httpClient.DefaultRequestVersion,
+            VersionPolicy = httpClient.DefaultVersionPolicy,
+        };
 
         HttpResponseMessage? response = null;
+        Exception? exception = null;
         try
         {
-            response = await httpClient.PostAsync(webhook.Url, stringContent, cancellationToken);
+            // Add headers
+            request.Headers.Add(Constants.WebhookEvents.HeaderNames.EventName, eventName);
+            request.Headers.Add(Constants.WebhookEvents.HeaderNames.RetryCount, retryCount.ToString());
+
+            foreach (KeyValuePair<string, string> header in webhook.Headers)
+            {
+                request.Headers.Add(header.Key, header.Value);
+            }
+
+            // Set content
+            request.Content = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            // Send request
+            response = await httpClient.SendAsync(request, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook);
+            exception = ex;
+            _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook.Key);
         }
 
-        var webhookResponseModel = new WebhookResponseModel
-        {
-            HttpResponseMessage = response,
-            RetryCount = retryCount,
-        };
-
-        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, webhookResponseModel, webhook, cancellationToken);
+        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, request, response, retryCount, exception, webhook, cancellationToken);
         await _webhookLogService.CreateAsync(log);
 
         return response;

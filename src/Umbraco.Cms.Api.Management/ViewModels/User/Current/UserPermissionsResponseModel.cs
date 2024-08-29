@@ -2,5 +2,5 @@
 
 public class UserPermissionsResponseModel
 {
-   public IEnumerable<UserPermissionViewModel> Permissions { get; set; } = Array.Empty<UserPermissionViewModel>();
+   public IEnumerable<UserPermissionViewModel> Permissions { get; set; } = Enumerable.Empty<UserPermissionViewModel>();
 }

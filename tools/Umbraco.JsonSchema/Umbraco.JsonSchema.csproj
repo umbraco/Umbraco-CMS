@@ -3,12 +3,14 @@
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="NJsonSchema" Version="10.9.0" />
+    <PackageReference Include="CommandLineParser" VersionOverride="2.9.1" />
+    <PackageReference Include="NJsonSchema" VersionOverride="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>

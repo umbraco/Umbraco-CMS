@@ -15,16 +15,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 public class CreateCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
-    private readonly IPackageDefinitionFactory _packageDefinitionFactory;
+    private readonly IPackagePresentationFactory _packagePresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateCreatedPackageController(
         IPackagingService packagingService,
-        IPackageDefinitionFactory packageDefinitionFactory,
+        IPackagePresentationFactory packagePresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _packagingService = packagingService;
-        _packageDefinitionFactory = packageDefinitionFactory;
+        _packagePresentationFactory = packagePresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -38,14 +38,16 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(CreatePackageRequestModel createPackageRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreatePackageRequestModel createPackageRequestModel)
     {
-        PackageDefinition packageDefinition = _packageDefinitionFactory.CreatePackageDefinition(createPackageRequestModel);
+        PackageDefinition packageDefinition = _packagePresentationFactory.CreatePackageDefinition(createPackageRequestModel);
 
         Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.CreateCreatedPackageAsync(packageDefinition, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyCreatedPackageController>(controller => nameof(controller.ByKey), packageDefinition.PackageId)
+            ? CreatedAtId<ByKeyCreatedPackageController>(controller => nameof(controller.ByKey), packageDefinition.PackageId)
             : PackageOperationStatusResult(result.Status);
     }
 }

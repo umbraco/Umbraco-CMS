@@ -31,7 +31,7 @@ public class UserGroupBuilder<TParent>
     private string _icon;
     private int? _id;
     private string _name;
-    private IEnumerable<string> _permissions = Enumerable.Empty<string>();
+    private ISet<string> _permissions = new HashSet<string>();
     private int? _startContentId;
     private int? _startMediaId;
     private string _suffix;
@@ -83,17 +83,12 @@ public class UserGroupBuilder<TParent>
         return this;
     }
 
-    public UserGroupBuilder<TParent> WithPermissions(string permissions)
-    {
-        _permissions = permissions.ToCharArray().Select(x => x.ToString());
-        return this;
-    }
-
-    public UserGroupBuilder<TParent> WithPermissions(IList<string> permissions)
+    public UserGroupBuilder<TParent> WithPermissions(ISet<string> permissions)
     {
         _permissions = permissions;
         return this;
     }
+
 
     public UserGroupBuilder<TParent> WithAllowedSections(IList<string> allowedSections)
     {
@@ -136,12 +131,14 @@ public class UserGroupBuilder<TParent>
 
         var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-        var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, _permissions, icon)
+        var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, icon)
         {
             Id = id,
             StartContentId = startContentId,
             StartMediaId = startMediaId
         };
+
+        userGroup.Permissions = _permissions;
 
         foreach (var section in _allowedSections)
         {
@@ -155,12 +152,12 @@ public class UserGroupBuilder<TParent>
         string alias = "testGroup",
         string name = "Test Group",
         string suffix = "",
-        string[] permissions = null,
+        ISet<string>? permissions = null,
         string[] allowedSections = null) =>
         (UserGroup)new UserGroupBuilder()
             .WithAlias(alias + suffix)
             .WithName(name + suffix)
-            .WithPermissions(permissions ?? new[] { "A", "B", "C" })
+            .WithPermissions(permissions ?? new[] { "A", "B", "C" }.ToHashSet())
             .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
             .Build();
 }

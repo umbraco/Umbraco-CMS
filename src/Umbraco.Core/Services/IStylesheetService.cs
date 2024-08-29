@@ -16,10 +16,11 @@ public interface IStylesheetService : IBasicFileService<IStylesheet>
     /// <summary>
     /// Updates an existing stylesheet.
     /// </summary>
+    /// <param name="path">The path of the stylesheet to update.</param>
     /// <param name="updateModel">A <see cref="StylesheetUpdateModel"/> with the changes.</param>
     /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="StylesheetOperationStatus"/>.</returns>
-    Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid userKey);
+    Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(string path, StylesheetUpdateModel updateModel, Guid userKey);
 
     /// <summary>
     /// Deletes a stylesheet.
@@ -28,4 +29,13 @@ public interface IStylesheetService : IBasicFileService<IStylesheet>
     /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>An operation status.</returns>
     Task<StylesheetOperationStatus> DeleteAsync(string path, Guid userKey);
+
+    /// <summary>
+    /// Renames a stylesheet.
+    /// </summary>
+    /// <param name="path">The path of the stylesheet to rename.</param>
+    /// <param name="renameModel">A <see cref="StylesheetRenameModel"/> with the changes.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="StylesheetOperationStatus"/>.</returns>
+    Task<Attempt<IStylesheet?, StylesheetOperationStatus>> RenameAsync(string path, StylesheetRenameModel renameModel, Guid userKey);
 }

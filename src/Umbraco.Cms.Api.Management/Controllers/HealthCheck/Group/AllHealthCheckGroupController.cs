@@ -31,7 +31,10 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         IGrouping<string?, Core.HealthChecks.HealthCheck>[] groups = _healthCheckGroupPresentationFactory
             .CreateGroupingFromHealthCheckCollection()

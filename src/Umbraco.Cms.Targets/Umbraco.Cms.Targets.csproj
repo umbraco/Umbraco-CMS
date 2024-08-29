@@ -4,11 +4,12 @@
     <Description>Installs Umbraco CMS with minimal dependencies in your ASP.NET Core project.</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
-    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
-    <EnablePackageValidation>false</EnablePackageValidation>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!--  TODO: [IDE0270] Simplify null checks, [CS0108] resolve hiding inherited members, [CS1998] remove async or make method synchronous,
+          and remove this override -->
+    <WarningsNotAsErrors>IDE0270,CS0108,CS1998</WarningsNotAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
@@ -26,7 +27,7 @@
     <NoWarn>NU5100;NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
     <None Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" Pack="true" PackagePath="tasks\netstandard2.0" Visible="false" />
     <Content Include="$(_UmbracoCmsJsonSchemaReference)" PackagePath="" Visible="false" />
     <Content Include="$(_UmbracoCmsPackageSchemaReference)" PackagePath="" Visible="false" />
@@ -65,7 +66,7 @@
   <!-- Generate JSON package schema on build (and before copying to project) -->
   <Target Name="GenerateUmbracoPackageSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')">
     <Message Text="Generating $(_UmbracoCmsPackageSchemaReference) because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.New.Client" Command="npm run generate:jsonschema -- --out &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsPackageSchemaReference)&quot; tsconfig.json UmbracoPackage" />
+    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client" Command="npm run generate:jsonschema -- --out &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsPackageSchemaReference)&quot; tsconfig.json UmbracoPackage" />
   </Target>
 
   <!-- Remove generated JSON package schema on clean -->

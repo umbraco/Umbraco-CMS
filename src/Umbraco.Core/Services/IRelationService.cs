@@ -171,7 +171,7 @@ public interface IRelationService : IService
     /// <param name="totalRecords"></param>
     /// <param name="ordering"></param>
     /// <returns></returns>
-    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);/// <summary>
+    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets a paged result of <see cref="IRelation" />
@@ -397,4 +397,13 @@ public interface IRelationService : IService
     IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
 
     Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias);
+    int CountRelationTypes();
+
+    /// <summary>
+    /// Gets the Relation types in a paged manner.
+    /// Currently implements the paging in memory on the name attribute because the underlying repository does not support paging yet
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids);
 }

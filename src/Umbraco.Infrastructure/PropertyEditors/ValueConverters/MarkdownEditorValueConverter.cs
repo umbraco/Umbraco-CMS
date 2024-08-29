@@ -28,7 +28,6 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IHtmlEncodedString);
 
-    // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Snapshot;
 
@@ -55,12 +54,6 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
         var mark = new Markdown();
         return new HtmlEncodedString(inter == null ? string.Empty : mark.Transform((string)inter));
     }
-
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
-
-        // source should come from ConvertSource and be a string (or null) already
-        inter?.ToString() ?? string.Empty;
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
 

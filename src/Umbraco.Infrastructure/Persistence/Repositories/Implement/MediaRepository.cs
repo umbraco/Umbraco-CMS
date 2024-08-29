@@ -260,8 +260,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         var list = new List<string>
         {
             "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
             "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
             " SET startContentId = NULL WHERE startContentId = @id",

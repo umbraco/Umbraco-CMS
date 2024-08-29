@@ -45,6 +45,9 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);
 
+        var nodeDtoTrashedIndex = $"IX_umbracoUserGroup_userGroupKey";
+        CreateIndex<UserGroupDto>(nodeDtoTrashedIndex);
+
         // We want specific keys for the default user groups, so we need to fetch the user groups again to set their keys.
         List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>();
 
@@ -53,6 +56,8 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             userGroup.Key = ResolveAliasToGuid(userGroup.Alias);
             Database.Update(userGroup);
         }
+
+        Context.Complete();
 
         scope.Complete();
     }
@@ -84,6 +89,8 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
         // Now that keys are disabled and we have a transaction, we'll do our migration.
         MigrateColumnSqlite();
+
+        Context.Complete();
         scope.Complete();
     }
 

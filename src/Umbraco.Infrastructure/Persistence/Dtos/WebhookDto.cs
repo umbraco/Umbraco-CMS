@@ -19,6 +19,7 @@ internal class WebhookDto
     public Guid Key { get; set; }
 
     [Column(Name = "url")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Url { get; set; } = string.Empty;
 

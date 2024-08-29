@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 
-public class DictionaryItemItemResponseModel : ItemResponseModelBase
+public class DictionaryItemItemResponseModel : NamedItemResponseModelBase
 {
 }

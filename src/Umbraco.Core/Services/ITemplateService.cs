@@ -45,13 +45,6 @@ public interface ITemplateService : IService
     Task<ITemplate?> GetAsync(Guid id);
 
     /// <summary>
-    /// Gets the scaffold code for a template.
-    /// </summary>
-    /// <param name="masterTemplateKey"></param>
-    /// <returns></returns>
-    Task<string> GetScaffoldAsync(Guid? masterTemplateKey);
-
-    /// <summary>
     ///     Gets the template descendants
     /// </summary>
     /// <param name="masterTemplateId"></param>
@@ -83,12 +76,13 @@ public interface ITemplateService : IService
     /// <summary>
     ///     Creates a new template
     /// </summary>
+    /// <param name="templateKey"></param>
     /// <param name="name">Name of the new template</param>
     /// <param name="alias">Alias of the template</param>
     /// <param name="content">View content for the new template</param>
     /// <param name="userKey">Key of the user performing the Create.</param>
     /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(string name, string alias, string? content, Guid userKey);
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(string name, string alias, string? content, Guid userKey, Guid? templateKey = null);
 
     /// <summary>
     ///     Creates a new template

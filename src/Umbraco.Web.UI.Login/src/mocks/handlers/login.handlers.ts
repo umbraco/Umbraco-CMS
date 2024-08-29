@@ -1,46 +1,59 @@
 import { umbLoginData } from '../data/login.data.js';
-import { rest } from 'msw';
+import { delay, http, type HttpHandler, HttpResponse } from "msw";
+import type { ManifestResponseModel } from "@umbraco-cms/backoffice/external/backend-api";
 
-export const handlers = [
-	rest.post('backoffice/umbracoapi/authentication/postlogin', async (req, res, ctx) => {
-		const json = await req.json();
+export const handlers: HttpHandler[] = [
+  http.get<any, Array<ManifestResponseModel>>('umbraco/management/api/v1/manifest/manifest/public', async () => {
+    await delay();
+    return HttpResponse.json<Array<ManifestResponseModel>>([
+      {
+        name: 'Test Package',
+        version: '1.0.0',
+        extensions: []
+      }
+    ]);
+  }),
+
+	http.post<any, {username: string, password: string}>('management/api/v1/security/back-office/login', async ({ request }) => {
+		const json = await request.json();
 
 		const username = json.username;
 		const password = json.password;
 
 		const { status, data } = umbLoginData.login(username, password);
 
-		return res(ctx.delay(), ctx.status(status), ctx.json(data));
+		return HttpResponse.json(data, { status });
 	}),
 
-	rest.post('backoffice/umbracoapi/authentication/PostRequestPasswordReset', async (_req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200));
+	http.post('management/api/v1/security/forgot-password', async () => {
+    await delay();
+    return new Response('', { status: 200 });
 	}),
 
-	rest.post('backoffice/umbracoapi/authentication/validatepasswordresetcode', async (req, res, ctx) => {
-		const json = await req.json();
+	http.post<any, {resetCode: string}>('management/api/v1/security/forgot-password/verify', async ({request}) => {
+		const json = await request.json();
 
-		const code = json.code;
+		const code = json.resetCode;
 
-		const { status } = umbLoginData.validatePasswordResetCode(code);
+		const response = umbLoginData.validatePasswordResetCode(code);
 
-		return res(ctx.delay(), ctx.status(status));
+    await delay();
+
+    return HttpResponse.json(response.data, { status: response.status });
 	}),
 
-	rest.post('backoffice/umbracoapi/authentication/newpassword', async (_req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200));
+	http.post('management/api/v1/security/forgot-password/reset', async () => {
+    await delay();
+    return new Response(null, { status: 204 });
 	}),
 
-	rest.get('backoffice/umbracoapi/authentication/Get2faProviders', async (_req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200), ctx.json(['Google', 'Lastpass']));
-	}),
-
-	rest.post('backoffice/umbracoapi/authentication/PostVerify2faCode', async (req, res, ctx) => {
-		const body = await req.json();
+	http.post<any, {code: string}>('management/api/v1/security/back-office/verify-2fa', async ({request}) => {
+		const body = await request.json();
+    await delay();
 		if (body.code === 'fail') {
-			return res(ctx.delay(), ctx.status(400), ctx.json({ Message: 'Invalid code' }));
+      return HttpResponse.json({ error: 'Invalid code' }, { status: 400 });
 		}
     const user = umbLoginData.users[0];
-		return res(ctx.delay(), ctx.status(200), ctx.json(user));
+    return HttpResponse.json(user);
 	}),
 ];

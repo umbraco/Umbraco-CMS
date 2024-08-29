@@ -1,10 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -30,17 +28,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         indexingSettings.OnChange(newValue => _indexingSettings = newValue);
     }
 
-
-    /// <summary>
-    ///  Constructor for the JsonPropertyIndexValueFactoryBase.
-    /// </summary>
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
-    protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer): this(jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
-    {
-
-    }
-
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
+    public virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
         IProperty property,
         string? culture,
         string? segment,
@@ -88,32 +76,6 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         return summary;
     }
 
-    /// <inheritdoc />
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
-        IProperty property,
-        string? culture,
-        string? segment,
-        bool published,
-        IEnumerable<string> availableCultures)
-    => GetIndexValues(
-        property,
-        culture,
-        segment,
-        published,
-        Enumerable.Empty<string>(),
-        StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
-
-    [Obsolete("Use method overload that has availableCultures, scheduled for removal in v14")]
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
-        => GetIndexValues(
-            property,
-            culture,
-            segment,
-            published,
-            Enumerable.Empty<string>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
-
     /// <summary>
     ///  Method to return a list of summary of the content. By default this returns an empty list
     /// </summary>
@@ -127,33 +89,12 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     /// <summary>
     ///  Method that handle the deserialized object.
     /// </summary>
-    [Obsolete("Use the non-obsolete overload instead, scheduled for removal in v14")]
     protected abstract IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
-        TSerialized deserializedPropertyValue,
-        IProperty property,
-        string? culture,
-        string? segment,
-        bool published);
-
-    [Obsolete("Use the non-obsolete overload instead, scheduled for removal in v14")]
-    protected virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
-        TSerialized deserializedPropertyValue,
-        IProperty property,
-        string? culture,
-        string? segment,
-        bool published,
-        IEnumerable<string> availableCultures) => Handle(deserializedPropertyValue, property, culture, segment, published);
-
-    /// <summary>
-    ///  Method that handle the deserialized object.
-    /// </summary>
-    protected virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,
         string? segment,
         bool published,
         IEnumerable<string> availableCultures,
-        IDictionary<Guid, IContentType> contentTypeDictionary)
-        => Handle(deserializedPropertyValue, property, culture, segment, published, availableCultures);
+        IDictionary<Guid, IContentType> contentTypeDictionary);
 }

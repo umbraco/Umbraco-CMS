@@ -5,10 +5,6 @@
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.PlainJson,
-    EditorType.PropertyValue,
-    "Configuration-less JSON",
-    "not-applicable",
-    Icon = "umb:edit",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Json)]
 public class PlainJsonPropertyEditor : DataEditor

@@ -15,6 +15,7 @@ public class UserGroupDto
         UserGroup2AppDtos = new List<UserGroup2AppDto>();
         UserGroup2LanguageDtos = new List<UserGroup2LanguageDto>();
         UserGroup2PermissionDtos = new List<UserGroup2PermissionDto>();
+        UserGroup2GranularPermissionDtos = new List<UserGroup2GranularPermissionDto>();
     }
 
     [Column("id")]
@@ -40,6 +41,7 @@ public class UserGroupDto
     [Column("userGroupDefaultPermissions")]
     [Length(50)]
     [NullSetting(NullSetting = NullSettings.Null)]
+    [Obsolete("Is not used anymore Use UserGroup2PermissionDtos instead. This will be removed in Umbraco 18.")]
     public string? DefaultPermissions { get; set; }
 
     [Column("createDate")]
@@ -81,6 +83,10 @@ public class UserGroupDto
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
     public List<UserGroup2PermissionDto> UserGroup2PermissionDtos { get; set; }
+
+    [ResultColumn]
+    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    public List<UserGroup2GranularPermissionDto> UserGroup2GranularPermissionDtos { get; set; }
 
     /// <summary>
     ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)

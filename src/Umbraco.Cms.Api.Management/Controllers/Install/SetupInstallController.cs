@@ -1,13 +1,12 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services.Installer;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
 
@@ -16,31 +15,24 @@ public class SetupInstallController : InstallControllerBase
 {
     private readonly IUmbracoMapper _mapper;
     private readonly IInstallService _installService;
-    private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly GlobalSettings _globalSettings;
 
     public SetupInstallController(
         IUmbracoMapper mapper,
-        IInstallService installService,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
+        IInstallService installService)
     {
         _mapper = mapper;
         _installService = installService;
-        _hostingEnvironment = hostingEnvironment;
-        _globalSettings = globalSettings.Value;
     }
 
     [HttpPost("setup")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Setup(InstallVResponseModel installData)
+    public async Task<IActionResult> Setup(CancellationToken cancellationToken, InstallRequestModel installData)
     {
         InstallData data = _mapper.Map<InstallData>(installData)!;
-        await _installService.Install(data);
+        Attempt<InstallationResult?, InstallOperationStatus> result = await _installService.InstallAsync(data);
 
-        return Ok();
+        return InstallOperationResult(result.Status, result.Result);
     }
 }

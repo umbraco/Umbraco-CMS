@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 /// This is an unscoped migration to support migrating sqlite, since it doesn't support adding columns.
 /// See <see cref="AddGuidsToUserGroups"/> for more information.
 /// </summary>
-public class AddGuidsToUsers : UnscopedMigrationBase
+internal class AddGuidsToUsers : UnscopedMigrationBase
 {
     private const string NewColumnName = "key";
     private readonly IScopeProvider _scopeProvider;
@@ -26,6 +26,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
 
     protected override void Migrate()
     {
+        InvalidateBackofficeUserAccess = true;
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
@@ -33,11 +34,13 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateSqlServer();
+            Context.Complete();
             scope.Complete();
             return;
         }
 
         MigrateSqlite();
+        Context.Complete();
         scope.Complete();
     }
 
@@ -45,13 +48,21 @@ public class AddGuidsToUsers : UnscopedMigrationBase
     {
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
-        List<UserDto>? userDtos = Database.Fetch<UserDto>();
+
+        var nodeDtoTrashedIndex = $"IX_umbracoUser_userKey";
+        if (IndexExists(nodeDtoTrashedIndex) is false)
+        {
+            CreateIndex<UserDto>(nodeDtoTrashedIndex);
+        }
+
+
+        List<NewUserDto>? userDtos = Database.Fetch<NewUserDto>();
         if (userDtos is null)
         {
             return;
         }
 
-        UserDto? superUser = userDtos.FirstOrDefault(x => x.Id == -1);
+        NewUserDto? superUser = userDtos.FirstOrDefault(x => x.Id == -1);
         if (superUser is not null)
         {
             superUser.Key = Constants.Security.SuperUserKey;
@@ -83,7 +94,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         Database.Execute("PRAGMA foreign_keys=off;");
         Database.Execute("BEGIN TRANSACTION;");
 
-        List<UserDto> users = Database.Fetch<OldUserDto>().Select(x => new UserDto
+        List<NewUserDto> users = Database.Fetch<OldUserDto>().Select(x => new NewUserDto
         {
             Id = x.Id,
             Key = x.Id is -1 ? Constants.Security.SuperUserKey : Guid.NewGuid(),
@@ -109,9 +120,9 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         }).ToList();
 
         Delete.Table(Constants.DatabaseSchema.Tables.User).Do();
-        Create.Table<UserDto>().Do();
+        Create.Table<NewUserDto>().Do();
 
-        foreach (UserDto user in users)
+        foreach (NewUserDto user in users)
         {
             Database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, user);
         }
@@ -120,7 +131,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         MigrateTwoFactorLogins(users);
     }
 
-    private void MigrateExternalLogins(List<UserDto> userDtos)
+    private void MigrateExternalLogins(List<NewUserDto> userDtos)
     {
         List<ExternalLoginDto>? externalLogins = Database.Fetch<ExternalLoginDto>();
         if (externalLogins is null)
@@ -130,7 +141,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
 
         foreach (ExternalLoginDto externalLogin in externalLogins)
         {
-            UserDto? associatedUser = userDtos.FirstOrDefault(x => x.Id.ToGuid() == externalLogin.UserOrMemberKey);
+            NewUserDto? associatedUser = userDtos.FirstOrDefault(x => x.Id.ToGuid() == externalLogin.UserOrMemberKey);
             if (associatedUser is null)
             {
                 continue;
@@ -141,7 +152,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         }
     }
 
-    private void MigrateTwoFactorLogins(List<UserDto> userDtos)
+    private void MigrateTwoFactorLogins(List<NewUserDto> userDtos)
     {
         // TODO: TEST ME!
         List<TwoFactorLoginDto>? twoFactorLoginDtos = Database.Fetch<TwoFactorLoginDto>();
@@ -152,7 +163,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
 
         foreach (TwoFactorLoginDto twoFactorLoginDto in twoFactorLoginDtos)
         {
-            UserDto? associatedUser = userDtos.FirstOrDefault(x => x.Id.ToGuid() == twoFactorLoginDto.UserOrMemberKey);
+            NewUserDto? associatedUser = userDtos.FirstOrDefault(x => x.Id.ToGuid() == twoFactorLoginDto.UserOrMemberKey);
 
             if (associatedUser is null)
             {
@@ -184,6 +195,125 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         [Column("userDisabled")]
         [Constraint(Default = "0")]
         public bool Disabled { get; set; }
+
+        [Column("userNoConsole")]
+        [Constraint(Default = "0")]
+        public bool NoConsole { get; set; }
+
+        [Column("userName")] public string UserName { get; set; } = null!;
+
+        [Column("userLogin")]
+        [Length(125)]
+        [Index(IndexTypes.NonClustered)]
+        public string? Login { get; set; }
+
+        [Column("userPassword")] [Length(500)] public string? Password { get; set; }
+
+        /// <summary>
+        ///     This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
+        /// </summary>
+        [Column("passwordConfig")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string? PasswordConfig { get; set; }
+
+        [Column("userEmail")] public string Email { get; set; } = null!;
+
+        [Column("userLanguage")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(10)]
+        public string? UserLanguage { get; set; }
+
+        [Column("securityStampToken")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(255)]
+        public string? SecurityStampToken { get; set; }
+
+        [Column("failedLoginAttempts")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? FailedLoginAttempts { get; set; }
+
+        [Column("lastLockoutDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastLockoutDate { get; set; }
+
+        [Column("lastPasswordChangeDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastPasswordChangeDate { get; set; }
+
+        [Column("lastLoginDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastLoginDate { get; set; }
+
+        [Column("emailConfirmedDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? EmailConfirmedDate { get; set; }
+
+        [Column("invitedDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? InvitedDate { get; set; }
+
+        [Column("createDate")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.CurrentDateTime)]
+        public DateTime CreateDate { get; set; } = DateTime.Now;
+
+        [Column("updateDate")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.CurrentDateTime)]
+        public DateTime UpdateDate { get; set; } = DateTime.Now;
+
+        /// <summary>
+        ///     Will hold the media file system relative path of the users custom avatar if they uploaded one
+        /// </summary>
+        [Column("avatar")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string? Avatar { get; set; }
+
+        /// <summary>
+        ///     A Json blob stored for recording tour data for a user
+        /// </summary>
+        [Column("tourData")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
+        public string? TourData { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
+        public List<UserGroupDto> UserGroupDtos { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
+        public HashSet<UserStartNodeDto> UserStartNodeDtos { get; set; }
+    }
+
+    [TableName(TableName)]
+    [PrimaryKey("id", AutoIncrement = true)]
+    [ExplicitColumns]
+    public class NewUserDto
+    {
+        public const string TableName = Constants.DatabaseSchema.Tables.User;
+
+        public NewUserDto()
+        {
+            UserGroupDtos = new List<UserGroupDto>();
+            UserStartNodeDtos = new HashSet<UserStartNodeDto>();
+        }
+
+        [Column("id")]
+        [PrimaryKeyColumn(Name = "PK_user")]
+        public int Id { get; set; }
+
+        [Column("userDisabled")]
+        [Constraint(Default = "0")]
+        public bool Disabled { get; set; }
+
+        [Column("key")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.NewGuid)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUser_userKey")]
+        public Guid Key { get; set; }
 
         [Column("userNoConsole")]
         [Constraint(Default = "0")]

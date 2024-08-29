@@ -1,30 +1,34 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Script.Item;
-using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Item;
 
 [ApiVersion("1.0")]
 public class ItemScriptItemController : ScriptItemControllerBase
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly IFileItemPresentationModelFactory _fileItemPresentationModelFactory;
+    private readonly IFileItemPresentationFactory _fileItemPresentationFactory;
 
-    public ItemScriptItemController(FileSystems fileSystems, IFileItemPresentationModelFactory fileItemPresentationModelFactory)
-    {
-        _fileSystem = fileSystems.ScriptsFileSystem ?? throw new ArgumentException("Missing scripts file system", nameof(fileSystems));
-        _fileItemPresentationModelFactory = fileItemPresentationModelFactory;
-    }
+    public ItemScriptItemController(IFileItemPresentationFactory fileItemPresentationFactory)
+        => _fileItemPresentationFactory = fileItemPresentationFactory;
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ScriptItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)
+    public async Task<IActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "path")] HashSet<string> paths)
     {
-        IEnumerable<ScriptItemResponseModel> reponseModels = _fileItemPresentationModelFactory.CreateScriptItemResponseModels(paths, _fileSystem);
-        return Ok(reponseModels);
+        if (paths.Count is 0)
+        {
+            return Ok(Enumerable.Empty<ScriptItemResponseModel>());
+        }
+
+        paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
+        IEnumerable<ScriptItemResponseModel> responseModels = _fileItemPresentationFactory.CreateScriptItemResponseModels(paths);
+        return await Task.FromResult(Ok(responseModels));
     }
 }

@@ -41,7 +41,7 @@ public class FullDataSetCachePolicyTests
 
         var isCached = false;
         var cache = new Mock<IAppPolicyCache>();
-        cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(), It.IsAny<string[]>()))
+        cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>()))
             .Callback(() => isCached = true);
 
         var policy =
@@ -79,8 +79,8 @@ public class FullDataSetCachePolicyTests
         IList list = null;
 
         var cache = new Mock<IAppPolicyCache>();
-        cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(), It.IsAny<string[]>()))
-            .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, string[] s) =>
+        cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>()))
+            .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b) =>
             {
                 cached.Add(cacheKey);
 
@@ -121,8 +121,8 @@ public class FullDataSetCachePolicyTests
         IList list = null;
 
         var cache = new Mock<IAppPolicyCache>();
-        cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(), It.IsAny<string[]>()))
-            .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, string[] s) =>
+        cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>()))
+            .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b) =>
             {
                 cached.Add(cacheKey);
 

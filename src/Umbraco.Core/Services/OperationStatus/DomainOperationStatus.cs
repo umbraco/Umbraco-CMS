@@ -6,5 +6,7 @@ public enum DomainOperationStatus
     CancelledByNotification,
     ContentNotFound,
     LanguageNotFound,
-    DuplicateDomainName
+    DuplicateDomainName,
+    ConflictingDomainName,
+    InvalidDomainName
 }

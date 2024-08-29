@@ -32,9 +32,9 @@ public interface ISimpleContentType
     string? Icon { get; }
 
     /// <summary>
-    ///     Gets a value indicating whether the content type is a container.
+    ///     Gets the list view of the content type.
     /// </summary>
-    bool IsContainer { get; }
+    Guid? ListView { get; }
 
     /// <summary>
     ///     Gets a value indicating whether content of that type can be created at the root of the tree.
