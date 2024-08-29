@@ -4,7 +4,6 @@ import { html, css, customElement, property, state, nothing } from '@umbraco-cms
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestBlockEditorCustomView,
-	UmbBlockEditorCustomViewElement,
 	UmbBlockEditorCustomViewProperties,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/extension-registry';
