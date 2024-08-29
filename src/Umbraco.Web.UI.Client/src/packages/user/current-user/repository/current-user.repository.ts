@@ -2,7 +2,8 @@ import { UmbCurrentUserServerDataSource } from './current-user.server.data-sourc
 import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 /**
  * A repository for the current user
@@ -116,11 +117,11 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	}
 	/**
 	 * Change password for current user
-	 * @param userId 
-	 * @param newPassword 
-	 * @param oldPassword 
-	 * @param isCurrentUser 
-	 * @returns 
+	 * @param userId
+	 * @param newPassword
+	 * @param oldPassword
+	 * @param isCurrentUser
+	 * @returns
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
 		if (!newPassword) throw new Error('New password is missing');
