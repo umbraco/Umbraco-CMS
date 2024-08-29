@@ -45,7 +45,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
                 Description = "All endpoints not defined under specific APIs",
             });
 
-        swaggerGenOptions.CustomOperationIds(description => _operationIdSelector.OperationId(description, _apiVersioningOptions.Value));
+        swaggerGenOptions.CustomOperationIds(description => _operationIdSelector.OperationId(description));
         swaggerGenOptions.DocInclusionPredicate((documentGroupName, apiDescription) =>
         {
             if (apiDescription.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
