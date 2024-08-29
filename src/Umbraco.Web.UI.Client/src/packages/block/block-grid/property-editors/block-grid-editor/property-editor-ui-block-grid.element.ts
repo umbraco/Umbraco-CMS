@@ -129,11 +129,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	#gotRootEntriesElement(element: Element | undefined): void {
 		if (this.#currentEntriesElement === element) return;
 		if (this.#currentEntriesElement) {
-			throw new Error(
-				'Cannot re-render root entries element because we currently do not support removing form control elements.',
-			);
-			// TODO: If this become relevant we should implement this method: [NL]
-			//this.removeFormControlElement(this.#currentEntriesElement as any);
+			this.removeFormControlElement(this.#currentEntriesElement as any);
 		}
 		this.#currentEntriesElement = element;
 		this.addFormControlElement(element as any);
