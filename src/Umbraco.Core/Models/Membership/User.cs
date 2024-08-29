@@ -41,7 +41,7 @@ public class User : EntityBase, IUser, IProfile
     private HashSet<IReadOnlyUserGroup> _userGroups;
 
     private string _username;
-    private UserType _type;
+    private UserKind _kind;
 
     /// <summary>
     ///     Constructor for creating a new/empty user
@@ -359,10 +359,10 @@ public class User : EntityBase, IUser, IProfile
     }
 
     [DataMember]
-    public UserType Type
+    public UserKind Kind
     {
-        get => _type;
-        set => SetPropertyValueAndDetectChanges(value, ref _type, nameof(Type));
+        get => _kind;
+        set => SetPropertyValueAndDetectChanges(value, ref _kind, nameof(Kind));
     }
 
     /// <summary>

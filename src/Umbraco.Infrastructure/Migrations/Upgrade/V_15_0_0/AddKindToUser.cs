@@ -8,12 +8,12 @@ using Umbraco.Cms.Infrastructure.Scoping;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
 [Obsolete("Remove in Umbraco 18.")]
-public class AddTypeToUser : UnscopedMigrationBase
+public class AddKindToUser : UnscopedMigrationBase
 {
-    private const string NewColumnName = "type";
+    private const string NewColumnName = "kind";
     private readonly IScopeProvider _scopeProvider;
 
-    public AddTypeToUser(IMigrationContext context, IScopeProvider scopeProvider)
+    public AddKindToUser(IMigrationContext context, IScopeProvider scopeProvider)
         : base(context)
         => _scopeProvider = scopeProvider;
 
@@ -90,7 +90,7 @@ public class AddTypeToUser : UnscopedMigrationBase
             CreateDate = x.CreateDate,
             UpdateDate = x.UpdateDate,
             Avatar = x.Avatar,
-            Type = 0
+            Kind = 0
         });
 
         Delete.Table(Constants.DatabaseSchema.Tables.User).Do();

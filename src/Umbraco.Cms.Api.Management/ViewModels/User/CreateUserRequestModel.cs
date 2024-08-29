@@ -6,5 +6,5 @@ public class CreateUserRequestModel : UserPresentationBase
 {
     public Guid? Id { get; set; }
 
-    public UserType Type { get; set; }
+    public UserKind Kind { get; set; }
 }
