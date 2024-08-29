@@ -78,6 +78,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateService = templateService;
         }
 
+        [Obsolete("Please use new constructor, scheduled for removal in v15")]
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
