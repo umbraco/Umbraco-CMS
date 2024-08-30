@@ -284,7 +284,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			<uui-form-validation-message .for=${this}></uui-form-validation-message>
+			<umb-form-validation-message .for=${this}></umb-form-validation-message>
 			${this._canCreate ? this.#renderCreateButton() : nothing}
 		`;
 	}

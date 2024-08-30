@@ -134,7 +134,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 	override render() {
 		//TODO: Using native input=color element instead of uui-color-picker due to its huge size and bad adaptability as a pop up
 		return html`
-			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
+			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<div id="item">
 					${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation"></uui-icon>`}
 					<div class="color-wrapper">
@@ -183,7 +183,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 						`,
 					)}
 				</div>
-			</uui-form-validation-message>
+			</umb-form-validation-message>
 		`;
 	}
 
