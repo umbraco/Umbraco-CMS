@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
+public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 

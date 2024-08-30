@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContentHybridCacheMockTests : UmbracoIntegrationTestWithContent
+public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 {
     private IPublishedContentCache _mockedCache;
     private Mock<IDatabaseCacheRepository> _mockedNucacheRepository;
