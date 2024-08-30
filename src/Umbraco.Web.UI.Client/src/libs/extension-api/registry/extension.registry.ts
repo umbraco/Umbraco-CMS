@@ -6,8 +6,16 @@ import type {
 } from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import type { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
-import { map, distinctUntilChanged, combineLatest, of, switchMap, filter } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	map,
+	distinctUntilChanged,
+	combineLatest,
+	of,
+	switchMap,
+	filter,
+	firstValueFrom,
+} from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  *
@@ -440,35 +448,15 @@ export class UmbExtensionRegistry<
 		) as Observable<Array<ExtensionTypes>>;
 	}
 
-
 	/**
 	 * Returns a promise that resolves when the extension with the specified alias is found.
 	 * @param alias {string} - The alias of the extension to wait for.
 	 * @returns {Promise<ManifestTypes>} - A promise that resolves with the extension.
 	 */
-	private _whenExtensionAliasIsRegistered(alias: string): Promise<ManifestBase> {
-		return new Promise((resolve, reject) => {
-			const subscription: Subscription = this.extensions
-				.pipe(filter((allExtensions) => allExtensions.some((ext) => ext.alias === alias)))
-				.subscribe({
-					next: (allExtensions) => {
-						console.log('I AM IN NEXT', allExtensions);
-						const extension = allExtensions.find((ext) => ext.alias === alias);
-						if (extension) {
-							subscription.unsubscribe();
-							resolve(extension as ManifestBase);
-						}
-					},
-					error: (error) => {
-						console.error('I AM IN ERROR', error);
-						reject(error);
-					},
-					complete: () => {
-						console.log('I AM IN COMPLETE');
-						reject(new Error(`Extension with alias ${alias} not found`));
-					},
-				});
-		});
+	private async _whenExtensionAliasIsRegistered(alias: string): Promise<ManifestBase> {
+		const source = this.extensions.pipe(filter((allExtensions) => allExtensions.some((ext) => ext.alias === alias)));
+		const value = await firstValueFrom(source);
+		return value[0];
 	}
 
 	/**
@@ -481,7 +469,6 @@ export class UmbExtensionRegistry<
 	 */
 	async appendCondition(alias: string, newCondition: UmbConditionConfigBase): Promise<void> {
 		try {
-
 			// Wait for the extension to be registered (as it could be registered late)
 			const extensionToWaitFor = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
 
@@ -530,7 +517,6 @@ export class UmbExtensionRegistry<
 	 */
 	async prependCondition(alias: string, newCondition: UmbConditionConfigBase): Promise<void> {
 		try {
-
 			// Wait for the extension to be registered (as it could be registered late)
 			const extensionToUpdate = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
 
@@ -543,7 +529,6 @@ export class UmbExtensionRegistry<
 			} else {
 				extensionToUpdate.conditions = [newCondition];
 			}
-
 		} catch (error) {
 			// TODO: [WB] Will this ever catch an error?
 			console.error(`Extension with alias ${alias} was never found and threw ${error}`);
