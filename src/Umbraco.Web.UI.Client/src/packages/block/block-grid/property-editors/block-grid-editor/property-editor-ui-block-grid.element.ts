@@ -1,16 +1,25 @@
+import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	css,
+	type PropertyValueMap,
+	ref,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import '../../components/block-grid-entries/index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
-import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
+import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
+import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -20,6 +29,9 @@ export class UmbPropertyEditorUIBlockGridElement
 	extends UmbFormControlMixin<UmbBlockGridValueModel, typeof UmbLitElement>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
+	#validationContext = new UmbValidationContext(this).provide();
+	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
+	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#context = new UmbBlockGridManagerContext(this);
 	//
 	private _value: UmbBlockGridValueModel = {
@@ -31,11 +43,6 @@ export class UmbPropertyEditorUIBlockGridElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		/*const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
-
-		this.#limitMin = validationLimit?.min;
-		this.#limitMax = validationLimit?.max;*/
-
 		const blocks = config.getValueByAlias<Array<UmbBlockGridTypeModel>>('blocks') ?? [];
 		this.#context.setBlockTypes(blocks);
 
@@ -44,7 +51,7 @@ export class UmbPropertyEditorUIBlockGridElement
 
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
-		//config.useLiveEditing, is covered by the EditorConfiguration of context.
+		//config.useLiveEditing, is covered by the EditorConfiguration of context. [NL]
 		this.#context.setEditorConfiguration(config);
 	}
 
@@ -69,6 +76,25 @@ export class UmbPropertyEditorUIBlockGridElement
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context.dataPath,
+				(dataPath) => {
+					// Translate paths for content/settings:
+					this.#contentDataPathTranslator?.destroy();
+					this.#settingsDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
+						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					}
+				},
+				'observeDataPath',
+			);
+		});
 
 		// TODO: Prevent initial notification from these observes
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
@@ -99,8 +125,21 @@ export class UmbPropertyEditorUIBlockGridElement
 		});
 	}
 
+	#currentEntriesElement?: Element;
+	#gotRootEntriesElement(element: Element | undefined): void {
+		if (this.#currentEntriesElement === element) return;
+		if (this.#currentEntriesElement) {
+			this.removeFormControlElement(this.#currentEntriesElement as any);
+		}
+		this.#currentEntriesElement = element;
+		if (element) {
+			this.addFormControlElement(element as any);
+		}
+	}
+
 	override render() {
 		return html` <umb-block-grid-entries
+			${ref(this.#gotRootEntriesElement)}
 			.areaKey=${null}
 			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
 	}

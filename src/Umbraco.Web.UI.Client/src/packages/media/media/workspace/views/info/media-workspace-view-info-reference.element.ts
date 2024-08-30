@@ -196,6 +196,10 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: contents;
+			}
+
 			uui-table-cell {
 				color: var(--uui-color-text-alt);
 			}

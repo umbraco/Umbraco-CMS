@@ -234,11 +234,11 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#updateCreatePaths() {
-		const index = this.#index.value;
-		if (this._entries && index !== undefined) {
+		if (this._entries) {
 			this.observe(
-				observeMultiple([this._entries.catalogueRouteBuilder, this._entries.canCreate]),
-				([catalogueRouteBuilder, canCreate]) => {
+				observeMultiple([this.index, this._entries.catalogueRouteBuilder, this._entries.canCreate]),
+				([index, catalogueRouteBuilder, canCreate]) => {
+					if (index === undefined) return;
 					if (catalogueRouteBuilder && canCreate) {
 						this.#createBeforePath.setValue(this._entries!.getPathForCreateBlock(index));
 						this.#createAfterPath.setValue(this._entries!.getPathForCreateBlock(index + 1));

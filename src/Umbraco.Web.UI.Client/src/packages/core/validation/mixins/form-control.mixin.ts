@@ -80,6 +80,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 	) => UmbFormControlValidatorConfig;
 	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
+	protected removeFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
 	protected getFormElement(): HTMLElement | undefined | null;
@@ -96,11 +97,11 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 }
 
 /**
+ * @mixin
  * The mixin allows a custom element to participate in HTML forms.
  * @param {object} superClass - superclass to be extended.
- * @param defaultValue
- * @returns {class} - The mixin class.
- * @mixin
+ * @param {object} defaultValue - Default value for the form control.
+ * @returns {Function} - The mixin class.
  */
 export function UmbFormControlMixin<
 	ValueType = FormData | FormDataEntryValue,
@@ -251,24 +252,40 @@ export function UmbFormControlMixin<
 			}
 		}
 
+		#runValidatorsCallback = () => this._runValidators;
+
 		/**
 		 * @function addFormControlElement
 		 * @description Important notice if adding a native form control then ensure that its value and thereby validity is updated when value is changed from the outside.
-		 * @param {UmbNativeFormControlElement} element - element to validate and include as part of this form association.
+		 * @param {UmbNativeFormControlElement} element - element to validate and include as part of this form control association.
+		 * @returns {void}
 		 */
 		protected addFormControlElement(element: UmbNativeFormControlElement) {
 			this.#formCtrlElements.push(element);
-			element.addEventListener(UmbValidationInvalidEvent.TYPE, () => {
-				this._runValidators();
-			});
-			element.addEventListener(UmbValidationValidEvent.TYPE, () => {
-				this._runValidators();
-			});
+			element.addEventListener(UmbValidationInvalidEvent.TYPE, this.#runValidatorsCallback);
+			element.addEventListener(UmbValidationValidEvent.TYPE, this.#runValidatorsCallback);
 			// If we are in validationMode/'touched'/not-pristine then we need to validate this newly added control. [NL]
 			if (this._pristine === false) {
 				element.checkValidity();
 				// I think we could just execute validators for the new control, but now lets just run al of it again. [NL]
 				this._runValidators();
+			}
+		}
+
+		/**
+		 * @function removeFormControlElement
+		 * @param {UmbNativeFormControlElement} element - element to remove as part of this form controls associated controls.
+		 * @returns {void}
+		 */
+		protected removeFormControlElement(element: UmbNativeFormControlElement) {
+			const index = this.#formCtrlElements.indexOf(element);
+			if (index !== -1) {
+				this.#formCtrlElements.splice(index, 1);
+				element.removeEventListener(UmbValidationInvalidEvent.TYPE, this.#runValidatorsCallback);
+				element.removeEventListener(UmbValidationValidEvent.TYPE, this.#runValidatorsCallback);
+				if (this._pristine === false) {
+					this._runValidators();
+				}
 			}
 		}
 

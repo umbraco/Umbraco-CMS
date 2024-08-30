@@ -13,6 +13,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	#selection = new UmbArrayState(<Array<ValueType>>[], (x) => x);
 	public readonly selection = this.#selection.asObservable();
+	public readonly hasSelection = this.#selection.asObservablePart((x) => x.length > 0);
 
 	#multiple = new UmbBooleanState(false);
 	public readonly multiple = this.#multiple.asObservable();

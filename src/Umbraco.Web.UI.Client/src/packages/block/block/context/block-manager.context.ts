@@ -148,6 +148,9 @@ export abstract class UmbBlockManagerContext<
 	getContentTypeNameOf(contentTypeKey: string) {
 		return this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.name;
 	}
+	getContentTypeKeyOf(contentTypeKey: string) {
+		return this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.unique;
+	}
 	getContentTypeHasProperties(contentTypeKey: string) {
 		const properties = this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.properties;
 		return properties ? properties.length > 0 : false;
