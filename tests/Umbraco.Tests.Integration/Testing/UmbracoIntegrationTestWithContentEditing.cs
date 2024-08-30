@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrationTest
 {
-    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
