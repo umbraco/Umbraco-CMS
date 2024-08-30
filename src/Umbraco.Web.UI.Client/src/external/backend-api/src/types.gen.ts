@@ -5068,6 +5068,12 @@ export type PostUserByIdChangePasswordData = {
 
 export type PostUserByIdChangePasswordResponse = string;
 
+export type PostCurrentUserChangePasswordData = {
+    requestBody?: ChangePasswordCurrentUserRequestModel;
+};
+
+export type PostCurrentUserChangePasswordResponse = string;
+
 export type PostUserByIdResetPasswordData = {
     id: string;
 };
