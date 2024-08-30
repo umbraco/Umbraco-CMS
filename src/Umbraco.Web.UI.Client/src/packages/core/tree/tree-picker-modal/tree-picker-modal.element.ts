@@ -21,6 +21,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	};
 
 	@state()
+	_hasSelection: boolean = false;
+
+	@state()
 	_createPath?: string;
 
 	@state()
@@ -34,6 +37,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	constructor() {
 		super();
 		this.#pickerContext.selection.setSelectable(true);
+		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
+			this._hasSelection = hasSelection;
+		});
 		this.#observePickerSelection();
 		this.#observeSearch();
 	}
@@ -188,7 +194,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					label=${this.localize.term('general_choose')}
 					look="primary"
 					color="positive"
-					@click=${this._submitModal}></uui-button>
+					@click=${this._submitModal}
+					?disabled=${!this._hasSelection}></uui-button>
 			</div>
 		`;
 	}

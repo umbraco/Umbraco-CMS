@@ -97,16 +97,14 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 
 	override render() {
 		return html`<uui-box>
-			<div id="rollback" slot="header">
-				<h2><umb-localize key="general_history">History</umb-localize></h2>
-				<uui-button
-					label=${this.localize.term('actions_rollback')}
-					look="secondary"
-					slot="actions"
-					@click=${this.#onRollbackModalOpen}>
-					<uui-icon name="icon-undo"></uui-icon> ${this.localize.term('actions_rollback')}
-				</uui-button>
-			</div>
+			<umb-localize slot="headline" key="general_history">History</umb-localize>
+			<uui-button
+				slot="header-actions"
+				label=${this.localize.term('actions_rollback')}
+				look="secondary"
+				@click=${this.#onRollbackModalOpen}>
+				<uui-icon name="icon-undo"></uui-icon> ${this.localize.term('actions_rollback')}
+			</uui-button>
 			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
 			${this.#renderPagination()}
 		</uui-box> `;
@@ -165,18 +163,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		css`
 			uui-loader-circle {
 				font-size: 2rem;
-			}
-
-			#rollback {
-				display: flex;
-				width: 100%;
-				align-items: center;
-				justify-content: space-between;
-			}
-
-			#rollback h2 {
-				font-size: var(--uui-type-h5-size);
-				margin: 0;
 			}
 
 			uui-tag uui-icon {

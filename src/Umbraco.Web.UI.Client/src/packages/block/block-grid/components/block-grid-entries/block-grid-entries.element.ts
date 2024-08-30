@@ -134,11 +134,23 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
+	#controlValidator?: UmbFormControlValidator;
+	#typeLimitValidator?: UmbFormControlValidatorConfig;
+	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
+	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 
-	@property({ attribute: false })
+	@property({ type: String, attribute: 'area-key', reflect: true })
 	public set areaKey(value: string | null | undefined) {
 		this._areaKey = value;
 		this.#context.setAreaKey(value ?? null);
+		this.#controlValidator?.destroy();
+		if (this.areaKey) {
+			// Only when there is a area key we should create a validator, otherwise it is the root entries element, which is taking part of the Property Editor Form Control. [NL]
+			// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
+			this.#controlValidator = new UmbFormControlValidator(this, this);
+
+			//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias = 'my-input-alias')].value");
+		}
 	}
 	public get areaKey(): string | null | undefined {
 		return this._areaKey;
@@ -169,6 +181,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	constructor() {
 		super();
+
 		this.observe(
 			this.#context.layoutEntries,
 			(layoutEntries) => {
@@ -207,6 +220,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			null,
 		);
 
+		this.observe(
+			this.#context.hasTypeLimits,
+			(hasTypeLimits) => {
+				this.#setupBlockTypeLimitValidation(hasTypeLimits);
+			},
+			null,
+		);
+
 		this.#context.getManager().then((manager) => {
 			this.observe(
 				manager.layoutStylesheet,
@@ -223,8 +244,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
-	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
-	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
@@ -240,9 +259,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
 					);
 				},
-				() => {
-					return this._layoutEntries.length < (rangeLimit?.min ?? 0);
-				},
+				() => this._layoutEntries.length < (rangeLimit?.min ?? 0),
 			);
 		}
 
@@ -260,8 +277,37 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						this._layoutEntries.length - (rangeLimit!.max ?? this._layoutEntries.length),
 					);
 				},
+				() => this._layoutEntries.length > (rangeLimit?.max ?? Infinity),
+			);
+		}
+	}
+
+	async #setupBlockTypeLimitValidation(hasTypeLimits: boolean | undefined) {
+		if (this.#typeLimitValidator) {
+			this.removeValidator(this.#typeLimitValidator);
+			this.#typeLimitValidator = undefined;
+		}
+		if (hasTypeLimits) {
+			this.#typeLimitValidator = this.addValidator(
+				'customError',
 				() => {
-					return (this._layoutEntries.length ?? 0) > (rangeLimit?.max ?? Infinity);
+					const invalids = this.#context.getInvalidBlockTypeLimits();
+					return invalids
+						.map((invalidRule) =>
+							this.localize.term(
+								invalidRule.amount < invalidRule.minRequirement
+									? 'blockEditor_areaValidationEntriesShort'
+									: 'blockEditor_areaValidationEntriesExceed',
+								invalidRule.name,
+								invalidRule.amount,
+								invalidRule.minRequirement,
+								invalidRule.maxRequirement,
+							),
+						)
+						.join(', ');
+				},
+				() => {
+					return !this.#context.checkBlockTypeLimitsValidity();
 				},
 			);
 		}
@@ -284,14 +330,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			<umb-form-validation-message .for=${this}></umb-form-validation-message>
 			${this._canCreate ? this.#renderCreateButton() : nothing}
+			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
 		`;
 	}
 
 	#renderCreateButton() {
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			return html`<uui-button-group>
+			return html`<uui-button-group id="createButton">
 				<uui-button
 					look="placeholder"
 					label=${this._singleBlockTypeName
@@ -343,18 +389,30 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				opacity: 0.2;
 				pointer-events: none;
 			}
+
 			> div {
 				display: flex;
 				flex-direction: column;
 				align-items: stretch;
 			}
 
-			uui-button-group {
+			#createButton {
 				padding-top: 1px;
 				grid-template-columns: 1fr auto;
+				display: grid;
+			}
 
+			// Only when we are n an area, we like to hide the button on drag
+			:host([area-key]) #createButton {
 				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
 				display: var(--umb-block-grid--is-dragging--variable, grid);
+			}
+			:host(:not([pristine]):invalid) #createButton {
+				--uui-button-contrast: var(--uui-color-danger);
+				--uui-button-contrast-hover: var(--uui-color-danger);
+				--uui-color-default-emphasis: var(--uui-color-danger);
+				--uui-button-border-color: var(--uui-color-danger);
+				--uui-button-border-color-hover: var(--uui-color-danger);
 			}
 
 			.umb-block-grid__layout-container[data-area-length='0'] {
