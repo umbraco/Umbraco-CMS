@@ -95,6 +95,20 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			this._updateDate = Array.isArray(variants) ? variants[0].updateDate || 'Unknown' : 'Unknown';
 		});
 	}
+	#openSvg(imagePath: string) {
+		const popup = window.open('', '_blank');
+		if (!popup) return;
+
+		const html = `<!doctype html>
+<body style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(135deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(135deg, transparent 75%, #ccc 75%); background-size:30px 30px; background-position:0 0, 15px 0, 15px -15px, 0px 15px;">
+	<img src="${imagePath}"/>
+	<script>history.pushState(null, null, "${window.location.href}");</script>
+</body>`;
+
+		popup.document.open();
+		popup.document.write(html);
+		popup.document.close();
+	}
 
 	override render() {
 		return html`
@@ -118,18 +132,12 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderLinksSection() {
-		/** TODO Make sure link section is completed */
 		if (this._urls && this._urls.length) {
 			return html`
 				${repeat(
 					this._urls,
-					(url) => url.url,
-					(url) => html`
-						<a href=${url.url} target="_blank" class="link-item with-href">
-							<span class="link-content">${url.url}</span>
-							<uui-icon name="icon-out"></uui-icon>
-						</a>
-					`,
+					(item) => item.url,
+					(item) => this.#renderLinkItem(item),
 				)}
 			`;
 		} else {
@@ -137,6 +145,25 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				<div class="link-item">
 					<span class="link-content italic"><umb-localize key="content_noMediaLink"></umb-localize></span>
 				</div>
+			`;
+		}
+	}
+
+	#renderLinkItem(item: MediaUrlInfoModel) {
+		const ext = item.url.split(/[#?]/)[0].split('.').pop()?.trim();
+		if (ext === 'svg') {
+			return html`
+				<a href="#" target="_blank" class="link-item with-href" @click=${() => this.#openSvg(item.url)}>
+					<span class="link-content">${item.url}</span>
+					<uui-icon name="icon-out"></uui-icon>
+				</a>
+			`;
+		} else {
+			return html`
+				<a href=${item.url} target="_blank" class="link-item with-href">
+					<span class="link-content">${item.url}</span>
+					<uui-icon name="icon-out"></uui-icon>
+				</a>
 			`;
 		}
 	}

@@ -257,6 +257,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
 				.props=${this._blockViewProps}
 				.filter=${this.#extensionSlotFilterMethod}
+				single
 				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
 			>
 			<uui-action-bar>

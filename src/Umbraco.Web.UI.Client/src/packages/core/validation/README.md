@@ -126,4 +126,28 @@ This fact enables a property to observe if there is any Message Paths that start
 Validators represent a component of the Validation to be considered, but it does not represent other messages of its path.
 To display messages from a given data-path, a Binder is needed. We bring a few to make this happen:
 
-UmbBindServerValidationToFormControl
+### UmbBindServerValidationToFormControl
+
+This binder takes a Form Control Element and a data-path.
+The Data Path is a JSON Path defining where the data of this input is located in the model sent to the server.
+
+```
+	this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
+		this,
+		this.querySelector('#myInput"),
+		"$.values.[?(@.alias = 'my-input-alias')].value",
+	);
+```
+
+Once the binder is initialized you need to keep it updated with the value your form control represents. Notice we do not recommend using events from the form control to notify about the changes.
+Instead observe the value in of your data model.
+
+This example is just a dummy example of how that could look:
+```
+	this.observe(
+		this.#value,
+		(value) => {
+			this.#validationMessageBinder.value = value;
+		},
+	);
+```

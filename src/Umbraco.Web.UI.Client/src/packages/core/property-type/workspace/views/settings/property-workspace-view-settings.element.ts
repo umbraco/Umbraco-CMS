@@ -195,7 +195,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		return html`
 			<uui-box class="uui-text">
 				<div class="container">
-					<uui-form-validation-message>
+					<umb-form-validation-message>
 						<uui-input
 							id="name-input"
 							name="name"
@@ -208,8 +208,8 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							${umbFocus()}>
 							<!-- TODO: validation for bad characters -->
 						</uui-input>
-					</uui-form-validation-message>
-					<uui-form-validation-message>
+					</umb-form-validation-message>
+					<umb-form-validation-message>
 						<uui-input-lock
 							id="alias-input"
 							name="alias"
@@ -222,7 +222,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							@input=${this.#onAliasChange}
 							@lock-change=${this.#onToggleAliasLock}>
 						</uui-input-lock>
-					</uui-form-validation-message>
+					</umb-form-validation-message>
 					<uui-textarea
 						id="description-input"
 						name="description"
@@ -231,13 +231,13 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						placeholder=${this.localize.term('placeholders_enterDescription')}
 						.value=${this._data?.description}></uui-textarea>
 				</div>
-				<uui-form-validation-message>
+				<umb-form-validation-message>
 					<umb-data-type-flow-input
 						.value=${this._data?.dataType?.unique ?? ''}
 						@change=${this.#onDataTypeIdChange}
 						required
 						${umbBindToValidation(this, '$.dataType.unique')}></umb-data-type-flow-input>
-				</uui-form-validation-message>
+				</umb-form-validation-message>
 				<hr />
 				<div class="container">
 					<b><umb-localize key="validation_validation">Validation</umb-localize></b>
