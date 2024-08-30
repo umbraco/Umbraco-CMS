@@ -16,4 +16,6 @@ public interface IDocumentCacheService
     Task RefreshContentAsync(IContent content);
 
     Task DeleteItemAsync(int id);
+
+    void Rebuild(IReadOnlyCollection<int> contentTypeKeys);
 }

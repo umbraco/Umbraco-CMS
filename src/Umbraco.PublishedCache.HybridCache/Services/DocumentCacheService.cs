@@ -152,4 +152,23 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _idKeyMap.ClearCache(id);
         scope.Complete();
     }
+
+    public void Rebuild(IReadOnlyCollection<int> contentTypeKeys)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild(contentTypeKeys.ToList());
+        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeKeys.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result));
+
+        foreach (ContentCacheNode content in contentByContentTypeKey)
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(content.Key, true)).GetAwaiter().GetResult();
+
+            if (content.IsDraft is false)
+            {
+                _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
+            }
+        }
+
+        scope.Complete();
+    }
 }

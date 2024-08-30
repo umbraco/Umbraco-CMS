@@ -229,7 +229,7 @@ AND cmsContentNu.nodeId IS NULL
 
         foreach (ContentSourceDto row in dtos)
         {
-            yield return CreateContentNodeKit(row, serializer, false);
+            yield return CreateContentNodeKit(row, serializer, row.Published is false);
         }
     }
 

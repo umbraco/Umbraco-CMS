@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-[Ignore("These tests does not work yet")]
 
 public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithContentEditing
 {
@@ -22,12 +21,8 @@ public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithCo
         //Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
 
-        var newContentType = ContentTypeBuilder.CreateBasicContentType();
-        newContentType.Key = ContentType.Key;
-        newContentType.Id = ContentType.Id;
-        newContentType.Alias = ContentType.Alias;
-        newContentType.DefaultTemplateId = ContentType.DefaultTemplateId;
-        ContentTypeService.Save(newContentType);
+        ContentType.RemovePropertyType("title");
+        ContentTypeService.Save(ContentType);
 
         // Assert
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
