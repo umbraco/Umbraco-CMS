@@ -1,4 +1,13 @@
-import { css, customElement, html, property, query, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	query,
+	state,
+	unsafeHTML,
+} from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
@@ -34,6 +43,22 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 	@property()
 	overlaySize?: UUIModalSidebarSize;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+		this.#editor?.monacoEditor?.updateOptions({ readOnly: this.#readonly });
+	}
+	#readonly = false;
+
 	#editor?: UmbCodeEditorController;
 
 	@query('umb-code-editor')
@@ -49,6 +74,9 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 
 		try {
 			this.#editor = this._codeEditor?.editor;
+
+			// Set read only mode
+			this.#editor?.monacoEditor?.updateOptions({ readOnly: this.#readonly });
 
 			// TODO: make all action into extensions
 			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
@@ -416,6 +444,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 	}
 
 	#renderToolbar() {
+		if (this.readonly) return nothing;
 		return html`
 			<div id="toolbar">
 				<uui-button-group>
