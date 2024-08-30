@@ -16,9 +16,6 @@ class UmbSorterTestElement extends UmbLitElement {
 		itemSelector: '.item',
 		containerSelector: '#container',
 		disabledItemSelector: '.disabled',
-		onChange: ({ model }) => {
-			this.model = model;
-		},
 	});
 
 	getAllItems() {

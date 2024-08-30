@@ -33,7 +33,7 @@ export class UmbChangeUserPasswordServerDataSource {
 			UserService.postUserByIdChangePassword({
 				id,
 				requestBody: {
-					newPassword,
+					newPassword
 				},
 			}),
 		);

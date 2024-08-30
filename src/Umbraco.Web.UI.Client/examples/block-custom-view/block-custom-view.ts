@@ -11,11 +11,15 @@ export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implemen
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
 	override render() {
 		return html`
-			<div class="uui-text">
+			<div class="uui-text ${this.settings?.blockAlignment ? 'align-' + this.settings?.blockAlignment : undefined}">
 				<h5 class="uui-text">My Custom View</h5>
 				<p>Headline: ${this.content?.headline}</p>
+				<p>Alignment: ${this.settings?.blockAlignment}</p>
 			</div>
 		`;
 	}
@@ -30,6 +34,13 @@ export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implemen
 				background-color: #dddddd;
 				border-radius: 9px;
 				padding: 12px;
+			}
+
+			.align-center {
+				text-align: center;
+			}
+			.align-right {
+				text-align: right;
 			}
 		`,
 	];

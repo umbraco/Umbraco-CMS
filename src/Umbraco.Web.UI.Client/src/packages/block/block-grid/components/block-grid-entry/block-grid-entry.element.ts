@@ -343,6 +343,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							default-element="umb-block-grid-block"
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
+							single
 							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
 						<uui-action-bar>
