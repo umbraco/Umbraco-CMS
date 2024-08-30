@@ -1,4 +1,4 @@
-import type { UmbBlockEditorCustomViewElement } from '../interfaces/index.js';
+import type { UmbBlockEditorCustomViewElement } from './types.js';
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestBlockEditorCustomView extends ManifestElement<UmbBlockEditorCustomViewElement> {
@@ -17,4 +17,10 @@ export interface ManifestBlockEditorCustomView extends ManifestElement<UmbBlockE
 	 * @example ['block-list', 'block-grid']
 	 */
 	forBlockEditor?: string | Array<string>;
+}
+
+declare global {
+	interface UmbManifestType {
+		blockEditorCustomView: ManifestBlockEditorCustomView;
+	}
 }
