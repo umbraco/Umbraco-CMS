@@ -1,4 +1,5 @@
 import { UmbUserDetailRepository } from '../../repository/index.js';
+import { UmbUserModelKind, UmbUserModelKindType } from '../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -24,6 +25,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 
 		const formData = new FormData(form);
 
+		const kind = formData.get('kind') as UmbUserModelKindType;
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
 
@@ -35,6 +37,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		const { data: userScaffold } = await this.#userDetailRepository.createScaffold();
 		if (!userScaffold) return;
 
+		userScaffold.kind = kind;
 		userScaffold.name = name;
 		userScaffold.email = email;
 		userScaffold.userName = email;
@@ -95,6 +98,17 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		return html` <uui-form>
 			<form id="CreateUserForm" name="form" @submit="${this.#onSubmit}">
 				<uui-form-layout-item>
+					<uui-label id="kindLabel" slot="label" for="kind" required>Kind</uui-label>
+					<uui-combobox id="kind" label="Kind" name="kind" value=${UmbUserModelKind.DEFAULT} required>
+						<uui-combobox-list>
+							<uui-combobox-list-option label=${UmbUserModelKind.DEFAULT}
+								>${UmbUserModelKind.DEFAULT}</uui-combobox-list-option
+							>
+							<uui-combobox-list-option label=${UmbUserModelKind.API}>${UmbUserModelKind.API}</uui-combobox-list-option>
+						</uui-combobox-list>
+					</uui-combobox>
+				</uui-form-layout-item>
+				<uui-form-layout-item>
 					<uui-label id="nameLabel" slot="label" for="name" required>Name</uui-label>
 					<uui-input id="name" label="name" type="text" name="name" required></uui-input>
 				</uui-form-layout-item>
@@ -115,7 +129,8 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		UmbTextStyles,
 		css`
 			uui-input,
-			uui-input-password {
+			uui-input-password,
+			uui-combobox {
 				width: 100%;
 			}
 
