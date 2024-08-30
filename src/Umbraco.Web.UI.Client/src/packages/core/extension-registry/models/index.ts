@@ -219,8 +219,24 @@ export type ManifestTypes =
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
 
 declare global {
-	interface UmbManifestType {
-		CORE: ManifestTypes;
+	/**
+	 * This global type allows to declare manifests types from its own module.
+	 * @example
+	 * ```js
+	declare global {
+		interface UmbManifestType {
+			My_UNIQUE_MANIFEST_NAME: ManifestTypes;
+		}
 	}
+	 * ```
+	 */
+	interface UmbManifestType {
+		UMB_CORE: ManifestTypes;
+	}
+
+	/**
+	 * This global type provides a union of all declared manifest types.
+	 * If this is a local package that declares additional Manifest Types, then these will also be included in this union.
+	 */
 	type UmbManifestTypes = UnionOfProperties<UmbManifestType>;
 }
