@@ -4,7 +4,6 @@ import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import {
 	UMB_BLOCK_RTE_WORKSPACE_MODAL,
 	type UmbBlockRteWorkspaceOriginData,
-	type UmbBlockRteWorkspaceData,
 } from '../workspace/block-rte-workspace.modal-token.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -41,8 +40,29 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						originData: {},
+						createBlockInWorkspace: true,
 					},
 				};
+			})
+			.onSubmit(async (value, data) => {
+				if (value?.create && data) {
+					const created = await this.create(
+						value.create.contentElementTypeKey,
+						// We can parse an empty object, cause the rest will be filled in by others.
+						{} as any,
+						data.originData as UmbBlockRteWorkspaceOriginData,
+					);
+					if (created) {
+						this.insert(
+							created.layout,
+							created.content,
+							created.settings,
+							data.originData as UmbBlockRteWorkspaceOriginData,
+						);
+					} else {
+						throw new Error('Failed to create block');
+					}
+				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
@@ -114,10 +134,10 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	async create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentUdi'>,
-		modalData?: UmbBlockRteWorkspaceData,
+		originData?: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, modalData);
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
 	}
 
 	// insert Block?
@@ -126,10 +146,10 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		layoutEntry: UmbBlockRteLayoutModel,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockRteWorkspaceData,
+		originData: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.insert(layoutEntry, content, settings, modalData) ?? false;
+		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
 	// create Block?

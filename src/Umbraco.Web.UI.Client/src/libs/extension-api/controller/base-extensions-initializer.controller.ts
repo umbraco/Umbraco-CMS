@@ -111,8 +111,6 @@ export abstract class UmbBaseExtensionsInitializer<
 		manifests.forEach((manifest) => {
 			const existing = this._extensions.find((x) => x.alias === manifest.alias);
 			if (!existing) {
-				// Idea: could be abstracted into a createController method, so we can override it in a subclass.
-				// (This should be enough to be able to create a element extension controller instead.)
 				this._extensions.push(this._createController(manifest));
 			}
 		});
