@@ -483,7 +483,7 @@ describe('Append Conditions', () => {
 				type: 'section',
 				name: 'test-section-2',
 				alias: 'Umb.Test.Section.2',
-				weight: 200
+				weight: 200,
 			},
 		];
 
@@ -657,6 +657,50 @@ describe('Prepend Conditions', () => {
 
 		// The thing to note here our two new conditions is that are prepended in reverse order they are passed in
 		// as each one is prepended to the front of the array
+		expect(extUpdated.conditions?.[0]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
+		expect(extUpdated.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Invalid');
+		expect(extUpdated.conditions?.[2]?.alias).to.equal('Umb.Test.Condition.Valid');
+	});
+
+	it('allows conditions to be prepended when an extension is loaded later on', async () => {
+		const conditions: Array<UmbConditionConfigBase> = [
+			{
+				alias: 'Umb.Test.Condition.Invalid',
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Document',
+			} as WorkspaceAliasConditionConfig,
+		];
+
+		console.log('About to go KABOOM..');
+
+		// Prepend the conditions
+		// [WB] HELP: Why is this fine when using in in an entrypoint
+		// /src/packages/property-editors/entry-point.ts
+		// But this TEST implodes if it can't find the extension that is not yet registered
+		await extensionRegistry.prependConditions('Late.Extension.To.Be.Loaded', conditions);
+
+		// Make sure the extension is not registered YET
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.false;
+
+		// Register the extension LATE/after the conditions have been added
+		extensionRegistry.register({
+			type: 'section',
+			name: 'Late Section Extension with one condition',
+			alias: 'Late.Extension.To.Be.Loaded',
+			weight: 200,
+			conditions: [
+				{
+					alias: 'Umb.Test.Condition.Valid',
+				},
+			],
+		});
+
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.true;
+
+		const extUpdated = extensionRegistry.getByAlias('Late.Extension.To.Be.Loaded') as ManifestWithDynamicConditions;
+		expect(extUpdated.conditions?.length).to.equal(3);
 		expect(extUpdated.conditions?.[0]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
 		expect(extUpdated.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Invalid');
 		expect(extUpdated.conditions?.[2]?.alias).to.equal('Umb.Test.Condition.Valid');
