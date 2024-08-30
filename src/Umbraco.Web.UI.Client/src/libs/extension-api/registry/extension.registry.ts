@@ -452,7 +452,8 @@ export class UmbExtensionRegistry<
 	private async _whenExtensionAliasIsRegistered(alias: string): Promise<ManifestBase> {
 		const source = this.extensions.pipe(filter((allExtensions) => allExtensions.some((ext) => ext.alias === alias)));
 		const value = await firstValueFrom(source);
-		return value[0];
+		const ext = value.find((ext) => ext.alias === alias) as ManifestBase;
+		return ext;
 	}
 
 	/**
@@ -467,9 +468,6 @@ export class UmbExtensionRegistry<
 		try {
 			// Wait for the extension to be registered (as it could be registered late)
 			const extensionToWaitFor = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
-
-			// Got it... now carry on & mutate it
-			console.log('got the extension to update/mutate', extensionToWaitFor);
 
 			// Append the condition to the extensions conditions array
 			if (extensionToWaitFor.conditions) {
@@ -486,10 +484,6 @@ export class UmbExtensionRegistry<
 
 				// Update the main extensions collection/observable
 				this._extensions.setValue(allExtensions);
-
-				// Log the updated extensions for debugging
-				console.log('UPDATED extensions:', this._extensions.getValue());
-				console.table(this._extensions.getValue());
 			}
 		} catch (error) {
 			// TODO: [WB] Will this ever catch an error?
@@ -503,7 +497,9 @@ export class UmbExtensionRegistry<
 	 * @param newConditions {Array<UmbConditionConfigBase>} - A collection of conditions to append to an extension.
 	 */
 	async appendConditions(alias: string, newConditions: Array<UmbConditionConfigBase>): Promise<void> {
-		newConditions.forEach((condition) => this.appendCondition(alias, condition));
+		for (const condition of newConditions) {
+			await this.appendCondition(alias, condition);
+		}
 	}
 
 	/**
@@ -515,9 +511,6 @@ export class UmbExtensionRegistry<
 		try {
 			// Wait for the extension to be registered (as it could be registered late)
 			const extensionToUpdate = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
-
-			// Got it... now carry on & mutate it
-			console.log('got the extension to update/mutate', extensionToUpdate);
 
 			// Append the condition to the extensions conditions array
 			if (extensionToUpdate.conditions) {
@@ -537,6 +530,8 @@ export class UmbExtensionRegistry<
 	 * @param newConditions {Array<UmbConditionConfigBase>} - A collection of conditions to prepend to an extension.
 	 */
 	async prependConditions(alias: string, newConditions: Array<UmbConditionConfigBase>): Promise<void> {
-		newConditions.forEach((condition) => this.prependCondition(alias, condition));
+		for (const condition of newConditions) {
+			await this.prependCondition(alias, condition);
+		}
 	}
 }
