@@ -384,6 +384,11 @@ export type CreateTemplateRequestModel = {
     id?: string | null;
 };
 
+export type CreateUserClientCredentialsRequestModel = {
+    clientId: string;
+    clientSecret: string;
+};
+
 export type CreateUserDataRequestModel = {
     group: string;
     identifier: string;
@@ -413,6 +418,7 @@ export type CreateUserRequestModel = {
     name: string;
     userGroupIds: Array<(ReferenceByIdModel)>;
     id?: string | null;
+    kind: UserKindModel;
 };
 
 export type CreateWebhookRequestModel = {
@@ -1075,6 +1081,7 @@ export type InviteUserRequestModel = {
     name: string;
     userGroupIds: Array<(ReferenceByIdModel)>;
     id?: string | null;
+    kind: UserKindModel;
     message?: string | null;
 };
 
@@ -1353,7 +1360,13 @@ export type MemberItemResponseModel = {
     id: string;
     memberType: MemberTypeReferenceResponseModel;
     variants: Array<(VariantItemResponseModel)>;
+    kind: MemberKindModel;
 };
+
+export enum MemberKindModel {
+    DEFAULT = 'Default',
+    API = 'Api'
+}
 
 export type MemberResponseModel = {
     values: Array<(MemberValueModel)>;
@@ -1370,6 +1383,7 @@ export type MemberResponseModel = {
     lastLockoutDate?: string | null;
     lastPasswordChangeDate?: string | null;
     groups: Array<(string)>;
+    kind: MemberKindModel;
 };
 
 export type MemberTypeCompositionModel = {
@@ -2685,7 +2699,13 @@ export type UserItemResponseModel = {
     id: string;
     name: string;
     avatarUrls: Array<(string)>;
+    kind: UserKindModel;
 };
+
+export enum UserKindModel {
+    DEFAULT = 'Default',
+    API = 'Api'
+}
 
 export enum UserOrderModel {
     USER_NAME = 'UserName',
@@ -2729,6 +2749,7 @@ export type UserResponseModel = {
     lastLockoutDate?: string | null;
     lastPasswordChangeDate?: string | null;
     isAdmin: boolean;
+    kind: UserKindModel;
 };
 
 export type UserSettingsPresentationModel = {
@@ -3494,6 +3515,7 @@ export type GetItemDocumentData = {
 export type GetItemDocumentResponse = Array<(DocumentItemResponseModel)>;
 
 export type GetItemDocumentSearchData = {
+    parentId?: string;
     query?: string;
     skip?: number;
     take?: number;
@@ -3947,6 +3969,7 @@ export type GetItemMediaData = {
 export type GetItemMediaResponse = Array<(MediaItemResponseModel)>;
 
 export type GetItemMediaSearchData = {
+    parentId?: string;
     query?: string;
     skip?: number;
     take?: number;
@@ -5068,11 +5091,25 @@ export type PostUserByIdChangePasswordData = {
 
 export type PostUserByIdChangePasswordResponse = string;
 
-export type PostCurrentUserChangePasswordData = {
-    requestBody?: ChangePasswordCurrentUserRequestModel;
+export type PostUserByIdClientCredentialsData = {
+    id: string;
+    requestBody?: CreateUserClientCredentialsRequestModel;
 };
 
-export type PostCurrentUserChangePasswordResponse = string;
+export type PostUserByIdClientCredentialsResponse = string;
+
+export type GetUserByIdClientCredentialsData = {
+    id: string;
+};
+
+export type GetUserByIdClientCredentialsResponse = Array<(string)>;
+
+export type DeleteUserByIdClientCredentialsByClientIdData = {
+    clientId: string;
+    id: string;
+};
+
+export type DeleteUserByIdClientCredentialsByClientIdResponse = string;
 
 export type PostUserByIdResetPasswordData = {
     id: string;
@@ -12956,6 +12993,69 @@ export type $OpenApiTs = {
                  * Not Found
                  */
                 404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/client-credentials': {
+        post: {
+            req: PostUserByIdClientCredentialsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+        get: {
+            req: GetUserByIdClientCredentialsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(string)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/client-credentials/{clientId}': {
+        delete: {
+            req: DeleteUserByIdClientCredentialsByClientIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
             };
         };
     };
