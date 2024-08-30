@@ -218,3 +218,12 @@ export type ManifestTypes =
 	| ManifestWorkspaces
 	| ManifestWorkspaceViews
 	| ManifestBase;
+
+type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
+
+declare global {
+	interface UmbManifestType {
+		CORE: ManifestTypes;
+	}
+	type UmbManifestTypes = UnionOfProperties<UmbManifestType>;
+}
