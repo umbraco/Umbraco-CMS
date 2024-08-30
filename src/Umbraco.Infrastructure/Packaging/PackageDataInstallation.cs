@@ -1719,18 +1719,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.'
                 var masterTemplate = _templateContentParserService.MasterTemplateAlias(tempElement.Value);
-                if (masterTemplate is not null)
+                if (masterTemplate is not null && templateElements.Any(x => (string?)x.Element("Alias") == masterTemplate))
                 {
                     dependencies.Add(masterTemplate);
                 }
-                else if (string.IsNullOrEmpty((string?)elementCopy.Element("Master")) == false &&
-                         templateElements.Any(x =>
-                             (string?)x.Element("Alias") == (string?)elementCopy.Element("Master")) == false)
+                else
                 {
                     _logger.LogInformation(
                         "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
                         (string?)elementCopy.Element("Alias"),
-                        (string?)elementCopy.Element("Master"));
+                        masterTemplate);
                 }
 
                 graph.AddItem(TopoGraph.CreateNode((string)elementCopy.Element("Alias")!, elementCopy, dependencies));
