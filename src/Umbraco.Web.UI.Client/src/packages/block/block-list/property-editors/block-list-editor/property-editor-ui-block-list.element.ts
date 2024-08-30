@@ -139,21 +139,14 @@ export class UmbPropertyEditorUIBlockListElement
 			this.observe(
 				context.dataPath,
 				(dataPath) => {
-					// Translate paths for content elements:
+					// Translate paths for content/settings:
 					this.#contentDataPathTranslator?.destroy();
-					if (dataPath) {
-						// Set the data path for the local validation context:
-						this.#validationContext.setDataPath(dataPath);
-
-						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
-					}
-
-					// Translate paths for settings elements:
 					this.#settingsDataPathTranslator?.destroy();
 					if (dataPath) {
 						// Set the data path for the local validation context:
 						this.#validationContext.setDataPath(dataPath);
 
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
 						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
 					}
 				},
@@ -163,13 +156,13 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.localize.term('validation_entriesShort'),
+			() => '#validation_entriesShort',
 			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.localize.term('validation_entriesExceed'),
+			() => '#validation_entriesExceed',
 			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
 		);
 

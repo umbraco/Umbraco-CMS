@@ -16,9 +16,7 @@ class UmbSorterTestElement extends UmbLitElement {
 		itemSelector: '.item',
 		containerSelector: '#container',
 		disabledItemSelector: '.disabled',
-		onChange: ({ model }) => {
-			this.model = model;
-		},
+		// TODO: In theory missing model change callback? [NL]
 	});
 
 	getAllItems() {
@@ -151,6 +149,7 @@ describe('UmbSorterController', () => {
 
 	describe('enable', () => {
 		it('sets all allowed items to draggable', () => {
+			// [NL] I have experienced an issue with this test, it may need a little delay before testing for this. As the test relies on DOM.
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
 			items.forEach((item) => {

@@ -58,19 +58,6 @@ const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
-		alias: 'Umb.EntityAction.User.ChangePassword',
-		name: 'Change User Password Entity Action',
-		weight: 600,
-		api: () => import('./change-password/change-user-password.action.js'),
-		forEntityTypes: [UMB_USER_ENTITY_TYPE],
-		meta: {
-			icon: 'icon-key',
-			label: '#user_changePassword',
-		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'default',
 		alias: 'Umb.EntityAction.User.Unlock',
 		name: 'Unlock User Entity Action',
 		weight: 600,

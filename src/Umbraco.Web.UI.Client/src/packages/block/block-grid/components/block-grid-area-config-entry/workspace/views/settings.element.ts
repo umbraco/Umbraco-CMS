@@ -1,15 +1,40 @@
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-block-grid-area-type-workspace-view')
 export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	// TODO: Add Localizations...
 	// TODO: Validation to prevent spaces and weird characters in alias:
-	// TODO: Add create button label field:
-	// TODO: Turn minAllowed and maxAllowed into one range property/input...
-	// TODO: Add validation permission field:
+
+	#dataset?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+
+	@state()
+	_minValue?: number;
+	@state()
+	_maxValue?: number;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+			this.#dataset = context;
+			this.observe(await this.#dataset.propertyValueByAlias<number>('minAllowed'), (min) => {
+				this._minValue = min ?? 0;
+			});
+			this.observe(await this.#dataset.propertyValueByAlias<number>('maxAllowed'), (max) => {
+				this._maxValue = max ?? Infinity;
+			});
+		});
+	}
+	#onAllowedRangeChange = (e: UmbChangeEvent) => {
+		this.#dataset?.setPropertyValue('minAllowed', (e!.target! as UmbInputNumberRangeElement).minValue);
+		this.#dataset?.setPropertyValue('maxAllowed', (e!.target! as UmbInputNumberRangeElement).maxValue);
+	};
+
 	override render() {
 		return html`
 			<uui-box headline=${'Identification'}>
@@ -24,14 +49,14 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
 			</uui-box>
 			<uui-box headline=${'Validation'}>
-				<umb-property
-					label=${'minAllowed'}
-					alias="minAllowed"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
-				<umb-property
-					label=${'maxAllowed'}
-					alias="maxAllowed"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
+				<umb-property-layout label=${'rangeAllowed'}>
+					<umb-input-number-range
+						slot="editor"
+						.minValue=${this._minValue}
+						.maxValue=${this._maxValue}
+						@change=${this.#onAllowedRangeChange}>
+					</umb-input-number-range>
+				</umb-property-layout>
 
 				<umb-property
 					label=${'specifiedAllowance'}

@@ -17,6 +17,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * @augments {UmbLitElement}
  */
 
+// TODO: Refactor extension-slot and extension-with-api slot.
 // TODO: Fire change event.
 // TODO: Make property that reveals the amount of displayed/permitted extensions.
 @customElement('umb-extension-with-api-slot')
@@ -26,6 +27,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 
 	@state()
 	private _permitted?: Array<UmbExtensionElementAndApiInitializer>;
+
+	@property({ type: Boolean })
+	single?: boolean;
 
 	/**
 	 * The type or types of extensions to render.
@@ -177,14 +181,16 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	override render() {
 		return this._permitted
 			? this._permitted.length > 0
-				? repeat(
-						this._permitted,
-						(ext) => ext.alias,
-						(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
-					)
+				? this.single
+					? this.#renderExtension(this._permitted[0], 0)
+					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
 				: html`<slot></slot>`
 			: '';
 	}
+
+	#renderExtension = (ext: UmbExtensionElementAndApiInitializer, i: number) => {
+		return this.renderMethod ? this.renderMethod(ext, i) : ext.component;
+	};
 
 	static override styles = css`
 		:host {

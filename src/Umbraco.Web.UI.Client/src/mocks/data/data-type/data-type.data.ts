@@ -407,6 +407,27 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Dropdown Alignment Options',
+		id: 'dt-dropdown-align',
+		parent: null,
+		editorAlias: 'Umbraco.DropDown.Flexible',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		values: [
+			{
+				alias: 'multiple',
+				value: false,
+			},
+			{
+				alias: 'items',
+				value: ['left', 'center', 'right'],
+			},
+		],
+	},
+	{
 		name: 'Slider',
 		id: 'dt-slider',
 		parent: null,
@@ -587,6 +608,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Headline',
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
+						settingsElementTypeKey: 'headline-settings-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
 						icon: 'icon-edit',
@@ -613,7 +635,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'useInlineEditingAsDefault',
-				value: true,
+				value: false,
 			},
 			{
 				alias: 'useLiveEditing',
