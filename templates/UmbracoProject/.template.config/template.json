@@ -116,7 +116,7 @@
         "cases": [
           {
             "condition": "(true)",
-            "value": "net8.0"
+            "value": "net9.0"
           }
         ]
       }
