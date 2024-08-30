@@ -60,8 +60,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
 
-	#readOnlyState = new UmbReadOnlyVariantStateManager(this);
-	public readonly readOnlyState = this.#readOnlyState;
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
@@ -109,9 +108,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 						message: '',
 					};
 
-					this.#readOnlyState?.addState(state);
+					this.readOnlyState?.addState(state);
 				} else {
-					this.#readOnlyState?.removeState(unique);
+					this.readOnlyState?.removeState(unique);
 				}
 			});
 		});
