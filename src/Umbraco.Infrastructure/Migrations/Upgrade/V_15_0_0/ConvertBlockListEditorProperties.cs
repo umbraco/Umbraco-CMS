@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
@@ -7,17 +8,20 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
+[Obsolete("Will be removed in V18")]
 public class ConvertBlockListEditorProperties : ConvertBlockEditorPropertiesBase
 {
-    /// <summary>
-    /// Setting this property to true will cause the migration to be skipped.
-    /// </summary>
-    /// <remarks>
-    /// If you choose to skip the migration, you're responsible for performing the content migration for Block Lists after the V15 upgrade has completed.
-    /// </remarks>
-    public static bool SkipMigration { get; set; } = false;
-
-    protected override bool SkipThisMigration() => SkipMigration;
+    public ConvertBlockListEditorProperties(
+        IMigrationContext context,
+        ILogger<ConvertBlockEditorPropertiesBase> logger,
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        IJsonSerializer jsonSerializer,
+        IUmbracoContextFactory umbracoContextFactory,
+        ILanguageService languageService,
+        IOptions<ConvertBlockEditorPropertiesOptions> options)
+        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService)
+        => SkipMigration = options.Value.SkipBlockListEditors;
 
     protected override IEnumerable<string> PropertyEditorAliases
         => new[] { Constants.PropertyEditors.Aliases.BlockList };

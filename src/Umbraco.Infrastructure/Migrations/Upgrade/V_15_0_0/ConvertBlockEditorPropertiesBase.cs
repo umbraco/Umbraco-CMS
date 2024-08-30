@@ -12,6 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
+[Obsolete("Will be removed in V18")]
 public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 {
     private readonly ILogger<ConvertBlockEditorPropertiesBase> _logger;
@@ -25,7 +26,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
     protected abstract EditorValueHandling DetermineEditorValueHandling(object editorValue);
 
-    protected abstract bool SkipThisMigration();
+    protected bool SkipMigration { get; init; }
 
     protected enum EditorValueHandling
     {
@@ -54,7 +55,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
     protected override void Migrate()
     {
-        if (SkipThisMigration())
+        if (SkipMigration)
         {
             _logger.LogInformation("Migration was skipped due to configuration.");
             return;
