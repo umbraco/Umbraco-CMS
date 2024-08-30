@@ -7,6 +7,8 @@ import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/ext
 
 @customElement('umb-test-extension-slot-manifest-element')
 class UmbTestExtensionSlotManifestElement extends HTMLElement {}
+@customElement('umb-test-extension-slot-manifest-element-2')
+class UmbTestExtensionSlotManifestElement2 extends HTMLElement {}
 
 function sleep(timeMs: number) {
 	return new Promise((resolve) => {
@@ -44,8 +46,20 @@ describe('UmbExtensionSlotElement', () => {
 				expect(element).to.have.property('filter');
 			});
 
+			it('has a props property', () => {
+				expect(element).to.have.property('props');
+			});
+
 			it('has a defaultElement property', () => {
 				expect(element).to.have.property('defaultElement');
+			});
+
+			it('has a renderMethod property', () => {
+				expect(element).to.have.property('renderMethod');
+			});
+
+			it('has a single property', () => {
+				expect(element).to.have.property('single');
 			});
 		});
 	});
@@ -57,6 +71,17 @@ describe('UmbExtensionSlotElement', () => {
 				alias: 'unit-test-ext-slot-element-manifest',
 				name: 'unit-test-extension',
 				elementName: 'umb-test-extension-slot-manifest-element',
+				weight: 200, // first is the heaviest and is therefor rendered first.
+				meta: {
+					pathname: 'test/test',
+				},
+			});
+			umbExtensionsRegistry.register({
+				type: 'dashboard',
+				alias: 'unit-test-ext-slot-element-manifest-2',
+				name: 'unit-test-extension-2',
+				elementName: 'umb-test-extension-slot-manifest-element-2',
+				weight: 100,
 				meta: {
 					pathname: 'test/test',
 				},
@@ -65,6 +90,7 @@ describe('UmbExtensionSlotElement', () => {
 
 		afterEach(async () => {
 			umbExtensionsRegistry.unregister('unit-test-ext-slot-element-manifest');
+			umbExtensionsRegistry.unregister('unit-test-ext-slot-element-manifest-2');
 		});
 
 		it('renders a manifest element', async () => {
@@ -73,18 +99,30 @@ describe('UmbExtensionSlotElement', () => {
 			await sleep(20);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			expect(element.shadowRoot!.childElementCount).to.be.equal(2);
 		});
 
 		it('works with the filtering method', async () => {
 			element = await fixture(
 				html`<umb-extension-slot
 					type="dashboard"
-					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`,
+					.filter=${(x: ManifestDashboard) =>
+						x.alias === 'unit-test-ext-slot-element-manifest-2'}></umb-extension-slot>`,
 			);
 
 			await sleep(20);
 
+			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement2);
+			expect(element.shadowRoot!.childElementCount).to.be.equal(1);
+		});
+
+		it('works with the single mode', async () => {
+			element = await fixture(html`<umb-extension-slot type="dashboard" single></umb-extension-slot>`);
+
+			await sleep(20);
+
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			expect(element.shadowRoot!.childElementCount).to.be.equal(1);
 		});
 
 		it('use the render method', async () => {
@@ -102,6 +140,7 @@ describe('UmbExtensionSlotElement', () => {
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
 				UmbTestExtensionSlotManifestElement,
 			);
+			expect(element.shadowRoot!.childElementCount).to.be.equal(1);
 		});
 
 		it('parses the props', async () => {
@@ -117,6 +156,7 @@ describe('UmbExtensionSlotElement', () => {
 
 			expect((element.shadowRoot!.firstElementChild as any).testProp).to.be.equal('fooBar');
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			expect(element.shadowRoot!.childElementCount).to.be.equal(1);
 		});
 	});
 });

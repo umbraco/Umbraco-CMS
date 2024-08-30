@@ -79,7 +79,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		return html`
 			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation" class="handle"></uui-icon>`}
 
-			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
+			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input
 					id="input"
 					label="Value"
@@ -90,7 +90,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 					?readonly=${this.readonly}
 					required=${this.required}
 					required-message="Value is missing"></uui-input>
-			</uui-form-validation-message>
+			</umb-form-validation-message>
 
 			${when(
 				!this.readonly,

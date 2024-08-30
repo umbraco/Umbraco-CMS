@@ -99,6 +99,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
  * The mixin allows a custom element to participate in HTML forms.
  * @param {object} superClass - superclass to be extended.
  * @param defaultValue
+ * @returns {class} - The mixin class.
  * @mixin
  */
 export function UmbFormControlMixin<
@@ -172,7 +173,7 @@ export function UmbFormControlMixin<
 		 * Get internal form element.
 		 * This has to be implemented to provide a FormControl Element of choice for the given context. The element is used as anchor for validation-messages.
 		 * @function getFormElement
-		 * @returns {HTMLElement | undefined | null}
+		 * @returns {HTMLElement | undefined | null} - Returns the form element or undefined if not found.
 		 */
 		protected getFormElement(): HTMLElement | undefined | null {
 			return this.#formCtrlElements.find((el) => el.validity.valid === false);
@@ -181,7 +182,7 @@ export function UmbFormControlMixin<
 		/**
 		 * Focus first element that is invalid.
 		 * @function focusFirstInvalidElement
-		 * @returns {HTMLElement | undefined}
+		 * @returns {HTMLElement | undefined} - Returns the first invalid element or undefined if no invalid elements are found.
 		 */
 		focusFirstInvalidElement() {
 			const firstInvalid = this.#formCtrlElements.find((el) => el.validity.valid === false);
@@ -219,6 +220,7 @@ export function UmbFormControlMixin<
 		 * @param {FlagTypes} flagKey the type of validation.
 		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
 		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
+		 * @returns {UmbFormControlValidatorConfig} - The added validator configuration.
 		 */
 		addValidator(
 			flagKey: FlagTypes,
@@ -252,7 +254,7 @@ export function UmbFormControlMixin<
 		/**
 		 * @function addFormControlElement
 		 * @description Important notice if adding a native form control then ensure that its value and thereby validity is updated when value is changed from the outside.
-		 * @param element {UmbNativeFormControlElement} - element to validate and include as part of this form association.
+		 * @param {UmbNativeFormControlElement} element - element to validate and include as part of this form association.
 		 */
 		protected addFormControlElement(element: UmbNativeFormControlElement) {
 			this.#formCtrlElements.push(element);
@@ -275,7 +277,7 @@ export function UmbFormControlMixin<
 		/**
 		 * @function setCustomValidity
 		 * @description Set custom validity state, set to empty string to remove the custom message.
-		 * @param message {string} - The message to be shown
+		 * @param {string} message - The message to be shown
 		 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity|HTMLObjectElement:setCustomValidity}
 		 */
 		protected setCustomValidity(message: string | null) {
