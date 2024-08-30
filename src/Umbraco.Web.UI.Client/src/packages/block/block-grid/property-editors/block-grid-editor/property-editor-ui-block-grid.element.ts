@@ -132,7 +132,9 @@ export class UmbPropertyEditorUIBlockGridElement
 			this.removeFormControlElement(this.#currentEntriesElement as any);
 		}
 		this.#currentEntriesElement = element;
-		this.addFormControlElement(element as any);
+		if (element) {
+			this.addFormControlElement(element as any);
+		}
 	}
 
 	override render() {
