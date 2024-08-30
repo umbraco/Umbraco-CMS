@@ -332,7 +332,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				if ('checkValidity' in this._element) {
 					const dataPath = this.dataPath;
 					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
-					// We trust blindly that the dataPath is available at this stage. [NL]
+					// We trust blindly that the dataPath will be present at this stage and not arrive later than this moment. [NL]
 					if (dataPath) {
 						this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
 							this,
