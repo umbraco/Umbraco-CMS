@@ -12,6 +12,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: 'Umbraco.MemberGroupPicker',
 			icon: 'icon-users-alt',
 			group: 'people',
+			supportsReadOnly: true,
 		},
 	},
 	memberGroupSchemaManifest,
