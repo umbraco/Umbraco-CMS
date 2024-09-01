@@ -175,6 +175,9 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: contents;
+			}
 			uui-table-cell:not(.link-cell) {
 				color: var(--uui-color-text-alt);
 			}

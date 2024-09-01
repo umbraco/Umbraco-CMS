@@ -151,6 +151,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 					type="blockEditorCustomView"
 					default-element=${'umb-ref-rte-block'}
 					.props=${this._blockViewProps}
+					single
 					>${this.#renderRefBlock()}</umb-extension-slot
 				>
 				<uui-action-bar>
