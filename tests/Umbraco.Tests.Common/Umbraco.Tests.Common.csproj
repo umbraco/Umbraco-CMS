@@ -8,8 +8,9 @@
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
   </PropertyGroup>
   <PropertyGroup>
-    <!--  TODO: Fix SYSLIB0012 and CS0618 obsolete references,CS1998 async, and remove overrides -->
-    <WarningsNotAsErrors>SYSLIB0012,CS0618,CS1998</WarningsNotAsErrors>
+    <!--  TODO: Fix CS1998 async, CSO618 obsolete references, fix SYSLIB0012 obsolete references,
+    and remove overrides -->
+    <WarningsNotAsErrors>CS1998,CS0618,SYSLIB0012</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" />

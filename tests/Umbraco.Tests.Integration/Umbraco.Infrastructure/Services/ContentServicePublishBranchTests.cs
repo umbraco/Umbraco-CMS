@@ -328,8 +328,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         Assert.IsTrue(vRoot.IsCulturePublished("es"));
         Assert.IsTrue(vRoot.IsCultureEdited("es")); // has draft
 
-        Assert.AreEqual("changed",
-            vRoot.GetValue("ip", published: true)); // publishing de implies publishing invariants
+        Assert.AreEqual("changed", vRoot.GetValue("ip", published: true)); // publishing de implies publishing invariants
         Assert.AreEqual("changed.de", vRoot.GetValue("vp", "de", published: true));
 
         // validate - de and ru are published, es has not been published
