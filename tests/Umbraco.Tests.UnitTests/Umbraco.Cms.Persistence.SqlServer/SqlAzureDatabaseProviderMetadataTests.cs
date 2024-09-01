@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Persistence.SqlServer.Services;
 

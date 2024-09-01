@@ -660,7 +660,7 @@ public class ReflectionUtilitiesTests
         public readonly int Field3 = 22;
 
         public int Field1 = 33;
-        private readonly int Field2 = 66;
+        private readonly int _field2 = 66;
 
         public Class1()
         {
