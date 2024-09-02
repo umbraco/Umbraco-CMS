@@ -38243,7 +38243,6 @@
       "InviteUserRequestModel": {
         "required": [
           "email",
-          "kind",
           "name",
           "userGroupIds",
           "userName"
@@ -38274,9 +38273,6 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
-          },
-          "kind": {
-            "$ref": "#/components/schemas/UserKindModel"
           },
           "message": {
             "type": "string",
