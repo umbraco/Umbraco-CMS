@@ -457,14 +457,14 @@ export class UmbExtensionRegistry<
 	}
 
 	/**
-	 * Appends a new condition to an existing extension
+	 * Add a new condition to an existing extension
 	 * Useful to add a condition for example the Save And Publish workspace action shipped by core
 	 * As overwriting the whole extension to simply add an extra condition is not ideal as it causes a lot of duplicated code
 	 * and could easily get out of sync from the CMS core implementation if a 3rd party dev was to try and overwrite it
 	 * @param alias {string} - The alias of the extension to append the condition to
 	 * @param newCondition {UmbConditionConfigBase} - The condition to append to the extension.
 	 */
-	async appendCondition(alias: string, newCondition: UmbConditionConfigBase): Promise<void> {
+	async addCondition(alias: string, newCondition: UmbConditionConfigBase): Promise<void> {
 		try {
 			// Wait for the extension to be registered (as it could be registered late)
 			const extensionToWaitFor = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
@@ -492,46 +492,13 @@ export class UmbExtensionRegistry<
 	}
 
 	/**
-	 * Appends a collection of conditions to an exsiting extension
+	 * Adds a collection of conditions to an exsiting extension
 	 * @param alias {string} - The alias of the extension to append the condition to
 	 * @param newConditions {Array<UmbConditionConfigBase>} - A collection of conditions to append to an extension.
 	 */
-	async appendConditions(alias: string, newConditions: Array<UmbConditionConfigBase>): Promise<void> {
+	async addConditions(alias: string, newConditions: Array<UmbConditionConfigBase>): Promise<void> {
 		for (const condition of newConditions) {
-			await this.appendCondition(alias, condition);
-		}
-	}
-
-	/**
-	 * Prepends a new condition to an existing extension
-	 * @param alias {string} - The alias of the extension to prepend the condition to
-	 * @param newCondition {UmbConditionConfigBase} - The condition to prepend to the extension.
-	 */
-	async prependCondition(alias: string, newCondition: UmbConditionConfigBase): Promise<void> {
-		try {
-			// Wait for the extension to be registered (as it could be registered late)
-			const extensionToUpdate = (await this._whenExtensionAliasIsRegistered(alias)) as ManifestWithDynamicConditions;
-
-			// Append the condition to the extensions conditions array
-			if (extensionToUpdate.conditions) {
-				extensionToUpdate.conditions.unshift(newCondition);
-			} else {
-				extensionToUpdate.conditions = [newCondition];
-			}
-		} catch (error) {
-			// TODO: [WB] Will this ever catch an error?
-			console.error(`Extension with alias ${alias} was never found and threw ${error}`);
-		}
-	}
-
-	/**
-	 * Prepends a collection of conditions to an existing extension
-	 * @param alias {string} - The alias of the extension to prepend the conditions to
-	 * @param newConditions {Array<UmbConditionConfigBase>} - A collection of conditions to prepend to an extension.
-	 */
-	async prependConditions(alias: string, newConditions: Array<UmbConditionConfigBase>): Promise<void> {
-		for (const condition of newConditions) {
-			await this.prependCondition(alias, condition);
+			await this.addCondition(alias, condition);
 		}
 	}
 }
