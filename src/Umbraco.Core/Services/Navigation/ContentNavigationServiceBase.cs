@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core.Factories;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -178,14 +180,11 @@ internal abstract class ContentNavigationServiceBase
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(readLock);
 
-        if (trashed)
-        {
-            _recycleBinNavigationStructure = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
-        }
-        else
-        {
-            _navigationStructure = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
-        }
+        IEnumerable<INavigationModel> navigationModels = trashed ?
+            _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey) :
+            _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
+
+        _navigationStructure = NavigationFactory.BuildNavigationDictionary(navigationModels);
     }
 
     private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)

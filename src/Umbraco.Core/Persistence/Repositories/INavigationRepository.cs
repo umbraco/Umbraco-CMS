@@ -1,21 +1,20 @@
-using System.Collections.Concurrent;
-using Umbraco.Cms.Core.Models.Navigation;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 public interface INavigationRepository
 {
     /// <summary>
-    ///     Retrieves a dictionary of content nodes based on the object type key.
+    ///     Retrieves a collection of content nodes as navigation models based on the object type key.
     /// </summary>
     /// <param name="objectTypeKey">The unique identifier for the object type.</param>
-    /// <returns>A dictionary of navigation nodes where the key is the unique identifier of the node.</returns>
-    public ConcurrentDictionary<Guid, NavigationNode> GetContentNodesByObjectType(Guid objectTypeKey);
+    /// <returns>A collection of navigation models.</returns>
+    IEnumerable<INavigationModel> GetContentNodesByObjectType(Guid objectTypeKey);
 
     /// <summary>
-    ///     Retrieves a dictionary of trashed content nodes based on the object type key.
+    ///     Retrieves a collection of trashed content nodes as navigation models based on the object type key.
     /// </summary>
     /// <param name="objectTypeKey">The unique identifier for the object type.</param>
-    /// <returns>A dictionary of navigation nodes where the key is the unique identifier of the node.</returns>
-    public ConcurrentDictionary<Guid, NavigationNode> GetTrashedContentNodesByObjectType(Guid objectTypeKey);
+    /// <returns>A collection of navigation models.</returns>
+    IEnumerable<INavigationModel> GetTrashedContentNodesByObjectType(Guid objectTypeKey);
 }
