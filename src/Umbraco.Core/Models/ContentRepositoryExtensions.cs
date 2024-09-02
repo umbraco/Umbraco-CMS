@@ -372,7 +372,7 @@ public static class ContentRepositoryExtensions
         // if the content varies by culture, let data editor opt-in to perform partial property publishing (per culture)
         if (content.ContentType.VariesByCulture()
             && propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor)
-            && dataEditor.ShouldPublishPartialValues(property.PropertyType))
+            && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
         {
             // perform partial publishing for the current culture
             property.PublishPartialValues(dataEditor, culture);

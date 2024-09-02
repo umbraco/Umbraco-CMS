@@ -41,13 +41,13 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     public override bool SupportsConfigurableElements => true;
 
     /// <inheritdoc />
-    public override bool ShouldPublishPartialValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
 
     /// <inheritdoc />
-    public override object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture)
+    public override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
     {
         var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
-        return valueEditor.PublishPartialValueForCulture(editedValue, publishedValue, culture);
+        return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
     }
 
     #region Pre Value Editor

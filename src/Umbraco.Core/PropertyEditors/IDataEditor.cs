@@ -53,16 +53,16 @@ public interface IDataEditor : IDiscoverable
     IConfigurationEditor GetConfigurationEditor();
 
     /// <summary>
-    ///     Determines if the value editor needs to perform <see cref="PublishPartialValueForCulture"/> for a given property type.
+    ///     Determines if the value editor needs to perform <see cref="MergePartialPropertyValueForCulture"/> for a given property type.
     /// </summary>
-    bool ShouldPublishPartialValues(IPropertyType propertyType) => false;
+    bool CanMergePartialPropertyValues(IPropertyType propertyType) => false;
 
     /// <summary>
-    ///     Partially published an edited property value into the published property value for a given culture.
+    ///     Partially merges a source property value into a target property value for a given culture.
     /// </summary>
-    /// <param name="editedValue">The edited property value.</param>
-    /// <param name="publishedValue">The published property value.</param>
+    /// <param name="sourceValue">The source property value.</param>
+    /// <param name="targetValue">The target property value.</param>
     /// <param name="culture">The culture (or null for invariant).</param>
-    /// <returns>The result of the partial publishing operation.</returns>
-    object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture) => editedValue;
+    /// <returns>The result of the merge operation.</returns>
+    object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
 }

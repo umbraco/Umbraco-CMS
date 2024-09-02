@@ -186,7 +186,7 @@ public class Property : EntityBase, IProperty
 
         culture = culture?.NullOrWhiteSpaceAsNull();
 
-        var value = dataEditor.PublishPartialValueForCulture(_pvalue?.EditedValue, _pvalue?.PublishedValue, culture);
+        var value = dataEditor.MergePartialPropertyValueForCulture(_pvalue?.EditedValue, _pvalue?.PublishedValue, culture);
         PublishValue(_pvalue, value);
     }
 

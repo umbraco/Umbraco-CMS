@@ -198,8 +198,8 @@ public class DataEditor : IDataEditor
     protected virtual string DebuggerDisplay() => $"Alias: {Alias}";
 
     /// <inheritdoc />
-    public virtual bool ShouldPublishPartialValues(IPropertyType propertyType) => false;
+    public virtual bool CanMergePartialPropertyValues(IPropertyType propertyType) => false;
 
     /// <inheritdoc />
-    public virtual object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture) => editedValue;
+    public virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
 }

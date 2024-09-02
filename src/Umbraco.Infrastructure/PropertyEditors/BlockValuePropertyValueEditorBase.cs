@@ -229,87 +229,87 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         }
     }
 
-    internal object? PublishPartialValueForCulture(object? editedValue, object? publishedValue, string? culture)
+    internal object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
     {
-        if (editedValue is null)
+        if (sourceValue is null)
         {
             return null;
         }
 
-        // parse the edited value as block editor data
-        BlockEditorData<TValue, TLayout>? editedBlockEditorValues = BlockEditorValues.DeserializeAndClean(editedValue);
-        if (editedBlockEditorValues?.Layout is null)
+        // parse the source value as block editor data
+        BlockEditorData<TValue, TLayout>? sourceBlockEditorValues = BlockEditorValues.DeserializeAndClean(sourceValue);
+        if (sourceBlockEditorValues?.Layout is null)
         {
             return null;
         }
 
-        // parse the published value as block editor data (fallback to an empty set of block editor data)
-        BlockEditorData<TValue, TLayout> publishedBlockEditorValues =
-            (publishedValue is not null ? BlockEditorValues.DeserializeAndClean(publishedValue) : null)
-            ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(editedBlockEditorValues.Layout));
+        // parse the target value as block editor data (fallback to an empty set of block editor data)
+        BlockEditorData<TValue, TLayout> targetBlockEditorValues =
+            (targetValue is not null ? BlockEditorValues.DeserializeAndClean(targetValue) : null)
+            ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(sourceBlockEditorValues.Layout));
 
-        PublishPartialValueForCulture(editedBlockEditorValues.BlockValue.ContentData, publishedBlockEditorValues.BlockValue.ContentData, culture);
-        PublishPartialValueForCulture(editedBlockEditorValues.BlockValue.SettingsData, publishedBlockEditorValues.BlockValue.SettingsData, culture);
+        MergePartialPropertyValueForCulture(sourceBlockEditorValues.BlockValue.ContentData, targetBlockEditorValues.BlockValue.ContentData, culture);
+        MergePartialPropertyValueForCulture(sourceBlockEditorValues.BlockValue.SettingsData, targetBlockEditorValues.BlockValue.SettingsData, culture);
 
-        return _jsonSerializer.Serialize(publishedBlockEditorValues.BlockValue);
+        return _jsonSerializer.Serialize(targetBlockEditorValues.BlockValue);
     }
 
-    private void PublishPartialValueForCulture(List<BlockItemData> editedBlockItems, List<BlockItemData> publishedBlockItems, string? culture)
+    private void MergePartialPropertyValueForCulture(List<BlockItemData> sourceBlockItems, List<BlockItemData> targetBlockItems, string? culture)
     {
-        // remove all published blocks that are not part of the edited blocks (structure is global)
-        publishedBlockItems.RemoveAll(pb => editedBlockItems.Any(eb => eb.Key == pb.Key) is false);
+        // remove all target blocks that are not part of the source blocks (structure is global)
+        targetBlockItems.RemoveAll(pb => sourceBlockItems.Any(eb => eb.Key == pb.Key) is false);
 
-        // merge the edited values into the published values for culture
-        foreach (BlockItemData editedBlockItem in editedBlockItems)
+        // merge the source values into the target values for culture
+        foreach (BlockItemData sourceBlockItem in sourceBlockItems)
         {
-            BlockItemData? publishedBlockItem = publishedBlockItems.FirstOrDefault(i => i.Key == editedBlockItem.Key);
-            if (publishedBlockItem is null)
+            BlockItemData? targetBlockItem = targetBlockItems.FirstOrDefault(i => i.Key == sourceBlockItem.Key);
+            if (targetBlockItem is null)
             {
-                publishedBlockItem = new BlockItemData(
-                    editedBlockItem.Key,
-                    editedBlockItem.ContentTypeKey,
-                    editedBlockItem.ContentTypeAlias);
+                targetBlockItem = new BlockItemData(
+                    sourceBlockItem.Key,
+                    sourceBlockItem.ContentTypeKey,
+                    sourceBlockItem.ContentTypeAlias);
 
-                // NOTE: this only works because publishedBlockItems is by ref!
-                publishedBlockItems.Add(publishedBlockItem);
+                // NOTE: this only works because targetBlockItem is by ref!
+                targetBlockItems.Add(targetBlockItem);
             }
 
-            foreach (BlockPropertyValue editedBlockPropertyValue in editedBlockItem.Values)
+            foreach (BlockPropertyValue sourceBlockPropertyValue in sourceBlockItem.Values)
             {
-                // is this another editor that supports partial publishing? i.e. blocks within blocks.
+                // is this another editor that supports partial merging? i.e. blocks within blocks.
                 IDataEditor? mergingDataEditor = null;
-                var shouldPerformPartialPublish = editedBlockPropertyValue.PropertyType is not null
-                                  && _propertyEditors.TryGet(editedBlockPropertyValue.PropertyType.PropertyEditorAlias, out mergingDataEditor)
-                                  && mergingDataEditor.ShouldPublishPartialValues(editedBlockPropertyValue.PropertyType);
+                var shouldPerformPartialMerge = sourceBlockPropertyValue.PropertyType is not null
+                                  && _propertyEditors.TryGet(sourceBlockPropertyValue.PropertyType.PropertyEditorAlias, out mergingDataEditor)
+                                  && mergingDataEditor.CanMergePartialPropertyValues(sourceBlockPropertyValue.PropertyType);
 
-                if (shouldPerformPartialPublish is false && editedBlockPropertyValue.Culture != culture)
+                if (shouldPerformPartialMerge is false && sourceBlockPropertyValue.Culture != culture)
                 {
                     // skip for now (irrelevant for the current culture, but might be included in the next pass)
                     continue;
                 }
 
-                BlockPropertyValue? publishedBlockPropertyValue = publishedBlockItem
+                BlockPropertyValue? targetBlockPropertyValue = targetBlockItem
                     .Values
                     .FirstOrDefault(v =>
-                        v.Alias == editedBlockPropertyValue.Alias &&
-                        v.Culture == editedBlockPropertyValue.Culture &&
-                        v.Segment == editedBlockPropertyValue.Segment);
+                        v.Alias == sourceBlockPropertyValue.Alias &&
+                        v.Culture == sourceBlockPropertyValue.Culture &&
+                        v.Segment == sourceBlockPropertyValue.Segment);
 
-                if (publishedBlockPropertyValue is null)
+                if (targetBlockPropertyValue is null)
                 {
-                    publishedBlockPropertyValue = new BlockPropertyValue
+                    targetBlockPropertyValue = new BlockPropertyValue
                     {
-                        Alias = editedBlockPropertyValue.Alias,
-                        Culture = editedBlockPropertyValue.Culture,
-                        Segment = editedBlockPropertyValue.Segment
+                        Alias = sourceBlockPropertyValue.Alias,
+                        Culture = sourceBlockPropertyValue.Culture,
+                        Segment = sourceBlockPropertyValue.Segment
                     };
-                    publishedBlockItem.Values.Add(publishedBlockPropertyValue);
+                    targetBlockItem.Values.Add(targetBlockPropertyValue);
                 }
 
-                // assign edited value to published value (or perform partial publish, depending on context)
-                publishedBlockPropertyValue.Value = shouldPerformPartialPublish is false
-                    ? editedBlockPropertyValue.Value
-                    : mergingDataEditor!.PublishPartialValueForCulture(editedBlockPropertyValue.Value, publishedBlockPropertyValue.Value, culture);
+                // assign source value to target value (or perform partial merge, depending on context)
+                targetBlockPropertyValue.Value = shouldPerformPartialMerge is false
+                    ? sourceBlockPropertyValue.Value
+                    : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
         }
     }
