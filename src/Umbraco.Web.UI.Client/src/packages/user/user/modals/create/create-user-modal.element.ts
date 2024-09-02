@@ -1,5 +1,5 @@
 import { UmbUserDetailRepository } from '../../repository/index.js';
-import { UmbUserModelKind, UmbUserModelKindType } from '../../utils/index.js';
+import { UmbUserKind, UmbUserKindType } from '../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -25,7 +25,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 
 		const formData = new FormData(form);
 
-		const kind = formData.get('kind') as UmbUserModelKindType;
+		const kind = formData.get('kind') as UmbUserKindType;
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
 
@@ -99,12 +99,10 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 			<form id="CreateUserForm" name="form" @submit="${this.#onSubmit}">
 				<uui-form-layout-item>
 					<uui-label id="kindLabel" slot="label" for="kind" required>Kind</uui-label>
-					<uui-combobox id="kind" label="Kind" name="kind" value=${UmbUserModelKind.DEFAULT} required>
+					<uui-combobox id="kind" label="Kind" name="kind" value=${UmbUserKind.DEFAULT} required>
 						<uui-combobox-list>
-							<uui-combobox-list-option label=${UmbUserModelKind.DEFAULT}
-								>${UmbUserModelKind.DEFAULT}</uui-combobox-list-option
-							>
-							<uui-combobox-list-option label=${UmbUserModelKind.API}>${UmbUserModelKind.API}</uui-combobox-list-option>
+							<uui-combobox-list-option label=${UmbUserKind.DEFAULT}>${UmbUserKind.DEFAULT}</uui-combobox-list-option>
+							<uui-combobox-list-option label=${UmbUserKind.API}>${UmbUserKind.API}</uui-combobox-list-option>
 						</uui-combobox-list>
 					</uui-combobox>
 				</uui-form-layout-item>

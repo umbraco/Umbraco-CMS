@@ -10,7 +10,7 @@ import type {
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbUserModelKind } from '../../utils/index.js';
+import { UmbUserKind } from '../../utils/index.js';
 
 /**
  * A data source for the User that fetches data from the server
@@ -46,7 +46,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			hasDocumentRootAccess: false,
 			hasMediaRootAccess: false,
 			isAdmin: false,
-			kind: UmbUserModelKind.DEFAULT,
+			kind: UmbUserKind.DEFAULT,
 			languageIsoCode: '',
 			lastLockoutDate: null,
 			lastLoginDate: null,

@@ -5,7 +5,7 @@ import {
 	UserStateModel,
 	type UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbUserModelKindType } from './utils/index.js';
+import { UmbUserKindType } from './utils/index.js';
 
 export type UmbUserStateEnum = UserStateModel;
 export const UmbUserStateEnum = UserStateModel;
@@ -27,7 +27,7 @@ export interface UmbUserDetailModel extends UmbUserStartNodesModel {
 	updateDate: string | null;
 	userGroupUniques: Array<UmbReferenceByUnique>;
 	userName: string;
-	kind: UmbUserModelKindType;
+	kind: UmbUserKindType;
 }
 
 export interface UmbUserStartNodesModel {

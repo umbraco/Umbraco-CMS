@@ -1,8 +1,8 @@
 export * from './is-user.function.js';
 
-export type UmbUserModelKindType = 'Default' | 'Api';
+export type UmbUserKindType = 'Default' | 'Api';
 
-export const UmbUserModelKind = Object.freeze({
+export const UmbUserKind = Object.freeze({
 	DEFAULT: 'Default',
 	API: 'Api',
 });
