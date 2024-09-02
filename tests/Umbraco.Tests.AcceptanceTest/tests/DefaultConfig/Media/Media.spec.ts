@@ -39,6 +39,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
@@ -49,11 +50,10 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
 });
 
-// The File type is skipped because there are frontend issues with the mediaType
 const mediaFileTypes = [
   {fileName: 'Article', filePath: 'Article.pdf'},
   {fileName: 'Audio', filePath: 'Audio.mp3'},
-  // {fileName: 'File', filePath: 'File.txt'},
+  {fileName: 'File', filePath: 'File.txt'},
   {fileName: 'Image', filePath: 'Umbraco.png'},
   {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg'},
   {fileName: 'Video', filePath: 'Video.mp4'}
@@ -66,8 +66,8 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
     // Act
-    await umbracoUi.media.clickCreateMediaItemButton();
-    await umbracoUi.media.clickMediaTypeWithNameButton(mediaFileType.fileName);
+    await umbracoUi.waitForTimeout(1000);
+    await umbracoUi.media.clickCreateMediaWithType(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
     await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
     await umbracoUi.media.clickSaveButton();
