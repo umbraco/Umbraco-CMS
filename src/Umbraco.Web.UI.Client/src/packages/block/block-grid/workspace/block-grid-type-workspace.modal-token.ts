@@ -14,7 +14,7 @@ export const UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL = new UmbModalToken<
 			type: 'sidebar',
 			size: 'large',
 		},
-		data: { entityType: UMB_BLOCK_GRID_TYPE, preset: { allowAtRoot: true } },
+		data: { entityType: UMB_BLOCK_GRID_TYPE, preset: { allowAtRoot: true, allowInAreas: true } },
 	},
 	// Recast the type, so the entityType data prop is not required:
 ) as UmbModalToken<Omit<UmbWorkspaceModalData, 'entityType' | 'preset'>, UmbWorkspaceModalValue>;

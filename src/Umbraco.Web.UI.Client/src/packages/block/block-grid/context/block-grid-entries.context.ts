@@ -490,7 +490,7 @@ export class UmbBlockGridEntriesContext
 							.filter((blockType) => blockType.groupKey === rule.groupKey && blockType.allowInAreas === true)
 							.map((x) => x.contentElementTypeKey) ?? [];
 					const groupAmount = layoutEntries.filter((entry) => {
-						const contentTypeKey = this._manager!.getContentTypeKeyOf(entry.contentUdi);
+						const contentTypeKey = this._manager!.getContentTypeKeyOfContentUdi(entry.contentUdi);
 						return contentTypeKey ? groupElementTypeKeys.indexOf(contentTypeKey) !== -1 : false;
 					}).length;
 
@@ -503,6 +503,7 @@ export class UmbBlockGridEntriesContext
 							maxRequirement: maxAllowed,
 						};
 					}
+					return undefined;
 				}
 				// For specific elementTypes:
 				else if (rule.elementTypeKey) {
@@ -519,6 +520,7 @@ export class UmbBlockGridEntriesContext
 							maxRequirement: maxAllowed,
 						};
 					}
+					return undefined;
 				}
 
 				// Lets fail cause the rule was bad.
