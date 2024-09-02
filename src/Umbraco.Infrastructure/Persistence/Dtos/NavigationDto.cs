@@ -1,10 +1,11 @@
 using NPoco;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 // Used internally for representing the data needed for constructing the in-memory navigation structure.
 [TableName(NodeDto.TableName)]
-internal class NavigationDto
+internal class NavigationDto : INavigationModel
 {
     /// <summary>
     ///     Gets the integer identifier of the entity.
