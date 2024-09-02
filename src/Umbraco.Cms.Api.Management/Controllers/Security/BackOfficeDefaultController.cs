@@ -13,9 +13,16 @@ public class BackOfficeDefaultController : Controller
 {
     private readonly IRuntime _umbracoRunTime;
 
+    [ActivatorUtilitiesConstructor]
     public BackOfficeDefaultController(IRuntime umbracoRunTime)
     {
         _umbracoRunTime = umbracoRunTime;
+    }
+
+    [Obsolete("Use the non obsoleted constructor instead. Scheduled to be removed in v17")]
+    public BackOfficeDefaultController()
+    {
+        _umbracoRunTime = StaticServiceProvider.Instance.GetRequiredService<IRuntime>();
     }
 
     [HttpGet]
