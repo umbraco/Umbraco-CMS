@@ -48,7 +48,6 @@ export abstract class UmbUserActionConditionBase
 		super(host, args);
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (context) => {
-			console.log(context);
 			this.observe(
 				observeMultiple([context.unique, context.state, context.kind]),
 				([unique, state, kind]) => {
