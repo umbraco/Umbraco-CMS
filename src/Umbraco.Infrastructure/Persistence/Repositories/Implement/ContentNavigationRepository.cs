@@ -1,9 +1,7 @@
-using System.Collections.Concurrent;
 using NPoco;
-using Umbraco.Cms.Core.Models.Navigation;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -19,20 +17,14 @@ public class ContentNavigationRepository : INavigationRepository
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
     /// <inheritdoc />
-    public ConcurrentDictionary<Guid, NavigationNode> GetContentNodesByObjectType(Guid objectTypeKey)
-    {
-        IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, false);
-        return NavigationFactory.BuildNavigationDictionary(navigationDtos);
-    }
+    public IEnumerable<INavigationModel> GetContentNodesByObjectType(Guid objectTypeKey)
+        => FetchNavigationDtos(objectTypeKey, false);
 
     /// <inheritdoc />
-    public ConcurrentDictionary<Guid, NavigationNode> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
-    {
-        IEnumerable<NavigationDto> navigationDtos = FetchNavigationDtos(objectTypeKey, true);
-        return NavigationFactory.BuildNavigationDictionary(navigationDtos);
-    }
+    public IEnumerable<INavigationModel> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
+        => FetchNavigationDtos(objectTypeKey, true);
 
-    private IEnumerable<NavigationDto> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
+    private IEnumerable<INavigationModel> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
     {
         Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
             .Select<NavigationDto>()
