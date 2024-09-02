@@ -185,10 +185,10 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   const search = "StartsWith(@MessageTemplate, 'The token')";
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
   await umbracoApi.logViewer.createSavedSearch(searchName, search);
-  // Need to reload page to get the latest saved search list after creating new saved search by api
-  await umbracoUi.reloadPage();
+  await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
 
   // Act
+  await umbracoUi.waitForTimeout(4000);
   await umbracoUi.logViewer.clickSavedSearchByName(searchName);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 

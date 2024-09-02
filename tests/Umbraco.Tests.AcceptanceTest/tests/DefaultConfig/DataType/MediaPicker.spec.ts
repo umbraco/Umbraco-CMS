@@ -23,7 +23,7 @@ for (const dataTypeName of dataTypes) {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "multiple",
-        "value": dataTypeName === 'Media Picker' ||  dataTypeName === 'Image Media Picker' ? true : false,
+        "value": dataTypeName === 'Media Picker' || dataTypeName === 'Image Media Picker' ? true : false,
       };
 
       // Act
@@ -123,20 +123,19 @@ for (const dataTypeName of dataTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can add accepted types', async ({page, umbracoApi, umbracoUi}) => {
+    test('can add accepted types', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const mediaTypeName = 'Audio';
       const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
       const imageTypeData = await umbracoApi.mediaType.getByName('Image');
       const expectedFilterValue =
-        dataTypeName === "Image Media Picker" ||
         dataTypeName === "Multiple Image Media Picker"
           ? imageTypeData.id + "," + mediaTypeData.id
           : mediaTypeData.id;
-      const expectedDataTypeValues = [{
+      const expectedDataTypeValues = {
         "alias": "filter",
         "value": expectedFilterValue
-      }];
+      };
 
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
@@ -148,7 +147,7 @@ for (const dataTypeName of dataTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can remove accepted types', async ({page, umbracoApi, umbracoUi}) => {
+    test('can remove accepted types', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const mediaTypeName = 'Audio';
       const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
@@ -166,7 +165,6 @@ for (const dataTypeName of dataTypes) {
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
       await umbracoUi.dataType.removeAcceptedType(mediaTypeName);
-      await page.pause()
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
