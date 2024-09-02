@@ -1,9 +1,9 @@
 import type {
-	UmbUserClientCredentialsDataSource,
-	UmbUserClientCredentialsDataSourceCreateArgs,
-	UmbUserClientCredentialsDataSourceDeleteArgs,
-	UmbUserClientCredentialsDataSourceReadArgs,
-} from './types.js';
+	UmbCreateUserClientCredentialRequestArgs,
+	UmbDeleteUserClientCredentialRequestArgs,
+	UmbUserClientCredentialRequestArgs,
+} from '../types.js';
+import type { UmbUserClientCredentialDataSource } from './types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -11,10 +11,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * Server data source for user client credentials
  * @export
- * @class UmbUserClientCredentialsServerDataSource
- * @implements {UmbUserClientCredentialsDataSource}
+ * @class UmbUserClientCredentialServerDataSource
+ * @implements {UmbUserClientCredentialDataSource}
  */
-export class UmbUserClientCredentialsServerDataSource implements UmbUserClientCredentialsDataSource {
+export class UmbUserClientCredentialServerDataSource implements UmbUserClientCredentialDataSource {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {
@@ -23,11 +23,11 @@ export class UmbUserClientCredentialsServerDataSource implements UmbUserClientCr
 
 	/**
 	 * Creates a new client credentials for a user
-	 * @param {UmbUserClientCredentialsDataSourceCreateArgs} args - The user and client to create the credentials for
+	 * @param {UmbCreateUserClientCredentialRequestArgs} args - The user and client to create the credentials for
 	 * @returns {*}
-	 * @memberof UmbUserClientCredentialsServerDataSource
+	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
-	create(args: UmbUserClientCredentialsDataSourceCreateArgs) {
+	create(args: UmbCreateUserClientCredentialRequestArgs) {
 		return tryExecuteAndNotify(
 			this.#host,
 			UserService.postUserByIdClientCredentials({
@@ -42,11 +42,11 @@ export class UmbUserClientCredentialsServerDataSource implements UmbUserClientCr
 
 	/**
 	 * Reads the client credentials for a user
-	 * @param {UmbUserClientCredentialsDataSourceReadArgs} args - The user to read the credentials for
+	 * @param {UmbUserClientCredentialRequestArgs} args - The user to read the credentials for
 	 * @returns {*}
-	 * @memberof UmbUserClientCredentialsServerDataSource
+	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
-	async read(args: UmbUserClientCredentialsDataSourceReadArgs) {
+	async read(args: UmbUserClientCredentialRequestArgs) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			UserService.getUserByIdClientCredentials({
@@ -67,11 +67,11 @@ export class UmbUserClientCredentialsServerDataSource implements UmbUserClientCr
 
 	/**
 	 * Deletes the client credentials for a user
-	 * @param {UmbUserClientCredentialsDataSourceDeleteArgs} args - The user and client unique to delete the credentials for
+	 * @param {UmbDeleteUserClientCredentialRequestArgs} args - The user and client unique to delete the credentials for
 	 * @returns {*}
-	 * @memberof UmbUserClientCredentialsServerDataSource
+	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
-	delete(args: UmbUserClientCredentialsDataSourceDeleteArgs) {
+	delete(args: UmbDeleteUserClientCredentialRequestArgs) {
 		return tryExecuteAndNotify(
 			this.#host,
 			UserService.deleteUserByIdClientCredentialsByClientId({

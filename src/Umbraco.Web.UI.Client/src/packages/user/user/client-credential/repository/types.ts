@@ -1,12 +1,16 @@
-import type {
-	UmbUserClientCredentialsDataSourceCreateArgs,
-	UmbUserClientCredentialsDataSourceDeleteArgs,
-	UmbUserClientCredentialsDataSourceReadArgs,
-} from './data-source/index.js';
+export interface UmbCreateUserClientCredentialRequestArgs {
+	user: { unique: string };
+	client: { unique: string; secret: string };
+}
 
-export type UmbUserClientCredentialsRepositoryCreateArgs = UmbUserClientCredentialsDataSourceCreateArgs;
-export type UmbUserClientCredentialsRepositoryReadArgs = UmbUserClientCredentialsDataSourceReadArgs;
-export type UmbUserClientCredentialsRepositoryDeleteArgs = UmbUserClientCredentialsDataSourceDeleteArgs;
+export interface UmbUserClientCredentialRequestArgs {
+	user: { unique: string };
+}
+
+export interface UmbDeleteUserClientCredentialRequestArgs {
+	user: { unique: string };
+	client: { unique: string };
+}
 
 export interface UmbUserClientCredentialModel {
 	unique: string;

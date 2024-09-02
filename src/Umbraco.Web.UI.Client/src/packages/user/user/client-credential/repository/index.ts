@@ -1,2 +1,3 @@
-export * from './user-client-credentials.repository.js';
+export * from './user-client-credential.repository.js';
 export * from './constants.js';
+export * from './types.js';
