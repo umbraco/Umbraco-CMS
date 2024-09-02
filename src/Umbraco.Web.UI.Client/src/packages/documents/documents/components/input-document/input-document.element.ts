@@ -197,15 +197,17 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderAddButton() {
-		if (this.selection.length >= this.max) return;
-		return html`
-			<uui-button
+		if (this.selection.length >= this.max) return nothing;
+		if (this.readonly && this.selection.length > 0) {
+			return nothing;
+		} else {
+			return html` <uui-button
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
 				label=${this.localize.term('general_choose')}
-				?disabled=${this.readonly}></uui-button>
-		`;
+				?disabled=${this.readonly}></uui-button>`;
+		}
 	}
 
 	#renderItems() {

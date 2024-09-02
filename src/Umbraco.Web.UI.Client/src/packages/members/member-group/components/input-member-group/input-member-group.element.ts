@@ -1,6 +1,6 @@
 import type { UmbMemberGroupItemModel } from '../../repository/index.js';
 import { UmbMemberGroupPickerInputContext } from './input-member-group.context.js';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -100,6 +100,27 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	@property({ type: Object, attribute: false })
 	public filter: (memberGroup: UmbMemberGroupItemModel) => boolean = () => true;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
+
 	@state()
 	private _editMemberGroupPath = '';
 
@@ -168,36 +189,38 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.selection.length >= this.max) return;
-		return html`<uui-button
-			id="btn-add"
-			look="placeholder"
-			@click=${this.#openPicker}
-			label=${this.localize.term('general_choose')}></uui-button>`;
+		if (this.max === 1 && this.selection.length >= this.max) return nothing;
+		if (this.readonly && this.selection.length > 0) {
+			return nothing;
+		} else {
+			return html`<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}></uui-button>`;
+		}
 	}
 
 	#renderItem(item: UmbMemberGroupItemModel) {
-		if (!item.unique) return;
+		if (!item.unique) return nothing;
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique}>
-				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)}
-					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
-				</uui-action-bar>
+			<uui-ref-node
+				name=${item.name}
+				id=${item.unique}
+				href="${this._editMemberGroupPath}edit/${item.unique}"
+				?readonly=${this.readonly}>
+				<uui-action-bar slot="actions"> ${this.#renderRemoveButton(item)} </uui-action-bar>
 				<umb-icon slot="icon" name="icon-users"></umb-icon>
 			</uui-ref-node>
 		`;
 	}
 
-	#renderOpenButton(item: UmbMemberGroupItemModel) {
-		if (!this.showOpenButton) return;
-		return html`
-			<uui-button
-				href="${this._editMemberGroupPath}edit/${item.unique}"
-				label="${this.localize.term('general_open')} ${item.name}">
-				${this.localize.term('general_open')}
-			</uui-button>
-		`;
+	#renderRemoveButton(item: UmbMemberGroupItemModel) {
+		if (this.readonly) return nothing;
+		return html`<uui-button
+			@click=${() => this.#removeItem(item)}
+			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
 	static override styles = [

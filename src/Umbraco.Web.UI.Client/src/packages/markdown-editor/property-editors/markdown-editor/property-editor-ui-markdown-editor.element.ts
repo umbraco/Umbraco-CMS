@@ -17,6 +17,15 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	@property()
 	value = '';
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _preview?: boolean;
 
@@ -41,7 +50,8 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 				value=${this.value}
 				.overlaySize=${this._overlaySize}
 				?preview=${this._preview}
-				@change=${this.#onChange}></umb-input-markdown>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}></umb-input-markdown>
 		`;
 	}
 }
