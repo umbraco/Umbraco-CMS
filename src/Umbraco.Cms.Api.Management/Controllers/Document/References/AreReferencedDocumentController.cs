@@ -32,32 +32,6 @@ public class AreReferencedDocumentController : DocumentControllerBase
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItems(
-        CancellationToken cancellationToken,
-        [FromQuery(Name="id")]HashSet<Guid> ids,
-        int skip = 0,
-        int take = 20)
-    {
-        PagedModel<RelationItemModel> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedItemsWithRelationsAsync(ids, skip, take, true);
-        var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
-        {
-            Total = distinctByKeyItemsWithReferencedRelations.Total,
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(distinctByKeyItemsWithReferencedRelations.Items),
-        };
-
-        return await Task.FromResult(pagedViewModel);
-    }
-
-    /// <summary>
-    ///     Gets a paged list of the items used in any kind of relation from selected keys.
-    /// </summary>
-    /// <remarks>
-    ///     Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).
-    ///     This is basically finding children of relations.
-    /// </remarks>
-    [HttpGet("are-referenced-fast")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItemsFast(
         CancellationToken cancellationToken,
         [FromQuery(Name="id")]HashSet<Guid> ids,
