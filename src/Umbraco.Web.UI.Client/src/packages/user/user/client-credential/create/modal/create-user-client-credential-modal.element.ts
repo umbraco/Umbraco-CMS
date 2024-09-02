@@ -1,0 +1,104 @@
+import type { UmbCreateUserClientCredentialRequestArgs } from '../../repository/index.js';
+import { UmbUserClientCredentialRepository } from '../../repository/index.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+
+const elementName = 'umb-create-user-client-credential-modal';
+@customElement(elementName)
+export class UmbCreateUserModalElement extends UmbModalBaseElement {
+	@query('#CreateUserClientCredentialForm')
+	_form?: HTMLFormElement;
+
+	#userClientCredentialRepository = new UmbUserClientCredentialRepository(this);
+
+	#uniquePrefix = 'umbraco-back-office-';
+
+	async #onSubmit(e: SubmitEvent) {
+		e.preventDefault();
+
+		const form = e.target as HTMLFormElement;
+		if (!form) return;
+
+		const isValid = form.checkValidity();
+		if (!isValid) return;
+
+		const formData = new FormData(form);
+
+		const unique = formData.get('unique') as string;
+		const secret = formData.get('secret') as string;
+
+		const payload: UmbCreateUserClientCredentialRequestArgs = {
+			user: { unique: this.data.user.unique },
+			client: { unique, secret },
+		};
+
+		// TODO: figure out when to use email or username
+		const { data } = await this.#userClientCredentialRepository.requestCreate(payload);
+		debugger;
+	}
+
+	override render() {
+		return html`<uui-dialog-layout headline="Create Client Credential">
+			<p>Lorem</p>
+
+			${this.#renderForm()}
+			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button
+				form="CreateUserClientCredentialForm"
+				slot="actions"
+				type="submit"
+				label="Create"
+				look="primary"
+				color="positive"></uui-button>
+		</uui-dialog-layout>`;
+	}
+
+	#renderForm() {
+		return html` <uui-form>
+			<form id="CreateUserClientCredentialForm" name="form" @submit="${this.#onSubmit}">
+				<uui-form-layout-item>
+					<uui-label id="uniqueLabel" slot="label" for="unique" required>Id</uui-label>
+					<uui-input id="unique" label="unique" type="text" name="unique" required>
+						<div class="prepend" slot="prepend">${this.#uniquePrefix}</div>
+					</uui-input>
+				</uui-form-layout-item>
+				<uui-form-layout-item>
+					<uui-label id="secretLabel" slot="label" for="secret" required>Secret</uui-label>
+					<uui-input-password id="secret" label="secret" name="secret" required></uui-input-password>
+				</uui-form-layout-item>
+			</form>
+		</uui-form>`;
+	}
+
+	static override styles = [
+		UmbTextStyles,
+		css`
+			uui-input,
+			uui-input-password {
+				width: 580px;
+			}
+
+			.prepend {
+				user-select: none;
+				height: 100%;
+				padding: 0 var(--uui-size-3);
+				border-right: 1px solid var(--uui-input-border-color, var(--uui-color-border));
+				background: #f3f3f3;
+				color: grey;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				white-space: nowrap;
+			}
+		`,
+	];
+}
+
+export { UmbCreateUserModalElement as element };
+
+declare global {
+	interface HTMLElementTagNameMap {
+		[elementName]: UmbCreateUserModalElement;
+	}
+}

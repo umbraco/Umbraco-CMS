@@ -13,6 +13,7 @@ import './components/user-workspace-profile-settings/user-workspace-profile-sett
 import './components/user-workspace-access/user-workspace-access.element.js';
 import './components/user-workspace-info/user-workspace-info.element.js';
 import './components/user-workspace-avatar/user-workspace-avatar.element.js';
+import './components/user-workspace-client-credentials/user-workspace-client-credentials.element.js';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
@@ -73,6 +74,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 		return html`
 			<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings>
+			<umb-user-workspace-client-credentials></umb-user-workspace-client-credentials>
 			<umb-user-workspace-assign-access></umb-user-workspace-assign-access>
 			<umb-user-workspace-access></umb-user-workspace-access>
 		`;
