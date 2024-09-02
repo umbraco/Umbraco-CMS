@@ -18,12 +18,23 @@ export interface UmbBlockLayoutBaseModel {
 	settingsUdi?: string | null;
 }
 
+export interface UmbBlockDataValueModel<ValueType = unknown> {
+	culture: string | null;
+	segment: string | null;
+	alias: string;
+	value: ValueType;
+}
+
 // Shared with the Property Editor
-export interface UmbBlockDataType {
+export interface UmbBlockDataModel {
 	udi: string;
 	contentTypeKey: string;
-	[key: string]: unknown;
+	values: Array<UmbBlockDataValueModel>;
 }
+/**
+ * @deprecated - use UmbBlockDataModel instead.
+ */
+export type UmbBlockDataType = UmbBlockDataModel;
 
 export interface UmbBlockEditorCustomViewConfiguration {
 	editContentPath?: string;
@@ -44,8 +55,8 @@ export interface UmbBlockEditorCustomViewProperties<
 	icon?: string;
 	index?: number;
 	layout?: LayoutType;
-	content?: UmbBlockDataType;
-	settings?: UmbBlockDataType;
+	content?: UmbBlockDataModel;
+	settings?: UmbBlockDataModel;
 	contentInvalid?: boolean;
 	settingsInvalid?: boolean;
 }
