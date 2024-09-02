@@ -361,6 +361,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	#renderAddButton() {
+		// TODO: Stop preventing adding more, instead implement proper validation for user feedback. [NL]
 		if ((this._cards && this.max && this._cards.length >= this.max) || (this._cards.length && !this.multiple)) return;
 		if (this.readonly && this._cards.length > 0) {
 			return nothing;
