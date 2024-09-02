@@ -27,8 +27,8 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	 * @returns {*}
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
-	create(args: UmbCreateUserClientCredentialRequestArgs) {
-		return tryExecuteAndNotify(
+	async create(args: UmbCreateUserClientCredentialRequestArgs) {
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			UserService.postUserByIdClientCredentials({
 				id: args.user.unique,
@@ -38,6 +38,12 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 				},
 			}),
 		);
+
+		if (!error) {
+			return { data: { unique: args.client.unique } };
+		}
+
+		return { error };
 	}
 
 	/**
