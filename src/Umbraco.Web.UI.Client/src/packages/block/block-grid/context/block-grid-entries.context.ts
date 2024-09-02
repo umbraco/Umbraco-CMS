@@ -1,4 +1,4 @@
-import type { UmbBlockDataType } from '../../block/index.js';
+import type { UmbBlockDataModel } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import {
 	UMB_BLOCK_GRID_ENTRY_CONTEXT,
@@ -380,8 +380,8 @@ export class UmbBlockGridEntriesContext
 
 	async insert(
 		layoutEntry: UmbBlockGridLayoutModel,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;

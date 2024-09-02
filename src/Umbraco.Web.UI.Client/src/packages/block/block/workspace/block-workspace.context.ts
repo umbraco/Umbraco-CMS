@@ -1,4 +1,4 @@
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import {
@@ -41,8 +41,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#liveEditingMode?: boolean;
 
 	#initialLayout?: LayoutDataType;
-	#initialContent?: UmbBlockDataType;
-	#initialSettings?: UmbBlockDataType;
+	#initialContent?: UmbBlockDataModel;
+	#initialSettings?: UmbBlockDataModel;
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();

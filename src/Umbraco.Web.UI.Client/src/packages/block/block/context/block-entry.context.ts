@@ -1,5 +1,5 @@
 import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataModel } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -119,13 +119,13 @@ export abstract class UmbBlockEntryContext<
 		([contentUdi, path]) => this.#generateWorkspaceEditSettingsPath(path, contentUdi),
 	);
 
-	#content = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
+	#content = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	public readonly content = this.#content.asObservable();
 	public readonly contentTypeKey = this.#content.asObservablePart((x) => x?.contentTypeKey);
 
 	// TODO: Make sure changes to the Block Content / Settings are reflected back to Manager.
 
-	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
+	#settings = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
 	private readonly settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
 		x ? (x.contentTypeKey ?? undefined) : null,

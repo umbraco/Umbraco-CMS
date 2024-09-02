@@ -1,6 +1,6 @@
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockRteWorkspaceOriginData } from '../index.js';
-import type { UmbBlockDataType } from '../../block/types.js';
+import type { UmbBlockDataModel } from '../../block/types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
@@ -55,8 +55,8 @@ export class UmbBlockRteManagerContext<
 
 	insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockRteWorkspaceOriginData,
 	) {
 		if (!this.#editor) return false;

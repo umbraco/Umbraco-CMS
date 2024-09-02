@@ -1,5 +1,5 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.modal-token.js';
-import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -93,8 +93,8 @@ export abstract class UmbBlockEntriesContext<
 
 	abstract insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: BlockOriginData,
 	): Promise<boolean>;
 	//edit?

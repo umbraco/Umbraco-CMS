@@ -1,17 +1,22 @@
-import type { UmbBlockDataType } from '../types.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel } from '../types.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbClassState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	type Observable,
+	UmbClassState,
+	UmbObjectState,
+	appendToFrozenArray,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockElementManager extends UmbControllerBase {
 	//
-	#data = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
+	#data = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise = new Promise<void>((resolve) => {
 		this.#getDataResolver = resolve;
@@ -50,7 +55,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		this.#variantId.setValue(variantId);
 	}
 
-	setData(data: UmbBlockDataType | undefined) {
+	setData(data: UmbBlockDataModel | undefined) {
 		this.#data.setValue(data);
 		this.#getDataResolver();
 	}
@@ -80,34 +85,65 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	/**
 	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias
+	 * @param {UmbVariantId | undefined} variantId - Optional variantId to filter by.
 	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
 	 * @description Get an Observable for the value of this property.
 	 */
-	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+	async propertyValueByAlias<PropertyValueType = unknown>(
+		propertyAlias: string,
+		variantId?: UmbVariantId,
+	): Promise<Observable<PropertyValueType | undefined> | undefined> {
 		await this.#getDataPromise;
-
-		return this.#data.asObservablePart((data) => data?.[propertyAlias] as ReturnType);
+		return this.#data.asObservablePart(
+			(data) =>
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
+					?.value as PropertyValueType,
+		);
 	}
 
-	async getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
+	/**
+	 * Get the current value of the property with the given alias and variantId.
+	 * @param alias
+	 * @param variantId
+	 * @returns The value or undefined if not set or found.
+	 */
+	async getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		await this.#getDataPromise;
-
-		return this.#data.getValue()?.[propertyAlias] as ReturnType;
+		const currentData = this.getData();
+		if (currentData) {
+			const newDataSet = currentData.values?.find(
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
+			);
+			return newDataSet?.value as ReturnType;
+		}
+		return undefined;
 	}
 
 	/**
 	 * @function setPropertyValue
 	 * @param {string} alias
 	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @param {UmbVariantId | undefined} variantId - Optional variantId to filter by.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.
 	 */
-	async setPropertyValue(alias: string, value: unknown) {
+	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		this.initiatePropertyValueChange();
 		await this.#getDataPromise;
 
-		this.#data.update({ [alias]: value });
-		this.finishPropertyValueChange();
+		variantId ??= UmbVariantId.CreateInvariant();
+
+		const entry = { ...variantId.toObject(), alias, value } as UmbBlockDataValueModel<ValueType>;
+		const currentData = this.getData();
+		if (currentData) {
+			const values = appendToFrozenArray(
+				currentData.values ?? [],
+				entry,
+				(x) => x.alias === alias && variantId!.compare(x),
+			);
+			this.#data.update({ values });
+			this.finishPropertyValueChange();
+		}
 	}
 
 	#updateLock = 0;

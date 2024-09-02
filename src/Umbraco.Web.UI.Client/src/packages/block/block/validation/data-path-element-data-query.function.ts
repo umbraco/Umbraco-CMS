@@ -1,4 +1,4 @@
-import type { UmbBlockDataType } from '../types.js';
+import type { UmbBlockDataModel } from '../types.js';
 
 /**
  * Validation Data Path Query generator for Block Element Data.
@@ -7,7 +7,7 @@ import type { UmbBlockDataType } from '../types.js';
  * @param data {{udi: string}} - A data object with the udi property.
  * @returns
  */
-export function UmbDataPathBlockElementDataQuery(data: Pick<UmbBlockDataType, 'udi'>): string {
+export function UmbDataPathBlockElementDataQuery(data: Pick<UmbBlockDataModel, 'udi'>): string {
 	// write a array of strings for each property, where alias must be present and culture and segment are optional
 	//const filters: Array<string> = [`@.udi = '${udi}'`];
 	//return `?(${filters.join(' && ')})`;

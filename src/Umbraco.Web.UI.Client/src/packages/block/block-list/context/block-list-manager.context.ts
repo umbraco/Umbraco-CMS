@@ -1,6 +1,6 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
-import type { UmbBlockDataType } from '../../block/types.js';
+import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
@@ -33,8 +33,8 @@ export class UmbBlockListManagerContext<
 
 	insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);

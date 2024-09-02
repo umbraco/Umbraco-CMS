@@ -5,7 +5,7 @@ import { removeLastSlashFromPath, transformServerPathToClientPath } from '@umbra
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { type UmbBlockDataModel, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
@@ -166,8 +166,8 @@ export class UmbBlockGridManagerContext<
 	// TODO: Remove dependency on modalData object here. [NL] Maybe change it into requiring the originData object instead.
 	insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
 		this.setOneLayout(layoutEntry, originData);

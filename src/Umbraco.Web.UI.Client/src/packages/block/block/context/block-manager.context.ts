@@ -1,5 +1,5 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataModel } from '../types.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -24,8 +24,8 @@ function buildUdi(entityType: string, guid: string) {
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
-	content: UmbBlockDataType;
-	settings?: UmbBlockDataType;
+	content: UmbBlockDataModel;
+	settings?: UmbBlockDataModel;
 };
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
@@ -60,10 +60,10 @@ export abstract class UmbBlockManagerContext<
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
 	public readonly layouts = this._layouts.asObservable();
 
-	#contents = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
+	#contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.udi);
 	public readonly contents = this.#contents.asObservable();
 
-	#settings = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
+	#settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.udi);
 	public readonly settings = this.#settings.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
@@ -86,10 +86,10 @@ export abstract class UmbBlockManagerContext<
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
-	setContents(contents: Array<UmbBlockDataType>) {
+	setContents(contents: Array<UmbBlockDataModel>) {
 		this.#contents.setValue(contents);
 	}
-	setSettings(settings: Array<UmbBlockDataType>) {
+	setSettings(settings: Array<UmbBlockDataModel>) {
 		this.#settings.setValue(settings);
 	}
 
@@ -182,10 +182,10 @@ export abstract class UmbBlockManagerContext<
 	setOneLayout(layoutData: BlockLayoutType, originData?: BlockOriginDataType) {
 		this._layouts.appendOne(layoutData);
 	}
-	setOneContent(contentData: UmbBlockDataType) {
+	setOneContent(contentData: UmbBlockDataModel) {
 		this.#contents.appendOne(contentData);
 	}
-	setOneSettings(settingsData: UmbBlockDataType) {
+	setOneSettings(settingsData: UmbBlockDataModel) {
 		this.#settings.appendOne(settingsData);
 	}
 
@@ -248,7 +248,7 @@ export abstract class UmbBlockManagerContext<
 			udi: layout.contentUdi,
 			contentTypeKey: contentElementTypeKey,
 		};
-		let settings: UmbBlockDataType | undefined = undefined;
+		let settings: UmbBlockDataModel | undefined = undefined;
 
 		if (blockType.settingsElementTypeKey) {
 			layout.settingsUdi = buildUdi('element', UmbId.new());
@@ -267,15 +267,15 @@ export abstract class UmbBlockManagerContext<
 
 	abstract insert(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		originData: BlockOriginDataType,
 	): boolean;
 
 	protected insertBlockData(
 		layoutEntry: BlockLayoutType,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
+		content: UmbBlockDataModel,
+		settings: UmbBlockDataModel | undefined,
 		// TODO: [v15]: ignoring unused var here here to prevent a breaking change
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData: BlockOriginDataType,
