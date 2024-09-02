@@ -92,8 +92,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             var innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[cn].uniqueId as [key]", "[pn].uniqueId as otherKey, [cr].childId as id",
-                    "[cr].parentId as otherId", "[rt].[alias]", "[rt].[name]",
+                    "[cn].uniqueId as [key]", "[pn].uniqueId as otherKey, [cr].childId as id", "[cr].parentId as otherId", "[rt].[alias]", "[rt].[name]",
                     "[rt].[isDependency]", "[rt].[dual]")
                 .From<RelationDto>("cr")
                 .InnerJoin<RelationTypeDto>("rt")
@@ -104,8 +103,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .On<RelationDto, NodeDto>((cr, pn) => cr.ParentId == pn.NodeId, "cr", "pn");
 
             var innerUnionSqlDualParent = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[pn].uniqueId as [key]", "[cn].uniqueId as otherKey, [dpr].parentId as id",
-                    "[dpr].childId as otherId", "[dprt].[alias]", "[dprt].[name]",
+                    "[pn].uniqueId as [key]", "[cn].uniqueId as otherKey, [dpr].parentId as id", "[dpr].childId as otherId", "[dprt].[alias]", "[dprt].[name]",
                     "[dprt].[isDependency]", "[dprt].[dual]")
                 .From<RelationDto>("dpr")
                 .InnerJoin<RelationTypeDto>("dprt")
@@ -117,8 +115,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .On<RelationDto, NodeDto>((dpr, pn) => dpr.ParentId == pn.NodeId, "dpr", "pn");
 
             var innerUnionSql3 = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[cn].uniqueId as [key]", "[pn].uniqueId as otherKey, [dcr].childId as id",
-                    "[dcr].parentId as otherId", "[dcrt].[alias]", "[dcrt].[name]",
+                    "[cn].uniqueId as [key]", "[pn].uniqueId as otherKey, [dcr].childId as id", "[dcr].parentId as otherId", "[dcrt].[alias]", "[dcrt].[name]",
                     "[dcrt].[isDependency]", "[dcrt].[dual]")
                 .From<RelationDto>("dcr")
                 .InnerJoin<RelationTypeDto>("dcrt")
@@ -193,8 +190,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     aliasLeft: "n",
                     aliasRight: "d");
 
-            sql = sql?.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery,
-                "n");
+            sql = sql?.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
 
             if (filterMustBeIsDependency)
             {
@@ -278,7 +274,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool filterMustBeIsDependency,
             out long totalRecords)
         {
-            Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
+           Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
             var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
                     "[x].[otherId] as nodeId",
                     "[n].[uniqueId] as nodeKey",
@@ -408,7 +404,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
         }
 
-        public IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
+         public IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
             ISet<Guid> keys,
             long skip,
             long take,
@@ -458,7 +454,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (totalRecords > 0)
             {
                 // Ordering is required for paging
-                sql = sql?.OrderBy<NodeDto>(x => x.UniqueId, "n");
+                sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
                 pagedResult =
                     _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
@@ -591,9 +587,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
-        }
+         }
 
-        [Obsolete("Use overload that takes keys instead of ids. This will be removed in Umbraco 15.")]
+         [Obsolete("Use overload that takes keys instead of ids. This will be removed in Umbraco 15.")]
         public IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
             int[] ids,
             long skip,
