@@ -222,6 +222,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderAddButton() {
+		// TODO: Stop preventing adding more, instead implement proper validation for user feedback. [NL]
 		if (this._cards && this.max && this._cards.length >= this.max) return nothing;
 		if (this.readonly && this._cards.length > 0) {
 			return nothing;
