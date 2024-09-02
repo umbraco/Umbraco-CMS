@@ -46,13 +46,23 @@ export class UmbUserClientCredentialsServerDataSource implements UmbUserClientCr
 	 * @returns {*}
 	 * @memberof UmbUserClientCredentialsServerDataSource
 	 */
-	read(args: UmbUserClientCredentialsDataSourceReadArgs) {
-		return tryExecuteAndNotify(
+	async read(args: UmbUserClientCredentialsDataSourceReadArgs) {
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			UserService.getUserByIdClientCredentials({
 				id: args.user.unique,
 			}),
 		);
+
+		if (data) {
+			const credentials = data.map((clientId) => ({
+				unique: clientId,
+			}));
+
+			return { data: credentials };
+		}
+
+		return { error };
 	}
 
 	/**
