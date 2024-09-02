@@ -232,7 +232,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.24.9",
 		"@eslint/js": "^9.9.1",
-		"@hey-api/openapi-ts": "^0.48.3",
+		"@hey-api/openapi-ts": "^0.52.11",
 		"@mdx-js/react": "^3.0.1",
 		"@open-wc/testing": "^4.0.0",
 		"@playwright/test": "^1.45.3",
