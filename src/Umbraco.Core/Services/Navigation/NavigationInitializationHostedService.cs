@@ -6,12 +6,12 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     Responsible for seeding the in-memory navigation structures at application's startup
 ///     by rebuild the navigation structures.
 /// </summary>
-public sealed class NavigationInitializationService : IHostedLifecycleService
+public sealed class NavigationInitializationHostedService : IHostedLifecycleService
 {
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
 
-    public NavigationInitializationService(IDocumentNavigationManagementService documentNavigationManagementService, IMediaNavigationManagementService mediaNavigationManagementService)
+    public NavigationInitializationHostedService(IDocumentNavigationManagementService documentNavigationManagementService, IMediaNavigationManagementService mediaNavigationManagementService)
     {
         _documentNavigationManagementService = documentNavigationManagementService;
         _mediaNavigationManagementService = mediaNavigationManagementService;
