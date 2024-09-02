@@ -361,18 +361,23 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	#renderAddButton() {
+		// TODO: Stop preventing adding more, instead implement proper validation for user feedback. [NL]
 		if ((this._cards && this.max && this._cards.length >= this.max) || (this._cards.length && !this.multiple)) return;
-		return html`
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}
-				?disabled=${this.readonly}>
-				<uui-icon name="icon-add"></uui-icon>
-				${this.localize.term('general_choose')}
-			</uui-button>
-		`;
+		if (this.readonly && this._cards.length > 0) {
+			return nothing;
+		} else {
+			return html`
+				<uui-button
+					id="btn-add"
+					look="placeholder"
+					@click=${this.#openPicker}
+					label=${this.localize.term('general_choose')}
+					?disabled=${this.readonly}>
+					<uui-icon name="icon-add"></uui-icon>
+					${this.localize.term('general_choose')}
+				</uui-button>
+			`;
+		}
 	}
 
 	#renderItem(item: UmbRichMediaCardModel) {
