@@ -1697,8 +1697,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Templates
 
+        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
         public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
             => ImportTemplates(new[] {templateElement}, userId);
+
+        public async Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId)
+            => ImportTemplatesAsync(new[] {templateElement}, userId).GetAwaiter().GetResult();
+
+
+        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
+        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
+            => ImportTemplatesAsync(templateElements, userId).GetAwaiter().GetResult();
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>
@@ -1706,7 +1715,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="templateElements">Xml to import</param>
         /// <param name="userId">Optional user id</param>
         /// <returns>An enumerable list of generated Templates</returns>
-        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
+        public async Task<IReadOnlyList<ITemplate>> ImportTemplatesAsync(IReadOnlyCollection<XElement> templateElements, int userId)
         {
             var templates = new List<ITemplate>();
 
@@ -1745,7 +1754,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var design = templateElement.Element("Design")?.Value;
                 XElement? masterElement = templateElement.Element("Master");
 
-                var existingTemplate = _templateService.GetAsync(alias).GetAwaiter().GetResult() as Template;
+                var existingTemplate = await _templateService.GetAsync(alias) as Template;
 
                 Template template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
 
@@ -1774,11 +1783,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (template.Id > 0)
                 {
-                    _templateService.UpdateAsync(template, Constants.Security.SuperUserKey);
+                    await _templateService.UpdateAsync(template, Constants.Security.SuperUserKey);
                 }
                 else
                 {
-                    _templateService.CreateAsync(template, Constants.Security.SuperUserKey);
+                    await _templateService.CreateAsync(template, Constants.Security.SuperUserKey);
                 }
             }
 
