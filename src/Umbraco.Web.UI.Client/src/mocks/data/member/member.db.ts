@@ -66,6 +66,7 @@ const detailResponseMapper = (item: UmbMockMemberModel): MemberResponseModel => 
 		isApproved: item.isApproved,
 		isLockedOut: item.isLockedOut,
 		isTwoFactorEnabled: item.isTwoFactorEnabled,
+		kind: item.kind,
 		lastLockoutDate: item.lastLockoutDate,
 		lastLoginDate: item.lastLoginDate,
 		lastPasswordChangeDate: item.lastPasswordChangeDate,
@@ -79,6 +80,7 @@ const detailResponseMapper = (item: UmbMockMemberModel): MemberResponseModel => 
 const itemResponseMapper = (item: UmbMockMemberModel): MemberItemResponseModel => {
 	return {
 		id: item.id,
+		kind: item.kind,
 		memberType: item.memberType,
 		variants: item.variants,
 	};
