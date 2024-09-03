@@ -637,21 +637,26 @@
                 }
 
                 blockObject.retrieveValuesFrom = function (content, settings) {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapElementValues(content, this.content);
+                        if (this.config.settingsElementTypeKey !== null) {
+                          mapElementValues(settings, this.settings);
+                      }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapElementValues(settings, this.settings);
-                    }
+
 
                 };
 
                 blockObject.sync = function () {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapToPropertyModel(this.content, this.data);
-                    }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapToPropertyModel(this.settings, this.settingsData);
+                        if (this.config.settingsElementTypeKey !== null) {
+                            mapToPropertyModel(this.settings, this.settingsData);
+                        }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
                 };
                 // first time instant update of label.

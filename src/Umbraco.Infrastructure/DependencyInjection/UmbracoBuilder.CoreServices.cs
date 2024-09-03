@@ -28,6 +28,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -237,6 +238,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
 
         builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
+
+        builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
         return builder;
     }
