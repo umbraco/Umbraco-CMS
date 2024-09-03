@@ -52,9 +52,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline="Create Client Credential">
-			<p>Lorem</p>
-
+		return html`<uui-dialog-layout headline="Create client credential">
 			${this.#renderForm()}
 			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
 			<uui-button
