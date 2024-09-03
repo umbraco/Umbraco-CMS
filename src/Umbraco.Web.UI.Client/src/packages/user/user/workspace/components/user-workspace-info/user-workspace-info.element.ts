@@ -2,6 +2,7 @@ import type { UmbUserDisplayStatus } from '../../../utils.js';
 import { TimeFormatOptions, getDisplayStateFromUserStatus } from '../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
+import { UmbUserKind } from '../../../utils/index.js';
 import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -69,6 +70,11 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			{ labelKey: 'user_updateDate', value: this.localize.date(user.updateDate!, TimeFormatOptions) },
 			{ labelKey: 'general_id', value: user.unique },
 		];
+
+		if (user.kind === UmbUserKind.API) {
+			const include = ['user_kind', 'user_createDate', 'user_updateDate', 'general_id'];
+			this._userInfo = this._userInfo.filter((item) => include.includes(item.labelKey));
+		}
 	};
 
 	override render() {
