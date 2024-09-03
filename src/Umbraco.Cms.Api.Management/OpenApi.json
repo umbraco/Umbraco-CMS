@@ -35493,8 +35493,8 @@
       "CreateUserRequestModel": {
         "required": [
           "email",
+          "kind",
           "name",
-          "type",
           "userGroupIds",
           "userName"
         ],
@@ -35525,8 +35525,8 @@
             "format": "uuid",
             "nullable": true
           },
-          "type": {
-            "$ref": "#/components/schemas/UserTypeModel"
+          "kind": {
+            "$ref": "#/components/schemas/UserKindModel"
           }
         },
         "additionalProperties": false
@@ -38244,7 +38244,6 @@
         "required": [
           "email",
           "name",
-          "type",
           "userGroupIds",
           "userName"
         ],
@@ -38274,9 +38273,6 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/UserTypeModel"
           },
           "message": {
             "type": "string",
@@ -39415,6 +39411,7 @@
       "MemberItemResponseModel": {
         "required": [
           "id",
+          "kind",
           "memberType",
           "variants"
         ],
@@ -39440,9 +39437,19 @@
                 }
               ]
             }
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MemberKindModel"
           }
         },
         "additionalProperties": false
+      },
+      "MemberKindModel": {
+        "enum": [
+          "Default",
+          "Api"
+        ],
+        "type": "string"
       },
       "MemberResponseModel": {
         "required": [
@@ -39453,6 +39460,7 @@
           "isApproved",
           "isLockedOut",
           "isTwoFactorEnabled",
+          "kind",
           "memberType",
           "username",
           "values",
@@ -39531,6 +39539,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MemberKindModel"
           }
         },
         "additionalProperties": false
@@ -45082,8 +45093,8 @@
         "required": [
           "avatarUrls",
           "id",
-          "name",
-          "type"
+          "kind",
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -45100,11 +45111,18 @@
               "type": "string"
             }
           },
-          "type": {
-            "$ref": "#/components/schemas/UserTypeModel"
+          "kind": {
+            "$ref": "#/components/schemas/UserKindModel"
           }
         },
         "additionalProperties": false
+      },
+      "UserKindModel": {
+        "enum": [
+          "Default",
+          "Api"
+        ],
+        "type": "string"
       },
       "UserOrderModel": {
         "enum": [
@@ -45172,10 +45190,10 @@
           "hasMediaRootAccess",
           "id",
           "isAdmin",
+          "kind",
           "mediaStartNodeIds",
           "name",
           "state",
-          "type",
           "updateDate",
           "userGroupIds",
           "userName"
@@ -45277,8 +45295,8 @@
           "isAdmin": {
             "type": "boolean"
           },
-          "type": {
-            "$ref": "#/components/schemas/UserTypeModel"
+          "kind": {
+            "$ref": "#/components/schemas/UserKindModel"
           }
         },
         "additionalProperties": false
@@ -45338,13 +45356,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "UserTypeModel": {
-        "enum": [
-          "Default",
-          "Api"
-        ],
-        "type": "string"
       },
       "VariantItemResponseModel": {
         "required": [
