@@ -22,9 +22,9 @@ export const onInit: UmbEntryPointOnInit = (_host, _extensionRegistry) => {
 		_extensionRegistry.isRegistered('Umb.Dashboard.UmbracoNewsLATE'),
 	);
 
-	_extensionRegistry.appendCondition('Umb.Dashboard.UmbracoNewsLATE', condition);
+	_extensionRegistry.addCondition('Umb.Dashboard.UmbracoNewsLATE', condition);
 
-	console.log('I HAZ APPENED CONDITIONS');
+	console.log('I HAZ ADDED CONDITION');
 
 	const ext: ManifestWithDynamicConditions = {
 		alias: 'Umb.Dashboard.UmbracoNewsLATE',
