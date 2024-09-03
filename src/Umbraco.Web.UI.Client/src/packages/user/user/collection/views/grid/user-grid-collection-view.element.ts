@@ -2,6 +2,7 @@ import { getDisplayStateFromUserStatus } from '../../../utils.js';
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
+import { UMB_USER_WORKSPACE_PATH } from '../../../paths.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -93,10 +94,12 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 			avatarSrcset += `${url.url} ${url.scale},`;
 		});
 
+		const href = UMB_USER_WORKSPACE_PATH + '/edit/' + user.unique;
+
 		return html`
 			<uui-card-user
 				.name=${user.name ?? 'Unnamed user'}
-				href=${'section/user-management/workspace/user/edit/' + user.unique}
+				href=${href}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#collectionContext?.selection.isSelected(user.unique)}

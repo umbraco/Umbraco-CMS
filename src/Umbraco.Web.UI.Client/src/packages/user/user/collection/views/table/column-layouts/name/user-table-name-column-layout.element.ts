@@ -1,3 +1,4 @@
+import { UMB_USER_WORKSPACE_PATH } from '../../../../../paths.js';
 import { html, LitElement, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
@@ -34,15 +35,15 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 			avatarSrcset += `${url.url} ${url.scale},`;
 		});
 
+		const href = UMB_USER_WORKSPACE_PATH + '/edit/' + this.value.unique;
+
 		return html` <div style="display: flex; align-items: center;">
 			<uui-avatar
 				style="margin-right: var(--uui-size-space-3);"
 				.name=${this.value.name || 'Unknown'}
 				img-src=${ifDefined(this.value.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
 				img-srcset=${ifDefined(this.value.avatarUrls.length > 0 ? avatarSrcset : undefined)}></uui-avatar>
-			<a style="font-weight: bold;" href="section/user-management/workspace/user/edit/${this.value.unique}"
-				>${this.value.name}</a
-			>
+			<a style="font-weight: bold;" href="${href}">${this.value.name}</a>
 		</div>`;
 	}
 }
