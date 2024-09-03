@@ -50,12 +50,6 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		this._loading = false;
 	}
 
-	//TODO How should we handle url stuff?
-	private _handleOpenCard(unique: string) {
-		//TODO this will not be needed when cards works as links with href
-		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + unique); //TODO Change to a tag with href and make dynamic
-	}
-
 	#onSelect(user: UmbUserDetailModel) {
 		this.#collectionContext?.selection.select(user.unique ?? '');
 	}
@@ -102,10 +96,10 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		return html`
 			<uui-card-user
 				.name=${user.name ?? 'Unnamed user'}
+				href=${'section/user-management/workspace/user/edit/' + user.unique}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#collectionContext?.selection.isSelected(user.unique)}
-				@open=${() => this._handleOpenCard(user.unique)}
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
