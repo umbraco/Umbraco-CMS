@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
+import { UmbUserKind } from '../../../utils/index.js';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
@@ -84,9 +85,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	}
 
 	#renderUsernameProperty() {
-		if (this._usernameIsEmail) {
-			return nothing;
-		}
+		if (this._usernameIsEmail) return nothing;
 
 		return html`
 			<umb-property-layout
@@ -106,6 +105,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	}
 
 	#renderUILanguageProperty() {
+		if (this._user?.kind === UmbUserKind.API) return nothing;
 		return html`
 			<umb-property-layout
 				label="${this.localize.term('user_language')}"
