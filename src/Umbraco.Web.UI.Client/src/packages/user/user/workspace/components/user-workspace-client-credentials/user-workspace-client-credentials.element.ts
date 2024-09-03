@@ -5,7 +5,8 @@ import type {
 } from '../../../client-credential/index.js';
 import { UmbUserClientCredentialRepository } from '../../../client-credential/index.js';
 import { UMB_CREATE_USER_CLIENT_CREDENTIAL_MODAL } from '../../../client-credential/create/modal/create-user-client-credential-modal.token.js';
-import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { UmbUserKind } from '../../../utils/index.js';
+import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -15,6 +16,9 @@ const elementName = 'umb-user-workspace-client-credentials';
 export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 	@state()
 	private _userUnique?: string;
+
+	@state()
+	private _userKind?: string;
 
 	@state()
 	private _clientCredentials: UmbUserClientCredentialModel[] = [];
@@ -28,6 +32,9 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
+
+			this.observe(this.#userWorkspaceContext.kind, (kind) => (this._userKind = kind), 'umbUserKindObserver');
+
 			this.observe(
 				this.#userWorkspaceContext.unique,
 				async (unique) => this.#onUserUniqueChange(unique),
@@ -89,20 +96,32 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (this._userKind !== UmbUserKind.API) return nothing;
+
 		return html`<uui-box>
 			<div slot="headline">Client Credentials</div>
-			${this._clientCredentials.map(
-				(client) =>
-					html`<div>
-						${client.unique} <uui-button @click=${(event: Event) => this.#onDelete(event, client)}>Delete</uui-button>
-					</div>`,
-			)}
+			${this._clientCredentials.map((client) => html` <uui-ref-list> ${this.#renderItem(client)} </uui-ref-list> `)}
 			<uui-button
 				id="add-button"
 				look="placeholder"
 				label=${this.localize.term('general_add')}
 				@click=${this.#onAdd}></uui-button>
 		</uui-box>`;
+	}
+
+	#renderItem(client: UmbUserClientCredentialModel) {
+		return html`
+			<uui-ref-node name=${client.unique} readonly>
+				<uui-icon slot="icon" name="icon-fingerprint"></uui-icon>
+				<uui-button
+					slot="actions"
+					@click=${(event: Event) => this.#onDelete(event, client)}
+					label="Delete ${client.unique}"
+					compact
+					><uui-icon style="color: var(--uui-color-danger)" name="icon-trash" look="danger"></uui-icon
+				></uui-button>
+			</uui-ref-node>
+		`;
 	}
 
 	static override styles = [
