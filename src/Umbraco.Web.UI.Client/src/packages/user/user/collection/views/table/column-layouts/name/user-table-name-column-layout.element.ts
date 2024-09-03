@@ -40,7 +40,7 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 				.name=${this.value.name || 'Unknown'}
 				img-src=${ifDefined(this.value.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
 				img-srcset=${ifDefined(this.value.avatarUrls.length > 0 ? avatarSrcset : undefined)}></uui-avatar>
-			<a style="font-weight: bold;" href="section/user-management/view/users/user/edit/${this.value.unique}"
+			<a style="font-weight: bold;" href="section/user-management/workspace/user/edit/${this.value.unique}"
 				>${this.value.name}</a
 			>
 		</div>`;
