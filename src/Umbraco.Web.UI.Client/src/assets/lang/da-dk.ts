@@ -1857,6 +1857,7 @@ export default {
 		inviteAnotherUser: 'Invitér anden bruger',
 		inviteUserHelp:
 			'Invitér nye brugere til at give dem adgang til Umbraco. En invitation vil blive sendt\n      via e-mail til brugeren med oplysninger om, hvordan man logger ind i Umbraco.\n    ',
+		kind: 'Slags',
 		language: 'Sprog',
 		languageHelp: 'Indstil det sprog, du vil se i menuer og dialoger',
 		lastLockoutDate: 'Senest låst ude',

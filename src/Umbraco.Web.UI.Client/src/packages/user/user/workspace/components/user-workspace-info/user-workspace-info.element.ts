@@ -43,6 +43,10 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 		this._userInfo = [
 			{
+				labelKey: 'user_kind',
+				value: user.kind,
+			},
+			{
 				labelKey: 'user_lastLogin',
 				value: user.lastLoginDate
 					? this.localize.date(user.lastLoginDate, TimeFormatOptions)

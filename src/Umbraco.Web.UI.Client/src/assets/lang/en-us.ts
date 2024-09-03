@@ -1849,6 +1849,7 @@ export default {
 				? 'The email address is used for notifications, password recovery, and as the username for logging in'
 				: 'The email address is used for notifications and password recovery';
 		},
+		kind: 'Kind',
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
