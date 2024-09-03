@@ -8,8 +8,8 @@
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
   </PropertyGroup>
   <PropertyGroup>
-    <!--  TODO: Fix CS1998 async, CSO618 obsolete references, fix SYSLIB0012 obsolete references,
-    and remove overrides -->
+    <!--  TODO: Fix [CS1998] async, [CSO618] obsolete references, fix [SYSLIB0012] obsolete references,
+          and remove overrides -->
     <WarningsNotAsErrors>CS1998,CS0618,SYSLIB0012</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Templates;
 
 public sealed class HtmlUrlParser
 {
-    private static readonly Regex ResolveUrlPattern = new(
+    private static readonly Regex _resolveUrlPattern = new(
         "(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
@@ -46,13 +46,13 @@ public sealed class HtmlUrlParser
             return text;
         }
 
-        using (DisposableTimer? timer = !(_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug)) ? null : _profilingLogger.DebugDuration(
+        using (DisposableTimer? timer = !_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration(
                    typeof(IOHelper),
                    "ResolveUrlsFromTextString starting",
                    "ResolveUrlsFromTextString complete"))
         {
             // find all relative URLs (ie. URLs that contain ~)
-            MatchCollection tags = ResolveUrlPattern.Matches(text);
+            MatchCollection tags = _resolveUrlPattern.Matches(text);
             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {
                 _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);

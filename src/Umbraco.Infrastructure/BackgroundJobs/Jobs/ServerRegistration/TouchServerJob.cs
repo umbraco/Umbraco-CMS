@@ -24,7 +24,8 @@ public class TouchServerJob : IRecurringBackgroundJob
     public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
 
     private event EventHandler? _periodChanged;
-    public event EventHandler PeriodChanged {
+    public event EventHandler PeriodChanged
+    {
         add { _periodChanged += value; }
         remove { _periodChanged -= value; }
     }

@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 // look for the super user with default password
-                var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+                NPoco.Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>()
                     .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
@@ -251,9 +251,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </remarks>
         public DatabaseSchemaResult? ValidateSchema()
         {
-            using (var scope = _scopeProvider.CreateCoreScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
-                var result = ValidateSchema(scope);
+                DatabaseSchemaResult? result = ValidateSchema(scope);
                 scope.Complete();
                 return result;
             }
@@ -262,10 +262,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private DatabaseSchemaResult? ValidateSchema(ICoreScope scope)
         {
             if (_databaseFactory.Initialized == false)
+            {
                 return new DatabaseSchemaResult();
+            }
 
             if (_databaseSchemaValidationResult != null)
+            {
                 return _databaseSchemaValidationResult;
+            }
 
             _databaseSchemaValidationResult = _scopeAccessor.AmbientScope?.Database.ValidateSchema();
 
@@ -283,9 +287,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </remarks>
         public Result? CreateSchemaAndData()
         {
-            using (var scope = _scopeProvider.CreateCoreScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
-                var result = CreateSchemaAndData(scope);
+                Result? result = CreateSchemaAndData(scope);
                 if (result?.Success is true)
                 {
                     scope.Notifications.Publish(new DatabaseSchemaAndDataCreatedNotification(result!.RequiresUpgrade));
@@ -299,7 +303,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             try
             {
-                var readyForInstall = CheckReadyForInstall();
+                Attempt<Result?> readyForInstall = CheckReadyForInstall();
                 if (readyForInstall.Success == false)
                 {
                     return readyForInstall.Result;
@@ -307,23 +311,25 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 _logger.LogInformation("Database configuration status: Started");
 
-                var database = _scopeAccessor.AmbientScope?.Database;
+                IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
 
                 var message = string.Empty;
 
-                var schemaResult = ValidateSchema();
+                DatabaseSchemaResult? schemaResult = ValidateSchema();
                 var hasInstalledVersion = schemaResult?.DetermineHasInstalledVersion() ?? false;
 
                 //If the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (!hasInstalledVersion)
                 {
                     if (_runtimeState.Level == RuntimeLevel.Run)
+                    {
                         throw new Exception("Umbraco is already configured!");
+                    }
 
-                    var creator = _databaseSchemaCreatorFactory.Create(database);
+                    DatabaseSchemaCreator creator = _databaseSchemaCreatorFactory.Create(database);
                     creator.InitializeDatabaseSchema();
 
-                    message = message + "<p>Installation completed!</p>";
+                    message += "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
                     _logger.LogInformation("Database configuration status: {DbConfigStatus}", message);
@@ -361,7 +367,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             try
             {
-                var readyForInstall = CheckReadyForInstall();
+                Attempt<Result?> readyForInstall = CheckReadyForInstall();
                 if (readyForInstall.Success == false)
                 {
                     return readyForInstall.Result;
