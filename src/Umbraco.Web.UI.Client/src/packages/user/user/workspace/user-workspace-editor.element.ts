@@ -73,9 +73,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return nothing;
 
 		return html`
-			<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings>
-			<umb-user-workspace-assign-access></umb-user-workspace-assign-access>
-			<umb-user-workspace-access></umb-user-workspace-access>
+			<umb-stack>
+				<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings>
+				<umb-user-workspace-assign-access></umb-user-workspace-assign-access>
+				<umb-user-workspace-access></umb-user-workspace-access>
+			</umb-stack>
 		`;
 	}
 

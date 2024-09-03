@@ -28,7 +28,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` <uui-box id="access" headline=${this.localize.term('user_access')}>
+		return html` <uui-box headline=${this.localize.term('user_access')}>
 			<div slot="header" class="faded-text">
 				<umb-localize key="user_accessHelp"
 					>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
@@ -60,8 +60,8 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			#access {
-				margin-top: var(--uui-size-space-4);
+			:host {
+				display: block;
 			}
 
 			hr {

@@ -123,6 +123,10 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+			}
+
 			uui-input {
 				width: 100%;
 			}
