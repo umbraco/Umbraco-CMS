@@ -159,6 +159,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			:host {
 				--uui-button-content-align: left;
 				--uui-menu-item-flat-structure: 1;
+				display: contents;
 			}
 
 			.filter-dropdown {
