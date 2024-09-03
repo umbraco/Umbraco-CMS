@@ -69,6 +69,7 @@ public class DocumentUrlService : IDocumentUrlService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (await ShouldRebuildUrlsAsync())
         {
+			_logger.LogInformation("Rebuilding all urls.");
             await RebuildAllUrlsAsync();
         }
 
@@ -85,40 +86,60 @@ public class DocumentUrlService : IDocumentUrlService
 
             if (languageIdToIsoCode.TryGetValue(publishedDocumentUrlSegment.LanguageId, out var isoCode))
             {
-                UpdateCache(publishedDocumentUrlSegment, isoCode);
+                UpdateCache(_coreScopeProvider.Context!, publishedDocumentUrlSegment, isoCode);
             }
         }
         _isInitialized = true;
         scope.Complete();
     }
 
-    private void UpdateCache(PublishedDocumentUrlSegment publishedDocumentUrlSegment, string isoCode)
+    private void UpdateCache(IScopeContext scopeContext, PublishedDocumentUrlSegment publishedDocumentUrlSegment, string isoCode)
     {
         var cacheKey = CreateCacheKey(publishedDocumentUrlSegment.DocumentKey, isoCode, publishedDocumentUrlSegment.IsDraft);
 
-        PublishedDocumentUrlSegment? existingValue = null;
-        _cache.TryGetValue(cacheKey, out existingValue);
+        scopeContext.Enlist("UpdateCache_" + cacheKey, () =>
+        {
+            PublishedDocumentUrlSegment? existingValue = null;
+            _cache.TryGetValue(cacheKey, out existingValue);
 
-        if (existingValue is null)
-        {
-            if (_cache.TryAdd(cacheKey, publishedDocumentUrlSegment) is false)
+            if (existingValue is null)
             {
-                throw new InvalidOperationException("Could not add the document url cache.");
+                if (_cache.TryAdd(cacheKey, publishedDocumentUrlSegment) is false)
+                {
+                    _logger.LogError("Could not add the document url cache.");
+                    return false;
+                }
             }
-        }
-        else
-        {
-            if (_cache.TryUpdate(cacheKey, publishedDocumentUrlSegment, existingValue) is false)
+            else
             {
-                throw new InvalidOperationException("Could not update the document url cache.");
+                if (_cache.TryUpdate(cacheKey, publishedDocumentUrlSegment, existingValue) is false)
+                {
+                    _logger.LogError("Could not update the document url cache.");
+                    return false;
+                }
             }
-        }
+
+            return true;
+        });
+
+
     }
 
-    private void RemoveFromCache(PublishedDocumentUrlSegment publishedDocumentUrlSegment, string isoCode)
+    private void RemoveFromCache(IScopeContext scopeContext, PublishedDocumentUrlSegment publishedDocumentUrlSegment, string isoCode)
     {
         var cacheKey = CreateCacheKey(publishedDocumentUrlSegment.DocumentKey, isoCode, publishedDocumentUrlSegment.IsDraft);
-        _cache.TryRemove(cacheKey, out _); // If it do not exists, we are still happy
+
+        scopeContext.Enlist("RemoveFromCache_" + cacheKey, () =>
+        {
+            if (_cache.TryRemove(cacheKey, out _) is false)
+            {
+                _logger.LogDebug("Could not remove the document url cache. But the important thing is that it is not there.");
+                return false;
+            }
+
+            return true;
+        });
+
     }
 
     public async Task RebuildAllUrlsAsync()
@@ -145,9 +166,6 @@ public class DocumentUrlService : IDocumentUrlService
 
     private string GetCurrentRebuildValue()
     {
-        // TODO check that the url providers has not changed
-        // TODO check that the ... has not changed
-
         return string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
     }
 
@@ -184,6 +202,10 @@ public class DocumentUrlService : IDocumentUrlService
 
         foreach (IContent document in documents)
         {
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                _logger.LogTrace("Rebuilding urls for document with key {DocumentKey}", document.Key);
+            }
 
             if (document.AvailableCultures.Any())
             {
@@ -191,19 +213,20 @@ public class DocumentUrlService : IDocumentUrlService
                 {
                     var language = languageDictionary[culture];
 
-                    HandleCaching(document, culture, language, toDelete, toSave);
+                    HandleCaching(_coreScopeProvider.Context!, document, culture, language, toDelete, toSave);
                 }
             }
             else
             {
                 var language = await _languageService.GetDefaultLanguageAsync();
 
-                HandleCaching(document, null, language!, toDelete, toSave);
+                HandleCaching(_coreScopeProvider.Context!, document, null, language!, toDelete, toSave);
             }
         }
 
         if(toSave.Any())
         {
+            _logger.LogTrace(".... {toSave}", toSave.Select(x=>x.UrlSegment));
             _documentUrlRepository.Save(toSave);
         }
 
@@ -212,11 +235,10 @@ public class DocumentUrlService : IDocumentUrlService
             _documentUrlRepository.DeleteByDocumentKey(toDelete);
         }
 
-        // TODO handle when scope is rolled back, we need to rebuilt cache, to ensure the is no inconsistency.
         scope.Complete();
     }
 
-    private void HandleCaching(IContent document, string? culture, ILanguage language, List<Guid> toDelete, List<PublishedDocumentUrlSegment> toSave)
+    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<Guid> toDelete, List<PublishedDocumentUrlSegment> toSave)
     {
         var models = GenerateModels(document, culture, language);
 
@@ -230,12 +252,12 @@ public class DocumentUrlService : IDocumentUrlService
             if (document.Trashed)
             {
                 toDelete.Add(model.DocumentKey);
-                RemoveFromCache(model, language.IsoCode);
+                RemoveFromCache(scopeContext, model, language.IsoCode);
             }
             else
             {
                 toSave.Add(model);
-                UpdateCache(model, language.IsoCode);
+                UpdateCache(scopeContext, model, language.IsoCode);
             }
         }
     }
@@ -243,7 +265,6 @@ public class DocumentUrlService : IDocumentUrlService
     private IEnumerable<PublishedDocumentUrlSegment> GenerateModels(IContent document, string? culture, ILanguage language)
     {
         var publishedUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, true);
-
         if(publishedUrlSegment.IsNullOrWhiteSpace())
         {
             _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
@@ -270,7 +291,7 @@ public class DocumentUrlService : IDocumentUrlService
             };
         }
     }
-    
+
     public async Task DeleteUrlsAsync(IEnumerable<IContent> documents)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
@@ -291,7 +312,7 @@ public class DocumentUrlService : IDocumentUrlService
                     var models = GenerateModels(document, culture, language);
                     foreach (PublishedDocumentUrlSegment model in models)
                     {
-                        RemoveFromCache(model, culture);
+                        RemoveFromCache(_coreScopeProvider.Context!, model, culture);
                     }
                 }
             }
@@ -302,14 +323,13 @@ public class DocumentUrlService : IDocumentUrlService
 
                 foreach (PublishedDocumentUrlSegment model in models)
                 {
-                    RemoveFromCache(model, language!.IsoCode);
+                    RemoveFromCache(_coreScopeProvider.Context!, model, language!.IsoCode);
                 }
             }
         }
 
         _documentUrlRepository.DeleteByDocumentKey(documents.Select(x=>x.Key));
 
-        // TODO handle when scope is rolled back, we need to rebuilt cache, to ensure the is no inconsistency.
         scope.Complete();
     }
 
@@ -355,12 +375,12 @@ public class DocumentUrlService : IDocumentUrlService
         // If there is no parts, it means it is a root (and no assigned domain)
         if(urlSegments.Length == 0)
         {
-            // if we do not hide the top level and no domain was found, it maens there is no content.
-            // TODO we can remove this to keep consistency with the old routing, but it seems incorrect to allow that.
-            if (hideTopLevelNodeFromPath is false)
-            {
-                return null;
-            }
+            // // if we do not hide the top level and no domain was found, it maens there is no content.
+            // // TODO we can remove this to keep consistency with the old routing, but it seems incorrect to allow that.
+            // if (hideTopLevelNodeFromPath is false)
+            // {
+            //     return null;
+            // }
 
             return GetTopMostRootKey();
         }
@@ -443,6 +463,11 @@ public class DocumentUrlService : IDocumentUrlService
         return null;
     }
 
+    /// <summary>
+    /// Gets the children based on the latest published version of the content. (No aware of things in this scope).
+    /// </summary>
+    /// <param name="documentKey">The key of the document to get children from.</param>
+    /// <returns>The keys of all the children of the document.</returns>
     // TODO replace with a navigational service when available
     private IEnumerable<Guid> GetChildKeys(Guid documentKey)
     {
@@ -456,6 +481,10 @@ public class DocumentUrlService : IDocumentUrlService
         return _contentService.GetPagedChildren(id.Value, 0, int.MaxValue, out _).Select(x => x.Key);
     }
 
+    /// <summary>
+    /// Gets the top most root key.
+    /// </summary>
+    /// <returns>The top most root key.</returns>
     // TODO replace with a navigational service when available
     private Guid? GetTopMostRootKey()
     {

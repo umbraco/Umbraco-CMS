@@ -98,8 +98,12 @@ public class ContentFinderByUrl : IContentFinder
             umbracoContext.InPreviewMode
             ); //TODO default culture
 
-        IPublishedContent? node =
-            umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
+        IPublishedContent? node = null;
+        if (documentKey.HasValue)
+        {
+            node = umbracoContext.Content?.GetById(umbracoContext.InPreviewMode, documentKey.Value);
+        }
+
         if (node != null)
         {
             docreq.SetPublishedContent(node);
@@ -114,12 +118,6 @@ public class ContentFinderByUrl : IContentFinder
             {
                 _logger.LogDebug("No match.");
             }
-        }
-
-        // TODO remove this check
-        if (node?.Key != documentKey)
-        {
-            throw new InvalidOperationException("For some reason the routing was different. Investigate!!");
         }
 
         return node;
