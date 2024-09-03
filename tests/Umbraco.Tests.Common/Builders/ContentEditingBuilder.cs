@@ -169,4 +169,11 @@ public class ContentEditingBuilder
             .WithParentKey(parentKey)
             .WithInvariantProperty("title", "Welcome to our Home page")
             .Build();
+
+public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name) =>
+    new ContentEditingBuilder()
+        .WithContentType(contentType)
+        .WithInvariantName(name)
+        .WithInvariantProperty("title", "Welcome to our Home page")
+        .Build();
 }
