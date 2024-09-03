@@ -1,11 +1,11 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserClientCredentialModel } from '../../../client-credential/index.js';
 import { UmbUserClientCredentialRepository } from '../../../client-credential/index.js';
+import { UMB_CREATE_USER_CLIENT_CREDENTIAL_MODAL } from '../../../client-credential/create/modal/create-user-client-credential-modal.token.js';
 import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_CREATE_USER_CLIENT_CREDENTIAL_MODAL } from '../../../client-credential/create/modal/create-user-client-credential-modal.token.js';
 
 const elementName = 'umb-user-workspace-client-credentials';
 @customElement(elementName)
@@ -76,6 +76,10 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+			}
+
 			uui-input {
 				width: 100%;
 			}

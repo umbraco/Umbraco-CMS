@@ -74,7 +74,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 		return html`
 			<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings>
-			<umb-user-workspace-client-credentials></umb-user-workspace-client-credentials>
 			<umb-user-workspace-assign-access></umb-user-workspace-assign-access>
 			<umb-user-workspace-access></umb-user-workspace-access>
 		`;
@@ -84,14 +83,16 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return nothing;
 
 		return html`
-			<umb-user-workspace-avatar></umb-user-workspace-avatar>
-			<umb-user-workspace-info></umb-user-workspace-info>
-
-			<uui-box>
-				<umb-entity-action-list
-					.entityType=${UMB_USER_ENTITY_TYPE}
-					.unique=${this._user.unique}></umb-entity-action-list>
-			</uui-box>
+			<umb-stack look="compact">
+				<umb-user-workspace-avatar></umb-user-workspace-avatar>
+				<umb-user-workspace-info></umb-user-workspace-info>
+				<umb-user-workspace-client-credentials></umb-user-workspace-client-credentials>
+				<uui-box>
+					<umb-entity-action-list
+						.entityType=${UMB_USER_ENTITY_TYPE}
+						.unique=${this._user.unique}></umb-entity-action-list>
+				</uui-box>
+			</umb-stack>
 		`;
 	}
 

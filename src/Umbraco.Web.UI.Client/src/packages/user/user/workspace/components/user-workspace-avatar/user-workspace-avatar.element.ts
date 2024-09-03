@@ -143,7 +143,6 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin-bottom: var(--uui-size-space-4);
 			}
 
 			#Avatar {

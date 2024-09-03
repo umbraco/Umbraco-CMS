@@ -104,12 +104,12 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-tag {
-				width: fit-content;
+			:host {
+				display: block;
 			}
 
-			#user-info {
-				margin-bottom: var(--uui-size-space-4);
+			uui-tag {
+				width: fit-content;
 			}
 
 			#state {
