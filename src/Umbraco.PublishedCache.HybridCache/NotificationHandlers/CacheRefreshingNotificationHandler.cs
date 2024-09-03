@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
@@ -22,17 +23,20 @@ internal sealed class CacheRefreshingNotificationHandler :
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IElementsCache _elementsCache;
     private readonly IRelationService _relationService;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
     public CacheRefreshingNotificationHandler(
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
         IElementsCache elementsCache,
-        IRelationService relationService)
+        IRelationService relationService,
+        IPublishedContentTypeCache publishedContentTypeCache)
     {
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
         _elementsCache = elementsCache;
         _relationService = relationService;
+        _publishedContentTypeCache = publishedContentTypeCache;
     }
 
     public async Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken)
@@ -104,8 +108,14 @@ internal sealed class CacheRefreshingNotificationHandler :
             = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
         var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id)
             .ToArray();
-        if (contentTypeIds.Any())
+
+        if (contentTypeIds.Length != 0)
         {
+            foreach (var contentTypeId in contentTypeIds)
+            {
+                _publishedContentTypeCache.ClearContentType(contentTypeId);
+            }
+
             _documentCacheService.Rebuild(contentTypeIds);
         }
 
