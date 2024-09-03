@@ -7,7 +7,7 @@ export interface UmbCreateUserClientCredentialModalData {
 	};
 }
 
-export interface UmbBlockCatalogueModalValue {
+export interface UmbCreateUserClientCredentialModalValue {
 	client: {
 		unique: string;
 		secret: string;

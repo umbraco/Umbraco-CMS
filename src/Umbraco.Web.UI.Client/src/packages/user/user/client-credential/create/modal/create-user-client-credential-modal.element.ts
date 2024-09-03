@@ -1,12 +1,19 @@
 import type { UmbCreateUserClientCredentialRequestArgs } from '../../repository/index.js';
 import { UmbUserClientCredentialRepository } from '../../repository/index.js';
+import type {
+	UmbCreateUserClientCredentialModalData,
+	UmbCreateUserClientCredentialModalValue,
+} from './create-user-client-credential-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 const elementName = 'umb-create-user-client-credential-modal';
 @customElement(elementName)
-export class UmbCreateUserModalElement extends UmbModalBaseElement {
+export class UmbCreateUserModalElement extends UmbModalBaseElement<
+	UmbCreateUserClientCredentialModalData,
+	UmbCreateUserClientCredentialModalValue
+> {
 	@query('#CreateUserClientCredentialForm')
 	_form?: HTMLFormElement;
 
@@ -16,6 +23,8 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 
 	async #onSubmit(e: SubmitEvent) {
 		e.preventDefault();
+
+		if (this.data?.user?.unique === undefined) throw new Error('User unique is required');
 
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
@@ -35,7 +44,11 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 
 		// TODO: figure out when to use email or username
 		const { data } = await this.#userClientCredentialRepository.requestCreate(payload);
-		debugger;
+
+		if (data) {
+			this.updateValue({ client: { unique: data.unique, secret } });
+			this._submitModal();
+		}
 	}
 
 	override render() {
