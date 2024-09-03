@@ -69,7 +69,11 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 	override render() {
 		return html`<uui-box>
 			<div slot="headline">Client Credentials</div>
-			<uui-button label="Add" @click=${this.#onAdd}></uui-button>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				label=${this.localize.term('general_add')}
+				@click=${this.#onAdd}></uui-button>
 		</uui-box>`;
 	}
 
@@ -81,6 +85,10 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 			}
 
 			uui-input {
+				width: 100%;
+			}
+
+			#add-button {
 				width: 100%;
 			}
 		`,
