@@ -74,7 +74,9 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<
 						<div class="prepend" slot="prepend">${this.#uniquePrefix}</div>
 					</uui-input>
 				</uui-form-layout-item>
+
 				<uui-form-layout-item>
+					<div slot="description">The secret cannot be retrieved again.</div>
 					<uui-label id="secretLabel" slot="label" for="secret" required>Secret</uui-label>
 					<uui-input-password id="secret" label="secret" name="secret" required></uui-input-password>
 				</uui-form-layout-item>
