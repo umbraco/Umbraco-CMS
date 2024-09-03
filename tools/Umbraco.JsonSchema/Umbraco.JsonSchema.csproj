@@ -6,8 +6,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <!--  TODO: Fix [SA1117] params all on same line, [SA1401] make fields private,
-          [SA1134] own line attributes, and remove overrides -->
-    <WarningsNotAsErrors>SA1117,SA1401,SA1134</WarningsNotAsErrors>
+          [SA1134] own line attributes, [CS9042] not obsolete, and remove overrides -->
+    <WarningsNotAsErrors>SA1117,SA1401,SA1134,CS9042</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" VersionOverride="2.9.1" />
