@@ -47,15 +47,26 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 		});
 	}
 
-	async #onUserUniqueChange(unique: string | undefined) {
+	#onUserUniqueChange(unique: string | undefined) {
 		if (unique && this._userUnique !== unique) {
-			const { data } = await this.#userClientCredentialRepository.requestClientCredentials({ user: { unique } });
-			if (data) {
-				this._clientCredentials = data;
-			}
+			this._userUnique = unique;
+			this.#loadClientCredentials();
 		}
 
-		this._userUnique = unique;
+		if (!unique) {
+			this._userUnique = undefined;
+			this._clientCredentials = [];
+		}
+	}
+
+	async #loadClientCredentials() {
+		if (!this._userUnique) throw new Error('User unique not available');
+
+		const { data } = await this.#userClientCredentialRepository.requestClientCredentials({
+			user: { unique: this._userUnique },
+		});
+
+		this._clientCredentials = data ?? [];
 	}
 
 	#onAdd(event: Event) {
@@ -71,9 +82,7 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 			},
 		});
 
-		modalContext.onSubmit().then((result) => {
-			console.log('submit', result);
-		});
+		modalContext.onSubmit().then(() => this.#loadClientCredentials());
 	}
 
 	async #onDelete(event: Event, client: UmbUserClientCredentialModel) {
@@ -92,7 +101,11 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 			client: { unique: client.unique },
 		};
 
-		this.#userClientCredentialRepository.requestDelete(payload);
+		const { error } = await this.#userClientCredentialRepository.requestDelete(payload);
+
+		if (!error) {
+			this.#loadClientCredentials();
+		}
 	}
 
 	override render() {
