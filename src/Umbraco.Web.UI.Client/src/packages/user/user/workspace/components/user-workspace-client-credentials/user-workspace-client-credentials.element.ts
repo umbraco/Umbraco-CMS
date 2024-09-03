@@ -113,7 +113,7 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 
 		return html`<uui-box>
 			<div slot="headline">Client Credentials</div>
-			${this._clientCredentials.map((client) => html` <uui-ref-list> ${this.#renderItem(client)} </uui-ref-list> `)}
+			<uui-ref-list>${this._clientCredentials.map((client) => html` ${this.#renderItem(client)} `)}</uui-ref-list>
 			<uui-button
 				id="add-button"
 				look="placeholder"
@@ -125,13 +125,13 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 	#renderItem(client: UmbUserClientCredentialModel) {
 		return html`
 			<uui-ref-node name=${client.unique} readonly>
-				<uui-icon slot="icon" name="icon-fingerprint"></uui-icon>
+				<uui-icon slot="icon" name="icon-key"></uui-icon>
 				<uui-button
 					slot="actions"
 					@click=${(event: Event) => this.#onDelete(event, client)}
 					label="Delete ${client.unique}"
 					compact
-					><uui-icon style="color: var(--uui-color-danger)" name="icon-trash" look="danger"></uui-icon
+					><uui-icon name="icon-trash" look="danger"></uui-icon
 				></uui-button>
 			</uui-ref-node>
 		`;
