@@ -9,6 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
+import { UmbUserKind } from '../../../utils/index.js';
 
 @customElement('umb-user-grid-collection-view')
 export class UmbUserGridCollectionViewElement extends UmbLitElement {
@@ -115,12 +116,14 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderUserLoginDate(user: UmbUserDetailModel) {
+		if (user.kind === UmbUserKind.API) return nothing;
+
 		if (!user.lastLoginDate) {
 			return html`<div class="user-login-time">${`${user.name} ${this.localize.term('user_noLogin')}`}</div>`;
 		}
 
 		return html`<div class="user-login-time">
-			<umb-localize key="user_lastLogin"></umb-localize><br />
+			<umb-localize key="user_lastLogin"></umb-localize>
 			${this.localize.date(user.lastLoginDate)}
 		</div>`;
 	}
@@ -142,6 +145,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 			uui-card-user {
 				width: 100%;
 				height: 180px;
+				justify-content: normal;
+				padding-top: var(--uui-size-space-5);
 			}
 
 			.user-login-time {

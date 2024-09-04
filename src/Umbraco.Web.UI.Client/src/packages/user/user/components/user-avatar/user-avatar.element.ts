@@ -1,7 +1,7 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
+import { UmbUserKind } from '../../utils/index.js';
 import { css, html, customElement, property, nothing, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbUserKind } from '../../utils/index.js';
 
 const elementName = 'umb-user-avatar';
 @customElement(elementName)
