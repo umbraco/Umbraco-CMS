@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -126,16 +127,19 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 var updateBatch = propertyDataDtos.Select(propertyDataDto =>
                     UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
 
-                // NOTE: .ToArray() here so we can modify the original updateBatch collection in the enumeration
-                UpdateBatch<PropertyDataDto>[] enumerableUpdateBatch = updateBatch.ToArray();
+                var updatesToSkip = new ConcurrentBag<UpdateBatch<PropertyDataDto>>();
+
                 var progress = 0;
 
-                foreach (UpdateBatch<PropertyDataDto> update in enumerableUpdateBatch)
+                ExecutionContext.SuppressFlow();
+                Parallel.ForEach(updateBatch, update =>
                 {
+                    using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+
                     progress++;
                     if (progress % 100 == 0)
                     {
-                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, enumerableUpdateBatch.Length);
+                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
                     }
 
                     PropertyDataDto propertyDataDto = update.Poco;
@@ -159,7 +163,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             propertyType.Name,
                             propertyType.Id,
                             propertyType.Alias);
-                        continue;
+                        return;
                     }
 
                     var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
@@ -175,21 +179,21 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                 propertyType.Name,
                                 propertyType.Id,
                                 propertyType.Alias);
-                            updateBatch.Remove(update);
-                            continue;
+                            updatesToSkip.Add(update);
+                            return;
 
                         case string str when str.IsNullOrWhiteSpace():
                             // indicates either an empty block editor or corrupt block editor data - we can't do anything about either here
-                            updateBatch.Remove(update);
-                            continue;
+                            updatesToSkip.Add(update);
+                            return;
 
                         default:
                             switch (DetermineEditorValueHandling(toEditorValue))
                             {
                                 case EditorValueHandling.IgnoreConversion:
                                     // nothing to convert, continue
-                                    updateBatch.Remove(update);
-                                    continue;
+                                    updatesToSkip.Add(update);
+                                    return;
                                 case EditorValueHandling.ProceedConversion:
                                     // continue the conversion
                                     break;
@@ -201,8 +205,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                                         propertyType.Name,
                                         propertyType.Id,
                                         propertyType.Alias);
-                                    updateBatch.Remove(update);
-                                    continue;
+                                    updatesToSkip.Add(update);
+                                    return;
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
@@ -221,14 +225,17 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             propertyType.Name,
                             propertyType.Id,
                             propertyType.Alias);
-                        updateBatch.Remove(update);
-                        continue;
+                        updatesToSkip.Add(update);
+                        return;
                     }
 
                     stringValue = UpdateDatabaseValue(stringValue);
 
                     propertyDataDto.TextValue = stringValue;
-                }
+                });
+                ExecutionContext.RestoreFlow();
+
+                updateBatch.RemoveAll(updatesToSkip.Contains);
 
                 if (updateBatch.Any() is false)
                 {
