@@ -122,6 +122,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 							unique: user.unique,
 							name: user.name,
 							avatarUrls: user.avatarUrls,
+							kind: user.kind,
 						},
 					},
 					{

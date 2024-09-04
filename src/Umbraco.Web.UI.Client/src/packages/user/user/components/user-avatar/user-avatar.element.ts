@@ -12,7 +12,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	@property({ type: String })
 	kind: UmbUserKindType = UmbUserKind.DEFAULT;
 
-	@property({ type: Array, attribute: 'img-urls' })
+	@property({ type: Array, attribute: false })
 	public get imgUrls(): Array<string> {
 		return this.#imgUrls;
 	}

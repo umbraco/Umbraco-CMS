@@ -1,6 +1,7 @@
 import { UMB_USER_WORKSPACE_PATH } from '../../../../../paths.js';
-import { html, LitElement, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-user-table-name-column-layout')
 export class UmbUserTableNameColumnLayoutElement extends LitElement {
@@ -14,38 +15,18 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 	value!: any;
 
 	override render() {
-		const avatarUrls = [
-			{
-				scale: '1x',
-				url: this.value.avatarUrls?.[0],
-			},
-			{
-				scale: '2x',
-				url: this.value.avatarUrls?.[1],
-			},
-			{
-				scale: '3x',
-				url: this.value.avatarUrls?.[2],
-			},
-		];
-
-		let avatarSrcset = '';
-
-		avatarUrls.forEach((url) => {
-			avatarSrcset += `${url.url} ${url.scale},`;
-		});
-
 		const href = UMB_USER_WORKSPACE_PATH + '/edit/' + this.value.unique;
 
 		return html` <div style="display: flex; align-items: center;">
-			<uui-avatar
+			<umb-user-avatar
 				style="margin-right: var(--uui-size-space-3);"
-				.name=${this.value.name || 'Unknown'}
-				img-src=${ifDefined(this.value.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
-				img-srcset=${ifDefined(this.value.avatarUrls.length > 0 ? avatarSrcset : undefined)}></uui-avatar>
+				name=${this.value.name}
+				kind=${this.value.kind}
+				.imgUrls=${this.value.avatarUrls}></umb-user-avatar>
 			<a style="font-weight: bold;" href="${href}">${this.value.name}</a>
 		</div>`;
 	}
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbUserTableNameColumnLayoutElement;
