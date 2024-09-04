@@ -5,57 +5,57 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence
     // read-only dto
     internal class ContentSourceDto : IReadOnlyContentBase
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
 
-        public Guid Key { get; set; }
+        public Guid Key { get; init; }
 
-        public int ContentTypeId { get; set; }
+        public int ContentTypeId { get; init; }
 
-        public int Level { get; set; }
+        public int Level { get; init; }
 
-        public string Path { get; set; } = string.Empty;
+        public string Path { get; init; } = string.Empty;
 
-        public int SortOrder { get; set; }
+        public int SortOrder { get; init; }
 
-        public int ParentId { get; set; }
+        public int ParentId { get; init; }
 
-        public bool Published { get; set; }
+        public bool Published { get; init; }
 
-        public bool Edited { get; set; }
+        public bool Edited { get; init; }
 
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateDate { get; init; }
 
-        public int CreatorId { get; set; }
+        public int CreatorId { get; init; }
 
         // edited data
-        public int VersionId { get; set; }
+        public int VersionId { get; init; }
 
-        public string? EditName { get; set; }
+        public string? EditName { get; init; }
 
-        public DateTime EditVersionDate { get; set; }
+        public DateTime EditVersionDate { get; init; }
 
-        public int EditWriterId { get; set; }
+        public int EditWriterId { get; init; }
 
-        public int EditTemplateId { get; set; }
+        public int EditTemplateId { get; init; }
 
-        public string? EditData { get; set; }
+        public string? EditData { get; init; }
 
-        public byte[]? EditDataRaw { get; set; }
+        public byte[]? EditDataRaw { get; init; }
 
         // published data
-        public int PublishedVersionId { get; set; }
+        public int PublishedVersionId { get; init; }
 
-        public string? PubName { get; set; }
+        public string? PubName { get; init; }
 
-        public DateTime PubVersionDate { get; set; }
+        public DateTime PubVersionDate { get; init; }
 
-        public int PubWriterId { get; set; }
+        public int PubWriterId { get; init; }
 
-        public int PubTemplateId { get; set; }
+        public int PubTemplateId { get; init; }
 
-        public string? PubData { get; set; }
+        public string? PubData { get; init; }
 
-        public byte[]? PubDataRaw { get; set; }
+        public byte[]? PubDataRaw { get; init; }
 
         // Explicit implementation
         DateTime IReadOnlyContentBase.UpdateDate => EditVersionDate;
