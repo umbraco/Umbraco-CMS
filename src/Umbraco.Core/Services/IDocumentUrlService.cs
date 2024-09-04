@@ -28,5 +28,5 @@ public interface IDocumentUrlService
 
     Task DeleteUrlsAsync(IEnumerable<IContent> documents);
 
-    Guid? GetDocumentKeyByRoute(string route, string culture, int? documentStartNodeId, bool isDraft);
+    Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft);
 }

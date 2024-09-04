@@ -333,13 +333,15 @@ public class DocumentUrlService : IDocumentUrlService
         scope.Complete();
     }
 
-    public Guid? GetDocumentKeyByRoute(string route, string culture, int? documentStartNodeId, bool isDraft)
+    public Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft)
     {
         var urlSegments = route.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
 
         // We need to translate legacy int ids to guid keys.
         Guid? runnerKey = GetStartNodeKey(documentStartNodeId);
         var hideTopLevelNodeFromPath = _globalSettings.HideTopLevelNodeFromPath;
+
+        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
         if (!_globalSettings.ForceCombineUrlPathLeftToRight
             && CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft)

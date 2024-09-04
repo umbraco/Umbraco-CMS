@@ -89,14 +89,12 @@ public class ContentFinderByUrl : IContentFinder
             _logger.LogDebug("Test route {Route}", route);
         }
 
-
-        // TODO find better way to strip the id from the route
         var documentKey = _documentUrlService.GetDocumentKeyByRoute(
             docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length),
-            docreq.Culture ?? "en-US",
+            docreq.Culture,
             docreq.Domain?.ContentId,
             umbracoContext.InPreviewMode
-            ); //TODO default culture
+            );
 
         IPublishedContent? node = null;
         if (documentKey.HasValue)
