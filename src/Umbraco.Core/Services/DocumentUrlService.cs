@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -27,6 +28,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly ILanguageService _languageService;
     private readonly IKeyValueService _keyValueService;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
     private bool _isInitialized = false;
@@ -42,7 +44,8 @@ public class DocumentUrlService : IDocumentUrlService
         IShortStringHelper shortStringHelper,
         ILanguageService languageService,
         IKeyValueService keyValueService,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -55,6 +58,7 @@ public class DocumentUrlService : IDocumentUrlService
         _languageService = languageService;
         _keyValueService = keyValueService;
         _idKeyMap = idKeyMap;
+        _documentNavigationQueryService = documentNavigationQueryService;
     }
 
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -470,27 +474,27 @@ public class DocumentUrlService : IDocumentUrlService
     /// </summary>
     /// <param name="documentKey">The key of the document to get children from.</param>
     /// <returns>The keys of all the children of the document.</returns>
-    // TODO replace with a navigational service when available
     private IEnumerable<Guid> GetChildKeys(Guid documentKey)
     {
-        var id = _contentService.GetById(documentKey)?.Id;
-
-        if (id.HasValue is false)
+        if(_documentNavigationQueryService.TryGetChildrenKeys(documentKey, out IEnumerable<Guid> childrenKeys))
         {
-            return Enumerable.Empty<Guid>();
+            return childrenKeys;
         }
 
-        return _contentService.GetPagedChildren(id.Value, 0, int.MaxValue, out _).Select(x => x.Key);
+        return Enumerable.Empty<Guid>();
     }
 
     /// <summary>
     /// Gets the top most root key.
     /// </summary>
     /// <returns>The top most root key.</returns>
-    // TODO replace with a navigational service when available
     private Guid? GetTopMostRootKey()
     {
-        return _contentService.GetRootContent().FirstOrDefault()?.Key;
+        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys))
+        {
+            return rootKeys.FirstOrDefault();
+        }
+        return null;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

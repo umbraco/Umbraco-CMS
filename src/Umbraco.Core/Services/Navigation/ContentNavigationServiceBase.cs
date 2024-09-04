@@ -36,6 +36,9 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys);
 
+    public bool TryGetRootKeys(out IEnumerable<Guid> childrenKeys)
+        => TryGetRootKeysFromStructure(_navigationStructure, out childrenKeys);
+
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
         => TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys);
 
@@ -162,6 +165,7 @@ internal abstract class ContentNavigationServiceBase
                _recycleBinNavigationStructure.TryRemove(key, out _);
     }
 
+
     /// <summary>
     ///     Rebuilds the navigation structure based on the specified object type key and whether the items are trashed.
     ///     Only relevant for items in the content and media trees (which have readLock values of -333 or -334).
@@ -210,6 +214,13 @@ internal abstract class ContentNavigationServiceBase
         }
 
         childrenKeys = parentNode.Children.Select(child => child.Key);
+        return true;
+    }
+
+    private bool TryGetRootKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, out IEnumerable<Guid> childrenKeys)
+    {
+        // TODO can we make this more efficient?
+        childrenKeys = structure.Values.Where(x=>x.Parent is null).Select(x=>x.Key);
         return true;
     }
 
