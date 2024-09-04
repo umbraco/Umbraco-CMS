@@ -66,6 +66,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			<div id="header" slot="header">
 				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}" ${umbFocus()}></uui-input>
 			</div>
+			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 		`;
 	}
 
@@ -89,11 +90,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				<umb-user-workspace-avatar></umb-user-workspace-avatar>
 				<umb-user-workspace-info></umb-user-workspace-info>
 				<umb-user-workspace-client-credentials></umb-user-workspace-client-credentials>
-				<uui-box>
-					<umb-entity-action-list
-						.entityType=${UMB_USER_ENTITY_TYPE}
-						.unique=${this._user.unique}></umb-entity-action-list>
-				</uui-box>
 			</umb-stack>
 		`;
 	}
