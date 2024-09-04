@@ -58,10 +58,10 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
-						<uui-menu-item label="Default" @click=${this.#onClick}>
+						<uui-menu-item label=${this.localize.term('user_userKindDefault')} @click=${this.#onClick}>
 							<umb-icon slot="icon" name="icon-user"></umb-icon>
 						</uui-menu-item>
-						<uui-menu-item label="Api" @click=${this.#onClick}>
+						<uui-menu-item label=${this.localize.term('user_userKindApi')} @click=${this.#onClick}>
 							<umb-icon slot="icon" name="icon-binarycode"></umb-icon>
 						</uui-menu-item>
 					</uui-scroll-container>

@@ -1953,6 +1953,8 @@ export default {
 		sortNameDescending: 'Navn (Å-A)',
 		sortCreateDateAscending: 'Nyeste',
 		sortCreateDateDescending: 'Ældste',
+		userKindDefault: 'Bruger',
+		userKindApi: 'API Bruger',
 		sortLastLoginDateDescending: 'Sidst logget ind',
 		noUserGroupsAdded: 'Ingen brugere er blevet tilføjet',
 		'2faDisableText': 'Hvis du ønsker at slå denne totrinsbekræftelse fra, så skal du nu indtaste koden fra din enhed:',

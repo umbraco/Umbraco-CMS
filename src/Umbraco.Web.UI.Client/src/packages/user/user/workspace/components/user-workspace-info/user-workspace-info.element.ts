@@ -45,7 +45,10 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		this._userInfo = [
 			{
 				labelKey: 'user_kind',
-				value: user.kind,
+				value:
+					user.kind === UmbUserKind.API
+						? this.localize.term('user_userKindApi')
+						: this.localize.term('user_userKindDefault'),
 			},
 			{
 				labelKey: 'user_lastLogin',

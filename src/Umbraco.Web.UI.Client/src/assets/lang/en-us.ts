@@ -1983,6 +1983,8 @@ export default {
 		sortCreateDateDescending: 'Newest',
 		sortCreateDateAscending: 'Oldest',
 		sortLastLoginDateDescending: 'Last login',
+		userKindDefault: 'User',
+		userKindApi: 'API User',
 		noUserGroupsAdded: 'No user groups have been added',
 		'2faDisableText':
 			'If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:',
