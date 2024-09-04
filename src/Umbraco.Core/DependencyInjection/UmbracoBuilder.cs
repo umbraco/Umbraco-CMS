@@ -39,6 +39,7 @@ using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.ImportExport;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -338,8 +339,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<IExternalLoginWithKeyRepository>()
-            ));
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>()));
             Services.AddUnique<ILogViewerService, LogViewerService>();
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
@@ -352,6 +352,12 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<CompiledPackageXmlParser>();
             Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
             Services.AddUnique<IPreviewService, PreviewService>();
+            Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
+            Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
+            Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());
+            Services.AddUnique<MediaNavigationService, MediaNavigationService>();
+            Services.AddUnique<IMediaNavigationQueryService>(x => x.GetRequiredService<MediaNavigationService>());
+            Services.AddUnique<IMediaNavigationManagementService>(x => x.GetRequiredService<MediaNavigationService>());
 
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();

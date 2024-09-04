@@ -49,7 +49,7 @@ public partial class UserServiceCrudTests
             Email = "some@one",
             Name = "Some One",
             UserGroupKeys = new HashSet<Guid> { userGroup.Key },
-            Type = UserType.Api
+            Kind = UserKind.Api
         };
 
         var userKey = (await userService.CreateAsync(Constants.Security.SuperUserKey, creationModel, true)).Result.CreatedUser!.Key;

@@ -7,5 +7,5 @@ public class UserItemResponseModel : NamedItemResponseModelBase
 {
     public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();
 
-    public UserType Type { get; set; }
+    public UserKind Kind { get; set; }
 }

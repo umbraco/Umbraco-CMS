@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -80,6 +80,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDataTypeUsageRepository, DataTypeUsageRepository>();
         builder.Services.AddUnique<ILogViewerRepository, LogViewerRepository>();
         builder.Services.AddUnique<IUserDataRepository, UserDataRepository>();
+        builder.Services.AddUnique<INavigationRepository, ContentNavigationRepository>();
 
         return builder;
     }

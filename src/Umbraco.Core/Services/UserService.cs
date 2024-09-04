@@ -1189,7 +1189,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
         }
 
-        if (user.Type != UserType.Default)
+        if (user.Kind != UserKind.Default)
         {
             return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
         }
@@ -2494,7 +2494,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         IUser? user = await GetAsync(userKey);
-        if (user is null || user.Type != UserType.Api)
+        if (user is null || user.Kind != UserKind.Api)
         {
             return UserClientCredentialsOperationStatus.InvalidUser;
         }
@@ -2517,7 +2517,7 @@ internal class UserService : RepositoryService, IUserService
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         IUser? user = _userRepository.GetByClientId(clientId);
-        return Task.FromResult(user?.Type == UserType.Api ? user : null);
+        return Task.FromResult(user?.Kind == UserKind.Api ? user : null);
     }
 
     public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
