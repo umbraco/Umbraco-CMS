@@ -105,7 +105,7 @@ internal sealed class CacheRefreshingNotificationHandler :
     public Task HandleAsync(ContentTypeRefreshedNotification notification, CancellationToken cancellationToken)
     {
         const ContentTypeChangeTypes types // only for those that have been refreshed
-            = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
+            = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Remove;
         var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id)
             .ToArray();
 
