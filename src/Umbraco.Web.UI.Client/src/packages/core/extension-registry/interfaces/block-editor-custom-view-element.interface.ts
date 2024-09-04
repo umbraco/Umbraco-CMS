@@ -31,10 +31,14 @@ export interface UmbBlockDataModel {
 	contentTypeKey: string;
 	values: Array<UmbBlockDataValueModel>;
 }
+
+// Shared with the Property Editor
 /**
- * @deprecated - use UmbBlockDataModel instead.
+ * Type for the values parsed to Custom Views.
  */
-export type UmbBlockDataType = UmbBlockDataModel;
+export interface UmbBlockDataType {
+	[key: string]: unknown;
+}
 
 export interface UmbBlockEditorCustomViewConfiguration {
 	editContentPath?: string;
@@ -55,8 +59,8 @@ export interface UmbBlockEditorCustomViewProperties<
 	icon?: string;
 	index?: number;
 	layout?: LayoutType;
-	content?: UmbBlockDataModel;
-	settings?: UmbBlockDataModel;
+	content?: UmbBlockDataType;
+	settings?: UmbBlockDataType;
 	contentInvalid?: boolean;
 	settingsInvalid?: boolean;
 }
