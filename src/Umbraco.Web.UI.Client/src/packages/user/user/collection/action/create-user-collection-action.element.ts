@@ -62,7 +62,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 							<umb-icon slot="icon" name="icon-user"></umb-icon>
 						</uui-menu-item>
 						<uui-menu-item label=${this.localize.term('user_userKindApi')} @click=${this.#onClick}>
-							<umb-icon slot="icon" name="icon-binarycode"></umb-icon>
+							<umb-icon slot="icon" name="icon-unplug"></umb-icon>
 						</uui-menu-item>
 					</uui-scroll-container>
 				</umb-popover-layout>
