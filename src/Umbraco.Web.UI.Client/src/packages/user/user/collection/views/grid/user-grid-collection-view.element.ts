@@ -86,7 +86,12 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
-				<umb-user-avatar slot="avatar" .user=${user} style="font-size: 1.6rem;"></umb-user-avatar>
+				<umb-user-avatar
+					slot="avatar"
+					.name=${user.name}
+					.kind=${user.kind}
+					.imgUrls=${user.avatarUrls}
+					style="font-size: 1.6rem;"></umb-user-avatar>
 			</uui-card-user>
 		`;
 	}

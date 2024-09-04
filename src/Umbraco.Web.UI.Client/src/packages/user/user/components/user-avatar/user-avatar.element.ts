@@ -1,62 +1,76 @@
-import type { UmbUserItemModel } from '../../repository/index.js';
+import type { UmbUserKindType } from '../../utils/index.js';
 import { UmbUserKind } from '../../utils/index.js';
-import { css, html, customElement, property, nothing, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, ifDefined, state, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const elementName = 'umb-user-avatar';
 @customElement(elementName)
 export class UmbUserAvatarElement extends UmbLitElement {
-	@property({ type: Object })
-	public get user(): UmbUserItemModel | undefined {
-		return this.#user;
+	@property({ type: String })
+	name?: string;
+
+	@property({ type: String })
+	kind: UmbUserKindType = UmbUserKind.DEFAULT;
+
+	@property({ type: Array, attribute: 'img-urls' })
+	public get imgUrls(): Array<string> {
+		return this.#imgUrls;
 	}
-	public set user(value: UmbUserItemModel | undefined) {
-		this.#user = value;
+	public set imgUrls(value: Array<string>) {
+		this.#imgUrls = value;
 		this.#setUrls();
 	}
-	#user?: UmbUserItemModel | undefined;
+	#imgUrls: Array<string> = [];
 
 	@state()
-	private _urls: Array<{ scale: string; url: string }> = [];
+	private _imgSrc: Array<{ scale: string; url: string }> = [];
 
 	@state()
-	private _srcset = '';
+	private _imbSrcSet = '';
+
+	@state()
+	private hasImgUrls = false;
 
 	#setUrls() {
-		const urls = this.user?.avatarUrls ?? [];
-		this._srcset = '';
+		this._imbSrcSet = '';
 
-		if (urls.length === 0) {
-			this._urls = [];
+		if (this.#imgUrls.length === 0) {
+			this._imgSrc = [];
+			this.hasImgUrls = false;
 			return;
 		}
 
-		this._urls = [
+		this._imgSrc = [
 			{
 				scale: '1x',
-				url: urls[1],
+				url: this.#imgUrls[1],
 			},
 			{
 				scale: '2x',
-				url: urls[2],
+				url: this.#imgUrls[2],
 			},
 			{
 				scale: '3x',
-				url: urls[3],
+				url: this.#imgUrls[3],
 			},
 		];
 
-		this._urls.forEach((url) => (this._srcset += `${url.url} ${url.scale},`));
+		this._imgSrc.forEach((url) => (this._imbSrcSet += `${url.url} ${url.scale},`));
+		this.hasImgUrls = true;
 	}
 
 	override render() {
-		if (!this.user) return nothing;
+		const classes = {
+			default: this.kind === UmbUserKind.API,
+			api: this.kind === UmbUserKind.API,
+			'has-image': this.hasImgUrls,
+		};
 
 		return html`<uui-avatar
-			.name=${this.user.name || 'Unknown'}
-			img-src=${ifDefined(this._urls.length > 0 ? this._urls[0].url : undefined)}
-			img-srcset=${ifDefined(this._urls.length > 0 ? this._srcset : undefined)}
-			class="${this.user.kind === UmbUserKind.API ? 'api' : 'default'}"></uui-avatar>`;
+			.name=${this.name || 'Unknown'}
+			img-src=${ifDefined(this.hasImgUrls ? this._imgSrc[0].url : undefined)}
+			img-srcset=${ifDefined(this.hasImgUrls ? this._imbSrcSet : undefined)}
+			class=${classMap(classes)}></uui-avatar>`;
 	}
 
 	static override styles = [
@@ -64,6 +78,10 @@ export class UmbUserAvatarElement extends UmbLitElement {
 			uui-avatar {
 				background-color: transparent;
 				border: 1.5px solid var(--uui-color-divider-standalone);
+			}
+
+			uui-avatar.has-image {
+				border-color: transparent;
 			}
 
 			uui-avatar.api {
