@@ -611,6 +611,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       } else {
         editor.selection.setNode(wrapper);
       }
+
+
+      angularHelper.safeApply($rootScope, function () {
+        editor.dispatch("Change");
+      });
     },
 
 
