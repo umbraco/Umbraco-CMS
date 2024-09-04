@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -66,14 +68,17 @@ public class RichTextPropertyEditor : DataEditor
     internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IHtmlSanitizer _htmlSanitizer;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IBlockEditorElementTypeCache _elementTypeCache;
+        private readonly IRichTextRequiredValidator _richTextRequiredValidator;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
 
+        [Obsolete("Use non-obsolete constructor. This is schedules for removal in v16.")]
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
@@ -91,19 +96,63 @@ public class RichTextPropertyEditor : DataEditor
             IBlockEditorElementTypeCache elementTypeCache,
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+            : this(
+                attribute,
+                propertyEditors,
+                dataTypeReadCache,
+                logger,
+                backOfficeSecurityAccessor,
+                localizedTextService,
+                shortStringHelper,
+                imageSourceParser,
+                localLinkParser,
+                pastedImages,
+                jsonSerializer,
+                ioHelper,
+                htmlSanitizer,
+                elementTypeCache,
+                propertyValidationService,
+                dataValueReferenceFactoryCollection,
+                StaticServiceProvider.Instance.GetRequiredService<IRichTextRequiredValidator>())
+        {
+
+        }
+
+        public RichTextPropertyValueEditor(
+            DataEditorAttribute attribute,
+            PropertyEditorCollection propertyEditors,
+            IDataTypeConfigurationCache dataTypeReadCache,
+            ILogger<RichTextPropertyValueEditor> logger,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            IHtmlSanitizer htmlSanitizer,
+            IBlockEditorElementTypeCache elementTypeCache,
+            IPropertyValidationService propertyValidationService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
+            IRichTextRequiredValidator richTextRequiredValidator)
             : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _localizedTextService = localizedTextService;
             _imageSourceParser = imageSourceParser;
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
             _elementTypeCache = elementTypeCache;
+            _richTextRequiredValidator = richTextRequiredValidator;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), elementTypeCache, jsonSerializer, logger));
         }
+
+        public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
 
         /// <inheritdoc />
         public override object? ConfigurationObject
