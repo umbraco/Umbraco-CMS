@@ -109,7 +109,7 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 								<umb-user-avatar
 									slot="avatar"
 									.name=${user?.name}
-									kind=${ifDefined(user?.kind)}
+									.kind=${user?.kind}
 									.imgUrls=${user?.avatarUrls ?? []}></umb-user-avatar>
 
 								<span class="log-type">
