@@ -17,7 +17,8 @@ public class ContentEditingBuilder
         IWithKeyBuilder,
         IWithContentTypeKeyBuilder,
         IWithParentKeyBuilder,
-        IWithTemplateKeyBuilder
+        IWithTemplateKeyBuilder,
+        IBuildContentTypes
 {
     private IContentType _contentType;
     private ContentTypeBuilder _contentTypeBuilder;
@@ -84,8 +85,7 @@ public class ContentEditingBuilder
         return this;
     }
 
-    public ContentEditingBuilder AddVariant(string culture, string segment, string name,
-        IEnumerable<PropertyValueModel> properties)
+    public ContentEditingBuilder AddVariant(string culture, string segment, string name, IEnumerable<PropertyValueModel> properties)
     {
         var variant = new VariantModel { Culture = culture, Segment = segment, Name = name, Properties = properties };
         _variants = _variants.Concat(new[] { variant });
