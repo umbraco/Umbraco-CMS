@@ -73,27 +73,6 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderUserCard(user: UmbUserDetailModel) {
-		const avatarUrls = [
-			{
-				scale: '1x',
-				url: user.avatarUrls?.[1],
-			},
-			{
-				scale: '2x',
-				url: user.avatarUrls?.[2],
-			},
-			{
-				scale: '3x',
-				url: user.avatarUrls?.[3],
-			},
-		];
-
-		let avatarSrcset = '';
-
-		avatarUrls.forEach((url) => {
-			avatarSrcset += `${url.url} ${url.scale},`;
-		});
-
 		const href = UMB_USER_WORKSPACE_PATH + '/edit/' + user.unique;
 
 		return html`
@@ -106,13 +85,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
-
-				<uui-avatar
-					style="font-size: 1.6rem;"
-					slot="avatar"
-					.name=${user.name || 'Unknown'}
-					img-src=${ifDefined(user.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
-					img-srcset=${ifDefined(user.avatarUrls.length > 0 ? avatarSrcset : undefined)}></uui-avatar>
+				<umb-user-avatar slot="avatar" .user=${user} style="font-size: 1.6rem;"></umb-user-avatar>
 			</uui-card-user>
 		`;
 	}
