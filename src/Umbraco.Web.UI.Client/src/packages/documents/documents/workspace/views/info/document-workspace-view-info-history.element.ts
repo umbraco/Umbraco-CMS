@@ -120,13 +120,15 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						(item) => {
 							const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
 							const user = this.#userMap.get(item.user.unique);
-							const userName = user?.name ?? 'Unknown';
-							const avatarUrl = user && Array.isArray(user.avatarUrls) ? user.avatarUrls[1] : undefined;
 
 							return html`<umb-history-item
-								.name=${userName}
+								.name=${user?.name ?? 'Unknown'}
 								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
-								<uui-avatar slot="avatar" .name="${userName}" img-src=${ifDefined(avatarUrl)}></uui-avatar>
+								<umb-user-avatar
+									slot="avatar"
+									.name=${user?.name}
+									kind=${ifDefined(user?.kind)}
+									.imgUrls=${user?.avatarUrls ?? []}></umb-user-avatar>
 
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}>
