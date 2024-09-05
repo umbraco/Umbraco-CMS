@@ -1,5 +1,4 @@
 import { UmbUserDetailRepository } from '../../repository/index.js';
-import type { UmbUserKindType } from '../../utils/index.js';
 import { UmbUserKind } from '../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
 import type { UmbCreateUserModalData } from './create-user-modal.token.js';
