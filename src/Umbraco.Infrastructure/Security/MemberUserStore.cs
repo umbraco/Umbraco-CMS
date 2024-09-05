@@ -3,9 +3,11 @@ using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -26,6 +28,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IEventMessagesFactory _eventMessagesFactory;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberUserStore" /> class for the members identity store
@@ -37,6 +40,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="publishedSnapshotAccessor">The published snapshot accessor</param>
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
+    /// <param name="eventMessagesFactory">The event messages factory</param>
     [ActivatorUtilitiesConstructor]
     public MemberUserStore(
         IMemberService memberService,
@@ -45,7 +49,8 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         IdentityErrorDescriber describer,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IExternalLoginWithKeyService externalLoginService,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IEventMessagesFactory eventMessagesFactory)
         : base(describer)
     {
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
@@ -54,6 +59,21 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _externalLoginService = externalLoginService;
         _twoFactorLoginService = twoFactorLoginService;
+        _eventMessagesFactory = eventMessagesFactory;
+    }
+
+    [Obsolete("Use ctor with IEventMessagesFactory param")]
+    public MemberUserStore(
+        IMemberService memberService,
+        IUmbracoMapper mapper,
+        ICoreScopeProvider scopeProvider,
+        IdentityErrorDescriber describer,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IExternalLoginWithKeyService externalLoginService,
+        ITwoFactorLoginService twoFactorLoginService)
+        : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, externalLoginService, twoFactorLoginService,
+              StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>())
+    {
     }
 
     [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
@@ -66,7 +86,8 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         IExternalLoginWithKeyService externalLoginService)
         : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
             StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>())
     {
     }
 
@@ -79,7 +100,8 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         IPublishedSnapshotAccessor publishedSnapshotAccessor)
         : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
             StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>())
     {
     }
 
@@ -97,6 +119,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new ArgumentNullException(nameof(user));
             }
 
+            EventMessages evtMsgs = _eventMessagesFactory.Get();
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // create member
@@ -127,6 +150,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             UpdateMemberProperties(memberEntity, user, out bool _);
 
+            var creatingNotification = new MemberCreatingNotification(memberEntity, evtMsgs);
+            if (scope.Notifications.PublishCancelable(creatingNotification))
+            {
+                scope.Complete();
+                throw new Exception("Member creation was cancelled");
+            }
+
             // create the member
             Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity);
             if (saveAttempt.Success is false)
@@ -139,6 +169,8 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
                     }));
             }
+
+            scope.Notifications.Publish(new MemberCreatedNotification(memberEntity, evtMsgs).WithStateFrom(creatingNotification));
 
             // We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
             _memberService.AssignRoles(
