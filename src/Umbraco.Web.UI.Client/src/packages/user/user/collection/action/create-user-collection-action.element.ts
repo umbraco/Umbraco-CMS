@@ -4,6 +4,7 @@ import { UmbUserKind } from '../../utils/index.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -32,17 +33,27 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 				},
 			},
 		});
-		modalContext?.onSubmit().catch(async () => {
-			// modal is closed after creation instead of navigating to the new user.
-			// We therefore need to reload the children of the entity
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType,
-				unique,
-			});
 
-			eventContext.dispatchEvent(event);
+		modalContext
+			?.onSubmit()
+			.then(() => {
+				this.#requestReloadChildrenOfEntity({ entityType, unique });
+			})
+			.catch(async () => {
+				// modal is closed after creation instead of navigating to the new user.
+				// We therefore need to reload the children of the entity
+				this.#requestReloadChildrenOfEntity({ entityType, unique });
+			});
+	}
+
+	async #requestReloadChildrenOfEntity({ entityType, unique }: UmbEntityModel) {
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType,
+			unique,
 		});
+
+		eventContext.dispatchEvent(event);
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
