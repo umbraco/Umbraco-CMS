@@ -35,6 +35,13 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         int skip,
         int take);
 
+    protected abstract Task<PagedModel<TContent>> GetPagedDescendantsAsync(
+        int id,
+        IQuery<TContent>? filter,
+        Ordering? ordering,
+        int skip,
+        int take);
+
     protected abstract Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key);
 
     protected async Task<Attempt<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>> GetListViewResultAsync(
@@ -63,6 +70,42 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         }
 
         PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Id ?? Constants.System.Root, filter, orderingAttempt.Result, skip, take);
+
+        var result = new ListViewPagedModel<TContent>
+        {
+            Items = items,
+            ListViewConfiguration = configurationAttempt.Result!,
+        };
+
+        return Attempt.SucceedWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.Success, result);
+    }
+
+    protected async Task<Attempt<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>> GetListViewDescendantsResultAsync(
+        IUser user,
+        TContent? content,
+        Guid? dataTypeKey,
+        string orderBy,
+        string? orderCulture,
+        Direction orderDirection,
+        string? filter,
+        int skip,
+        int take)
+    {
+        Attempt<ListViewConfiguration?, ContentCollectionOperationStatus> configurationAttempt = await GetListViewConfigurationAsync(content?.ContentType.Key, dataTypeKey);
+
+        if (configurationAttempt.Success == false)
+        {
+            return Attempt.FailWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(configurationAttempt.Status, null);
+        }
+
+        Attempt<Ordering?, ContentCollectionOperationStatus> orderingAttempt = HandleListViewOrdering(configurationAttempt.Result, orderBy, orderCulture, orderDirection);
+
+        if (orderingAttempt.Success == false)
+        {
+            return Attempt.FailWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(orderingAttempt.Status, null);
+        }
+
+        PagedModel<TContent> items = await GetAllowedListViewDescendantsItemsAsync(user, content?.Id ?? Constants.System.Root, filter, orderingAttempt.Result, skip, take);
 
         var result = new ListViewPagedModel<TContent>
         {
@@ -221,12 +264,34 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         var queryFilter = ParseQueryFilter(filter);
 
         var pagedChildren = await GetPagedChildrenAsync(
-            contentId,
-            queryFilter,
-            ordering,
-            skip,
-            take);
+                contentId,
+                queryFilter,
+                ordering,
+                skip,
+                take);
 
+        // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
+        // This has been the case with this functionality in Umbraco for a long time.
+        var items = await FilterItemsBasedOnAccessAsync(user, pagedChildren.Items);
+
+        var pagedResult = new PagedModel<TContent>
+        {
+            Items = items,
+            Total = pagedChildren.Total,
+        };
+
+        return pagedResult;
+    }
+
+    private async Task<PagedModel<TContent>> GetAllowedListViewDescendantsItemsAsync(IUser user, int contentId, string? filter, Ordering? ordering, int skip, int take)
+    {
+        var queryFilter = ParseQueryFilter(filter);
+        var pagedChildren = await GetPagedDescendantsAsync(
+                contentId,
+                queryFilter,
+                ordering,
+                skip,
+                take);
         // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
         // This has been the case with this functionality in Umbraco for a long time.
         var items = await FilterItemsBasedOnAccessAsync(user, pagedChildren.Items);

@@ -47,7 +47,14 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
             return Attempt.FailWithStatus<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
         }
 
-        return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
+        if (string.IsNullOrEmpty(filter))
+        {
+            return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
+        }
+        else
+        {
+            return await GetListViewDescendantsResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
+        }
     }
 
     protected override async Task<PagedModel<IMedia>> GetPagedChildrenAsync(int id, IQuery<IMedia>? filter, Ordering? ordering, int skip, int take)
@@ -68,6 +75,26 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
             Total = total,
         };
 
+        return pagedResult;
+    }
+
+    protected override async Task<PagedModel<IMedia>> GetPagedDescendantsAsync(int id, IQuery<IMedia>? filter, Ordering? ordering, int skip, int take)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        IEnumerable<IMedia> items = await Task.FromResult(_mediaService.GetPagedDescendants(
+            id,
+            pageNumber,
+            pageSize,
+            out var total,
+            filter,
+            ordering));
+
+        var pagedResult = new PagedModel<IMedia>
+        {
+            Items = items,
+            Total = total,
+        };
         return pagedResult;
     }
 

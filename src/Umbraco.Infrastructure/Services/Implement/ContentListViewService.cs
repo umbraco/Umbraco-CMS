@@ -75,6 +75,32 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
         return pagedResult;
     }
 
+    protected override async Task<PagedModel<IContent>> GetPagedDescendantsAsync(
+        int id,
+        IQuery<IContent>? filter,
+        Ordering? ordering,
+        int skip,
+        int take)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        IEnumerable<IContent> items = await Task.FromResult(_contentService.GetPagedDescendants(
+            id,
+            pageNumber,
+            pageSize,
+            out var total,
+            filter,
+            ordering));
+
+        var pagedResult = new PagedModel<IContent>
+        {
+            Items = items,
+            Total = total,
+        };
+
+        return pagedResult;
+    }
+
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.
     // However, we cannot pass in all the items; we want only the ones that comply, as opposed to
     // a general response whether the user has access to all nodes.
