@@ -17,7 +17,7 @@ public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
     private Guid? _dataTypeKey;
     private bool _variesByCulture;
     private bool _variesBySegment;
-    private PropertyTypeValidationEditingValidationBuilder<PropertyTypeEditingBuilder<TParent>> _validationBuilder;
+    private PropertyTypeValidationEditingBuilder<PropertyTypeEditingBuilder<TParent>> _validationBuilder;
     private PropertyTypeAppearance _appearance;
 
 
@@ -75,9 +75,9 @@ public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
         set => _variesBySegment = value;
     }
 
-    public PropertyTypeValidationEditingValidationBuilder<PropertyTypeEditingBuilder<TParent>> WithValidation()
+    public PropertyTypeValidationEditingBuilder<PropertyTypeEditingBuilder<TParent>> WithValidation()
     {
-        var builder = new PropertyTypeValidationEditingValidationBuilder<PropertyTypeEditingBuilder<TParent>>(this);
+        var builder = new PropertyTypeValidationEditingBuilder<PropertyTypeEditingBuilder<TParent>>(this);
         _validationBuilder = builder;
         return builder;
     }
