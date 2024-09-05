@@ -1,6 +1,8 @@
 import { UmbUserDetailRepository } from '../../repository/index.js';
-import { UmbUserKind, UmbUserKindType } from '../../utils/index.js';
+import type { UmbUserKindType } from '../../utils/index.js';
+import { UmbUserKind } from '../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
+import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
@@ -8,7 +10,7 @@ import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/bac
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
-export class UmbCreateUserModalElement extends UmbModalBaseElement {
+export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUserModalData> {
 	#userDetailRepository = new UmbUserDetailRepository(this);
 
 	@query('#CreateUserForm')
@@ -25,7 +27,6 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 
 		const formData = new FormData(form);
 
-		const kind = formData.get('kind') as UmbUserKindType;
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
 
@@ -37,7 +38,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		const { data: userScaffold } = await this.#userDetailRepository.createScaffold();
 		if (!userScaffold) return;
 
-		userScaffold.kind = kind;
+		userScaffold.kind = this.data?.user.kind ?? UmbUserKind.DEFAULT;
 		userScaffold.name = name;
 		userScaffold.email = email;
 		userScaffold.userName = email;
@@ -47,7 +48,11 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		const { data } = await this.#userDetailRepository.create(userScaffold);
 
 		if (data) {
-			this.#openSuccessModal(data.unique);
+			if (data.kind === UmbUserKind.DEFAULT) {
+				this.#openSuccessModal(data.unique);
+			} else {
+				this._submitModal();
+			}
 		}
 	}
 
@@ -97,15 +102,6 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 	#renderForm() {
 		return html` <uui-form>
 			<form id="CreateUserForm" name="form" @submit="${this.#onSubmit}">
-				<uui-form-layout-item>
-					<uui-label id="kindLabel" slot="label" for="kind" required>Kind</uui-label>
-					<uui-combobox id="kind" label="Kind" name="kind" value=${UmbUserKind.DEFAULT} required>
-						<uui-combobox-list>
-							<uui-combobox-list-option label=${UmbUserKind.DEFAULT}>${UmbUserKind.DEFAULT}</uui-combobox-list-option>
-							<uui-combobox-list-option label=${UmbUserKind.API}>${UmbUserKind.API}</uui-combobox-list-option>
-						</uui-combobox-list>
-					</uui-combobox>
-				</uui-form-layout-item>
 				<uui-form-layout-item>
 					<uui-label id="nameLabel" slot="label" for="name" required>Name</uui-label>
 					<uui-input id="name" label="name" type="text" name="name" required></uui-input>
