@@ -1831,6 +1831,9 @@ export default {
 		administrators: 'Administrator',
 		categoryField: 'Kategorifelt',
 		createDate: 'Bruger oprettet',
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Opret API bruger' : 'Opret bruger';
+		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
 		newPassword: 'Nyt kodeord',

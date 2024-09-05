@@ -81,11 +81,8 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline="Create user">
-			<p>
-				Create new users to give them access to Umbraco. When a user is created a password will be generated that you
-				can share with the user.
-			</p>
+		return html`<uui-dialog-layout headline=${this.localize.term('user_createUserHeadline', this.data?.user.kind)}>
+			<p>${this.localize.term('user_createUserDescription', this.data?.user.kind)}</p>
 
 			${this.#renderForm()}
 			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>

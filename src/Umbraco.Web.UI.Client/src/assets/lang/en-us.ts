@@ -1840,6 +1840,14 @@ export default {
 		administrators: 'Administrator',
 		categoryField: 'Category field',
 		createDate: 'Created',
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Create API user' : 'Create user';
+		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `Create a user to give them access to Umbraco. When a user is created a password will be generated that you can share with them.`;
+			const apiUserText = `Create an Api User to allow external services to authenticate with the Umbraco Management API.`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
 		changePassword: 'Change password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
