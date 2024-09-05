@@ -2254,7 +2254,12 @@ public class ContentController : ContentControllerBase
             return null;
         }
 
-        _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        OperationResult moveResult = _contentService.AttemptMove(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+
+        if (!moveResult.Success)
+        {
+            return ValidationProblem();
+        }
 
         return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
     }
