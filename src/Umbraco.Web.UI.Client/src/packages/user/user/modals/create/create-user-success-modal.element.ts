@@ -1,6 +1,7 @@
 import { UmbUserItemRepository } from '../../repository/item/index.js';
 import { UmbNewUserPasswordRepository } from '../../repository/new-password/index.js';
 import type { UmbUserItemModel } from '../../repository/item/types.js';
+import { UMB_USER_WORKSPACE_PATH } from '../../paths.js';
 import type {
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue,
@@ -11,7 +12,6 @@ import type { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/u
 import type { UmbNotificationDefaultData, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UMB_USER_WORKSPACE_PATH } from '../../paths.js';
 
 @customElement('umb-create-user-success-modal')
 export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
