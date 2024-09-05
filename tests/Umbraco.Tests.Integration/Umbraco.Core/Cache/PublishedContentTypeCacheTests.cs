@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -14,74 +13,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Cache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class PublishedContentTypeCacheTests : UmbracoIntegrationTest
+public class PublishedContentTypeCacheTests : UmbracoIntegrationTestWithContentEditing
 {
     // Integration tests på om IPublishedCOntentTypeCache bliver opdateret CRUD
 
-    // Create a ContentTypeEdtingBuilder
-    protected ContentTypeCreateModel ContentType { get; private set; }
-
-
-    // Inspiration: https://github.com/umbraco/Umbraco-CMS/pull/16938/commits/e45fa106840d7b88ed5ea095c29571e24275e925
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
-    private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
     private IPublishedContentTypeCache PublishedContentTypeCache => GetRequiredService<IPublishedContentTypeCache>();
-
-    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
-
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     [Test]
-    public async Task Can_Get_Draft_Content_By_Id()
+    public async Task Can_Get_Published_DocumentType_By_Key()
     {
-        //Act
-        ContentTypeEditingBuilder contentTypeBuilder = new ContentTypeEditingBuilder();
-        // contentTypeBuilder.createBasicContentType();
-        //ContentTypeEditingService
-
-        //var textPage = await PublishedContentTypeCache.Get(TextpageId, true);
-
-        // var newContentType = ContentTypeBuilder.CreateBasicContentType();
-        // newContentType.Key = ContentType.Key;
-        // newContentType.Id = ContentType.Id;
-        // newContentType.Alias = ContentType.Alias;
-        // newContentType.DefaultTemplateId = ContentType.DefaultTemplateId;
-        // ContentTypeService.Save(newContentType);
-
-        // Assert
-        //var newTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-       // Assert.IsNull(newTextPage.Value("title"));
+        var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
+        Assert.IsNotNull(contentType);
+        var contentTypeAgain = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
+        Assert.IsNotNull(contentType);
     }
-    //
-    // [Test]
-    // public async Task Can_Get_Draft_Content_By_Key()
-    // {
-    //     // Act
-    //     var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
-    //
-    //     var newContentType = ContentTypeBuilder.CreateBasicContentType();
-    //     newContentType.Key = ContentType.Key;
-    //     newContentType.Id = ContentType.Id;
-    //     newContentType.Alias = ContentType.Alias;
-    //     newContentType.DefaultTemplateId = ContentType.DefaultTemplateId;
-    //     ContentTypeService.Save(newContentType);
-    //
-    //     //Assert
-    //     var newTextPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
-    //     Assert.IsNull(newTextPage.Value("title"));
-    // }
 
-
-     [SetUp]
-    public new void Setup() => CreateTestData();
-
-    protected async void CreateTestData()
+    [Test]
+    public async Task Published_DocumentType_Gets_Deleted()
     {
-        ContentType =
-            ContentTypeEditingBuilder.CreateBasicContentType("umbTextpage", "Textpage");
+        var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
+        Assert.IsNotNull(contentType);
 
-        var contentTypeResult = await ContentTypeEditingService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeResult.Success);
-
+        await ContentTypeService.DeleteAsync(contentType.Key, Constants.Security.SuperUserKey);
+        // PublishedContentTypeCache just explodes if it doesn't exist
+        Assert.Catch(() => PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey));
     }
 }
