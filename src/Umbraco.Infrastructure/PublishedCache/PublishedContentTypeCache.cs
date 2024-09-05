@@ -170,7 +170,10 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
 
             if (_keyToIdMap.TryGetValue(key, out var id))
             {
-                return Get(itemType, id);
+                if (_typesById.TryGetValue(id, out IPublishedContentType? foundType))
+                {
+                    return foundType;
+                }
             }
 
             IPublishedContentType type = CreatePublishedContentType(itemType, key);
@@ -283,6 +286,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             }
         }
     }
+
     private static string GetAliasKey(PublishedItemType itemType, string alias)
     {
         string k;
