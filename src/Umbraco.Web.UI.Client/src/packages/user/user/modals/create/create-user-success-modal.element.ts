@@ -11,6 +11,7 @@ import type { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/u
 import type { UmbNotificationDefaultData, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_USER_WORKSPACE_PATH } from '../../paths.js';
 
 @customElement('umb-create-user-success-modal')
 export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
@@ -69,10 +70,8 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		this._rejectModal({ type: 'createAnotherUser' });
 	};
 
-	#onGoToProfile = (event: Event) => {
-		event.stopPropagation();
+	#onGoToProfile = () => {
 		this._submitModal();
-		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + this.data?.user.unique); //TODO: URL Should be dynamic
 	};
 
 	override render() {
@@ -98,7 +97,8 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 				slot="actions"
 				label="Go to profile"
 				look="primary"
-				color="positive"></uui-button>
+				color="positive"
+				href=${UMB_USER_WORKSPACE_PATH + '/edit/' + this.data?.user.unique}></uui-button>
 		</uui-dialog-layout>`;
 	}
 
