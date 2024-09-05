@@ -6,14 +6,16 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrationTest
 {
-    protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    protected IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
     protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
@@ -41,7 +43,9 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
     protected int Subpage2Id { get; private set; }
 
-    protected ContentType ContentType { get; private set; }
+    protected ContentTypeCreateModel ContentTypeCreateModel { get; private set; }
+
+    protected IContentType ContentType { get; private set; }
 
     [SetUp]
     public new void Setup() => CreateTestData();
@@ -53,16 +57,17 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
-        ContentType =
-            ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-        ContentType.AllowedAsRoot = true;
-        ContentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias) };
-        var contentTypeResult = await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        ContentTypeCreateModel =
+            ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);
+        ContentTypeCreateModel.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
+        ContentTypeCreateModel.AllowedAsRoot = true;
+        ContentTypeCreateModel.AllowedContentTypes = new[] { new ContentTypeSort((Guid)ContentTypeCreateModel.Key, 0, ContentTypeCreateModel.Alias) };
+        var contentTypeResult = await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(contentTypeResult.Success);
+        ContentType = contentTypeResult.Result;
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
-        Textpage = ContentEditingBuilder.CreateSimpleContent(ContentType);
+        Textpage = ContentEditingBuilder.CreateSimpleContent(ContentTypeCreateModel);
         Textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
         var createContentResultTextPage = await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
         Assert.IsTrue(createContentResultTextPage.Success);
@@ -85,7 +90,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         };
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
-        PublishedTextPage = ContentEditingBuilder.CreateSimpleContent(ContentType, "Published Page", Textpage.Key);
+        PublishedTextPage = ContentEditingBuilder.CreateSimpleContent(ContentTypeCreateModel, "Published Page", Textpage.Key);
         var createContentResultSubPage = await ContentEditingService.CreateAsync(PublishedTextPage, Constants.Security.SuperUserKey);
         Assert.IsTrue(createContentResultSubPage.Success);
 
@@ -102,7 +107,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055
-        Subpage1 = ContentEditingBuilder.CreateSimpleContent(ContentType, "Text Page 1", Textpage.Key);
+        Subpage1 = ContentEditingBuilder.CreateSimpleContent(ContentTypeCreateModel, "Text Page 1", Textpage.Key);
         var createContentResultSubPage1 = await ContentEditingService.CreateAsync(Subpage1, Constants.Security.SuperUserKey);
         Assert.IsTrue(createContentResultSubPage1.Success);
         if (!Subpage1.Key.HasValue)
@@ -115,7 +120,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
             Subpage1Id = createContentResultSubPage1.Result.Content.Id;
         }
 
-        Subpage2 = ContentEditingBuilder.CreateSimpleContent(ContentType, "Text Page 2", Textpage.Key);
+        Subpage2 = ContentEditingBuilder.CreateSimpleContent(ContentTypeCreateModel, "Text Page 2", Textpage.Key);
         var createContentResultSubPage2 = await ContentEditingService.CreateAsync(Subpage2, Constants.Security.SuperUserKey);
         Assert.IsTrue(createContentResultSubPage2.Success);
         if (!Subpage2.Key.HasValue)
