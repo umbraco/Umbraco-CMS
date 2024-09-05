@@ -15,7 +15,6 @@ public class PropertyTypeContainerBuilder<TParent>(TParent parentBuilder)
     private string _type;
     private int? _sortOrder;
 
-
     Guid? IWithKeyBuilder.Key
     {
         get => _key;
@@ -45,7 +44,6 @@ public class PropertyTypeContainerBuilder<TParent>(TParent parentBuilder)
         get => _sortOrder;
         set => _sortOrder = value;
     }
-
 
     public override ContentTypePropertyContainerModel Build()
     {

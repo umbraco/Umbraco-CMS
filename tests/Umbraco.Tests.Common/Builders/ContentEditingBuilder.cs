@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces.ContentCreateModel;
@@ -20,8 +20,8 @@ public class ContentEditingBuilder
         IWithTemplateKeyBuilder,
         IBuildContentTypes
 {
-    private IContentType _contentType;
-    private ContentTypeBuilder _contentTypeBuilder;
+    private ContentTypeCreateModel _contentType;
+    private ContentTypeEditingBuilder _contentTypeEditingBuilder;
     private IEnumerable<PropertyValueModel> _invariantProperties = [];
     private IEnumerable<VariantModel> _variants = [];
     private Guid _contentTypeKey;
@@ -104,9 +104,9 @@ public class ContentEditingBuilder
         return this;
     }
 
-    public ContentEditingBuilder WithContentType(IContentType contentType)
+    public ContentEditingBuilder WithContentType(ContentTypeCreateModel contentType)
     {
-        _contentTypeBuilder = null;
+        _contentTypeEditingBuilder = null;
         _contentType = contentType;
         return this;
     }
@@ -120,13 +120,13 @@ public class ContentEditingBuilder
         var invariantProperties = _invariantProperties;
         var variants = _variants;
 
-        if (_contentTypeBuilder is null && _contentType is null)
+        if (_contentTypeEditingBuilder is null && _contentType is null)
         {
             throw new InvalidOperationException(
                 "A content item cannot be constructed without providing a content type. Use AddContentType() or WithContentType().");
         }
 
-        var contentType = _contentType ?? _contentTypeBuilder.Build();
+        var contentType = _contentType ?? _contentTypeEditingBuilder.Build();
         var content = new ContentCreateModel();
 
         content.InvariantName = invariantName;
@@ -140,7 +140,11 @@ public class ContentEditingBuilder
             content.TemplateKey = templateKey;
         }
 
-        content.ContentTypeKey = contentType.Key;
+        if (contentType.Key != null)
+        {
+            content.ContentTypeKey = (Guid)contentType.Key;
+        }
+
         content.Key = key;
         content.InvariantProperties = invariantProperties;
         content.Variants = variants;
@@ -148,21 +152,21 @@ public class ContentEditingBuilder
         return content;
     }
 
-    public static ContentCreateModel CreateBasicContent(IContentType contentType, Guid? key) =>
+    public static ContentCreateModel CreateBasicContent(ContentTypeCreateModel contentType, Guid? key) =>
         new ContentEditingBuilder()
             .WithKey(key)
             .WithContentType(contentType)
             .WithInvariantName("Home")
             .Build();
 
-    public static ContentCreateModel CreateSimpleContent(IContentType contentType) =>
+    public static ContentCreateModel CreateSimpleContent(ContentTypeCreateModel contentType) =>
         new ContentEditingBuilder()
             .WithContentType(contentType)
             .WithInvariantName("Home")
             .WithInvariantProperty("title", "Welcome to our Home page")
             .Build();
 
-    public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name, Guid? parentKey) =>
+    public static ContentCreateModel CreateSimpleContent(ContentTypeCreateModel contentType, string name, Guid? parentKey) =>
         new ContentEditingBuilder()
             .WithContentType(contentType)
             .WithInvariantName(name)
@@ -170,7 +174,7 @@ public class ContentEditingBuilder
             .WithInvariantProperty("title", "Welcome to our Home page")
             .Build();
 
-public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name) =>
+public static ContentCreateModel CreateSimpleContent(ContentTypeCreateModel contentType, string name) =>
     new ContentEditingBuilder()
         .WithContentType(contentType)
         .WithInvariantName(name)

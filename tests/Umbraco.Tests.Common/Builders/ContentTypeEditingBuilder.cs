@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
@@ -19,7 +22,10 @@ public class ContentTypeEditingBuilder
     private bool? _variesByCulture;
     private bool? _variesBySegment;
     private readonly List<PropertyTypeEditingBuilder<ContentTypeEditingBuilder>> _propertyTypeBuilders = new();
-    private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders = new();
+
+    private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders =
+        new();
+
     private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new();
     private readonly List<TemplateBuilder> _templateBuilders = new();
 
@@ -96,13 +102,35 @@ public class ContentTypeEditingBuilder
         return contentType;
     }
 
-    public static ContentTypeCreateModel CreateBasicContentType(string alias = "basePage", string name = "Base Page", IContentType parent = null)
+    public static ContentTypeCreateModel CreateBasicContentType(string alias = "basePage", string name = "Base Page",
+        IContentType parent = null)
     {
         var builder = new ContentTypeEditingBuilder();
         return (ContentTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
             .WithParentContentType(parent)
+            .Build();
+    }
+
+    public static ContentTypeCreateModel CreateSimpleContentType(string alias, string name, IContentType parent = null, string propertyGroupName = "Content", Guid? defaultTemplateKey = null)
+    {
+        var containerKey = Guid.NewGuid();
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithParentContentType(parent)
+            .AddPropertyGroup()
+            .WithKey(containerKey)
+            .WithName(propertyGroupName)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("title")
+            .WithDataTypeKey(Constants.DataTypes.Guids.TextareaGuid)
+            .WithName("Title")
+            .Done()
+            .WithDefaultTemplateKey(defaultTemplateKey ?? Guid.Empty)
             .Build();
     }
 }

@@ -1,10 +1,11 @@
-﻿using Umbraco.Cms.Core.Models.ContentTypeEditing;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
-    : ChildBuilderBase<TParent, ContentTypePropertyTypeModel>(parentBuilder), IWithKeyBuilder, IWIthContainerKeyBuilder,
+    : ChildBuilderBase<TParent, ContentTypePropertyTypeModel>(parentBuilder), IBuildPropertyTypes, IWithKeyBuilder, IWIthContainerKeyBuilder,
         IWithSortOrderBuilder, IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder, IWithDataTypeKeyBuilder,
         IWithVariesByCultureBuilder, IWithVariesBySegmentBuilder
 {
@@ -88,6 +89,7 @@ public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
         return this;
     }
 
+
     public override ContentTypePropertyTypeModel Build()
     {
         var key = _key ?? Guid.NewGuid();
@@ -96,7 +98,7 @@ public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
         var alias = _alias ?? "prop";
         var name = _name ?? "Property";
         var description = _description;
-        var dataTypeKey = _dataTypeKey ?? Guid.NewGuid();
+        var dataTypeKey = _dataTypeKey ?? Constants.DataTypes.Guids.TextareaGuid;
         var variesByCulture = _variesByCulture;
         var variesBySegment = _variesBySegment;
         var validation = _validationBuilder?.Build();
