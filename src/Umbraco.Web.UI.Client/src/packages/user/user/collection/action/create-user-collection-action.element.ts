@@ -1,4 +1,6 @@
 import { UMB_CREATE_USER_MODAL } from '../../modals/create/create-user-modal.token.js';
+import type { UmbUserKindType } from '../../utils/index.js';
+import { UmbUserKind } from '../../utils/index.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -12,7 +14,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
-	async #onClick(event: Event) {
+	async #onClick(event: Event, kind: UmbUserKindType) {
 		event.stopPropagation();
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
@@ -23,7 +25,13 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 		if (unique === undefined) throw new Error('Missing unique');
 		if (!entityType) throw new Error('Missing entityType');
 
-		const modalContext = modalManager.open(this, UMB_CREATE_USER_MODAL);
+		const modalContext = modalManager.open(this, UMB_CREATE_USER_MODAL, {
+			data: {
+				user: {
+					kind,
+				},
+			},
+		});
 		modalContext?.onSubmit().catch(async () => {
 			// modal is closed after creation instead of navigating to the new user.
 			// We therefore need to reload the children of the entity
@@ -58,10 +66,14 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
-						<uui-menu-item label=${this.localize.term('user_userKindDefault')} @click=${this.#onClick}>
+						<uui-menu-item
+							label=${this.localize.term('user_userKindDefault')}
+							@click=${(event: Event) => this.#onClick(event, UmbUserKind.DEFAULT)}>
 							<umb-icon slot="icon" name="icon-user"></umb-icon>
 						</uui-menu-item>
-						<uui-menu-item label=${this.localize.term('user_userKindApi')} @click=${this.#onClick}>
+						<uui-menu-item
+							label=${this.localize.term('user_userKindApi')}
+							@click=${(event: Event) => this.#onClick(event, UmbUserKind.API)}>
 							<umb-icon slot="icon" name="icon-unplug"></umb-icon>
 						</uui-menu-item>
 					</uui-scroll-container>
