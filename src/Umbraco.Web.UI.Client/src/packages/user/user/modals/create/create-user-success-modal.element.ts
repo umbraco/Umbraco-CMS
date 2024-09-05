@@ -36,8 +36,6 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		const unique = this.data?.user.unique;
 		if (!unique) throw new Error('No user unique is provided');
 
-		debugger;
-
 		const [userItemResponse, newPasswordResponse] = await Promise.all([
 			this.#userItemRepository.requestItems([unique]),
 			this.#userNewPasswordRepository.requestNewPassword(unique),
