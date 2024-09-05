@@ -1,11 +1,12 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class ContentTypeEditingBuilder
-    : ContentTypeBaseBuilder<ContentEditingBuilder, IContentType>,
+    : ContentTypeBaseBuilder<ContentEditingBuilder, ContentTypeCreateModel>,
         IBuildPropertyTypes
 {
     private Guid? _key;
@@ -13,10 +14,12 @@ public class ContentTypeEditingBuilder
     private ContentTypeCleanup _cleanup;
     private IEnumerable<Guid> _allowedTemplateKeys;
     private Guid? _defaultTemplateKey;
+    private bool? _allowAtRoot;
     private bool? _isElement;
-    private ContentVariation? _contentVariation;
-    private readonly List<PropertyTypeBuilder<ContentTypeEditingBuilder>> _groupPropertyTypeBuilders = new();
-    private readonly List<PropertyGroupBuilder<ContentTypeEditingBuilder>> _propertyGroupBuilders = new();
+    private bool? _variesByCulture;
+    private bool? _variesBySegment;
+    private readonly List<PropertyTypeEditingBuilder<ContentTypeEditingBuilder>> _propertyTypeBuilders = new();
+    private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders = new();
     private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new();
     private readonly List<TemplateBuilder> _templateBuilders = new();
 
@@ -44,17 +47,17 @@ public class ContentTypeEditingBuilder
         return this;
     }
 
-    public PropertyGroupBuilder<ContentTypeEditingBuilder> AddPropertyGroup()
+    public PropertyTypeContainerBuilder<ContentTypeEditingBuilder> AddPropertyGroup()
     {
-        var builder = new PropertyGroupBuilder<ContentTypeEditingBuilder>(this);
-        _propertyGroupBuilders.Add(builder);
+        var builder = new PropertyTypeContainerBuilder<ContentTypeEditingBuilder>(this);
+        _propertyTypeContainerBuilders.Add(builder);
         return builder;
     }
 
-    public PropertyTypeBuilder<ContentTypeEditingBuilder> AddPropertyType()
+    public PropertyTypeEditingBuilder<ContentTypeEditingBuilder> AddPropertyType()
     {
-        var builder = new PropertyTypeBuilder<ContentTypeEditingBuilder>(this);
-        _groupPropertyTypeBuilders.Add(builder);
+        var builder = new PropertyTypeEditingBuilder<ContentTypeEditingBuilder>(this);
+        _propertyTypeBuilders.Add(builder);
         return builder;
     }
 
@@ -72,11 +75,34 @@ public class ContentTypeEditingBuilder
         return builder;
     }
 
-    public override IContentType Build()
+    public override ContentTypeCreateModel Build()
     {
-        var contentVariation = _contentVariation ?? ContentVariation.Nothing;
+        ContentTypeCreateModel contentType = new ContentTypeCreateModel();
+        contentType.Name = GetName();
+        contentType.Alias = GetAlias();
+        contentType.Key = GetKey();
+        contentType.ContainerKey = _containerKey;
+        contentType.Cleanup = _cleanup;
+        contentType.AllowedTemplateKeys = _allowedTemplateKeys;
+        contentType.DefaultTemplateKey = _defaultTemplateKey;
+        contentType.IsElement = _isElement ?? false;
+        contentType.VariesByCulture = _variesByCulture ?? false;
+        contentType.VariesBySegment = _variesBySegment ?? false;
+        contentType.AllowedAsRoot = _allowAtRoot ?? false;
+        contentType.Properties = _propertyTypeBuilders.Select(x => x.Build()).ToList();
+        contentType.Containers = _propertyTypeContainerBuilders.Select(x => x.Build()).ToList();
+        contentType.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build()).ToList();
 
-        ContentType contentType;
-        return contentType
+        return contentType;
+    }
+
+    public static ContentTypeCreateModel CreateBasicContentType(string alias = "basePage", string name = "Base Page", IContentType parent = null)
+    {
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithParentContentType(parent)
+            .Build();
     }
 }
