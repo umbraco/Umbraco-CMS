@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -17,6 +18,8 @@ public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithCo
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
     private IPublishedContentTypeCache PublishedContentTypeCache => GetRequiredService<IPublishedContentTypeCache>();
+
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     [Test]
     public async Task Can_Get_Draft_Content_By_Id()
