@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
@@ -18,6 +19,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
     private readonly ModelsGenerationError _mbErrors;
     private readonly IModelsGenerator _modelGenerator;
 
+    [ActivatorUtilitiesConstructor]
     public BuildModelsBuilderController(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
@@ -28,6 +30,26 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
 
         modelsBuilderSettings.OnChange(x => _modelsBuilderSettings = x);
+    }
+
+    [Obsolete("Please use the constructor that accepts IModelsGenerator only. Will be removed in V16.")]
+    public BuildModelsBuilderController(
+        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
+        ModelsGenerationError mbErrors,
+        ModelsGenerator modelGenerator)
+        : this(modelsBuilderSettings, mbErrors, (IModelsGenerator)modelGenerator)
+    {
+    }
+
+    // this constructor is required for the DI, otherwise it'll throw an "Ambiguous Constructor" errors at boot time.
+    [Obsolete("Please use the constructor that accepts IModelsGenerator only. Will be removed in V16.")]
+    public BuildModelsBuilderController(
+        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
+        ModelsGenerationError mbErrors,
+        IModelsGenerator modelGenerator,
+        ModelsGenerator notUsed)
+        : this(modelsBuilderSettings, mbErrors, modelGenerator)
+    {
     }
 
     [HttpPost("build")]
