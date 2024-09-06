@@ -299,7 +299,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
             _globalSettings.DefaultUILanguage,
             createModel.Name,
             createModel.Id,
-            createModel.Type);
+            createModel.Kind);
 
         IdentityResult created = await CreateAsync(identityUser);
 

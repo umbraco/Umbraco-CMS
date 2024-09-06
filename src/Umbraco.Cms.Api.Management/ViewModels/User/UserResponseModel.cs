@@ -34,5 +34,5 @@ public class UserResponseModel : UserPresentationBase
 
     public bool IsAdmin { get; set; }
 
-    public UserType Type { get; set; }
+    public UserKind Kind { get; set; }
 }

@@ -79,19 +79,28 @@ public class MemberController : DeliveryApiControllerBase
         // the Authorize endpoint is not allowed unless authorization code flow is enabled.
         if (_deliveryApiSettings.MemberAuthorization?.AuthorizationCodeFlow?.Enabled is not true)
         {
-            return BadRequest("Member authorization is not allowed.");
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "Not allowed", ErrorDescription = "Member authorization is not allowed."
+            });
         }
 
         OpenIddictRequest? request = HttpContext.GetOpenIddictServerRequest();
         if (request is null)
         {
-            return BadRequest("Unable to obtain OpenID data from the current request.");
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "No context found", ErrorDescription = "Unable to obtain context from the current request."
+            });
         }
 
         // make sure this endpoint ONLY handles member authentication
         if (request.ClientId is not Constants.OAuthClientIds.Member)
         {
-            return BadRequest("The specified client ID cannot be used here.");
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "Invalid 'client ID'", ErrorDescription = "The specified 'client_id' is not valid."
+            });
         }
 
         return request.IdentityProvider.IsNullOrWhiteSpace()
@@ -106,7 +115,10 @@ public class MemberController : DeliveryApiControllerBase
         OpenIddictRequest? request = HttpContext.GetOpenIddictServerRequest();
         if (request is null)
         {
-            return BadRequest("Unable to obtain OpenID data from the current request.");
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "No context found", ErrorDescription = "Unable to obtain context from the current request."
+            });
         }
 
         // authorization code flow or refresh token flow?
@@ -117,7 +129,10 @@ public class MemberController : DeliveryApiControllerBase
 
             return authenticateResult is { Succeeded: true, Principal: not null }
                 ? new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, authenticateResult.Principal)
-                : BadRequest("The supplied authorization was not be verified.");
+                : BadRequest(new OpenIddictResponse
+                {
+                    Error = "Authorization failed", ErrorDescription = "The supplied authorization could not be verified."
+                });
         }
 
         // client credentials flow?
@@ -128,7 +143,10 @@ public class MemberController : DeliveryApiControllerBase
             MemberIdentityUser? member = await _memberClientCredentialsManager.FindMemberAsync(request.ClientId!);
             return member is not null
                 ? await SignInMember(member, request)
-                : BadRequest("Invalid client or client configuration.");
+                : BadRequest(new OpenIddictResponse
+                {
+                    Error = "Authorization failed", ErrorDescription = "Invalid 'client_id' or client configuration."
+                });
         }
 
         throw new InvalidOperationException("The requested grant type is not supported.");
@@ -159,7 +177,10 @@ public class MemberController : DeliveryApiControllerBase
         if (member is null)
         {
             _logger.LogError("The member with username {userName} was successfully authorized, but could not be retrieved by the member manager", userName);
-            return BadRequest("The member could not be found.");
+            return BadRequest(new OpenIddictResponse
+            {
+                Error = "Authorization failed", ErrorDescription = "The member associated with the supplied 'client_id' could not be found."
+            });
         }
 
         return await SignInMember(member, request);
@@ -187,7 +208,10 @@ public class MemberController : DeliveryApiControllerBase
             if (member is null)
             {
                 _logger.LogError("A member was successfully authorized using external authentication, but could not be retrieved by the member manager");
-                return BadRequest("The member could not be found.");
+                return BadRequest(new OpenIddictResponse
+                {
+                    Error = "Authorization failed", ErrorDescription = "The member associated with the supplied 'client_id' could not be found."
+                });
             }
 
             // update member authentication tokens if succeeded

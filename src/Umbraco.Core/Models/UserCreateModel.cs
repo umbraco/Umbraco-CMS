@@ -12,7 +12,7 @@ public class UserCreateModel
 
     public string Name { get; set; } = string.Empty;
 
-    public UserType Type { get; set; }
+    public UserKind Kind { get; set; }
 
     public ISet<Guid> UserGroupKeys { get; set; } = new HashSet<Guid>();
 }
