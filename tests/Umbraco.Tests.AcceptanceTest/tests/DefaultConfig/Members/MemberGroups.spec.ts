@@ -16,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.memberGroup.clickMemberGroupsTab();
-  await umbracoUi.memberGroup.clickCreateButton();
+  await umbracoUi.memberGroup.clickCreateButton(true);
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
   await umbracoUi.memberGroup.clickSaveButton();
 
