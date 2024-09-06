@@ -12,27 +12,28 @@
   </ItemGroup>
   <!-- Microsoft packages -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.0-preview.5.24306.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.0-preview.7.24306.11" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.0-preview.5.24306.3" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0-preview.5.24306.3" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-preview.5.24306.3" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.0-preview.7.24306.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0-preview.7.24306.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-preview.7.24306.3" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0-preview.5.24306.11" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="9.0.0-preview.5.24306.11" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="9.0.0-preview.5.24306.11" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0-preview.5.24306.7" />
-    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0-preview.5.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.SqlServer" Version="9.0.0-preview.7.24406.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0-preview.7.24306.11" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="9.0.0-preview.7.24306.11" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="9.0.0-preview.7.24306.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0-preview.7.24306.7" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0-preview.7.24306.7" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.7.24406.2" />
   </ItemGroup>
   <!-- Umbraco packages -->
@@ -84,7 +85,7 @@
     <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <!-- Examine brings in a vulnerable version of System.Security.Cryptography.Xml -->
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.0-preview.5.24306.7" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.0-preview.7.24306.7" />
     <!-- Both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc bring in a vulnerable version of System.Text.RegularExpressions -->
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
