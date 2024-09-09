@@ -31,7 +31,7 @@ public class DailyMotion : OEmbedProviderBase
         return GetXmlProperty(xmlDocument, "/oembed/html");
     }
 
-    [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
+    [Obsolete("Use GetOEmbedDataAsync instead. This will be removed in Umbraco 15.")]
     public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
     {
         return GetOEmbedDataAsync(url, maxWidth, maxHeight, CancellationToken.None).GetAwaiter().GetResult();
