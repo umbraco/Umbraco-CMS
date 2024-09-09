@@ -6,7 +6,7 @@ import type {
 import {
 	RuntimeLevelModel,
 	RuntimeModeModel,
-	ServerTroubleshootingResponseModel,
+	type ServerTroubleshootingResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
