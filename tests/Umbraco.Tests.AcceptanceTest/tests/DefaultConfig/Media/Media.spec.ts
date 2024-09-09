@@ -35,7 +35,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongMediaFileName = 'NotACorrectName';
   await umbracoApi.media.ensureNameNotExists(wrongMediaFileName);
-  await umbracoApi.media.createDefaultMedia(wrongMediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(wrongMediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
@@ -84,7 +84,7 @@ for (const mediaFileType of mediaFileTypes) {
 
 test('can delete a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoApi.media.doesNameExist(mediaFileName);
 
@@ -162,8 +162,8 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondMediaFile = 'SecondMediaFile';
   await umbracoApi.media.ensureNameNotExists(secondMediaFile);
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
-  await umbracoApi.media.createDefaultMedia(secondMediaFile, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  await umbracoApi.media.createDefaultMediaFile(secondMediaFile);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
@@ -180,7 +180,7 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
 test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoApi.media.doesNameExist(mediaFileName);
 
@@ -201,7 +201,7 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
 test('can restore a media item from the recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoApi.media.trashMediaItem(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -223,7 +223,7 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
 test.skip('can delete a media item from the recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoApi.media.trashMediaItem(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -240,7 +240,7 @@ test.skip('can delete a media item from the recycle bin', async ({umbracoApi, um
 test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
-  await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoApi.media.trashMediaItem(mediaFileName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
