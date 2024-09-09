@@ -53,7 +53,8 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
+				.variantLanguageOptions=${this._options}
+				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>

@@ -82,7 +82,8 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
+				.variantLanguageOptions=${this._options}
+				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
 
 			<uui-form-layout-item>
 				<uui-toggle

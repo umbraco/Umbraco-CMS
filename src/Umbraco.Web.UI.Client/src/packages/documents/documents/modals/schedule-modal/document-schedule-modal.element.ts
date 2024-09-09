@@ -101,19 +101,26 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return repeat(
 			this._options,
 			(option) => option.unique,
-			(option) => html`
-				<uui-menu-item
-					selectable
-					label=${option.variant?.name ?? option.language.name}
-					@selected=${() => this.#selectionManager.select(option.unique)}
-					@deselected=${() => this.#selectionManager.deselect(option.unique)}
-					?selected=${this.#isSelected(option.unique)}>
-					<uui-icon slot="icon" name="icon-globe"></uui-icon>
-					${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
-				</uui-menu-item>
-				${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
-			`,
+			(option) => this.#renderItem(option),
 		);
+	}
+
+	#renderItem(option: UmbDocumentVariantOptionModel) {
+		const pickable = this.data?.pickableFilter ? this.data.pickableFilter(option) : () => true;
+
+		return html`
+			<uui-menu-item
+				?selectable=${pickable}
+				?disabled=${!pickable}
+				label=${option.variant?.name ?? option.language.name}
+				@selected=${() => this.#selectionManager.select(option.unique)}
+				@deselected=${() => this.#selectionManager.deselect(option.unique)}
+				?selected=${this.#isSelected(option.unique)}>
+				<uui-icon slot="icon" name="icon-globe"></uui-icon>
+				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
+			</uui-menu-item>
+			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
+		`;
 	}
 
 	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
