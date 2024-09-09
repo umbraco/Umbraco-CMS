@@ -212,6 +212,9 @@
 		"npm": ">=10.1 < 11"
 	},
 	"dependencies": {
+		"@tiptap/core": "^2.6.6",
+		"@tiptap/pm": "^2.6.6",
+		"@tiptap/starter-kit": "^2.6.6",
 		"@types/diff": "^5.2.1",
 		"@types/dompurify": "^3.0.5",
 		"@types/uuid": "^10.0.0",
