@@ -1,14 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
@@ -84,8 +82,7 @@ public class UmbLoginController : SurfaceController
             MemberIdentityUser? attemptedUser = await _memberManager.FindByNameAsync(model.Username);
             if (attemptedUser == null!)
             {
-                return new ValidationErrorResult(
-                    $"No local member found for username {model.Username}");
+                return BadRequest($"No local member found for username {model.Username}");
             }
 
             IEnumerable<string> providerNames =

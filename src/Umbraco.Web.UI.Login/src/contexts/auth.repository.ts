@@ -9,7 +9,13 @@ import {
 } from "../types.js";
 import { UmbRepositoryBase } from "@umbraco-cms/backoffice/repository";
 import { UmbLocalizationController } from "@umbraco-cms/backoffice/localization-api";
-import { ApiError, CancelError, SecurityResource, UserResource } from "@umbraco-cms/backoffice/external/backend-api";
+import {
+  ApiError,
+  CancelError,
+  ProblemDetails,
+  SecurityService,
+  UserService
+} from "@umbraco-cms/backoffice/external/backend-api";
 import { tryExecute } from "@umbraco-cms/backoffice/resources";
 
 export class UmbAuthRepository extends UmbRepositoryBase {
@@ -30,13 +36,21 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 
       const response = await fetch(request);
 
-      // If the response code is 402, it means that the user has enabled 2-factor authentication
-      let twoFactorView = '';
-      let twoFactorProviders: Array<string> = [];
-      if (response.status === 402) {
-        const responseData = await response.json();
-        twoFactorView = responseData.twoFactorLoginView ?? '';
-        twoFactorProviders = responseData.enabledTwoFactorProviderNames ?? [];
+      if (!response.ok) {
+        // If the response code is 402, it means that the user has enabled 2-factor authentication
+        if (response.status === 402) {
+          const responseData = await response.json();
+          return {
+            status: response.status,
+            twoFactorView: responseData.twoFactorLoginView ?? '',
+            twoFactorProviders: responseData.enabledTwoFactorProviderNames ?? [],
+          };
+        }
+
+        return {
+          status: response.status,
+          error: await this.#getErrorText(response),
+        };
       }
 
       return {
@@ -44,45 +58,46 @@ export class UmbAuthRepository extends UmbRepositoryBase {
         data: {
           username: data.username,
         },
-        error: await this.#getErrorText(response),
-        twoFactorView,
-        twoFactorProviders,
       };
     } catch (error) {
       return {
         status: 500,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
       };
     }
   }
 
   public async validateMfaCode(code: string, provider: string): Promise<MfaCodeResponse> {
-    const requestData = new Request('management/api/v1/security/back-office/verify-2fa', {
-      method: 'POST',
-      body: JSON.stringify({
-        code,
-        provider,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      const requestData = new Request('management/api/v1/security/back-office/verify-2fa', {
+        method: 'POST',
+        body: JSON.stringify({
+          code,
+          provider,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    const request = fetch(requestData);
+      const response = await fetch(requestData);
 
-    const response = await tryExecute(request);
+      if (!response.ok) {
+        return {
+          error: response.status === 400 ? this.#localize.term('auth_mfaInvalidCode') : await this.#getErrorText(response),
+        };
+      }
 
-    if (response.error) {
+      return {};
+    } catch (error) {
       return {
-        error: this.#getApiErrorDetailText(response.error, 'Could not validate the MFA code'),
+        error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
       };
     }
-
-    return {};
   }
 
   public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-    const response = await tryExecute(SecurityResource.postSecurityForgotPassword({
+    const response = await tryExecute(SecurityService.postSecurityForgotPassword({
       requestBody: {
         email
       }
@@ -98,7 +113,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse> {
-    const { data, error } = await tryExecute(SecurityResource.postSecurityForgotPasswordVerify({
+    const { data, error } = await tryExecute(SecurityService.postSecurityForgotPasswordVerify({
       requestBody: {
         user: {
           id: userId
@@ -119,7 +134,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
-    const response = await tryExecute(SecurityResource.postSecurityForgotPasswordReset({
+    const response = await tryExecute(SecurityService.postSecurityForgotPasswordReset({
       requestBody: {
         password,
         resetCode,
@@ -139,7 +154,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
-    const { data, error } = await tryExecute(UserResource.postUserInviteVerify({
+    const { data, error } = await tryExecute(UserService.postUserInviteVerify({
       requestBody: {
         token,
         user: {
@@ -160,7 +175,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
-    const response = await tryExecute(UserResource.postUserInviteCreatePassword({
+    const response = await tryExecute(UserService.postUserInviteCreatePassword({
       requestBody: {
         password,
         token,
@@ -182,7 +197,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   #getApiErrorDetailText(error: ApiError | CancelError | undefined, fallbackText?: string): string | undefined {
     if (error instanceof ApiError) {
       // Try to parse the body
-      return error.body ? error.body.title ?? fallbackText : fallbackText ?? 'An unknown error occurred.';
+      return typeof error.body === 'object' ? (error.body as ProblemDetails).title ?? fallbackText : fallbackText ?? 'An unknown error occurred.';
     }
 
     // Ignore cancel errors (user cancelled the request)
@@ -202,12 +217,11 @@ export class UmbAuthRepository extends UmbRepositoryBase {
       case 402:
         return this.#localize.term('auth_mfaText');
 
-      case 500:
-        return this.#localize.term('auth_receivedErrorFromServer');
+      case 403:
+        return this.#localize.term('auth_userLockedOut');
 
       default:
         return (
-          response.statusText ??
           this.#localize.term('auth_receivedErrorFromServer')
         );
     }

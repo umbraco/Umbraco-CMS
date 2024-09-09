@@ -1,12 +1,20 @@
-﻿namespace Umbraco.Cms.Core.Models.Blocks;
+﻿using Umbraco.Cms.Core.Serialization;
+
+namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
 ///     Data converter for blocks in the richtext property editor
 /// </summary>
 public sealed class RichTextEditorBlockDataConverter : BlockEditorDataConverter<RichTextBlockValue, RichTextBlockLayoutItem>
 {
+    [Obsolete("Use the constructor that takes IJsonSerializer. Will be removed in V15.")]
     public RichTextEditorBlockDataConverter()
         : base(Constants.PropertyEditors.Aliases.TinyMce)
+    {
+    }
+
+    public RichTextEditorBlockDataConverter(IJsonSerializer jsonSerializer)
+        : base(jsonSerializer)
     {
     }
 

@@ -1,7 +1,10 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Serialization;
 
@@ -15,6 +18,14 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
 
     public IEnumerable<Type> FindSubTypes(Type type)
     {
+        JsonDerivedTypeAttribute[] explicitJsonDerivedTypes = type
+            .GetCustomAttributes<JsonDerivedTypeAttribute>(false)
+            .ToArray();
+        if (explicitJsonDerivedTypes.Any())
+        {
+            return explicitJsonDerivedTypes.Select(a => a.DerivedType);
+        }
+
         if (type.IsInterface is false)
         {
             // IMPORTANT: do NOT return an empty enumerable here. it will cause nullability to fail on reference
@@ -31,6 +42,24 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
         var result = _typeFinder.FindClassesOfType(type).OrderBy(x => x.Name).ToHashSet();
         _subTypesCache.TryAdd(type, result);
         return result;
+    }
+
+    public string? GetTypeDiscriminatorValue(Type type)
+    {
+        JsonDerivedTypeAttribute? jsonDerivedTypeAttribute = type
+            .GetBaseTypes(false)
+            .WhereNotNull()
+            .SelectMany(baseType => baseType.GetCustomAttributes<JsonDerivedTypeAttribute>(false))
+            .FirstOrDefault(attr => attr.DerivedType == type);
+
+        if (jsonDerivedTypeAttribute is not null)
+        {
+            // IMPORTANT: do NOT perform fallback to type.Name here - it will work for the schema generation,
+            //            but not for the actual serialization, and then it's only going to cause confusion.
+            return jsonDerivedTypeAttribute.TypeDiscriminator?.ToString();
+        }
+
+        return typeof(IOpenApiDiscriminator).IsAssignableFrom(type) ? type.Name : null;
     }
 
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)

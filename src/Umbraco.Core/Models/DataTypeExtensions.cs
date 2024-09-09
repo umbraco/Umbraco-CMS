@@ -18,7 +18,6 @@ public static class DataTypeExtensions
         Constants.DataTypes.Guids.TagsGuid,
         Constants.DataTypes.Guids.ListViewContentGuid,
         Constants.DataTypes.Guids.ListViewMediaGuid,
-        Constants.DataTypes.Guids.ListViewMembersGuid,
         Constants.DataTypes.Guids.DatePickerWithTimeGuid,
         Constants.DataTypes.Guids.ApprovedColorGuid,
         Constants.DataTypes.Guids.DropdownMultipleGuid,
@@ -56,7 +55,6 @@ public static class DataTypeExtensions
         // these data types are required for default list view handling
         Constants.DataTypes.Guids.ListViewContentGuid,
         Constants.DataTypes.Guids.ListViewMediaGuid,
-        Constants.DataTypes.Guids.ListViewMembersGuid,
     };
 
     /// <summary>

@@ -52,7 +52,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
             return;
         }
 
-        IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);
+        IUser? admin = await _userService.GetAsync(Constants.Security.SuperUserKey);
         if (admin == null)
         {
             throw new InvalidOperationException("Could not find the super user!");

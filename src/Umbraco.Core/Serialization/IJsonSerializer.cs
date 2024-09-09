@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Umbraco.Cms.Core.Serialization;
 
 /// <summary>
@@ -24,4 +26,14 @@ public interface IJsonSerializer
     /// A <typeparamref name="T" /> representation of the JSON value.
     /// </returns>
     T? Deserialize<T>(string input);
+
+    /// <summary>
+    /// Attempts to parse an object that represents a JSON structure - i.e. a JSON object or a JSON array - to a strongly typed representation.
+    /// </summary>
+    /// <typeparam name="T">The target type of the JSON value.</typeparam>
+    /// <param name="input">The object input to parse.</param>
+    /// <param name="value">The parsed result, or null if the parsing fails.</param>
+    /// <returns>True if the parsing results in a non-null value, false otherwise.</returns>
+    bool TryDeserialize<T>(object input, [NotNullWhen(true)] out T? value)
+        where T : class;
 }

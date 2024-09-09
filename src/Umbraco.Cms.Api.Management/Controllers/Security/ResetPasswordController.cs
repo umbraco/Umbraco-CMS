@@ -12,7 +12,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
-// FIXME: Add requiring password reset token policy when its implemented
 [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class ResetPasswordController : SecurityControllerBase
 {

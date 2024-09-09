@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.Telemetry;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -61,14 +62,18 @@ public static partial class UmbracoBuilderExtensions
         // We also need to register the store as a core-friendly interface that doesn't leak technology.
         services.AddScoped<IBackOfficeUserStore, BackOfficeUserStore>();
         services.AddScoped<ICoreBackOfficeUserManager, BackOfficeUserManager>();
+        services.AddScoped<ICoreBackOfficeSignInManager, BackOfficeSignInManager>();
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
         services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();
+        services.AddScoped<IBackOfficeUserClientCredentialsManager, BackOfficeUserClientCredentialsManager>();
 
         services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
 
         // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
+
+        services.AddScoped<IBackOfficeExternalLoginService, BackOfficeExternalLoginService>();
 
         return builder;
     }

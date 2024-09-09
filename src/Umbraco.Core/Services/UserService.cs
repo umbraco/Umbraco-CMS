@@ -1,17 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Notifications;
@@ -50,7 +55,9 @@ internal class UserService : RepositoryService, IUserService
     private readonly IIsoCodeValidator _isoCodeValidator;
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    [Obsolete("Use the constructor that takes an IUserIdKeyResolver instead. Scheduled for removal in V15.")]
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -70,6 +77,49 @@ internal class UserService : RepositoryService, IUserService
         IOptions<ContentSettings> contentSettings,
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            userRepository,
+            userGroupRepository,
+            globalSettings,
+            securitySettings,
+            userEditorAuthorizationHelper,
+            serviceScopeFactory,
+            entityService,
+            localLoginSettingProvider,
+            inviteSender,
+            mediaFileManager,
+            temporaryFileService,
+            shortStringHelper,
+            contentSettings,
+            isoCodeValidator,
+            forgotPasswordSender,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
+
+    public UserService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IUserRepository userRepository,
+        IUserGroupRepository userGroupRepository,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<SecuritySettings> securitySettings,
+        UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+        IServiceScopeFactory serviceScopeFactory,
+        IEntityService entityService,
+        ILocalLoginSettingProvider localLoginSettingProvider,
+        IUserInviteSender inviteSender,
+        MediaFileManager mediaFileManager,
+        ITemporaryFileService temporaryFileService,
+        IShortStringHelper shortStringHelper,
+        IOptions<ContentSettings> contentSettings,
+        IIsoCodeValidator isoCodeValidator,
+        IUserForgotPasswordSender forgotPasswordSender,
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -84,6 +134,7 @@ internal class UserService : RepositoryService, IUserService
         _shortStringHelper = shortStringHelper;
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
+        _userIdKeyResolver = userIdKeyResolver;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -187,11 +238,13 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
+    [Obsolete("Please use GetAsync instead. Scheduled for removal in V15.")]
     public IUser? GetById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _userRepository.Get(id);
+            Guid userKey = _userIdKeyResolver.GetAsync(id).GetAwaiter().GetResult();
+            return _userRepository.Get(userKey);
         }
     }
 
@@ -935,20 +988,30 @@ internal class UserService : RepositoryService, IUserService
 
         // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
         // but I'd rather keep the ids out of the service API as much as possible.
-        int[]? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
+        List<int>? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
 
-        if (startContentIds is null || startContentIds.Length != model.ContentStartNodeKeys.Count)
+        if (startContentIds is null || startContentIds.Count != model.ContentStartNodeKeys.Count)
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ContentStartNodeNotFound, existingUser);
         }
 
-        int[]? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
+        List<int>? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
 
-        if (startMediaIds is null || startMediaIds.Length != model.MediaStartNodeKeys.Count)
+        if (startMediaIds is null || startMediaIds.Count != model.MediaStartNodeKeys.Count)
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
+        }
+
+        if (model.HasContentRootAccess)
+        {
+            startContentIds.Add(Constants.System.Root);
+        }
+
+        if (model.HasMediaRootAccess)
+        {
+            startMediaIds.Add(Constants.System.Root);
         }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
@@ -1036,15 +1099,15 @@ internal class UserService : RepositoryService, IUserService
         UserUpdateModel source,
         ISet<IUserGroup> sourceUserGroups,
         IUser target,
-        int[]? startContentIds,
-        int[]? startMediaIds)
+        List<int> startContentIds,
+        List<int> startMediaIds)
     {
         target.Name = source.Name;
         target.Language = source.LanguageIsoCode;
         target.Email = source.Email;
         target.Username = source.UserName;
-        target.StartContentIds = startContentIds;
-        target.StartMediaIds = startMediaIds;
+        target.StartContentIds = startContentIds.ToArray();
+        target.StartMediaIds = startMediaIds.ToArray();
 
         target.ClearGroups();
         foreach (IUserGroup group in sourceUserGroups)
@@ -1103,13 +1166,13 @@ internal class UserService : RepositoryService, IUserService
 
     private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
 
-    private int[]? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
+    private List<int>? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
     {
-        int[]? keys = guids?
+        var keys = guids?
             .Select(x => _entityService.GetId(x, type))
             .Where(x => x.Success)
             .Select(x => x.Result)
-            .ToArray();
+            .ToList();
 
         return keys;
     }
@@ -1124,6 +1187,11 @@ internal class UserService : RepositoryService, IUserService
         if (user is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
+        }
+
+        if (user.Kind != UserKind.Default)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.InvalidUserType, new PasswordChangedModel());
         }
 
         IUser? performingUser = await userStore.GetAsync(performingUserKey);
@@ -1669,14 +1737,6 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    public IEnumerable<IUser> GetNextUsers(int id, int count)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userRepository.GetNextUsers(id, count);
-        }
-    }
-
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
     /// </summary>
@@ -1969,10 +2029,17 @@ internal class UserService : RepositoryService, IUserService
                     userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
                 var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
                 var groupIds = groupUsers.Select(x => x.Id).ToArray();
+                var addedUserKeys = new List<Guid>();
+                foreach (var userId in userIds.Except(groupIds))
+                {
+                    Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+                    addedUserKeys.Add(userKey);
+                }
+
                 IEnumerable<int> addedUserIds = userIds.Except(groupIds);
 
                 addedUsers = addedUserIds.Count() > 0
-                    ? _userRepository.GetMany(addedUserIds.ToArray()).Where(x => x.Id != 0).ToArray()
+                    ? _userRepository.GetMany(addedUserKeys.ToArray()).Where(x => x.Id != 0).ToArray()
                     : new IUser[] { };
                 removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
             }
@@ -2281,7 +2348,18 @@ internal class UserService : RepositoryService, IUserService
         }
 
         // We don't know what the entity type may be, so we have to get the entire entity :(
-        var idKeyMap = keys.ToDictionary(key => _entityService.Get(key)!.Id);
+        Dictionary<int, Guid> idKeyMap = new();
+        foreach (Guid key in keys)
+        {
+            IEntitySlim? entity = _entityService.Get(key);
+
+            if (entity is null)
+            {
+                return Attempt.FailWithStatus(UserOperationStatus.NodeNotFound, Enumerable.Empty<NodePermissions>());
+            }
+
+            idKeyMap[entity.Id] = key;
+        }
 
         EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
 
@@ -2376,6 +2454,7 @@ internal class UserService : RepositoryService, IUserService
         EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+
     }
 
     /// <summary>
@@ -2402,6 +2481,51 @@ internal class UserService : RepositoryService, IUserService
             GetPermissionsForPath(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+    }
+
+    public async Task<UserClientCredentialsOperationStatus> AddClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
+        if (currentClientIds.InvariantContains(clientId))
+        {
+            return UserClientCredentialsOperationStatus.DuplicateClientId;
+        }
+
+        IUser? user = await GetAsync(userKey);
+        if (user is null || user.Kind != UserKind.Api)
+        {
+            return UserClientCredentialsOperationStatus.InvalidUser;
+        }
+
+        _userRepository.AddClientId(user.Id, clientId);
+
+        return UserClientCredentialsOperationStatus.Success;
+    }
+
+    public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.RemoveClientId(userId, clientId);
+    }
+
+    public Task<IUser?> FindByClientIdAsync(string clientId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IUser? user = _userRepository.GetByClientId(clientId);
+        return Task.FromResult(user?.Kind == UserKind.Api ? user : null);
+    }
+
+    public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        var userId = await _userIdKeyResolver.GetAsync(userKey);
+        return _userRepository.GetClientIds(userId);
     }
 
     /// <summary>

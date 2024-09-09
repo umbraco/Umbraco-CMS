@@ -12,7 +12,7 @@ public class CreateMemberRequestModel : CreateContentRequestModelBase<MemberValu
 
     public required ReferenceByIdModel MemberType { get; set; }
 
-    public IEnumerable<string>? Groups { get; set; }
+    public IEnumerable<Guid>? Groups { get; set; }
 
     public bool IsApproved { get; set; }
 }

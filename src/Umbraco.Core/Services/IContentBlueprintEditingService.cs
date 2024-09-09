@@ -8,6 +8,11 @@ public interface IContentBlueprintEditingService
 {
     Task<IContent?> GetAsync(Guid key);
 
+    Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(
+        Guid contentTypeKey,
+        int skip,
+        int take);
+
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentBlueprintCreateModel createModel, Guid userKey);
 
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid userKey);

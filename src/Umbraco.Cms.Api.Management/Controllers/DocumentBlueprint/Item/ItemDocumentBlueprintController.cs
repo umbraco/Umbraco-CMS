@@ -25,10 +25,15 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<DocumentBlueprintItemResponseModel>());
+        }
+
         IEnumerable<IDocumentEntitySlim> documents = _entityService
             .GetAll(UmbracoObjectTypes.DocumentBlueprint, ids.ToArray())
             .Select(x => x as IDocumentEntitySlim)

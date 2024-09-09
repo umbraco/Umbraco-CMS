@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
+public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
 {
     /// <summary>
     ///     Gets the count of items based on a complex query
@@ -19,6 +19,15 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     /// <param name="username"></param>
     /// <returns></returns>
     bool ExistsByUserName(string username);
+
+    /// <summary>
+    ///     Returns a user by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>
+    ///     A cached <see cref="IUser" /> instance
+    /// </returns>
+    IUser? Get(int id);
 
     /// <summary>
     ///     Checks if a user with the login exists
@@ -142,5 +151,13 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
 
     void ClearLoginSession(Guid sessionId);
 
-    IEnumerable<IUser> GetNextUsers(int id, int count);
+    IEnumerable<string> GetAllClientIds();
+
+    IEnumerable<string> GetClientIds(int id);
+
+    void AddClientId(int id, string clientId);
+
+    bool RemoveClientId(int id, string clientId);
+
+    IUser? GetByClientId(string clientId);
 }

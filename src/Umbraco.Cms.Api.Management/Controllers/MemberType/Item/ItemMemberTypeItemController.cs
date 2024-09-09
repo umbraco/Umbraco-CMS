@@ -27,6 +27,11 @@ public class ItemMemberTypeItemController : MemberTypeItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<MemberTypeItemResponseModel>());
+        }
+
         IEnumerable<IMemberType> memberTypes = _memberTypeService.GetAll(ids);
         List<MemberTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(memberTypes);
         return Ok(responseModels);

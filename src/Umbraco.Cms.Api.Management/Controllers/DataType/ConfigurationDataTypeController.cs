@@ -25,7 +25,6 @@ public class ConfigurationDataTypeController : DataTypeControllerBase
             CanBeChanged = _dataTypesSettings.CanBeChanged,
             DocumentListViewId = Constants.DataTypes.Guids.ListViewContentGuid,
             MediaListViewId = Constants.DataTypes.Guids.ListViewMediaGuid,
-            MemberListViewId = Constants.DataTypes.Guids.ListViewMembersGuid,
         };
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }

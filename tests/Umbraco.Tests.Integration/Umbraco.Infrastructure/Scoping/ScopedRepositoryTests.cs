@@ -63,7 +63,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
     [TestCase(true)]
     [TestCase(false)]
-    public void DefaultRepositoryCachePolicy(bool complete)
+    public async Task DefaultRepositoryCachePolicy(bool complete)
     {
         var scopeProvider = (ScopeProvider)ScopeProvider;
         var service = (UserService)UserService;
@@ -72,13 +72,13 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         service.Save(user);
 
         // User has been saved so the cache has been cleared of it
-        var globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
+        var globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Key), () => null);
         Assert.IsNull(globalCached);
         // Get user again to load it into the cache again, this also ensure we don't modify the one that's in the cache.
-        user = service.GetUserById(user.Id);
+        user = await service.GetAsync(user.Key);
 
         // global cache contains the entity
-        globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
+        globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Key), () => null);
         Assert.IsNotNull(globalCached);
         Assert.AreEqual(user.Id, globalCached.Id);
         Assert.AreEqual("name", globalCached.Name);
@@ -104,7 +104,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
             Assert.AreEqual("changed", scopeCached.Name);
 
             // global cache is unchanged
-            globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
+            globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Key), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual("name", globalCached.Name);
@@ -117,7 +117,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
         Assert.IsNull(scopeProvider.AmbientScope);
 
-        globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
+        globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Key), () => null);
         if (complete)
         {
             // global cache has been cleared
@@ -130,11 +130,11 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         }
 
         // get again, updated if completed
-        user = service.GetUserById(user.Id);
+        user = await service.GetAsync(user.Key);
         Assert.AreEqual(complete ? "changed" : "name", user.Name);
 
         // global cache contains the entity again
-        globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
+        globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Key), () => null);
         Assert.IsNotNull(globalCached);
         Assert.AreEqual(user.Id, globalCached.Id);
         Assert.AreEqual(complete ? "changed" : "name", globalCached.Name);

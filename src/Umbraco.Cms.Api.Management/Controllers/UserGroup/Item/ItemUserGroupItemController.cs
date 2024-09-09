@@ -27,6 +27,11 @@ public class ItemUserGroupItemController : UserGroupItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<UserGroupItemResponseModel>());
+        }
+
         IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(ids);
         List<UserGroupItemResponseModel> responseModels = _mapper.MapEnumerable<IUserGroup, UserGroupItemResponseModel>(userGroups);
         return Ok(responseModels);

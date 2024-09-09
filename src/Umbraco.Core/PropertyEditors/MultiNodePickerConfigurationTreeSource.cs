@@ -22,7 +22,7 @@ public class MultiNodePickerConfigurationTreeSource
 
     [JsonPropertyName("id")]
     [DataMember(Name = "id")]
-    public Udi? StartNodeId { get; set; }
+    public Guid? StartNodeId { get; set; }
 }
 
 [DataContract]

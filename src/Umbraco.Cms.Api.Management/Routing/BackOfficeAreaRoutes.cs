@@ -1,11 +1,7 @@
-using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
@@ -25,20 +21,14 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     public BackOfficeAreaRoutes(IRuntimeState runtimeState)
         => _runtimeState = runtimeState;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
-    /// </summary>
-    [Obsolete("The globalSettings and hostingEnvironment parameters are not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
-    public BackOfficeAreaRoutes(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IRuntimeState runtimeState)
-        : this(runtimeState)
-    { }
-
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
         if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Run)
         {
             MapMinimalBackOffice(endpoints);
+
+            endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub);
         }
     }
 
@@ -66,6 +56,6 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
                 Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),
                 Action = nameof(BackOfficeDefaultController.Index),
             },
-            constraints: new { slug = @"^(section.*|upgrade|install|logout)$" });
+            constraints: new { slug = @"^(section|preview|upgrade|install|oauth_complete|logout|error).*$" });
     }
 }

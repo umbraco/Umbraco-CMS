@@ -4,29 +4,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using StackExchange.Profiling;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Profiler;
 
 internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfilerOptions>
 {
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly string _backOfficePath;
 
-    public ConfigureMiniProfilerOptions(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IHostingEnvironment hostingEnvironment)
-    {
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _backOfficePath = hostingEnvironment.GetBackOfficePath();
-    }
-
-    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
-    public ConfigureMiniProfilerOptions(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
-        : this(backOfficeSecurityAccessor, hostingEnvironment)
-    { }
+    public ConfigureMiniProfilerOptions(IHostingEnvironment hostingEnvironment)
+        => _backOfficePath = hostingEnvironment.GetBackOfficePath();
 
     public void Configure(MiniProfilerOptions options)
     {
@@ -51,6 +40,5 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
 
         return identity?.GetClaims(Core.Constants.Security.AllowedApplicationsClaimType)
             .InvariantContains(Core.Constants.Applications.Settings) ?? false;
-
     }
 }

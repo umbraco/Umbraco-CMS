@@ -143,7 +143,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                             ContentSettings.PreviewBadge,
                             HostingEnvironment.GetBackOfficePath(),
                             Context.Request.GetEncodedUrl(),
-                            UmbracoContext.PublishedRequest?.PublishedContent?.Id);
+                            UmbracoContext.PublishedRequest?.PublishedContent?.Key);
                 }
                 else
                 {

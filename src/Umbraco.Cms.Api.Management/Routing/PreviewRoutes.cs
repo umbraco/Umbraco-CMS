@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Preview;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 
@@ -19,11 +16,6 @@ public sealed class PreviewRoutes : IAreaRoutes
 
     public PreviewRoutes(IRuntimeState runtimeState)
         => _runtimeState = runtimeState;
-
-    [Obsolete("The globalSettings and hostingEnvironment parameters are not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
-    public PreviewRoutes(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IRuntimeState runtimeState)
-        : this(runtimeState)
-    { }
 
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {

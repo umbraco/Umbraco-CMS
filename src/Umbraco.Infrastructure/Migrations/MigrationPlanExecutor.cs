@@ -1,10 +1,16 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenIddict.Abstractions;
+using Org.BouncyCastle.Utilities;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -39,10 +45,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly IMigrationBuilder _migrationBuilder;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly IPublishedSnapshotService _publishedSnapshotService;
+    private readonly IKeyValueService _keyValueService;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DistributedCache _distributedCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
     private bool _rebuildCache;
+    private bool _invalidateBackofficeUserAccess;
 
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
@@ -51,7 +60,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         IMigrationBuilder migrationBuilder,
         IUmbracoDatabaseFactory databaseFactory,
         IPublishedSnapshotService publishedSnapshotService,
-        DistributedCache distributedCache)
+        DistributedCache distributedCache,
+        IKeyValueService keyValueService,
+        IServiceScopeFactory serviceScopeFactory)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
@@ -59,11 +70,35 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _migrationBuilder = migrationBuilder;
         _databaseFactory = databaseFactory;
         _publishedSnapshotService = publishedSnapshotService;
+        _keyValueService = keyValueService;
+        _serviceScopeFactory = serviceScopeFactory;
         _distributedCache = distributedCache;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
 
-    [Obsolete("Use constructor with 7 parameters")]
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    public MigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        ILoggerFactory loggerFactory,
+        IMigrationBuilder migrationBuilder,
+        IUmbracoDatabaseFactory databaseFactory,
+        IPublishedSnapshotService publishedSnapshotService,
+        DistributedCache distributedCache)
+        : this(
+            scopeProvider,
+            scopeAccessor,
+            loggerFactory,
+            migrationBuilder,
+            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
+            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IServiceScopeFactory>())
+    {
+    }
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
         IScopeAccessor scopeAccessor,
@@ -76,7 +111,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             migrationBuilder,
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
-            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>())
+            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IServiceScopeFactory>())
     {
     }
 
@@ -92,7 +129,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
     /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
     /// </remarks>
-    [Obsolete("This will return an ExecutedMigrationPlan in V13")]
     public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState)
     {
         plan.Validate();
@@ -104,7 +140,14 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         // If any completed migration requires us to rebuild cache we'll do that.
         if (_rebuildCache)
         {
+            _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
             RebuildCache();
+        }
+
+        // If any completed migration requires us to sign out the user we'll do that.
+        if (_invalidateBackofficeUserAccess)
+        {
+            RevokeBackofficeTokens().GetAwaiter().GetResult(); // should async all the way up at some point
         }
 
         return result;
@@ -160,11 +203,11 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             {
                 if (transition.MigrationType.IsAssignableTo(typeof(UnscopedMigrationBase)))
                 {
-                    executedMigrationContexts.Add(RunUnscopedMigration(transition.MigrationType, plan));
+                    executedMigrationContexts.Add(RunUnscopedMigration(transition, plan));
                 }
                 else
                 {
-                    executedMigrationContexts.Add(RunScopedMigration(transition.MigrationType, plan));
+                    executedMigrationContexts.Add(RunScopedMigration(transition, plan));
                 }
             }
             catch (Exception exception)
@@ -182,6 +225,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     Plan = plan,
                     ExecutedMigrationContexts = executedMigrationContexts
                 };
+            }
+
+
+            IEnumerable<IMigrationContext> nonCompletedMigrationsContexts = executedMigrationContexts.Where(x => x.IsCompleted is false);
+            if (nonCompletedMigrationsContexts.Any())
+            {
+                throw new InvalidOperationException($"Migration ({transition.MigrationType.FullName}) has been executed without indicated it was completed correctly.");
             }
 
             // The plan migration (transition), completed, so we'll add this to our list so we can return this at some point.
@@ -233,17 +283,22 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         };
     }
 
-    private MigrationContext RunUnscopedMigration(Type migrationType, MigrationPlan plan)
+    private MigrationContext RunUnscopedMigration(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
-        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>());
+        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), () => OnComplete(plan, transition.TargetState));
 
-        RunMigration(migrationType, context);
+        RunMigration(transition.MigrationType, context);
 
         return context;
     }
 
-    private MigrationContext RunScopedMigration(Type migrationType, MigrationPlan plan)
+    private void OnComplete(MigrationPlan plan, string targetState)
+    {
+        _keyValueService.SetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, targetState);
+    }
+
+    private MigrationContext RunScopedMigration(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         // We want to suppress scope (service, etc...) notifications during a migration plan
         // execution. This is because if a package that doesn't have their migration plan
@@ -255,9 +310,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             var context = new MigrationContext(
                 plan,
                 _scopeAccessor.AmbientScope?.Database,
-                _loggerFactory.CreateLogger<MigrationContext>());
+                _loggerFactory.CreateLogger<MigrationContext>(),
+                () => OnComplete(plan, transition.TargetState));
 
-            RunMigration(migrationType, context);
+            RunMigration(transition.MigrationType, context);
+
+            // Ensure we mark the context as complete before the scope completes
+            context.Complete();
 
             scope.Complete();
 
@@ -276,11 +335,43 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         {
             _rebuildCache = true;
         }
+
+        if (migration.InvalidateBackofficeUserAccess)
+        {
+            _invalidateBackofficeUserAccess = true;
+        }
     }
 
     private void RebuildCache()
     {
         _publishedSnapshotService.RebuildAll();
         _distributedCache.RefreshAllPublishedSnapshot();
+    }
+
+    private async Task RevokeBackofficeTokens()
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+
+        IOpenIddictApplicationManager openIddictApplicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
+        var backOfficeClient = await openIddictApplicationManager.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice);
+        if (backOfficeClient is null)
+        {
+            _logger.LogWarning("Could not get the openIddict Application for {backofficeClientId}. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            return;
+        }
+
+        var backOfficeClientId = await openIddictApplicationManager.GetIdAsync(backOfficeClient);
+        if (backOfficeClientId is null)
+        {
+            _logger.LogWarning("Could not extract the clientId from the openIddict backofficelient Application. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            return;
+        }
+
+        IOpenIddictTokenManager tokenManager = scope.ServiceProvider.GetRequiredService<IOpenIddictTokenManager>();
+        var tokens = await tokenManager.FindByApplicationIdAsync(backOfficeClientId).ToArrayAsync();
+        foreach (var token in tokens)
+        {
+            await tokenManager.DeleteAsync(token);
+        }
     }
 }

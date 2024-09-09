@@ -50,7 +50,22 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
         builder.Services.AddTransient(CreateLocalizedTextServiceFileSourcesFactory);
         builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
-        builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
+        builder.Services.AddUnique<ICreatedPackagesRepository>(factory
+            => new CreatedPackageSchemaRepository(
+                factory.GetRequiredService<IHostingEnvironment>(),
+                factory.GetRequiredService<FileSystems>(),
+                factory.GetRequiredService<IEntityXmlSerializer>(),
+                factory.GetRequiredService<IDataTypeService>(),
+                factory.GetRequiredService<IFileService>(),
+                factory.GetRequiredService<IMediaService>(),
+                factory.GetRequiredService<IMediaTypeService>(),
+                factory.GetRequiredService<IContentService>(),
+                factory.GetRequiredService<MediaFileManager>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<IScopeAccessor>(),
+                factory.GetRequiredService<ITemplateService>(),
+                factory.GetRequiredService<IDictionaryItemService>(),
+                factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddSingleton(CreatePackageDataInstallation);
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
         builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
@@ -83,8 +98,8 @@ public static partial class UmbracoBuilderExtensions
             packageRepoFileName);
 
     // Factory registration is only required because of ambiguous constructor
-    private static PackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
-        => new(
+    private static IPackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
+        => new PackageDataInstallation(
             factory.GetRequiredService<IDataValueEditorFactory>(),
             factory.GetRequiredService<ILogger<PackageDataInstallation>>(),
             factory.GetRequiredService<IFileService>(),

@@ -44,11 +44,11 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public async Task<IEnumerable<DocumentUrlInfo>> GetUrlsAsync(IContent content)
+    public async Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content)
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
-        UrlInfo[] urlInfos = (await content.GetContentUrlsAsync(
+        IEnumerable<UrlInfo> urlInfos = await content.GetContentUrlsAsync(
             _publishedRouter,
             umbracoContext,
             _languageService,
@@ -57,11 +57,24 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             _variationContextAccessor,
             _loggerFactory.CreateLogger<IContent>(),
             _uriUtility,
-            _publishedUrlProvider)).ToArray();
+            _publishedUrlProvider);
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)
             .Select(urlInfo => new DocumentUrlInfo { Culture = urlInfo.Culture, Url = urlInfo.Text })
             .ToArray();
+    }
+
+    public async Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems)
+    {
+        var documentUrlInfoResourceSets = new List<DocumentUrlInfoResponseModel>();
+
+        foreach (IContent content in contentItems)
+        {
+            IEnumerable<DocumentUrlInfo> urls = await CreateUrlsAsync(content);
+            documentUrlInfoResourceSets.Add(new DocumentUrlInfoResponseModel(content.Key, urls));
+        }
+
+        return documentUrlInfoResourceSets;
     }
 }

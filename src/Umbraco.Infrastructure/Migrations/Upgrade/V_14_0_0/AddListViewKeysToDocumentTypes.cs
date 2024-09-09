@@ -31,11 +31,13 @@ public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateSqlServer();
+            Context.Complete();
             scope.Complete();
             return;
         }
 
         MigrateSqlite();
+        Context.Complete();
         scope.Complete();
     }
 
@@ -113,11 +115,6 @@ public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
         if (dto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
         {
             return Constants.DataTypes.Guids.ListViewMediaGuid;
-        }
-
-        if (dto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
-        {
-            return Constants.DataTypes.Guids.ListViewMembersGuid;
         }
 
         // No custom list view was found, and not one of the default types either. Therefore we cannot find it.

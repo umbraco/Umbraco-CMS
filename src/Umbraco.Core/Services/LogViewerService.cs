@@ -32,8 +32,8 @@ public class LogViewerService : ILogViewerService
 
     /// <inheritdoc/>
     public async Task<Attempt<PagedModel<ILogEntry>?, LogViewerOperationStatus>> GetPagedLogsAsync(
-        DateTime? startDate,
-        DateTime? endDate,
+        DateTimeOffset? startDate,
+        DateTimeOffset? endDate,
         int skip,
         int take,
         Direction orderDirection = Direction.Descending,
@@ -109,7 +109,7 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTime? startDate, DateTime? endDate)
+    public async Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
         bool isAllowed = CanViewLogs(logTimePeriod);
@@ -123,7 +123,7 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate)
+    public async Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
@@ -143,7 +143,7 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate, int skip, int take)
+    public async Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTimeOffset? startDate, DateTimeOffset? endDate, int skip, int take)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
@@ -183,7 +183,7 @@ public class LogViewerService : ILogViewerService
     /// <param name="startDate">The start date for the date range (can be null).</param>
     /// <param name="endDate">The end date for the date range (can be null).</param>
     /// <returns>The LogTimePeriod object used to filter logs.</returns>
-    private LogTimePeriod GetTimePeriod(DateTime? startDate, DateTime? endDate)
+    private LogTimePeriod GetTimePeriod(DateTimeOffset? startDate, DateTimeOffset? endDate)
     {
         if (startDate is null || endDate is null)
         {
@@ -199,7 +199,7 @@ public class LogViewerService : ILogViewerService
             }
         }
 
-        return new LogTimePeriod(startDate.Value, endDate.Value);
+        return new LogTimePeriod(startDate.Value.LocalDateTime, endDate.Value.LocalDateTime);
     }
 
     /// <summary>

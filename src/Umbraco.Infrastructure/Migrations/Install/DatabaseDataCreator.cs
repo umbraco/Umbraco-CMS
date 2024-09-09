@@ -676,25 +676,6 @@ internal class DatabaseDataCreator
             "id");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.ListViewMembers,
-            new NodeDto
-            {
-                NodeId = Constants.DataTypes.DefaultMembersListView,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = $"-1,{Constants.DataTypes.DefaultMembersListView}",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.ListViewMembersGuid,
-                Text = Constants.Conventions.DataTypes.ListViewPrefix + "Members",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.Tags,
             new NodeDto
             {
@@ -1081,6 +1062,7 @@ internal class DatabaseDataCreator
                     Thumbnail = Constants.Icons.MediaFolder,
                     AllowAtRoot = true,
                     Variations = (byte)ContentVariation.Nothing,
+                    ListView = Constants.DataTypes.Guids.ListViewMediaGuid
                 });
         }
 
@@ -1889,9 +1871,9 @@ internal class DatabaseDataCreator
 
     private void CreateDataTypeData()
     {
-        void InsertDataTypeDto(int id, string editorAlias, string dbType, string? configuration = null)
+        void InsertDataTypeDto(int id, string editorAlias, string editorUiAlias, string dbType, string? configuration)
         {
-            var dataTypeDto = new DataTypeDto { NodeId = id, EditorAlias = editorAlias, DbType = dbType };
+            var dataTypeDto = new DataTypeDto { NodeId = id, EditorAlias = editorAlias, EditorUiAlias = editorUiAlias, DbType = dbType };
 
             if (configuration != null)
             {
@@ -1905,11 +1887,13 @@ internal class DatabaseDataCreator
         }
 
         // layouts for the list view
-        const string cardLayout =
-            "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": true, \"selected\": true}";
-        const string listLayout =
-            "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": true,\"selected\": true}";
-        const string layouts = "[" + cardLayout + "," + listLayout + "]";
+        string TableCollectionView(string collectionViewType) =>
+            $"{{\"name\": \"List\",\"collectionView\": \"Umb.CollectionView.{collectionViewType}.Table\", \"icon\": \"icon-list\", \"isSystem\": true, \"selected\": true}}";
+
+        string GridCollectionView(string collectionViewType) =>
+            $"{{\"name\": \"Grid\",\"collectionView\": \"Umb.CollectionView.{collectionViewType}.Grid\",\"icon\": \"icon-thumbnails-small\", \"isSystem\": true,\"selected\": true}}";
+
+        string Layouts(string collectionViewType) => $"[{GridCollectionView(collectionViewType)},{TableCollectionView(collectionViewType)}]";
 
         // Insert data types only if the corresponding Node record exists (which may or may not have been created depending on configuration
         // of data types to create).
@@ -1920,6 +1904,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.Boolean,
                     EditorAlias = Constants.PropertyEditors.Aliases.Boolean,
+                    EditorUiAlias = "Umb.PropertyEditorUi.Toggle",
                     DbType = "Integer",
                 });
         }
@@ -1931,6 +1916,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = -51,
                     EditorAlias = Constants.PropertyEditors.Aliases.Integer,
+                    EditorUiAlias = "Umb.PropertyEditorUi.Integer",
                     DbType = "Integer",
                 });
         }
@@ -1945,9 +1931,10 @@ internal class DatabaseDataCreator
                 {
                     NodeId = -87,
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
+                    EditorUiAlias = "Umb.PropertyEditorUi.TinyMCE",
                     DbType = "Ntext",
                     Configuration =
-                        "{\"toolbar\":[\"ace\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
+                        "{\"toolbar\":[\"sourcecode\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
                 });
         }
 
@@ -1958,6 +1945,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.Textbox,
                     EditorAlias = Constants.PropertyEditors.Aliases.TextBox,
+                    EditorUiAlias = "Umb.PropertyEditorUi.TextBox",
                     DbType = "Nvarchar",
                 });
         }
@@ -1969,6 +1957,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.Textarea,
                     EditorAlias = Constants.PropertyEditors.Aliases.TextArea,
+                    EditorUiAlias = "Umb.PropertyEditorUi.TextArea",
                     DbType = "Ntext",
                 });
         }
@@ -1980,22 +1969,23 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.Upload,
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
+                    EditorUiAlias = "Umb.PropertyEditorUi.UploadField",
                     DbType = "Nvarchar",
                 });
         }
 
-        InsertDataTypeDto(Constants.DataTypes.LabelString, Constants.PropertyEditors.Aliases.Label, "Nvarchar",
-            "{\"umbracoDataValueType\":\"STRING\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelInt, Constants.PropertyEditors.Aliases.Label, "Integer",
-            "{\"umbracoDataValueType\":\"INT\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelBigint, Constants.PropertyEditors.Aliases.Label, "Nvarchar",
-            "{\"umbracoDataValueType\":\"BIGINT\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelDateTime, Constants.PropertyEditors.Aliases.Label, "Date",
-            "{\"umbracoDataValueType\":\"DATETIME\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelDecimal, Constants.PropertyEditors.Aliases.Label, "Decimal",
-            "{\"umbracoDataValueType\":\"DECIMAL\"}");
-        InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.Label, "Date",
-            "{\"umbracoDataValueType\":\"TIME\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelString, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Nvarchar", "{\"umbracoDataValueType\":\"STRING\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelInt, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Integer", "{\"umbracoDataValueType\":\"INT\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelBigint, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Nvarchar", "{\"umbracoDataValueType\":\"BIGINT\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelDateTime, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Date", "{\"umbracoDataValueType\":\"DATETIME\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelDecimal, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Decimal", "{\"umbracoDataValueType\":\"DECIMAL\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Date", "{\"umbracoDataValueType\":\"TIME\"}");
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.DateTime))
         {
@@ -2004,6 +1994,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.DateTime,
                     EditorAlias = Constants.PropertyEditors.Aliases.DateTime,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DatePicker",
                     DbType = "Date",
                     Configuration = "{\"format\":\"YYYY-MM-DD HH:mm:ss\"}",
                 });
@@ -2016,12 +2007,13 @@ internal class DatabaseDataCreator
                 {
                     NodeId = -37,
                     EditorAlias = Constants.PropertyEditors.Aliases.ColorPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.ColorPicker",
                     DbType = "Nvarchar",
                 });
         }
 
         InsertDataTypeDto(Constants.DataTypes.DropDownSingle, Constants.PropertyEditors.Aliases.DropDownListFlexible,
-            "Nvarchar", "{\"multiple\":false}");
+            "Umb.PropertyEditorUi.Dropdown", "Nvarchar", "{\"multiple\":false}");
 
         if (_database.Exists<NodeDto>(-40))
         {
@@ -2030,6 +2022,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = -40,
                     EditorAlias = Constants.PropertyEditors.Aliases.RadioButtonList,
+                    EditorUiAlias = "Umb.PropertyEditorUi.RadioButtonList",
                     DbType = "Nvarchar",
                 });
         }
@@ -2040,14 +2033,15 @@ internal class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = -41,
-                    EditorAlias = "Umbraco.DateTime",
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTime,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DatePicker",
                     DbType = "Date",
                     Configuration = "{\"format\":\"YYYY-MM-DD\"}",
                 });
         }
 
         InsertDataTypeDto(Constants.DataTypes.DropDownMultiple, Constants.PropertyEditors.Aliases.DropDownListFlexible,
-            "Nvarchar", "{\"multiple\":true}");
+            "Umb.PropertyEditorUi.Dropdown", "Nvarchar", "{\"multiple\":true}");
 
         if (_database.Exists<NodeDto>(-43))
         {
@@ -2056,6 +2050,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = -43,
                     EditorAlias = Constants.PropertyEditors.Aliases.CheckBoxList,
+                    EditorUiAlias = "Umb.PropertyEditorUi.CheckBoxList",
                     DbType = "Nvarchar",
                 });
         }
@@ -2070,6 +2065,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.Tags,
                     EditorAlias = Constants.PropertyEditors.Aliases.Tags,
+                    EditorUiAlias = "Umb.PropertyEditorUi.Tags",
                     DbType = "Ntext",
                     Configuration = "{\"group\":\"default\", \"storageType\":\"Json\"}",
                 });
@@ -2082,6 +2078,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.ImageCropper,
                     EditorAlias = Constants.PropertyEditors.Aliases.ImageCropper,
+                    EditorUiAlias = "Umb.PropertyEditorUi.ImageCropper",
                     DbType = "Ntext",
                 });
         }
@@ -2096,10 +2093,11 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.DefaultContentListView,
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
+                    EditorUiAlias = "Umb.PropertyEditorUi.Collection",
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
-                        layouts +
+                        Layouts("Document") +
                         ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
@@ -2114,10 +2112,11 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.DefaultMediaListView,
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
+                    EditorUiAlias = "Umb.PropertyEditorUi.Collection",
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
-                        layouts +
+                        Layouts("Media") +
                         ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
@@ -2132,6 +2131,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.DefaultMembersListView,
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
+                    EditorUiAlias = "Umb.PropertyEditorUi.Collection",
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"pageSize\":10, \"orderBy\":\"username\", \"orderDirection\":\"asc\", \"includeProperties\":[{\"alias\":\"username\",\"isSystem\":true},{\"alias\":\"email\",\"isSystem\":true},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true}]}",
@@ -2146,6 +2146,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = 1046,
                     EditorAlias = Constants.PropertyEditors.Aliases.ContentPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DocumentPicker",
                     DbType = "Nvarchar",
                 });
         }
@@ -2157,6 +2158,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = 1047,
                     EditorAlias = Constants.PropertyEditors.Aliases.MemberPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MemberPicker",
                     DbType = "Nvarchar",
                 });
         }
@@ -2168,6 +2170,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = 1050,
                     EditorAlias = Constants.PropertyEditors.Aliases.MultiUrlPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MultiUrlPicker",
                     DbType = "Ntext",
                 });
         }
@@ -2179,6 +2182,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.UploadVideo,
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
+                    EditorUiAlias = "Umb.PropertyEditorUi.UploadField",
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"fileExtensions\":[\"mp4\",\"webm\",\"ogv\"]}",
@@ -2192,6 +2196,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.UploadAudio,
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
+                    EditorUiAlias = "Umb.PropertyEditorUi.UploadField",
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"fileExtensions\":[\"mp3\",\"weba\",\"oga\",\"opus\"]}",
@@ -2205,6 +2210,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.UploadArticle,
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
+                    EditorUiAlias = "Umb.PropertyEditorUi.UploadField",
                     DbType = "Nvarchar",
                     Configuration =
                         "{\"fileExtensions\":[\"pdf\",\"docx\",\"doc\"]}",
@@ -2218,6 +2224,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = Constants.DataTypes.UploadVectorGraphics,
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
+                    EditorUiAlias = "Umb.PropertyEditorUi.UploadField",
                     DbType = "Nvarchar",
                     Configuration = "{\"fileExtensions\":[\"svg\"]}",
                 });
@@ -2230,6 +2237,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = 1051,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
                     Configuration = "{\"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
                 });
@@ -2242,6 +2250,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = 1052,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
                     Configuration = "{\"multiple\": true}",
                 });
@@ -2254,6 +2263,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = 1053,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
                     Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
@@ -2267,6 +2277,7 @@ internal class DatabaseDataCreator
                 {
                     NodeId = 1054,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
                     Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": true}",

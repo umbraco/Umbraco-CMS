@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -112,5 +113,23 @@ public partial class MediaTypeEditingServiceTests
         Assert.AreEqual(10, property2.SortOrder);
 
         Assert.AreEqual(2, mediaType.NoGroupPropertyTypes.Count());
+    }
+
+    [TestCase(Constants.Conventions.MediaTypes.File)]
+    [TestCase(Constants.Conventions.MediaTypes.Folder)]
+    [TestCase(Constants.Conventions.MediaTypes.Image)]
+    public async Task Cannot_Change_Alias_Of_System_Media_Type(string mediaTypeAlias)
+    {
+        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        Assert.IsNotNull(mediaType);
+
+        var updateModel = MediaTypeUpdateModel(mediaTypeAlias, $"{mediaTypeAlias}_updated");
+        var result = await MediaTypeEditingService.UpdateAsync(mediaType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.NotAllowed, result.Status);
+        });
     }
 }

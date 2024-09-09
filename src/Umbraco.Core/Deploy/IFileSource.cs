@@ -17,6 +17,7 @@ public interface IFileSource
     /// <para>Returns null if no content could be read.</para>
     /// <para>The caller should ensure that the stream is properly closed/disposed.</para>
     /// </remarks>
+    [Obsolete("Use GetFileStreamAsync() instead. This method will be removed in a future version.")]
     Stream GetFileStream(StringUdi udi);
 
     /// <summary>
@@ -43,6 +44,7 @@ public interface IFileSource
     /// <remarks>
     /// Returns null if no content could be read.
     /// </remarks>
+    [Obsolete("Use GetFileContentAsync() instead. This method will be removed in a future version.")]
     string GetFileContent(StringUdi udi);
 
     /// <summary>
@@ -65,6 +67,7 @@ public interface IFileSource
     /// <returns>
     /// The length of the file, or -1 if the file does not exist.
     /// </returns>
+    [Obsolete("Use GetFileLengthAsync() instead. This method will be removed in a future version.")]
     long GetFileLength(StringUdi udi);
 
     /// <summary>
@@ -83,6 +86,7 @@ public interface IFileSource
     /// <param name="udis">The UDIs of the files to get.</param>
     /// <param name="continueOnFileNotFound">A flag indicating whether to continue if a file isn't found or to stop and throw a FileNotFoundException.</param>
     /// <param name="fileTypes">A collection of file types which can store the files.</param>
+    [Obsolete("Use GetFilesAsync() instead. This method will be removed in a future version.")]
     void GetFiles(IEnumerable<StringUdi> udis, bool continueOnFileNotFound, IFileTypeCollection fileTypes);
 
     /// <summary>

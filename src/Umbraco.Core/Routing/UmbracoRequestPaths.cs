@@ -43,11 +43,6 @@ public class UmbracoRequestPaths
         _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }
 
-    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
-    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
-        : this(hostingEnvironment, umbracoRequestPathsOptions)
-    { }
-
     /// <summary>
     ///     Checks if the current uri is a back office request
     /// </summary>
@@ -76,7 +71,7 @@ public class UmbracoRequestPaths
     /// </remarks>
     public bool IsBackOfficeRequest(string absPath)
     {
-        string urlPath = absPath.TrimStart(_appPath).EnsureStartsWith('/');
+        string urlPath = absPath.TrimStartExact(_appPath).EnsureStartsWith('/');
 
         // check if this is in the umbraco back office
         if (!urlPath.InvariantStartsWith(_backOfficePath))
@@ -146,7 +141,7 @@ public class UmbracoRequestPaths
     /// <summary>
     ///     Checks if the current uri is an install request
     /// </summary>
-    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_installPath);
+    public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_managementApiPath);
 
     /// <summary>
     ///     Rudimentary check to see if it's not a server side request

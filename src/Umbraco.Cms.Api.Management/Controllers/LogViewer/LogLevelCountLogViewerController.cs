@@ -34,8 +34,8 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     [ProducesResponseType(typeof(LogLevelCountsReponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> LogLevelCounts(
         CancellationToken cancellationToken,
-        DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null)
     {
         Attempt<LogLevelCounts?, LogViewerOperationStatus> logLevelCountsAttempt =
             await _logViewerService.GetLogLevelCountsAsync(startDate, endDate);

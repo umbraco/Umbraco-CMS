@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.UserGroup;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -40,7 +41,7 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            UserPermissionResource.WithKeys(requestModel.UserIds),
+            UserPermissionResource.WithKeys(requestModel.UserIds.Select(x => x.Id)),
             AuthorizationPolicies.UserPermissionByResource);
 
         if (authorizationResult.Succeeded is false)
@@ -48,8 +49,12 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
             return Forbidden();
         }
 
-        UserGroupOperationStatus status = await _userGroupService.UpdateUserGroupsOnUsersAsync(requestModel.UserGroupIds, requestModel.UserIds);
+        Attempt<UserGroupOperationStatus> result = await _userGroupService.UpdateUserGroupsOnUsersAsync(
+            requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
+            requestModel.UserIds.Select(x => x.Id).ToHashSet());
 
-        return UserGroupOperationStatusResult(status);
+        return result.Success
+            ? Ok()
+            : UserGroupOperationStatusResult(result.Result);
     }
 }

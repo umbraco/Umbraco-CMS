@@ -14,7 +14,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         mapper.Define<IMemberType, MemberTypeResponseModel>((_, _) => new MemberTypeResponseModel(), Map);
         mapper.Define<IMemberType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
         mapper.Define<IMemberEntitySlim, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
-        mapper.Define<IContentEntitySlim, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
+        mapper.Define<IMember, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
     }
 
@@ -49,16 +49,18 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         target.Icon = source.Icon ?? string.Empty;
     }
 
+    // Umbraco.Code.MapAll -Collection
     private void Map(IMemberEntitySlim source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.ContentTypeKey;
         target.Icon = source.ContentTypeIcon ?? string.Empty;
     }
 
-    private void Map(IContentEntitySlim source, MemberTypeReferenceResponseModel target, MapperContext context)
+    // Umbraco.Code.MapAll -Collection
+    private void Map(IMember source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
-        target.Id = source.ContentTypeKey;
-        target.Icon = source.ContentTypeIcon ?? string.Empty;
+        target.Id = source.ContentType.Key;
+        target.Icon = source.ContentType.Icon ?? string.Empty;
     }
 
     // Umbraco.Code.MapAll -Collection

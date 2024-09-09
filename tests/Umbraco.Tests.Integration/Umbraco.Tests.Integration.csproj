@@ -139,8 +139,71 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Get.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.GetPagedByContentTypeKey.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Move.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Update.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetMediaTypesForFileExtension.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetFolderMediaTypes.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Copy.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Create.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Delete.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.DeleteFromRecycleBin.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Move.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Rebuild.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Restore.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Update.cs">
+      <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Create.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Delete.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.DeleteFromRecycleBin.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Move.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Rebuild.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Restore.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
+      <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 

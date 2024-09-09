@@ -34,7 +34,6 @@ public sealed class RichTextEditorPastedImages
     private readonly IMediaImportService _mediaImportService;
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IUserService _userService;
-    private readonly ContentSettings _contentSettings;
 
     [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     public RichTextEditorPastedImages(
@@ -81,7 +80,7 @@ public sealed class RichTextEditorPastedImages
         IMediaImportService mediaImportService,
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings)
-        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService, imageUrlGenerator, contentSettings)
+        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService, imageUrlGenerator)
     {
     }
 
@@ -91,8 +90,7 @@ public sealed class RichTextEditorPastedImages
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
         IMediaImportService mediaImportService,
-        IImageUrlGenerator imageUrlGenerator,
-        IOptions<ContentSettings> contentSettings)
+        IImageUrlGenerator imageUrlGenerator)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -101,25 +99,10 @@ public sealed class RichTextEditorPastedImages
         _scopeProvider = scopeProvider;
         _mediaImportService = mediaImportService;
         _imageUrlGenerator = imageUrlGenerator;
-        _contentSettings = contentSettings.Value;
 
         // this obviously is not correct. however, we only use IUserService in an obsolete method,
         // so this is better than having even more obsolete constructors for V16
         _userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
-    }
-
-    /// <summary>
-    ///     Used by the RTE (and grid RTE) for converting inline base64 images to Media items.
-    /// </summary>
-    /// <param name="html">HTML from the Rich Text Editor property editor.</param>
-    /// <param name="mediaParentFolder"></param>
-    /// <param name="userId"></param>
-    /// <returns>Formatted HTML.</returns>
-    /// <exception cref="NotSupportedException">Thrown if image extension is not allowed</exception>
-    internal string FindAndPersistEmbeddedImages(string html, Guid mediaParentFolder, Guid userId)
-    {
-        // FIXME: the FindAndPersistEmbeddedImages implementation from #14546 must be ported to V14 and added here
-        return html;
     }
 
     [Obsolete($"Please use {nameof(FindAndPersistPastedTempImagesAsync)}. Will be removed in V16.")]
@@ -179,7 +162,7 @@ public sealed class RichTextEditorPastedImages
                 {
                     using Stream fileStream = temporaryFile.OpenReadStream();
                     Guid? parentFolderKey = mediaParentFolder == Guid.Empty ? Constants.System.RootKey : mediaParentFolder;
-                    IMedia mediaFile = await _mediaImportService.ImportAsync(temporaryFile.FileName, fileStream, parentFolderKey, Constants.Conventions.MediaTypes.Image, userKey);
+                    IMedia mediaFile = await _mediaImportService.ImportAsync(temporaryFile.FileName, fileStream, parentFolderKey, MediaTypeAlias(temporaryFile.FileName), userKey);
                     udi = mediaFile.GetUdi();
                 }
                 else
@@ -230,4 +213,9 @@ public sealed class RichTextEditorPastedImages
 
         return htmlDoc.DocumentNode.OuterHtml;
     }
+
+    private string MediaTypeAlias(string fileName)
+        => fileName.InvariantEndsWith(".svg")
+            ? Constants.Conventions.MediaTypes.VectorGraphicsAlias
+            : Constants.Conventions.MediaTypes.Image;
 }

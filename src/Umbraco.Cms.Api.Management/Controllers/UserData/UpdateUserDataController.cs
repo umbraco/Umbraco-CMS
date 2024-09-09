@@ -33,7 +33,7 @@ public class UpdateUserDataController : UserDataControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CancellationToken cancellationToken, UpdateUserDataRequestModel model)
+    public async Task<IActionResult> Update(CancellationToken cancellationToken, UpdateUserDataRequestModel model)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
@@ -43,7 +43,7 @@ public class UpdateUserDataController : UserDataControllerBase
         Attempt<IUserData, UserDataOperationStatus> attempt = await _userDataService.UpdateAsync(userData);
 
         return attempt.Success
-            ? Ok(attempt.Result)
+            ? Ok()
             : UserDataOperationStatusResult(attempt.Status);
     }
 }

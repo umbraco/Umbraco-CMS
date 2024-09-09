@@ -82,7 +82,7 @@ public sealed class AuditNotificationsHandler :
         get
         {
             IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            IUser? user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
+            IUser? user = identity == null ? null : _userService.GetAsync(identity.Key).GetAwaiter().GetResult();
             return user ?? UnknownUser(_globalSettings);
         }
     }

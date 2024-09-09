@@ -30,7 +30,6 @@ public class GlobalSettings
     internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
     internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
     internal const string StaticDistributedLockingWriteLockDefaultTimeout = "00:00:05";
-    internal const bool StaticSanitizeTinyMce = false;
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
     private const bool StaticForceCombineUrlPathLeftToRight = true;
     private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
@@ -193,12 +192,6 @@ public class GlobalSettings
     ///     Gets a value indicating whether there is a physical pickup directory configured.
     /// </summary>
     public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether TinyMCE scripting sanitization should be applied.
-    /// </summary>
-    [DefaultValue(StaticSanitizeTinyMce)]
-    public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
     /// <summary>
     ///     Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed read lock.

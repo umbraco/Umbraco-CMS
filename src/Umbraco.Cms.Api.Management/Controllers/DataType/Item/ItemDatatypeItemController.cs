@@ -23,10 +23,15 @@ public class ItemDatatypeItemController : DatatypeItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<DataTypeItemResponseModel>());
+        }
+
         var dataTypes = new List<IDataType>();
         foreach (Guid id in ids)
         {

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -73,16 +72,9 @@ public class SliderPropertyEditor : DataEditor
         }
 
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
-        {
-            // FIXME: do not rely explicitly on concrete JSON implementation here - consider creating an object deserialization method on IJsonSerializer (see also MultiUrlPickerValueEditor)
-            if (editorValue.Value is not JsonNode jsonNode)
-            {
-                return null;
-            }
-
-            SliderRange? range = _jsonSerializer.Deserialize<SliderRange>(jsonNode.ToJsonString());
-            return range?.ToString();
-        }
+            => editorValue.Value is not null && _jsonSerializer.TryDeserialize(editorValue.Value, out SliderRange? sliderRange)
+                ? sliderRange.ToString()
+                : null;
 
         internal class SliderRange
         {

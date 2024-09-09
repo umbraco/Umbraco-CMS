@@ -1,4 +1,3 @@
-@using System.Globalization
 @using Microsoft.Extensions.Options;
 @using Umbraco.Cms.Api.Management.Extensions
 @using Umbraco.Cms.Api.Management.Security
@@ -10,6 +9,7 @@
 @using Umbraco.Cms.Core.Serialization
 @using Umbraco.Cms.Web.Common.Hosting
 @using Umbraco.Extensions
+@inject IOptions<GlobalSettings> GlobalSettings
 @inject IOptions<ContentSettings> ContentSettings
 @inject IOptions<SecuritySettings> SecuritySettings
 @inject IEmailSender EmailSender
@@ -30,10 +30,9 @@
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
 }
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
-<html lang="@CultureInfo.CurrentCulture.Name.ToLowerInvariant()">
+<html lang="@GlobalSettings.Value.DefaultUILanguage">
 <head>
     <meta charset="UTF-8"/>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
@@ -44,8 +43,7 @@
     <meta name="pinterest" content="nopin"/>
     <title>Umbraco</title>
 
-    <link rel="stylesheet" href="~/umbraco/login/user-defined.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" />
     <style>
       body {
         margin: 0;
@@ -55,7 +53,7 @@
     </style>
 
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService)
-    <script type="module" src="~/umbraco/login/login.js" asp-append-version="true"></script>
+    <script type="module" src="~/umbraco/login/login.js"></script>
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">

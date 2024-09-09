@@ -28,13 +28,19 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
 
     public IWebhook CreateWebhook(CreateWebhookRequestModel webhookRequestModel)
     {
-        var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers);
+        var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers)
+        {
+            Key = webhookRequestModel.Id ?? Guid.NewGuid(),
+        };
         return target;
     }
 
-    public IWebhook CreateWebhook(UpdateWebhookRequestModel webhookRequestModel)
+    public IWebhook CreateWebhook(UpdateWebhookRequestModel webhookRequestModel, Guid existingWebhookkey)
     {
-        var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers);
+        var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers)
+        {
+            Key = existingWebhookkey,
+        };
         return target;
     }
 

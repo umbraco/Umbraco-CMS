@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 
@@ -18,6 +20,8 @@ public class BackOfficeLoginModel
     /// The configured Umbraco directory.
     /// </summary>
     public string? UmbracoUrl { get; set; }
+
+    public bool UserIsAlreadyLoggedIn { get; set; }
 }
 
 [ApiExplorerSettings(IgnoreApi = true)]
@@ -37,8 +41,14 @@ public class BackOfficeLoginController : Controller
     }
 
     // GET
-    public IActionResult Index(CancellationToken cancellationToken, BackOfficeLoginModel model)
+    public async Task<IActionResult> Index(CancellationToken cancellationToken, BackOfficeLoginModel model)
     {
+        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        if (cookieAuthResult.Succeeded)
+        {
+            model.UserIsAlreadyLoggedIn = true;
+        }
+
         if (string.IsNullOrEmpty(model.UmbracoUrl))
         {
             model.UmbracoUrl = _hostingEnvironment.GetBackOfficePath();
@@ -47,6 +57,11 @@ public class BackOfficeLoginController : Controller
         if (string.IsNullOrEmpty(model.ReturnUrl))
         {
             model.ReturnUrl = model.UmbracoUrl;
+        }
+
+        if ( Uri.TryCreate(model.ReturnUrl, UriKind.Relative, out _) is false) // Needs to test for relative and not absolute, as /whatever/ is an absolute path on linux
+        {
+            return BadRequest("ReturnUrl must be a relative path.");
         }
 
         return View("/umbraco/UmbracoLogin/Index.cshtml", model);

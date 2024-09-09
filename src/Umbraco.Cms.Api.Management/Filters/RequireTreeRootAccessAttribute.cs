@@ -16,10 +16,6 @@ public abstract class RequireTreeRootAccessAttribute : ActionFilterAttribute
         IUser? user = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
         var startNodeIds = user != null ? GetUserStartNodeIds(user, context) : Array.Empty<int>();
-
-        // TODO: remove this once we have backoffice auth in place
-        startNodeIds = new[] { Constants.System.Root };
-
         if (startNodeIds.Contains(Constants.System.Root))
         {
             return;
@@ -27,13 +23,13 @@ public abstract class RequireTreeRootAccessAttribute : ActionFilterAttribute
 
         var problemDetails = new ProblemDetails
         {
-            Title = "Unauthorized user",
+            Title = "Forbidden",
             Detail = "The current backoffice user should have access to the tree root",
-            Status = StatusCodes.Status401Unauthorized,
+            Status = StatusCodes.Status403Forbidden,
             Type = "Error",
         };
 
-        context.Result = new ObjectResult(problemDetails) { StatusCode = StatusCodes.Status401Unauthorized };
+        context.Result = new ObjectResult(problemDetails) { StatusCode = problemDetails.Status };
     }
 
     protected abstract int[] GetUserStartNodeIds(IUser user, ActionExecutingContext context);

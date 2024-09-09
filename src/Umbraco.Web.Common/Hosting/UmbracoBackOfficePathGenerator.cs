@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -17,11 +15,6 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
         BackOfficePath = hostingEnvironment.GetBackOfficePath();
         BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion);
     }
-
-    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
-    public UmbracoBackOfficePathGenerator(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IOptions<GlobalSettings> globalSettings)
-        : this(hostingEnvironment, umbracoVersion)
-    { }
 
     /// <inheritdoc />
     public string BackOfficePath { get; }

@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Member;
 
@@ -19,11 +20,13 @@ public class MemberResponseModel : ContentResponseModelBase<MemberValueModel, Me
 
     public int FailedPasswordAttempts { get; set; }
 
-    public DateTime? LastLoginDate { get; set; }
+    public DateTimeOffset? LastLoginDate { get; set; }
 
-    public DateTime? LastLockoutDate { get; set; }
+    public DateTimeOffset? LastLockoutDate { get; set; }
 
-    public DateTime? LastPasswordChangeDate { get; set; }
+    public DateTimeOffset? LastPasswordChangeDate { get; set; }
 
-    public IEnumerable<string> Groups { get; set; } = [];
+    public IEnumerable<Guid> Groups { get; set; } = [];
+
+    public MemberKind Kind { get; set; }
 }

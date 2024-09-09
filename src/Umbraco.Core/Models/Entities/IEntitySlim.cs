@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.Models.Entities;
 /// <summary>
 ///     Represents a lightweight entity, managed by the entity service.
 /// </summary>
-public interface IEntitySlim : IUmbracoEntity, IHaveAdditionalData
+public interface IEntitySlim : IUmbracoEntity
 {
     /// <summary>
     ///     Gets or sets the entity object type.

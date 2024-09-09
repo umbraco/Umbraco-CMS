@@ -16,7 +16,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
   allowPasswordReset = false;
 
   @state()
-  private _loginState: UUIButtonState = undefined;
+  private _loginState?: UUIButtonState;
 
   @state()
   private _loginError = '';
@@ -42,6 +42,12 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
     if (!this.#formElement) return;
 
+    // We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
+    this.#formElement.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.#onSubmitClick();
+      }
+    });
     this.#formElement.onsubmit = this.#handleSubmit;
   }
 
@@ -53,13 +59,17 @@ export default class UmbLoginPageElement extends UmbLitElement {
     const form = e.target as HTMLFormElement;
     if (!form) return;
 
-    if (!form.checkValidity()) return;
-
     const formData = new FormData(form);
 
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     const persist = formData.has('persist');
+
+    if (!username || !password) {
+      this._loginError = this.localize.term('auth_userFailedLogin');
+      this._loginState = 'failed';
+      return;
+    }
 
     this._loginState = 'waiting';
 
@@ -87,7 +97,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
     }
 
     if (response.error) {
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true}));
       return;
     }
 
@@ -96,8 +105,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
     if (returnPath) {
       location.href = returnPath;
     }
-
-    this.dispatchEvent(new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data}));
   };
 
   get #greetingLocalizationKey() {

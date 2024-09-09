@@ -24,6 +24,7 @@ public static partial class UmbracoBuilderExtensions
         .AddConfiguration()
         .AddUmbracoCore()
         .AddWebComponents()
+        .AddHelpers()
         .AddBackOfficeCore()
         .AddBackOfficeIdentity()
         .AddBackOfficeAuthentication()

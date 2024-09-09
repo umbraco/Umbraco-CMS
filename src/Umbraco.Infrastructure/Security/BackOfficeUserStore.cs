@@ -141,6 +141,7 @@ public class BackOfficeUserStore :
             StartMediaIds = user.StartMediaIds ?? new int[] { },
             IsLockedOut = user.IsLockedOut,
             Key = user.Key,
+            Kind = user.Kind
         };
 
 
@@ -157,8 +158,9 @@ public class BackOfficeUserStore :
             throw new DataException("Could not create the user, check logs for details");
         }
 
-        // re-assign id
+        // re-assign id and key
         user.Id = UserIdToString(userEntity.Id);
+        user.Key = userEntity.Key;
 
         if (isLoginsPropertyDirty)
         {
@@ -269,13 +271,14 @@ public class BackOfficeUserStore :
 
     public Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids)
     {
-        if (ids?.Length <= 0)
+        if (ids is null || ids.Length <= 0)
         {
             return Task.FromResult(Enumerable.Empty<IUser>());
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IUser> users = _userRepository.GetMany(ids);
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => ids.Contains(x.Id));
+        IEnumerable<IUser> users = _userRepository.Get(query);
 
         return Task.FromResult(users);
     }
@@ -288,8 +291,7 @@ public class BackOfficeUserStore :
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => keys.Contains(x.Key));
-        IEnumerable<IUser> users = _userRepository.Get(query);
+        IEnumerable<IUser> users = _userRepository.GetMany(keys);
 
         return Task.FromResult(users);
     }
@@ -298,8 +300,7 @@ public class BackOfficeUserStore :
     public Task<IUser?> GetAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Key == key);
-        return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
+        return Task.FromResult(_userRepository.Get(key));
     }
 
     /// <inheritdoc />

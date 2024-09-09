@@ -44,12 +44,20 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
             };
         }
 
+        // Assuming if and endpoint have more then one AuthorizeAttribute, there is a risk the user do not have access while still being authorized.
+        // The two is the simple two on ManagementApiControllerBase that just requires access to backoffice and feature flags
+        var numberOfAuthorizeAttributes =
+            context.MethodInfo.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute)
+            + context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute);
 
-        // If method/controller has an explicit AuthorizeAttribute or the controller ctor injects IAuthorizationService, then we know Forbid result is possible.
-        if (context.MethodInfo.GetCustomAttributes(false).Any(x => x is AuthorizeAttribute
-                                                                   || context.MethodInfo.DeclaringType?.GetConstructors().Any(x => x.GetParameters().Any(x => x.ParameterType == typeof(IAuthorizationService))) is true))
+
+        var hasConstructorInjectingIAuthorizationService = context.MethodInfo.DeclaringType?.GetConstructors()
+            .Any(ctor =>
+                ctor.GetParameters().Any(parameter => parameter.GetType() == typeof(IAuthorizationService))) ?? false;
+
+        if (numberOfAuthorizeAttributes > 2 || hasConstructorInjectingIAuthorizationService)
         {
-            operation.Responses.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse
+            operation.Responses.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse()
             {
                 Description = "The authenticated user do not have access to this resource"
             });

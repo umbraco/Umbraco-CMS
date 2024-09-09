@@ -1,12 +1,13 @@
 import {
   UmbBundleExtensionInitializer,
-  UmbEntryPointExtensionInitializer,
   UmbServerExtensionRegistrator
 } from "@umbraco-cms/backoffice/extension-api";
-import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
+import {
+  UmbAppEntryPointExtensionInitializer,
+  umbExtensionsRegistry
+} from "@umbraco-cms/backoffice/extension-registry";
 import type { UmbElement } from "@umbraco-cms/backoffice/element-api";
 import { UmbControllerBase } from "@umbraco-cms/backoffice/class-api";
-import { UmbIconRegistry } from "@umbraco-cms/backoffice/icon";
 import { UUIIconRegistryEssential } from "@umbraco-cms/backoffice/external/uui";
 
 // We import what we need from the Backoffice app.
@@ -18,16 +19,14 @@ import '@umbraco-cms/backoffice/localization';
  * It is responsible for initializing the backoffice and only the extensions that is needed to run the login screen.
  */
 export class UmbSlimBackofficeController extends UmbControllerBase {
-  #umbIconRegistry = new UmbIconRegistry();
   #uuiIconRegistry = new UUIIconRegistryEssential();
 
   constructor(host: UmbElement) {
     super(host);
     new UmbBundleExtensionInitializer(host, umbExtensionsRegistry);
-    new UmbEntryPointExtensionInitializer(host, umbExtensionsRegistry);
+    new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
     new UmbServerExtensionRegistrator(host, umbExtensionsRegistry).registerPublicExtensions();
 
-    this.#umbIconRegistry.attach(host);
     this.#uuiIconRegistry.attach(host);
 
     host.classList.add('uui-text');

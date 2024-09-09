@@ -31,8 +31,6 @@ public class MemberGroupTests
         Assert.AreNotSame(clone, group);
         Assert.AreEqual(clone, group);
         Assert.AreEqual(clone.Id, group.Id);
-        Assert.AreEqual(clone.AdditionalData, group.AdditionalData);
-        Assert.AreEqual(clone.AdditionalData.Count, group.AdditionalData.Count);
         Assert.AreEqual(clone.CreateDate, group.CreateDate);
         Assert.AreEqual(clone.CreatorId, group.CreatorId);
         Assert.AreEqual(clone.Key, group.Key);
@@ -64,9 +62,5 @@ public class MemberGroupTests
             .WithCreatorId(4)
             .WithCreateDate(DateTime.Now)
             .WithUpdateDate(DateTime.Now)
-            .AddAdditionalData()
-            .WithKeyValue("test1", 123)
-            .WithKeyValue("test2", "hello")
-            .Done()
             .Build();
 }

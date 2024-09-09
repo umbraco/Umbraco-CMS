@@ -18,6 +18,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
     private readonly ILogger<MemberEditingService> _logger;
+    private readonly IMemberGroupService _memberGroupService;
 
     public MemberEditingService(
         IMemberService memberService,
@@ -26,7 +27,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         IMemberManager memberManager,
         ITwoFactorLoginService twoFactorLoginService,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
-        ILogger<MemberEditingService> logger)
+        ILogger<MemberEditingService> logger,
+        IMemberGroupService memberGroupService)
     {
         _memberService = memberService;
         _memberTypeService = memberTypeService;
@@ -35,6 +37,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         _twoFactorLoginService = twoFactorLoginService;
         _passwordChanger = passwordChanger;
         _logger = logger;
+        _memberGroupService = memberGroupService;
     }
 
     public async Task<IMember?> GetAsync(Guid key)
@@ -246,8 +249,20 @@ internal sealed class MemberEditingService : IMemberEditingService
         return MemberEditingOperationStatus.Success;
     }
 
-    private async Task<bool> UpdateRoles(IEnumerable<string>? roles, MemberIdentityUser identityMember)
+    private async Task<bool> UpdateRoles(IEnumerable<Guid>? roles, MemberIdentityUser identityMember)
     {
+        // We have to convert the GUIDS to names here, as roles on a member are stored by name, not key.
+        var memberGroups = new List<IMemberGroup>();
+        foreach (Guid key in roles ?? Enumerable.Empty<Guid>())
+        {
+
+            IMemberGroup? group = await _memberGroupService.GetAsync(key);
+            if (group is not null)
+            {
+                memberGroups.Add(group);
+            }
+        }
+
         // We're gonna look up the current roles now because the below code can cause
         // events to be raised and developers could be manually adding roles to members in
         // their handlers. If we don't look this up now there's a chance we'll just end up
@@ -255,7 +270,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         IEnumerable<string> currentRoles = (await _memberManager.GetRolesAsync(identityMember)).ToList();
 
         // find the ones to remove and remove them
-        var rolesToRemove = currentRoles.Except(roles ?? Enumerable.Empty<string>()).ToArray();
+        IEnumerable<string> memberGroupNames = memberGroups.Select(x => x.Name).WhereNotNull().ToArray();
+        var rolesToRemove = currentRoles.Except(memberGroupNames).ToArray();
 
         // Now let's do the role provider stuff - now that we've saved the content item (that is important since
         // if we are changing the username, it must be persisted before looking up the member roles).
@@ -270,8 +286,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         }
 
         // find the ones to add and add them
-        var rolesToAdd = roles?.Except(currentRoles).ToArray();
-        if (rolesToAdd?.Any() is true)
+        var rolesToAdd = memberGroupNames.Except(currentRoles).ToArray();
+        if (rolesToAdd.Any())
         {
             // add the ones submitted
             IdentityResult identityResult = await _memberManager.AddToRolesAsync(identityMember, rolesToAdd);
@@ -312,6 +328,9 @@ internal sealed class MemberEditingService : IMemberEditingService
                     break;
                 case nameof(IdentityErrorDescriber.DuplicateEmail):
                     createStatus = MemberEditingOperationStatus.DuplicateEmail;
+                    break;
+                case MemberUserStore.CancelledIdentityErrorCode:
+                    createStatus = MemberEditingOperationStatus.CancelledByNotificationHandler;
                     break;
             }
 

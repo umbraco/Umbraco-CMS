@@ -1,11 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
 /// <inheritdoc />
-public sealed class SystemTextJsonSerializer : IJsonSerializer
+public sealed class SystemTextJsonSerializer : SystemTextJsonSerializerBase
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
@@ -21,14 +20,10 @@ public sealed class SystemTextJsonSerializer : IJsonSerializer
                 new JsonStringEnumConverter(),
                 new JsonUdiConverter(),
                 new JsonUdiRangeConverter(),
-                // We may need to add JsonObjectConverter at some point, but for the time being things work fine without
-                //new JsonObjectConverter()
+                new JsonObjectConverter(), // Required for block editor values
+                new JsonBlockValueConverter()
             }
         };
 
-    /// <inheritdoc />
-    public string Serialize(object? input) => JsonSerializer.Serialize(input, _jsonSerializerOptions);
-
-    /// <inheritdoc />
-    public T? Deserialize<T>(string input) => JsonSerializer.Deserialize<T>(input, _jsonSerializerOptions);
+    protected override JsonSerializerOptions JsonSerializerOptions => _jsonSerializerOptions;
 }

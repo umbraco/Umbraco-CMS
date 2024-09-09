@@ -26,6 +26,7 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
 
     protected override void Migrate()
     {
+        InvalidateBackofficeUserAccess = true;
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
@@ -33,11 +34,13 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateSqlServer();
+            Context.Complete();
             scope.Complete();
             return;
         }
 
         MigrateSqlite();
+        Context.Complete();
         scope.Complete();
     }
 
@@ -47,7 +50,11 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
 
         var nodeDtoTrashedIndex = $"IX_umbracoUser_userKey";
-        CreateIndex<UserDto>(nodeDtoTrashedIndex);
+        if (IndexExists(nodeDtoTrashedIndex) is false)
+        {
+            CreateIndex<UserDto>(nodeDtoTrashedIndex);
+        }
+
 
         List<NewUserDto>? userDtos = Database.Fetch<NewUserDto>();
         if (userDtos is null)

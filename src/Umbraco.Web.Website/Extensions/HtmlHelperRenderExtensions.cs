@@ -87,7 +87,7 @@ public static class HtmlHelperRenderExtensions
                     contentSettings.PreviewBadge,
                     hostingEnvironment.GetBackOfficePath(),
                     WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                    umbracoContext.PublishedRequest?.PublishedContent?.Id);
+                    umbracoContext.PublishedRequest?.PublishedContent?.Key);
             return new HtmlString(htmlBadge);
         }
 
