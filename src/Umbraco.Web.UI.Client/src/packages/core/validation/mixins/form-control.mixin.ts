@@ -165,6 +165,9 @@ export function UmbFormControlMixin<
 			this._internals = this.attachInternals();
 
 			this.addEventListener('blur', () => {
+				/*if (e.composedPath().some((x) => x === this)) {
+					return;
+				}*/
 				this.pristine = false;
 				this.checkValidity();
 			});

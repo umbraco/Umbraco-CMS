@@ -10,7 +10,7 @@ import { UmbClassState, UmbObjectState, UmbStringState } from '@umbraco-cms/back
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
+import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
@@ -60,6 +60,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
 
+	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
@@ -91,6 +93,25 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.variantId, (variantId) => {
 				this.#variantId.setValue(variantId);
+			});
+
+			// If the current property is readonly all inner block content should also be readonly.
+			this.observe(context.isReadOnly, (isReadOnly) => {
+				const unique = 'UMB_PROPERTY_CONTEXT';
+				const variantId = this.#variantId.getValue();
+				if (variantId === undefined) return;
+
+				if (isReadOnly) {
+					const state = {
+						unique,
+						variantId,
+						message: '',
+					};
+
+					this.readOnlyState?.addState(state);
+				} else {
+					this.readOnlyState?.removeState(unique);
+				}
 			});
 		});
 
