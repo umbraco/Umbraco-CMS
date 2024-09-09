@@ -62,7 +62,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 			return html`
 				<uui-table-row>
 					<uui-table-cell>${serverKeyValue.name}</uui-table-cell>
-					<uui-table-cell>${serverKeyValue.data}</uui-table-cell>
+					<uui-table-cell class="data-cell">${serverKeyValue.data}</uui-table-cell>
 				</uui-table-row>
 			`;
 		});
@@ -143,6 +143,10 @@ ${serverKeyValues}`;
 				width: 100%;
 				max-height: 300px;
 				overflow: auto;
+			}
+
+			.data-cell {
+				word-break: break-word;
 			}
 		`,
 	];
