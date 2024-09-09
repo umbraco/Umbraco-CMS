@@ -188,7 +188,7 @@ internal abstract class ContentNavigationServiceBase
             _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey) :
             _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
 
-        _navigationStructure = NavigationFactory.BuildNavigationDictionary(navigationModels);
+        NavigationFactory.BuildNavigationDictionary(_navigationStructure, navigationModels);
     }
 
     private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
