@@ -19,7 +19,6 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { type ManifestFileUploadPreview, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
@@ -70,14 +69,12 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#manager = new UmbTemporaryFileManager(this);
 
-	#previewers = new UmbArrayState(<Array<ManifestFileUploadPreview>>[], (x) => x.alias);
+	#previewers: Array<ManifestFileUploadPreview> = [];
 
 	constructor() {
 		super();
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (previews) => {
-			previews.forEach((preview) => {
-				this.#previewers.appendOne(preview.manifest);
-			});
+			this.#previewers = previews.map((preview) => preview.manifest);
 		});
 	}
 
@@ -91,25 +88,29 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#getPreviewElementAlias() {
-		const previews = this.#previewers.getValue();
-		const fallbackAlias = previews.find((preview) => preview.forMimeTypes.includes('*/*'))?.alias;
+		const fallbackAlias = this.#previewers.find((preview) => preview.forMimeTypes.includes('*/*'))?.alias;
 
 		const mimeType = this.#getMimeTypeFromPath(this._src);
 		if (!mimeType) return fallbackAlias;
 
-		const manifest = previews.find((preview) => {
-			return preview.forMimeTypes?.find((type) => {
-				if (mimeType === type) preview.alias;
+		// Check for an exact match
+		const exactMatch = this.#previewers.find((preview) => {
+			return preview.forMimeTypes.find((type) => type === mimeType);
+		});
+		if (exactMatch) return exactMatch.alias;
 
+		// Check for wildcard match (e.g. image/*)
+		const wildcardMatch = this.#previewers.find((preview) => {
+			return preview.forMimeTypes.find((type) => {
 				const snippet = type.replace(/\*/g, '');
-
 				if (mimeType.startsWith(snippet)) return preview.alias;
 				if (mimeType.endsWith(snippet)) return preview.alias;
 				return undefined;
 			});
 		});
+		if (wildcardMatch) return wildcardMatch.alias;
 
-		if (manifest) return manifest.alias;
+		// Use fallbackAlias.
 		return fallbackAlias;
 	}
 
