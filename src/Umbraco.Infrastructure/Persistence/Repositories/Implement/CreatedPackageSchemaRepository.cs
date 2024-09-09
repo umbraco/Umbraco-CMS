@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,12 +25,14 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IScopeAccessor _scopeAccessor;
+    private readonly ITemplateService _templateService;
+    private readonly IDictionaryItemService _dictionaryItemService;
+    private readonly ILanguageService _languageService;
     private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
     private readonly IFileService _fileService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly ILocalizationService _localizationService;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
@@ -44,13 +44,10 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     ///     Initializes a new instance of the <see cref="CreatedPackageSchemaRepository" /> class.
     /// </summary>
     public CreatedPackageSchemaRepository(
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IHostingEnvironment hostingEnvironment,
-        IOptions<GlobalSettings> globalSettings,
         FileSystems fileSystems,
         IEntityXmlSerializer serializer,
         IDataTypeService dataTypeService,
-        ILocalizationService localizationService,
         IFileService fileService,
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
@@ -58,6 +55,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         MediaFileManager mediaFileManager,
         IContentTypeService contentTypeService,
         IScopeAccessor scopeAccessor,
+        ITemplateService templateService,
+        IDictionaryItemService dictionaryItemService,
+        ILanguageService languageService,
         string? mediaFolderPath = null,
         string? tempFolderPath = null)
     {
@@ -65,7 +65,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _fileSystems = fileSystems;
         _serializer = serializer;
         _dataTypeService = dataTypeService;
-        _localizationService = localizationService;
         _fileService = fileService;
         _mediaService = mediaService;
         _mediaTypeService = mediaTypeService;
@@ -73,6 +72,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _mediaFileManager = mediaFileManager;
         _contentTypeService = contentTypeService;
         _scopeAccessor = scopeAccessor;
+        _templateService = templateService;
+        _dictionaryItemService = dictionaryItemService;
+        _languageService = languageService;
         _xmlParser = new PackageDefinitionXmlParser();
         _createdPackagesFolderPath = mediaFolderPath ?? Constants.SystemDirectories.CreatedPackages;
         _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData + "/PackageFiles";
@@ -93,25 +95,63 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         IContentService contentService,
         MediaFileManager mediaFileManager,
         IContentTypeService contentTypeService,
+        IScopeAccessor scopeAccessor,
         string? mediaFolderPath = null,
         string? tempFolderPath = null)
-    : this(
-        umbracoDatabaseFactory,
-        hostingEnvironment,
-        globalSettings,
-        fileSystems,
-        serializer,
-        dataTypeService,
-        localizationService,
-        fileService,
-        mediaService,
-        mediaTypeService,
-        contentService,
-        mediaFileManager,
-        contentTypeService,
-        StaticServiceProvider.Instance.GetRequiredService<IScopeAccessor>(),
-        mediaFolderPath,
-        tempFolderPath)
+        : this(
+            hostingEnvironment,
+            fileSystems,
+            serializer,
+            dataTypeService,
+            fileService,
+            mediaService,
+            mediaTypeService,
+            contentService,
+            mediaFileManager,
+            contentTypeService,
+            scopeAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDictionaryItemService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            mediaFolderPath,
+            tempFolderPath)
+    {
+    }
+
+    [Obsolete("use ctor with all dependencies instead")]
+    public CreatedPackageSchemaRepository(
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IHostingEnvironment hostingEnvironment,
+        IOptions<GlobalSettings> globalSettings,
+        FileSystems fileSystems,
+        IEntityXmlSerializer serializer,
+        IDataTypeService dataTypeService,
+        ILocalizationService localizationService,
+        IFileService fileService,
+        IMediaService mediaService,
+        IMediaTypeService mediaTypeService,
+        IContentService contentService,
+        MediaFileManager mediaFileManager,
+        IContentTypeService contentTypeService,
+        string? mediaFolderPath = null,
+        string? tempFolderPath = null)
+        : this(
+            umbracoDatabaseFactory,
+            hostingEnvironment,
+            globalSettings,
+            fileSystems,
+            serializer,
+            dataTypeService,
+            localizationService,
+            fileService,
+            mediaService,
+            mediaTypeService,
+            contentService,
+            mediaFileManager,
+            contentTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IScopeAccessor>(),
+            mediaFolderPath,
+            tempFolderPath)
     {
     }
 
@@ -404,15 +444,15 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private void PackageDataTypes(PackageDefinition definition, XContainer root)
     {
         var dataTypes = new XElement("DataTypes");
-        foreach (var dtId in definition.DataTypes)
+        foreach (var dataTypeId in definition.DataTypes)
         {
-            if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            if (Guid.TryParse(dataTypeId, out Guid dataTypeKey) is false)
             {
                 continue;
             }
 
-            IDataType? dataType = _dataTypeService.GetDataType(outInt);
-            if (dataType == null)
+            IDataType? dataType = _dataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult();
+            if (dataType is null)
             {
                 continue;
             }
@@ -426,14 +466,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private void PackageLanguages(PackageDefinition definition, XContainer root)
     {
         var languages = new XElement("Languages");
-        foreach (var langId in definition.Languages)
+        foreach (var isoCode in definition.Languages)
         {
-            if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
-            {
-                continue;
-            }
-
-            ILanguage? lang = _localizationService.GetLanguageById(outInt);
+            ILanguage? lang = _languageService.GetAsync(isoCode).GetAwaiter().GetResult();
             if (lang == null)
             {
                 continue;
@@ -452,19 +487,19 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
         foreach (var dictionaryId in definition.DictionaryItems)
         {
-            if (!int.TryParse(dictionaryId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            if (Guid.TryParse(dictionaryId, out Guid dictionaryKey) is false)
             {
                 continue;
             }
 
-            IDictionaryItem? di = _localizationService.GetDictionaryItemById(outInt);
+            IDictionaryItem? dictionaryItem = _dictionaryItemService.GetAsync(dictionaryKey).GetAwaiter().GetResult();
 
-            if (di == null)
+            if (dictionaryItem is null)
             {
                 continue;
             }
 
-            items[di.Key] = (di, _serializer.Serialize(di, false));
+            items[dictionaryItem.Key] = (dictionaryItem, _serializer.Serialize(dictionaryItem, false));
         }
 
         // organize them in hierarchy ...
@@ -584,12 +619,12 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         var templatesXml = new XElement("Templates");
         foreach (var templateId in definition.Templates)
         {
-            if (!int.TryParse(templateId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            if (Guid.TryParse(templateId, out Guid templateKey) is false)
             {
                 continue;
             }
 
-            ITemplate? template = _fileService.GetTemplate(outInt);
+            ITemplate? template = _templateService.GetAsync(templateKey).GetAwaiter().GetResult();
             if (template == null)
             {
                 continue;
@@ -605,15 +640,15 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     {
         var contentTypes = new HashSet<IContentType>();
         var docTypesXml = new XElement("DocumentTypes");
-        foreach (var dtId in definition.DocumentTypes)
+        foreach (var documentTypeIdentifierString in definition.DocumentTypes)
         {
-            if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            if (Guid.TryParse(documentTypeIdentifierString, out Guid documentTypeKey) is false)
             {
                 continue;
             }
 
-            IContentType? contentType = _contentTypeService.Get(outInt);
-            if (contentType == null)
+            IContentType? contentType = _contentTypeService.Get(documentTypeKey);
+            if (contentType is null)
             {
                 continue;
             }
@@ -635,12 +670,12 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         var mediaTypesXml = new XElement("MediaTypes");
         foreach (var mediaTypeId in definition.MediaTypes)
         {
-            if (!int.TryParse(mediaTypeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            if (Guid.TryParse(mediaTypeId, out Guid mediaTypeKey) is false)
             {
                 continue;
             }
 
-            IMediaType? mediaType = _mediaTypeService.Get(outInt);
+            IMediaType? mediaType = _mediaTypeService.Get(mediaTypeKey);
             if (mediaType == null)
             {
                 continue;
@@ -660,33 +695,34 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
     {
         // Documents and tags
-        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(
-                definition.ContentNodeId,
-                NumberStyles.Integer,
-                CultureInfo.InvariantCulture,
-                out var contentNodeId))
+        if (string.IsNullOrWhiteSpace(definition.ContentNodeId))
         {
-            if (contentNodeId > 0)
-            {
-                // load content from umbraco.
-                IContent? content = _contentService.GetById(contentNodeId);
-                if (content != null)
-                {
-                    XElement contentXml = definition.ContentLoadChildNodes
-                        ? content.ToDeepXml(_serializer)
-                        : content.ToXml(_serializer);
-
-                    // Create the Documents/DocumentSet node
-                    root.Add(
-                        new XElement(
-                            "Documents",
-                            new XElement(
-                                "DocumentSet",
-                                new XAttribute("importMode", "root"),
-                                contentXml)));
-                }
-            }
+            return;
         }
+
+        if (Guid.TryParse(definition.ContentNodeId, out Guid contentNodeKey) is false)
+        {
+            return;
+        }
+
+        IContent? content = _contentService.GetById(contentNodeKey);
+        if (content is null)
+        {
+            return;
+        }
+
+        XElement contentXml = definition.ContentLoadChildNodes
+            ? content.ToDeepXml(_serializer)
+            : content.ToXml(_serializer);
+
+        // Create the Documents/DocumentSet node
+        root.Add(
+            new XElement(
+                "Documents",
+                new XElement(
+                    "DocumentSet",
+                    new XAttribute("importMode", "root"),
+                    contentXml)));
     }
 
     private Dictionary<string, Stream> PackageMedia(PackageDefinition definition, XElement root)

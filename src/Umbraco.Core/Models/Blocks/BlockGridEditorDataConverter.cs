@@ -19,7 +19,7 @@ public class BlockGridEditorDataConverter : BlockEditorDataConverter<BlockGridVa
     }
 
     public BlockGridEditorDataConverter(IJsonSerializer jsonSerializer)
-        : base(Constants.PropertyEditors.Aliases.BlockGrid, jsonSerializer)
+        : base(jsonSerializer)
     {
     }
 

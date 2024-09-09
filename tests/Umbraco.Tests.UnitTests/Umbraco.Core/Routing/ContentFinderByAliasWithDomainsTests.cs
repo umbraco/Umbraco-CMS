@@ -31,7 +31,7 @@ public class ContentFinderByAliasWithDomainsTests : UrlRoutingTestBase
         var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
         // must lookup domain
-        publishedRouter.FindDomain(request);
+        publishedRouter.FindAndSetDomain(request);
 
         if (expectedNode > 0)
         {

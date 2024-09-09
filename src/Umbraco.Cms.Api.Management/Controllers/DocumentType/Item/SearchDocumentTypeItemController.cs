@@ -27,7 +27,7 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.DocumentType, query, skip, take);
         if (searchResult.Items.Any() is false)

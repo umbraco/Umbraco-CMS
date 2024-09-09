@@ -30,7 +30,7 @@ internal class PackagePresentationFactory : IPackagePresentationFactory
 
         // Temp Id, PackageId and PackagePath for the newly created package
         packageDefinition.Id = 0;
-        packageDefinition.PackageId = Guid.Empty;
+        packageDefinition.PackageId = createPackageRequestModel.Id ?? Guid.Empty;
         packageDefinition.PackagePath = string.Empty;
 
         return packageDefinition;

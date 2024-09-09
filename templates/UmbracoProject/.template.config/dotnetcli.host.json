@@ -8,10 +8,23 @@
     },
     "UmbracoVersion": {
       "longName": "version",
-      "shortName": "v"
+      "shortName": "v",
+      "isHidden": true
+    },
+    "UmbracoRelease": {
+      "longName": "release",
+      "shortName": "r"
     },
     "UseHttpsRedirect": {
       "longName": "use-https-redirect",
+      "shortName": ""
+    },
+    "UseDeliveryApi": {
+      "longName": "use-delivery-api",
+      "shortName": "da"
+    },
+    "Docker": {
+      "longName": "add-docker",
       "shortName": ""
     },
     "SkipRestore": {
@@ -58,6 +71,18 @@
       "longName": "PackageTestSiteName",
       "shortName": "p",
       "isHidden": true
+    },
+    "ModelsBuilderMode": {
+      "longName": "models-mode",
+      "shortName": "mm"
+    },
+    "StarterKit": {
+      "longName": "starter-kit",
+      "shortName": "sk"
+    },
+    "DevelopmentMode": {
+      "longName": "development-mode",
+      "shortName": "dm"
     }
   },
   "usageExamples": [

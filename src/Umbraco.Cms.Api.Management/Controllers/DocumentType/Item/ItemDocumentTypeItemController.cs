@@ -27,6 +27,11 @@ public class ItemDocumentTypeItemController : DocumentTypeItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<DocumentTypeItemResponseModel>());
+        }
+
         IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll(ids);
         List<DocumentTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IContentType, DocumentTypeItemResponseModel>(contentTypes);
         return await Task.FromResult(Ok(responseModels));

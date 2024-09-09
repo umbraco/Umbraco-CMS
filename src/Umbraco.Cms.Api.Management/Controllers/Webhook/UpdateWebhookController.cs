@@ -2,14 +2,12 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
@@ -19,14 +17,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 public class UpdateWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IWebhookPresentationFactory _webhookPresentationFactory;
+
 
     public UpdateWebhookController(
-        IWebhookService webhookService,
-        IUmbracoMapper umbracoMapper)
+        IWebhookService webhookService, IWebhookPresentationFactory webhookPresentationFactory)
     {
         _webhookService = webhookService;
-        _umbracoMapper = umbracoMapper;
+        _webhookPresentationFactory = webhookPresentationFactory;
     }
 
     [HttpPut("{id:guid}")]
@@ -45,7 +43,7 @@ public class UpdateWebhookController : WebhookControllerBase
             return WebhookNotFound();
         }
 
-        IWebhook updated = _umbracoMapper.Map(updateWebhookRequestModel, current);
+        IWebhook updated = _webhookPresentationFactory.CreateWebhook(updateWebhookRequestModel, id);
 
         Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updated);
 

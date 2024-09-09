@@ -1,7 +1,9 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -18,17 +20,24 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IMemberGroupService _memberGroupService;
+    private readonly DeliveryApiSettings _deliveryApiSettings;
+    private IEnumerable<Guid>? _clientCredentialsMemberKeys;
 
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,
         IMemberTypeService memberTypeService,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IMemberGroupService memberGroupService,
+        IOptions<DeliveryApiSettings> deliveryApiSettings)
     {
         _umbracoMapper = umbracoMapper;
         _memberService = memberService;
         _memberTypeService = memberTypeService;
         _twoFactorLoginService = twoFactorLoginService;
+        _memberGroupService = memberGroupService;
+        _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
     public async Task<MemberResponseModel> CreateResponseModelAsync(IMember member, IUser currentUser)
@@ -36,8 +45,11 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         MemberResponseModel responseModel = _umbracoMapper.Map<MemberResponseModel>(member)!;
 
         responseModel.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(member.Key);
-        responseModel.Groups = _memberService.GetAllRoles(member.Username);
+        responseModel.Kind = GetMemberKind(member.Key);
+        IEnumerable<string> roles = _memberService.GetAllRoles(member.Username);
 
+        // Get the member groups per role, so we can return the group keys
+        responseModel.Groups = roles.Select(x => _memberGroupService.GetByName(x)).WhereNotNull().Select(x => x.Key).ToArray();
         return currentUser.HasAccessToSensitiveData()
             ? responseModel
             : await RemoveSensitiveDataAsync(member, responseModel);
@@ -55,20 +67,22 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     }
 
     public MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity)
-    {
-        var responseModel = new MemberItemResponseModel
+        => CreateItemResponseModel<IMemberEntitySlim>(entity);
+
+    public MemberItemResponseModel CreateItemResponseModel(IMember entity)
+        => CreateItemResponseModel<IMember>(entity);
+
+    private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
+        where T : ITreeEntity
+        => new MemberItemResponseModel
         {
             Id = entity.Key,
+            MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!,
+            Variants = CreateVariantsItemResponseModels(entity),
+            Kind = GetMemberKind(entity.Key)
         };
 
-        responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
-
-        responseModel.Variants = CreateVariantsItemResponseModels(entity);
-
-        return responseModel;
-    }
-
-    public IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IMemberEntitySlim entity)
+    private static IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(ITreeEntity entity)
         => new[]
         {
             new VariantItemResponseModel
@@ -77,9 +91,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
                 Culture = null
             }
         };
-
-    public MemberTypeReferenceResponseModel CreateMemberTypeReferenceResponseModel(IMemberEntitySlim entity)
-        => _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
 
     private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
     {
@@ -104,5 +115,25 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             .ToArray();
 
         return responseModel;
+    }
+
+    private MemberKind GetMemberKind(Guid key)
+    {
+        if (_clientCredentialsMemberKeys is null)
+        {
+            IEnumerable<string> clientCredentialsMemberUserNames = _deliveryApiSettings
+                                                                       .MemberAuthorization?
+                                                                       .ClientCredentialsFlow?
+                                                                       .AssociatedMembers
+                                                                       .Select(m => m.UserName).ToArray()
+                                                                   ?? [];
+
+            _clientCredentialsMemberKeys = clientCredentialsMemberUserNames
+                .Select(_memberService.GetByUsername)
+                .WhereNotNull()
+                .Select(m => m.Key).ToArray();
+        }
+
+        return _clientCredentialsMemberKeys.Contains(key) ? MemberKind.Api : MemberKind.Default;
     }
 }

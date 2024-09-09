@@ -22,6 +22,11 @@ public class ItemStylesheetItemController : StylesheetItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "path")] HashSet<string> paths)
     {
+        if (paths.Count is 0)
+        {
+            return Ok(Enumerable.Empty<StylesheetItemResponseModel>());
+        }
+
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
         IEnumerable<StylesheetItemResponseModel> responseModels = _fileItemPresentationFactory.CreateStylesheetItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));

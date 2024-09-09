@@ -141,6 +141,7 @@ public class BackOfficeUserStore :
             StartMediaIds = user.StartMediaIds ?? new int[] { },
             IsLockedOut = user.IsLockedOut,
             Key = user.Key,
+            Kind = user.Kind
         };
 
 
@@ -157,8 +158,9 @@ public class BackOfficeUserStore :
             throw new DataException("Could not create the user, check logs for details");
         }
 
-        // re-assign id
+        // re-assign id and key
         user.Id = UserIdToString(userEntity.Id);
+        user.Key = userEntity.Key;
 
         if (isLoginsPropertyDirty)
         {
@@ -249,8 +251,7 @@ public class BackOfficeUserStore :
 
         try
         {
-            IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Id == id);
-            return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
+            return Task.FromResult(_userRepository.Get(id));
         }
         catch (DbException)
         {

@@ -603,6 +603,75 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
     }
 
+    public async Task<Attempt<ContentTypeOperationStatus>> CreateAsync(TItem item, Guid performingUserKey) => await InternalSaveAsync(item, performingUserKey);
+
+    public async Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(TItem item, Guid performingUserKey) => await InternalSaveAsync(item, performingUserKey);
+
+    private async Task<Attempt<ContentTypeOperationStatus>> InternalSaveAsync(TItem item, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        Attempt<ContentTypeOperationStatus> validationAttempt = ValidateCommon(item);
+        if (validationAttempt.Success is false)
+        {
+            return Attempt.Fail(validationAttempt.Result);
+        }
+
+        SavingNotification<TItem> savingNotification = GetSavingNotification(item, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentTypeOperationStatus.CancelledByNotification);
+        }
+
+        scope.WriteLock(WriteLockIds);
+
+        // validate the DAG transform, within the lock
+        ValidateLocked(item); // throws if invalid
+
+        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        item.CreatorId = userId;
+        if (item.Description == string.Empty)
+        {
+            item.Description = null;
+        }
+
+        Repository.Save(item); // also updates content/media/member items
+
+        // figure out impacted content types
+        ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(item).ToArray();
+
+        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+        await _eventAggregator.PublishAsync(GetContentTypeRefreshedNotification(changes, eventMessages));
+
+        scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
+
+        SavedNotification<TItem> savedNotification = GetSavedNotification(item, eventMessages);
+        savedNotification.WithStateFrom(savingNotification);
+        scope.Notifications.Publish(savedNotification);
+
+        Audit(AuditType.Save, userId, item.Id);
+        scope.Complete();
+
+        return Attempt.Succeed(ContentTypeOperationStatus.Success);
+    }
+
+    private Attempt<ContentTypeOperationStatus> ValidateCommon(TItem item)
+    {
+        if (string.IsNullOrWhiteSpace(item.Name))
+        {
+            return Attempt.Fail(ContentTypeOperationStatus.NameCannotBeEmpty);
+        }
+
+        if (item.Name.Length > 255)
+        {
+            return Attempt.Fail(ContentTypeOperationStatus.NameTooLong);
+        }
+
+        return Attempt.Succeed(ContentTypeOperationStatus.Success);
+    }
+
     #endregion
 
     #region Delete
@@ -620,6 +689,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.NotFound;
         }
 
+        if (CanDelete(item) is false)
+        {
+            return ContentTypeOperationStatus.NotAllowed;
+        }
+
         Delete(item, performingUserId);
 
         scope.Complete();
@@ -628,6 +702,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
     {
+        if (CanDelete(item) is false)
+        {
+            throw new InvalidOperationException("The item was not allowed to be deleted");
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -695,6 +774,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     public void Delete(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
     {
         TItem[] itemsA = items.ToArray();
+        if (itemsA.All(CanDelete) is false)
+        {
+            throw new InvalidOperationException("One or more items were not allowed to be deleted");
+        }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -749,6 +832,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     protected abstract void DeleteItemsOfTypes(IEnumerable<int> typeIds);
+
+    protected virtual bool CanDelete(TItem item) => true;
 
     #endregion
 

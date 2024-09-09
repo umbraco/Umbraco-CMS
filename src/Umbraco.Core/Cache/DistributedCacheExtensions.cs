@@ -22,22 +22,26 @@ public static class DistributedCacheExtensions
 
     #region UserCacheRefresher
 
-    public static void RemoveUserCache(this DistributedCache dc, int userId)
-        => dc.Remove(UserCacheRefresher.UniqueId, userId);
-
     public static void RemoveUserCache(this DistributedCache dc, IEnumerable<IUser> users)
-        => dc.Remove(UserCacheRefresher.UniqueId, users.Select(x => x.Id).Distinct().ToArray());
+    {
+        IEnumerable<UserCacheRefresher.JsonPayload> payloads = users.Select(x => new UserCacheRefresher.JsonPayload()
+        {
+            Id = x.Id,
+            Key = x.Key,
+        });
 
-    public static void RefreshUserCache(this DistributedCache dc, int userId)
-        => dc.Refresh(UserCacheRefresher.UniqueId, userId);
+        dc.RefreshByPayload(UserCacheRefresher.UniqueId, payloads);
+    }
 
     public static void RefreshUserCache(this DistributedCache dc, IEnumerable<IUser> users)
     {
-        foreach (IUser user in users)
+        IEnumerable<UserCacheRefresher.JsonPayload> payloads = users.Select(x => new UserCacheRefresher.JsonPayload()
         {
-            dc.Refresh(UserCacheRefresher.UniqueId, user.Key);
-            dc.Refresh(UserCacheRefresher.UniqueId, user.Id);
-        }
+            Id = x.Id,
+            Key = x.Key,
+        });
+
+        dc.RefreshByPayload(UserCacheRefresher.UniqueId, payloads);
     }
 
     public static void RefreshAllUserCache(this DistributedCache dc)

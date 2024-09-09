@@ -37,6 +37,7 @@ public static partial class UmbracoBuilderExtensions
         builder.ContentFinders()
             .Append<ContentFinderByPageIdQuery>()
             .Append<ContentFinderByUrl>()
+            .Append<ContentFinderByKeyPath>()
             .Append<ContentFinderByIdPath>()
             /*.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder */
             .Append<ContentFinderByUrlAlias>()
@@ -72,7 +73,6 @@ public static partial class UmbracoBuilderExtensions
         // register OEmbed providers - no type scanning - all explicit opt-in of adding types, IEmbedProvider is not IDiscoverable
         builder.EmbedProviders()
             .Append<YouTube>()
-            .Append<Twitter>()
             .Append<Vimeo>()
             .Append<DailyMotion>()
             .Append<Flickr>()
@@ -84,7 +84,8 @@ public static partial class UmbracoBuilderExtensions
             .Append<Issuu>()
             .Append<Hulu>()
             .Append<Giphy>()
-            .Append<LottieFiles>();
+            .Append<LottieFiles>()
+            .Append<X>();
         builder.SelectorHandlers().Add(() => builder.TypeLoader.GetTypes<ISelectorHandler>());
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());

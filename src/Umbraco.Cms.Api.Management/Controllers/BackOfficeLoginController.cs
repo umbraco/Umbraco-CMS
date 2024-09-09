@@ -54,14 +54,14 @@ public class BackOfficeLoginController : Controller
             model.UmbracoUrl = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
         }
 
-        if ( Uri.TryCreate(model.ReturnUrl, UriKind.Relative, out _) is false) // Needs to test for relative and not absolute, as /whatever/ is an absolute path on linux
-        {
-            return BadRequest("ReturnUrl must be a relative path.");
-        }
-
         if (string.IsNullOrEmpty(model.ReturnUrl))
         {
             model.ReturnUrl = model.UmbracoUrl;
+        }
+
+        if ( Uri.TryCreate(model.ReturnUrl, UriKind.Relative, out _) is false) // Needs to test for relative and not absolute, as /whatever/ is an absolute path on linux
+        {
+            return BadRequest("ReturnUrl must be a relative path.");
         }
 
         return View("/umbraco/UmbracoLogin/Index.cshtml", model);

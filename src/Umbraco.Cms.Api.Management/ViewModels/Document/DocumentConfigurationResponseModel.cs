@@ -2,8 +2,6 @@
 
 public class DocumentConfigurationResponseModel
 {
-    public required bool SanitizeTinyMce { get; set; }
-
     public required bool DisableDeleteWhenReferenced { get; set; }
 
     public required bool DisableUnpublishWhenReferenced { get; set; }
@@ -12,5 +10,6 @@ public class DocumentConfigurationResponseModel
 
     public required bool AllowNonExistingSegmentsCreation { get; set; }
 
+    [Obsolete("Use DocumentTypeConfigurationResponseModel.ReservedFieldNames from the ConfigurationDocumentTypeController endpoint instead.")]
     public required ISet<string> ReservedFieldNames { get; set; }
 }

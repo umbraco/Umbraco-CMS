@@ -6,7 +6,6 @@ public class MediaConfigurationResponseModel
 
     public required bool DisableUnpublishWhenReferenced { get; set; }
 
-    public required bool SanitizeTinyMce { get; set; }
-
+    [Obsolete("Use MediaTypeConfigurationResponseModel.ReservedFieldNames from the ConfigurationMediaTypeController endpoint instead.")]
     public required ISet<string> ReservedFieldNames { get; set; }
 }

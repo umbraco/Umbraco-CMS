@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -20,6 +21,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
@@ -36,6 +38,8 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private bool _passwordConfigInitialized;
     private readonly object _sqliteValidateSessionLock = new();
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
+    private readonly IAppPolicyCache _globalCache;
+    private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -52,6 +56,7 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
+    /// <param name="globalCache">The app policy cache.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -68,15 +73,18 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers)
+        IEnumerable<IPermissionMapper> permissionMappers,
+        IAppPolicyCache globalCache)
         : base(scopeAccessor, appCaches, logger)
     {
+        _scopeAccessor = scopeAccessor;
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _passwordConfiguration =
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
+        _globalCache = globalCache;
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
@@ -659,6 +667,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2ClientId} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key)",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key",
@@ -917,6 +926,39 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    // This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
+    // We do however need this, as all content have creatorId (as int) and thus when we index content
+    // this gets called for each content item, and we need to cache the user to avoid a lot of db calls
+    // TODO: Remove this once CreatorId gets migrated to a key.
+    public IUser? Get(int id)
+    {
+        string cacheKey = RepositoryCacheKeys.GetKey<IUser, int>(id);
+        IUser? cachedUser = IsolatedCache.GetCacheItem<IUser>(cacheKey);
+        if (cachedUser is not null)
+        {
+            return cachedUser;
+        }
+
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Select<UserDto>()
+            .From<UserDto>()
+            .Where<UserDto>(x => x.Id == id);
+
+        List<UserDto>? dtos = Database.Fetch<UserDto>(sql);
+
+        if (dtos.Count == 0)
+        {
+            return null;
+        }
+
+        PerformGetReferencedDtos(dtos);
+
+        IUser user = UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
+        IsolatedCache.Insert(cacheKey, () => user, TimeSpan.FromMinutes(5), true);
+
+        return user;
+    }
+
     public bool ExistsByLogin(string login)
     {
         Sql<ISqlContext> sql = SqlContext.Sql()
@@ -1127,6 +1169,39 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
     }
 
+    public IEnumerable<string> GetAllClientIds()
+        => Database.Fetch<string>(SqlContext.Sql()
+            .Select<User2ClientIdDto>(d => d.ClientId)
+            .From<User2ClientIdDto>());
+
+    public IEnumerable<string> GetClientIds(int id)
+        => Database.Fetch<string>(SqlContext.Sql()
+            .Select<User2ClientIdDto>(d => d.ClientId)
+            .From<User2ClientIdDto>()
+            .Where<User2ClientIdDto>(d => d.UserId == id));
+
+    public void AddClientId(int id, string clientId)
+        => Database.Insert(new User2ClientIdDto { UserId = id, ClientId = clientId });
+
+    public bool RemoveClientId(int id, string clientId)
+        => Database.Delete<User2ClientIdDto>(SqlContext.Sql()
+            .Where<User2ClientIdDto>(d => d.UserId == id && d.ClientId == clientId)) > 0;
+
+    public IUser? GetByClientId(string clientId)
+    {
+        var userId = Database.ExecuteScalar<int>(
+            SqlContext.Sql()
+                .Select<User2ClientIdDto>(d => d.UserId)
+                .From<User2ClientIdDto>()
+                .Where<User2ClientIdDto>(d => d.ClientId == clientId));
+        if (userId == 0)
+        {
+            return null;
+        }
+
+        return Get(userId);
+    }
+
     private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)
     {
         if (filterSql == null)
@@ -1138,7 +1213,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var args = filterSql.Arguments;
         var sqlFilter = hasWhereClause
             ? filterSql.SQL
-            : " WHERE " + filterSql.SQL.TrimStart("AND ");
+            : " WHERE " + filterSql.SQL.TrimStartExact("AND ");
 
         sql.Append(SqlContext.Sql(sqlFilter, args));
 

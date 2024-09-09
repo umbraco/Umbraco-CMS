@@ -71,6 +71,9 @@ public class MemberControllerBase : ContentControllerBase
                 .WithTitle("Duplicate email detected")
                 .WithDetail("The supplied email is already in use by another member.")
                 .Build()),
+            MemberEditingOperationStatus.CancelledByNotificationHandler => BadRequest(problemDetailsBuilder
+                .WithTitle("Cancelled")
+                .Build()),
             MemberEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
                 problemDetailsBuilder

@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -33,25 +34,27 @@ public class ContentService : RepositoryService, IContentService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
 
     public ContentService(
-    ICoreScopeProvider provider,
-    ILoggerFactory loggerFactory,
-    IEventMessagesFactory eventMessagesFactory,
-    IDocumentRepository documentRepository,
-    IEntityRepository entityRepository,
-    IAuditRepository auditRepository,
-    IContentTypeRepository contentTypeRepository,
-    IDocumentBlueprintRepository documentBlueprintRepository,
-    ILanguageRepository languageRepository,
-    Lazy<IPropertyValidationService> propertyValidationService,
-    IShortStringHelper shortStringHelper,
-    ICultureImpactFactory cultureImpactFactory,
-    IUserIdKeyResolver userIdKeyResolver)
-    : base(provider, loggerFactory, eventMessagesFactory)
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        IDocumentNavigationManagementService documentNavigationManagementService)
+        : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
@@ -63,7 +66,41 @@ public class ContentService : RepositoryService, IContentService
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
+        _documentNavigationManagementService = documentNavigationManagementService;
         _logger = loggerFactory.CreateLogger<ContentService>();
+    }
+
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
+    {
     }
 
     [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
@@ -93,7 +130,8 @@ public class ContentService : RepositoryService, IContentService
             propertyValidationService,
             shortStringHelper,
             cultureImpactFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationManagementService>())
     {
     }
 
@@ -1034,6 +1072,11 @@ public class ContentService : RepositoryService, IContentService
             // have always changed if it's been saved in the back office but that's not really fail safe.
             _documentRepository.Save(content);
 
+            // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
+            UpdateInMemoryNavigationStructure(
+                "Umbraco.Cms.Core.Services.ContentService.Save-with-contentSchedule",
+                () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
+
             if (contentSchedule != null)
             {
                 _documentRepository.PersistContentSchedule(content, contentSchedule);
@@ -1097,6 +1140,11 @@ public class ContentService : RepositoryService, IContentService
                 content.WriterId = userId;
 
                 _documentRepository.Save(content);
+
+                // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
+                UpdateInMemoryNavigationStructure(
+                    "Umbraco.Cms.Core.Services.ContentService.Save",
+                    () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
             }
 
             scope.Notifications.Publish(
@@ -1139,6 +1187,8 @@ public class ContentService : RepositoryService, IContentService
         {
             throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
         }
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
 
         // we need to guard against unsaved changes before proceeding; the content will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(content))
@@ -1186,8 +1236,6 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-
             // this will create the correct culture impact even if culture is * or null
             IEnumerable<CultureImpact?> impacts =
                 cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
@@ -1199,7 +1247,15 @@ public class ContentService : RepositoryService, IContentService
                 content.PublishCulture(impact);
             }
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+            // Change state to publishing
+            content.PublishedState = PublishedState.Publishing;
+            var publishingNotification = new ContentPublishingNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(publishingNotification))
+            {
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+            }
+
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, publishingNotification.State, userId);
             scope.Complete();
             return result;
         }
@@ -1254,6 +1310,12 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
+            var savingNotification = new ContentSavingNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+            }
+
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
@@ -1262,7 +1324,7 @@ public class ContentService : RepositoryService, IContentService
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
                 scope.Complete();
                 return result;
             }
@@ -1276,7 +1338,7 @@ public class ContentService : RepositoryService, IContentService
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
 
                 scope.Complete();
 
@@ -1327,9 +1389,15 @@ public class ContentService : RepositoryService, IContentService
 
             scope.WriteLock(Constants.Locks.ContentTree);
 
+            var savingNotification = new ContentSavingNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+            }
+
             var allLangs = _languageRepository.GetMany().ToList();
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
             scope.Complete();
             return result;
         }
@@ -1359,8 +1427,8 @@ public class ContentService : RepositoryService, IContentService
         IContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
         int userId,
-        out IDictionary<string, object?>? initialNotificationState,
         bool branchOne = false,
         bool branchRoot = false)
     {
@@ -1422,7 +1490,6 @@ public class ContentService : RepositoryService, IContentService
             _documentRepository.Save(c);
         }
 
-        initialNotificationState = null;
         if (publishing)
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
@@ -1440,9 +1507,18 @@ public class ContentService : RepositoryService, IContentService
                 culturesUnpublishing,
                 eventMessages,
                 allLangs,
-                out initialNotificationState);
+                notificationState);
+
             if (publishResult.Success)
             {
+                // raise Publishing notification
+                if (scope.Notifications.PublishCancelable(
+                        new ContentPublishingNotification(content, eventMessages).WithState(notificationState)))
+                {
+                    _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
+                }
+
                 // note: StrategyPublish flips the PublishedState to Publishing!
                 publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, eventMessages);
 
@@ -1503,7 +1579,7 @@ public class ContentService : RepositoryService, IContentService
                 // handling events, business rules, etc
                 // note: StrategyUnpublish flips the PublishedState to Unpublishing!
                 // note: This unpublishes the entire document (not different variants)
-                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, out initialNotificationState);
+                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
                 if (unpublishResult.Success)
                 {
                     unpublishResult = StrategyUnpublish(content, eventMessages);
@@ -1539,7 +1615,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 // events and audit
                 scope.Notifications.Publish(
-                    new ContentUnpublishedNotification(content, eventMessages).WithState(initialNotificationState));
+                    new ContentUnpublishedNotification(content, eventMessages).WithState(notificationState));
                 scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
                 if (culturesUnpublishing != null)
@@ -1601,7 +1677,7 @@ public class ContentService : RepositoryService, IContentService
                     scope.Notifications.Publish(
                         new ContentTreeChangeNotification(content, changeType, eventMessages));
                     scope.Notifications.Publish(
-                        new ContentPublishedNotification(content, eventMessages).WithState(initialNotificationState));
+                        new ContentPublishedNotification(content, eventMessages).WithState(notificationState));
                 }
 
                 // it was not published and now is... descendants that were 'published' (but
@@ -1611,7 +1687,7 @@ public class ContentService : RepositoryService, IContentService
                 {
                     IContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
                     scope.Notifications.Publish(
-                        new ContentPublishedNotification(descendants, eventMessages).WithState(initialNotificationState));
+                        new ContentPublishedNotification(descendants, eventMessages).WithState(notificationState));
                 }
 
                 switch (publishResult.Result)
@@ -1711,6 +1787,13 @@ public class ContentService : RepositoryService, IContentService
                         continue; // shouldn't happen but no point in processing this document if there's nothing there
                     }
 
+                    var savingNotification = new ContentSavingNotification(d, evtMsgs);
+                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    {
+                        results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                        continue;
+                    }
+
                     foreach (var c in pendingCultures)
                     {
                         // Clear this schedule for this culture
@@ -1721,7 +1804,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     _documentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
+                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     if (result.Success == false)
                     {
                         _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1775,6 +1858,13 @@ public class ContentService : RepositoryService, IContentService
                     {
                         continue; // shouldn't happen but no point in processing this document if there's nothing there
                     }
+                    var savingNotification = new ContentSavingNotification(d, evtMsgs);
+                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    {
+                        results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                        continue;
+                    }
+
 
                     var publishing = true;
                     foreach (var culture in pendingCultures)
@@ -1820,7 +1910,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
+                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     }
 
                     if (result.Success == false)
@@ -2162,6 +2252,12 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
         }
 
+        var savingNotification = new ContentSavingNotification(document, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
+        }
+
         // publish & check if values are valid
         if (!publishCultures(document, culturesToPublish, allLangs))
         {
@@ -2169,7 +2265,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, userId, out initialNotificationState, true, isRoot);
+        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
@@ -2240,6 +2336,26 @@ public class ContentService : RepositoryService, IContentService
         }
 
         DoDelete(content);
+
+        if (content.Trashed)
+        {
+            // Updates in-memory navigation structure for recycle bin items
+            UpdateInMemoryNavigationStructure(
+                "Umbraco.Cms.Core.Services.ContentService.DeleteLocked-trashed",
+                () => _documentNavigationManagementService.RemoveFromBin(content.Key));
+        }
+        else
+        {
+            // Updates in-memory navigation structure for both documents and recycle bin items
+            // as the item needs to be deleted whether it is in the recycle bin or not
+            UpdateInMemoryNavigationStructure(
+                "Umbraco.Cms.Core.Services.ContentService.DeleteLocked",
+                () =>
+                {
+                    _documentNavigationManagementService.MoveToBin(content.Key);
+                    _documentNavigationManagementService.RemoveFromBin(content.Key);
+                });
+        }
     }
 
     // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
@@ -2464,6 +2580,8 @@ public class ContentService : RepositoryService, IContentService
     // trash indicates whether we are trashing, un-trashing, or not changing anything
     private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
     {
+        // Needed to update the in-memory navigation structure
+        var cameFromRecycleBin = content.ParentId == Constants.System.RecycleBinContent;
         content.WriterId = userId;
         content.ParentId = parentId;
 
@@ -2512,6 +2630,33 @@ public class ContentService : RepositoryService, IContentService
             }
         }
         while (total > pageSize);
+
+        if (parentId == Constants.System.RecycleBinContent)
+        {
+            // Updates in-memory navigation structure for both document items and recycle bin items
+            // as we are moving to recycle bin
+            UpdateInMemoryNavigationStructure(
+                "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-to-recycle-bin",
+                () => _documentNavigationManagementService.MoveToBin(content.Key));
+        }
+        else
+        {
+            if (cameFromRecycleBin)
+            {
+                // Updates in-memory navigation structure for both document items and recycle bin items
+                // as we are restoring from recycle bin
+                UpdateInMemoryNavigationStructure(
+                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked-restore",
+                    () => _documentNavigationManagementService.RestoreFromBin(content.Key, parent?.Key));
+            }
+            else
+            {
+                // Updates in-memory navigation structure
+                UpdateInMemoryNavigationStructure(
+                    "Umbraco.Cms.Core.Services.ContentService.PerformMoveLocked",
+                    () => _documentNavigationManagementService.Move(content.Key, parent?.Key));
+            }
+        }
     }
 
     private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
@@ -2615,6 +2760,9 @@ public class ContentService : RepositoryService, IContentService
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
+        // keep track of updates (copied item key and parent key) for the in-memory navigation structure
+        var navigationUpdates = new List<Tuple<Guid, Guid?>>();
+
         IContent copy = content.DeepCloneWithResetIdentities();
         copy.ParentId = parentId;
 
@@ -2650,6 +2798,9 @@ public class ContentService : RepositoryService, IContentService
 
             // save and flush because we need the ID for the recursive Copying events
             _documentRepository.Save(copy);
+
+            // store navigation update information for copied item
+            navigationUpdates.Add(Tuple.Create(copy.Key, GetParent(copy)?.Key));
 
             // add permissions
             if (currentPermissions.Count > 0)
@@ -2702,10 +2853,27 @@ public class ContentService : RepositoryService, IContentService
                         // save and flush (see above)
                         _documentRepository.Save(descendantCopy);
 
+                        // store navigation update information for descendants
+                        navigationUpdates.Add(Tuple.Create(descendantCopy.Key, GetParent(descendantCopy)?.Key));
+
                         copies.Add(Tuple.Create(descendant, descendantCopy));
                         idmap[descendant.Id] = descendantCopy.Id;
                     }
                 }
+            }
+
+            if (navigationUpdates.Count > 0)
+            {
+                // Updates in-memory navigation structure
+                UpdateInMemoryNavigationStructure(
+                    "Umbraco.Cms.Core.Services.ContentService.Copy",
+                    () =>
+                    {
+                        foreach (Tuple<Guid, Guid?> update in navigationUpdates)
+                        {
+                            _documentNavigationManagementService.Add(update.Item1, update.Item2);
+                        }
+                    });
             }
 
             // not handling tags here, because
@@ -3018,19 +3186,8 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyCollection<string>? culturesUnpublishing,
         EventMessages evtMsgs,
         IReadOnlyCollection<ILanguage> allLangs,
-        out IDictionary<string, object?>? initialNotificationState)
+        IDictionary<string, object?>? notificationState)
     {
-        // raise Publishing notification
-        var notification = new ContentPublishingNotification(content, evtMsgs);
-        var notificationResult = scope.Notifications.PublishCancelable(notification);
-        initialNotificationState = notification.State;
-
-        if (notificationResult)
-        {
-            _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-        }
-
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // If it's null it's invariant
@@ -3268,12 +3425,11 @@ public class ContentService : RepositoryService, IContentService
         ICoreScope scope,
         IContent content,
         EventMessages evtMsgs,
-        out IDictionary<string, object?>? initialNotificationState)
+        IDictionary<string, object?>? notificationState)
     {
         // raise Unpublishing notification
-        var notification = new ContentUnpublishingNotification(content, evtMsgs);
+        var notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
         var notificationResult = scope.Notifications.PublishCancelable(notification);
-        initialNotificationState = notification.State;
 
         if (notificationResult)
         {
@@ -3661,4 +3817,29 @@ public class ContentService : RepositoryService, IContentService
         DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
 
     #endregion
+
+    /// <summary>
+    ///     Enlists an action in the current scope context to update the in-memory navigation structure
+    ///     when the scope completes successfully.
+    /// </summary>
+    /// <param name="enlistingActionKey">The unique key identifying the action to be enlisted.</param>
+    /// <param name="updateNavigation">The action to be performed for updating the in-memory navigation structure.</param>
+    /// <exception cref="NullReferenceException">Thrown when the scope context is null and therefore cannot be used.</exception>
+    private void UpdateInMemoryNavigationStructure(string enlistingActionKey, Action updateNavigation)
+    {
+        IScopeContext? scopeContext = ScopeProvider.Context;
+
+        if (scopeContext is null)
+        {
+            throw new NullReferenceException($"The {nameof(scopeContext)} is null and cannot be used.");
+        }
+
+        scopeContext.Enlist(enlistingActionKey, completed =>
+        {
+            if (completed)
+            {
+                updateNavigation();
+            }
+        });
+    }
 }

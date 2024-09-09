@@ -7,4 +7,8 @@ public class MediaTypeResponseModel : ContentTypeResponseModelBase<MediaTypeProp
     public IEnumerable<MediaTypeSort> AllowedMediaTypes { get; set; } = Enumerable.Empty<MediaTypeSort>();
 
     public IEnumerable<MediaTypeComposition> Compositions { get; set; } = Enumerable.Empty<MediaTypeComposition>();
+
+    public bool IsDeletable { get; set; }
+
+    public bool AliasCanBeChanged { get; set; }
 }

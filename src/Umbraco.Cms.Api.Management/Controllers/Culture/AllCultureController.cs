@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels.Culture;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Culture;
 
@@ -12,8 +13,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Culture;
 public class AllCultureController : CultureControllerBase
 {
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly ICultureService _cultureService;
 
-    public AllCultureController(IUmbracoMapper umbracoMapper) => _umbracoMapper = umbracoMapper;
+    public AllCultureController(IUmbracoMapper umbracoMapper, ICultureService cultureService)
+    {
+        _umbracoMapper = umbracoMapper;
+        _cultureService = cultureService;
+    }
 
     /// <summary>
     ///     Returns all cultures available for creating languages.
@@ -24,10 +30,7 @@ public class AllCultureController : CultureControllerBase
     [ProducesResponseType(typeof(PagedViewModel<CultureReponseModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<CultureReponseModel>> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
-        CultureInfo[] all = CultureInfo.GetCultures(CultureTypes.AllCultures)
-            .DistinctBy(x => x.Name)
-            .OrderBy(x => x.EnglishName)
-            .ToArray();
+        CultureInfo[] all = _cultureService.GetValidCultureInfos();
 
         var viewModel = new PagedViewModel<CultureReponseModel>
         {

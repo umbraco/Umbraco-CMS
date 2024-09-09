@@ -124,6 +124,6 @@ public interface IRedirectUrlService : IService
     {
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-        return GetAllRedirectUrls(pageNumber, pageSize, out total);
+        return SearchRedirectUrls(searchTerm, pageNumber, pageSize, out total);
     }
 }

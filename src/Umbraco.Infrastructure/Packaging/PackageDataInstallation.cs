@@ -21,7 +21,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
-    public class PackageDataInstallation
+    public class PackageDataInstallation : IPackageDataInstallation
     {
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
@@ -590,7 +590,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //Iterate the sorted document types and create them as IContentType objects
             foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                var alias = GetEntityTypeAlias(documentType);
 
                 if (alias is not null && importedContentTypes.ContainsKey(alias) == false)
                 {
@@ -623,7 +623,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 //Update the structure here - we can't do it until all DocTypes have been created
                 foreach (XElement documentType in documentTypes)
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     XElement? structureElement = documentType.Element("Structure");
                     //Ensure that we only update ContentTypes which has actual structure-elements
                     if (structureElement == null || structureElement.Elements().Any() == false || alias is null)
@@ -661,7 +661,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                              // exist which contains it's folders
                                              && ((string?)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
 
                     XAttribute? folderKeysAttribute = documentType.Attribute("FolderKeys");
@@ -744,13 +744,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
         }
 
+        public Guid GetContentTypeKey(XElement contentType)
+            => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
+
+        public string? GetEntityTypeAlias(XElement entityType)
+            => entityType.Element("Info")?.Element("Alias")?.Value;
+
         private T CreateContentTypeFromXml<T>(
             XElement documentType,
             IReadOnlyDictionary<string, T> importedContentTypes,
             IContentTypeBaseService<T> service)
             where T : class, IContentTypeComposition
         {
-            var key = Guid.Parse(documentType.Element("Info")!.Element("Key")!.Value);
+            var key = GetContentTypeKey(documentType);
 
             XElement infoElement = documentType.Element("Info")!;
 
@@ -1251,12 +1257,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         editor = new VoidEditor(_dataValueEditorFactory) {Alias = editorAlias ?? string.Empty};
                     }
 
+                    var editorUiAlias = dataTypeElement.Attribute("EditorUiAlias")?.Value?.Trim() ?? editorAlias;
+
                     var dataType = new DataType(editor, _serializer)
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
                         DatabaseType = databaseType,
-                        ParentId = parentId
+                        ParentId = parentId,
+                        EditorUiAlias = editorUiAlias,
                     };
 
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;

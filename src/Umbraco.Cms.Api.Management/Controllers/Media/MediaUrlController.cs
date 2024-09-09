@@ -25,10 +25,10 @@ public class MediaUrlController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("urls")]
     [ProducesResponseType(typeof(IEnumerable<MediaUrlInfoResponseModel>), StatusCodes.Status200OK)]
-    public ActionResult GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IMedia> items = _mediaService.GetByIds(ids);
 
-        return Ok(_mediaUrlFactory.CreateUrlSets(items));
+        return await Task.FromResult(Ok(_mediaUrlFactory.CreateUrlSets(items)));
     }
 }

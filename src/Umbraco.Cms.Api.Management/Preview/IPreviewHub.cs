@@ -5,7 +5,7 @@ public interface IPreviewHub
     // define methods implemented by client
     // ReSharper disable InconsistentNaming
 
-    Task refreshed(int id);
+    Task refreshed(Guid key);
 
     // ReSharper restore InconsistentNaming
 }

@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -13,12 +14,31 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberType}")]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
-public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
+public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<MemberTypeTreeItemResponseModel>
 {
-    public MemberTypeTreeControllerBase(IEntityService entityService)
-        : base(entityService)
-    {
-    }
+    private readonly IMemberTypeService _memberTypeService;
+
+    public MemberTypeTreeControllerBase(IEntityService entityService, IMemberTypeService memberTypeService)
+        : base(entityService) =>
+        _memberTypeService = memberTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MemberType;
+
+    protected override MemberTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    {
+        var memberTypes = _memberTypeService
+            .GetAll(entities.Select(entity => entity.Id).ToArray())
+            .ToDictionary(contentType => contentType.Id);
+
+        return entities.Select(entity =>
+        {
+            MemberTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
+            if (memberTypes.TryGetValue(entity.Id, out IMemberType? memberType))
+            {
+                responseModel.Icon = memberType.Icon ?? responseModel.Icon;
+            }
+
+            return responseModel;
+        }).ToArray();
+    }
 }

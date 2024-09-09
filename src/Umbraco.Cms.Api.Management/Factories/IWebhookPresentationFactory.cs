@@ -10,5 +10,5 @@ public interface IWebhookPresentationFactory
 
     IWebhook CreateWebhook(CreateWebhookRequestModel webhookRequestModel);
 
-    IWebhook CreateWebhook(UpdateWebhookRequestModel webhookRequestModel);
+    IWebhook CreateWebhook(UpdateWebhookRequestModel webhookRequestModel, Guid existingWebhookKey);
 }

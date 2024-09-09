@@ -2,8 +2,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 public class AllWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IWebhookPresentationFactory _webhookPresentationFactory;
 
-    public AllWebhookController(IWebhookService webhookService, IUmbracoMapper umbracoMapper)
+    public AllWebhookController(IWebhookService webhookService, IWebhookPresentationFactory webhookPresentationFactory)
     {
         _webhookService = webhookService;
-        _umbracoMapper = umbracoMapper;
+        _webhookPresentationFactory = webhookPresentationFactory;
     }
 
     [HttpGet]
@@ -34,7 +34,7 @@ public class AllWebhookController : WebhookControllerBase
         var viewModel = new PagedViewModel<WebhookResponseModel>
         {
             Total = result.Total,
-            Items = _umbracoMapper.MapEnumerable<IWebhook, WebhookResponseModel>(webhooks)
+            Items = webhooks.Select(x => _webhookPresentationFactory.CreateResponseModel(x)),
         };
 
         return Ok(viewModel);

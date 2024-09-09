@@ -34,6 +34,10 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid master template")
                 .WithDetail("The master template referenced in the template leads to a circular reference.")
                 .Build()),
+            TemplateOperationStatus.MasterTemplateNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Master template not found")
+                .WithDetail("The master template referenced in the template was not found.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")
                 .Build()),

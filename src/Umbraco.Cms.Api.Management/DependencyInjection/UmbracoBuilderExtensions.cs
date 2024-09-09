@@ -22,8 +22,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
+        builder.AddUmbracoApiOpenApiUI();
 
-        if (!services.Any(x => x.ImplementationType == typeof(JsonPatchService)))
+        if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
         {
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
                 .AddJson()
@@ -67,7 +68,10 @@ public static partial class UmbracoBuilderExtensions
                 .AddPreview()
                 .AddPasswordConfiguration()
                 .AddSupplemenataryLocalizedTextFileSources()
-                .AddUserData();
+                .AddUserData()
+                .AddSegment()
+                .AddExport()
+                .AddImport();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()

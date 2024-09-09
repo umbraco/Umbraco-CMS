@@ -78,7 +78,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<WebRoutingSettings>()
             .AddUmbracoOptions<UmbracoPluginSettings>()
             .AddUmbracoOptions<UnattendedSettings>()
-            .AddUmbracoOptions<RichTextEditorSettings>()
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<RuntimeMinificationSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
@@ -86,7 +85,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
-            .AddUmbracoOptions<PackageManifestSettings>()
             .AddUmbracoOptions<WebhookSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes

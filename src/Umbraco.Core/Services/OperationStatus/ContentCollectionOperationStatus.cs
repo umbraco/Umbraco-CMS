@@ -8,7 +8,6 @@ public enum ContentCollectionOperationStatus
     ContentNotFound,
     ContentTypeNotFound,
     DataTypeNotCollection,
-    DataTypeNotContentCollection,
     DataTypeNotContentProperty,
     DataTypeNotFound,
     DataTypeWithoutContentType,

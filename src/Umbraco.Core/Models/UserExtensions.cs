@@ -1,5 +1,3 @@
-using System.Net;
-using System.Security.Cryptography;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -155,8 +153,8 @@ public static class UserExtensions
 
     public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserAllContentStartNodesPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -189,8 +187,8 @@ public static class UserExtensions
     /// <returns></returns>
     public static int[]? CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserAllMediaStartNodesPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -214,8 +212,8 @@ public static class UserExtensions
 
     public static string[]? GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserMediaStartNodePathsPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserMediaStartNodePathsPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -232,8 +230,8 @@ public static class UserExtensions
 
     public static string[]? GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserContentStartNodePathsPrefix + user.Id;
-        IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
+        var cacheKey = user.UserCacheKey(CacheKeys.UserContentStartNodePathsPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
         var result = runtimeCache.GetCacheItem(
             cacheKey,
             () =>
@@ -316,6 +314,12 @@ public static class UserExtensions
 
         return lsn.ToArray();
     }
+
+    private static IAppPolicyCache GetUserCache(AppCaches appCaches)
+        => appCaches.IsolatedCaches.GetOrCreate<IUser>();
+
+    private static string UserCacheKey(this IUser user, string cacheKey)
+        => $"{cacheKey}{user.Key}";
 
     private static bool StartsWithPath(string test, string path) =>
         test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';

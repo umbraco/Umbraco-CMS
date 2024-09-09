@@ -22,6 +22,11 @@ public class ItemPartialViewItemController : PartialViewItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "path")] HashSet<string> paths)
     {
+        if (paths.Count is 0)
+        {
+            return Ok(Enumerable.Empty<PartialViewItemResponseModel>());
+        }
+
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
         IEnumerable<PartialViewItemResponseModel> responseModels = _fileItemPresentationFactory.CreatePartialViewItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));

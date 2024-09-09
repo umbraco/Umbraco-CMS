@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
+public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
@@ -112,6 +112,15 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     {
         MapBlockItemDataToEditor(property, blockValue.ContentData);
         MapBlockItemDataToEditor(property, blockValue.SettingsData);
+    }
+
+    protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)
+    {
+        yield return configuration.ContentElementTypeKey;
+        if (configuration.SettingsElementTypeKey is not null)
+        {
+            yield return configuration.SettingsElementTypeKey.Value;
+        }
     }
 
     private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)

@@ -193,7 +193,7 @@ namespace Umbraco.Extensions
 
                 var temp = new Sql<ISqlContext>(sql.SqlContext);
                 temp = predicates[i](temp);
-                wsql.Append(temp.SQL.TrimStart("WHERE "), temp.Arguments);
+                wsql.Append(temp.SQL.TrimStartExact("WHERE "), temp.Arguments);
             }
             wsql.Append(")");
 
@@ -582,7 +582,7 @@ namespace Umbraco.Extensions
         {
             var sql = new Sql<ISqlContext>(sqlJoin.SqlContext);
             sql = on(sql);
-            var text = sql.SQL.Trim().TrimStart("WHERE").Trim();
+            var text = sql.SQL.Trim().TrimStartExact("WHERE").Trim();
             return sqlJoin.On(text, sql.Arguments);
         }
 

@@ -78,5 +78,22 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
         To<V_14_0_0.MigrateTours>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
+        To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
+        To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");
+        To<V_14_0_0.AddEditorUiToDataType>("{5A2EF07D-37B4-49D5-8E9B-3ED01877263B}");
+        // we need to re-run this migration, as it was flawed for V14 RC3 (the migration can run twice without any issues)
+        To<V_14_0_0.AddEditorUiToDataType>("{6FB5CA9E-C823-473B-A14C-FE760D75943C}");
+        To<V_14_0_0.CleanUpDataTypeConfigurations>("{827360CA-0855-42A5-8F86-A51F168CB559}");
+
+        // To 14.1.0
+        To<V_14_1_0.MigrateRichTextConfiguration>("{FEF2DAF4-5408-4636-BB0E-B8798DF8F095}");
+        To<V_14_1_0.MigrateOldRichTextSeedConfiguration>("{A385C5DF-48DC-46B4-A742-D5BB846483BC}");
+
+        // To 14.2.0
+        To<V_14_2_0.AddMissingDateTimeConfiguration>("{20ED404C-6FF9-4F91-8AC9-2B298E0002EB}");
+
+        // To 15.0.0
+        To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
+        To<V_15_0_0.AddKindToUser>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
     }
 }

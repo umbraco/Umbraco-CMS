@@ -48,6 +48,8 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
                 MediaType = referenceByIdModel,
                 CompositionType = compositionType,
             });
+        target.IsDeletable = source.IsSystemMediaType() is false;
+        target.AliasCanBeChanged = source.IsSystemMediaType() is false;
     }
 
     // Umbraco.Code.MapAll

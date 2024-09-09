@@ -189,7 +189,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             return null;
         }
 
-        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _constructorCache);
+        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _jsonSerializer, _constructorCache);
         return creator.CreateBlockModel(referenceCacheLevel, blocks, preview, configuration.Blocks);
     }
 

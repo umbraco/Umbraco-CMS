@@ -21,6 +21,15 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     bool ExistsByUserName(string username);
 
     /// <summary>
+    ///     Returns a user by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>
+    ///     A cached <see cref="IUser" /> instance
+    /// </returns>
+    IUser? Get(int id);
+
+    /// <summary>
     ///     Checks if a user with the login exists
     /// </summary>
     /// <param name="login"></param>
@@ -141,4 +150,14 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     int ClearLoginSessions(TimeSpan timespan);
 
     void ClearLoginSession(Guid sessionId);
+
+    IEnumerable<string> GetAllClientIds();
+
+    IEnumerable<string> GetClientIds(int id);
+
+    void AddClientId(int id, string clientId);
+
+    bool RemoveClientId(int id, string clientId);
+
+    IUser? GetByClientId(string clientId);
 }
