@@ -48,6 +48,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
+        //TODO replace with documentUrlService
         IEnumerable<UrlInfo> urlInfos = await content.GetContentUrlsAsync(
             _publishedRouter,
             umbracoContext,
