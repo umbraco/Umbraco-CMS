@@ -21,7 +21,7 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
     public abstract string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
-    public virtual Task<string?> GeOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken) => Task.FromResult(GetMarkup(url, maxWidth ?? 0, maxHeight ?? 0));
+    public virtual Task<string?> GetOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken) => Task.FromResult(GetMarkup(url, maxWidth ?? 0, maxHeight ?? 0));
 
     public virtual string GetEmbedProviderUrl(string url, int? maxWidth, int? maxHeight) => GetEmbedProviderUrl(url, maxWidth ?? 0, maxHeight ?? 0);
     public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)

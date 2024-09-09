@@ -22,10 +22,10 @@ public class LottieFiles : OEmbedProviderBase
     [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
     public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
     {
-        return GeOEmbedDataAsync(url, maxWidth, maxHeight, CancellationToken.None).GetAwaiter().GetResult();
+        return GetOEmbedDataAsync(url, maxWidth, maxHeight, CancellationToken.None).GetAwaiter().GetResult();
     }
 
-    public override async Task<string?> GeOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
+    public override async Task<string?> GetOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
     {
         var requestUrl = this.GetEmbedProviderUrl(url, maxWidth, maxHeight);
         OEmbedResponse? oembed = await this.GetJsonResponseAsync<OEmbedResponse>(requestUrl, cancellationToken);
