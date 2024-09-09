@@ -6,7 +6,11 @@ const elementName = 'umb-help-header-app';
 @customElement(elementName)
 export class UmbHelpHeaderAppElement extends UmbHeaderAppButtonElement {
 	override render() {
-		return html` <div>My Header App</div> `;
+		return html`
+			<uui-button look="primary" label="help" compact>
+				<uui-icon name="icon-help-alt"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	static override styles: CSSResultGroup = [UmbHeaderAppButtonElement.styles, css``];
