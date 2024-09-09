@@ -106,7 +106,8 @@ test('can add decimal number to the decimal in the content section', async ({umb
   expect(contentData.values[0].value).toEqual(decmial);
 });
 
-test('can create content with the custom data type with code editor property editor', async ({umbracoApi, umbracoUi}) => {
+// Skip this test as currently there is no code editor property editor available.
+test.skip('can create content with the custom data type with code editor property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Code Editor';
   const customDataTypeId = await umbracoApi.dataType.createCodeEditorDataType(customDataTypeName);
@@ -128,6 +129,7 @@ test('can create content with the custom data type with code editor property edi
   expect(contentData.values).toEqual([]);
 });
 
+// Skip this test as currently there is no code editor property editor available.
 test('can add javascript code to the code editor in the content section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Code Editor';
