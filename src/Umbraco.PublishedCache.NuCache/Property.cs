@@ -371,6 +371,10 @@ internal class Property : PublishedPropertyBase
 
         public CacheValue For(string? culture, string? segment)
         {
+            // since this allows null and empty string values, we need to assume null and empty string is the same
+            culture ??= string.Empty;
+            segment ??= string.Empty;
+
             if (culture == string.Empty && segment == string.Empty)
             {
                 return this;
