@@ -19,7 +19,7 @@ public class BlockListEditorDataConverter : BlockEditorDataConverter<BlockListVa
     }
 
     public BlockListEditorDataConverter(IJsonSerializer jsonSerializer)
-        : base(Constants.PropertyEditors.Aliases.BlockList, jsonSerializer)
+        : base(jsonSerializer)
     {
     }
 
