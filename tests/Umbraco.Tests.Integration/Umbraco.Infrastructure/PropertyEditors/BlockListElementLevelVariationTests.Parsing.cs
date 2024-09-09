@@ -1,10 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -29,7 +26,7 @@ public partial class BlockListElementLevelVariationTests
                 new() { Alias = "variantText", Value = "The culture variant settings value in Danish", Culture = "da-DK" },
             });
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+        SetVariationContext(culture, null);
 
         var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
         Assert.IsNotNull(value);
@@ -80,7 +77,7 @@ public partial class BlockListElementLevelVariationTests
                 new() { Alias = "variantText", Value = "The segment variant settings value for Segment2", Segment = "segment2" },
             });
 
-        VariationContextAccessor.VariationContext = new VariationContext(segment: segment);
+        SetVariationContext(null, segment);
 
         var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
         Assert.IsNotNull(value);
@@ -157,7 +154,7 @@ public partial class BlockListElementLevelVariationTests
                 new() { Alias = "variantText", Value = "The variant settings value in Danish for Segment2", Culture = "da-DK", Segment = "segment2" }
             });
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: culture, segment: segment);
+        SetVariationContext(culture, segment);
 
         var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
         Assert.IsNotNull(value);
@@ -206,7 +203,7 @@ public partial class BlockListElementLevelVariationTests
                 new() { Alias = "variantText", Value = "Another invariant settings value" }
             });
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+        SetVariationContext(culture, null);
 
         var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
         Assert.IsNotNull(value);
@@ -280,7 +277,7 @@ public partial class BlockListElementLevelVariationTests
 
         var publishedContent = GetPublishedContent(content.Key);
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+        SetVariationContext(culture, null);
 
         // the "blocks" property is invariant (at content level), and the block data currently stored is also invariant.
         // however, the content and element types both vary by culture at this point, so the blocks should be parsed
@@ -372,7 +369,7 @@ public partial class BlockListElementLevelVariationTests
 
         var publishedContent = GetPublishedContent(content.Key);
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: requestCulture);
+        SetVariationContext(requestCulture, null);
 
         // the "blocks" property is invariant (at content level), but the block data currently stored is variant because the
         // content type was originally variant. however, as the content type has changed to invariant, we expect no variance
@@ -457,7 +454,7 @@ public partial class BlockListElementLevelVariationTests
             },
             true);
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+        SetVariationContext(culture, null);
 
         var publishedContent = GetPublishedContent(content.Key);
 
@@ -530,7 +527,7 @@ public partial class BlockListElementLevelVariationTests
             },
             true);
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: culture, segment: segment);
+        SetVariationContext(culture, segment);
 
         var publishedContent = GetPublishedContent(content.Key);
 
@@ -618,7 +615,7 @@ public partial class BlockListElementLevelVariationTests
             },
             true);
 
-        VariationContextAccessor.VariationContext = new VariationContext(culture: culture, segment: segment);
+        SetVariationContext(culture, segment);
 
         var publishedContent = GetPublishedContent(content.Key);
 

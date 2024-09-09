@@ -72,7 +72,7 @@ public partial class BlockListElementLevelVariationTests
             string expectedInvariantContentValue, string expectedVariantContentValue,
             string expectedInvariantSettingsValue, string expectedVariantSettingsValue)
         {
-            VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+            SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
@@ -180,7 +180,7 @@ public partial class BlockListElementLevelVariationTests
             string expectedInvariantContentValue, string expectedVariantContentValue,
             string expectedInvariantSettingsValue, string expectedVariantSettingsValue)
         {
-            VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+            SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
@@ -383,7 +383,7 @@ public partial class BlockListElementLevelVariationTests
 
         void AssertPropertyValues(string culture, Action<IPublishedElement, IPublishedElement, IPublishedElement> validateBlockValues)
         {
-            VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+            SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
 
             var rootBlock = publishedContent.Value<BlockListModel>("blocks");
@@ -622,7 +622,7 @@ public partial class BlockListElementLevelVariationTests
 
         void AssertPropertyValues(string culture, Action<IPublishedElement, IPublishedElement, IPublishedElement> validateBlockValues)
         {
-            VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+            SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
 
             var rootBlock = publishedContent.Value<BlockListModel>("blocks");
@@ -729,7 +729,7 @@ public partial class BlockListElementLevelVariationTests
 
         void AssertPropertyValues(string culture, string? segment, string expectedInvariantContentValue, string expectedVariantContentValue)
         {
-            VariationContextAccessor.VariationContext = new VariationContext(culture: culture, segment: segment);
+            SetVariationContext(culture, segment);
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
@@ -790,7 +790,7 @@ public partial class BlockListElementLevelVariationTests
 
         void AssertPropertyValues(string? segment, string expectedInvariantContentValue, string expectedVariantContentValue)
         {
-            VariationContextAccessor.VariationContext = new VariationContext(culture: null, segment: segment);
+            SetVariationContext(null, segment);
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
@@ -943,7 +943,7 @@ public partial class BlockListElementLevelVariationTests
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
         {
-            VariationContextAccessor.VariationContext = new VariationContext(culture: culture);
+            SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");

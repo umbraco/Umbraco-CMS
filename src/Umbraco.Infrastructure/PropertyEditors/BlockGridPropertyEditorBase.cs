@@ -39,7 +39,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockGridEditorPropertyValueEditor>(Attribute!);
 
-    private class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
+    internal class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
     {
         public BlockGridEditorPropertyValueEditor(
             DataEditorAttribute attribute,
