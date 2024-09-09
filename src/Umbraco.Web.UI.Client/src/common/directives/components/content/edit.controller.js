@@ -757,8 +757,8 @@
                                 formHelper.showNotifications(err.data);
                                 clearNotifications($scope.content);
                                 
-                                handleHttpException(err);
-                                deferred.reject(err);
+                              handleHttpException(err);
+                              deferred.reject(err);
                             });
                         },
                         close: function () {
@@ -787,6 +787,7 @@
                 }, function (err) {
                     $scope.page.buttonGroupState = "error";
                     handleHttpException(err);
+                    $scope.$broadcast("formSubmittedValidationFailed")
                     deferred.reject(err);
                 });
             }
