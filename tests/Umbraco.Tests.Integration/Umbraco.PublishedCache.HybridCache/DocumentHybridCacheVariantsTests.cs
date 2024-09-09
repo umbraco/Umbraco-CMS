@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+[Platform("Linux", Reason = "This uses too much memory when running both caches, should be removed when nuchache is removed")]
 public class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 {
     private string _englishIsoCode = "en-US";
