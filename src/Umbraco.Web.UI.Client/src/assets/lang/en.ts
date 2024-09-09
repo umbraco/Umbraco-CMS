@@ -1939,7 +1939,7 @@ export default {
 		lastPasswordChangeDate: 'Password last changed',
 		loginname: 'Username',
 		loginnameRequired: 'Required - enter a username for this user',
-		loginnameDescription: 'A unique name that identifies the user',
+		loginnameDescription: 'The username is used for logging in',
 		mediastartnode: 'Media start node',
 		mediastartnodehelp: 'Limit the media library to a specific start node',
 		mediastartnodes: 'Media start nodes',
