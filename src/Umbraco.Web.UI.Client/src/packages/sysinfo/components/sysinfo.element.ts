@@ -49,6 +49,11 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 			this._serverKeyValues.push({ name: 'Runtime mode', data: serverInformation.runtimeMode });
 		}
 
+		// Browser information
+		this._serverKeyValues.push({ name: 'Browser (user agent)', data: navigator.userAgent });
+		this._serverKeyValues.push({ name: 'Browser language', data: navigator.language });
+		this._serverKeyValues.push({ name: 'Browser location', data: location.href });
+
 		this._loading = false;
 	}
 
