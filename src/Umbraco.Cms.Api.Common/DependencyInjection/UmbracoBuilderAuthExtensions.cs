@@ -2,6 +2,9 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using OpenIddict.Server;
+using OpenIddict.Validation;
+using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -15,7 +18,7 @@ public static class UmbracoBuilderAuthExtensions
 {
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
-        if (builder.Services.Any(x=>x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
+        if (builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
         {
             ConfigureOpenIddict(builder);
         }
@@ -96,6 +99,13 @@ public static class UmbracoBuilderAuthExtensions
                 options
                     .AddEncryptionKey(new SymmetricSecurityKey(RandomNumberGenerator.GetBytes(32))) // generate a cryptographically secure random 256-bits key
                     .AddSigningKey(new RsaSecurityKey(RSA.Create(keySizeInBits: 2048))); // generate RSA key with recommended size of 2048-bits
+
+                // Add custom handler for the "ProcessRequestContext" server event, to stop OpenIddict from handling
+                // every last request to the server (including front-end requests).
+                options.AddEventHandler<OpenIddictServerEvents.ProcessRequestContext>(configuration =>
+                {
+                    configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
+                });
             })
 
             // Register the OpenIddict validation components.
@@ -113,8 +123,16 @@ public static class UmbracoBuilderAuthExtensions
 
                 // Use ASP.NET Core Data Protection for tokens instead of JWT. (see note in AddServer)
                 options.UseDataProtection();
+
+                // Add custom handler for the "ProcessRequestContext" validation event, to stop OpenIddict from handling
+                // every last request to the server (including front-end requests).
+                options.AddEventHandler<OpenIddictValidationEvents.ProcessRequestContext>(configuration =>
+                {
+                    configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
+                });
             });
 
         builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
+        builder.Services.ConfigureOptions<ConfigureOpenIddict>();
     }
 }

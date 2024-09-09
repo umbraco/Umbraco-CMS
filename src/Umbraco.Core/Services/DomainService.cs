@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -201,6 +202,11 @@ public class DomainService : RepositoryService, IDomainService
         foreach (DomainModel domainModel in updateModel.Domains)
         {
             domainModel.DomainName = domainModel.DomainName.ToLowerInvariant();
+
+            if(Uri.IsWellFormedUriString(domainModel.DomainName, UriKind.RelativeOrAbsolute) is false)
+            {
+                return Attempt.FailWithStatus(DomainOperationStatus.InvalidDomainName, new DomainUpdateResult());
+            }
         }
 
         // make sure we're not attempting to assign duplicate domains

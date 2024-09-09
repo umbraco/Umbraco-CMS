@@ -1,8 +1,6 @@
 ﻿import { test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
-// TODO: Added List View - Members to the list when the front-end is ready
-//const listViewTypes = ['List View - Content', 'List View - Media', 'List View - Members'];
 const listViewTypes = ['List View - Content', 'List View - Media'];
 for (const listViewType of listViewTypes) {
   test.describe(`${listViewType} tests`, () => {
@@ -13,7 +11,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.goToBackOffice();
       await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
       dataTypeDefaultData = await umbracoApi.dataType.getByName(listViewType);
-      await umbracoUi.dataType.goToDataType(listViewType);
     });
 
     test.afterEach(async ({ umbracoApi }) => {
@@ -22,15 +19,16 @@ for (const listViewType of listViewTypes) {
       }
     });
 
-    test(`can update Page Size`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update page size', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const pageSizeValue = 5;
       const expectedDataTypeValues = {
-        alias: "pageSize",
-        value: pageSizeValue,
+        "alias": "pageSize",
+        "value": pageSizeValue
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.enterPageSizeValue(pageSizeValue.toString());
       await umbracoUi.dataType.clickSaveButton();
 
@@ -39,16 +37,17 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Order Direction`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update order direction', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const isAscending = listViewType == 'List View - Members' ? false : true;
       const orderDirectionValue = isAscending ? 'asc' : 'desc';
       const expectedDataTypeValues = {
-        alias: "orderDirection",
-        value: orderDirectionValue,
+        "alias": "orderDirection",
+        "value": orderDirectionValue
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.chooseOrderDirection(isAscending);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -57,18 +56,26 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    //TODO: Uncomment when the frontend works
-    test.skip(`can add Column Displayed`, async ({ umbracoApi, umbracoUi }) => {
+    test('can add column displayed', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const columnName = 'Document Type';
+      let columnData: string[];
+      if (listViewType === 'List View - Media') {
+        columnData = ['Document Type', 'TestDocumentType', 'sortOrder', 'Sort'];
+        await umbracoApi.documentType.ensureNameNotExists(columnData[1]);
+        await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(columnData[1]);
+      } else {
+        columnData = ['Media Type', 'Audio', 'sortOrder', 'Sort'];
+      }
+
       const expectedIncludePropertiesValues = {
-        alias: "contentTypeAlias",
-        header: "Document Type",
-        isSystem: true,
+        "alias": columnData[2],
+        "header": columnData[3],
+        "isSystem": 1
       };
 
       // Act
-      await umbracoUi.dataType.addColumnDisplayed(columnName);
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.dataType.addColumnDisplayed(columnData[0], columnData[1], columnData[2]);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -77,35 +84,112 @@ for (const listViewType of listViewTypes) {
       expect(includePropertiesData.value).toContainEqual(expectedIncludePropertiesValues);
     });
 
-    //TODO: Uncomment when the frontend works
-    test.skip(`can remove Column Displayed`, async ({ umbracoApi, umbracoUi }) => {
+    test('can remove column displayed', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const columnName = 'Last edited';
-      const expectedIncludePropertiesValues = {
-        alias: "updateDate",
-        header: "Last edited",
-        isSystem: 1,
-      };
+      let columnData: string[];
+      if (listViewType === 'List View - Media') {
+        columnData = ['Document Type', 'TestDocumentType', 'owner', 'Created by'];
+        await umbracoApi.documentType.ensureNameNotExists(columnData[1]);
+        await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(columnData[1]);
+      } else {
+        columnData = ['Media Type', 'Audio', 'owner', 'Created by'];
+      }
+
+      const removedDataTypeValues = [{
+        "alias": "includeProperties",
+        "value": [{
+          "alias": columnData[2],
+          "header": columnData[3],
+          "isSystem": 1,
+        }]
+      }];
+  
+      // Remove all existing values and add a column displayed to remove
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      dataTypeData.values = removedDataTypeValues;
+      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
 
       // Act
-      await umbracoUi.dataType.removeColumnDisplayed(columnName);
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.dataType.removeColumnDisplayed(columnData[2]);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
-      const includePropertiesData = dataTypeData.values.find(value => value.alias === "includeProperties");
-      expect(includePropertiesData.value).not.toContainEqual(expectedIncludePropertiesValues);
+      expect(dataTypeData.values).toEqual([]);
     });
 
-    test(`can update Order By`, async ({ umbracoApi, umbracoUi }) => {
+    // TODO: Remove skip when the front-end is ready
+    test.skip('can add layouts', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const orderByValue = 'Last edited';
-      const expectedDataTypeValues = {
-        alias: "orderBy",
-        value: "updateDate",
+      let layoutsData = 'Document Grid Collection View';
+      if (listViewType === 'List View - Media') {
+        layoutsData = 'Media Grid Collection View';
+      }
+
+      const expectedIncludePropertiesValues = {
+        "icon": "icon-thumbnails-small",
+        "collectionView": layoutsData,
+        "isSystem": true,
+        "name": "Grid", 
+        "selected": true
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.waitForTimeout(500);
+      await umbracoUi.dataType.addLayouts(layoutsData);
+      await umbracoUi.dataType.clickSaveButton();
+
+      // Assert
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      const includePropertiesData = dataTypeData.values.find(value => value.alias === "layouts");
+      expect(includePropertiesData.value).toContainEqual(expectedIncludePropertiesValues);
+    });
+
+    test('can remove layouts', async ({umbracoApi, umbracoUi}) => {
+      // Arrange
+      let layoutsData = 'Document Grid Collection View';
+      if (listViewType === 'List View - Media') {
+        layoutsData = 'Media Grid Collection View';
+      }
+
+      const removedDataTypeValues = [{
+        "alias": "layouts",
+        "value": [{
+          "icon": "icon-thumbnails-small",
+          "collectionView": layoutsData,
+          "isSystem": true,
+          "name": "Grid", 
+          "selected": true
+        }]
+      }];
+  
+      // Remove all existing values and add a layout to remove
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      dataTypeData.values = removedDataTypeValues;
+      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
+
+      // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.dataType.removeLayouts(layoutsData);
+      await umbracoUi.dataType.clickSaveButton();
+
+      // Assert
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      expect(dataTypeData.values).toEqual([]);
+    });
+
+    test('can update order by', async ({umbracoApi, umbracoUi}) => {
+      // Arrange
+      const orderByValue = 'Last edited';
+      const expectedDataTypeValues = {
+        "alias": "orderBy",
+        "value": "updateDate"
+      };
+
+      // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.chooseOrderByValue(orderByValue);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -114,22 +198,22 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    // The output is currently not the same
-    test.skip(`can update Bulk Action Permission`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const bulkActionPermissionValue = 'Allow bulk copy (content only)';
+      const bulkActionPermissionValue = 'Allow bulk delete';
       const expectedDataTypeValues = {
-        alias: "bulkActionPermissions",
-        value: {
-          allowBulkPublish: false,
-          allowBulkUnpublish: false,
-          allowBulkCopy: true,
-          allowBulkDelete: false,
-          allowBulkMove: false,
-        },
+        "alias": "bulkActionPermissions",
+        "value": {
+          "allowBulkCopy": false, 
+          "allowBulkDelete": true, 
+          "allowBulkMove": false, 
+          "allowBulkPublish": false, 
+          "allowBulkUnpublish": false
+        }
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickBulkActionPermissionsSliderByValue(bulkActionPermissionValue);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -138,7 +222,7 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Content App Icon`, async ({ page, umbracoApi, umbracoUi }) => {
+    test('can update content app icon', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const iconValue = 'icon-activity';
       const expectedDataTypeValues = {
@@ -147,12 +231,9 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickContentAppIconButton();
-      // TODO: Uncomment one of the possible ways to select the icon. when the helpers are fixed
-      // await umbracoUi.dataType.clickLabelWithName(iconValue, true);
-      // await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
-      await page.getByLabel(iconValue).click({force: true});
-      await umbracoUi.dataType.clickSubmitButton();
+      await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -160,15 +241,16 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Content App Name`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update content app name', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const contentAppName = 'Test Content App Name';
       const expectedDataTypeValues = {
-        alias: "tabName",
-        value: contentAppName,
+        "alias": "tabName",
+        "value": contentAppName
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.enterContentAppName(contentAppName);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -177,14 +259,15 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can enable Show Content App First`, async ({umbracoApi, umbracoUi}) => {
+    test('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
-        alias: "showContentFirst",
-        value: true,
+        "alias": "showContentFirst",
+        "value": true
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickShowContentAppFirstSlider();
       await umbracoUi.dataType.clickSaveButton();
 
@@ -193,19 +276,21 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can enable Edit in Infinite Editor`, async ({umbracoApi, umbracoUi}) => {
+    // Skip this test as there are no setting for infinite editor
+    test.skip('can enable edit in infinite editor', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
-        alias: "useInfiniteEditor",
-        value: true,
+        "alias": "useInfiniteEditor",
+        "value": true
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickEditInInfiniteEditorSlider();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
+      await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });

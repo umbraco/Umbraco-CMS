@@ -1,10 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
@@ -43,6 +40,7 @@ internal class TelemetryService : ITelemetryService
     public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
     {
         telemetryReportData = GetTelemetryReportDataAsync().GetAwaiter().GetResult();
+
         return telemetryReportData != null;
     }
 
@@ -58,26 +56,25 @@ internal class TelemetryService : ITelemetryService
         {
             Id = telemetryId,
             Version = GetVersion(),
-            Packages = await GetPackageTelemetryAsync(),
+            Packages = await GetPackageTelemetryAsync().ConfigureAwait(false),
             Detailed = _usageInformationService.GetDetailed(),
         };
     }
 
-    private string? GetVersion() => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+    private string? GetVersion()
+        => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
         ? null
         : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
 
-
-
-    private Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
+    private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
         if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
         {
-            return Task.FromResult<IEnumerable<PackageTelemetry>?>(null);
+            return null;
         }
 
         List<PackageTelemetry> packages = new();
-        IEnumerable<InstalledPackage> installedPackages = _packagingService.GetAllInstalledPackages();
+        IEnumerable<InstalledPackage> installedPackages = await _packagingService.GetAllInstalledPackagesAsync().ConfigureAwait(false);
 
         foreach (InstalledPackage installedPackage in installedPackages)
         {
@@ -94,6 +91,6 @@ internal class TelemetryService : ITelemetryService
             });
         }
 
-        return Task.FromResult<IEnumerable<PackageTelemetry>?>(packages);
+        return packages;
     }
 }

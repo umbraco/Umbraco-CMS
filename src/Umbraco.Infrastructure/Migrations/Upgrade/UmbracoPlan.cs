@@ -84,5 +84,12 @@ public class UmbracoPlan : MigrationPlan
         // we need to re-run this migration, as it was flawed for V14 RC3 (the migration can run twice without any issues)
         To<V_14_0_0.AddEditorUiToDataType>("{6FB5CA9E-C823-473B-A14C-FE760D75943C}");
         To<V_14_0_0.CleanUpDataTypeConfigurations>("{827360CA-0855-42A5-8F86-A51F168CB559}");
+
+        // To 14.1.0
+        To<V_14_1_0.MigrateRichTextConfiguration>("{FEF2DAF4-5408-4636-BB0E-B8798DF8F095}");
+        To<V_14_1_0.MigrateOldRichTextSeedConfiguration>("{A385C5DF-48DC-46B4-A742-D5BB846483BC}");
+
+        // To 14.2.0
+        To<V_14_2_0.AddMissingDateTimeConfiguration>("{20ED404C-6FF9-4F91-8AC9-2B298E0002EB}");
     }
 }
