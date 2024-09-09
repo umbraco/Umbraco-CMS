@@ -257,6 +257,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddUmbracoCore()
                 .AddWebComponents()
                 .AddNuCache()
+                .AddUmbracoHybridCache()
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
@@ -298,7 +299,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected virtual void CustomMvcSetup(IMvcBuilder mvcBuilder)
         {
-            
+
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
 {
     private ContentPickerValueConverter CreateValueConverter(IApiContentNameProvider? nameProvider = null)
         => new ContentPickerValueConverter(
-            PublishedSnapshotAccessor,
+            PublishedContentCacheMock.Object,
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
                 CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings()),
