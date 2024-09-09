@@ -25176,6 +25176,41 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/server/upgrade-check": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "GetServerUpgradeCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UpgradeCheckResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/static-file": {
       "get": {
         "tags": [
@@ -42446,12 +42481,17 @@
       },
       "ServerConfigurationResponseModel": {
         "required": [
-          "allowPasswordReset"
+          "allowPasswordReset",
+          "versionCheckPeriod"
         ],
         "type": "object",
         "properties": {
           "allowPasswordReset": {
             "type": "boolean"
+          },
+          "versionCheckPeriod": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -44510,6 +44550,26 @@
             "items": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpgradeCheckResponseModel": {
+        "required": [
+          "comment",
+          "type",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
           }
         },
         "additionalProperties": false
