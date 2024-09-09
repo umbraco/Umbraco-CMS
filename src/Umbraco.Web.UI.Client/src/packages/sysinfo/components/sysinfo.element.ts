@@ -127,7 +127,7 @@ ${this._serverKeyValues.map((serverKeyValue) => `${serverKeyValue.name}: ${serve
 		}
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			#sysinfo-table {
