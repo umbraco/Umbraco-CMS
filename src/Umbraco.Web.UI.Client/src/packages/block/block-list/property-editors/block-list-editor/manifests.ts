@@ -14,6 +14,7 @@ export const manifests: Array<ManifestTypes> = [
 			propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS,
 			icon: 'icon-thumbnail-list',
 			group: 'lists',
+			supportsReadOnly: true,
 			settings: {
 				properties: [
 					{
