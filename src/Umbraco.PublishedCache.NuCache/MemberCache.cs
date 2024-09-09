@@ -32,10 +32,11 @@ public class MemberCache : IPublishedMemberCache, IDisposable
     public IPublishedContentType GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Member, id);
 
     public IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Member, alias);
+    public Task<IPublishedMember?> GetAsync(IMember member) => throw new NotImplementedException();
 
-    public IPublishedContent? Get(IMember member)
+    public IPublishedMember? Get(IMember member)
         =>
-            PublishedMember.Create(
+            (IPublishedMember?)PublishedMember.Create(
                 member,
                 GetContentType(member.ContentTypeId),
                 _previewDefault,
@@ -58,7 +59,7 @@ public class MemberCache : IPublishedMemberCache, IDisposable
         {
             if (disposing)
             {
-                _contentTypeCache.Dispose();
+                // _contentTypeCache.Dispose();
             }
 
             _disposedValue = true;

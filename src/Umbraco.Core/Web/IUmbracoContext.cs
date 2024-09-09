@@ -31,6 +31,7 @@ public interface IUmbracoContext : IDisposable
     /// </summary>
     IPublishedSnapshot PublishedSnapshot { get; }
 
+    // TODO: Obsolete these, and use cache manager to get
     /// <summary>
     ///     Gets the published content cache.
     /// </summary>
