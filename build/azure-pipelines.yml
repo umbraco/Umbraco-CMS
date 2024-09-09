@@ -288,7 +288,6 @@ stages:
     jobs:
       # Integration Tests (SQLite)
       - job:
-        timeoutInMinutes: 180
         displayName: Integration Tests (SQLite)
         strategy:
           matrix:
