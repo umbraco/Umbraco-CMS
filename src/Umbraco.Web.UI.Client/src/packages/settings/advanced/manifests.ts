@@ -10,11 +10,11 @@ export const manifests = [
 	{
 		type: 'sectionSidebarApp',
 		kind: 'menu',
-		alias: 'Umb.SectionSidebarMenu.AdvancedSettings',
-		name: 'Advanced Settings Sidebar Menu',
+		alias: 'Umb.SectionSidebarApp.Menu.Users',
+		name: 'Users Section Sidebar Menu',
 		weight: 100,
 		meta: {
-			label: '#treeHeaders_advancedGroup',
+			label: 'Users',
 			menu: UMB_ADVANCED_SETTINGS_MENU_ALIAS,
 		},
 		conditions: [
