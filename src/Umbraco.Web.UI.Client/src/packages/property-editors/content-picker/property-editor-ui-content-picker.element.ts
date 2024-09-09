@@ -37,6 +37,15 @@ export class UmbPropertyEditorUIContentPickerElement
 	}
 	#value?: UmbContentPickerValueType = [];
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	_type: UmbContentPickerSource['type'] = 'content';
 
@@ -150,6 +159,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				.startNode=${startNode}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
 				?showOpenButton=${this._showOpenButton}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-content>
 		`;
 	}

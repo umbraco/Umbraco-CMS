@@ -22,6 +22,15 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 		this._max = minMax?.max ?? Infinity;
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	_min = 0;
 
@@ -40,7 +49,8 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 				.max=${this._max}
 				.value=${this.value}
 				?showOpenButton=${true}
-				@change=${this.#onChange}></umb-input-member-group>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}></umb-input-member-group>
 		`;
 	}
 }
