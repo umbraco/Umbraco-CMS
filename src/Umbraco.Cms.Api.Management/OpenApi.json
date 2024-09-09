@@ -36516,11 +36516,15 @@
       "DocumentNotificationResponseModel": {
         "required": [
           "actionId",
+          "alias",
           "subscribed"
         ],
         "type": "object",
         "properties": {
           "actionId": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "subscribed": {
