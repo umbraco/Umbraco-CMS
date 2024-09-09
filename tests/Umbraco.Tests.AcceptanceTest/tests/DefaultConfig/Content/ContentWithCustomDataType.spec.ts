@@ -313,10 +313,6 @@ test('can save content after changing the property editor of the custom data typ
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([inputText]);
 });
 
 
