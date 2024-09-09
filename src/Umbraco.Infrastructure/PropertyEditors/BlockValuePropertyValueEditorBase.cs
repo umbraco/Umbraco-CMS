@@ -248,6 +248,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             (targetValue is not null ? BlockEditorValues.DeserializeAndClean(targetValue) : null)
             ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(sourceBlockEditorValues.Layout));
 
+        // structure is global, and layout follows structure
+        targetBlockEditorValues.BlockValue.Layout = sourceBlockEditorValues.BlockValue.Layout;
+
         MergePartialPropertyValueForCulture(sourceBlockEditorValues.BlockValue.ContentData, targetBlockEditorValues.BlockValue.ContentData, culture);
         MergePartialPropertyValueForCulture(sourceBlockEditorValues.BlockValue.SettingsData, targetBlockEditorValues.BlockValue.SettingsData, culture);
 
