@@ -119,6 +119,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 			uui-avatar {
 				background-color: transparent;
 				border: 1.5px solid var(--uui-color-divider-standalone);
+				color: inherit;
 			}
 
 			uui-avatar.has-image {
