@@ -105,10 +105,13 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 
 	#copyToClipboard() {
 		try {
+			const serverKeyValues = this._serverKeyValues
+				.map((serverKeyValue) => `${serverKeyValue.name}: ${serverKeyValue.data}`)
+				.join('\n');
 			const text = `
 Umbraco system information\n
 --------------------------------\n
-${this._serverKeyValues.map((serverKeyValue) => `${serverKeyValue.name}: ${serverKeyValue.data}`).join('\n')}`;
+${serverKeyValues}`;
 			navigator.clipboard.writeText(text);
 
 			this.#notificationContext?.peek('positive', {
