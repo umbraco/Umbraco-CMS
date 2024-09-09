@@ -1,5 +1,5 @@
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSysinfoRepository } from '../repository/sysinfo.repository';
+import { UmbSysinfoRepository } from '../repository/sysinfo.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
