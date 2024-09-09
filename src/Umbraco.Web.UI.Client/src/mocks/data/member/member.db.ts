@@ -6,10 +6,11 @@ import { UmbMockContentCollectionManager } from '../utils/content/content-collec
 import type { UmbMockMemberModel } from './member.data.js';
 import { data } from './member.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type {
-	CreateMemberRequestModel,
-	MemberItemResponseModel,
-	MemberResponseModel,
+import {
+	MemberKindModel,
+	type CreateMemberRequestModel,
+	type MemberItemResponseModel,
+	type MemberResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
@@ -39,6 +40,7 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
+		kind: MemberKindModel.DEFAULT,
 		memberType: {
 			id: memberType.id,
 			icon: memberType.icon,
