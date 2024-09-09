@@ -204,10 +204,14 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	contentProperty(udi: string, propertyAlias: string) {
-		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+		this.#contents.asObservablePart(
+			(source) => source.find((x) => x.udi === udi)?.values?.find((values) => values.alias === propertyAlias)?.value,
+		);
 	}
 	settingsProperty(udi: string, propertyAlias: string) {
-		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+		this.#contents.asObservablePart(
+			(source) => source.find((x) => x.udi === udi)?.values?.find((values) => values.alias === propertyAlias)?.value,
+		);
 	}
 
 	abstract create(
@@ -228,10 +232,19 @@ export abstract class UmbBlockManagerContext<
 		return {
 			udi: buildUdi('element', UmbId.new()),
 			contentTypeKey: blockType.settingsElementTypeKey,
+			values: [],
 		};
 	}
 
-	protected createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
+	protected _createBlockElementData(udi: string, elementTypeKey: string) {
+		return {
+			udi: udi,
+			contentTypeKey: elementTypeKey,
+			values: [],
+		};
+	}
+
+	protected _createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
@@ -244,18 +257,12 @@ export abstract class UmbBlockManagerContext<
 			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
 
-		const content = {
-			udi: layout.contentUdi,
-			contentTypeKey: contentElementTypeKey,
-		};
+		const content = this._createBlockElementData(layout.contentUdi, contentElementTypeKey);
 		let settings: UmbBlockDataModel | undefined = undefined;
 
 		if (blockType.settingsElementTypeKey) {
 			layout.settingsUdi = buildUdi('element', UmbId.new());
-			settings = {
-				udi: layout.settingsUdi,
-				contentTypeKey: blockType.settingsElementTypeKey,
-			};
+			settings = this._createBlockElementData(layout.settingsUdi, blockType.settingsElementTypeKey);
 		}
 
 		return {

@@ -28,7 +28,7 @@ export class UmbBlockListManagerContext<
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData?: UmbBlockListWorkspaceOriginData,
 	) {
-		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	insert(

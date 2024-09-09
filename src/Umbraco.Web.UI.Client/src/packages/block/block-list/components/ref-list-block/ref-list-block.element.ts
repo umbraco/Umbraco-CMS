@@ -1,7 +1,7 @@
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 import '@umbraco-cms/backoffice/ufm';
 
@@ -18,7 +18,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	icon?: string;
 
 	@state()
-	_content?: UmbBlockDataModel;
+	_content?: UmbBlockDataType;
 
 	@property()
 	_workspaceEditPath?: string;
@@ -29,7 +29,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		// UMB_BLOCK_LIST_ENTRY_CONTEXT
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.content,
+				context.contentValues,
 				(content) => {
 					this._content = content;
 				},

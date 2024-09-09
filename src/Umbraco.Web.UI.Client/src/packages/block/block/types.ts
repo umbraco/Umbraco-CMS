@@ -1,5 +1,6 @@
 import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/extension-registry';
 export type {
+	UmbBlockDataType,
 	UmbBlockDataModel,
 	UmbBlockDataValueModel,
 	UmbBlockLayoutBaseModel,

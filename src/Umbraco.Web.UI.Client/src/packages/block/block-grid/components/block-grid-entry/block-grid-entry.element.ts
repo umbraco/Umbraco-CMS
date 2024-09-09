@@ -190,23 +190,29 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.content,
+			this.#context.contentValues,
 			(content) => {
 				this.#updateBlockViewProps({ content });
 			},
 			null,
 		);
 		this.observe(
-			this.#context.settings,
+			this.#context.settingsValues,
 			(settings) => {
 				this.#updateBlockViewProps({ settings });
+			},
+			null,
+		);
 
+		this.observe(
+			this.#context.settingsUdi,
+			(settingsUdi) => {
 				this.removeUmbControllerByAlias('observeMessagesForSettings');
-				if (settings) {
+				if (settingsUdi) {
 					// Observe settings validation state:
 					new UmbObserveValidationStateController(
 						this,
-						`$.settingsData[${UmbDataPathBlockElementDataQuery(settings)}]`,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ udi: settingsUdi })}]`,
 						(hasMessages) => {
 							this._settingsInvalid = hasMessages;
 							this._blockViewProps.settingsInvalid = hasMessages;

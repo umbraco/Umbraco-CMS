@@ -81,7 +81,7 @@ export class UmbBlockGridManagerContext<
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
-		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+		return super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	/**

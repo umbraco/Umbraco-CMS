@@ -37,6 +37,8 @@ export interface UmbBlockDataModel {
  * Type for the values parsed to Custom Views.
  */
 export interface UmbBlockDataType {
+	//udi: string; // I want to try to leave these out for now [NL]
+	//contentTypeKey: string; // I want to try to leave these out for now [NL]
 	[key: string]: unknown;
 }
 

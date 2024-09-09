@@ -1,5 +1,5 @@
 import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel } from '../types.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -56,12 +56,19 @@ export abstract class UmbBlockEntryContext<
 		this._manager?.setOneSettingsProperty(settingsUdi, propertyAlias, value);
 	}
 
+	// TODO: adjust to variants. [NL]
 	contentPropertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#content.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
+		return this.#content.asObservablePart(
+			(x) => x?.values.find((x) => x.alias === propertyAlias)?.value as ReturnType | undefined,
+		);
 	}
+	/*
 	settingsPropertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#settings.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
+		return this.#settings.asObservablePart(
+			(x) => x?.values.find((x) => x.alias === propertyAlias)?.value as ReturnType | undefined,
+		);
 	}
+	*/
 
 	#index = new UmbNumberState(undefined);
 	readonly index = this.#index.asObservable();
@@ -122,6 +129,12 @@ export abstract class UmbBlockEntryContext<
 	#content = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	public readonly content = this.#content.asObservable();
 	public readonly contentTypeKey = this.#content.asObservablePart((x) => x?.contentTypeKey);
+	public readonly contentValues = this.#content.asObservablePart((x) =>
+		x?.values.reduce((acc, curr) => {
+			acc[curr.alias] = curr.value;
+			return acc;
+		}, {} as UmbBlockDataType),
+	);
 
 	// TODO: Make sure changes to the Block Content / Settings are reflected back to Manager.
 
@@ -129,6 +142,12 @@ export abstract class UmbBlockEntryContext<
 	public readonly settings = this.#settings.asObservable();
 	private readonly settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
 		x ? (x.contentTypeKey ?? undefined) : null,
+	);
+	public readonly settingsValues = this.#content.asObservablePart((x) =>
+		x?.values.reduce((acc, curr) => {
+			acc[curr.alias] = curr.value;
+			return acc;
+		}, {} as UmbBlockDataType),
 	);
 
 	abstract readonly showContentEdit: Observable<boolean>;
