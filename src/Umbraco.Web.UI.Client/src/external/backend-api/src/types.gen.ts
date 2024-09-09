@@ -1081,7 +1081,6 @@ export type InviteUserRequestModel = {
     name: string;
     userGroupIds: Array<(ReferenceByIdModel)>;
     id?: string | null;
-    kind: UserKindModel;
     message?: string | null;
 };
 
