@@ -1,25 +1,14 @@
-import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../section/index.js';
-import type { ManifestSectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_USER_ROOT_ENTITY_TYPE } from '../entity.js';
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-const sectionsViews: Array<ManifestSectionView> = [
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	{
-		type: 'sectionView',
-		alias: 'Umb.SectionView.Users',
-		name: 'Users Section View',
-		js: () => import('./users-section-view.element.js'),
-		weight: 200,
+		type: 'workspace',
+		alias: 'Umb.Workspace.UserRoot',
+		name: 'User Root Workspace View',
+		element: () => import('./user-root-workspace-view.element.js'),
 		meta: {
-			label: '#general_users',
-			pathname: 'users',
-			icon: 'icon-user',
+			entityType: UMB_USER_ROOT_ENTITY_TYPE,
 		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.SectionAlias',
-				match: UMB_USER_MANAGEMENT_SECTION_ALIAS,
-			},
-		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...sectionsViews];

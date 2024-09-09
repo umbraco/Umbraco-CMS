@@ -8,9 +8,11 @@ import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as menuItemManifests } from './menu-item/manifests.js';
 
-export const manifests: Array<ManifestTypes> = [
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...collectionManifests,
 	...conditionsManifests,
 	...entityActionsManifests,
@@ -21,4 +23,5 @@ export const manifests: Array<ManifestTypes> = [
 	...sectionViewManifests,
 	...propertyEditorManifests,
 	...workspaceManifests,
+	...menuItemManifests,
 ];
