@@ -62,7 +62,8 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 			</p>
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
+				.variantLanguageOptions=${this._options}
+				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
 
 			<p><umb-localize key="content_variantsWillBeSaved">All new variants will be saved.</umb-localize></p>
 
