@@ -6,6 +6,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbMemberItemRepository } from '../../../repository/index.js';
+import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-member-table-collection-view')
 export class UmbMemberTableCollectionViewElement extends UmbLitElement {
@@ -29,6 +31,10 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 			alias: 'memberEmail',
 		},
 		{
+			name: this.localize.term('content_membertype'),
+			alias: 'memberType',
+		},
+		{
 			name: this.localize.term('member_kind'),
 			alias: 'memberKind',
 		},
@@ -38,6 +44,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	#collectionContext?: UmbMemberCollectionContext;
+	#memberTypeItemRepository = new UmbMemberTypeItemRepository(this);
 
 	constructor() {
 		super();
@@ -53,8 +60,10 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
 	}
 
-	#createTableItems(members: Array<UmbMemberCollectionModel>) {
-		console.log('members', members);
+	async #createTableItems(members: Array<UmbMemberCollectionModel>) {
+		const memberTypeUniques = members.map((member) => member.memberType.unique);
+		const { data: memberTypes } = await this.#memberTypeItemRepository.requestItems(memberTypeUniques);
+
 		this._tableItems = members.map((member) => {
 			// TODO: get correct variant name
 			const name = member.variants[0].name;
@@ -63,9 +72,11 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 					? this.localize.term('member_memberKindApi')
 					: this.localize.term('member_memberKindDefault');
 
+			const memberType = memberTypes?.find((type) => type.unique === member.memberType.unique);
+
 			return {
 				id: member.unique,
-				icon: 'icon-user',
+				icon: memberType?.icon,
 				data: [
 					{
 						columnAlias: 'memberName',
@@ -78,6 +89,10 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'memberEmail',
 						value: member.email,
+					},
+					{
+						columnAlias: 'memberType',
+						value: memberType?.name,
 					},
 					{
 						columnAlias: 'memberKind',
