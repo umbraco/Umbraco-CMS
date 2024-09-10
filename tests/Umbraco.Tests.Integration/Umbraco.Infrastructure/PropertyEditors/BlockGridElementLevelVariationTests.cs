@@ -173,7 +173,6 @@ public class BlockGridElementLevelVariationTests : BlockEditorElementVariationTe
         }
     }
 
-
     [Test]
     public async Task Can_Publish_With_Blocks_Removed_At_Root()
     {
@@ -192,7 +191,7 @@ public class BlockGridElementLevelVariationTests : BlockEditorElementVariationTe
 
         blockGridValue = JsonSerializer.Deserialize<BlockGridValue>((string)content.Properties["blocks"]!.GetValue()!);
 
-        // remove block #3 (second at root level
+        // remove block #3 (second at root level)
         blockGridValue.Layout[blockGridValue.Layout.First().Key] =
         [
             blockGridValue.Layout.First().Value.First(),
