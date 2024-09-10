@@ -70,41 +70,37 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 	#renderGeneralSection() {
 		return html`
-			<div class="general-item">
-				<strong><umb-localize key="content_createDate">Created</umb-localize></strong>
-				<span> ${this._createDate} </span>
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="content_updateDate">Last edited</umb-localize></strong>
-				<span> ${this._updateDate} </span>
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="content_membertype">Member Type</umb-localize></strong>
-				<uui-ref-node
-					standalone
-					.name=${this._memberTypeName}
-					.href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}>
-					<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
-				</uui-ref-node>
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="template_id">Id</umb-localize></strong>
-				<span>${this._unique}</span>
-			</div>
+			<umb-stack look="compact">
+				<div>
+					<h4><umb-localize key="content_createDate">Created</umb-localize></h4>
+					<span> ${this._createDate} </span>
+				</div>
+				<div>
+					<h4><umb-localize key="content_updateDate">Last edited</umb-localize></h4>
+					<span> ${this._updateDate} </span>
+				</div>
+				<div>
+					<h4><umb-localize key="content_membertype">Member Type</umb-localize></h4>
+					<uui-ref-node
+						standalone
+						.name=${this._memberTypeName}
+						.href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}>
+						<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
+					</uui-ref-node>
+				</div>
+				<div>
+					<h4><umb-localize key="template_id">Id</umb-localize></h4>
+					<span>${this._unique}</span>
+				</div>
+			</umb-stack>
 		`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			.general-item {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-1);
-			}
-
-			.general-item:not(:last-child) {
-				margin-bottom: var(--uui-size-space-6);
+			h4 {
+				margin: 0;
 			}
 		`,
 	];
