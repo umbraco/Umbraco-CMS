@@ -70,6 +70,7 @@ public static class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddCacheSeeding(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IDocumentSeedKeyProvider, ContentTypeSeedKeyProvider>();
+        builder.Services.AddSingleton<IDocumentSeedKeyProvider, BreadthFirstKeyProvider>();
 
         return builder;
     }

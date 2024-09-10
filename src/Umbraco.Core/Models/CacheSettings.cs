@@ -10,4 +10,7 @@ public class CacheSettings
     /// </summary>
     public List<Guid> ContentTypeKeys { get; set; } =
         new();
+
+
+    public int BreadthFirstSeedCount = 10;
 }
