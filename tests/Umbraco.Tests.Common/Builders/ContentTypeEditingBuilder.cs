@@ -1,10 +1,9 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
@@ -14,20 +13,16 @@ public class ContentTypeEditingBuilder
 {
     private Guid? _key;
     private Guid? _containerKey;
-    private ContentTypeCleanup _cleanup;
+    private ContentTypeCleanup _cleanup = new();
     private IEnumerable<Guid> _allowedTemplateKeys;
     private Guid? _defaultTemplateKey;
     private bool? _allowAtRoot;
     private bool? _isElement;
     private bool? _variesByCulture;
     private bool? _variesBySegment;
-    private readonly List<PropertyTypeEditingBuilder<ContentTypeEditingBuilder>> _propertyTypeBuilders = new();
-
-    private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders =
-        new();
-
-    private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new();
-    private readonly List<TemplateBuilder> _templateBuilders = new();
+    private readonly List<PropertyTypeEditingBuilder> _propertyTypeBuilders = [];
+    private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders = [];
+    private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = [];
 
 
     public ContentTypeEditingBuilder()
@@ -60,19 +55,13 @@ public class ContentTypeEditingBuilder
         return builder;
     }
 
-    public PropertyTypeEditingBuilder<ContentTypeEditingBuilder> AddPropertyType()
+    public PropertyTypeEditingBuilder AddPropertyType()
     {
-        var builder = new PropertyTypeEditingBuilder<ContentTypeEditingBuilder>(this);
+        var builder = new PropertyTypeEditingBuilder(this);
         _propertyTypeBuilders.Add(builder);
         return builder;
     }
 
-    public TemplateBuilder AddAllowedTemplate()
-    {
-        var builder = new TemplateBuilder(this);
-        _templateBuilders.Add(builder);
-        return builder;
-    }
 
     public ContentTypeSortBuilder AddAllowedContentType()
     {
@@ -80,6 +69,13 @@ public class ContentTypeEditingBuilder
         _allowedContentTypeBuilders.Add(builder);
         return builder;
     }
+
+    public IEnumerable<Guid> AddAllowedTemplateKeys(IEnumerable<Guid> templateKeys)
+    {
+        _allowedTemplateKeys = templateKeys;
+        return _allowedTemplateKeys;
+    }
+
 
     public override ContentTypeCreateModel Build()
     {
@@ -89,15 +85,16 @@ public class ContentTypeEditingBuilder
         contentType.Key = GetKey();
         contentType.ContainerKey = _containerKey;
         contentType.Cleanup = _cleanup;
-        contentType.AllowedTemplateKeys = _allowedTemplateKeys;
+        contentType.AllowedTemplateKeys = _allowedTemplateKeys ?? Array.Empty<Guid>();
         contentType.DefaultTemplateKey = _defaultTemplateKey;
         contentType.IsElement = _isElement ?? false;
         contentType.VariesByCulture = _variesByCulture ?? false;
         contentType.VariesBySegment = _variesBySegment ?? false;
         contentType.AllowedAsRoot = _allowAtRoot ?? false;
-        contentType.Properties = _propertyTypeBuilders.Select(x => x.Build()).ToList();
-        contentType.Containers = _propertyTypeContainerBuilders.Select(x => x.Build()).ToList();
-        contentType.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build()).ToList();
+        contentType.Properties = _propertyTypeBuilders.Select(x => x.Build());
+        contentType.Containers = _propertyTypeContainerBuilders.Select(x => x.Build());
+        contentType.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build());
+
 
         return contentType;
     }
@@ -113,7 +110,8 @@ public class ContentTypeEditingBuilder
             .Build();
     }
 
-    public static ContentTypeCreateModel CreateSimpleContentType(string alias, string name, IContentType parent = null, string propertyGroupName = "Content", Guid? defaultTemplateKey = null)
+    public static ContentTypeCreateModel CreateSimpleContentType(string alias, string name, IContentType parent = null,
+        string propertyGroupName = "Content", Guid? defaultTemplateKey = null)
     {
         var containerKey = Guid.NewGuid();
         var builder = new ContentTypeEditingBuilder();
@@ -129,6 +127,7 @@ public class ContentTypeEditingBuilder
             .WithAlias("title")
             .WithDataTypeKey(Constants.DataTypes.Guids.TextareaGuid)
             .WithName("Title")
+            .WithContainerKey(containerKey)
             .Done()
             .WithDefaultTemplateKey(defaultTemplateKey ?? Guid.Empty)
             .Build();

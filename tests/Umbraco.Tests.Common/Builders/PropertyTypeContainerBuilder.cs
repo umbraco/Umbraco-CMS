@@ -50,7 +50,7 @@ public class PropertyTypeContainerBuilder<TParent>(TParent parentBuilder)
         var key = _key ?? Guid.NewGuid();
         var parentKey = _parentKey;
         var name = _name ?? "Container";
-        var type = _type ?? "group";
+        var type = _type ?? "Group";
         var sortOrder = _sortOrder ?? 0;
 
 

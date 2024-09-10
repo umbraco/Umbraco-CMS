@@ -4,8 +4,9 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
-    : ChildBuilderBase<TParent, ContentTypePropertyTypeModel>(parentBuilder), IBuildPropertyTypes, IWithKeyBuilder, IWIthContainerKeyBuilder,
+public class PropertyTypeEditingBuilder
+    : ChildBuilderBase<ContentTypeEditingBuilder, ContentTypePropertyTypeModel>, IBuildPropertyTypes, IWithKeyBuilder,
+        IWIthContainerKeyBuilder,
         IWithSortOrderBuilder, IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder, IWithDataTypeKeyBuilder,
         IWithVariesByCultureBuilder, IWithVariesBySegmentBuilder
 {
@@ -18,9 +19,15 @@ public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
     private Guid? _dataTypeKey;
     private bool _variesByCulture;
     private bool _variesBySegment;
-    private PropertyTypeValidationEditingBuilder<PropertyTypeEditingBuilder<TParent>> _validationBuilder;
-    private PropertyTypeAppearance _appearance;
+    private PropertyTypeValidationEditingBuilder _validationBuilder;
+    private PropertyTypeAppearanceBuilder _appearanceBuilder;
 
+
+    public PropertyTypeEditingBuilder(ContentTypeEditingBuilder parentBuilder) : base(parentBuilder)
+    {
+        _validationBuilder = new PropertyTypeValidationEditingBuilder(this);
+        _appearanceBuilder = new PropertyTypeAppearanceBuilder(this);
+    }
 
     Guid? IWithKeyBuilder.Key
     {
@@ -76,16 +83,23 @@ public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
         set => _variesBySegment = value;
     }
 
-    public PropertyTypeValidationEditingBuilder<PropertyTypeEditingBuilder<TParent>> WithValidation()
+    public PropertyTypeValidationEditingBuilder AddValidation()
     {
-        var builder = new PropertyTypeValidationEditingBuilder<PropertyTypeEditingBuilder<TParent>>(this);
+        var builder = new PropertyTypeValidationEditingBuilder(this);
         _validationBuilder = builder;
         return builder;
     }
 
-    public PropertyTypeEditingBuilder<TParent> WithAppearance(PropertyTypeAppearance appearance)
+    public PropertyTypeAppearanceBuilder AddAppearance()
     {
-        _appearance = appearance;
+        var builder = new PropertyTypeAppearanceBuilder(this);
+        _appearanceBuilder = builder;
+        return builder;
+    }
+
+    public PropertyTypeEditingBuilder WithContainerKey(Guid? containerKey)
+    {
+        _containerKey = containerKey;
         return this;
     }
 
@@ -101,8 +115,8 @@ public class PropertyTypeEditingBuilder<TParent>(TParent parentBuilder)
         var dataTypeKey = _dataTypeKey ?? Constants.DataTypes.Guids.TextareaGuid;
         var variesByCulture = _variesByCulture;
         var variesBySegment = _variesBySegment;
-        var validation = _validationBuilder?.Build();
-        var appearance = _appearance ?? new PropertyTypeAppearance();
+        var validation = _validationBuilder.Build();
+        var appearance = _appearanceBuilder.Build();
 
         return new ContentTypePropertyTypeModel
         {

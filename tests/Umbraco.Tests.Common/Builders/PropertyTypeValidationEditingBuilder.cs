@@ -3,38 +3,38 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeValidationEditingBuilder<TParent>
-    : ChildBuilderBase<TParent, PropertyTypeValidation>, IWithMandatoryBuilder,
+public class PropertyTypeValidationEditingBuilder
+    : ChildBuilderBase<PropertyTypeEditingBuilder, PropertyTypeValidation>, IBuildPropertyTypes, IWithMandatoryBuilder,
         IWithMandatoryMessageBuilder, IWithRegularExpressionBuilder, IWithRegularExpressionMessage
 {
-    private bool _mandatory;
+    private bool? _mandatory;
     private string? _mandatoryMessage;
     private string? _regularExpression;
     private string? _regularExpressionMessage;
 
-    public PropertyTypeValidationEditingBuilder(TParent parentBuilder) : base(parentBuilder)
+    public PropertyTypeValidationEditingBuilder(PropertyTypeEditingBuilder parentBuilder) : base(parentBuilder)
     {
     }
 
-    public bool Mandatory
+    bool? IWithMandatoryBuilder.Mandatory
     {
         get => _mandatory;
         set => _mandatory = value;
     }
 
-    public string? MandatoryMessage
+    string? IWithMandatoryMessageBuilder.MandatoryMessage
     {
         get => _mandatoryMessage;
         set => _mandatoryMessage = value;
     }
 
-    public string? RegularExpression
+    string? IWithRegularExpressionBuilder.RegularExpression
     {
         get => _regularExpression;
         set => _regularExpression = value;
     }
 
-    public string? RegularExpressionMessage
+    string? IWithRegularExpressionMessage.RegularExpressionMessage
     {
         get => _regularExpressionMessage;
         set => _regularExpressionMessage = value;
@@ -44,13 +44,12 @@ public class PropertyTypeValidationEditingBuilder<TParent>
     {
         var validation = new PropertyTypeValidation
         {
-            Mandatory = _mandatory,
-            MandatoryMessage = _mandatoryMessage,
-            RegularExpression = _regularExpression,
-            RegularExpressionMessage = _regularExpressionMessage,
+            Mandatory = _mandatory ?? false,
+            MandatoryMessage = _mandatoryMessage ?? string.Empty,
+            RegularExpression = _regularExpression ?? string.Empty,
+            RegularExpressionMessage = _regularExpressionMessage ?? string.Empty,
         };
 
         return validation;
     }
 }
-
