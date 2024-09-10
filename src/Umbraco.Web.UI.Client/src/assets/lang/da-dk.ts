@@ -357,6 +357,7 @@ export default {
 	member: {
 		createNewMember: 'Opret et nyt medlem',
 		allMembers: 'Alle medlemmer',
+		kind: 'Slags',
 		memberGroupNoProperties: 'Medlemgrupper har ingen yderligere egenskaber til redigering.',
 		'2fa': 'Totrinsbekræftelse',
 		duplicateMemberLogin: 'A member with this login already exists',
@@ -364,6 +365,8 @@ export default {
 		memberHasPassword: 'The member already has a password set',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
+		memberKindDefault: 'Bruger',
+		memberKindApi: 'API Bruger',
 	},
 	contentType: {
 		copyFailed: 'Kopiering af indholdstypen fejlede',
