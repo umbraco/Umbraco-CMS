@@ -1,5 +1,7 @@
 import type { UmbUserGroupDetailModel } from '../index.js';
+import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH } from '../paths.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
+import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -170,9 +172,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 		return html`
 			<umb-workspace-editor
-				alias="Umb.Workspace.UserGroup"
+				alias=${UMB_USER_GROUP_WORKSPACE_ALIAS}
 				class="uui-text"
-				back-path="/section/user-management/view/user-groups">
+				back-path=${UMB_USER_GROUP_ROOT_WORKSPACE_PATH}>
 				${this.#renderHeader()} ${this.#renderMain()}
 			</umb-workspace-editor>
 		`;
