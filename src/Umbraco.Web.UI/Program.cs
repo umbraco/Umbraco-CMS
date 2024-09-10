@@ -1,8 +1,5 @@
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors(opt =>
-    opt.AddPolicy("AllowAll", options => options.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
-
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
@@ -19,8 +16,6 @@ await app.BootUmbracoAsync();
 #if (UseHttpsRedirect)
 app.UseHttpsRedirection();
 #endif
-
-app.UseCors("AllowAll");
 
 app.UseUmbraco()
     .WithMiddleware(u =>
