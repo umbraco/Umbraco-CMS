@@ -321,13 +321,10 @@ export abstract class UmbBlockEntryContext<
 	#observeContentData() {
 		if (!this._manager || !this.#contentKey) return;
 
-		console.log('get content of', this.#contentKey, this._layout.value);
-
 		// observe content:
 		this.observe(
 			this._manager.contentOf(this.#contentKey),
 			(content) => {
-				console.log('content', content);
 				this.#content.setValue(content);
 			},
 			'observeContent',
@@ -375,8 +372,6 @@ export abstract class UmbBlockEntryContext<
 		const contentTypeKey = this.#content.getValue()?.contentTypeKey;
 		if (!contentTypeKey) return;
 
-		console.log('observeBlockType based on ', this.#content.getValue());
-
 		// observe blockType:
 		this.observe(
 			this._manager.blockTypeOf(contentTypeKey),
@@ -403,7 +398,6 @@ export abstract class UmbBlockEntryContext<
 			this.observe(
 				this.contentElementTypeName,
 				(contentTypeName) => {
-					console.log('contentElementTypeName', contentTypeName);
 					this.#label.setValue(contentTypeName ?? 'no name');
 				},
 				'observeContentTypeName',
