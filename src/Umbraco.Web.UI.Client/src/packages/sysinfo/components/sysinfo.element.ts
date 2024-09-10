@@ -78,7 +78,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 					${when(
 						this._loading,
 						() => html`<uui-loader-bar></uui-loader-bar>`,
-						() => html` <umb-code-block> ${this._systemInformation} </umb-code-block> `,
+						() => html` <umb-code-block id="codeblock"> ${this._systemInformation} </umb-code-block> `,
 					)}
 
 					<uui-button
@@ -131,12 +131,8 @@ ${this._systemInformation}`;
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
-			#container {
+			#code-block {
 				max-height: 300px;
-			}
-
-			.data-cell {
-				word-break: break-word;
 			}
 		`,
 	];
