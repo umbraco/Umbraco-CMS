@@ -6,6 +6,7 @@ import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbrac
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbMemberKind } from '../../utils/index.js';
 
 /**
  * A data source for the Member that fetches data from the server
@@ -42,6 +43,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			isApproved: false,
 			isLockedOut: false,
 			isTwoFactorEnabled: false,
+			kind: UmbMemberKind.DEFAULT,
 			failedPasswordAttempts: 0,
 			lastLoginDate: null,
 			lastLockoutDate: null,
@@ -90,6 +92,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			isApproved: data.isApproved,
 			isLockedOut: data.isLockedOut,
 			isTwoFactorEnabled: data.isTwoFactorEnabled,
+			kind: data.kind,
 			failedPasswordAttempts: data.failedPasswordAttempts,
 			lastLoginDate: data.lastLoginDate || null,
 			lastLockoutDate: data.lastLockoutDate || null,

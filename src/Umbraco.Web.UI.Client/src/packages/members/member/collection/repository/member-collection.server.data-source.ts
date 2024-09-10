@@ -50,6 +50,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 				email: item.email,
 				variants: item.variants as UmbVariantModel[],
 				unique: item.id,
+				kind: item.kind,
 				lastLoginDate: item.lastLoginDate || null,
 				lastLockoutDate: item.lastLockoutDate || null,
 				lastPasswordChangeDate: item.lastPasswordChangeDate || null,
