@@ -163,8 +163,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleRouting(JsonPayload payload)
     {
-        //TODO test at denne methode bliver kaldt ved save også.
-
         if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
@@ -172,7 +170,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
         if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            //TODO Force rebuilt instead
             _documentUrlService.RebuildAllUrlsAsync().GetAwaiter().GetResult(); //TODO make async
         }
 

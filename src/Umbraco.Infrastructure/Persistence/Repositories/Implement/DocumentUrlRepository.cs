@@ -67,8 +67,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
                     {
                         toUpdate.Add(found);
                     }
-
-                    // if it's an update then it's not an insert
+                    // if we found it, we know we should not insert it as a new
                     toInsert.Remove((found.UniqueId, found.LanguageId, found.IsDraft));
                 }
                 else
@@ -86,12 +85,9 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
         if (toUpdate.Any())
         {
-            var updater = Database.UpdateMany<DocumentUrlDto>();
-            updater.OnlyFields(x=>x.UrlSegment);
-
             foreach (DocumentUrlDto updated in toUpdate)
             {
-                updater.Execute(updated);
+                Database.Update(updated);
             }
         }
 
@@ -129,7 +125,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             UrlSegment = model.UrlSegment,
             UniqueId = model.DocumentKey,
             LanguageId = model.LanguageId,
-            IsDraft = model.IsDraft
+            IsDraft = model.IsDraft,
         };
     }
 }

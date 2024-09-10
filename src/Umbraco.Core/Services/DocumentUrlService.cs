@@ -441,15 +441,24 @@ public class DocumentUrlService : IDocumentUrlService
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
     {
         var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
-        IEnumerable<IContent> contents = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
-        await CreateOrUpdateUrlSegmentsAsync(contents);
+        IContent item = _contentService.GetById(id)!;
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+
+        await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
+        {
+            item
+        });
     }
 
     public async Task DeleteUrlsAndDescendantsAsync(Guid key)
     {
         var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
-        IEnumerable<IContent> contents = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
-        await DeleteUrlsAsync(contents);
+        IContent item = _contentService.GetById(id)!;
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        await DeleteUrlsAsync(new List<IContent>(descendants)
+        {
+            item
+        });
     }
 
     public async Task CreateOrUpdateUrlSegmentsAsync(Guid key)
