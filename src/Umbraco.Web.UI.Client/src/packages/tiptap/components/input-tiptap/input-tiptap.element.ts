@@ -6,6 +6,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 import './tiptap-fixed-menu.element.js';
 import { Editor, StarterKit } from '@umbraco-cms/backoffice/external/tiptap';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -22,23 +23,7 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 		if (!editor) return;
 
-		const json =
-			this.value && typeof this.value === 'string'
-				? JSON.parse(this.value)
-				: {
-						type: 'doc',
-						content: [
-							{
-								type: 'paragraph',
-								content: [
-									{
-										type: 'text',
-										text: 'Hello Umbraco',
-									},
-								],
-							},
-						],
-					};
+		const json = this.value && typeof this.value === 'string' ? JSON.parse(this.value) : this.value;
 
 		// TODO: Try Disable css inject to remove prosemirror css
 		this._editor = new Editor({
@@ -48,7 +33,7 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 			onUpdate: ({ editor }) => {
 				const json = editor.getJSON();
 				this.value = JSON.stringify(json);
-				console.log('json', json);
+				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
 	}

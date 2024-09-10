@@ -1,9 +1,11 @@
+import type UmbInputTiptapElement from '../../components/input-tiptap/input-tiptap.element.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-
-import '../../components/input-tiptap/input-tiptap.element.js';
 
 // Look at Tiny for correct types
 export interface UmbRichTextEditorValueType {
@@ -22,10 +24,10 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	}
 
 	@property({ attribute: false })
-	public set value(value: UmbRichTextEditorValueType) {
+	public set value(value: string) {
 		this._value = value;
 	}
-	public get value(): UmbRichTextEditorValueType {
+	public get value(): string {
 		return this._value;
 	}
 
@@ -33,10 +35,19 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	_config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _value: UmbRichTextEditorValueType = {};
+	private _value: string = '';
+
+	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
+		const value = event.target.value as string;
+		this._value = value;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
 
 	override render() {
-		return html`<umb-input-tiptap></umb-input-tiptap>`;
+		return html`<umb-input-tiptap
+			.value=${this.value}
+			@change=${this.#onChange}
+			.configuration=${this._config}></umb-input-tiptap>`;
 	}
 }
 
