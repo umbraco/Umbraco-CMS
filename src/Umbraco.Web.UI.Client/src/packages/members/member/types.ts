@@ -1,4 +1,5 @@
 import type { UmbMemberEntityType } from './entity.js';
+import type { UmbMemberKindType } from './utils/index.js';
 import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbMemberDetailModel {
@@ -9,6 +10,7 @@ export interface UmbMemberDetailModel {
 	isApproved: boolean;
 	isLockedOut: boolean;
 	isTwoFactorEnabled: boolean;
+	kind: UmbMemberKindType;
 	lastLockoutDate: string | null;
 	lastLoginDate: string | null;
 	lastPasswordChangeDate: string | null;
