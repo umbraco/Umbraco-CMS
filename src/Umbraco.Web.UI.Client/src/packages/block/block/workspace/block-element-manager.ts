@@ -110,10 +110,14 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		await this.#getDataPromise;
 
 		return mergeObservables(
-			[this.#data.asObservablePart((data) => data?.values?.filter((x) => x?.alias === propertyAlias)), this.variantId],
-			([propertyValues, variantId]) => {
-				if (!propertyValues || !variantId) return;
-				return propertyValues.find((x) => variantId.compare(x))?.value as PropertyValueType;
+			[
+				this.#data.asObservablePart((data) => data?.values?.filter((x) => x?.alias === propertyAlias)),
+				await this.propertyVariantId(propertyAlias),
+			],
+			([propertyValues, propertyVariantId]) => {
+				if (!propertyValues || !propertyVariantId) return;
+
+				return propertyValues.find((x) => propertyVariantId.compare(x))?.value as PropertyValueType;
 			},
 		);
 	}
@@ -126,15 +130,15 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	 */
 	async getPropertyValue<ReturnType = unknown>(alias: string) {
 		await this.#getDataPromise;
-		const variantId = this.#variantId.getValue();
+		const managerVariantId = this.#variantId.getValue();
+		if (!managerVariantId) return;
+		const property = await this.structure.getPropertyStructureByAlias(alias);
+		if (!property) return;
+		const variantId = this.#createPropertyVariantId(property, managerVariantId);
 		const currentData = this.getData();
-		if (currentData) {
-			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
-			);
-			return newDataSet?.value as ReturnType;
-		}
-		return undefined;
+		if (!currentData) return;
+		const newDataSet = currentData.values?.find((x) => x.alias === alias && (variantId ? variantId.compare(x) : true));
+		return newDataSet?.value as ReturnType;
 	}
 
 	/**
@@ -148,9 +152,11 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType) {
 		this.initiatePropertyValueChange();
 		await this.#getDataPromise;
-
-		const variantId = this.#variantId.getValue();
-		if (!variantId) return;
+		const managerVariantId = this.#variantId.getValue();
+		if (!managerVariantId) return;
+		const property = await this.structure.getPropertyStructureByAlias(alias);
+		if (!property) return;
+		const variantId = this.#createPropertyVariantId(property, managerVariantId);
 
 		const entry = { ...variantId.toObject(), alias, value } as UmbBlockDataValueModel<ValueType>;
 		const currentData = this.getData();
@@ -158,7 +164,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 			const values = appendToFrozenArray(
 				currentData.values ?? [],
 				entry,
-				(x) => x.alias === alias && variantId!.compare(x),
+				(x) => x.alias === alias && variantId.compare(x),
 			);
 			this.#data.update({ values });
 		}

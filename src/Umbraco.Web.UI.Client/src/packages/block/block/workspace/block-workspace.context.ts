@@ -84,6 +84,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 				'observeLiveEditingMode',
 			);
+			this.observe(context.variantId, (variantId) => {
+				console.log('workspace variantID:', variantId);
+				this.#variantId.setValue(variantId);
+			});
 		}).asPromise();
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
@@ -91,10 +95,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}).asPromise();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.variantId, (variantId) => {
-				this.#variantId.setValue(variantId);
-			});
-
+			// TODO: Ideally we move this into the Block Manager [NL] To avoid binding the Block Manager to a Property...
 			// If the current property is readonly all inner block content should also be readonly.
 			this.observe(context.isReadOnly, (isReadOnly) => {
 				const unique = 'UMB_PROPERTY_CONTEXT';
@@ -117,6 +118,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.observe(this.variantId, (variantId) => {
 			this.content.setVariantId(variantId);
+			this.settings.setVariantId(variantId);
 		});
 
 		this.routes.setRoutes([

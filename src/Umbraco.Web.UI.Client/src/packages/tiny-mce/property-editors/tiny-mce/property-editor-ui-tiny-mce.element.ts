@@ -11,6 +11,7 @@ import {
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export interface UmbRichTextEditorValueType {
 	markup: string;
@@ -86,6 +87,43 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			// TODO: Implement validation translation for RTE Blocks:
+			/*
+			this.observe(
+				context.dataPath,
+				(dataPath) => {
+					// Translate paths for content/settings:
+					this.#contentDataPathTranslator?.destroy();
+					this.#settingsDataPathTranslator?.destroy();
+					if (dataPath) {
+						// Set the data path for the local validation context:
+						this.#validationContext.setDataPath(dataPath);
+
+						this.#contentDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'contentData');
+						this.#settingsDataPathTranslator = new UmbBlockElementDataValidationPathTranslator(this, 'settingsData');
+					}
+				},
+				'observeDataPath',
+			);
+			*/
+
+			this.observe(
+				context?.alias,
+				(alias) => {
+					this.#managerContext.setPropertyAlias(alias);
+				},
+				'observePropertyAlias',
+			);
+			this.observe(
+				context.variantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeDataPath',
+			);
+		});
 
 		this.observe(this.#managerContext.layouts, (layouts) => {
 			this._value = {

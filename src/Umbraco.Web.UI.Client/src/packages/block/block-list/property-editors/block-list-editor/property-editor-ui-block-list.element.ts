@@ -21,7 +21,7 @@ import {
 } from '@umbraco-cms/backoffice/block';
 
 import '../../components/block-list-entry/index.js';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
@@ -173,6 +173,17 @@ export class UmbPropertyEditorUIBlockListElement
 				},
 				'observeDataPath',
 			);
+
+			this.observe(
+				context?.alias,
+				(alias) => {
+					this.#managerContext.setPropertyAlias(alias);
+				},
+				'observePropertyAlias',
+			);
+		});
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#managerContext.setVariantId(context.getVariantId());
 		});
 
 		this.addValidator(

@@ -9,7 +9,6 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-re
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
@@ -31,9 +30,15 @@ export abstract class UmbBlockManagerContext<
 
 	#propertyAlias = new UmbStringState(undefined);
 	propertyAlias = this.#propertyAlias.asObservable();
+	setPropertyAlias(propertyAlias: string | undefined) {
+		this.#propertyAlias.setValue(propertyAlias);
+	}
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	variantId = this.#variantId.asObservable();
+	setVariantId(variantId: UmbVariantId | undefined) {
+		this.#variantId.setValue(variantId);
+	}
 
 	#structures: Array<UmbContentTypeStructureManager> = [];
 
@@ -84,23 +89,6 @@ export abstract class UmbBlockManagerContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
-
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-			this.observe(
-				propertyContext?.alias,
-				(alias) => {
-					this.#propertyAlias.setValue(alias);
-				},
-				'observePropertyAlias',
-			);
-			this.observe(
-				propertyContext?.variantId,
-				(variantId) => {
-					this.#variantId.setValue(variantId);
-				},
-				'observePropertyVariantId',
-			);
-		});
 
 		this.observe(this.blockTypes, (blockTypes) => {
 			blockTypes.forEach((x) => {
