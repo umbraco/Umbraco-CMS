@@ -2,5 +2,5 @@
 
 public interface IWithMandatoryBuilder
 {
-    bool Mandatory{ get; set; }
+    bool? Mandatory { get; set; }
 }
