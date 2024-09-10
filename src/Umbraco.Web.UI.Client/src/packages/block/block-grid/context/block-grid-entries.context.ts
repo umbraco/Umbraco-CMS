@@ -490,7 +490,7 @@ export class UmbBlockGridEntriesContext
 							.filter((blockType) => blockType.groupKey === rule.groupKey && blockType.allowInAreas === true)
 							.map((x) => x.contentElementTypeKey) ?? [];
 					const groupAmount = layoutEntries.filter((entry) => {
-						const contentTypeKey = this._manager!.getContentTypeKeyOfcontentKey(entry.contentKey);
+						const contentTypeKey = this._manager!.getContentTypeKeyOfContentKey(entry.contentKey);
 						return contentTypeKey ? groupElementTypeKeys.indexOf(contentTypeKey) !== -1 : false;
 					}).length;
 
