@@ -18,6 +18,7 @@ public class SecuritySettings
     internal const bool StaticAllowPasswordReset = true;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticAllowConcurrentLogins = false;
+    internal const bool StaticAllowShowPasswordCheckBox = false;
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     internal const string StaticAllowedUserNameCharacters =
@@ -68,6 +69,12 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAllowedUserNameCharacters)]
     public string AllowedUserNameCharacters { get; set; } = StaticAllowedUserNameCharacters;
+
+    /// <summary>
+    ///     Gets or sets the set the ablity to show/hide show password functionality
+    /// </summary>
+    [DefaultValue(StaticAllowShowPasswordCheckBox)]
+    public bool AllowShowPasswordCheckBox { get; set; } = StaticAllowShowPasswordCheckBox;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to bypass the two factor requirement in Umbraco when using external login

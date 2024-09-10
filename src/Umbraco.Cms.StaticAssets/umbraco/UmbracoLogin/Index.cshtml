@@ -30,28 +30,29 @@
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
+    var allowShowPasswordCheckBox = SecuritySettings.Value.AllowShowPasswordCheckBox;
 }
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
 <html lang="@GlobalSettings.Value.DefaultUILanguage">
 <head>
-    <meta charset="UTF-8"/>
-    <base href="@backOfficePath.EnsureEndsWith('/')"/>
-    <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="robots" content="noindex, nofollow"/>
-    <meta name="pinterest" content="nopin"/>
+    <meta charset="UTF-8" />
+    <base href="@backOfficePath.EnsureEndsWith('/')" />
+    <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="pinterest" content="nopin" />
     <title>Umbraco</title>
 
     <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" asp-append-version="true" />
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-      }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
     </style>
 
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService)
@@ -59,42 +60,42 @@
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-<noscript>
-    <style>
-        #noscript-container {
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            padding: 0 20px;
-            text-align: center;
-        }
-    </style>
-    <div id="noscript-container">
-        <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
-            <img aria-hidden="true" alt="logo" src="@loginLogoImage" style="width: 100%" />
-        </h1>
-        <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
-        <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
-    </div>
-</noscript>
+    <noscript>
+        <style>
+            #noscript-container {
+                display: flex;
+                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                padding: 0 20px;
+                text-align: center;
+            }
+        </style>
+        <div id="noscript-container">
+            <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
+                <img aria-hidden="true" alt="logo" src="@loginLogoImage" style="width: 100%" />
+            </h1>
+            <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
+            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+        </div>
+    </noscript>
 
-<umb-auth
-    return-url="@backOfficePath"
-    logo-image="@loginLogoImage"
-    logo-image-alternative="@loginLogoImageAlternative"
-    background-image="@loginBackgroundImage"
-    username-is-email="@usernameIsEmail"
-    allow-user-invite="@allowUserInvite"
-    allow-password-reset="@allowPasswordReset"
-    disable-local-login="@disableLocalLogin">
-</umb-auth>
+    <umb-auth return-url="@backOfficePath"
+              logo-image="@loginLogoImage"
+              logo-image-alternative="@loginLogoImageAlternative"
+              background-image="@loginBackgroundImage"
+              username-is-email="@usernameIsEmail"
+              allow-user-invite="@allowUserInvite"
+              allow-password-reset="@allowPasswordReset"
+              disable-local-login="@disableLocalLogin"
+              allow-show-password-check-box="@allowShowPasswordCheckBox">
+    </umb-auth>
 
-@if (isDebug)
-{
-    @Html.Raw(ProfilerHtml.Render())
-}
+    @if (isDebug)
+    {
+        @Html.Raw(ProfilerHtml.Render())
+    }
 </body>
 </html>

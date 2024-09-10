@@ -77,6 +77,10 @@ export default class UmbAuthElement extends UmbLitElement {
   @property({type: Boolean, attribute: 'disable-local-login'})
   disableLocalLogin = false;
 
+  @property({ type: Boolean, attribute: 'allow-show-password-check-box' })
+  allowShowPasswordCheckBox = false;
+  
+
   @property({attribute: 'background-image'})
   backgroundImage?: string;
 
