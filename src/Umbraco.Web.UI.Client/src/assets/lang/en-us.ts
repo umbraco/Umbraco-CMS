@@ -1839,8 +1839,16 @@ export default {
 		assignAccess: 'Assign access',
 		administrators: 'Administrator',
 		categoryField: 'Category field',
-		createDate: 'User created',
-		changePassword: 'Change your password',
+		createDate: 'Created',
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Create API user' : 'Create user';
+		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `Create a user to give them access to Umbraco. When a user is created a password will be generated that you can share with them.`;
+			const apiUserText = `Create an Api User to allow external services to authenticate with the Umbraco Management API.`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
+		changePassword: 'Change password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure MFA',
 		emailRequired: 'Required - enter an email address for this user',
@@ -1849,6 +1857,7 @@ export default {
 				? 'The email address is used for notifications, password recovery, and as the username for logging in'
 				: 'The email address is used for notifications and password recovery';
 		},
+		kind: 'Kind',
 		newPassword: 'New password',
 		newPasswordFormatLengthTip: 'Minimum %0% character(s) to go!',
 		newPasswordFormatNonAlphaTip: 'There should be at least %0% special character(s) in there.',
@@ -1935,7 +1944,7 @@ export default {
 		startnodehelp: 'Limit the content tree to a specific start node',
 		startnodes: 'Content start nodes',
 		startnodeshelp: 'Limit the content tree to specific start nodes',
-		updateDate: 'User last updated',
+		updateDate: 'Updated',
 		userCreated: 'has been created',
 		userCreatedSuccessHelp:
 			'The new user has successfully been created. To log in to Umbraco use the\n      password below.\n    ',
@@ -1982,6 +1991,8 @@ export default {
 		sortCreateDateDescending: 'Newest',
 		sortCreateDateAscending: 'Oldest',
 		sortLastLoginDateDescending: 'Last login',
+		userKindDefault: 'User',
+		userKindApi: 'API User',
 		noUserGroupsAdded: 'No user groups have been added',
 		'2faDisableText':
 			'If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:',
@@ -2288,6 +2299,7 @@ export default {
 		labelForArrayOfItems: 'Collection of %0%',
 		labelForRemoveAllEntries: 'Remove all items',
 		labelForClearClipboard: 'Clear clipboard',
+		labelForCopyToClipboard: 'Copy to clipboard',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',

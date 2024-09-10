@@ -33,5 +33,6 @@ const mapper = (item: UserItemResponseModel): UmbUserItemModel => {
 		entityType: UMB_USER_ENTITY_TYPE,
 		name: item.name,
 		unique: item.id,
+		kind: item.kind,
 	};
 };

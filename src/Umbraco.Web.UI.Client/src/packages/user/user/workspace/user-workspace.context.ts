@@ -25,6 +25,7 @@ export class UmbUserWorkspaceContext
 	readonly data = this.#currentData.asObservable();
 	readonly state = this.#currentData.asObservablePart((x) => x?.state);
 	readonly unique = this.#currentData.asObservablePart((x) => x?.unique);
+	readonly kind = this.#currentData.asObservablePart((x) => x?.kind);
 	readonly userGroupUniques = this.#currentData.asObservablePart((x) => x?.userGroupUniques || []);
 	readonly documentStartNodeUniques = this.#currentData.asObservablePart(
 		(data) => data?.documentStartNodeUniques || [],
