@@ -1,4 +1,4 @@
-import { UMB_USER_SECTION_PATHNAME } from '../user-section/paths.js';
+import { UMB_USER_SECTION_PATHNAME } from '../section/paths.js';
 import { UMB_USER_ENTITY_TYPE } from './entity.js';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 
