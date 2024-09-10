@@ -40,7 +40,7 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
 
   // Arrange
   await umbracoUi.waitForTimeout(1000);
-  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true);
+  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true, true);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
 

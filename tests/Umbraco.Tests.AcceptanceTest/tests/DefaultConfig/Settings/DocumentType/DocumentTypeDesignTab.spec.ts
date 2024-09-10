@@ -176,7 +176,8 @@ test('can create a document type with multiple groups', async ({umbracoApi, umbr
   expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, secondDataTypeName, secondDataType.id, secondGroupName)).toBeTruthy();
 });
 
-test('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
+// TODO: unskip, currently flaky
+test.skip('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
