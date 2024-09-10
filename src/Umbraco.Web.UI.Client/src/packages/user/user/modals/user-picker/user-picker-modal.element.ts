@@ -58,7 +58,11 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 								@selected=${() => this.#selectionManager.select(user.unique)}
 								@deselected=${() => this.#selectionManager.deselect(user.unique)}
 								?selected=${this.#selectionManager.isSelected(user.unique)}>
-								<uui-avatar slot="icon" name=${ifDefined(user.name)}></uui-avatar>
+								<umb-user-avatar
+									slot="icon"
+									.name=${user.name}
+									.kind=${user.kind}
+									.imgUrls=${user.avatarUrls}></umb-user-avatar>
 							</uui-menu-item>
 						`,
 					)}
@@ -74,8 +78,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-avatar {
-				border: 2px solid var(--uui-color-surface);
+			umb-user-avatar {
 				font-size: 12px;
 			}
 		`,

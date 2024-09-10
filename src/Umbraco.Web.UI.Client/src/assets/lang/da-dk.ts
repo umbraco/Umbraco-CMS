@@ -1831,6 +1831,9 @@ export default {
 		administrators: 'Administrator',
 		categoryField: 'Kategorifelt',
 		createDate: 'Bruger oprettet',
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Opret API bruger' : 'Opret bruger';
+		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
 		newPassword: 'Nyt kodeord',
@@ -1857,6 +1860,7 @@ export default {
 		inviteAnotherUser: 'Invitér anden bruger',
 		inviteUserHelp:
 			'Invitér nye brugere til at give dem adgang til Umbraco. En invitation vil blive sendt\n      via e-mail til brugeren med oplysninger om, hvordan man logger ind i Umbraco.\n    ',
+		kind: 'Slags',
 		language: 'Sprog',
 		languageHelp: 'Indstil det sprog, du vil se i menuer og dialoger',
 		lastLockoutDate: 'Senest låst ude',
@@ -1952,6 +1956,8 @@ export default {
 		sortNameDescending: 'Navn (Å-A)',
 		sortCreateDateAscending: 'Nyeste',
 		sortCreateDateDescending: 'Ældste',
+		userKindDefault: 'Bruger',
+		userKindApi: 'API Bruger',
 		sortLastLoginDateDescending: 'Sidst logget ind',
 		noUserGroupsAdded: 'Ingen brugere er blevet tilføjet',
 		'2faDisableText': 'Hvis du ønsker at slå denne totrinsbekræftelse fra, så skal du nu indtaste koden fra din enhed:',
@@ -2223,6 +2229,7 @@ export default {
 		labelForArrayOfItems: 'Samling af %0%',
 		labelForRemoveAllEntries: 'Fjern alle elementer',
 		labelForClearClipboard: 'Ryd udklipsholder',
+		labelForCopyToClipboard: 'Kopier til udklipsholder',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Åben egenskabshandlinger',

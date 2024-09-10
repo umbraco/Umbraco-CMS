@@ -16,23 +16,44 @@ export abstract class UmbUserActionConditionBase
 {
 	/**
 	 * The unique identifier of the user being edited
+	 * @protected
+	 * @type {string}
+	 * @memberof UmbUserActionConditionBase
 	 */
 	protected userUnique?: string;
 
 	/**
 	 * The state of the user being edited
+	 * @protected
+	 * @type {(UmbUserStateEnum | null)}
+	 * @memberof UmbUserActionConditionBase
 	 */
 	protected userState?: UmbUserStateEnum | null;
 
+	/**
+	 * The kind of user being edited
+	 * @protected
+	 * @type {string}
+	 * @memberof UmbUserActionConditionBase
+	 */
+	protected userKind?: string;
+
+	/**
+	 * Creates an instance of UmbUserActionConditionBase.
+	 * @param {UmbControllerHost} host The host controller
+	 * @param {UmbConditionControllerArguments<UmbConditionConfigBase>} args The condition arguments
+	 * @memberof UmbUserActionConditionBase
+	 */
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
 		super(host, args);
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				observeMultiple([context.unique, context.state]),
-				([unique, state]) => {
+				observeMultiple([context.unique, context.state, context.kind]),
+				([unique, state, kind]) => {
 					this.userUnique = unique;
 					this.userState = state;
+					this.userKind = kind;
 					this._onUserDataChange();
 				},
 				'_umbActiveUser',

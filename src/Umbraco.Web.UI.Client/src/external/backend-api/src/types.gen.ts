@@ -3,23 +3,23 @@
 export type AllowedDocumentTypeModel = {
     id: string;
     name: string;
-    description?: (string) | null;
-    icon?: (string) | null;
+    description?: string | null;
+    icon?: string | null;
 };
 
 export type AllowedMediaTypeModel = {
     id: string;
     name: string;
-    description?: (string) | null;
-    icon?: (string) | null;
+    description?: string | null;
+    icon?: string | null;
 };
 
 export type AuditLogResponseModel = {
-    user: (ReferenceByIdModel);
+    user: ReferenceByIdModel;
     timestamp: string;
     logType: AuditTypeModel;
-    comment?: (string) | null;
-    parameters?: (string) | null;
+    comment?: string | null;
+    parameters?: string | null;
 };
 
 export enum AuditTypeModel {
@@ -83,7 +83,7 @@ export type CalculatedUserStartNodesResponseModel = {
 
 export type ChangePasswordCurrentUserRequestModel = {
     newPassword: string;
-    oldPassword?: (string) | null;
+    oldPassword?: string | null;
 };
 
 export type ChangePasswordUserRequestModel = {
@@ -101,21 +101,21 @@ export type ConsentLevelPresentationModel = {
 };
 
 export type CopyDataTypeRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type CopyDocumentRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
     relateToOriginal: boolean;
     includeDescendants: boolean;
 };
 
 export type CopyDocumentTypeRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type CopyMediaTypeRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type CreateDataTypeRequestModel = {
@@ -123,92 +123,92 @@ export type CreateDataTypeRequestModel = {
     editorAlias: string;
     editorUiAlias: string;
     values: Array<(DataTypePropertyPresentationModel)>;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
 };
 
 export type CreateDictionaryItemRequestModel = {
     name: string;
     translations: Array<(DictionaryItemTranslationModel)>;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
 };
 
 export type CreateDocumentBlueprintFromDocumentRequestModel = {
-    document: (ReferenceByIdModel);
-    id?: (string) | null;
+    document: ReferenceByIdModel;
+    id?: string | null;
     name: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
 };
 
 export type CreateDocumentBlueprintRequestModel = {
     values: Array<(DocumentValueModel)>;
     variants: Array<(DocumentVariantRequestModel)>;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
-    documentType: (ReferenceByIdModel);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
+    documentType: ReferenceByIdModel;
 };
 
 export type CreateDocumentRequestModel = {
     values: Array<(DocumentValueModel)>;
     variants: Array<(DocumentVariantRequestModel)>;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
-    documentType: (ReferenceByIdModel);
-    template: ((ReferenceByIdModel) | null);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
+    documentType: ReferenceByIdModel;
+    template: ReferenceByIdModel | null;
 };
 
 export type CreateDocumentTypePropertyTypeContainerRequestModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type CreateDocumentTypePropertyTypeRequestModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
 };
 
 export type CreateDocumentTypeRequestModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(CreateDocumentTypePropertyTypeRequestModel)>;
     containers: Array<(CreateDocumentTypePropertyTypeContainerRequestModel)>;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
     allowedTemplates: Array<(ReferenceByIdModel)>;
-    defaultTemplate?: ((ReferenceByIdModel) | null);
-    cleanup: (DocumentTypeCleanupModel);
+    defaultTemplate?: ReferenceByIdModel | null;
+    cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<(DocumentTypeSortModel)>;
     compositions: Array<(DocumentTypeCompositionModel)>;
 };
 
 export type CreateFolderRequestModel = {
     name: string;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
 };
 
 export type CreateInitialPasswordUserRequestModel = {
-    user: (ReferenceByIdModel);
+    user: ReferenceByIdModel;
     token: string;
     password: string;
 };
@@ -217,44 +217,44 @@ export type CreateLanguageRequestModel = {
     name: string;
     isDefault: boolean;
     isMandatory: boolean;
-    fallbackIsoCode?: (string) | null;
+    fallbackIsoCode?: string | null;
     isoCode: string;
 };
 
 export type CreateMediaRequestModel = {
     values: Array<(MediaValueModel)>;
     variants: Array<(MediaVariantRequestModel)>;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
-    mediaType: (ReferenceByIdModel);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
+    mediaType: ReferenceByIdModel;
 };
 
 export type CreateMediaTypePropertyTypeContainerRequestModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type CreateMediaTypePropertyTypeRequestModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
 };
 
 export type CreateMediaTypeRequestModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
@@ -262,73 +262,73 @@ export type CreateMediaTypeRequestModel = {
     isElement: boolean;
     properties: Array<(CreateMediaTypePropertyTypeRequestModel)>;
     containers: Array<(CreateMediaTypePropertyTypeContainerRequestModel)>;
-    id?: (string) | null;
-    parent?: ((ReferenceByIdModel) | null);
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
     allowedMediaTypes: Array<(MediaTypeSortModel)>;
     compositions: Array<(MediaTypeCompositionModel)>;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
 };
 
 export type CreateMemberGroupRequestModel = {
     name: string;
-    id?: (string) | null;
+    id?: string | null;
 };
 
 export type CreateMemberRequestModel = {
     values: Array<(MemberValueModel)>;
     variants: Array<(MemberVariantRequestModel)>;
-    id?: (string) | null;
+    id?: string | null;
     email: string;
     username: string;
     password: string;
-    memberType: (ReferenceByIdModel);
+    memberType: ReferenceByIdModel;
     groups?: Array<(string)> | null;
     isApproved: boolean;
 };
 
 export type CreateMemberTypePropertyTypeContainerRequestModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type CreateMemberTypePropertyTypeRequestModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
     isSensitive: boolean;
-    visibility: (MemberTypePropertyTypeVisibilityModel);
+    visibility: MemberTypePropertyTypeVisibilityModel;
 };
 
 export type CreateMemberTypeRequestModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(CreateMemberTypePropertyTypeRequestModel)>;
     containers: Array<(CreateMemberTypePropertyTypeContainerRequestModel)>;
-    id?: (string) | null;
+    id?: string | null;
     compositions: Array<(MemberTypeCompositionModel)>;
 };
 
 export type CreatePackageRequestModel = {
     name: string;
-    contentNodeId?: (string) | null;
+    contentNodeId?: string | null;
     contentLoadChildNodes: boolean;
     mediaIds: Array<(string)>;
     mediaLoadChildNodes: boolean;
@@ -341,70 +341,75 @@ export type CreatePackageRequestModel = {
     scripts: Array<(string)>;
     languages: Array<(string)>;
     dictionaryItems: Array<(string)>;
-    id?: (string) | null;
+    id?: string | null;
 };
 
 export type CreatePartialViewFolderRequestModel = {
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
 };
 
 export type CreatePartialViewRequestModel = {
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     content: string;
 };
 
 export type CreateScriptFolderRequestModel = {
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
 };
 
 export type CreateScriptRequestModel = {
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     content: string;
 };
 
 export type CreateStylesheetFolderRequestModel = {
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
 };
 
 export type CreateStylesheetRequestModel = {
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     content: string;
 };
 
 export type CreateTemplateRequestModel = {
     name: string;
     alias: string;
-    content?: (string) | null;
-    id?: (string) | null;
+    content?: string | null;
+    id?: string | null;
+};
+
+export type CreateUserClientCredentialsRequestModel = {
+    clientId: string;
+    clientSecret: string;
 };
 
 export type CreateUserDataRequestModel = {
     group: string;
     identifier: string;
     value: string;
-    key?: (string) | null;
+    key?: string | null;
 };
 
 export type CreateUserGroupRequestModel = {
     name: string;
     alias: string;
-    icon?: (string) | null;
+    icon?: string | null;
     sections: Array<(string)>;
     languages: Array<(string)>;
     hasAccessToAllLanguages: boolean;
-    documentStartNode?: ((ReferenceByIdModel) | null);
+    documentStartNode?: ReferenceByIdModel | null;
     documentRootAccess: boolean;
-    mediaStartNode?: ((ReferenceByIdModel) | null);
+    mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
-    id?: (string) | null;
+    id?: string | null;
 };
 
 export type CreateUserRequestModel = {
@@ -412,7 +417,8 @@ export type CreateUserRequestModel = {
     userName: string;
     name: string;
     userGroupIds: Array<(ReferenceByIdModel)>;
-    id?: (string) | null;
+    id?: string | null;
+    kind: UserKindModel;
 };
 
 export type CreateWebhookRequestModel = {
@@ -422,13 +428,13 @@ export type CreateWebhookRequestModel = {
     headers: {
         [key: string]: (string);
     };
-    id?: (string) | null;
+    id?: string | null;
     events: Array<(string)>;
 };
 
 export type CultureAndScheduleRequestModel = {
-    culture?: (string) | null;
-    schedule?: ((ScheduleRequestModel) | null);
+    culture?: string | null;
+    schedule?: ScheduleRequestModel | null;
 };
 
 export type CultureReponseModel = {
@@ -442,7 +448,7 @@ export type CurrenUserConfigurationResponseModel = {
      * @deprecated
      */
     usernameIsEmail: boolean;
-    passwordConfiguration: (PasswordConfigurationResponseModel);
+    passwordConfiguration: PasswordConfigurationResponseModel;
 };
 
 export type CurrentUserResponseModel = {
@@ -450,7 +456,7 @@ export type CurrentUserResponseModel = {
     email: string;
     userName: string;
     name: string;
-    languageIsoCode: (string) | null;
+    languageIsoCode: string | null;
     documentStartNodeIds: Array<(ReferenceByIdModel)>;
     hasDocumentRootAccess: boolean;
     mediaStartNodeIds: Array<(ReferenceByIdModel)>;
@@ -473,15 +479,15 @@ export enum DataTypeChangeModeModel {
 
 export type DataTypeContentTypeReferenceModel = {
     id: string;
-    type: (string) | null;
-    name: (string) | null;
-    icon: (string) | null;
+    type: string | null;
+    name: string | null;
+    icon: string | null;
 };
 
 export type DataTypeItemResponseModel = {
     id: string;
     name: string;
-    editorUiAlias?: (string) | null;
+    editorUiAlias?: string | null;
     isDeletable: boolean;
 };
 
@@ -496,7 +502,7 @@ export type DataTypePropertyReferenceModel = {
 };
 
 export type DataTypeReferenceResponseModel = {
-    contentType: (DataTypeContentTypeReferenceModel);
+    contentType: DataTypeContentTypeReferenceModel;
     properties: Array<(DataTypePropertyReferenceModel)>;
 };
 
@@ -513,22 +519,22 @@ export type DataTypeResponseModel = {
 export type DataTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     name: string;
     isFolder: boolean;
-    editorUiAlias?: (string) | null;
+    editorUiAlias?: string | null;
     isDeletable: boolean;
 };
 
 export type DatabaseInstallRequestModel = {
     id: string;
     providerName: string;
-    server?: (string) | null;
-    name?: (string) | null;
-    username?: (string) | null;
-    password?: (string) | null;
+    server?: string | null;
+    name?: string | null;
+    username?: string | null;
+    password?: string | null;
     useIntegratedAuthentication: boolean;
-    connectionString?: (string) | null;
+    connectionString?: string | null;
     trustServerCertificate: boolean;
 };
 
@@ -554,9 +560,9 @@ export type DatatypeConfigurationResponseModel = {
 
 export type DefaultReferenceResponseModel = {
     id: string;
-    name?: (string) | null;
-    type?: (string) | null;
-    icon?: (string) | null;
+    name?: string | null;
+    type?: string | null;
+    icon?: string | null;
 };
 
 export type DeleteUserGroupsRequestModel = {
@@ -584,9 +590,9 @@ export type DictionaryItemTranslationModel = {
 };
 
 export type DictionaryOverviewResponseModel = {
-    name?: (string) | null;
+    name?: string | null;
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     translatedIsoCodes: Array<(string)>;
 };
 
@@ -602,33 +608,33 @@ export type DisableUserRequestModel = {
 export type DocumentBlueprintItemResponseModel = {
     id: string;
     name: string;
-    documentType: (DocumentTypeReferenceResponseModel);
+    documentType: DocumentTypeReferenceResponseModel;
 };
 
 export type DocumentBlueprintResponseModel = {
     values: Array<(DocumentValueModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
-    documentType: (DocumentTypeReferenceResponseModel);
+    documentType: DocumentTypeReferenceResponseModel;
 };
 
 export type DocumentBlueprintTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     name: string;
     isFolder: boolean;
-    documentType?: ((DocumentTypeReferenceResponseModel) | null);
+    documentType?: DocumentTypeReferenceResponseModel | null;
 };
 
 export type DocumentCollectionResponseModel = {
     values: Array<(DocumentValueModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
-    creator?: (string) | null;
+    creator?: string | null;
     sortOrder: number;
-    documentType: (DocumentTypeCollectionReferenceResponseModel);
-    updater?: (string) | null;
+    documentType: DocumentTypeCollectionReferenceResponseModel;
+    updater?: string | null;
 };
 
 export type DocumentConfigurationResponseModel = {
@@ -646,7 +652,7 @@ export type DocumentItemResponseModel = {
     id: string;
     isTrashed: boolean;
     isProtected: boolean;
-    documentType: (DocumentTypeReferenceResponseModel);
+    documentType: DocumentTypeReferenceResponseModel;
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
 
@@ -657,43 +663,43 @@ export type DocumentNotificationResponseModel = {
 
 export type DocumentPermissionPresentationModel = {
     $type: string;
-    document: (ReferenceByIdModel);
+    document: ReferenceByIdModel;
     verbs: Array<(string)>;
 };
 
 export type DocumentRecycleBinItemResponseModel = {
     id: string;
     hasChildren: boolean;
-    parent?: ((ItemReferenceByIdResponseModel) | null);
-    documentType: (DocumentTypeReferenceResponseModel);
+    parent?: ItemReferenceByIdResponseModel | null;
+    documentType: DocumentTypeReferenceResponseModel;
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
 
 export type DocumentReferenceResponseModel = {
     id: string;
-    name?: (string) | null;
-    published?: (boolean) | null;
-    documentType: (TrackedReferenceDocumentTypeModel);
+    name?: string | null;
+    published?: boolean | null;
+    documentType: TrackedReferenceDocumentTypeModel;
 };
 
 export type DocumentResponseModel = {
     values: Array<(DocumentValueModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
-    documentType: (DocumentTypeReferenceResponseModel);
+    documentType: DocumentTypeReferenceResponseModel;
     urls: Array<(DocumentUrlInfoModel)>;
-    template?: ((ReferenceByIdModel) | null);
+    template?: ReferenceByIdModel | null;
     isTrashed: boolean;
 };
 
 export type DocumentTreeItemResponseModel = {
     hasChildren: boolean;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
     isProtected: boolean;
-    documentType: (DocumentTypeReferenceResponseModel);
+    documentType: DocumentTypeReferenceResponseModel;
     variants: Array<(DocumentVariantItemResponseModel)>;
 };
 
@@ -704,8 +710,8 @@ export type DocumentTypeBlueprintItemResponseModel = {
 
 export type DocumentTypeCleanupModel = {
     preventCleanup: boolean;
-    keepAllVersionsNewerThanDays?: (number) | null;
-    keepLatestVersionPerDayForDays?: (number) | null;
+    keepAllVersionsNewerThanDays?: number | null;
+    keepLatestVersionPerDayForDays?: number | null;
 };
 
 export type DocumentTypeCollectionReferenceResponseModel = {
@@ -715,12 +721,12 @@ export type DocumentTypeCollectionReferenceResponseModel = {
 };
 
 export type DocumentTypeCompositionModel = {
-    documentType: (ReferenceByIdModel);
+    documentType: ReferenceByIdModel;
     compositionType: CompositionTypeModel;
 };
 
 export type DocumentTypeCompositionRequestModel = {
-    id?: (string) | null;
+    id?: string | null;
     currentPropertyAliases: Array<(string)>;
     currentCompositeIds: Array<(string)>;
     isElement: boolean;
@@ -743,67 +749,67 @@ export type DocumentTypeItemResponseModel = {
     id: string;
     name: string;
     isElement: boolean;
-    icon?: (string) | null;
-    description?: (string) | null;
+    icon?: string | null;
+    description?: string | null;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type DocumentTypePropertyTypeResponseModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
 };
 
 export type DocumentTypeReferenceResponseModel = {
     id: string;
     icon: string;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
 };
 
 export type DocumentTypeResponseModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(DocumentTypePropertyTypeResponseModel)>;
     containers: Array<(DocumentTypePropertyTypeContainerResponseModel)>;
     id: string;
     allowedTemplates: Array<(ReferenceByIdModel)>;
-    defaultTemplate?: ((ReferenceByIdModel) | null);
-    cleanup: (DocumentTypeCleanupModel);
+    defaultTemplate?: ReferenceByIdModel | null;
+    cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<(DocumentTypeSortModel)>;
     compositions: Array<(DocumentTypeCompositionModel)>;
 };
 
 export type DocumentTypeSortModel = {
-    documentType: (ReferenceByIdModel);
+    documentType: ReferenceByIdModel;
     sortOrder: number;
 };
 
 export type DocumentTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     name: string;
     isFolder: boolean;
     isElement: boolean;
@@ -811,7 +817,7 @@ export type DocumentTypeTreeItemResponseModel = {
 };
 
 export type DocumentUrlInfoModel = {
-    culture: (string) | null;
+    culture: string | null;
     url: string;
 };
 
@@ -821,32 +827,32 @@ export type DocumentUrlInfoResponseModel = {
 };
 
 export type DocumentValueModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     alias: string;
     value?: unknown;
 };
 
 export type DocumentVariantItemResponseModel = {
     name: string;
-    culture?: (string) | null;
+    culture?: string | null;
     state: DocumentVariantStateModel;
 };
 
 export type DocumentVariantRequestModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     name: string;
 };
 
 export type DocumentVariantResponseModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     name: string;
     createDate: string;
     updateDate: string;
     state: DocumentVariantStateModel;
-    publishDate?: (string) | null;
+    publishDate?: string | null;
 };
 
 export enum DocumentVariantStateModel {
@@ -858,9 +864,9 @@ export enum DocumentVariantStateModel {
 
 export type DocumentVersionItemResponseModel = {
     id: string;
-    document: (ReferenceByIdModel);
-    documentType: (ReferenceByIdModel);
-    user: (ReferenceByIdModel);
+    document: ReferenceByIdModel;
+    documentType: ReferenceByIdModel;
+    user: ReferenceByIdModel;
     versionDate: string;
     isCurrentPublishedVersion: boolean;
     isCurrentDraftVersion: boolean;
@@ -871,8 +877,8 @@ export type DocumentVersionResponseModel = {
     values: Array<(DocumentValueModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
-    documentType: (DocumentTypeReferenceResponseModel);
-    document?: ((ReferenceByIdModel) | null);
+    documentType: DocumentTypeReferenceResponseModel;
+    document?: ReferenceByIdModel | null;
 };
 
 export type DomainPresentationModel = {
@@ -881,24 +887,24 @@ export type DomainPresentationModel = {
 };
 
 export type DomainsResponseModel = {
-    defaultIsoCode?: (string) | null;
+    defaultIsoCode?: string | null;
     domains: Array<(DomainPresentationModel)>;
 };
 
 export type DynamicRootContextRequestModel = {
-    id?: (string) | null;
-    parent: (ReferenceByIdModel);
-    culture?: (string) | null;
-    segment?: (string) | null;
+    id?: string | null;
+    parent: ReferenceByIdModel;
+    culture?: string | null;
+    segment?: string | null;
 };
 
 export type DynamicRootQueryOriginRequestModel = {
     alias: string;
-    id?: (string) | null;
+    id?: string | null;
 };
 
 export type DynamicRootQueryRequestModel = {
-    origin: (DynamicRootQueryOriginRequestModel);
+    origin: DynamicRootQueryOriginRequestModel;
     steps: Array<(DynamicRootQueryStepRequestModel)>;
 };
 
@@ -908,8 +914,8 @@ export type DynamicRootQueryStepRequestModel = {
 };
 
 export type DynamicRootRequestModel = {
-    context: (DynamicRootContextRequestModel);
-    query: (DynamicRootQueryRequestModel);
+    context: DynamicRootContextRequestModel;
+    query: DynamicRootQueryRequestModel;
 };
 
 export type DynamicRootResponseModel = {
@@ -927,8 +933,8 @@ export type EnableUserRequestModel = {
 
 export type EntityImportAnalysisResponseModel = {
     entityType: string;
-    alias?: (string) | null;
-    key?: (string) | null;
+    alias?: string | null;
+    key?: string | null;
 };
 
 export enum EventMessageTypeModel {
@@ -952,7 +958,7 @@ export type FileSystemTreeItemPresentationModel = {
     hasChildren: boolean;
     name: string;
     path: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 };
 
@@ -962,14 +968,14 @@ export type FolderResponseModel = {
 };
 
 export type HealthCheckActionRequestModel = {
-    healthCheck: (ReferenceByIdModel);
-    alias?: (string) | null;
-    name?: (string) | null;
-    description?: (string) | null;
+    healthCheck: ReferenceByIdModel;
+    alias?: string | null;
+    name?: string | null;
+    description?: string | null;
     valueRequired: boolean;
-    providedValue?: (string) | null;
-    providedValueValidation?: (string) | null;
-    providedValueValidationRegex?: (string) | null;
+    providedValue?: string | null;
+    providedValueValidation?: string | null;
+    providedValueValidationRegex?: string | null;
     actionParameters?: {
         [key: string]: unknown;
     } | null;
@@ -991,14 +997,14 @@ export type HealthCheckGroupWithResultResponseModel = {
 export type HealthCheckModel = {
     id: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
 };
 
 export type HealthCheckResultResponseModel = {
     message: string;
     resultType: StatusResultTypeModel;
     actions?: Array<(HealthCheckActionRequestModel)> | null;
-    readMoreLink?: (string) | null;
+    readMoreLink?: string | null;
 };
 
 export type HealthCheckWithResultPresentationModel = {
@@ -1014,14 +1020,14 @@ export enum HealthStatusModel {
 
 export type HealthStatusResponseModel = {
     status: HealthStatusModel;
-    message?: (string) | null;
+    message?: string | null;
 };
 
 export type HelpPageResponseModel = {
-    name?: (string) | null;
-    description?: (string) | null;
-    url?: (string) | null;
-    type?: (string) | null;
+    name?: string | null;
+    description?: string | null;
+    url?: string | null;
+    type?: string | null;
 };
 
 export enum ImageCropModeModel {
@@ -1034,21 +1040,21 @@ export enum ImageCropModeModel {
 }
 
 export type ImportDictionaryRequestModel = {
-    temporaryFile: (ReferenceByIdModel);
-    parent?: ((ReferenceByIdModel) | null);
+    temporaryFile: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
 };
 
 export type ImportDocumentTypeRequestModel = {
-    file: (ReferenceByIdModel);
+    file: ReferenceByIdModel;
 };
 
 export type ImportMediaTypeRequestModel = {
-    file: (ReferenceByIdModel);
+    file: ReferenceByIdModel;
 };
 
 export type IndexResponseModel = {
     name: string;
-    healthStatus: (HealthStatusResponseModel);
+    healthStatus: HealthStatusResponseModel;
     canRebuild: boolean;
     searcherName: string;
     documentCount: number;
@@ -1059,13 +1065,13 @@ export type IndexResponseModel = {
 };
 
 export type InstallRequestModel = {
-    user: (UserInstallRequestModel);
-    database: (DatabaseInstallRequestModel);
+    user: UserInstallRequestModel;
+    database: DatabaseInstallRequestModel;
     telemetryLevel: TelemetryLevelModel;
 };
 
 export type InstallSettingsResponseModel = {
-    user: (UserSettingsPresentationModel);
+    user: UserSettingsPresentationModel;
     databases: Array<(DatabaseSettingsPresentationModel)>;
 };
 
@@ -1074,8 +1080,8 @@ export type InviteUserRequestModel = {
     userName: string;
     name: string;
     userGroupIds: Array<(ReferenceByIdModel)>;
-    id?: (string) | null;
-    message?: (string) | null;
+    id?: string | null;
+    message?: string | null;
 };
 
 export type ItemReferenceByIdResponseModel = {
@@ -1096,7 +1102,7 @@ export type LanguageResponseModel = {
     name: string;
     isDefault: boolean;
     isMandatory: boolean;
-    fallbackIsoCode?: (string) | null;
+    fallbackIsoCode?: string | null;
     isoCode: string;
 };
 
@@ -1119,20 +1125,20 @@ export enum LogLevelModel {
 
 export type LogMessagePropertyPresentationModel = {
     name: string;
-    value?: (string) | null;
+    value?: string | null;
 };
 
 export type LogMessageResponseModel = {
     timestamp: string;
     level: LogLevelModel;
-    messageTemplate?: (string) | null;
-    renderedMessage?: (string) | null;
+    messageTemplate?: string | null;
+    renderedMessage?: string | null;
     properties: Array<(LogMessagePropertyPresentationModel)>;
-    exception?: (string) | null;
+    exception?: string | null;
 };
 
 export type LogTemplateResponseModel = {
-    messageTemplate?: (string) | null;
+    messageTemplate?: string | null;
     count: number;
 };
 
@@ -1143,8 +1149,8 @@ export type LoggerResponseModel = {
 
 export type ManifestResponseModel = {
     name: string;
-    id?: (string) | null;
-    version?: (string) | null;
+    id?: string | null;
+    version?: string | null;
     extensions: Array<unknown>;
 };
 
@@ -1152,9 +1158,9 @@ export type MediaCollectionResponseModel = {
     values: Array<(MediaValueModel)>;
     variants: Array<(MediaVariantResponseModel)>;
     id: string;
-    creator?: (string) | null;
+    creator?: string | null;
     sortOrder: number;
-    mediaType: (MediaTypeCollectionReferenceResponseModel);
+    mediaType: MediaTypeCollectionReferenceResponseModel;
 };
 
 export type MediaConfigurationResponseModel = {
@@ -1169,22 +1175,22 @@ export type MediaConfigurationResponseModel = {
 export type MediaItemResponseModel = {
     id: string;
     isTrashed: boolean;
-    mediaType: (MediaTypeReferenceResponseModel);
+    mediaType: MediaTypeReferenceResponseModel;
     variants: Array<(VariantItemResponseModel)>;
 };
 
 export type MediaRecycleBinItemResponseModel = {
     id: string;
     hasChildren: boolean;
-    parent?: ((ItemReferenceByIdResponseModel) | null);
-    mediaType: (MediaTypeReferenceResponseModel);
+    parent?: ItemReferenceByIdResponseModel | null;
+    mediaType: MediaTypeReferenceResponseModel;
     variants: Array<(VariantItemResponseModel)>;
 };
 
 export type MediaReferenceResponseModel = {
     id: string;
-    name?: (string) | null;
-    mediaType: (TrackedReferenceMediaTypeModel);
+    name?: string | null;
+    mediaType: TrackedReferenceMediaTypeModel;
 };
 
 export type MediaResponseModel = {
@@ -1193,16 +1199,16 @@ export type MediaResponseModel = {
     id: string;
     urls: Array<(MediaUrlInfoModel)>;
     isTrashed: boolean;
-    mediaType: (MediaTypeReferenceResponseModel);
+    mediaType: MediaTypeReferenceResponseModel;
 };
 
 export type MediaTreeItemResponseModel = {
     hasChildren: boolean;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     noAccess: boolean;
     isTrashed: boolean;
     id: string;
-    mediaType: (MediaTypeReferenceResponseModel);
+    mediaType: MediaTypeReferenceResponseModel;
     variants: Array<(VariantItemResponseModel)>;
 };
 
@@ -1213,12 +1219,12 @@ export type MediaTypeCollectionReferenceResponseModel = {
 };
 
 export type MediaTypeCompositionModel = {
-    mediaType: (ReferenceByIdModel);
+    mediaType: ReferenceByIdModel;
     compositionType: CompositionTypeModel;
 };
 
 export type MediaTypeCompositionRequestModel = {
-    id?: (string) | null;
+    id?: string | null;
     currentPropertyAliases: Array<(string)>;
     currentCompositeIds: Array<(string)>;
 };
@@ -1236,46 +1242,46 @@ export type MediaTypeConfigurationResponseModel = {
 export type MediaTypeItemResponseModel = {
     id: string;
     name: string;
-    icon?: (string) | null;
+    icon?: string | null;
 };
 
 export type MediaTypePropertyTypeContainerResponseModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type MediaTypePropertyTypeResponseModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
 };
 
 export type MediaTypeReferenceResponseModel = {
     id: string;
     icon: string;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
 };
 
 export type MediaTypeResponseModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(MediaTypePropertyTypeResponseModel)>;
     containers: Array<(MediaTypePropertyTypeContainerResponseModel)>;
@@ -1287,14 +1293,14 @@ export type MediaTypeResponseModel = {
 };
 
 export type MediaTypeSortModel = {
-    mediaType: (ReferenceByIdModel);
+    mediaType: ReferenceByIdModel;
     sortOrder: number;
 };
 
 export type MediaTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     name: string;
     isFolder: boolean;
     icon: string;
@@ -1302,7 +1308,7 @@ export type MediaTypeTreeItemResponseModel = {
 };
 
 export type MediaUrlInfoModel = {
-    culture: (string) | null;
+    culture: string | null;
     url: string;
 };
 
@@ -1312,21 +1318,21 @@ export type MediaUrlInfoResponseModel = {
 };
 
 export type MediaValueModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     alias: string;
     value?: unknown;
 };
 
 export type MediaVariantRequestModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     name: string;
 };
 
 export type MediaVariantResponseModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     name: string;
     createDate: string;
     updateDate: string;
@@ -1351,9 +1357,15 @@ export type MemberGroupResponseModel = {
 
 export type MemberItemResponseModel = {
     id: string;
-    memberType: (MemberTypeReferenceResponseModel);
+    memberType: MemberTypeReferenceResponseModel;
     variants: Array<(VariantItemResponseModel)>;
+    kind: MemberKindModel;
 };
+
+export enum MemberKindModel {
+    DEFAULT = 'Default',
+    API = 'Api'
+}
 
 export type MemberResponseModel = {
     values: Array<(MemberValueModel)>;
@@ -1361,24 +1373,25 @@ export type MemberResponseModel = {
     id: string;
     email: string;
     username: string;
-    memberType: (MemberTypeReferenceResponseModel);
+    memberType: MemberTypeReferenceResponseModel;
     isApproved: boolean;
     isLockedOut: boolean;
     isTwoFactorEnabled: boolean;
     failedPasswordAttempts: number;
-    lastLoginDate?: (string) | null;
-    lastLockoutDate?: (string) | null;
-    lastPasswordChangeDate?: (string) | null;
+    lastLoginDate?: string | null;
+    lastLockoutDate?: string | null;
+    lastPasswordChangeDate?: string | null;
     groups: Array<(string)>;
+    kind: MemberKindModel;
 };
 
 export type MemberTypeCompositionModel = {
-    memberType: (ReferenceByIdModel);
+    memberType: ReferenceByIdModel;
     compositionType: CompositionTypeModel;
 };
 
 export type MemberTypeCompositionRequestModel = {
-    id?: (string) | null;
+    id?: string | null;
     currentPropertyAliases: Array<(string)>;
     currentCompositeIds: Array<(string)>;
 };
@@ -1396,31 +1409,31 @@ export type MemberTypeConfigurationResponseModel = {
 export type MemberTypeItemResponseModel = {
     id: string;
     name: string;
-    icon?: (string) | null;
+    icon?: string | null;
 };
 
 export type MemberTypePropertyTypeContainerResponseModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type MemberTypePropertyTypeResponseModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
     isSensitive: boolean;
-    visibility: (MemberTypePropertyTypeVisibilityModel);
+    visibility: MemberTypePropertyTypeVisibilityModel;
 };
 
 export type MemberTypePropertyTypeVisibilityModel = {
@@ -1431,18 +1444,18 @@ export type MemberTypePropertyTypeVisibilityModel = {
 export type MemberTypeReferenceResponseModel = {
     id: string;
     icon: string;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
 };
 
 export type MemberTypeResponseModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(MemberTypePropertyTypeResponseModel)>;
     containers: Array<(MemberTypePropertyTypeContainerResponseModel)>;
@@ -1453,27 +1466,27 @@ export type MemberTypeResponseModel = {
 export type MemberTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     name: string;
     icon: string;
 };
 
 export type MemberValueModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     alias: string;
     value?: unknown;
 };
 
 export type MemberVariantRequestModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     name: string;
 };
 
 export type MemberVariantResponseModel = {
-    culture?: (string) | null;
-    segment?: (string) | null;
+    culture?: string | null;
+    segment?: string | null;
     name: string;
     createDate: string;
     updateDate: string;
@@ -1483,9 +1496,9 @@ export type ModelsBuilderResponseModel = {
     mode: ModelsModeModel;
     canGenerate: boolean;
     outOfDateModels: boolean;
-    lastError?: (string) | null;
-    version?: (string) | null;
-    modelsNamespace?: (string) | null;
+    lastError?: string | null;
+    version?: string | null;
+    modelsNamespace?: string | null;
     trackingOutOfDateModels: boolean;
 };
 
@@ -1497,37 +1510,37 @@ export enum ModelsModeModel {
 }
 
 export type MoveDataTypeRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type MoveDictionaryRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type MoveDocumentBlueprintRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type MoveDocumentRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type MoveDocumentTypeRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type MoveMediaRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type MoveMediaTypeRequestModel = {
-    target?: ((ReferenceByIdModel) | null);
+    target?: ReferenceByIdModel | null;
 };
 
 export type NamedEntityTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     name: string;
 };
 
@@ -1546,7 +1559,7 @@ export type OEmbedResponseModel = {
 };
 
 export type ObjectTypeResponseModel = {
-    name?: (string) | null;
+    name?: string | null;
     id: string;
 };
 
@@ -1577,7 +1590,7 @@ export type PackageConfigurationResponseModel = {
 
 export type PackageDefinitionResponseModel = {
     name: string;
-    contentNodeId?: (string) | null;
+    contentNodeId?: string | null;
     contentLoadChildNodes: boolean;
     mediaIds: Array<(string)>;
     mediaLoadChildNodes: boolean;
@@ -1897,20 +1910,20 @@ export type PagedWebhookResponseModel = {
 export type PartialViewFolderResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
 };
 
 export type PartialViewItemResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 };
 
 export type PartialViewResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     content: string;
 };
 
@@ -1934,11 +1947,11 @@ export type PasswordConfigurationResponseModel = {
 };
 
 export type ProblemDetails = {
-    type?: (string) | null;
-    title?: (string) | null;
-    status?: (number) | null;
-    detail?: (string) | null;
-    instance?: (string) | null;
+    type?: string | null;
+    title?: string | null;
+    status?: number | null;
+    detail?: string | null;
+    instance?: string | null;
     [key: string]: (unknown | string | number) | undefined;
 };
 
@@ -1960,21 +1973,21 @@ export type PropertyTypeAppearanceModel = {
 
 export type PropertyTypeValidationModel = {
     mandatory: boolean;
-    mandatoryMessage?: (string) | null;
-    regEx?: (string) | null;
-    regExMessage?: (string) | null;
+    mandatoryMessage?: string | null;
+    regEx?: string | null;
+    regExMessage?: string | null;
 };
 
 export type PublicAccessRequestModel = {
-    loginDocument: (ReferenceByIdModel);
-    errorDocument: (ReferenceByIdModel);
+    loginDocument: ReferenceByIdModel;
+    errorDocument: ReferenceByIdModel;
     memberUserNames: Array<(string)>;
     memberGroupNames: Array<(string)>;
 };
 
 export type PublicAccessResponseModel = {
-    loginDocument: (ReferenceByIdModel);
-    errorDocument: (ReferenceByIdModel);
+    loginDocument: ReferenceByIdModel;
+    errorDocument: ReferenceByIdModel;
     members: Array<(MemberItemResponseModel)>;
     groups: Array<(MemberGroupItemResponseModel)>;
 };
@@ -1998,8 +2011,8 @@ export type RedirectUrlResponseModel = {
     originalUrl: string;
     destinationUrl: string;
     created: string;
-    document: (ReferenceByIdModel);
-    culture?: (string) | null;
+    document: ReferenceByIdModel;
+    culture?: string | null;
 };
 
 export type RedirectUrlStatusResponseModel = {
@@ -2013,16 +2026,16 @@ export type ReferenceByIdModel = {
 
 export type RelationReferenceModel = {
     id: string;
-    name?: (string) | null;
+    name?: string | null;
 };
 
 export type RelationResponseModel = {
     id: string;
-    relationType: (ReferenceByIdModel);
-    parent: (RelationReferenceModel);
-    child: (RelationReferenceModel);
+    relationType: ReferenceByIdModel;
+    parent: RelationReferenceModel;
+    child: RelationReferenceModel;
     createDate: string;
-    comment?: (string) | null;
+    comment?: string | null;
 };
 
 export type RelationTypeItemResponseModel = {
@@ -2036,9 +2049,9 @@ export type RelationTypeResponseModel = {
     isBidirectional: boolean;
     isDependency: boolean;
     id: string;
-    alias?: (string) | null;
-    parentObject?: ((ObjectTypeResponseModel) | null);
-    childObject?: ((ObjectTypeResponseModel) | null);
+    alias?: string | null;
+    parentObject?: ObjectTypeResponseModel | null;
+    childObject?: ObjectTypeResponseModel | null;
 };
 
 export type RenamePartialViewRequestModel = {
@@ -2054,8 +2067,8 @@ export type RenameStylesheetRequestModel = {
 };
 
 export type ResendInviteUserRequestModel = {
-    user: (ReferenceByIdModel);
-    message?: (string) | null;
+    user: ReferenceByIdModel;
+    message?: string | null;
 };
 
 export type ResetPasswordRequestModel = {
@@ -2063,13 +2076,13 @@ export type ResetPasswordRequestModel = {
 };
 
 export type ResetPasswordTokenRequestModel = {
-    user: (ReferenceByIdModel);
+    user: ReferenceByIdModel;
     resetCode: string;
     password: string;
 };
 
 export type ResetPasswordUserResponseModel = {
-    resetPassword?: (string) | null;
+    resetPassword?: string | null;
 };
 
 export enum RuntimeLevelModel {
@@ -2098,27 +2111,27 @@ export type SavedLogSearchResponseModel = {
 };
 
 export type ScheduleRequestModel = {
-    publishTime?: (string) | null;
-    unpublishTime?: (string) | null;
+    publishTime?: string | null;
+    unpublishTime?: string | null;
 };
 
 export type ScriptFolderResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
 };
 
 export type ScriptItemResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 };
 
 export type ScriptResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     content: string;
 };
 
@@ -2134,7 +2147,7 @@ export type SearcherResponseModel = {
 };
 
 export type SecurityConfigurationResponseModel = {
-    passwordConfiguration: (PasswordConfigurationResponseModel);
+    passwordConfiguration: PasswordConfigurationResponseModel;
 };
 
 export type SegmentResponseModel = {
@@ -2167,18 +2180,18 @@ export type ServerTroubleshootingResponseModel = {
 };
 
 export type SetAvatarRequestModel = {
-    file: (ReferenceByIdModel);
+    file: ReferenceByIdModel;
 };
 
 export type SortingRequestModel = {
-    parent?: ((ReferenceByIdModel) | null);
+    parent?: ReferenceByIdModel | null;
     sorting: Array<(ItemSortingRequestModel)>;
 };
 
 export type StaticFileItemResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 };
 
@@ -2192,27 +2205,27 @@ export enum StatusResultTypeModel {
 export type StylesheetFolderResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
 };
 
 export type StylesheetItemResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 };
 
 export type StylesheetResponseModel = {
     path: string;
     name: string;
-    parent?: ((FileSystemFolderModel) | null);
+    parent?: FileSystemFolderModel | null;
     content: string;
 };
 
 export type TagResponseModel = {
     id: string;
-    text?: (string) | null;
-    group?: (string) | null;
+    text?: string | null;
+    group?: string | null;
     nodeCount: number;
 };
 
@@ -2247,16 +2260,16 @@ export type TemplateQueryExecuteFilterPresentationModel = {
 };
 
 export type TemplateQueryExecuteModel = {
-    rootDocument?: ((ReferenceByIdModel) | null);
-    documentTypeAlias?: (string) | null;
+    rootDocument?: ReferenceByIdModel | null;
+    documentTypeAlias?: string | null;
     filters?: Array<(TemplateQueryExecuteFilterPresentationModel)> | null;
-    sort?: ((TemplateQueryExecuteSortModel) | null);
+    sort?: TemplateQueryExecuteSortModel | null;
     take: number;
 };
 
 export type TemplateQueryExecuteSortModel = {
     propertyAlias: string;
-    direction?: (string) | null;
+    direction?: string | null;
 };
 
 export type TemplateQueryOperatorModel = {
@@ -2296,34 +2309,34 @@ export type TemplateQuerySettingsResponseModel = {
 export type TemplateResponseModel = {
     name: string;
     alias: string;
-    content?: (string) | null;
+    content?: string | null;
     id: string;
-    masterTemplate?: ((ReferenceByIdModel) | null);
+    masterTemplate?: ReferenceByIdModel | null;
 };
 
 export type TemporaryFileConfigurationResponseModel = {
     imageFileTypes: Array<(string)>;
     disallowedUploadedFilesExtensions: Array<(string)>;
     allowedUploadedFileExtensions: Array<(string)>;
-    maxFileSize?: (number) | null;
+    maxFileSize?: number | null;
 };
 
 export type TemporaryFileResponseModel = {
     id: string;
-    availableUntil?: (string) | null;
+    availableUntil?: string | null;
     fileName: string;
 };
 
 export type TrackedReferenceDocumentTypeModel = {
-    icon?: (string) | null;
-    alias?: (string) | null;
-    name?: (string) | null;
+    icon?: string | null;
+    alias?: string | null;
+    name?: string | null;
 };
 
 export type TrackedReferenceMediaTypeModel = {
-    icon?: (string) | null;
-    alias?: (string) | null;
-    name?: (string) | null;
+    icon?: string | null;
+    alias?: string | null;
+    name?: string | null;
 };
 
 export type UnknownTypePermissionPresentationModel = {
@@ -2364,52 +2377,52 @@ export type UpdateDocumentNotificationsRequestModel = {
 export type UpdateDocumentRequestModel = {
     values: Array<(DocumentValueModel)>;
     variants: Array<(DocumentVariantRequestModel)>;
-    template?: ((ReferenceByIdModel) | null);
+    template?: ReferenceByIdModel | null;
 };
 
 export type UpdateDocumentTypePropertyTypeContainerRequestModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type UpdateDocumentTypePropertyTypeRequestModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
 };
 
 export type UpdateDocumentTypeRequestModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(UpdateDocumentTypePropertyTypeRequestModel)>;
     containers: Array<(UpdateDocumentTypePropertyTypeContainerRequestModel)>;
     allowedTemplates: Array<(ReferenceByIdModel)>;
-    defaultTemplate?: ((ReferenceByIdModel) | null);
-    cleanup: (DocumentTypeCleanupModel);
+    defaultTemplate?: ReferenceByIdModel | null;
+    cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<(DocumentTypeSortModel)>;
     compositions: Array<(DocumentTypeCompositionModel)>;
 };
 
 export type UpdateDomainsRequestModel = {
-    defaultIsoCode?: (string) | null;
+    defaultIsoCode?: string | null;
     domains: Array<(DomainPresentationModel)>;
 };
 
@@ -2421,7 +2434,7 @@ export type UpdateLanguageRequestModel = {
     name: string;
     isDefault: boolean;
     isMandatory: boolean;
-    fallbackIsoCode?: (string) | null;
+    fallbackIsoCode?: string | null;
 };
 
 export type UpdateMediaRequestModel = {
@@ -2431,35 +2444,35 @@ export type UpdateMediaRequestModel = {
 
 export type UpdateMediaTypePropertyTypeContainerRequestModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type UpdateMediaTypePropertyTypeRequestModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
 };
 
 export type UpdateMediaTypeRequestModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(UpdateMediaTypePropertyTypeRequestModel)>;
     containers: Array<(UpdateMediaTypePropertyTypeContainerRequestModel)>;
@@ -2476,8 +2489,8 @@ export type UpdateMemberRequestModel = {
     variants: Array<(MemberVariantRequestModel)>;
     email: string;
     username: string;
-    oldPassword?: (string) | null;
-    newPassword?: (string) | null;
+    oldPassword?: string | null;
+    newPassword?: string | null;
     groups?: Array<(string)> | null;
     isApproved: boolean;
     isLockedOut: boolean;
@@ -2486,37 +2499,37 @@ export type UpdateMemberRequestModel = {
 
 export type UpdateMemberTypePropertyTypeContainerRequestModel = {
     id: string;
-    parent?: ((ReferenceByIdModel) | null);
-    name?: (string) | null;
+    parent?: ReferenceByIdModel | null;
+    name?: string | null;
     type: string;
     sortOrder: number;
 };
 
 export type UpdateMemberTypePropertyTypeRequestModel = {
     id: string;
-    container?: ((ReferenceByIdModel) | null);
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
-    description?: (string) | null;
-    dataType: (ReferenceByIdModel);
+    description?: string | null;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    validation: (PropertyTypeValidationModel);
-    appearance: (PropertyTypeAppearanceModel);
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
     isSensitive: boolean;
-    visibility: (MemberTypePropertyTypeVisibilityModel);
+    visibility: MemberTypePropertyTypeVisibilityModel;
 };
 
 export type UpdateMemberTypeRequestModel = {
     alias: string;
     name: string;
-    description?: (string) | null;
+    description?: string | null;
     icon: string;
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection?: ((ReferenceByIdModel) | null);
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<(UpdateMemberTypePropertyTypeRequestModel)>;
     containers: Array<(UpdateMemberTypePropertyTypeContainerRequestModel)>;
@@ -2525,7 +2538,7 @@ export type UpdateMemberTypeRequestModel = {
 
 export type UpdatePackageRequestModel = {
     name: string;
-    contentNodeId?: (string) | null;
+    contentNodeId?: string | null;
     contentLoadChildNodes: boolean;
     mediaIds: Array<(string)>;
     mediaLoadChildNodes: boolean;
@@ -2556,7 +2569,7 @@ export type UpdateStylesheetRequestModel = {
 export type UpdateTemplateRequestModel = {
     name: string;
     alias: string;
-    content?: (string) | null;
+    content?: string | null;
 };
 
 export type UpdateUserDataRequestModel = {
@@ -2569,13 +2582,13 @@ export type UpdateUserDataRequestModel = {
 export type UpdateUserGroupRequestModel = {
     name: string;
     alias: string;
-    icon?: (string) | null;
+    icon?: string | null;
     sections: Array<(string)>;
     languages: Array<(string)>;
     hasAccessToAllLanguages: boolean;
-    documentStartNode?: ((ReferenceByIdModel) | null);
+    documentStartNode?: ReferenceByIdModel | null;
     documentRootAccess: boolean;
-    mediaStartNode?: ((ReferenceByIdModel) | null);
+    mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
@@ -2619,7 +2632,7 @@ export type UpgradeSettingsResponseModel = {
 export type UserConfigurationResponseModel = {
     canInviteUsers: boolean;
     usernameIsEmail: boolean;
-    passwordConfiguration: (PasswordConfigurationResponseModel);
+    passwordConfiguration: PasswordConfigurationResponseModel;
 };
 
 export type UserDataModel = {
@@ -2644,7 +2657,7 @@ export type UserDataResponseModel = {
 
 export type UserExternalLoginProviderModel = {
     providerSchemeName: string;
-    providerKey?: (string) | null;
+    providerKey?: string | null;
     isLinkedOnUser: boolean;
     hasManualLinkingEnabled: boolean;
 };
@@ -2652,20 +2665,20 @@ export type UserExternalLoginProviderModel = {
 export type UserGroupItemResponseModel = {
     id: string;
     name: string;
-    icon?: (string) | null;
-    alias?: (string) | null;
+    icon?: string | null;
+    alias?: string | null;
 };
 
 export type UserGroupResponseModel = {
     name: string;
     alias: string;
-    icon?: (string) | null;
+    icon?: string | null;
     sections: Array<(string)>;
     languages: Array<(string)>;
     hasAccessToAllLanguages: boolean;
-    documentStartNode?: ((ReferenceByIdModel) | null);
+    documentStartNode?: ReferenceByIdModel | null;
     documentRootAccess: boolean;
-    mediaStartNode?: ((ReferenceByIdModel) | null);
+    mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<(string)>;
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
@@ -2685,7 +2698,13 @@ export type UserItemResponseModel = {
     id: string;
     name: string;
     avatarUrls: Array<(string)>;
+    kind: UserKindModel;
 };
+
+export enum UserKindModel {
+    DEFAULT = 'Default',
+    API = 'Api'
+}
 
 export enum UserOrderModel {
     USER_NAME = 'UserName',
@@ -2715,7 +2734,7 @@ export type UserResponseModel = {
     name: string;
     userGroupIds: Array<(ReferenceByIdModel)>;
     id: string;
-    languageIsoCode?: (string) | null;
+    languageIsoCode?: string | null;
     documentStartNodeIds: Array<(ReferenceByIdModel)>;
     hasDocumentRootAccess: boolean;
     mediaStartNodeIds: Array<(ReferenceByIdModel)>;
@@ -2725,10 +2744,11 @@ export type UserResponseModel = {
     failedLoginAttempts: number;
     createDate: string;
     updateDate: string;
-    lastLoginDate?: (string) | null;
-    lastLockoutDate?: (string) | null;
-    lastPasswordChangeDate?: (string) | null;
+    lastLoginDate?: string | null;
+    lastLockoutDate?: string | null;
+    lastPasswordChangeDate?: string | null;
     isAdmin: boolean;
+    kind: UserKindModel;
 };
 
 export type UserSettingsPresentationModel = {
@@ -2753,24 +2773,24 @@ export type UserTwoFactorProviderModel = {
 
 export type VariantItemResponseModel = {
     name: string;
-    culture?: (string) | null;
+    culture?: string | null;
 };
 
 export type VerifyInviteUserRequestModel = {
-    user: (ReferenceByIdModel);
+    user: ReferenceByIdModel;
     token: string;
 };
 
 export type VerifyInviteUserResponseModel = {
-    passwordConfiguration: (PasswordConfigurationResponseModel);
+    passwordConfiguration: PasswordConfigurationResponseModel;
 };
 
 export type VerifyResetPasswordResponseModel = {
-    passwordConfiguration: (PasswordConfigurationResponseModel);
+    passwordConfiguration: PasswordConfigurationResponseModel;
 };
 
 export type VerifyResetPasswordTokenRequestModel = {
-    user: (ReferenceByIdModel);
+    user: ReferenceByIdModel;
     resetCode: string;
 };
 
@@ -2810,85 +2830,85 @@ export type GetCultureData = {
     take?: number;
 };
 
-export type GetCultureResponse = ((PagedCultureReponseModel));
+export type GetCultureResponse = PagedCultureReponseModel;
 
 export type PostDataTypeData = {
-    requestBody?: (CreateDataTypeRequestModel);
+    requestBody?: CreateDataTypeRequestModel;
 };
 
-export type PostDataTypeResponse = (string);
+export type PostDataTypeResponse = string;
 
 export type GetDataTypeByIdData = {
     id: string;
 };
 
-export type GetDataTypeByIdResponse = ((DataTypeResponseModel));
+export type GetDataTypeByIdResponse = DataTypeResponseModel;
 
 export type DeleteDataTypeByIdData = {
     id: string;
 };
 
-export type DeleteDataTypeByIdResponse = (string);
+export type DeleteDataTypeByIdResponse = string;
 
 export type PutDataTypeByIdData = {
     id: string;
-    requestBody?: (UpdateDataTypeRequestModel);
+    requestBody?: UpdateDataTypeRequestModel;
 };
 
-export type PutDataTypeByIdResponse = (string);
+export type PutDataTypeByIdResponse = string;
 
 export type PostDataTypeByIdCopyData = {
     id: string;
-    requestBody?: (CopyDataTypeRequestModel);
+    requestBody?: CopyDataTypeRequestModel;
 };
 
-export type PostDataTypeByIdCopyResponse = (string);
+export type PostDataTypeByIdCopyResponse = string;
 
 export type GetDataTypeByIdIsUsedData = {
     id: string;
 };
 
-export type GetDataTypeByIdIsUsedResponse = (boolean);
+export type GetDataTypeByIdIsUsedResponse = boolean;
 
 export type PutDataTypeByIdMoveData = {
     id: string;
-    requestBody?: (MoveDataTypeRequestModel);
+    requestBody?: MoveDataTypeRequestModel;
 };
 
-export type PutDataTypeByIdMoveResponse = (string);
+export type PutDataTypeByIdMoveResponse = string;
 
 export type GetDataTypeByIdReferencesData = {
     id: string;
 };
 
-export type GetDataTypeByIdReferencesResponse = (Array<(DataTypeReferenceResponseModel)>);
+export type GetDataTypeByIdReferencesResponse = Array<(DataTypeReferenceResponseModel)>;
 
-export type GetDataTypeConfigurationResponse = ((DatatypeConfigurationResponseModel));
+export type GetDataTypeConfigurationResponse = DatatypeConfigurationResponseModel;
 
 export type PostDataTypeFolderData = {
-    requestBody?: (CreateFolderRequestModel);
+    requestBody?: CreateFolderRequestModel;
 };
 
-export type PostDataTypeFolderResponse = (string);
+export type PostDataTypeFolderResponse = string;
 
 export type GetDataTypeFolderByIdData = {
     id: string;
 };
 
-export type GetDataTypeFolderByIdResponse = ((FolderResponseModel));
+export type GetDataTypeFolderByIdResponse = FolderResponseModel;
 
 export type DeleteDataTypeFolderByIdData = {
     id: string;
 };
 
-export type DeleteDataTypeFolderByIdResponse = (string);
+export type DeleteDataTypeFolderByIdResponse = string;
 
 export type PutDataTypeFolderByIdData = {
     id: string;
-    requestBody?: (UpdateFolderResponseModel);
+    requestBody?: UpdateFolderResponseModel;
 };
 
-export type PutDataTypeFolderByIdResponse = (string);
+export type PutDataTypeFolderByIdResponse = string;
 
 export type GetFilterDataTypeData = {
     editorAlias?: string;
@@ -2898,13 +2918,13 @@ export type GetFilterDataTypeData = {
     take?: number;
 };
 
-export type GetFilterDataTypeResponse = ((PagedDataTypeItemResponseModel));
+export type GetFilterDataTypeResponse = PagedDataTypeItemResponseModel;
 
 export type GetItemDataTypeData = {
     id?: Array<(string)>;
 };
 
-export type GetItemDataTypeResponse = (Array<(DataTypeItemResponseModel)>);
+export type GetItemDataTypeResponse = Array<(DataTypeItemResponseModel)>;
 
 export type GetItemDataTypeSearchData = {
     query?: string;
@@ -2912,13 +2932,13 @@ export type GetItemDataTypeSearchData = {
     take?: number;
 };
 
-export type GetItemDataTypeSearchResponse = ((PagedModelDataTypeItemResponseModel));
+export type GetItemDataTypeSearchResponse = PagedModelDataTypeItemResponseModel;
 
 export type GetTreeDataTypeAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeDataTypeAncestorsResponse = (Array<(DataTypeTreeItemResponseModel)>);
+export type GetTreeDataTypeAncestorsResponse = Array<(DataTypeTreeItemResponseModel)>;
 
 export type GetTreeDataTypeChildrenData = {
     foldersOnly?: boolean;
@@ -2927,7 +2947,7 @@ export type GetTreeDataTypeChildrenData = {
     take?: number;
 };
 
-export type GetTreeDataTypeChildrenResponse = ((PagedDataTypeTreeItemResponseModel));
+export type GetTreeDataTypeChildrenResponse = PagedDataTypeTreeItemResponseModel;
 
 export type GetTreeDataTypeRootData = {
     foldersOnly?: boolean;
@@ -2935,7 +2955,7 @@ export type GetTreeDataTypeRootData = {
     take?: number;
 };
 
-export type GetTreeDataTypeRootResponse = ((PagedDataTypeTreeItemResponseModel));
+export type GetTreeDataTypeRootResponse = PagedDataTypeTreeItemResponseModel;
 
 export type GetDictionaryData = {
     filter?: string;
@@ -2943,64 +2963,64 @@ export type GetDictionaryData = {
     take?: number;
 };
 
-export type GetDictionaryResponse = ((PagedDictionaryOverviewResponseModel));
+export type GetDictionaryResponse = PagedDictionaryOverviewResponseModel;
 
 export type PostDictionaryData = {
-    requestBody?: (CreateDictionaryItemRequestModel);
+    requestBody?: CreateDictionaryItemRequestModel;
 };
 
-export type PostDictionaryResponse = (string);
+export type PostDictionaryResponse = string;
 
 export type GetDictionaryByIdData = {
     id: string;
 };
 
-export type GetDictionaryByIdResponse = ((DictionaryItemResponseModel));
+export type GetDictionaryByIdResponse = DictionaryItemResponseModel;
 
 export type DeleteDictionaryByIdData = {
     id: string;
 };
 
-export type DeleteDictionaryByIdResponse = (string);
+export type DeleteDictionaryByIdResponse = string;
 
 export type PutDictionaryByIdData = {
     id: string;
-    requestBody?: (UpdateDictionaryItemRequestModel);
+    requestBody?: UpdateDictionaryItemRequestModel;
 };
 
-export type PutDictionaryByIdResponse = (string);
+export type PutDictionaryByIdResponse = string;
 
 export type GetDictionaryByIdExportData = {
     id: string;
     includeChildren?: boolean;
 };
 
-export type GetDictionaryByIdExportResponse = (((Blob | File)));
+export type GetDictionaryByIdExportResponse = (Blob | File);
 
 export type PutDictionaryByIdMoveData = {
     id: string;
-    requestBody?: (MoveDictionaryRequestModel);
+    requestBody?: MoveDictionaryRequestModel;
 };
 
-export type PutDictionaryByIdMoveResponse = (string);
+export type PutDictionaryByIdMoveResponse = string;
 
 export type PostDictionaryImportData = {
-    requestBody?: (ImportDictionaryRequestModel);
+    requestBody?: ImportDictionaryRequestModel;
 };
 
-export type PostDictionaryImportResponse = (string);
+export type PostDictionaryImportResponse = string;
 
 export type GetItemDictionaryData = {
     id?: Array<(string)>;
 };
 
-export type GetItemDictionaryResponse = (Array<(DictionaryItemItemResponseModel)>);
+export type GetItemDictionaryResponse = Array<(DictionaryItemItemResponseModel)>;
 
 export type GetTreeDictionaryAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeDictionaryAncestorsResponse = (Array<(NamedEntityTreeItemResponseModel)>);
+export type GetTreeDictionaryAncestorsResponse = Array<(NamedEntityTreeItemResponseModel)>;
 
 export type GetTreeDictionaryChildrenData = {
     parentId?: string;
@@ -3008,89 +3028,89 @@ export type GetTreeDictionaryChildrenData = {
     take?: number;
 };
 
-export type GetTreeDictionaryChildrenResponse = ((PagedNamedEntityTreeItemResponseModel));
+export type GetTreeDictionaryChildrenResponse = PagedNamedEntityTreeItemResponseModel;
 
 export type GetTreeDictionaryRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreeDictionaryRootResponse = ((PagedNamedEntityTreeItemResponseModel));
+export type GetTreeDictionaryRootResponse = PagedNamedEntityTreeItemResponseModel;
 
 export type PostDocumentBlueprintData = {
-    requestBody?: (CreateDocumentBlueprintRequestModel);
+    requestBody?: CreateDocumentBlueprintRequestModel;
 };
 
-export type PostDocumentBlueprintResponse = (string);
+export type PostDocumentBlueprintResponse = string;
 
 export type GetDocumentBlueprintByIdData = {
     id: string;
 };
 
-export type GetDocumentBlueprintByIdResponse = ((DocumentBlueprintResponseModel));
+export type GetDocumentBlueprintByIdResponse = DocumentBlueprintResponseModel;
 
 export type DeleteDocumentBlueprintByIdData = {
     id: string;
 };
 
-export type DeleteDocumentBlueprintByIdResponse = (string);
+export type DeleteDocumentBlueprintByIdResponse = string;
 
 export type PutDocumentBlueprintByIdData = {
     id: string;
-    requestBody?: (UpdateDocumentBlueprintRequestModel);
+    requestBody?: UpdateDocumentBlueprintRequestModel;
 };
 
-export type PutDocumentBlueprintByIdResponse = (string);
+export type PutDocumentBlueprintByIdResponse = string;
 
 export type PutDocumentBlueprintByIdMoveData = {
     id: string;
-    requestBody?: (MoveDocumentBlueprintRequestModel);
+    requestBody?: MoveDocumentBlueprintRequestModel;
 };
 
-export type PutDocumentBlueprintByIdMoveResponse = (string);
+export type PutDocumentBlueprintByIdMoveResponse = string;
 
 export type PostDocumentBlueprintFolderData = {
-    requestBody?: (CreateFolderRequestModel);
+    requestBody?: CreateFolderRequestModel;
 };
 
-export type PostDocumentBlueprintFolderResponse = (string);
+export type PostDocumentBlueprintFolderResponse = string;
 
 export type GetDocumentBlueprintFolderByIdData = {
     id: string;
 };
 
-export type GetDocumentBlueprintFolderByIdResponse = ((FolderResponseModel));
+export type GetDocumentBlueprintFolderByIdResponse = FolderResponseModel;
 
 export type DeleteDocumentBlueprintFolderByIdData = {
     id: string;
 };
 
-export type DeleteDocumentBlueprintFolderByIdResponse = (string);
+export type DeleteDocumentBlueprintFolderByIdResponse = string;
 
 export type PutDocumentBlueprintFolderByIdData = {
     id: string;
-    requestBody?: (UpdateFolderResponseModel);
+    requestBody?: UpdateFolderResponseModel;
 };
 
-export type PutDocumentBlueprintFolderByIdResponse = (string);
+export type PutDocumentBlueprintFolderByIdResponse = string;
 
 export type PostDocumentBlueprintFromDocumentData = {
-    requestBody?: (CreateDocumentBlueprintFromDocumentRequestModel);
+    requestBody?: CreateDocumentBlueprintFromDocumentRequestModel;
 };
 
-export type PostDocumentBlueprintFromDocumentResponse = (string);
+export type PostDocumentBlueprintFromDocumentResponse = string;
 
 export type GetItemDocumentBlueprintData = {
     id?: Array<(string)>;
 };
 
-export type GetItemDocumentBlueprintResponse = (Array<(DocumentBlueprintItemResponseModel)>);
+export type GetItemDocumentBlueprintResponse = Array<(DocumentBlueprintItemResponseModel)>;
 
 export type GetTreeDocumentBlueprintAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeDocumentBlueprintAncestorsResponse = (Array<(DocumentBlueprintTreeItemResponseModel)>);
+export type GetTreeDocumentBlueprintAncestorsResponse = Array<(DocumentBlueprintTreeItemResponseModel)>;
 
 export type GetTreeDocumentBlueprintChildrenData = {
     foldersOnly?: boolean;
@@ -3099,7 +3119,7 @@ export type GetTreeDocumentBlueprintChildrenData = {
     take?: number;
 };
 
-export type GetTreeDocumentBlueprintChildrenResponse = ((PagedDocumentBlueprintTreeItemResponseModel));
+export type GetTreeDocumentBlueprintChildrenResponse = PagedDocumentBlueprintTreeItemResponseModel;
 
 export type GetTreeDocumentBlueprintRootData = {
     foldersOnly?: boolean;
@@ -3107,32 +3127,32 @@ export type GetTreeDocumentBlueprintRootData = {
     take?: number;
 };
 
-export type GetTreeDocumentBlueprintRootResponse = ((PagedDocumentBlueprintTreeItemResponseModel));
+export type GetTreeDocumentBlueprintRootResponse = PagedDocumentBlueprintTreeItemResponseModel;
 
 export type PostDocumentTypeData = {
-    requestBody?: (CreateDocumentTypeRequestModel);
+    requestBody?: CreateDocumentTypeRequestModel;
 };
 
-export type PostDocumentTypeResponse = (string);
+export type PostDocumentTypeResponse = string;
 
 export type GetDocumentTypeByIdData = {
     id: string;
 };
 
-export type GetDocumentTypeByIdResponse = ((DocumentTypeResponseModel));
+export type GetDocumentTypeByIdResponse = DocumentTypeResponseModel;
 
 export type DeleteDocumentTypeByIdData = {
     id: string;
 };
 
-export type DeleteDocumentTypeByIdResponse = (string);
+export type DeleteDocumentTypeByIdResponse = string;
 
 export type PutDocumentTypeByIdData = {
     id: string;
-    requestBody?: (UpdateDocumentTypeRequestModel);
+    requestBody?: UpdateDocumentTypeRequestModel;
 };
 
-export type PutDocumentTypeByIdResponse = (string);
+export type PutDocumentTypeByIdResponse = string;
 
 export type GetDocumentTypeByIdAllowedChildrenData = {
     id: string;
@@ -3140,7 +3160,7 @@ export type GetDocumentTypeByIdAllowedChildrenData = {
     take?: number;
 };
 
-export type GetDocumentTypeByIdAllowedChildrenResponse = ((PagedAllowedDocumentTypeModel));
+export type GetDocumentTypeByIdAllowedChildrenResponse = PagedAllowedDocumentTypeModel;
 
 export type GetDocumentTypeByIdBlueprintData = {
     id: string;
@@ -3148,92 +3168,92 @@ export type GetDocumentTypeByIdBlueprintData = {
     take?: number;
 };
 
-export type GetDocumentTypeByIdBlueprintResponse = ((PagedDocumentTypeBlueprintItemResponseModel));
+export type GetDocumentTypeByIdBlueprintResponse = PagedDocumentTypeBlueprintItemResponseModel;
 
 export type GetDocumentTypeByIdCompositionReferencesData = {
     id: string;
 };
 
-export type GetDocumentTypeByIdCompositionReferencesResponse = (Array<(DocumentTypeCompositionResponseModel)>);
+export type GetDocumentTypeByIdCompositionReferencesResponse = Array<(DocumentTypeCompositionResponseModel)>;
 
 export type PostDocumentTypeByIdCopyData = {
     id: string;
-    requestBody?: (CopyDocumentTypeRequestModel);
+    requestBody?: CopyDocumentTypeRequestModel;
 };
 
-export type PostDocumentTypeByIdCopyResponse = (string);
+export type PostDocumentTypeByIdCopyResponse = string;
 
 export type GetDocumentTypeByIdExportData = {
     id: string;
 };
 
-export type GetDocumentTypeByIdExportResponse = (((Blob | File)));
+export type GetDocumentTypeByIdExportResponse = (Blob | File);
 
 export type PutDocumentTypeByIdImportData = {
     id: string;
-    requestBody?: (ImportDocumentTypeRequestModel);
+    requestBody?: ImportDocumentTypeRequestModel;
 };
 
-export type PutDocumentTypeByIdImportResponse = (string);
+export type PutDocumentTypeByIdImportResponse = string;
 
 export type PutDocumentTypeByIdMoveData = {
     id: string;
-    requestBody?: (MoveDocumentTypeRequestModel);
+    requestBody?: MoveDocumentTypeRequestModel;
 };
 
-export type PutDocumentTypeByIdMoveResponse = (string);
+export type PutDocumentTypeByIdMoveResponse = string;
 
 export type GetDocumentTypeAllowedAtRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetDocumentTypeAllowedAtRootResponse = ((PagedAllowedDocumentTypeModel));
+export type GetDocumentTypeAllowedAtRootResponse = PagedAllowedDocumentTypeModel;
 
 export type PostDocumentTypeAvailableCompositionsData = {
-    requestBody?: (DocumentTypeCompositionRequestModel);
+    requestBody?: DocumentTypeCompositionRequestModel;
 };
 
-export type PostDocumentTypeAvailableCompositionsResponse = (Array<(AvailableDocumentTypeCompositionResponseModel)>);
+export type PostDocumentTypeAvailableCompositionsResponse = Array<(AvailableDocumentTypeCompositionResponseModel)>;
 
-export type GetDocumentTypeConfigurationResponse = ((DocumentTypeConfigurationResponseModel));
+export type GetDocumentTypeConfigurationResponse = DocumentTypeConfigurationResponseModel;
 
 export type PostDocumentTypeFolderData = {
-    requestBody?: (CreateFolderRequestModel);
+    requestBody?: CreateFolderRequestModel;
 };
 
-export type PostDocumentTypeFolderResponse = (string);
+export type PostDocumentTypeFolderResponse = string;
 
 export type GetDocumentTypeFolderByIdData = {
     id: string;
 };
 
-export type GetDocumentTypeFolderByIdResponse = ((FolderResponseModel));
+export type GetDocumentTypeFolderByIdResponse = FolderResponseModel;
 
 export type DeleteDocumentTypeFolderByIdData = {
     id: string;
 };
 
-export type DeleteDocumentTypeFolderByIdResponse = (string);
+export type DeleteDocumentTypeFolderByIdResponse = string;
 
 export type PutDocumentTypeFolderByIdData = {
     id: string;
-    requestBody?: (UpdateFolderResponseModel);
+    requestBody?: UpdateFolderResponseModel;
 };
 
-export type PutDocumentTypeFolderByIdResponse = (string);
+export type PutDocumentTypeFolderByIdResponse = string;
 
 export type PostDocumentTypeImportData = {
-    requestBody?: (ImportDocumentTypeRequestModel);
+    requestBody?: ImportDocumentTypeRequestModel;
 };
 
-export type PostDocumentTypeImportResponse = (string);
+export type PostDocumentTypeImportResponse = string;
 
 export type GetItemDocumentTypeData = {
     id?: Array<(string)>;
 };
 
-export type GetItemDocumentTypeResponse = (Array<(DocumentTypeItemResponseModel)>);
+export type GetItemDocumentTypeResponse = Array<(DocumentTypeItemResponseModel)>;
 
 export type GetItemDocumentTypeSearchData = {
     query?: string;
@@ -3241,13 +3261,13 @@ export type GetItemDocumentTypeSearchData = {
     take?: number;
 };
 
-export type GetItemDocumentTypeSearchResponse = ((PagedModelDocumentTypeItemResponseModel));
+export type GetItemDocumentTypeSearchResponse = PagedModelDocumentTypeItemResponseModel;
 
 export type GetTreeDocumentTypeAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeDocumentTypeAncestorsResponse = (Array<(DocumentTypeTreeItemResponseModel)>);
+export type GetTreeDocumentTypeAncestorsResponse = Array<(DocumentTypeTreeItemResponseModel)>;
 
 export type GetTreeDocumentTypeChildrenData = {
     foldersOnly?: boolean;
@@ -3256,7 +3276,7 @@ export type GetTreeDocumentTypeChildrenData = {
     take?: number;
 };
 
-export type GetTreeDocumentTypeChildrenResponse = ((PagedDocumentTypeTreeItemResponseModel));
+export type GetTreeDocumentTypeChildrenResponse = PagedDocumentTypeTreeItemResponseModel;
 
 export type GetTreeDocumentTypeRootData = {
     foldersOnly?: boolean;
@@ -3264,7 +3284,7 @@ export type GetTreeDocumentTypeRootData = {
     take?: number;
 };
 
-export type GetTreeDocumentTypeRootResponse = ((PagedDocumentTypeTreeItemResponseModel));
+export type GetTreeDocumentTypeRootResponse = PagedDocumentTypeTreeItemResponseModel;
 
 export type GetDocumentVersionData = {
     culture?: string;
@@ -3273,27 +3293,27 @@ export type GetDocumentVersionData = {
     take?: number;
 };
 
-export type GetDocumentVersionResponse = ((PagedDocumentVersionItemResponseModel));
+export type GetDocumentVersionResponse = PagedDocumentVersionItemResponseModel;
 
 export type GetDocumentVersionByIdData = {
     id: string;
 };
 
-export type GetDocumentVersionByIdResponse = ((DocumentVersionResponseModel));
+export type GetDocumentVersionByIdResponse = DocumentVersionResponseModel;
 
 export type PutDocumentVersionByIdPreventCleanupData = {
     id: string;
     preventCleanup?: boolean;
 };
 
-export type PutDocumentVersionByIdPreventCleanupResponse = (string);
+export type PutDocumentVersionByIdPreventCleanupResponse = string;
 
 export type PostDocumentVersionByIdRollbackData = {
     culture?: string;
     id: string;
 };
 
-export type PostDocumentVersionByIdRollbackResponse = (string);
+export type PostDocumentVersionByIdRollbackResponse = string;
 
 export type GetCollectionDocumentByIdData = {
     dataTypeId?: string;
@@ -3306,32 +3326,32 @@ export type GetCollectionDocumentByIdData = {
     take?: number;
 };
 
-export type GetCollectionDocumentByIdResponse = ((PagedDocumentCollectionResponseModel));
+export type GetCollectionDocumentByIdResponse = PagedDocumentCollectionResponseModel;
 
 export type PostDocumentData = {
-    requestBody?: (CreateDocumentRequestModel);
+    requestBody?: CreateDocumentRequestModel;
 };
 
-export type PostDocumentResponse = (string);
+export type PostDocumentResponse = string;
 
 export type GetDocumentByIdData = {
     id: string;
 };
 
-export type GetDocumentByIdResponse = ((DocumentResponseModel));
+export type GetDocumentByIdResponse = DocumentResponseModel;
 
 export type DeleteDocumentByIdData = {
     id: string;
 };
 
-export type DeleteDocumentByIdResponse = (string);
+export type DeleteDocumentByIdResponse = string;
 
 export type PutDocumentByIdData = {
     id: string;
-    requestBody?: (UpdateDocumentRequestModel);
+    requestBody?: UpdateDocumentRequestModel;
 };
 
-export type PutDocumentByIdResponse = (string);
+export type PutDocumentByIdResponse = string;
 
 export type GetDocumentByIdAuditLogData = {
     id: string;
@@ -3341,93 +3361,93 @@ export type GetDocumentByIdAuditLogData = {
     take?: number;
 };
 
-export type GetDocumentByIdAuditLogResponse = ((PagedAuditLogResponseModel));
+export type GetDocumentByIdAuditLogResponse = PagedAuditLogResponseModel;
 
 export type PostDocumentByIdCopyData = {
     id: string;
-    requestBody?: (CopyDocumentRequestModel);
+    requestBody?: CopyDocumentRequestModel;
 };
 
-export type PostDocumentByIdCopyResponse = (string);
+export type PostDocumentByIdCopyResponse = string;
 
 export type GetDocumentByIdDomainsData = {
     id: string;
 };
 
-export type GetDocumentByIdDomainsResponse = ((DomainsResponseModel));
+export type GetDocumentByIdDomainsResponse = DomainsResponseModel;
 
 export type PutDocumentByIdDomainsData = {
     id: string;
-    requestBody?: (UpdateDomainsRequestModel);
+    requestBody?: UpdateDomainsRequestModel;
 };
 
-export type PutDocumentByIdDomainsResponse = (string);
+export type PutDocumentByIdDomainsResponse = string;
 
 export type PutDocumentByIdMoveData = {
     id: string;
-    requestBody?: (MoveDocumentRequestModel);
+    requestBody?: MoveDocumentRequestModel;
 };
 
-export type PutDocumentByIdMoveResponse = (string);
+export type PutDocumentByIdMoveResponse = string;
 
 export type PutDocumentByIdMoveToRecycleBinData = {
     id: string;
 };
 
-export type PutDocumentByIdMoveToRecycleBinResponse = (string);
+export type PutDocumentByIdMoveToRecycleBinResponse = string;
 
 export type GetDocumentByIdNotificationsData = {
     id: string;
 };
 
-export type GetDocumentByIdNotificationsResponse = (Array<(DocumentNotificationResponseModel)>);
+export type GetDocumentByIdNotificationsResponse = Array<(DocumentNotificationResponseModel)>;
 
 export type PutDocumentByIdNotificationsData = {
     id: string;
-    requestBody?: (UpdateDocumentNotificationsRequestModel);
+    requestBody?: UpdateDocumentNotificationsRequestModel;
 };
 
-export type PutDocumentByIdNotificationsResponse = (string);
+export type PutDocumentByIdNotificationsResponse = string;
 
 export type PostDocumentByIdPublicAccessData = {
     id: string;
-    requestBody?: (PublicAccessRequestModel);
+    requestBody?: PublicAccessRequestModel;
 };
 
-export type PostDocumentByIdPublicAccessResponse = (string);
+export type PostDocumentByIdPublicAccessResponse = string;
 
 export type DeleteDocumentByIdPublicAccessData = {
     id: string;
 };
 
-export type DeleteDocumentByIdPublicAccessResponse = (string);
+export type DeleteDocumentByIdPublicAccessResponse = string;
 
 export type GetDocumentByIdPublicAccessData = {
     id: string;
 };
 
-export type GetDocumentByIdPublicAccessResponse = ((PublicAccessResponseModel));
+export type GetDocumentByIdPublicAccessResponse = PublicAccessResponseModel;
 
 export type PutDocumentByIdPublicAccessData = {
     id: string;
-    requestBody?: (PublicAccessRequestModel);
+    requestBody?: PublicAccessRequestModel;
 };
 
-export type PutDocumentByIdPublicAccessResponse = (string);
+export type PutDocumentByIdPublicAccessResponse = string;
 
 export type PutDocumentByIdPublishData = {
     id: string;
-    requestBody?: (PublishDocumentRequestModel);
+    requestBody?: PublishDocumentRequestModel;
 };
 
-export type PutDocumentByIdPublishResponse = (string);
+export type PutDocumentByIdPublishResponse = string;
 
 export type PutDocumentByIdPublishWithDescendantsData = {
     id: string;
-    requestBody?: (PublishDocumentWithDescendantsRequestModel);
+    requestBody?: PublishDocumentWithDescendantsRequestModel;
 };
 
-export type PutDocumentByIdPublishWithDescendantsResponse = (string);
+export type PutDocumentByIdPublishWithDescendantsResponse = string;
 
 export type GetDocumentByIdReferencedByData = {
     id: string;
@@ -3435,7 +3455,7 @@ export type GetDocumentByIdReferencedByData = {
     take?: number;
 };
 
-export type GetDocumentByIdReferencedByResponse = ((PagedIReferenceResponseModel));
+export type GetDocumentByIdReferencedByResponse = PagedIReferenceResponseModel;
 
 export type GetDocumentByIdReferencedDescendantsData = {
     id: string;
@@ -3443,21 +3463,21 @@ export type GetDocumentByIdReferencedDescendantsData = {
     take?: number;
 };
 
-export type GetDocumentByIdReferencedDescendantsResponse = ((PagedReferenceByIdModel));
+export type GetDocumentByIdReferencedDescendantsResponse = PagedReferenceByIdModel;
 
 export type PutDocumentByIdUnpublishData = {
     id: string;
-    requestBody?: (UnpublishDocumentRequestModel);
+    requestBody?: UnpublishDocumentRequestModel;
 };
 
-export type PutDocumentByIdUnpublishResponse = (string);
+export type PutDocumentByIdUnpublishResponse = string;
 
 export type PutDocumentByIdValidateData = {
     id: string;
-    requestBody?: (UpdateDocumentRequestModel);
+    requestBody?: UpdateDocumentRequestModel;
 };
 
-export type PutDocumentByIdValidateResponse = (string);
+export type PutDocumentByIdValidateResponse = string;
 
 export type GetDocumentAreReferencedData = {
     id?: Array<(string)>;
@@ -3465,62 +3485,63 @@ export type GetDocumentAreReferencedData = {
     take?: number;
 };
 
-export type GetDocumentAreReferencedResponse = ((PagedReferenceByIdModel));
+export type GetDocumentAreReferencedResponse = PagedReferenceByIdModel;
 
-export type GetDocumentConfigurationResponse = ((DocumentConfigurationResponseModel));
+export type GetDocumentConfigurationResponse = DocumentConfigurationResponseModel;
 
 export type PutDocumentSortData = {
-    requestBody?: (SortingRequestModel);
+    requestBody?: SortingRequestModel;
 };
 
-export type PutDocumentSortResponse = (string);
+export type PutDocumentSortResponse = string;
 
 export type GetDocumentUrlsData = {
     id?: Array<(string)>;
 };
 
-export type GetDocumentUrlsResponse = (Array<(DocumentUrlInfoResponseModel)>);
+export type GetDocumentUrlsResponse = Array<(DocumentUrlInfoResponseModel)>;
 
 export type PostDocumentValidateData = {
-    requestBody?: (CreateDocumentRequestModel);
+    requestBody?: CreateDocumentRequestModel;
 };
 
-export type PostDocumentValidateResponse = (string);
+export type PostDocumentValidateResponse = string;
 
 export type GetItemDocumentData = {
     id?: Array<(string)>;
 };
 
-export type GetItemDocumentResponse = (Array<(DocumentItemResponseModel)>);
+export type GetItemDocumentResponse = Array<(DocumentItemResponseModel)>;
 
 export type GetItemDocumentSearchData = {
+    parentId?: string;
     query?: string;
     skip?: number;
     take?: number;
 };
 
-export type GetItemDocumentSearchResponse = ((PagedModelDocumentItemResponseModel));
+export type GetItemDocumentSearchResponse = PagedModelDocumentItemResponseModel;
 
-export type DeleteRecycleBinDocumentResponse = (string);
+export type DeleteRecycleBinDocumentResponse = string;
 
 export type DeleteRecycleBinDocumentByIdData = {
     id: string;
 };
 
-export type DeleteRecycleBinDocumentByIdResponse = (string);
+export type DeleteRecycleBinDocumentByIdResponse = string;
 
 export type GetRecycleBinDocumentByIdOriginalParentData = {
     id: string;
 };
 
-export type GetRecycleBinDocumentByIdOriginalParentResponse = ((ReferenceByIdModel));
+export type GetRecycleBinDocumentByIdOriginalParentResponse = ReferenceByIdModel;
 
 export type PutRecycleBinDocumentByIdRestoreData = {
     id: string;
-    requestBody?: (MoveMediaRequestModel);
+    requestBody?: MoveMediaRequestModel;
 };
 
-export type PutRecycleBinDocumentByIdRestoreResponse = (string);
+export type PutRecycleBinDocumentByIdRestoreResponse = string;
 
 export type GetRecycleBinDocumentChildrenData = {
     parentId?: string;
@@ -3528,20 +3549,20 @@ export type GetRecycleBinDocumentChildrenData = {
     take?: number;
 };
 
-export type GetRecycleBinDocumentChildrenResponse = ((PagedDocumentRecycleBinItemResponseModel));
+export type GetRecycleBinDocumentChildrenResponse = PagedDocumentRecycleBinItemResponseModel;
 
 export type GetRecycleBinDocumentRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetRecycleBinDocumentRootResponse = ((PagedDocumentRecycleBinItemResponseModel));
+export type GetRecycleBinDocumentRootResponse = PagedDocumentRecycleBinItemResponseModel;
 
 export type GetTreeDocumentAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeDocumentAncestorsResponse = (Array<(DocumentTreeItemResponseModel)>);
+export type GetTreeDocumentAncestorsResponse = Array<(DocumentTreeItemResponseModel)>;
 
 export type GetTreeDocumentChildrenData = {
     dataTypeId?: string;
@@ -3550,7 +3571,7 @@ export type GetTreeDocumentChildrenData = {
     take?: number;
 };
 
-export type GetTreeDocumentChildrenResponse = ((PagedDocumentTreeItemResponseModel));
+export type GetTreeDocumentChildrenResponse = PagedDocumentTreeItemResponseModel;
 
 export type GetTreeDocumentRootData = {
     dataTypeId?: string;
@@ -3558,40 +3579,40 @@ export type GetTreeDocumentRootData = {
     take?: number;
 };
 
-export type GetTreeDocumentRootResponse = ((PagedDocumentTreeItemResponseModel));
+export type GetTreeDocumentRootResponse = PagedDocumentTreeItemResponseModel;
 
 export type PostDynamicRootQueryData = {
-    requestBody?: (DynamicRootRequestModel);
+    requestBody?: DynamicRootRequestModel;
 };
 
-export type PostDynamicRootQueryResponse = ((DynamicRootResponseModel));
+export type PostDynamicRootQueryResponse = DynamicRootResponseModel;
 
-export type GetDynamicRootStepsResponse = (Array<(string)>);
+export type GetDynamicRootStepsResponse = Array<(string)>;
 
 export type GetHealthCheckGroupData = {
     skip?: number;
     take?: number;
 };
 
-export type GetHealthCheckGroupResponse = ((PagedHealthCheckGroupResponseModel));
+export type GetHealthCheckGroupResponse = PagedHealthCheckGroupResponseModel;
 
 export type GetHealthCheckGroupByNameData = {
     name: string;
 };
 
-export type GetHealthCheckGroupByNameResponse = ((HealthCheckGroupPresentationModel));
+export type GetHealthCheckGroupByNameResponse = HealthCheckGroupPresentationModel;
 
 export type PostHealthCheckGroupByNameCheckData = {
     name: string;
 };
 
-export type PostHealthCheckGroupByNameCheckResponse = ((HealthCheckGroupWithResultResponseModel));
+export type PostHealthCheckGroupByNameCheckResponse = HealthCheckGroupWithResultResponseModel;
 
 export type PostHealthCheckExecuteActionData = {
-    requestBody?: (HealthCheckActionRequestModel);
+    requestBody?: HealthCheckActionRequestModel;
 };
 
-export type PostHealthCheckExecuteActionResponse = ((HealthCheckResultResponseModel));
+export type PostHealthCheckExecuteActionResponse = HealthCheckResultResponseModel;
 
 export type GetHelpData = {
     baseUrl?: string;
@@ -3601,7 +3622,7 @@ export type GetHelpData = {
     tree?: string;
 };
 
-export type GetHelpResponse = ((PagedHelpPageResponseModel));
+export type GetHelpResponse = PagedHelpPageResponseModel;
 
 export type GetImagingResizeUrlsData = {
     height?: number;
@@ -3610,100 +3631,100 @@ export type GetImagingResizeUrlsData = {
     width?: number;
 };
 
-export type GetImagingResizeUrlsResponse = (Array<(MediaUrlInfoResponseModel)>);
+export type GetImagingResizeUrlsResponse = Array<(MediaUrlInfoResponseModel)>;
 
 export type GetImportAnalyzeData = {
     temporaryFileId?: string;
 };
 
-export type GetImportAnalyzeResponse = ((EntityImportAnalysisResponseModel));
+export type GetImportAnalyzeResponse = EntityImportAnalysisResponseModel;
 
 export type GetIndexerData = {
     skip?: number;
     take?: number;
 };
 
-export type GetIndexerResponse = ((PagedIndexResponseModel));
+export type GetIndexerResponse = PagedIndexResponseModel;
 
 export type GetIndexerByIndexNameData = {
     indexName: string;
 };
 
-export type GetIndexerByIndexNameResponse = ((IndexResponseModel));
+export type GetIndexerByIndexNameResponse = IndexResponseModel;
 
 export type PostIndexerByIndexNameRebuildData = {
     indexName: string;
 };
 
-export type PostIndexerByIndexNameRebuildResponse = (string);
+export type PostIndexerByIndexNameRebuildResponse = string;
 
-export type GetInstallSettingsResponse = ((InstallSettingsResponseModel));
+export type GetInstallSettingsResponse = InstallSettingsResponseModel;
 
 export type PostInstallSetupData = {
-    requestBody?: (InstallRequestModel);
+    requestBody?: InstallRequestModel;
 };
 
-export type PostInstallSetupResponse = (string);
+export type PostInstallSetupResponse = string;
 
 export type PostInstallValidateDatabaseData = {
-    requestBody?: (DatabaseInstallRequestModel);
+    requestBody?: DatabaseInstallRequestModel;
 };
 
-export type PostInstallValidateDatabaseResponse = (string);
+export type PostInstallValidateDatabaseResponse = string;
 
 export type GetItemLanguageData = {
     isoCode?: Array<(string)>;
 };
 
-export type GetItemLanguageResponse = (Array<(LanguageItemResponseModel)>);
+export type GetItemLanguageResponse = Array<(LanguageItemResponseModel)>;
 
-export type GetItemLanguageDefaultResponse = ((LanguageItemResponseModel));
+export type GetItemLanguageDefaultResponse = LanguageItemResponseModel;
 
 export type GetLanguageData = {
     skip?: number;
     take?: number;
 };
 
-export type GetLanguageResponse = ((PagedLanguageResponseModel));
+export type GetLanguageResponse = PagedLanguageResponseModel;
 
 export type PostLanguageData = {
-    requestBody?: (CreateLanguageRequestModel);
+    requestBody?: CreateLanguageRequestModel;
 };
 
-export type PostLanguageResponse = (string);
+export type PostLanguageResponse = string;
 
 export type GetLanguageByIsoCodeData = {
     isoCode: string;
 };
 
-export type GetLanguageByIsoCodeResponse = ((LanguageResponseModel));
+export type GetLanguageByIsoCodeResponse = LanguageResponseModel;
 
 export type DeleteLanguageByIsoCodeData = {
     isoCode: string;
 };
 
-export type DeleteLanguageByIsoCodeResponse = (string);
+export type DeleteLanguageByIsoCodeResponse = string;
 
 export type PutLanguageByIsoCodeData = {
     isoCode: string;
-    requestBody?: (UpdateLanguageRequestModel);
+    requestBody?: UpdateLanguageRequestModel;
 };
 
-export type PutLanguageByIsoCodeResponse = (string);
+export type PutLanguageByIsoCodeResponse = string;
 
 export type GetLogViewerLevelData = {
     skip?: number;
     take?: number;
 };
 
-export type GetLogViewerLevelResponse = ((PagedLoggerResponseModel));
+export type GetLogViewerLevelResponse = PagedLoggerResponseModel;
 
 export type GetLogViewerLevelCountData = {
     endDate?: string;
     startDate?: string;
 };
 
-export type GetLogViewerLevelCountResponse = ((LogLevelCountsReponseModel));
+export type GetLogViewerLevelCountResponse = LogLevelCountsReponseModel;
 
 export type GetLogViewerLogData = {
     endDate?: string;
@@ -3715,7 +3736,7 @@ export type GetLogViewerLogData = {
     take?: number;
 };
 
-export type GetLogViewerLogResponse = ((PagedLogMessageResponseModel));
+export type GetLogViewerLogResponse = PagedLogMessageResponseModel;
 
 export type GetLogViewerMessageTemplateData = {
     endDate?: string;
@@ -3724,51 +3745,51 @@ export type GetLogViewerMessageTemplateData = {
     take?: number;
 };
 
-export type GetLogViewerMessageTemplateResponse = ((PagedLogTemplateResponseModel));
+export type GetLogViewerMessageTemplateResponse = PagedLogTemplateResponseModel;
 
 export type GetLogViewerSavedSearchData = {
     skip?: number;
     take?: number;
 };
 
-export type GetLogViewerSavedSearchResponse = ((PagedSavedLogSearchResponseModel));
+export type GetLogViewerSavedSearchResponse = PagedSavedLogSearchResponseModel;
 
 export type PostLogViewerSavedSearchData = {
-    requestBody?: (SavedLogSearchRequestModel);
+    requestBody?: SavedLogSearchRequestModel;
 };
 
-export type PostLogViewerSavedSearchResponse = (string);
+export type PostLogViewerSavedSearchResponse = string;
 
 export type GetLogViewerSavedSearchByNameData = {
     name: string;
 };
 
-export type GetLogViewerSavedSearchByNameResponse = ((SavedLogSearchResponseModel));
+export type GetLogViewerSavedSearchByNameResponse = SavedLogSearchResponseModel;
 
 export type DeleteLogViewerSavedSearchByNameData = {
     name: string;
 };
 
-export type DeleteLogViewerSavedSearchByNameResponse = (string);
+export type DeleteLogViewerSavedSearchByNameResponse = string;
 
 export type GetLogViewerValidateLogsSizeData = {
     endDate?: string;
     startDate?: string;
 };
 
-export type GetLogViewerValidateLogsSizeResponse = (unknown);
+export type GetLogViewerValidateLogsSizeResponse = unknown;
 
-export type GetManifestManifestResponse = (Array<(ManifestResponseModel)>);
+export type GetManifestManifestResponse = Array<(ManifestResponseModel)>;
 
-export type GetManifestManifestPrivateResponse = (Array<(ManifestResponseModel)>);
+export type GetManifestManifestPrivateResponse = Array<(ManifestResponseModel)>;
 
-export type GetManifestManifestPublicResponse = (Array<(ManifestResponseModel)>);
+export type GetManifestManifestPublicResponse = Array<(ManifestResponseModel)>;
 
 export type GetItemMediaTypeData = {
     id?: Array<(string)>;
 };
 
-export type GetItemMediaTypeResponse = (Array<(MediaTypeItemResponseModel)>);
+export type GetItemMediaTypeResponse = Array<(MediaTypeItemResponseModel)>;
 
 export type GetItemMediaTypeAllowedData = {
     fileExtension?: string;
@@ -3776,14 +3797,14 @@ export type GetItemMediaTypeAllowedData = {
     take?: number;
 };
 
-export type GetItemMediaTypeAllowedResponse = ((PagedModelMediaTypeItemResponseModel));
+export type GetItemMediaTypeAllowedResponse = PagedModelMediaTypeItemResponseModel;
 
 export type GetItemMediaTypeFoldersData = {
     skip?: number;
     take?: number;
 };
 
-export type GetItemMediaTypeFoldersResponse = ((PagedModelMediaTypeItemResponseModel));
+export type GetItemMediaTypeFoldersResponse = PagedModelMediaTypeItemResponseModel;
 
 export type GetItemMediaTypeSearchData = {
     query?: string;
@@ -3791,32 +3812,32 @@ export type GetItemMediaTypeSearchData = {
     take?: number;
 };
 
-export type GetItemMediaTypeSearchResponse = ((PagedModelMediaTypeItemResponseModel));
+export type GetItemMediaTypeSearchResponse = PagedModelMediaTypeItemResponseModel;
 
 export type PostMediaTypeData = {
-    requestBody?: (CreateMediaTypeRequestModel);
+    requestBody?: CreateMediaTypeRequestModel;
 };
 
-export type PostMediaTypeResponse = (string);
+export type PostMediaTypeResponse = string;
 
 export type GetMediaTypeByIdData = {
     id: string;
 };
 
-export type GetMediaTypeByIdResponse = ((MediaTypeResponseModel));
+export type GetMediaTypeByIdResponse = MediaTypeResponseModel;
 
 export type DeleteMediaTypeByIdData = {
     id: string;
 };
 
-export type DeleteMediaTypeByIdResponse = (string);
+export type DeleteMediaTypeByIdResponse = string;
 
 export type PutMediaTypeByIdData = {
     id: string;
-    requestBody?: (UpdateMediaTypeRequestModel);
+    requestBody?: UpdateMediaTypeRequestModel;
 };
 
-export type PutMediaTypeByIdResponse = (string);
+export type PutMediaTypeByIdResponse = string;
 
 export type GetMediaTypeByIdAllowedChildrenData = {
     id: string;
@@ -3824,92 +3845,92 @@ export type GetMediaTypeByIdAllowedChildrenData = {
     take?: number;
 };
 
-export type GetMediaTypeByIdAllowedChildrenResponse = ((PagedAllowedMediaTypeModel));
+export type GetMediaTypeByIdAllowedChildrenResponse = PagedAllowedMediaTypeModel;
 
 export type GetMediaTypeByIdCompositionReferencesData = {
     id: string;
 };
 
-export type GetMediaTypeByIdCompositionReferencesResponse = (Array<(MediaTypeCompositionResponseModel)>);
+export type GetMediaTypeByIdCompositionReferencesResponse = Array<(MediaTypeCompositionResponseModel)>;
 
 export type PostMediaTypeByIdCopyData = {
     id: string;
-    requestBody?: (CopyMediaTypeRequestModel);
+    requestBody?: CopyMediaTypeRequestModel;
 };
 
-export type PostMediaTypeByIdCopyResponse = (string);
+export type PostMediaTypeByIdCopyResponse = string;
 
 export type GetMediaTypeByIdExportData = {
     id: string;
 };
 
-export type GetMediaTypeByIdExportResponse = (((Blob | File)));
+export type GetMediaTypeByIdExportResponse = (Blob | File);
 
 export type PutMediaTypeByIdImportData = {
     id: string;
-    requestBody?: (ImportMediaTypeRequestModel);
+    requestBody?: ImportMediaTypeRequestModel;
 };
 
-export type PutMediaTypeByIdImportResponse = (string);
+export type PutMediaTypeByIdImportResponse = string;
 
 export type PutMediaTypeByIdMoveData = {
     id: string;
-    requestBody?: (MoveMediaTypeRequestModel);
+    requestBody?: MoveMediaTypeRequestModel;
 };
 
-export type PutMediaTypeByIdMoveResponse = (string);
+export type PutMediaTypeByIdMoveResponse = string;
 
 export type GetMediaTypeAllowedAtRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetMediaTypeAllowedAtRootResponse = ((PagedAllowedMediaTypeModel));
+export type GetMediaTypeAllowedAtRootResponse = PagedAllowedMediaTypeModel;
 
 export type PostMediaTypeAvailableCompositionsData = {
-    requestBody?: (MediaTypeCompositionRequestModel);
+    requestBody?: MediaTypeCompositionRequestModel;
 };
 
-export type PostMediaTypeAvailableCompositionsResponse = (Array<(AvailableMediaTypeCompositionResponseModel)>);
+export type PostMediaTypeAvailableCompositionsResponse = Array<(AvailableMediaTypeCompositionResponseModel)>;
 
-export type GetMediaTypeConfigurationResponse = ((MediaTypeConfigurationResponseModel));
+export type GetMediaTypeConfigurationResponse = MediaTypeConfigurationResponseModel;
 
 export type PostMediaTypeFolderData = {
-    requestBody?: (CreateFolderRequestModel);
+    requestBody?: CreateFolderRequestModel;
 };
 
-export type PostMediaTypeFolderResponse = (string);
+export type PostMediaTypeFolderResponse = string;
 
 export type GetMediaTypeFolderByIdData = {
     id: string;
 };
 
-export type GetMediaTypeFolderByIdResponse = ((FolderResponseModel));
+export type GetMediaTypeFolderByIdResponse = FolderResponseModel;
 
 export type DeleteMediaTypeFolderByIdData = {
     id: string;
 };
 
-export type DeleteMediaTypeFolderByIdResponse = (string);
+export type DeleteMediaTypeFolderByIdResponse = string;
 
 export type PutMediaTypeFolderByIdData = {
     id: string;
-    requestBody?: (UpdateFolderResponseModel);
+    requestBody?: UpdateFolderResponseModel;
 };
 
-export type PutMediaTypeFolderByIdResponse = (string);
+export type PutMediaTypeFolderByIdResponse = string;
 
 export type PostMediaTypeImportData = {
-    requestBody?: (ImportMediaTypeRequestModel);
+    requestBody?: ImportMediaTypeRequestModel;
 };
 
-export type PostMediaTypeImportResponse = (string);
+export type PostMediaTypeImportResponse = string;
 
 export type GetTreeMediaTypeAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeMediaTypeAncestorsResponse = (Array<(MediaTypeTreeItemResponseModel)>);
+export type GetTreeMediaTypeAncestorsResponse = Array<(MediaTypeTreeItemResponseModel)>;
 
 export type GetTreeMediaTypeChildrenData = {
     foldersOnly?: boolean;
@@ -3918,7 +3939,7 @@ export type GetTreeMediaTypeChildrenData = {
     take?: number;
 };
 
-export type GetTreeMediaTypeChildrenResponse = ((PagedMediaTypeTreeItemResponseModel));
+export type GetTreeMediaTypeChildrenResponse = PagedMediaTypeTreeItemResponseModel;
 
 export type GetTreeMediaTypeRootData = {
     foldersOnly?: boolean;
@@ -3926,7 +3947,7 @@ export type GetTreeMediaTypeRootData = {
     take?: number;
 };
 
-export type GetTreeMediaTypeRootResponse = ((PagedMediaTypeTreeItemResponseModel));
+export type GetTreeMediaTypeRootResponse = PagedMediaTypeTreeItemResponseModel;
 
 export type GetCollectionMediaData = {
     dataTypeId?: string;
@@ -3938,46 +3959,47 @@ export type GetCollectionMediaData = {
     take?: number;
 };
 
-export type GetCollectionMediaResponse = ((PagedMediaCollectionResponseModel));
+export type GetCollectionMediaResponse = PagedMediaCollectionResponseModel;
 
 export type GetItemMediaData = {
     id?: Array<(string)>;
 };
 
-export type GetItemMediaResponse = (Array<(MediaItemResponseModel)>);
+export type GetItemMediaResponse = Array<(MediaItemResponseModel)>;
 
 export type GetItemMediaSearchData = {
+    parentId?: string;
     query?: string;
     skip?: number;
     take?: number;
 };
 
-export type GetItemMediaSearchResponse = ((PagedModelMediaItemResponseModel));
+export type GetItemMediaSearchResponse = PagedModelMediaItemResponseModel;
 
 export type PostMediaData = {
-    requestBody?: (CreateMediaRequestModel);
+    requestBody?: CreateMediaRequestModel;
 };
 
-export type PostMediaResponse = (string);
+export type PostMediaResponse = string;
 
 export type GetMediaByIdData = {
     id: string;
 };
 
-export type GetMediaByIdResponse = ((MediaResponseModel));
+export type GetMediaByIdResponse = MediaResponseModel;
 
 export type DeleteMediaByIdData = {
     id: string;
 };
 
-export type DeleteMediaByIdResponse = (string);
+export type DeleteMediaByIdResponse = string;
 
 export type PutMediaByIdData = {
     id: string;
-    requestBody?: (UpdateMediaRequestModel);
+    requestBody?: UpdateMediaRequestModel;
 };
 
-export type PutMediaByIdResponse = (string);
+export type PutMediaByIdResponse = string;
 
 export type GetMediaByIdAuditLogData = {
     id: string;
@@ -3987,20 +4009,20 @@ export type GetMediaByIdAuditLogData = {
     take?: number;
 };
 
-export type GetMediaByIdAuditLogResponse = ((PagedAuditLogResponseModel));
+export type GetMediaByIdAuditLogResponse = PagedAuditLogResponseModel;
 
 export type PutMediaByIdMoveData = {
     id: string;
-    requestBody?: (MoveMediaRequestModel);
+    requestBody?: MoveMediaRequestModel;
 };
 
-export type PutMediaByIdMoveResponse = (string);
+export type PutMediaByIdMoveResponse = string;
 
 export type PutMediaByIdMoveToRecycleBinData = {
     id: string;
 };
 
-export type PutMediaByIdMoveToRecycleBinResponse = (string);
+export type PutMediaByIdMoveToRecycleBinResponse = string;
 
 export type GetMediaByIdReferencedByData = {
     id: string;
@@ -4008,7 +4030,7 @@ export type GetMediaByIdReferencedByData = {
     take?: number;
 };
 
-export type GetMediaByIdReferencedByResponse = ((PagedIReferenceResponseModel));
+export type GetMediaByIdReferencedByResponse = PagedIReferenceResponseModel;
 
 export type GetMediaByIdReferencedDescendantsData = {
     id: string;
@@ -4016,14 +4038,14 @@ export type GetMediaByIdReferencedDescendantsData = {
     take?: number;
 };
 
-export type GetMediaByIdReferencedDescendantsResponse = ((PagedReferenceByIdModel));
+export type GetMediaByIdReferencedDescendantsResponse = PagedReferenceByIdModel;
 
 export type PutMediaByIdValidateData = {
     id: string;
-    requestBody?: (UpdateMediaRequestModel);
+    requestBody?: UpdateMediaRequestModel;
 };
 
-export type PutMediaByIdValidateResponse = (string);
+export type PutMediaByIdValidateResponse = string;
 
 export type GetMediaAreReferencedData = {
     id?: Array<(string)>;
@@ -4031,48 +4053,48 @@ export type GetMediaAreReferencedData = {
     take?: number;
 };
 
-export type GetMediaAreReferencedResponse = ((PagedReferenceByIdModel));
+export type GetMediaAreReferencedResponse = PagedReferenceByIdModel;
 
-export type GetMediaConfigurationResponse = ((MediaConfigurationResponseModel));
+export type GetMediaConfigurationResponse = MediaConfigurationResponseModel;
 
 export type PutMediaSortData = {
-    requestBody?: (SortingRequestModel);
+    requestBody?: SortingRequestModel;
 };
 
-export type PutMediaSortResponse = (string);
+export type PutMediaSortResponse = string;
 
 export type GetMediaUrlsData = {
     id?: Array<(string)>;
 };
 
-export type GetMediaUrlsResponse = (Array<(MediaUrlInfoResponseModel)>);
+export type GetMediaUrlsResponse = Array<(MediaUrlInfoResponseModel)>;
 
 export type PostMediaValidateData = {
-    requestBody?: (CreateMediaRequestModel);
+    requestBody?: CreateMediaRequestModel;
 };
 
-export type PostMediaValidateResponse = (string);
+export type PostMediaValidateResponse = string;
 
-export type DeleteRecycleBinMediaResponse = (string);
+export type DeleteRecycleBinMediaResponse = string;
 
 export type DeleteRecycleBinMediaByIdData = {
     id: string;
 };
 
-export type DeleteRecycleBinMediaByIdResponse = (string);
+export type DeleteRecycleBinMediaByIdResponse = string;
 
 export type GetRecycleBinMediaByIdOriginalParentData = {
     id: string;
 };
 
-export type GetRecycleBinMediaByIdOriginalParentResponse = ((ReferenceByIdModel));
+export type GetRecycleBinMediaByIdOriginalParentResponse = ReferenceByIdModel;
 
 export type PutRecycleBinMediaByIdRestoreData = {
     id: string;
-    requestBody?: (MoveMediaRequestModel);
+    requestBody?: MoveMediaRequestModel;
 };
 
-export type PutRecycleBinMediaByIdRestoreResponse = (string);
+export type PutRecycleBinMediaByIdRestoreResponse = string;
 
 export type GetRecycleBinMediaChildrenData = {
     parentId?: string;
@@ -4080,20 +4102,20 @@ export type GetRecycleBinMediaChildrenData = {
     take?: number;
 };
 
-export type GetRecycleBinMediaChildrenResponse = ((PagedMediaRecycleBinItemResponseModel));
+export type GetRecycleBinMediaChildrenResponse = PagedMediaRecycleBinItemResponseModel;
 
 export type GetRecycleBinMediaRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetRecycleBinMediaRootResponse = ((PagedMediaRecycleBinItemResponseModel));
+export type GetRecycleBinMediaRootResponse = PagedMediaRecycleBinItemResponseModel;
 
 export type GetTreeMediaAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeMediaAncestorsResponse = (Array<(MediaTreeItemResponseModel)>);
+export type GetTreeMediaAncestorsResponse = Array<(MediaTreeItemResponseModel)>;
 
 export type GetTreeMediaChildrenData = {
     dataTypeId?: string;
@@ -4102,7 +4124,7 @@ export type GetTreeMediaChildrenData = {
     take?: number;
 };
 
-export type GetTreeMediaChildrenResponse = ((PagedMediaTreeItemResponseModel));
+export type GetTreeMediaChildrenResponse = PagedMediaTreeItemResponseModel;
 
 export type GetTreeMediaRootData = {
     dataTypeId?: string;
@@ -4110,58 +4132,58 @@ export type GetTreeMediaRootData = {
     take?: number;
 };
 
-export type GetTreeMediaRootResponse = ((PagedMediaTreeItemResponseModel));
+export type GetTreeMediaRootResponse = PagedMediaTreeItemResponseModel;
 
 export type GetItemMemberGroupData = {
     id?: Array<(string)>;
 };
 
-export type GetItemMemberGroupResponse = (Array<(MemberGroupItemResponseModel)>);
+export type GetItemMemberGroupResponse = Array<(MemberGroupItemResponseModel)>;
 
 export type GetMemberGroupData = {
     skip?: number;
     take?: number;
 };
 
-export type GetMemberGroupResponse = ((PagedMemberGroupResponseModel));
+export type GetMemberGroupResponse = PagedMemberGroupResponseModel;
 
 export type PostMemberGroupData = {
-    requestBody?: (CreateMemberGroupRequestModel);
+    requestBody?: CreateMemberGroupRequestModel;
 };
 
-export type PostMemberGroupResponse = (string);
+export type PostMemberGroupResponse = string;
 
 export type GetMemberGroupByIdData = {
     id: string;
 };
 
-export type GetMemberGroupByIdResponse = ((MemberGroupResponseModel));
+export type GetMemberGroupByIdResponse = MemberGroupResponseModel;
 
 export type DeleteMemberGroupByIdData = {
     id: string;
 };
 
-export type DeleteMemberGroupByIdResponse = (string);
+export type DeleteMemberGroupByIdResponse = string;
 
 export type PutMemberGroupByIdData = {
     id: string;
-    requestBody?: (UpdateMemberGroupRequestModel);
+    requestBody?: UpdateMemberGroupRequestModel;
 };
 
-export type PutMemberGroupByIdResponse = (string);
+export type PutMemberGroupByIdResponse = string;
 
 export type GetTreeMemberGroupRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreeMemberGroupRootResponse = ((PagedNamedEntityTreeItemResponseModel));
+export type GetTreeMemberGroupRootResponse = PagedNamedEntityTreeItemResponseModel;
 
 export type GetItemMemberTypeData = {
     id?: Array<(string)>;
 };
 
-export type GetItemMemberTypeResponse = (Array<(MemberTypeItemResponseModel)>);
+export type GetItemMemberTypeResponse = Array<(MemberTypeItemResponseModel)>;
 
 export type GetItemMemberTypeSearchData = {
     query?: string;
@@ -4169,59 +4191,59 @@ export type GetItemMemberTypeSearchData = {
     take?: number;
 };
 
-export type GetItemMemberTypeSearchResponse = ((PagedModelMemberTypeItemResponseModel));
+export type GetItemMemberTypeSearchResponse = PagedModelMemberTypeItemResponseModel;
 
 export type PostMemberTypeData = {
-    requestBody?: (CreateMemberTypeRequestModel);
+    requestBody?: CreateMemberTypeRequestModel;
 };
 
-export type PostMemberTypeResponse = (string);
+export type PostMemberTypeResponse = string;
 
 export type GetMemberTypeByIdData = {
     id: string;
 };
 
-export type GetMemberTypeByIdResponse = ((MemberTypeResponseModel));
+export type GetMemberTypeByIdResponse = MemberTypeResponseModel;
 
 export type DeleteMemberTypeByIdData = {
     id: string;
 };
 
-export type DeleteMemberTypeByIdResponse = (string);
+export type DeleteMemberTypeByIdResponse = string;
 
 export type PutMemberTypeByIdData = {
     id: string;
-    requestBody?: (UpdateMemberTypeRequestModel);
+    requestBody?: UpdateMemberTypeRequestModel;
 };
 
-export type PutMemberTypeByIdResponse = (string);
+export type PutMemberTypeByIdResponse = string;
 
 export type GetMemberTypeByIdCompositionReferencesData = {
     id: string;
 };
 
-export type GetMemberTypeByIdCompositionReferencesResponse = (Array<(MemberTypeCompositionResponseModel)>);
+export type GetMemberTypeByIdCompositionReferencesResponse = Array<(MemberTypeCompositionResponseModel)>;
 
 export type PostMemberTypeByIdCopyData = {
     id: string;
 };
 
-export type PostMemberTypeByIdCopyResponse = (string);
+export type PostMemberTypeByIdCopyResponse = string;
 
 export type PostMemberTypeAvailableCompositionsData = {
-    requestBody?: (MemberTypeCompositionRequestModel);
+    requestBody?: MemberTypeCompositionRequestModel;
 };
 
-export type PostMemberTypeAvailableCompositionsResponse = (Array<(AvailableMemberTypeCompositionResponseModel)>);
+export type PostMemberTypeAvailableCompositionsResponse = Array<(AvailableMemberTypeCompositionResponseModel)>;
 
-export type GetMemberTypeConfigurationResponse = ((MemberTypeConfigurationResponseModel));
+export type GetMemberTypeConfigurationResponse = MemberTypeConfigurationResponseModel;
 
 export type GetTreeMemberTypeRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreeMemberTypeRootResponse = ((PagedMemberTypeTreeItemResponseModel));
+export type GetTreeMemberTypeRootResponse = PagedMemberTypeTreeItemResponseModel;
 
 export type GetFilterMemberData = {
     filter?: string;
@@ -4235,13 +4257,13 @@ export type GetFilterMemberData = {
     take?: number;
 };
 
-export type GetFilterMemberResponse = ((PagedMemberResponseModel));
+export type GetFilterMemberResponse = PagedMemberResponseModel;
 
 export type GetItemMemberData = {
     id?: Array<(string)>;
 };
 
-export type GetItemMemberResponse = (Array<(MemberItemResponseModel)>);
+export type GetItemMemberResponse = Array<(MemberItemResponseModel)>;
 
 export type GetItemMemberSearchData = {
     query?: string;
@@ -4249,60 +4271,60 @@ export type GetItemMemberSearchData = {
     take?: number;
 };
 
-export type GetItemMemberSearchResponse = ((PagedModelMemberItemResponseModel));
+export type GetItemMemberSearchResponse = PagedModelMemberItemResponseModel;
 
 export type PostMemberData = {
-    requestBody?: (CreateMemberRequestModel);
+    requestBody?: CreateMemberRequestModel;
 };
 
-export type PostMemberResponse = (string);
+export type PostMemberResponse = string;
 
 export type GetMemberByIdData = {
     id: string;
 };
 
-export type GetMemberByIdResponse = ((MemberResponseModel));
+export type GetMemberByIdResponse = MemberResponseModel;
 
 export type DeleteMemberByIdData = {
     id: string;
 };
 
-export type DeleteMemberByIdResponse = (string);
+export type DeleteMemberByIdResponse = string;
 
 export type PutMemberByIdData = {
     id: string;
-    requestBody?: (UpdateMemberRequestModel);
+    requestBody?: UpdateMemberRequestModel;
 };
 
-export type PutMemberByIdResponse = (string);
+export type PutMemberByIdResponse = string;
 
 export type PutMemberByIdValidateData = {
     id: string;
-    requestBody?: (UpdateMemberRequestModel);
+    requestBody?: UpdateMemberRequestModel;
 };
 
-export type PutMemberByIdValidateResponse = (string);
+export type PutMemberByIdValidateResponse = string;
 
-export type GetMemberConfigurationResponse = ((MemberConfigurationResponseModel));
+export type GetMemberConfigurationResponse = MemberConfigurationResponseModel;
 
 export type PostMemberValidateData = {
-    requestBody?: (CreateMemberRequestModel);
+    requestBody?: CreateMemberRequestModel;
 };
 
-export type PostMemberValidateResponse = (string);
+export type PostMemberValidateResponse = string;
 
-export type PostModelsBuilderBuildResponse = (string);
+export type PostModelsBuilderBuildResponse = string;
 
-export type GetModelsBuilderDashboardResponse = ((ModelsBuilderResponseModel));
+export type GetModelsBuilderDashboardResponse = ModelsBuilderResponseModel;
 
-export type GetModelsBuilderStatusResponse = ((OutOfDateStatusResponseModel));
+export type GetModelsBuilderStatusResponse = OutOfDateStatusResponseModel;
 
 export type GetObjectTypesData = {
     skip?: number;
     take?: number;
 };
 
-export type GetObjectTypesResponse = ((PagedObjectTypeResponseModel));
+export type GetObjectTypesResponse = PagedObjectTypeResponseModel;
 
 export type GetOembedQueryData = {
     maxHeight?: number;
@@ -4310,135 +4332,135 @@ export type GetOembedQueryData = {
     url?: string;
 };
 
-export type GetOembedQueryResponse = ((OEmbedResponseModel));
+export type GetOembedQueryResponse = OEmbedResponseModel;
 
 export type PostPackageByNameRunMigrationData = {
     name: string;
 };
 
-export type PostPackageByNameRunMigrationResponse = (string);
+export type PostPackageByNameRunMigrationResponse = string;
 
-export type GetPackageConfigurationResponse = ((PackageConfigurationResponseModel));
+export type GetPackageConfigurationResponse = PackageConfigurationResponseModel;
 
 export type GetPackageCreatedData = {
     skip?: number;
     take?: number;
 };
 
-export type GetPackageCreatedResponse = ((PagedPackageDefinitionResponseModel));
+export type GetPackageCreatedResponse = PagedPackageDefinitionResponseModel;
 
 export type PostPackageCreatedData = {
-    requestBody?: (CreatePackageRequestModel);
+    requestBody?: CreatePackageRequestModel;
 };
 
-export type PostPackageCreatedResponse = (string);
+export type PostPackageCreatedResponse = string;
 
 export type GetPackageCreatedByIdData = {
     id: string;
 };
 
-export type GetPackageCreatedByIdResponse = ((PackageDefinitionResponseModel));
+export type GetPackageCreatedByIdResponse = PackageDefinitionResponseModel;
 
 export type DeletePackageCreatedByIdData = {
     id: string;
 };
 
-export type DeletePackageCreatedByIdResponse = (string);
+export type DeletePackageCreatedByIdResponse = string;
 
 export type PutPackageCreatedByIdData = {
     id: string;
-    requestBody?: (UpdatePackageRequestModel);
+    requestBody?: UpdatePackageRequestModel;
 };
 
-export type PutPackageCreatedByIdResponse = (string);
+export type PutPackageCreatedByIdResponse = string;
 
 export type GetPackageCreatedByIdDownloadData = {
     id: string;
 };
 
-export type GetPackageCreatedByIdDownloadResponse = (((Blob | File)));
+export type GetPackageCreatedByIdDownloadResponse = (Blob | File);
 
 export type GetPackageMigrationStatusData = {
     skip?: number;
     take?: number;
 };
 
-export type GetPackageMigrationStatusResponse = ((PagedPackageMigrationStatusResponseModel));
+export type GetPackageMigrationStatusResponse = PagedPackageMigrationStatusResponseModel;
 
 export type GetItemPartialViewData = {
     path?: Array<(string)>;
 };
 
-export type GetItemPartialViewResponse = (Array<(PartialViewItemResponseModel)>);
+export type GetItemPartialViewResponse = Array<(PartialViewItemResponseModel)>;
 
 export type PostPartialViewData = {
-    requestBody?: (CreatePartialViewRequestModel);
+    requestBody?: CreatePartialViewRequestModel;
 };
 
-export type PostPartialViewResponse = (string);
+export type PostPartialViewResponse = string;
 
 export type GetPartialViewByPathData = {
     path: string;
 };
 
-export type GetPartialViewByPathResponse = ((PartialViewResponseModel));
+export type GetPartialViewByPathResponse = PartialViewResponseModel;
 
 export type DeletePartialViewByPathData = {
     path: string;
 };
 
-export type DeletePartialViewByPathResponse = (string);
+export type DeletePartialViewByPathResponse = string;
 
 export type PutPartialViewByPathData = {
     path: string;
-    requestBody?: (UpdatePartialViewRequestModel);
+    requestBody?: UpdatePartialViewRequestModel;
 };
 
-export type PutPartialViewByPathResponse = (string);
+export type PutPartialViewByPathResponse = string;
 
 export type PutPartialViewByPathRenameData = {
     path: string;
-    requestBody?: (RenamePartialViewRequestModel);
+    requestBody?: RenamePartialViewRequestModel;
 };
 
-export type PutPartialViewByPathRenameResponse = (string);
+export type PutPartialViewByPathRenameResponse = string;
 
 export type PostPartialViewFolderData = {
-    requestBody?: (CreatePartialViewFolderRequestModel);
+    requestBody?: CreatePartialViewFolderRequestModel;
 };
 
-export type PostPartialViewFolderResponse = (string);
+export type PostPartialViewFolderResponse = string;
 
 export type GetPartialViewFolderByPathData = {
     path: string;
 };
 
-export type GetPartialViewFolderByPathResponse = ((PartialViewFolderResponseModel));
+export type GetPartialViewFolderByPathResponse = PartialViewFolderResponseModel;
 
 export type DeletePartialViewFolderByPathData = {
     path: string;
 };
 
-export type DeletePartialViewFolderByPathResponse = (string);
+export type DeletePartialViewFolderByPathResponse = string;
 
 export type GetPartialViewSnippetData = {
     skip?: number;
     take?: number;
 };
 
-export type GetPartialViewSnippetResponse = ((PagedPartialViewSnippetItemResponseModel));
+export type GetPartialViewSnippetResponse = PagedPartialViewSnippetItemResponseModel;
 
 export type GetPartialViewSnippetByIdData = {
     id: string;
 };
 
-export type GetPartialViewSnippetByIdResponse = ((PartialViewSnippetResponseModel));
+export type GetPartialViewSnippetByIdResponse = PartialViewSnippetResponseModel;
 
 export type GetTreePartialViewAncestorsData = {
     descendantPath?: string;
 };
 
-export type GetTreePartialViewAncestorsResponse = (Array<(FileSystemTreeItemPresentationModel)>);
+export type GetTreePartialViewAncestorsResponse = Array<(FileSystemTreeItemPresentationModel)>;
 
 export type GetTreePartialViewChildrenData = {
     parentPath?: string;
@@ -4446,41 +4468,41 @@ export type GetTreePartialViewChildrenData = {
     take?: number;
 };
 
-export type GetTreePartialViewChildrenResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreePartialViewChildrenResponse = PagedFileSystemTreeItemPresentationModel;
 
 export type GetTreePartialViewRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreePartialViewRootResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreePartialViewRootResponse = PagedFileSystemTreeItemPresentationModel;
 
-export type DeletePreviewResponse = (string);
+export type DeletePreviewResponse = string;
 
-export type PostPreviewResponse = (string);
+export type PostPreviewResponse = string;
 
-export type GetProfilingStatusResponse = ((ProfilingStatusResponseModel));
+export type GetProfilingStatusResponse = ProfilingStatusResponseModel;
 
 export type PutProfilingStatusData = {
-    requestBody?: (ProfilingStatusRequestModel);
+    requestBody?: ProfilingStatusRequestModel;
 };
 
-export type PutProfilingStatusResponse = (string);
+export type PutProfilingStatusResponse = string;
 
 export type GetPropertyTypeIsUsedData = {
     contentTypeId?: string;
     propertyAlias?: string;
 };
 
-export type GetPropertyTypeIsUsedResponse = (boolean);
+export type GetPropertyTypeIsUsedResponse = boolean;
 
-export type PostPublishedCacheCollectResponse = (string);
+export type PostPublishedCacheCollectResponse = string;
 
-export type PostPublishedCacheRebuildResponse = (string);
+export type PostPublishedCacheRebuildResponse = string;
 
-export type PostPublishedCacheReloadResponse = (string);
+export type PostPublishedCacheReloadResponse = string;
 
-export type GetPublishedCacheStatusResponse = (string);
+export type GetPublishedCacheStatusResponse = string;
 
 export type GetRedirectManagementData = {
     filter?: string;
@@ -4488,7 +4510,7 @@ export type GetRedirectManagementData = {
     take?: number;
 };
 
-export type GetRedirectManagementResponse = ((PagedRedirectUrlResponseModel));
+export type GetRedirectManagementResponse = PagedRedirectUrlResponseModel;
 
 export type GetRedirectManagementByIdData = {
     id: string;
@@ -4496,40 +4518,40 @@ export type GetRedirectManagementByIdData = {
     take?: number;
 };
 
-export type GetRedirectManagementByIdResponse = ((PagedRedirectUrlResponseModel));
+export type GetRedirectManagementByIdResponse = PagedRedirectUrlResponseModel;
 
 export type DeleteRedirectManagementByIdData = {
     id: string;
 };
 
-export type DeleteRedirectManagementByIdResponse = (string);
+export type DeleteRedirectManagementByIdResponse = string;
 
-export type GetRedirectManagementStatusResponse = ((RedirectUrlStatusResponseModel));
+export type GetRedirectManagementStatusResponse = RedirectUrlStatusResponseModel;
 
 export type PostRedirectManagementStatusData = {
     status?: RedirectStatusModel;
 };
 
-export type PostRedirectManagementStatusResponse = (string);
+export type PostRedirectManagementStatusResponse = string;
 
 export type GetItemRelationTypeData = {
     id?: Array<(string)>;
 };
 
-export type GetItemRelationTypeResponse = (Array<(RelationTypeItemResponseModel)>);
+export type GetItemRelationTypeResponse = Array<(RelationTypeItemResponseModel)>;
 
 export type GetRelationTypeData = {
     skip?: number;
     take?: number;
 };
 
-export type GetRelationTypeResponse = ((PagedRelationTypeResponseModel));
+export type GetRelationTypeResponse = PagedRelationTypeResponseModel;
 
 export type GetRelationTypeByIdData = {
     id: string;
 };
 
-export type GetRelationTypeByIdResponse = ((RelationTypeResponseModel));
+export type GetRelationTypeByIdResponse = RelationTypeResponseModel;
 
 export type GetRelationByRelationTypeIdData = {
     id: string;
@@ -4537,69 +4559,69 @@ export type GetRelationByRelationTypeIdData = {
     take?: number;
 };
 
-export type GetRelationByRelationTypeIdResponse = ((PagedRelationResponseModel));
+export type GetRelationByRelationTypeIdResponse = PagedRelationResponseModel;
 
 export type GetItemScriptData = {
     path?: Array<(string)>;
 };
 
-export type GetItemScriptResponse = (Array<(ScriptItemResponseModel)>);
+export type GetItemScriptResponse = Array<(ScriptItemResponseModel)>;
 
 export type PostScriptData = {
-    requestBody?: (CreateScriptRequestModel);
+    requestBody?: CreateScriptRequestModel;
 };
 
-export type PostScriptResponse = (string);
+export type PostScriptResponse = string;
 
 export type GetScriptByPathData = {
     path: string;
 };
 
-export type GetScriptByPathResponse = ((ScriptResponseModel));
+export type GetScriptByPathResponse = ScriptResponseModel;
 
 export type DeleteScriptByPathData = {
     path: string;
 };
 
-export type DeleteScriptByPathResponse = (string);
+export type DeleteScriptByPathResponse = string;
 
 export type PutScriptByPathData = {
     path: string;
-    requestBody?: (UpdateScriptRequestModel);
+    requestBody?: UpdateScriptRequestModel;
 };
 
-export type PutScriptByPathResponse = (string);
+export type PutScriptByPathResponse = string;
 
 export type PutScriptByPathRenameData = {
     path: string;
-    requestBody?: (RenameScriptRequestModel);
+    requestBody?: RenameScriptRequestModel;
 };
 
-export type PutScriptByPathRenameResponse = (string);
+export type PutScriptByPathRenameResponse = string;
 
 export type PostScriptFolderData = {
-    requestBody?: (CreateScriptFolderRequestModel);
+    requestBody?: CreateScriptFolderRequestModel;
 };
 
-export type PostScriptFolderResponse = (string);
+export type PostScriptFolderResponse = string;
 
 export type GetScriptFolderByPathData = {
     path: string;
 };
 
-export type GetScriptFolderByPathResponse = ((ScriptFolderResponseModel));
+export type GetScriptFolderByPathResponse = ScriptFolderResponseModel;
 
 export type DeleteScriptFolderByPathData = {
     path: string;
 };
 
-export type DeleteScriptFolderByPathResponse = (string);
+export type DeleteScriptFolderByPathResponse = string;
 
 export type GetTreeScriptAncestorsData = {
     descendantPath?: string;
 };
 
-export type GetTreeScriptAncestorsResponse = (Array<(FileSystemTreeItemPresentationModel)>);
+export type GetTreeScriptAncestorsResponse = Array<(FileSystemTreeItemPresentationModel)>;
 
 export type GetTreeScriptChildrenData = {
     parentPath?: string;
@@ -4607,21 +4629,21 @@ export type GetTreeScriptChildrenData = {
     take?: number;
 };
 
-export type GetTreeScriptChildrenResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreeScriptChildrenResponse = PagedFileSystemTreeItemPresentationModel;
 
 export type GetTreeScriptRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreeScriptRootResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreeScriptRootResponse = PagedFileSystemTreeItemPresentationModel;
 
 export type GetSearcherData = {
     skip?: number;
     take?: number;
 };
 
-export type GetSearcherResponse = ((PagedSearcherResponseModel));
+export type GetSearcherResponse = PagedSearcherResponseModel;
 
 export type GetSearcherBySearcherNameQueryData = {
     searcherName: string;
@@ -4630,54 +4652,54 @@ export type GetSearcherBySearcherNameQueryData = {
     term?: string;
 };
 
-export type GetSearcherBySearcherNameQueryResponse = ((PagedSearchResultResponseModel));
+export type GetSearcherBySearcherNameQueryResponse = PagedSearchResultResponseModel;
 
-export type GetSecurityConfigurationResponse = ((SecurityConfigurationResponseModel));
+export type GetSecurityConfigurationResponse = SecurityConfigurationResponseModel;
 
 export type PostSecurityForgotPasswordData = {
-    requestBody?: (ResetPasswordRequestModel);
+    requestBody?: ResetPasswordRequestModel;
 };
 
-export type PostSecurityForgotPasswordResponse = (string);
+export type PostSecurityForgotPasswordResponse = string;
 
 export type PostSecurityForgotPasswordResetData = {
-    requestBody?: (ResetPasswordTokenRequestModel);
+    requestBody?: ResetPasswordTokenRequestModel;
 };
 
-export type PostSecurityForgotPasswordResetResponse = (string);
+export type PostSecurityForgotPasswordResetResponse = string;
 
 export type PostSecurityForgotPasswordVerifyData = {
-    requestBody?: (VerifyResetPasswordTokenRequestModel);
+    requestBody?: VerifyResetPasswordTokenRequestModel;
 };
 
-export type PostSecurityForgotPasswordVerifyResponse = ((VerifyResetPasswordResponseModel));
+export type PostSecurityForgotPasswordVerifyResponse = VerifyResetPasswordResponseModel;
 
 export type GetSegmentData = {
     skip?: number;
     take?: number;
 };
 
-export type GetSegmentResponse = ((PagedSegmentResponseModel));
+export type GetSegmentResponse = PagedSegmentResponseModel;
 
-export type GetServerConfigurationResponse = ((ServerConfigurationResponseModel));
+export type GetServerConfigurationResponse = ServerConfigurationResponseModel;
 
-export type GetServerInformationResponse = ((ServerInformationResponseModel));
+export type GetServerInformationResponse = ServerInformationResponseModel;
 
-export type GetServerStatusResponse = ((ServerStatusResponseModel));
+export type GetServerStatusResponse = ServerStatusResponseModel;
 
-export type GetServerTroubleshootingResponse = ((ServerTroubleshootingResponseModel));
+export type GetServerTroubleshootingResponse = ServerTroubleshootingResponseModel;
 
 export type GetItemStaticFileData = {
     path?: Array<(string)>;
 };
 
-export type GetItemStaticFileResponse = (Array<(StaticFileItemResponseModel)>);
+export type GetItemStaticFileResponse = Array<(StaticFileItemResponseModel)>;
 
 export type GetTreeStaticFileAncestorsData = {
     descendantPath?: string;
 };
 
-export type GetTreeStaticFileAncestorsResponse = (Array<(FileSystemTreeItemPresentationModel)>);
+export type GetTreeStaticFileAncestorsResponse = Array<(FileSystemTreeItemPresentationModel)>;
 
 export type GetTreeStaticFileChildrenData = {
     parentPath?: string;
@@ -4685,76 +4707,76 @@ export type GetTreeStaticFileChildrenData = {
     take?: number;
 };
 
-export type GetTreeStaticFileChildrenResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreeStaticFileChildrenResponse = PagedFileSystemTreeItemPresentationModel;
 
 export type GetTreeStaticFileRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreeStaticFileRootResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreeStaticFileRootResponse = PagedFileSystemTreeItemPresentationModel;
 
 export type GetItemStylesheetData = {
     path?: Array<(string)>;
 };
 
-export type GetItemStylesheetResponse = (Array<(StylesheetItemResponseModel)>);
+export type GetItemStylesheetResponse = Array<(StylesheetItemResponseModel)>;
 
 export type PostStylesheetData = {
-    requestBody?: (CreateStylesheetRequestModel);
+    requestBody?: CreateStylesheetRequestModel;
 };
 
-export type PostStylesheetResponse = (string);
+export type PostStylesheetResponse = string;
 
 export type GetStylesheetByPathData = {
     path: string;
 };
 
-export type GetStylesheetByPathResponse = ((StylesheetResponseModel));
+export type GetStylesheetByPathResponse = StylesheetResponseModel;
 
 export type DeleteStylesheetByPathData = {
     path: string;
 };
 
-export type DeleteStylesheetByPathResponse = (string);
+export type DeleteStylesheetByPathResponse = string;
 
 export type PutStylesheetByPathData = {
     path: string;
-    requestBody?: (UpdateStylesheetRequestModel);
+    requestBody?: UpdateStylesheetRequestModel;
 };
 
-export type PutStylesheetByPathResponse = (string);
+export type PutStylesheetByPathResponse = string;
 
 export type PutStylesheetByPathRenameData = {
     path: string;
-    requestBody?: (RenameStylesheetRequestModel);
+    requestBody?: RenameStylesheetRequestModel;
 };
 
-export type PutStylesheetByPathRenameResponse = (string);
+export type PutStylesheetByPathRenameResponse = string;
 
 export type PostStylesheetFolderData = {
-    requestBody?: (CreateStylesheetFolderRequestModel);
+    requestBody?: CreateStylesheetFolderRequestModel;
 };
 
-export type PostStylesheetFolderResponse = (string);
+export type PostStylesheetFolderResponse = string;
 
 export type GetStylesheetFolderByPathData = {
     path: string;
 };
 
-export type GetStylesheetFolderByPathResponse = ((StylesheetFolderResponseModel));
+export type GetStylesheetFolderByPathResponse = StylesheetFolderResponseModel;
 
 export type DeleteStylesheetFolderByPathData = {
     path: string;
 };
 
-export type DeleteStylesheetFolderByPathResponse = (string);
+export type DeleteStylesheetFolderByPathResponse = string;
 
 export type GetTreeStylesheetAncestorsData = {
     descendantPath?: string;
 };
 
-export type GetTreeStylesheetAncestorsResponse = (Array<(FileSystemTreeItemPresentationModel)>);
+export type GetTreeStylesheetAncestorsResponse = Array<(FileSystemTreeItemPresentationModel)>;
 
 export type GetTreeStylesheetChildrenData = {
     parentPath?: string;
@@ -4762,14 +4784,14 @@ export type GetTreeStylesheetChildrenData = {
     take?: number;
 };
 
-export type GetTreeStylesheetChildrenResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreeStylesheetChildrenResponse = PagedFileSystemTreeItemPresentationModel;
 
 export type GetTreeStylesheetRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreeStylesheetRootResponse = ((PagedFileSystemTreeItemPresentationModel));
+export type GetTreeStylesheetRootResponse = PagedFileSystemTreeItemPresentationModel;
 
 export type GetTagData = {
     culture?: string;
@@ -4779,28 +4801,28 @@ export type GetTagData = {
     take?: number;
 };
 
-export type GetTagResponse = ((PagedTagResponseModel));
+export type GetTagResponse = PagedTagResponseModel;
 
 export type GetTelemetryData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTelemetryResponse = ((PagedTelemetryResponseModel));
+export type GetTelemetryResponse = PagedTelemetryResponseModel;
 
-export type GetTelemetryLevelResponse = ((TelemetryResponseModel));
+export type GetTelemetryLevelResponse = TelemetryResponseModel;
 
 export type PostTelemetryLevelData = {
-    requestBody?: (TelemetryRequestModel);
+    requestBody?: TelemetryRequestModel;
 };
 
-export type PostTelemetryLevelResponse = (string);
+export type PostTelemetryLevelResponse = string;
 
 export type GetItemTemplateData = {
     id?: Array<(string)>;
 };
 
-export type GetItemTemplateResponse = (Array<(TemplateItemResponseModel)>);
+export type GetItemTemplateResponse = Array<(TemplateItemResponseModel)>;
 
 export type GetItemTemplateSearchData = {
     query?: string;
@@ -4808,48 +4830,48 @@ export type GetItemTemplateSearchData = {
     take?: number;
 };
 
-export type GetItemTemplateSearchResponse = ((PagedModelTemplateItemResponseModel));
+export type GetItemTemplateSearchResponse = PagedModelTemplateItemResponseModel;
 
 export type PostTemplateData = {
-    requestBody?: (CreateTemplateRequestModel);
+    requestBody?: CreateTemplateRequestModel;
 };
 
-export type PostTemplateResponse = (string);
+export type PostTemplateResponse = string;
 
 export type GetTemplateByIdData = {
     id: string;
 };
 
-export type GetTemplateByIdResponse = ((TemplateResponseModel));
+export type GetTemplateByIdResponse = TemplateResponseModel;
 
 export type DeleteTemplateByIdData = {
     id: string;
 };
 
-export type DeleteTemplateByIdResponse = (string);
+export type DeleteTemplateByIdResponse = string;
 
 export type PutTemplateByIdData = {
     id: string;
-    requestBody?: (UpdateTemplateRequestModel);
+    requestBody?: UpdateTemplateRequestModel;
 };
 
-export type PutTemplateByIdResponse = (string);
+export type PutTemplateByIdResponse = string;
 
-export type GetTemplateConfigurationResponse = ((TemplateConfigurationResponseModel));
+export type GetTemplateConfigurationResponse = TemplateConfigurationResponseModel;
 
 export type PostTemplateQueryExecuteData = {
-    requestBody?: (TemplateQueryExecuteModel);
+    requestBody?: TemplateQueryExecuteModel;
 };
 
-export type PostTemplateQueryExecuteResponse = ((TemplateQueryResultResponseModel));
+export type PostTemplateQueryExecuteResponse = TemplateQueryResultResponseModel;
 
-export type GetTemplateQuerySettingsResponse = ((TemplateQuerySettingsResponseModel));
+export type GetTemplateQuerySettingsResponse = TemplateQuerySettingsResponseModel;
 
 export type GetTreeTemplateAncestorsData = {
     descendantId?: string;
 };
 
-export type GetTreeTemplateAncestorsResponse = (Array<(NamedEntityTreeItemResponseModel)>);
+export type GetTreeTemplateAncestorsResponse = Array<(NamedEntityTreeItemResponseModel)>;
 
 export type GetTreeTemplateChildrenData = {
     parentId?: string;
@@ -4857,14 +4879,14 @@ export type GetTreeTemplateChildrenData = {
     take?: number;
 };
 
-export type GetTreeTemplateChildrenResponse = ((PagedNamedEntityTreeItemResponseModel));
+export type GetTreeTemplateChildrenResponse = PagedNamedEntityTreeItemResponseModel;
 
 export type GetTreeTemplateRootData = {
     skip?: number;
     take?: number;
 };
 
-export type GetTreeTemplateRootResponse = ((PagedNamedEntityTreeItemResponseModel));
+export type GetTreeTemplateRootResponse = PagedNamedEntityTreeItemResponseModel;
 
 export type PostTemporaryFileData = {
     formData?: {
@@ -4873,31 +4895,31 @@ export type PostTemporaryFileData = {
     };
 };
 
-export type PostTemporaryFileResponse = (string);
+export type PostTemporaryFileResponse = string;
 
 export type GetTemporaryFileByIdData = {
     id: string;
 };
 
-export type GetTemporaryFileByIdResponse = ((TemporaryFileResponseModel));
+export type GetTemporaryFileByIdResponse = TemporaryFileResponseModel;
 
 export type DeleteTemporaryFileByIdData = {
     id: string;
 };
 
-export type DeleteTemporaryFileByIdResponse = (string);
+export type DeleteTemporaryFileByIdResponse = string;
 
-export type GetTemporaryFileConfigurationResponse = ((TemporaryFileConfigurationResponseModel));
+export type GetTemporaryFileConfigurationResponse = TemporaryFileConfigurationResponseModel;
 
-export type PostUpgradeAuthorizeResponse = (string);
+export type PostUpgradeAuthorizeResponse = string;
 
-export type GetUpgradeSettingsResponse = ((UpgradeSettingsResponseModel));
+export type GetUpgradeSettingsResponse = UpgradeSettingsResponseModel;
 
 export type PostUserDataData = {
-    requestBody?: (CreateUserDataRequestModel);
+    requestBody?: CreateUserDataRequestModel;
 };
 
-export type PostUserDataResponse = (string);
+export type PostUserDataResponse = string;
 
 export type GetUserDataData = {
     groups?: Array<(string)>;
@@ -4906,19 +4928,19 @@ export type GetUserDataData = {
     take?: number;
 };
 
-export type GetUserDataResponse = ((PagedUserDataResponseModel));
+export type GetUserDataResponse = PagedUserDataResponseModel;
 
 export type PutUserDataData = {
-    requestBody?: (UpdateUserDataRequestModel);
+    requestBody?: UpdateUserDataRequestModel;
 };
 
-export type PutUserDataResponse = (string);
+export type PutUserDataResponse = string;
 
 export type GetUserDataByIdData = {
     id: string;
 };
 
-export type GetUserDataByIdResponse = ((UserDataModel));
+export type GetUserDataByIdResponse = UserDataModel;
 
 export type GetFilterUserGroupData = {
     filter?: string;
@@ -4926,65 +4948,65 @@ export type GetFilterUserGroupData = {
     take?: number;
 };
 
-export type GetFilterUserGroupResponse = ((PagedUserGroupResponseModel));
+export type GetFilterUserGroupResponse = PagedUserGroupResponseModel;
 
 export type GetItemUserGroupData = {
     id?: Array<(string)>;
 };
 
-export type GetItemUserGroupResponse = (Array<(UserGroupItemResponseModel)>);
+export type GetItemUserGroupResponse = Array<(UserGroupItemResponseModel)>;
 
 export type DeleteUserGroupData = {
-    requestBody?: (DeleteUserGroupsRequestModel);
+    requestBody?: DeleteUserGroupsRequestModel;
 };
 
-export type DeleteUserGroupResponse = (string);
+export type DeleteUserGroupResponse = string;
 
 export type PostUserGroupData = {
-    requestBody?: (CreateUserGroupRequestModel);
+    requestBody?: CreateUserGroupRequestModel;
 };
 
-export type PostUserGroupResponse = (string);
+export type PostUserGroupResponse = string;
 
 export type GetUserGroupData = {
     skip?: number;
     take?: number;
 };
 
-export type GetUserGroupResponse = ((PagedUserGroupResponseModel));
+export type GetUserGroupResponse = PagedUserGroupResponseModel;
 
 export type GetUserGroupByIdData = {
     id: string;
 };
 
-export type GetUserGroupByIdResponse = ((UserGroupResponseModel));
+export type GetUserGroupByIdResponse = UserGroupResponseModel;
 
 export type DeleteUserGroupByIdData = {
     id: string;
 };
 
-export type DeleteUserGroupByIdResponse = (string);
+export type DeleteUserGroupByIdResponse = string;
 
 export type PutUserGroupByIdData = {
     id: string;
-    requestBody?: (UpdateUserGroupRequestModel);
+    requestBody?: UpdateUserGroupRequestModel;
 };
 
-export type PutUserGroupByIdResponse = (string);
+export type PutUserGroupByIdResponse = string;
 
 export type DeleteUserGroupByIdUsersData = {
     id: string;
     requestBody?: Array<(ReferenceByIdModel)>;
 };
 
-export type DeleteUserGroupByIdUsersResponse = (string);
+export type DeleteUserGroupByIdUsersResponse = string;
 
 export type PostUserGroupByIdUsersData = {
     id: string;
     requestBody?: Array<(ReferenceByIdModel)>;
 };
 
-export type PostUserGroupByIdUsersResponse = (string);
+export type PostUserGroupByIdUsersResponse = string;
 
 export type GetFilterUserData = {
     filter?: string;
@@ -4996,246 +5018,8696 @@ export type GetFilterUserData = {
     userStates?: Array<UserStateModel>;
 };
 
-export type GetFilterUserResponse = ((PagedUserResponseModel));
+export type GetFilterUserResponse = PagedUserResponseModel;
 
 export type GetItemUserData = {
     id?: Array<(string)>;
 };
 
-export type GetItemUserResponse = (Array<(UserItemResponseModel)>);
+export type GetItemUserResponse = Array<(UserItemResponseModel)>;
 
 export type PostUserData = {
-    requestBody?: (CreateUserRequestModel);
+    requestBody?: CreateUserRequestModel;
 };
 
-export type PostUserResponse = (string);
+export type PostUserResponse = string;
 
 export type DeleteUserData = {
-    requestBody?: (DeleteUsersRequestModel);
+    requestBody?: DeleteUsersRequestModel;
 };
 
-export type DeleteUserResponse = (string);
+export type DeleteUserResponse = string;
 
 export type GetUserData = {
     skip?: number;
     take?: number;
 };
 
-export type GetUserResponse = ((PagedUserResponseModel));
+export type GetUserResponse = PagedUserResponseModel;
 
 export type GetUserByIdData = {
     id: string;
 };
 
-export type GetUserByIdResponse = ((UserResponseModel));
+export type GetUserByIdResponse = UserResponseModel;
 
 export type DeleteUserByIdData = {
     id: string;
 };
 
-export type DeleteUserByIdResponse = (string);
+export type DeleteUserByIdResponse = string;
 
 export type PutUserByIdData = {
     id: string;
-    requestBody?: (UpdateUserRequestModel);
+    requestBody?: UpdateUserRequestModel;
 };
 
-export type PutUserByIdResponse = (string);
+export type PutUserByIdResponse = string;
 
 export type GetUserById2FaData = {
     id: string;
 };
 
-export type GetUserById2FaResponse = (Array<(UserTwoFactorProviderModel)>);
+export type GetUserById2FaResponse = Array<(UserTwoFactorProviderModel)>;
 
 export type DeleteUserById2FaByProviderNameData = {
     id: string;
     providerName: string;
 };
 
-export type DeleteUserById2FaByProviderNameResponse = (string);
+export type DeleteUserById2FaByProviderNameResponse = string;
 
 export type GetUserByIdCalculateStartNodesData = {
     id: string;
 };
 
-export type GetUserByIdCalculateStartNodesResponse = ((CalculatedUserStartNodesResponseModel));
+export type GetUserByIdCalculateStartNodesResponse = CalculatedUserStartNodesResponseModel;
 
 export type PostUserByIdChangePasswordData = {
     id: string;
-    requestBody?: (ChangePasswordUserRequestModel);
+    requestBody?: ChangePasswordUserRequestModel;
 };
 
-export type PostUserByIdChangePasswordResponse = (string);
+export type PostUserByIdChangePasswordResponse = string;
+
+export type PostUserByIdClientCredentialsData = {
+    id: string;
+    requestBody?: CreateUserClientCredentialsRequestModel;
+};
+
+export type PostUserByIdClientCredentialsResponse = string;
+
+export type GetUserByIdClientCredentialsData = {
+    id: string;
+};
+
+export type GetUserByIdClientCredentialsResponse = Array<(string)>;
+
+export type DeleteUserByIdClientCredentialsByClientIdData = {
+    clientId: string;
+    id: string;
+};
+
+export type DeleteUserByIdClientCredentialsByClientIdResponse = string;
 
 export type PostUserByIdResetPasswordData = {
     id: string;
 };
 
-export type PostUserByIdResetPasswordResponse = ((ResetPasswordUserResponseModel));
+export type PostUserByIdResetPasswordResponse = ResetPasswordUserResponseModel;
 
 export type DeleteUserAvatarByIdData = {
     id: string;
 };
 
-export type DeleteUserAvatarByIdResponse = (string);
+export type DeleteUserAvatarByIdResponse = string;
 
 export type PostUserAvatarByIdData = {
     id: string;
-    requestBody?: (SetAvatarRequestModel);
+    requestBody?: SetAvatarRequestModel;
 };
 
-export type PostUserAvatarByIdResponse = (string);
+export type PostUserAvatarByIdResponse = string;
 
-export type GetUserConfigurationResponse = ((UserConfigurationResponseModel));
+export type GetUserConfigurationResponse = UserConfigurationResponseModel;
 
-export type GetUserCurrentResponse = ((CurrentUserResponseModel));
+export type GetUserCurrentResponse = CurrentUserResponseModel;
 
-export type GetUserCurrent2FaResponse = (Array<(UserTwoFactorProviderModel)>);
+export type GetUserCurrent2FaResponse = Array<(UserTwoFactorProviderModel)>;
 
 export type DeleteUserCurrent2FaByProviderNameData = {
     code?: string;
     providerName: string;
 };
 
-export type DeleteUserCurrent2FaByProviderNameResponse = (string);
+export type DeleteUserCurrent2FaByProviderNameResponse = string;
 
 export type PostUserCurrent2FaByProviderNameData = {
     providerName: string;
-    requestBody?: (EnableTwoFactorRequestModel);
+    requestBody?: EnableTwoFactorRequestModel;
 };
 
-export type PostUserCurrent2FaByProviderNameResponse = ((NoopSetupTwoFactorModel));
+export type PostUserCurrent2FaByProviderNameResponse = NoopSetupTwoFactorModel;
 
 export type GetUserCurrent2FaByProviderNameData = {
     providerName: string;
 };
 
-export type GetUserCurrent2FaByProviderNameResponse = ((NoopSetupTwoFactorModel));
+export type GetUserCurrent2FaByProviderNameResponse = NoopSetupTwoFactorModel;
 
 export type PostUserCurrentAvatarData = {
-    requestBody?: (SetAvatarRequestModel);
+    requestBody?: SetAvatarRequestModel;
 };
 
-export type PostUserCurrentAvatarResponse = (string);
+export type PostUserCurrentAvatarResponse = string;
 
 export type PostUserCurrentChangePasswordData = {
-    requestBody?: (ChangePasswordCurrentUserRequestModel);
+    requestBody?: ChangePasswordCurrentUserRequestModel;
 };
 
-export type PostUserCurrentChangePasswordResponse = (string);
+export type PostUserCurrentChangePasswordResponse = string;
 
-export type GetUserCurrentConfigurationResponse = ((CurrenUserConfigurationResponseModel));
+export type GetUserCurrentConfigurationResponse = CurrenUserConfigurationResponseModel;
 
-export type GetUserCurrentLoginProvidersResponse = (Array<(UserExternalLoginProviderModel)>);
+export type GetUserCurrentLoginProvidersResponse = Array<(UserExternalLoginProviderModel)>;
 
 export type GetUserCurrentPermissionsData = {
     id?: Array<(string)>;
 };
 
-export type GetUserCurrentPermissionsResponse = ((UserPermissionsResponseModel));
+export type GetUserCurrentPermissionsResponse = UserPermissionsResponseModel;
 
 export type GetUserCurrentPermissionsDocumentData = {
     id?: Array<(string)>;
 };
 
-export type GetUserCurrentPermissionsDocumentResponse = (Array<(UserPermissionsResponseModel)>);
+export type GetUserCurrentPermissionsDocumentResponse = Array<(UserPermissionsResponseModel)>;
 
 export type GetUserCurrentPermissionsMediaData = {
     id?: Array<(string)>;
 };
 
-export type GetUserCurrentPermissionsMediaResponse = ((UserPermissionsResponseModel));
+export type GetUserCurrentPermissionsMediaResponse = UserPermissionsResponseModel;
 
 export type PostUserDisableData = {
-    requestBody?: (DisableUserRequestModel);
+    requestBody?: DisableUserRequestModel;
 };
 
-export type PostUserDisableResponse = (string);
+export type PostUserDisableResponse = string;
 
 export type PostUserEnableData = {
-    requestBody?: (EnableUserRequestModel);
+    requestBody?: EnableUserRequestModel;
 };
 
-export type PostUserEnableResponse = (string);
+export type PostUserEnableResponse = string;
 
 export type PostUserInviteData = {
-    requestBody?: (InviteUserRequestModel);
+    requestBody?: InviteUserRequestModel;
 };
 
-export type PostUserInviteResponse = (string);
+export type PostUserInviteResponse = string;
 
 export type PostUserInviteCreatePasswordData = {
-    requestBody?: (CreateInitialPasswordUserRequestModel);
+    requestBody?: CreateInitialPasswordUserRequestModel;
 };
 
-export type PostUserInviteCreatePasswordResponse = (string);
+export type PostUserInviteCreatePasswordResponse = string;
 
 export type PostUserInviteResendData = {
-    requestBody?: (ResendInviteUserRequestModel);
+    requestBody?: ResendInviteUserRequestModel;
 };
 
-export type PostUserInviteResendResponse = (string);
+export type PostUserInviteResendResponse = string;
 
 export type PostUserInviteVerifyData = {
-    requestBody?: (VerifyInviteUserRequestModel);
+    requestBody?: VerifyInviteUserRequestModel;
 };
 
-export type PostUserInviteVerifyResponse = ((VerifyInviteUserResponseModel));
+export type PostUserInviteVerifyResponse = VerifyInviteUserResponseModel;
 
 export type PostUserSetUserGroupsData = {
-    requestBody?: (UpdateUserGroupsOnUserRequestModel);
+    requestBody?: UpdateUserGroupsOnUserRequestModel;
 };
 
-export type PostUserSetUserGroupsResponse = (string);
+export type PostUserSetUserGroupsResponse = string;
 
 export type PostUserUnlockData = {
-    requestBody?: (UnlockUsersRequestModel);
+    requestBody?: UnlockUsersRequestModel;
 };
 
-export type PostUserUnlockResponse = (string);
+export type PostUserUnlockResponse = string;
 
 export type GetItemWebhookData = {
     id?: Array<(string)>;
 };
 
-export type GetItemWebhookResponse = (Array<(WebhookItemResponseModel)>);
+export type GetItemWebhookResponse = Array<(WebhookItemResponseModel)>;
 
 export type GetWebhookData = {
     skip?: number;
     take?: number;
 };
 
-export type GetWebhookResponse = ((PagedWebhookResponseModel));
+export type GetWebhookResponse = PagedWebhookResponseModel;
 
 export type PostWebhookData = {
-    requestBody?: (CreateWebhookRequestModel);
+    requestBody?: CreateWebhookRequestModel;
 };
 
-export type PostWebhookResponse = (string);
+export type PostWebhookResponse = string;
 
 export type GetWebhookByIdData = {
     id: string;
 };
 
-export type GetWebhookByIdResponse = ((WebhookResponseModel));
+export type GetWebhookByIdResponse = WebhookResponseModel;
 
 export type DeleteWebhookByIdData = {
     id: string;
 };
 
-export type DeleteWebhookByIdResponse = (string);
+export type DeleteWebhookByIdResponse = string;
 
 export type PutWebhookByIdData = {
     id: string;
-    requestBody?: (UpdateWebhookRequestModel);
+    requestBody?: UpdateWebhookRequestModel;
 };
 
-export type PutWebhookByIdResponse = (string);
+export type PutWebhookByIdResponse = string;
 
 export type GetWebhookEventsData = {
     skip?: number;
     take?: number;
 };
 
-export type GetWebhookEventsResponse = ((PagedWebhookEventModel));
+export type GetWebhookEventsResponse = PagedWebhookEventModel;
+
+export type $OpenApiTs = {
+    '/umbraco/management/api/v1/culture': {
+        get: {
+            req: GetCultureData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedCultureReponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type': {
+        post: {
+            req: PostDataTypeData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/{id}': {
+        get: {
+            req: GetDataTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DataTypeResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDataTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDataTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/{id}/copy': {
+        post: {
+            req: PostDataTypeByIdCopyData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/{id}/is-used': {
+        get: {
+            req: GetDataTypeByIdIsUsedData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: boolean;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/{id}/move': {
+        put: {
+            req: PutDataTypeByIdMoveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/{id}/references': {
+        get: {
+            req: GetDataTypeByIdReferencesData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DataTypeReferenceResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: DatatypeConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/folder': {
+        post: {
+            req: PostDataTypeFolderData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/data-type/folder/{id}': {
+        get: {
+            req: GetDataTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: FolderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDataTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDataTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/filter/data-type': {
+        get: {
+            req: GetFilterDataTypeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDataTypeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/data-type': {
+        get: {
+            req: GetItemDataTypeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DataTypeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/data-type/search': {
+        get: {
+            req: GetItemDataTypeSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelDataTypeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/data-type/ancestors': {
+        get: {
+            req: GetTreeDataTypeAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DataTypeTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/data-type/children': {
+        get: {
+            req: GetTreeDataTypeChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDataTypeTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/data-type/root': {
+        get: {
+            req: GetTreeDataTypeRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDataTypeTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/dictionary': {
+        get: {
+            req: GetDictionaryData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDictionaryOverviewResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        post: {
+            req: PostDictionaryData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+                /**
+                 * Conflict
+                 */
+                409: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/dictionary/{id}': {
+        get: {
+            req: GetDictionaryByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DictionaryItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDictionaryByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDictionaryByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/dictionary/{id}/export': {
+        get: {
+            req: GetDictionaryByIdExportData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: (Blob | File);
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/dictionary/{id}/move': {
+        put: {
+            req: PutDictionaryByIdMoveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/dictionary/import': {
+        post: {
+            req: PostDictionaryImportData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/dictionary': {
+        get: {
+            req: GetItemDictionaryData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DictionaryItemItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/dictionary/ancestors': {
+        get: {
+            req: GetTreeDictionaryAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(NamedEntityTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/dictionary/children': {
+        get: {
+            req: GetTreeDictionaryChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedNamedEntityTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/dictionary/root': {
+        get: {
+            req: GetTreeDictionaryRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedNamedEntityTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-blueprint': {
+        post: {
+            req: PostDocumentBlueprintData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-blueprint/{id}': {
+        get: {
+            req: GetDocumentBlueprintByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DocumentBlueprintResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDocumentBlueprintByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentBlueprintByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-blueprint/{id}/move': {
+        put: {
+            req: PutDocumentBlueprintByIdMoveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-blueprint/folder': {
+        post: {
+            req: PostDocumentBlueprintFolderData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-blueprint/folder/{id}': {
+        get: {
+            req: GetDocumentBlueprintFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: FolderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDocumentBlueprintFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentBlueprintFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-blueprint/from-document': {
+        post: {
+            req: PostDocumentBlueprintFromDocumentData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/document-blueprint': {
+        get: {
+            req: GetItemDocumentBlueprintData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentBlueprintItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document-blueprint/ancestors': {
+        get: {
+            req: GetTreeDocumentBlueprintAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentBlueprintTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document-blueprint/children': {
+        get: {
+            req: GetTreeDocumentBlueprintChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentBlueprintTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document-blueprint/root': {
+        get: {
+            req: GetTreeDocumentBlueprintRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentBlueprintTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type': {
+        post: {
+            req: PostDocumentTypeData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}': {
+        get: {
+            req: GetDocumentTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DocumentTypeResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDocumentTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}/allowed-children': {
+        get: {
+            req: GetDocumentTypeByIdAllowedChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedAllowedDocumentTypeModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}/blueprint': {
+        get: {
+            req: GetDocumentTypeByIdBlueprintData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentTypeBlueprintItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}/composition-references': {
+        get: {
+            req: GetDocumentTypeByIdCompositionReferencesData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentTypeCompositionResponseModel)>;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}/copy': {
+        post: {
+            req: PostDocumentTypeByIdCopyData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}/export': {
+        get: {
+            req: GetDocumentTypeByIdExportData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: (Blob | File);
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}/import': {
+        put: {
+            req: PutDocumentTypeByIdImportData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/{id}/move': {
+        put: {
+            req: PutDocumentTypeByIdMoveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/allowed-at-root': {
+        get: {
+            req: GetDocumentTypeAllowedAtRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedAllowedDocumentTypeModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/available-compositions': {
+        post: {
+            req: PostDocumentTypeAvailableCompositionsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(AvailableDocumentTypeCompositionResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: DocumentTypeConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/folder': {
+        post: {
+            req: PostDocumentTypeFolderData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/folder/{id}': {
+        get: {
+            req: GetDocumentTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: FolderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDocumentTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-type/import': {
+        post: {
+            req: PostDocumentTypeImportData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/document-type': {
+        get: {
+            req: GetItemDocumentTypeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentTypeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/document-type/search': {
+        get: {
+            req: GetItemDocumentTypeSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelDocumentTypeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document-type/ancestors': {
+        get: {
+            req: GetTreeDocumentTypeAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentTypeTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document-type/children': {
+        get: {
+            req: GetTreeDocumentTypeChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentTypeTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document-type/root': {
+        get: {
+            req: GetTreeDocumentTypeRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentTypeTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-version': {
+        get: {
+            req: GetDocumentVersionData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentVersionItemResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-version/{id}': {
+        get: {
+            req: GetDocumentVersionByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DocumentVersionResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-version/{id}/prevent-cleanup': {
+        put: {
+            req: PutDocumentVersionByIdPreventCleanupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document-version/{id}/rollback': {
+        post: {
+            req: PostDocumentVersionByIdRollbackData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/collection/document/{id}': {
+        get: {
+            req: GetCollectionDocumentByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentCollectionResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document': {
+        post: {
+            req: PostDocumentData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}': {
+        get: {
+            req: GetDocumentByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DocumentResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDocumentByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/audit-log': {
+        get: {
+            req: GetDocumentByIdAuditLogData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedAuditLogResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/copy': {
+        post: {
+            req: PostDocumentByIdCopyData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/domains': {
+        get: {
+            req: GetDocumentByIdDomainsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DomainsResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentByIdDomainsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+                /**
+                 * Conflict
+                 */
+                409: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/move': {
+        put: {
+            req: PutDocumentByIdMoveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/move-to-recycle-bin': {
+        put: {
+            req: PutDocumentByIdMoveToRecycleBinData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/notifications': {
+        get: {
+            req: GetDocumentByIdNotificationsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentNotificationResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentByIdNotificationsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/public-access': {
+        post: {
+            req: PostDocumentByIdPublicAccessData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteDocumentByIdPublicAccessData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        get: {
+            req: GetDocumentByIdPublicAccessData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PublicAccessResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutDocumentByIdPublicAccessData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/publish': {
+        put: {
+            req: PutDocumentByIdPublishData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/publish-with-descendants': {
+        put: {
+            req: PutDocumentByIdPublishWithDescendantsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/referenced-by': {
+        get: {
+            req: GetDocumentByIdReferencedByData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedIReferenceResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/referenced-descendants': {
+        get: {
+            req: GetDocumentByIdReferencedDescendantsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedReferenceByIdModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/unpublish': {
+        put: {
+            req: PutDocumentByIdUnpublishData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/{id}/validate': {
+        put: {
+            req: PutDocumentByIdValidateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/are-referenced': {
+        get: {
+            req: GetDocumentAreReferencedData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedReferenceByIdModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: DocumentConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/sort': {
+        put: {
+            req: PutDocumentSortData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/urls': {
+        get: {
+            req: GetDocumentUrlsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentUrlInfoResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/document/validate': {
+        post: {
+            req: PostDocumentValidateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/document': {
+        get: {
+            req: GetItemDocumentData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/document/search': {
+        get: {
+            req: GetItemDocumentSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelDocumentItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/document': {
+        delete: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/document/{id}': {
+        delete: {
+            req: DeleteRecycleBinDocumentByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/document/{id}/original-parent': {
+        get: {
+            req: GetRecycleBinDocumentByIdOriginalParentData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: ReferenceByIdModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/document/{id}/restore': {
+        put: {
+            req: PutRecycleBinDocumentByIdRestoreData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/document/children': {
+        get: {
+            req: GetRecycleBinDocumentChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentRecycleBinItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/document/root': {
+        get: {
+            req: GetRecycleBinDocumentRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentRecycleBinItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document/ancestors': {
+        get: {
+            req: GetTreeDocumentAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(DocumentTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document/children': {
+        get: {
+            req: GetTreeDocumentChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/document/root': {
+        get: {
+            req: GetTreeDocumentRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedDocumentTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/dynamic-root/query': {
+        post: {
+            req: PostDynamicRootQueryData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DynamicRootResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/dynamic-root/steps': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(string)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/health-check-group': {
+        get: {
+            req: GetHealthCheckGroupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedHealthCheckGroupResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/health-check-group/{name}': {
+        get: {
+            req: GetHealthCheckGroupByNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: HealthCheckGroupPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/health-check-group/{name}/check': {
+        post: {
+            req: PostHealthCheckGroupByNameCheckData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: HealthCheckGroupWithResultResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/health-check/execute-action': {
+        post: {
+            req: PostHealthCheckExecuteActionData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: HealthCheckResultResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/help': {
+        get: {
+            req: GetHelpData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedHelpPageResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/imaging/resize/urls': {
+        get: {
+            req: GetImagingResizeUrlsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MediaUrlInfoResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/import/analyze': {
+        get: {
+            req: GetImportAnalyzeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: EntityImportAnalysisResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/indexer': {
+        get: {
+            req: GetIndexerData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedIndexResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/indexer/{indexName}': {
+        get: {
+            req: GetIndexerByIndexNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: IndexResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/indexer/{indexName}/rebuild': {
+        post: {
+            req: PostIndexerByIndexNameRebuildData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+                /**
+                 * Conflict
+                 */
+                409: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/install/settings': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: InstallSettingsResponseModel;
+                /**
+                 * Precondition Required
+                 */
+                428: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/install/setup': {
+        post: {
+            req: PostInstallSetupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Precondition Required
+                 */
+                428: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/install/validate-database': {
+        post: {
+            req: PostInstallValidateDatabaseData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/language': {
+        get: {
+            req: GetItemLanguageData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(LanguageItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/language/default': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: LanguageItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/language': {
+        get: {
+            req: GetLanguageData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedLanguageResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+        post: {
+            req: PostLanguageData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/language/{isoCode}': {
+        get: {
+            req: GetLanguageByIsoCodeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: LanguageResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteLanguageByIsoCodeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutLanguageByIsoCodeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/log-viewer/level': {
+        get: {
+            req: GetLogViewerLevelData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedLoggerResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/log-viewer/level-count': {
+        get: {
+            req: GetLogViewerLevelCountData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: LogLevelCountsReponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/log-viewer/log': {
+        get: {
+            req: GetLogViewerLogData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedLogMessageResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/log-viewer/message-template': {
+        get: {
+            req: GetLogViewerMessageTemplateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedLogTemplateResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/log-viewer/saved-search': {
+        get: {
+            req: GetLogViewerSavedSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedSavedLogSearchResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        post: {
+            req: PostLogViewerSavedSearchData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/log-viewer/saved-search/{name}': {
+        get: {
+            req: GetLogViewerSavedSearchByNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: SavedLogSearchResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteLogViewerSavedSearchByNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/log-viewer/validate-logs-size': {
+        get: {
+            req: GetLogViewerValidateLogsSizeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: unknown;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/manifest/manifest': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(ManifestResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/manifest/manifest/private': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(ManifestResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/manifest/manifest/public': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(ManifestResponseModel)>;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/media-type': {
+        get: {
+            req: GetItemMediaTypeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MediaTypeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/media-type/allowed': {
+        get: {
+            req: GetItemMediaTypeAllowedData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelMediaTypeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/media-type/folders': {
+        get: {
+            req: GetItemMediaTypeFoldersData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelMediaTypeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/media-type/search': {
+        get: {
+            req: GetItemMediaTypeSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelMediaTypeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type': {
+        post: {
+            req: PostMediaTypeData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/{id}': {
+        get: {
+            req: GetMediaTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MediaTypeResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteMediaTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutMediaTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/{id}/allowed-children': {
+        get: {
+            req: GetMediaTypeByIdAllowedChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedAllowedMediaTypeModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/{id}/composition-references': {
+        get: {
+            req: GetMediaTypeByIdCompositionReferencesData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MediaTypeCompositionResponseModel)>;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/{id}/copy': {
+        post: {
+            req: PostMediaTypeByIdCopyData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/{id}/export': {
+        get: {
+            req: GetMediaTypeByIdExportData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: (Blob | File);
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/{id}/import': {
+        put: {
+            req: PutMediaTypeByIdImportData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/{id}/move': {
+        put: {
+            req: PutMediaTypeByIdMoveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/allowed-at-root': {
+        get: {
+            req: GetMediaTypeAllowedAtRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedAllowedMediaTypeModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/available-compositions': {
+        post: {
+            req: PostMediaTypeAvailableCompositionsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(AvailableMediaTypeCompositionResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: MediaTypeConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/folder': {
+        post: {
+            req: PostMediaTypeFolderData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/folder/{id}': {
+        get: {
+            req: GetMediaTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: FolderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteMediaTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutMediaTypeFolderByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media-type/import': {
+        post: {
+            req: PostMediaTypeImportData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/media-type/ancestors': {
+        get: {
+            req: GetTreeMediaTypeAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MediaTypeTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/media-type/children': {
+        get: {
+            req: GetTreeMediaTypeChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMediaTypeTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/media-type/root': {
+        get: {
+            req: GetTreeMediaTypeRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMediaTypeTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/collection/media': {
+        get: {
+            req: GetCollectionMediaData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMediaCollectionResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/media': {
+        get: {
+            req: GetItemMediaData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MediaItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/media/search': {
+        get: {
+            req: GetItemMediaSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelMediaItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media': {
+        post: {
+            req: PostMediaData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/{id}': {
+        get: {
+            req: GetMediaByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MediaResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteMediaByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutMediaByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/{id}/audit-log': {
+        get: {
+            req: GetMediaByIdAuditLogData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedAuditLogResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/{id}/move': {
+        put: {
+            req: PutMediaByIdMoveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/{id}/move-to-recycle-bin': {
+        put: {
+            req: PutMediaByIdMoveToRecycleBinData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/{id}/referenced-by': {
+        get: {
+            req: GetMediaByIdReferencedByData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedIReferenceResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/{id}/referenced-descendants': {
+        get: {
+            req: GetMediaByIdReferencedDescendantsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedReferenceByIdModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/{id}/validate': {
+        put: {
+            req: PutMediaByIdValidateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/are-referenced': {
+        get: {
+            req: GetMediaAreReferencedData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedReferenceByIdModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: MediaConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/sort': {
+        put: {
+            req: PutMediaSortData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/urls': {
+        get: {
+            req: GetMediaUrlsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MediaUrlInfoResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/media/validate': {
+        post: {
+            req: PostMediaValidateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/media': {
+        delete: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/media/{id}': {
+        delete: {
+            req: DeleteRecycleBinMediaByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/media/{id}/original-parent': {
+        get: {
+            req: GetRecycleBinMediaByIdOriginalParentData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: ReferenceByIdModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/media/{id}/restore': {
+        put: {
+            req: PutRecycleBinMediaByIdRestoreData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/media/children': {
+        get: {
+            req: GetRecycleBinMediaChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMediaRecycleBinItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/recycle-bin/media/root': {
+        get: {
+            req: GetRecycleBinMediaRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMediaRecycleBinItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/media/ancestors': {
+        get: {
+            req: GetTreeMediaAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MediaTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/media/children': {
+        get: {
+            req: GetTreeMediaChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMediaTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/media/root': {
+        get: {
+            req: GetTreeMediaRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMediaTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/member-group': {
+        get: {
+            req: GetItemMemberGroupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MemberGroupItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-group': {
+        get: {
+            req: GetMemberGroupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMemberGroupResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        post: {
+            req: PostMemberGroupData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-group/{id}': {
+        get: {
+            req: GetMemberGroupByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemberGroupResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: unknown;
+            };
+        };
+        delete: {
+            req: DeleteMemberGroupByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutMemberGroupByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/member-group/root': {
+        get: {
+            req: GetTreeMemberGroupRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedNamedEntityTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/member-type': {
+        get: {
+            req: GetItemMemberTypeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MemberTypeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/member-type/search': {
+        get: {
+            req: GetItemMemberTypeSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelMemberTypeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-type': {
+        post: {
+            req: PostMemberTypeData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-type/{id}': {
+        get: {
+            req: GetMemberTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemberTypeResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteMemberTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutMemberTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-type/{id}/composition-references': {
+        get: {
+            req: GetMemberTypeByIdCompositionReferencesData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MemberTypeCompositionResponseModel)>;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-type/{id}/copy': {
+        post: {
+            req: PostMemberTypeByIdCopyData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-type/available-compositions': {
+        post: {
+            req: PostMemberTypeAvailableCompositionsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(AvailableMemberTypeCompositionResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member-type/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemberTypeConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/member-type/root': {
+        get: {
+            req: GetTreeMemberTypeRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMemberTypeTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/filter/member': {
+        get: {
+            req: GetFilterMemberData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedMemberResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/member': {
+        get: {
+            req: GetItemMemberData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(MemberItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/member/search': {
+        get: {
+            req: GetItemMemberSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelMemberItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member': {
+        post: {
+            req: PostMemberData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member/{id}': {
+        get: {
+            req: GetMemberByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemberResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteMemberByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutMemberByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member/{id}/validate': {
+        put: {
+            req: PutMemberByIdValidateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemberConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/member/validate': {
+        post: {
+            req: PostMemberValidateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/models-builder/build': {
+        post: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Precondition Required
+                 */
+                428: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/models-builder/dashboard': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: ModelsBuilderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/models-builder/status': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: OutOfDateStatusResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/object-types': {
+        get: {
+            req: GetObjectTypesData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedObjectTypeResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/oembed/query': {
+        get: {
+            req: GetOembedQueryData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: OEmbedResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/package/{name}/run-migration': {
+        post: {
+            req: PostPackageByNameRunMigrationData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+                /**
+                 * Conflict
+                 */
+                409: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/package/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: PackageConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/package/created': {
+        get: {
+            req: GetPackageCreatedData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedPackageDefinitionResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        post: {
+            req: PostPackageCreatedData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/package/created/{id}': {
+        get: {
+            req: GetPackageCreatedByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PackageDefinitionResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeletePackageCreatedByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutPackageCreatedByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/package/created/{id}/download': {
+        get: {
+            req: GetPackageCreatedByIdDownloadData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: (Blob | File);
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/package/migration-status': {
+        get: {
+            req: GetPackageMigrationStatusData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedPackageMigrationStatusResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/partial-view': {
+        get: {
+            req: GetItemPartialViewData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(PartialViewItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/partial-view': {
+        post: {
+            req: PostPartialViewData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/partial-view/{path}': {
+        get: {
+            req: GetPartialViewByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PartialViewResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeletePartialViewByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutPartialViewByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/partial-view/{path}/rename': {
+        put: {
+            req: PutPartialViewByPathRenameData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/partial-view/folder': {
+        post: {
+            req: PostPartialViewFolderData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/partial-view/folder/{path}': {
+        get: {
+            req: GetPartialViewFolderByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PartialViewFolderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeletePartialViewFolderByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/partial-view/snippet': {
+        get: {
+            req: GetPartialViewSnippetData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedPartialViewSnippetItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/partial-view/snippet/{id}': {
+        get: {
+            req: GetPartialViewSnippetByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PartialViewSnippetResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/partial-view/ancestors': {
+        get: {
+            req: GetTreePartialViewAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(FileSystemTreeItemPresentationModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/partial-view/children': {
+        get: {
+            req: GetTreePartialViewChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/partial-view/root': {
+        get: {
+            req: GetTreePartialViewRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/preview': {
+        delete: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+            };
+        };
+        post: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/profiling/status': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: ProfilingStatusResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        put: {
+            req: PutProfilingStatusData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/property-type/is-used': {
+        get: {
+            req: GetPropertyTypeIsUsedData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: boolean;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/published-cache/collect': {
+        post: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/published-cache/rebuild': {
+        post: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/published-cache/reload': {
+        post: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/published-cache/status': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/redirect-management': {
+        get: {
+            req: GetRedirectManagementData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedRedirectUrlResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/redirect-management/{id}': {
+        get: {
+            req: GetRedirectManagementByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedRedirectUrlResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        delete: {
+            req: DeleteRedirectManagementByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/redirect-management/status': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: RedirectUrlStatusResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        post: {
+            req: PostRedirectManagementStatusData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/relation-type': {
+        get: {
+            req: GetItemRelationTypeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(RelationTypeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/relation-type': {
+        get: {
+            req: GetRelationTypeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedRelationTypeResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/relation-type/{id}': {
+        get: {
+            req: GetRelationTypeByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: RelationTypeResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/relation/type/{id}': {
+        get: {
+            req: GetRelationByRelationTypeIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedRelationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: PagedProblemDetailsModel;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/script': {
+        get: {
+            req: GetItemScriptData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(ScriptItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/script': {
+        post: {
+            req: PostScriptData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/script/{path}': {
+        get: {
+            req: GetScriptByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: ScriptResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteScriptByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutScriptByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/script/{path}/rename': {
+        put: {
+            req: PutScriptByPathRenameData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/script/folder': {
+        post: {
+            req: PostScriptFolderData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/script/folder/{path}': {
+        get: {
+            req: GetScriptFolderByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: ScriptFolderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteScriptFolderByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/script/ancestors': {
+        get: {
+            req: GetTreeScriptAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(FileSystemTreeItemPresentationModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/script/children': {
+        get: {
+            req: GetTreeScriptChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/script/root': {
+        get: {
+            req: GetTreeScriptRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/searcher': {
+        get: {
+            req: GetSearcherData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedSearcherResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/searcher/{searcherName}/query': {
+        get: {
+            req: GetSearcherBySearcherNameQueryData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedSearchResultResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/security/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: SecurityConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/security/forgot-password': {
+        post: {
+            req: PostSecurityForgotPasswordData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/security/forgot-password/reset': {
+        post: {
+            req: PostSecurityForgotPasswordResetData;
+            res: {
+                /**
+                 * No Content
+                 */
+                204: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetailsBuilderModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetailsBuilderModel;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/security/forgot-password/verify': {
+        post: {
+            req: PostSecurityForgotPasswordVerifyData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: VerifyResetPasswordResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetailsBuilderModel;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetailsBuilderModel;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/segment': {
+        get: {
+            req: GetSegmentData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedSegmentResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/server/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: ServerConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/server/information': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: ServerInformationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/server/status': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: ServerStatusResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/server/troubleshooting': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: ServerTroubleshootingResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/static-file': {
+        get: {
+            req: GetItemStaticFileData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(StaticFileItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/static-file/ancestors': {
+        get: {
+            req: GetTreeStaticFileAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(FileSystemTreeItemPresentationModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/static-file/children': {
+        get: {
+            req: GetTreeStaticFileChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/static-file/root': {
+        get: {
+            req: GetTreeStaticFileRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/stylesheet': {
+        get: {
+            req: GetItemStylesheetData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(StylesheetItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/stylesheet': {
+        post: {
+            req: PostStylesheetData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/stylesheet/{path}': {
+        get: {
+            req: GetStylesheetByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: StylesheetResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteStylesheetByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutStylesheetByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/stylesheet/{path}/rename': {
+        put: {
+            req: PutStylesheetByPathRenameData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/stylesheet/folder': {
+        post: {
+            req: PostStylesheetFolderData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/stylesheet/folder/{path}': {
+        get: {
+            req: GetStylesheetFolderByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: StylesheetFolderResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteStylesheetFolderByPathData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/stylesheet/ancestors': {
+        get: {
+            req: GetTreeStylesheetAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(FileSystemTreeItemPresentationModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/stylesheet/children': {
+        get: {
+            req: GetTreeStylesheetChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/stylesheet/root': {
+        get: {
+            req: GetTreeStylesheetRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedFileSystemTreeItemPresentationModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tag': {
+        get: {
+            req: GetTagData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedTagResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/telemetry': {
+        get: {
+            req: GetTelemetryData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedTelemetryResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/telemetry/level': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: TelemetryResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+        post: {
+            req: PostTelemetryLevelData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/template': {
+        get: {
+            req: GetItemTemplateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(TemplateItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/template/search': {
+        get: {
+            req: GetItemTemplateSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedModelTemplateItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/template': {
+        post: {
+            req: PostTemplateData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/template/{id}': {
+        get: {
+            req: GetTemplateByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: TemplateResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteTemplateByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutTemplateByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/template/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: TemplateConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/template/query/execute': {
+        post: {
+            req: PostTemplateQueryExecuteData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: TemplateQueryResultResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/template/query/settings': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: TemplateQuerySettingsResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/template/ancestors': {
+        get: {
+            req: GetTreeTemplateAncestorsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(NamedEntityTreeItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/template/children': {
+        get: {
+            req: GetTreeTemplateChildrenData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedNamedEntityTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/tree/template/root': {
+        get: {
+            req: GetTreeTemplateRootData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedNamedEntityTreeItemResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/temporary-file': {
+        post: {
+            req: PostTemporaryFileData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/temporary-file/{id}': {
+        get: {
+            req: GetTemporaryFileByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: TemporaryFileResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteTemporaryFileByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/temporary-file/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: TemporaryFileConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/upgrade/authorize': {
+        post: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Precondition Required
+                 */
+                428: ProblemDetails;
+                /**
+                 * Internal Server Error
+                 */
+                500: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/upgrade/settings': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: UpgradeSettingsResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Precondition Required
+                 */
+                428: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user-data': {
+        post: {
+            req: PostUserDataData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: UserDataOperationStatusModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: UserDataOperationStatusModel;
+            };
+        };
+        get: {
+            req: GetUserDataData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedUserDataResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+        put: {
+            req: PutUserDataData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: UserDataOperationStatusModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: UserDataOperationStatusModel;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user-data/{id}': {
+        get: {
+            req: GetUserDataByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: UserDataModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/filter/user-group': {
+        get: {
+            req: GetFilterUserGroupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedUserGroupResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/user-group': {
+        get: {
+            req: GetItemUserGroupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(UserGroupItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user-group': {
+        delete: {
+            req: DeleteUserGroupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        post: {
+            req: PostUserGroupData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+        get: {
+            req: GetUserGroupData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedUserGroupResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user-group/{id}': {
+        get: {
+            req: GetUserGroupByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: UserGroupResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteUserGroupByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutUserGroupByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user-group/{id}/users': {
+        delete: {
+            req: DeleteUserGroupByIdUsersData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        post: {
+            req: PostUserGroupByIdUsersData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/filter/user': {
+        get: {
+            req: GetFilterUserData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedUserResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/user': {
+        get: {
+            req: GetItemUserData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(UserItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user': {
+        post: {
+            req: PostUserData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteUserData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+        get: {
+            req: GetUserData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedUserResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}': {
+        get: {
+            req: GetUserByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: UserResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteUserByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutUserByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/2fa': {
+        get: {
+            req: GetUserById2FaData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(UserTwoFactorProviderModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/2fa/{providerName}': {
+        delete: {
+            req: DeleteUserById2FaByProviderNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/calculate-start-nodes': {
+        get: {
+            req: GetUserByIdCalculateStartNodesData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: CalculatedUserStartNodesResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/change-password': {
+        post: {
+            req: PostUserByIdChangePasswordData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/client-credentials': {
+        post: {
+            req: PostUserByIdClientCredentialsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+        get: {
+            req: GetUserByIdClientCredentialsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(string)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/client-credentials/{clientId}': {
+        delete: {
+            req: DeleteUserByIdClientCredentialsByClientIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/{id}/reset-password': {
+        post: {
+            req: PostUserByIdResetPasswordData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: ResetPasswordUserResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/avatar/{id}': {
+        delete: {
+            req: DeleteUserAvatarByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        post: {
+            req: PostUserAvatarByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: UserConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: CurrentUserResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/2fa': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(UserTwoFactorProviderModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/2fa/{providerName}': {
+        delete: {
+            req: DeleteUserCurrent2FaByProviderNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        post: {
+            req: PostUserCurrent2FaByProviderNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NoopSetupTwoFactorModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        get: {
+            req: GetUserCurrent2FaByProviderNameData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NoopSetupTwoFactorModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/avatar': {
+        post: {
+            req: PostUserCurrentAvatarData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/change-password': {
+        post: {
+            req: PostUserCurrentChangePasswordData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/configuration': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: CurrenUserConfigurationResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/login-providers': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(UserExternalLoginProviderModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/permissions': {
+        get: {
+            req: GetUserCurrentPermissionsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: UserPermissionsResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/permissions/document': {
+        get: {
+            req: GetUserCurrentPermissionsDocumentData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(UserPermissionsResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/current/permissions/media': {
+        get: {
+            req: GetUserCurrentPermissionsMediaData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: UserPermissionsResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/disable': {
+        post: {
+            req: PostUserDisableData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/enable': {
+        post: {
+            req: PostUserEnableData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/invite': {
+        post: {
+            req: PostUserInviteData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/invite/create-password': {
+        post: {
+            req: PostUserInviteCreatePasswordData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/invite/resend': {
+        post: {
+            req: PostUserInviteResendData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/invite/verify': {
+        post: {
+            req: PostUserInviteVerifyData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: VerifyInviteUserResponseModel;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/set-user-groups': {
+        post: {
+            req: PostUserSetUserGroupsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/user/unlock': {
+        post: {
+            req: PostUserUnlockData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/item/webhook': {
+        get: {
+            req: GetItemWebhookData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<(WebhookItemResponseModel)>;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/webhook': {
+        get: {
+            req: GetWebhookData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedWebhookResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+        post: {
+            req: PostWebhookData;
+            res: {
+                /**
+                 * Created
+                 */
+                201: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/webhook/{id}': {
+        get: {
+            req: GetWebhookByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: WebhookResponseModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        delete: {
+            req: DeleteWebhookByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+        put: {
+            req: PutWebhookByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: string;
+                /**
+                 * Bad Request
+                 */
+                400: ProblemDetails;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+                /**
+                 * The authenticated user do not have access to this resource
+                 */
+                403: string;
+                /**
+                 * Not Found
+                 */
+                404: ProblemDetails;
+            };
+        };
+    };
+    '/umbraco/management/api/v1/webhook/events': {
+        get: {
+            req: GetWebhookEventsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: PagedWebhookEventModel;
+                /**
+                 * The resource is protected and requires an authentication token
+                 */
+                401: unknown;
+            };
+        };
+    };
+};

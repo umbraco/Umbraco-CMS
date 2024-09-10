@@ -1,5 +1,4 @@
 import type { UmbUserDetailModel } from '../index.js';
-import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import type { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from './user-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -13,6 +12,7 @@ import './components/user-workspace-profile-settings/user-workspace-profile-sett
 import './components/user-workspace-access/user-workspace-access.element.js';
 import './components/user-workspace-info/user-workspace-info.element.js';
 import './components/user-workspace-avatar/user-workspace-avatar.element.js';
+import './components/user-workspace-client-credentials/user-workspace-client-credentials.element.js';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
@@ -65,6 +65,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			<div id="header" slot="header">
 				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}" ${umbFocus()}></uui-input>
 			</div>
+			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 		`;
 	}
 
@@ -72,9 +73,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return nothing;
 
 		return html`
-			<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings>
-			<umb-user-workspace-assign-access></umb-user-workspace-assign-access>
-			<umb-user-workspace-access></umb-user-workspace-access>
+			<umb-stack>
+				<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings>
+				<umb-user-workspace-assign-access></umb-user-workspace-assign-access>
+				<umb-user-workspace-access></umb-user-workspace-access>
+			</umb-stack>
 		`;
 	}
 
@@ -82,14 +85,11 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return nothing;
 
 		return html`
-			<umb-user-workspace-avatar></umb-user-workspace-avatar>
-			<umb-user-workspace-info></umb-user-workspace-info>
-
-			<uui-box>
-				<umb-entity-action-list
-					.entityType=${UMB_USER_ENTITY_TYPE}
-					.unique=${this._user.unique}></umb-entity-action-list>
-			</uui-box>
+			<umb-stack look="compact">
+				<umb-user-workspace-avatar></umb-user-workspace-avatar>
+				<umb-user-workspace-info></umb-user-workspace-info>
+				<umb-user-workspace-client-credentials></umb-user-workspace-client-credentials>
+			</umb-stack>
 		`;
 	}
 

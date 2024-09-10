@@ -195,9 +195,10 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 
 const itemMapper = (item: UmbMockUserModel): UserItemResponseModel => {
 	return {
-		id: item.id,
-		name: item.name,
 		avatarUrls: item.avatarUrls,
+		id: item.id,
+		kind: item.kind,
+		name: item.name,
 	};
 };
 
@@ -222,30 +223,32 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastLockoutDate: null,
 		lastPasswordChangeDate: null,
 		isAdmin: item.userGroupIds.map((reference) => reference.id).includes(umbUserGroupMockDb.getAll()[0].id),
+		kind: item.kind,
 	};
 };
 
 const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 	return {
-		email: item.email,
-		userName: item.userName,
-		name: item.name,
-		userGroupIds: item.userGroupIds,
-		id: item.id,
-		languageIsoCode: item.languageIsoCode,
+		avatarUrls: item.avatarUrls,
+		createDate: item.createDate,
 		documentStartNodeIds: item.documentStartNodeIds,
-		mediaStartNodeIds: item.mediaStartNodeIds,
+		email: item.email,
+		failedLoginAttempts: item.failedLoginAttempts,
 		hasDocumentRootAccess: item.hasDocumentRootAccess,
 		hasMediaRootAccess: item.hasMediaRootAccess,
-		avatarUrls: item.avatarUrls,
-		state: item.state,
-		failedLoginAttempts: item.failedLoginAttempts,
-		createDate: item.createDate,
-		updateDate: item.updateDate,
-		lastLoginDate: item.lastLoginDate,
-		lastLockoutDate: item.lastLockoutDate,
-		lastPasswordChangeDate: item.lastPasswordChangeDate,
+		id: item.id,
 		isAdmin: item.isAdmin,
+		kind: item.kind,
+		languageIsoCode: item.languageIsoCode,
+		lastLockoutDate: item.lastLockoutDate,
+		lastLoginDate: item.lastLoginDate,
+		lastPasswordChangeDate: item.lastPasswordChangeDate,
+		mediaStartNodeIds: item.mediaStartNodeIds,
+		name: item.name,
+		state: item.state,
+		updateDate: item.updateDate,
+		userGroupIds: item.userGroupIds,
+		userName: item.userName,
 	};
 };
 
