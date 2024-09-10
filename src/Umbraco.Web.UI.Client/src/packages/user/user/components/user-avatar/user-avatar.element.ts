@@ -1,7 +1,6 @@
 import type { UmbUserKindType } from '../../utils/index.js';
 import { UmbUserKind } from '../../utils/index.js';
 import type { UUIAvatarElement } from '@umbraco-cms/backoffice/external/uui';
-import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import {
 	css,
 	html,

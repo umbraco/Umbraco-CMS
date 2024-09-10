@@ -16,12 +16,12 @@ on:
     branches:
       - main
       - release/*
-      - dev/*
+      - v*/dev
   pull_request:
     branches:
       - main
       - release/*
-      - dev/*
+      - v*/dev
   schedule:
     - cron: '33 2 * * 1'
 

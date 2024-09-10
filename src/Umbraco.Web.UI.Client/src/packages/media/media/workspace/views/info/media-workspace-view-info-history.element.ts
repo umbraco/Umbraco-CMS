@@ -2,7 +2,7 @@ import type { UmbMediaAuditLogModel } from '../../../audit-log/types.js';
 import { UmbMediaAuditLogRepository } from '../../../audit-log/index.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
 import { TimeOptions, getMediaHistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, nothing, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';

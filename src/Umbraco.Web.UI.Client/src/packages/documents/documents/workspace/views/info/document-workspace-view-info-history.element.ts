@@ -3,7 +3,7 @@ import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
 import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { TimeOptions, getDocumentHistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, nothing, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
