@@ -1,8 +1,9 @@
-import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSysinfoRepository } from '../repository/sysinfo.repository.js';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 type ServerKeyValue = {
 	name: string;
@@ -12,11 +13,15 @@ type ServerKeyValue = {
 @customElement('umb-sysinfo')
 export class UmbSysinfoElement extends UmbModalBaseElement {
 	@state()
-	private _serverKeyValues: Array<ServerKeyValue> = [];
+	private _systemInformation = '';
 
 	@state()
 	private _loading = false;
 
+	@state()
+	private _buttonState?: UUIButtonState;
+
+	#serverKeyValues: Array<ServerKeyValue> = [];
 	#sysinfoRepository = new UmbSysinfoRepository(this);
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -32,7 +37,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 
 	async #populate() {
 		this._loading = true;
-		this._serverKeyValues = [];
+		this.#serverKeyValues = [];
 
 		const [serverTroubleshooting, serverInformation] = await Promise.all([
 			this.#sysinfoRepository.requestTroubleShooting(),
@@ -40,32 +45,30 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		]);
 
 		if (serverTroubleshooting) {
-			this._serverKeyValues = [...this._serverKeyValues, ...serverTroubleshooting.items];
+			this.#serverKeyValues = serverTroubleshooting.items;
 		}
 
 		if (serverInformation) {
-			this._serverKeyValues.push({ name: 'Umbraco build version', data: serverInformation.version });
-			this._serverKeyValues.push({ name: 'Server time offset', data: serverInformation.baseUtcOffset });
-			this._serverKeyValues.push({ name: 'Runtime mode', data: serverInformation.runtimeMode });
+			this.#serverKeyValues.push({ name: 'Umbraco build version', data: serverInformation.version });
+			this.#serverKeyValues.push({ name: 'Server time offset', data: serverInformation.baseUtcOffset });
+			this.#serverKeyValues.push({ name: 'Runtime mode', data: serverInformation.runtimeMode });
 		}
 
 		// Browser information
-		this._serverKeyValues.push({ name: 'Browser (user agent)', data: navigator.userAgent });
-		this._serverKeyValues.push({ name: 'Browser language', data: navigator.language });
-		this._serverKeyValues.push({ name: 'Browser location', data: location.href });
+		this.#serverKeyValues.push({ name: 'Browser (user agent)', data: navigator.userAgent });
+		this.#serverKeyValues.push({ name: 'Browser language', data: navigator.language });
+		this.#serverKeyValues.push({ name: 'Browser location', data: location.href });
 
+		this._systemInformation = this.#renderServerKeyValues();
 		this._loading = false;
 	}
 
 	#renderServerKeyValues() {
-		return this._serverKeyValues.map((serverKeyValue) => {
-			return html`
-				<uui-table-row>
-					<uui-table-cell>${serverKeyValue.name}</uui-table-cell>
-					<uui-table-cell class="data-cell">${serverKeyValue.data}</uui-table-cell>
-				</uui-table-row>
-			`;
-		});
+		return this.#serverKeyValues
+			.map((serverKeyValue) => {
+				return `${serverKeyValue.name}: ${serverKeyValue.data}`;
+			})
+			.join('\n');
 	}
 
 	override render() {
@@ -75,21 +78,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 					${when(
 						this._loading,
 						() => html`<uui-loader-bar></uui-loader-bar>`,
-						() => html`
-							<uui-scroll-container id="container">
-								<uui-table aria-label="System information">
-									<uui-table-column style="width: 20%"></uui-table-column>
-									<uui-table-column style="width: 80%"></uui-table-column>
-
-									<uui-table-head>
-										<uui-table-head-cell>Name</uui-table-head-cell>
-										<uui-table-head-cell>Data</uui-table-head-cell>
-									</uui-table-head>
-
-									${this.#renderServerKeyValues()}
-								</uui-table>
-							</uui-scroll-container>
-						`,
+						() => html` <umb-code-block> ${this._systemInformation} </umb-code-block> `,
 					)}
 
 					<uui-button
@@ -100,6 +89,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 
 					<uui-button
 						@click=${this.#copyToClipboard}
+						.state=${this._buttonState}
 						slot="actions"
 						look="primary"
 						color="positive"
@@ -109,24 +99,26 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		`;
 	}
 
-	#copyToClipboard() {
+	async #copyToClipboard() {
 		try {
-			const serverKeyValues = this._serverKeyValues
-				.map((serverKeyValue) => `${serverKeyValue.name}: ${serverKeyValue.data}`)
-				.join('\n');
-			const text = `
-Umbraco system information\n
---------------------------------\n
-${serverKeyValues}`;
-			navigator.clipboard.writeText(text);
+			this._buttonState = 'waiting';
+			const text = `Umbraco system information
+--------------------------------
+${this._systemInformation}`;
+			const textAsCode = `\`\`\`\n${text}\n\`\`\`\n`;
+			await navigator.clipboard.writeText(textAsCode);
 
-			this.#notificationContext?.peek('positive', {
-				data: {
-					headline: 'System information',
-					message: this.localize.term('speechBubbles_copySuccessMessage'),
-				},
-			});
+			setTimeout(() => {
+				this.#notificationContext?.peek('positive', {
+					data: {
+						headline: 'System information',
+						message: this.localize.term('speechBubbles_copySuccessMessage'),
+					},
+				});
+				this._buttonState = 'success';
+			}, 250);
 		} catch {
+			this._buttonState = 'failed';
 			this.#notificationContext?.peek('danger', {
 				data: {
 					headline: 'System information',
