@@ -128,9 +128,9 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
 		//const blockElements = editor.dom.select(`umb-rte-block, umb-rte-block-inline`);
 		const usedContentUdis = Array.from(blockEls).map((blockElement) => blockElement.getAttribute('data-content-udi'));
-		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentUdis.indexOf(x.contentUdi) === -1);
+		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentUdis.indexOf(x.contentKey) === -1);
 		unusedBlocks.forEach((blockLayout) => {
-			this.#managerContext.removeOneLayout(blockLayout.contentUdi);
+			this.#managerContext.removeOneLayout(blockLayout.contentKey);
 		});
 
 		// Then get the content of the editor and update the value.

@@ -28,17 +28,17 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	@property({ attribute: false })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
+	public set contentKey(value: string | undefined) {
 		if (!value) return;
-		this._contentUdi = value;
-		this.#context.setContentUdi(value);
+		this._contentKey = value;
+		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
 			this,
-			`$.contentData[${UmbDataPathBlockElementDataQuery({ udi: value })}]`,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: value })}]`,
 			(hasMessages) => {
 				this._contentInvalid = hasMessages;
 				this._blockViewProps.contentInvalid = hasMessages;
@@ -46,7 +46,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			'observeMessagesForContent',
 		);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 
 	/**
 	 * Sets the element to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -92,7 +92,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
@@ -174,14 +174,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.settingsUdi,
-			(settingsUdi) => {
+			this.#context.settingsKey,
+			(settingsKey) => {
 				this.removeUmbControllerByAlias('observeMessagesForSettings');
-				if (settingsUdi) {
+				if (settingsKey) {
 					// Observe settings validation state:
 					new UmbObserveValidationStateController(
 						this,
-						`$.settingsData[${UmbDataPathBlockElementDataQuery({ udi: settingsUdi })}]`,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
 						(hasMessages) => {
 							this._settingsInvalid = hasMessages;
 							this._blockViewProps.settingsInvalid = hasMessages;

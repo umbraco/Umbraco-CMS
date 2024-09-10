@@ -12,16 +12,6 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-/**
- *
- * @param {string} entityType - The entity type
- * @param {string} guid - The entity
- * @returns {string} UDI in the format `umb://<entityType>/<guid>`
- */
-function buildUdi(entityType: string, guid: string) {
-	return `umb://${entityType}/${guid.replace(/-/g, '')}`;
-}
-
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
 	content: UmbBlockDataModel;
@@ -56,13 +46,13 @@ export abstract class UmbBlockManagerContext<
 	protected _liveEditingMode = new UmbBooleanState(undefined);
 	public readonly liveEditingMode = this._liveEditingMode.asObservable();
 
-	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
+	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentKey);
 	public readonly layouts = this._layouts.asObservable();
 
-	#contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.udi);
+	#contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
 
-	#settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.udi);
+	#settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
@@ -132,8 +122,8 @@ export abstract class UmbBlockManagerContext<
 		this.#structures.push(structure);
 	}
 
-	getContentTypeKeyOfContentUdi(contentUdi: string) {
-		return this.getContentOf(contentUdi)?.contentTypeKey;
+	getContentTypeKeyOfcontentKey(contentKey: string) {
+		return this.getContentOf(contentKey)?.contentTypeKey;
 	}
 	contentTypeOf(contentTypeKey: string) {
 		const structure = this.#structures.find((x) => x.getOwnerContentTypeUnique() === contentTypeKey);
@@ -165,21 +155,21 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	layoutOf(contentUdi: string) {
-		return this._layouts.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
+	layoutOf(contentKey: string) {
+		return this._layouts.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
-	contentOf(udi: string) {
-		return this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi));
+	contentOf(key: string) {
+		return this.#contents.asObservablePart((source) => source.find((x) => x.key === key));
 	}
-	settingsOf(udi: string) {
-		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
+	settingsOf(key: string) {
+		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
 
 	getBlockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
 	}
-	getContentOf(contentUdi: string) {
-		return this.#contents.value.find((x) => x.udi === contentUdi);
+	getContentOf(contentKey: string) {
+		return this.#contents.value.find((x) => x.key === contentKey);
 	}
 	// TODO: [v15]: ignoring unused var here here to prevent a breaking change
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -193,34 +183,34 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.appendOne(settingsData);
 	}
 
-	removeOneContent(contentUdi: string) {
-		this.#contents.removeOne(contentUdi);
+	removeOneContent(contentKey: string) {
+		this.#contents.removeOne(contentKey);
 	}
-	removeOneSettings(settingsUdi: string) {
-		this.#settings.removeOne(settingsUdi);
-	}
-
-	setOneContentProperty(udi: string, propertyAlias: string, value: unknown) {
-		this.#contents.updateOne(udi, { [propertyAlias]: value });
-	}
-	setOneSettingsProperty(udi: string, propertyAlias: string, value: unknown) {
-		this.#settings.updateOne(udi, { [propertyAlias]: value });
+	removeOneSettings(settingsKey: string) {
+		this.#settings.removeOne(settingsKey);
 	}
 
-	contentProperty(udi: string, propertyAlias: string) {
+	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
+		this.#contents.updateOne(key, { [propertyAlias]: value });
+	}
+	setOneSettingsProperty(key: string, propertyAlias: string, value: unknown) {
+		this.#settings.updateOne(key, { [propertyAlias]: value });
+	}
+
+	contentProperty(key: string, propertyAlias: string) {
 		this.#contents.asObservablePart(
-			(source) => source.find((x) => x.udi === udi)?.values?.find((values) => values.alias === propertyAlias)?.value,
+			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
-	settingsProperty(udi: string, propertyAlias: string) {
+	settingsProperty(key: string, propertyAlias: string) {
 		this.#contents.asObservablePart(
-			(source) => source.find((x) => x.udi === udi)?.values?.find((values) => values.alias === propertyAlias)?.value,
+			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
 
 	abstract create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		originData?: BlockOriginDataType,
 	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
 
@@ -234,21 +224,21 @@ export abstract class UmbBlockManagerContext<
 		}
 
 		return {
-			udi: buildUdi('element', UmbId.new()),
+			key: UmbId.new(),
 			contentTypeKey: blockType.settingsElementTypeKey,
 			values: [],
 		};
 	}
 
-	protected _createBlockElementData(udi: string, elementTypeKey: string) {
+	protected _createBlockElementData(key: string, elementTypeKey: string) {
 		return {
-			udi: udi,
+			key: key,
 			contentTypeKey: elementTypeKey,
 			values: [],
 		};
 	}
 
-	protected _createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
+	protected _createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
@@ -257,16 +247,16 @@ export abstract class UmbBlockManagerContext<
 
 		// Create layout entry:
 		const layout: BlockLayoutType = {
-			contentUdi: buildUdi('element', UmbId.new()),
+			contentKey: UmbId.new(),
 			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
 
-		const content = this._createBlockElementData(layout.contentUdi, contentElementTypeKey);
+		const content = this._createBlockElementData(layout.contentKey, contentElementTypeKey);
 		let settings: UmbBlockDataModel | undefined = undefined;
 
 		if (blockType.settingsElementTypeKey) {
-			layout.settingsUdi = buildUdi('element', UmbId.new());
-			settings = this._createBlockElementData(layout.settingsUdi, blockType.settingsElementTypeKey);
+			layout.settingsKey = UmbId.new();
+			settings = this._createBlockElementData(layout.settingsKey, blockType.settingsElementTypeKey);
 		}
 
 		return {
@@ -292,15 +282,15 @@ export abstract class UmbBlockManagerContext<
 		originData: BlockOriginDataType,
 	) {
 		// Create content entry:
-		if (layoutEntry.contentUdi) {
+		if (layoutEntry.contentKey) {
 			this.#contents.appendOne(content);
 		} else {
-			throw new Error('Cannot create block, missing contentUdi');
+			throw new Error('Cannot create block, missing contentKey');
 			return false;
 		}
 
 		//Create settings entry:
-		if (settings && layoutEntry.settingsUdi) {
+		if (settings && layoutEntry.settingsKey) {
 			this.#settings.appendOne(settings);
 		}
 	}

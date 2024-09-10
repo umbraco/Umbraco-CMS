@@ -23,8 +23,8 @@ export class UmbBlockRteManagerContext<
 		return this.#editor;
 	}
 
-	removeOneLayout(contentUdi: string) {
-		this._layouts.removeOne(contentUdi);
+	removeOneLayout(contentKey: string) {
+		this._layouts.removeOne(contentKey);
 	}
 
 	getLayouts(): Array<BlockLayoutType> {
@@ -33,7 +33,7 @@ export class UmbBlockRteManagerContext<
 
 	create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData?: UmbBlockRteWorkspaceOriginData,
@@ -67,11 +67,11 @@ export class UmbBlockRteManagerContext<
 
 		if (layoutEntry.displayInline) {
 			this.#editor.selection.setContent(
-				`<umb-rte-block-inline data-content-udi="${layoutEntry.contentUdi}"><!--Umbraco-Block--></umb-rte-block-inline>`,
+				`<umb-rte-block-inline data-content-key="${layoutEntry.contentKey}"><!--Umbraco-Block--></umb-rte-block-inline>`,
 			);
 		} else {
 			this.#editor.selection.setContent(
-				`<umb-rte-block data-content-udi="${layoutEntry.contentUdi}"><!--Umbraco-Block--></umb-rte-block>`,
+				`<umb-rte-block data-content-key="${layoutEntry.contentKey}"><!--Umbraco-Block--></umb-rte-block>`,
 			);
 		}
 
@@ -81,16 +81,16 @@ export class UmbBlockRteManagerContext<
 	}
 
 	/**
-	 * @param contentUdi
+	 * @param contentKey
 	 * @internal
 	 */
-	public deleteLayoutElement(contentUdi: string) {
+	public deleteLayoutElement(contentKey: string) {
 		if (!this.#editor) return;
 
-		const blockElementsOfThisUdi = this.#editor.dom.select(
-			`umb-rte-block[data-content-udi='${contentUdi}'], umb-rte-block-inline[data-content-udi='${contentUdi}']`,
+		const blockElementsOfThiskey = this.#editor.dom.select(
+			`umb-rte-block[data-content-key='${contentKey}'], umb-rte-block-inline[data-content-key='${contentKey}']`,
 		);
-		blockElementsOfThisUdi.forEach((blockElement) => {
+		blockElementsOfThiskey.forEach((blockElement) => {
 			this.#editor?.dom.remove(blockElement);
 		});
 	}

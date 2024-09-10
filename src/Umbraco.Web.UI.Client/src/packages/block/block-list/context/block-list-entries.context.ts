@@ -136,7 +136,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 
 	async create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentUdi'>,
+		partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentKey'>,
 		originData?: UmbBlockListWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
@@ -156,8 +156,8 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	// create Block?
-	override async delete(contentUdi: string) {
+	override async delete(contentKey: string) {
 		// TODO: Loop through children and delete them as well?
-		await super.delete(contentUdi);
+		await super.delete(contentKey);
 	}
 }

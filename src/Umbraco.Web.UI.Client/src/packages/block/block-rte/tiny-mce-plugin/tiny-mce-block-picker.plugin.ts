@@ -19,7 +19,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 			onAction: () => this.showDialog(),
 			onSetup: function (api) {
 				const changed = args.editor.selection.selectorChangedWithUnbind(
-					'umb-rte-block[data-content-udi], umb-rte-block-inline[data-content-udi]',
+					'umb-rte-block[data-content-key], umb-rte-block-inline[data-content-key]',
 					(state) => api.setActive(state),
 				);
 				return () => changed.unbind();
@@ -46,10 +46,10 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		//const blockEl = this.editor.selection.getNode();
 
 		/*if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
-			const blockUdi = blockEl.getAttribute('data-content-udi') ?? undefined;
-			if (blockUdi) {
+			const blockkey = blockEl.getAttribute('data-content-key') ?? undefined;
+			if (blockkey) {
 				// TODO: Missing a solution to edit a block from this scope. [NL]
-				this.#editBlock(blockUdi);
+				this.#editBlock(blockkey);
 				return;
 			}
 		}*/

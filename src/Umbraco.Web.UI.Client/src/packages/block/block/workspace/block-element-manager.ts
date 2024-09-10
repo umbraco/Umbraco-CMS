@@ -26,7 +26,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
 
-	readonly unique = this.#data.asObservablePart((data) => data?.udi);
+	readonly unique = this.#data.asObservablePart((data) => data?.key);
 	readonly contentTypeId = this.#data.asObservablePart((data) => data?.contentTypeKey);
 
 	readonly structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(
@@ -40,9 +40,9 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		super(host);
 
 		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
-		this.observe(this.unique, (udi) => {
-			if (udi) {
-				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.udi = '${udi}')]`);
+		this.observe(this.unique, (key) => {
+			if (key) {
+				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key = '${key}')]`);
 			}
 		});
 	}
@@ -65,7 +65,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	}
 
 	getUnique() {
-		return this.getData()?.udi;
+		return this.getData()?.key;
 	}
 
 	getEntityType() {

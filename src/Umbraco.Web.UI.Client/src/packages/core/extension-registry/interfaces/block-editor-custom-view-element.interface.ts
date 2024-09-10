@@ -14,8 +14,8 @@ export interface UmbBlockTypeBaseModel {
 
 // Shared with the Property Editor
 export interface UmbBlockLayoutBaseModel {
-	contentUdi: string;
-	settingsUdi?: string | null;
+	contentKey: string;
+	settingsKey?: string | null;
 }
 
 export interface UmbBlockDataValueModel<ValueType = unknown> {
@@ -27,7 +27,7 @@ export interface UmbBlockDataValueModel<ValueType = unknown> {
 
 // Shared with the Property Editor
 export interface UmbBlockDataModel {
-	udi: string;
+	key: string;
 	contentTypeKey: string;
 	values: Array<UmbBlockDataValueModel>;
 }
@@ -56,7 +56,7 @@ export interface UmbBlockEditorCustomViewProperties<
 	manifest?: ManifestBlockEditorCustomView;
 	config?: Partial<UmbBlockEditorCustomViewConfiguration>;
 	blockType?: BlockType;
-	contentUdi?: string;
+	contentKey?: string;
 	label?: string;
 	icon?: string;
 	index?: number;

@@ -15,7 +15,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 export class UmbInlineListBlockElement extends UmbLitElement {
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
-	#contentUdi?: string;
+	#contentKey?: string;
 
 	@property({ type: String, reflect: false })
 	label?: string;
@@ -33,11 +33,11 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			this.#blockContext = blockContext;
 			this.observe(
 				this.#blockContext.unique,
-				(contentUdi) => {
-					this.#contentUdi = contentUdi;
+				(contentKey) => {
+					this.#contentKey = contentKey;
 					this.#load();
 				},
-				'observeContentUdi',
+				'observeContentKey',
 			);
 		});
 		this.observe(umbExtensionsRegistry.byTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
@@ -59,8 +59,8 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	}
 
 	#load() {
-		if (!this.#workspaceContext || !this.#contentUdi) return;
-		this.#workspaceContext.load(this.#contentUdi);
+		if (!this.#workspaceContext || !this.#contentKey) return;
+		this.#workspaceContext.load(this.#contentKey);
 	}
 
 	override render() {

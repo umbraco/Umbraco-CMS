@@ -36,24 +36,24 @@ export abstract class UmbBlockEntryContext<
 	_manager?: BlockManagerContextType;
 	_entries?: BlockEntriesContextType;
 
-	#contentUdi?: string;
+	#contentKey?: string;
 
 	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).
 	getEntityType() {
 		return 'block';
 	}
 	getUnique() {
-		return this.getContentUdi();
+		return this.getContentKey();
 	}
 
 	setContentPropertyValue(propertyAlias: string, value: unknown) {
-		if (!this.#contentUdi) throw new Error('No content UDI set.');
-		this._manager?.setOneContentProperty(this.#contentUdi, propertyAlias, value);
+		if (!this.#contentKey) throw new Error('No content key set.');
+		this._manager?.setOneContentProperty(this.#contentKey, propertyAlias, value);
 	}
 	setSettingsPropertyValue(propertyAlias: string, value: unknown) {
-		const settingsUdi = this._layout.getValue()?.settingsUdi;
-		if (!settingsUdi) throw new Error('Settings UDI was not available.');
-		this._manager?.setOneSettingsProperty(settingsUdi, propertyAlias, value);
+		const settingsKey = this._layout.getValue()?.settingsKey;
+		if (!settingsKey) throw new Error('Settings key was not available.');
+		this._manager?.setOneSettingsProperty(settingsKey, propertyAlias, value);
 	}
 
 	// TODO: adjust to variants. [NL]
@@ -102,28 +102,28 @@ export abstract class UmbBlockEntryContext<
 	/**
 	 * @obsolete Use `unique` instead. Cause we will most likely rename this in the future.
 	 */
-	public readonly contentUdi = this._layout.asObservablePart((x) => x?.contentUdi);
-	public readonly settingsUdi = this._layout.asObservablePart((x) => x?.settingsUdi);
-	public readonly unique = this._layout.asObservablePart((x) => x?.contentUdi);
+	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
+	public readonly settingsKey = this._layout.asObservablePart((x) => x?.settingsKey);
+	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
 
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
 
-	#generateWorkspaceEditContentPath = (path?: string, contentUdi?: string) =>
-		path && contentUdi ? path + 'edit/' + encodeFilePath(contentUdi) + '/view/content' : '';
+	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
+		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/content' : '';
 
-	#generateWorkspaceEditSettingsPath = (path?: string, contentUdi?: string) =>
-		path && contentUdi ? path + 'edit/' + encodeFilePath(contentUdi) + '/view/settings' : '';
+	#generateWorkspaceEditSettingsPath = (path?: string, contentKey?: string) =>
+		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/settings' : '';
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentUdi, this.workspacePath],
-		([contentUdi, path]) => this.#generateWorkspaceEditContentPath(path, contentUdi),
+		[this.contentKey, this.workspacePath],
+		([contentKey, path]) => this.#generateWorkspaceEditContentPath(path, contentKey),
 	);
 	public readonly workspaceEditSettingsPath = mergeObservables(
-		[this.contentUdi, this.workspacePath],
-		([contentUdi, path]) => this.#generateWorkspaceEditSettingsPath(path, contentUdi),
+		[this.contentKey, this.workspacePath],
+		([contentKey, path]) => this.#generateWorkspaceEditSettingsPath(path, contentKey),
 	);
 
 	#content = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
@@ -153,13 +153,13 @@ export abstract class UmbBlockEntryContext<
 	abstract readonly showContentEdit: Observable<boolean>;
 
 	/**
-	 * Set the contentUdi of this entry.
-	 * @function setContentUdi
-	 * @param {string} contentUdi the entry content UDI.
+	 * Set the contentKey of this entry.
+	 * @function setContentKey
+	 * @param {string} contentKey the entry content key.
 	 * @returns {void}
 	 */
-	setContentUdi(contentUdi: string) {
-		this.#contentUdi = contentUdi;
+	setContentKey(contentKey: string) {
+		this.#contentKey = contentKey;
 		this.#observeLayout();
 	}
 
@@ -193,10 +193,10 @@ export abstract class UmbBlockEntryContext<
 			this.#gotEntries();
 		});
 
-		// Observe UDI:
-		this.observe(this.unique, (contentUdi) => {
-			if (!contentUdi) return;
-			this.#observeData();
+		// Observe key:
+		this.observe(this.unique, (contentKey) => {
+			if (!contentKey) return;
+			this.#observeContentData();
 		});
 
 		// Observe contentElementTypeKey:
@@ -218,9 +218,9 @@ export abstract class UmbBlockEntryContext<
 			([settingsElementTypeKey, settingsDataContentTypeKey]) => {
 				// Notice the values are only undefined while we are missing the source of these observables. [NL]
 				if (settingsElementTypeKey === undefined || settingsDataContentTypeKey === undefined) return;
-				// Is there a difference between configuration and actual data udi:
+				// Is there a difference between configuration and actual data key:
 				if (settingsElementTypeKey !== settingsDataContentTypeKey) {
-					// We need to update our udi for the settings data [NL]
+					// We need to update our key for the settings data [NL]
 					if (settingsElementTypeKey != null) {
 						// Update the settings model with latest elementTypeKey, so data is up to date with configuration: [NL]
 						const currentSettings = this.#settings.getValue();
@@ -234,22 +234,22 @@ export abstract class UmbBlockEntryContext<
 		);
 
 		this.observe(observeMultiple([this.layout, this.blockType]), ([layout, blockType]) => {
-			if (!this.#contentUdi || !layout || !blockType) return;
-			if (layout.settingsUdi == null && blockType.settingsElementTypeKey) {
+			if (!this.#contentKey || !layout || !blockType) return;
+			if (layout.settingsKey == null && blockType.settingsElementTypeKey) {
 				// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
 				const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
 				this._manager?.setOneSettings(settingsData);
-				this._layout.update({ settingsUdi: settingsData.udi } as Partial<BlockLayoutType>);
-			} else if (layout.settingsUdi && blockType.settingsElementTypeKey === undefined) {
-				// We no longer have settings ElementType in config. So we remove the settingsData and settings UDI from the layout. [NL]
-				this._manager?.removeOneSettings(layout.settingsUdi);
-				this._layout.update({ settingsUdi: undefined } as Partial<BlockLayoutType>);
+				this._layout.update({ settingsKey: settingsData.key } as Partial<BlockLayoutType>);
+			} else if (layout.settingsKey && blockType.settingsElementTypeKey === undefined) {
+				// We no longer have settings ElementType in config. So we remove the settingsData and settings key from the layout. [NL]
+				this._manager?.removeOneSettings(layout.settingsKey);
+				this._layout.update({ settingsKey: undefined } as Partial<BlockLayoutType>);
 			}
 		});
 	}
 
-	getContentUdi() {
-		return this._layout.value?.contentUdi;
+	getContentKey() {
+		return this._layout.value?.contentKey;
 	}
 
 	#updateCreatePaths() {
@@ -272,10 +272,10 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#observeLayout() {
-		if (!this._entries || !this.#contentUdi) return;
+		if (!this._entries || !this.#contentKey) return;
 
 		this.observe(
-			this._entries.layoutOf(this.#contentUdi),
+			this._entries.layoutOf(this.#contentKey),
 			(layout) => {
 				this._layout.setValue(layout);
 			},
@@ -294,7 +294,8 @@ export abstract class UmbBlockEntryContext<
 
 	#gotManager() {
 		this.#observeBlockType();
-		this.#observeData();
+		this.#observeContentData();
+		this.#observeSettingsData();
 	}
 
 	abstract _gotManager(): void;
@@ -317,59 +318,39 @@ export abstract class UmbBlockEntryContext<
 
 	abstract _gotEntries(): void;
 
-	#observeData() {
-		if (!this._manager || !this.#contentUdi) return;
+	#observeContentData() {
+		if (!this._manager || !this.#contentKey) return;
+
+		console.log('get content of', this.#contentKey, this._layout.value);
 
 		// observe content:
 		this.observe(
-			this._manager.contentOf(this.#contentUdi),
+			this._manager.contentOf(this.#contentKey),
 			(content) => {
+				console.log('content', content);
 				this.#content.setValue(content);
 			},
 			'observeContent',
 		);
-		/*
-
-		This two way binding does not work well, might need to further investigate what the exact problem is.
-		this.observe(
-			this.content,
-			(content) => {
-				if (content) {
-					this._manager?.setOneContent(content);
-				}
-			},
-			'observeInternalContent',
-		);
-		*/
-
+	}
+	#observeSettingsData() {
+		if (!this._manager) return;
 		// observe settings:
-		const settingsUdi = this._layout.value?.settingsUdi;
-		if (settingsUdi) {
+		const settingsKey = this._layout.value?.settingsKey;
+		if (settingsKey) {
 			this.observe(
-				this._manager.settingsOf(settingsUdi),
+				this._manager.settingsOf(settingsKey),
 				(settings) => {
 					this.#settings.setValue(settings);
 				},
 				'observeSettings',
 			);
-			/*
-
-			This two way binding does not work well, might need to further investigate what the exact problem is.
-			this.observe(
-				this.settings,
-				(settings) => {
-					if (settings) {
-						this._manager?.setOneSettings(settings);
-					}
-				},
-				'observeInternalSettings',
-			);*/
 		}
 	}
 
 	#observeContentType() {
 		if (!this._manager) return;
-		const contentTypeKey = this.#content.value?.contentTypeKey;
+		const contentTypeKey = this.#content.getValue()?.contentTypeKey;
 		if (!contentTypeKey) return;
 
 		// observe blockType:
@@ -391,8 +372,10 @@ export abstract class UmbBlockEntryContext<
 
 	#observeBlockType() {
 		if (!this._manager) return;
-		const contentTypeKey = this.#content.value?.contentTypeKey;
+		const contentTypeKey = this.#content.getValue()?.contentTypeKey;
 		if (!contentTypeKey) return;
+
+		console.log('observeBlockType based on ', this.#content.getValue());
 
 		// observe blockType:
 		this.observe(
@@ -406,7 +389,7 @@ export abstract class UmbBlockEntryContext<
 
 	#observeBlockTypeLabel() {
 		if (!this._manager) return;
-		const blockType = this._blockType.value;
+		const blockType = this._blockType.getValue();
 		if (!blockType) return;
 
 		if (blockType.label) {
@@ -420,6 +403,7 @@ export abstract class UmbBlockEntryContext<
 			this.observe(
 				this.contentElementTypeName,
 				(contentTypeName) => {
+					console.log('contentElementTypeName', contentTypeName);
 					this.#label.setValue(contentTypeName ?? 'no name');
 				},
 				'observeContentTypeName',
@@ -431,10 +415,10 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentUdi());
+		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey());
 	}
 	public editSettings() {
-		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentUdi());
+		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey());
 	}
 
 	async requestDelete() {
@@ -451,9 +435,9 @@ export abstract class UmbBlockEntryContext<
 
 	public delete() {
 		if (!this._entries) return;
-		const contentUdi = this._layout.value?.contentUdi;
-		if (!contentUdi) return;
-		this._entries.delete(contentUdi);
+		const contentKey = this._layout.value?.contentKey;
+		if (!contentKey) return;
+		this._entries.delete(contentKey);
 	}
 
 	//copy

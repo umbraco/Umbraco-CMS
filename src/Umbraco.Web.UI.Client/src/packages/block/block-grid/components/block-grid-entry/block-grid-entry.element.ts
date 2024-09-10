@@ -32,19 +32,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	@property({ attribute: false })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
-		if (!value || value === this._contentUdi) return;
-		this._contentUdi = value;
-		this._blockViewProps.contentUdi = value;
-		this.setAttribute('data-element-udi', value);
-		this.#context.setContentUdi(value);
+	public set contentKey(value: string | undefined) {
+		if (!value || value === this._contentKey) return;
+		this._contentKey = value;
+		this._blockViewProps.contentKey = value;
+		this.setAttribute('data-element-key', value);
+		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
 			this,
-			`$.contentData[${UmbDataPathBlockElementDataQuery({ udi: value })}]`,
+			`$.contentData[${UmbDataPathBlockElementDataQuery({ key: value })}]`,
 			(hasMessages) => {
 				this._contentInvalid = hasMessages;
 				this._blockViewProps.contentInvalid = hasMessages;
@@ -52,7 +52,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			'observeMessagesForContent',
 		);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 	//
 
 	#context = new UmbBlockGridEntryContext(this);
@@ -113,7 +113,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
@@ -205,14 +205,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 
 		this.observe(
-			this.#context.settingsUdi,
-			(settingsUdi) => {
+			this.#context.settingsKey,
+			(settingsKey) => {
 				this.removeUmbControllerByAlias('observeMessagesForSettings');
-				if (settingsUdi) {
+				if (settingsKey) {
 					// Observe settings validation state:
 					new UmbObserveValidationStateController(
 						this,
-						`$.settingsData[${UmbDataPathBlockElementDataQuery({ udi: settingsUdi })}]`,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
 						(hasMessages) => {
 							this._settingsInvalid = hasMessages;
 							this._blockViewProps.settingsInvalid = hasMessages;
@@ -380,7 +380,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderBlock() {
-		return this.contentUdi && this._contentTypeAlias
+		return this.contentKey && this._contentTypeAlias
 			? html`
 					${this._createBeforePath && this._showInlineCreateBefore
 						? html`<uui-button-inline-create

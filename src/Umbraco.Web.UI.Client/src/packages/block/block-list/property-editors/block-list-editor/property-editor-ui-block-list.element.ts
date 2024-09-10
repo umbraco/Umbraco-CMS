@@ -26,10 +26,10 @@ import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffi
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentUdi!;
+		return element.contentKey!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentUdi;
+		return modelEntry.contentKey;
 	},
 	//identifier: 'block-list-editor',
 	itemSelector: 'umb-block-list-entry',
@@ -228,11 +228,11 @@ export class UmbPropertyEditorUIBlockListElement
 	override render() {
 		return html` ${repeat(
 				this._layouts,
-				(x) => x.contentUdi,
+				(x) => x.contentKey,
 				(layoutEntry, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
-						.contentUdi=${layoutEntry.contentUdi}
+						.contentKey=${layoutEntry.contentKey}
 						.layout=${layoutEntry}
 						?readonly=${this.readonly}
 						${umbDestroyOnDisconnect()}>

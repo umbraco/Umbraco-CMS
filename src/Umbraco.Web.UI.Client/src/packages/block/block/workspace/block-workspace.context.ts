@@ -46,8 +46,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
-	readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
-	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
+	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
+	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
 	readonly content = new UmbBlockElementManager(this, 'contentData');
 
@@ -137,12 +137,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				},
 			},
 			{
-				path: 'edit/:udi',
+				path: 'edit/:key',
 				component: UmbBlockWorkspaceEditorElement,
 				setup: (component, info) => {
 					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
-					const udi = decodeFilePath(info.match.params.udi);
-					this.load(udi);
+					const key = decodeFilePath(info.match.params.key);
+					this.load(key);
 				},
 			},
 		]);
@@ -228,7 +228,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				throw new Error('Block Entries could not insert block');
 			}
 
-			const unique = blockCreated.layout.contentUdi;
+			const unique = blockCreated.layout.contentKey;
 
 			this.#observeBlockData(unique);
 			this.establishLiveSync();
@@ -246,13 +246,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.#layout.setValue(layoutData as LayoutDataType);
 
 				// Content:
-				const contentUdi = layoutData?.contentUdi;
-				if (!contentUdi) {
+				const contentKey = layoutData?.contentKey;
+				if (!contentKey) {
 					return;
 				}
 
 				this.observe(
-					this.#blockManager!.contentOf(contentUdi),
+					this.#blockManager!.contentOf(contentKey),
 					(contentData) => {
 						this.content.setData(contentData);
 					},
@@ -260,7 +260,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				);
 				if (!this.#initialContent) {
 					this.observe(
-						this.#blockManager!.contentOf(contentUdi),
+						this.#blockManager!.contentOf(contentKey),
 						(contentData) => {
 							this.#initialContent ??= contentData;
 							this.removeUmbControllerByAlias('observeContentInitially');
@@ -270,10 +270,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				}
 
 				// Settings:
-				const settingsUdi = layoutData?.settingsUdi;
-				if (settingsUdi) {
+				const settingsKey = layoutData?.settingsKey;
+				if (settingsKey) {
 					this.observe(
-						this.#blockManager!.settingsOf(settingsUdi),
+						this.#blockManager!.settingsOf(settingsKey),
 						(settingsData) => {
 							this.settings.setData(settingsData);
 						},
@@ -281,7 +281,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					);
 					if (!this.#initialSettings) {
 						this.observe(
-							this.#blockManager!.settingsOf(settingsUdi),
+							this.#blockManager!.settingsOf(settingsKey),
 							(settingsData) => {
 								this.#initialSettings ??= settingsData;
 								this.removeUmbControllerByAlias('observeSettingsInitially');
@@ -324,7 +324,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	getUnique() {
-		return this.getData()!.contentUdi;
+		return this.getData()!.contentKey;
 	}
 
 	getEntityType() {
@@ -409,9 +409,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			// Did it exist before?
 			if (this.getIsNew() === true) {
 				// Remove the block?
-				const contentUdi = this.#layout.value?.contentUdi;
-				if (contentUdi) {
-					this.#blockEntries?.delete(contentUdi);
+				const contentKey = this.#layout.value?.contentKey;
+				if (contentKey) {
+					this.#blockEntries?.delete(contentKey);
 				}
 			} else {
 				// Revert the layout, content & settings data to the original state: [NL]

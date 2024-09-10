@@ -23,7 +23,7 @@ export class UmbBlockListManagerContext<
 
 	create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this.
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		originData?: UmbBlockListWorkspaceOriginData,

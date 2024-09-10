@@ -16,16 +16,16 @@ import '../ref-rte-block/index.js';
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ type: String, attribute: 'data-content-udi', reflect: true })
-	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+	@property({ type: String, attribute: 'data-content-key', reflect: true })
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
-	public set contentUdi(value: string | undefined) {
+	public set contentKey(value: string | undefined) {
 		if (!value) return;
-		this._contentUdi = value;
-		this.#context.setContentUdi(value);
+		this._contentKey = value;
+		this.#context.setContentKey(value);
 	}
-	private _contentUdi?: string | undefined;
+	private _contentKey?: string | undefined;
 
 	#context = new UmbBlockRteEntryContext(this);
 
@@ -48,7 +48,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
-		contentUdi: undefined!,
+		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
@@ -120,14 +120,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		// TODO: Implement validation for RTE Blocks: [NL]
 		/*
 		this.observe(
-			this.#context.settingsUdi,
-			(settingsUdi) => {
+			this.#context.settingsKey,
+			(settingsKey) => {
 				this.removeUmbControllerByAlias('observeMessagesForSettings');
-				if (settingsUdi) {
+				if (settingsKey) {
 					// Observe settings validation state:
 					new UmbObserveValidationStateController(
 						this,
-						`$.settingsData[${UmbDataPathBlockElementDataQuery({ udi: settingsUdi })}]`,
+						`$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`,
 						(hasMessages) => {
 							this._settingsInvalid = hasMessages;
 							this._blockViewProps.settingsInvalid = hasMessages;

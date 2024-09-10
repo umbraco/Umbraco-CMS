@@ -91,10 +91,10 @@ function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutMod
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentUdi!;
+		return element.contentKey!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentUdi;
+		return modelEntry.contentKey;
 	},
 	resolvePlacement: resolvePlacementAsGrid,
 	identifier: 'block-grid-editor',
@@ -123,7 +123,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.#context.setLayouts(model);
 		},
 		onRequestMove: ({ item }) => {
-			return this.#context.allowDrop(item.contentUdi);
+			return this.#context.allowDrop(item.contentKey);
 		},
 		onDisallowed: () => {
 			this.setAttribute('disallow-drop', '');
@@ -320,12 +320,12 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(x) => x.contentUdi,
+					(x) => x.contentKey,
 					(layoutEntry, index) =>
 						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
-							.contentUdi=${layoutEntry.contentUdi}
+							.contentKey=${layoutEntry.contentKey}
 							.layout=${layoutEntry}>
 						</umb-block-grid-entry>`,
 				)}

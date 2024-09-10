@@ -89,11 +89,11 @@ export class UmbBlockGridEntriesContext
 		return nameState.asObservable();
 	}
 
-	setParentUnique(contentUdi: string | null) {
-		this.#parentUnique = contentUdi;
+	setParentUnique(contentKey: string | null) {
+		this.#parentUnique = contentKey;
 		// Notice pathFolderName can be removed when we have switched to use a proper GUID/ID/KEY. [NL]
-		this.#workspaceModal.setUniquePathValue('parentUnique', pathFolderName(contentUdi ?? 'null'));
-		this.#catalogueModal.setUniquePathValue('parentUnique', pathFolderName(contentUdi ?? 'null'));
+		this.#workspaceModal.setUniquePathValue('parentUnique', pathFolderName(contentKey ?? 'null'));
+		this.#catalogueModal.setUniquePathValue('parentUnique', pathFolderName(contentKey ?? 'null'));
 	}
 
 	setAreaKey(areaKey: string | null) {
@@ -377,7 +377,7 @@ export class UmbBlockGridEntriesContext
 
 	async create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockGridLayoutModel, 'contentUdi'>,
+		partialLayoutEntry?: Omit<UmbBlockGridLayoutModel, 'contentKey'>,
 		originData?: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
@@ -398,9 +398,9 @@ export class UmbBlockGridEntriesContext
 	}
 
 	// create Block?
-	override async delete(contentUdi: string) {
+	override async delete(contentKey: string) {
 		// TODO: Loop through children and delete them as well?
-		await super.delete(contentUdi);
+		await super.delete(contentKey);
 	}
 
 	/**
@@ -490,7 +490,7 @@ export class UmbBlockGridEntriesContext
 							.filter((blockType) => blockType.groupKey === rule.groupKey && blockType.allowInAreas === true)
 							.map((x) => x.contentElementTypeKey) ?? [];
 					const groupAmount = layoutEntries.filter((entry) => {
-						const contentTypeKey = this._manager!.getContentTypeKeyOfContentUdi(entry.contentUdi);
+						const contentTypeKey = this._manager!.getContentTypeKeyOfcontentKey(entry.contentKey);
 						return contentTypeKey ? groupElementTypeKeys.indexOf(contentTypeKey) !== -1 : false;
 					}).length;
 
@@ -508,7 +508,7 @@ export class UmbBlockGridEntriesContext
 				// For specific elementTypes:
 				else if (rule.elementTypeKey) {
 					const amount = layoutEntries.filter((entry) => {
-						const contentTypeKey = this._manager!.getContentOf(entry.contentUdi)?.contentTypeKey;
+						const contentTypeKey = this._manager!.getContentOf(entry.contentKey)?.contentTypeKey;
 						return contentTypeKey === rule.elementTypeKey;
 					}).length;
 					if (amount < minAllowed || (maxAllowed > 0 ? amount > maxAllowed : false)) {
@@ -533,12 +533,12 @@ export class UmbBlockGridEntriesContext
 	}
 
 	/**
-	 * Check if given contentUdi is allowed in the current area.
-	 * @param contentUdi {string} - The contentUdi of the content to check.
+	 * Check if given contentKey is allowed in the current area.
+	 * @param contentKey {string} - The contentKey of the content to check.
 	 * @returns {boolean} - True if the content is allowed in the current area, otherwise false.
 	 */
-	allowDrop(contentUdi: string) {
-		const content = this._manager?.getContentOf(contentUdi);
+	allowDrop(contentKey: string) {
+		const content = this._manager?.getContentOf(contentKey);
 		const allowedBlocks = this.#allowedBlockTypes.getValue();
 		if (!content || !allowedBlocks) return false;
 
