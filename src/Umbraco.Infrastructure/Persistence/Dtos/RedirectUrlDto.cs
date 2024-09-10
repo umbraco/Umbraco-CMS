@@ -37,7 +37,7 @@ internal class RedirectUrlDto
     public DateTime CreateDateUtc { get; set; }
 
     [Column("url")]
-    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string Url { get; set; } = null!;
 
     [Column("culture")]
