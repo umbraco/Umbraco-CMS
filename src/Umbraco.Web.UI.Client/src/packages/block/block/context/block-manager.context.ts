@@ -46,7 +46,7 @@ export abstract class UmbBlockManagerContext<
 	variantId = this.#variantId.asObservable();
 
 	#contentTypes = new UmbArrayState(<Array<UmbContentTypeModel>>[], (x) => x.unique);
-	public readonly contentTypes = this.#contentTypes.asObservable();
+	//public readonly contentTypes = this.#contentTypes.asObservable();
 
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
