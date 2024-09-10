@@ -6,7 +6,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.UserRoot',
 		name: 'User Root Workspace View',
-		element: () => import('./user-root-workspace-view.element.js'),
+		element: () => import('./user-root-workspace.element.js'),
 		meta: {
 			entityType: UMB_USER_ROOT_ENTITY_TYPE,
 		},
