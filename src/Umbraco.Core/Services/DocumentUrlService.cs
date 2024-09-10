@@ -230,7 +230,6 @@ public class DocumentUrlService : IDocumentUrlService
 
         if(toSave.Any())
         {
-            _logger.LogTrace(".... {toSave}", toSave.Select(x=>x.UrlSegment));
             _documentUrlRepository.Save(toSave);
         }
 

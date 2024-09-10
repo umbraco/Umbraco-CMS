@@ -95,6 +95,6 @@ public class UmbracoPlan : MigrationPlan
         // To 15.0.0
         To<V_15_0_0.AddUserClientId>("{7F4F31D8-DD71-4F0D-93FC-2690A924D84B}");
         To<V_15_0_0.AddKindToUser>("{1A8835EF-F8AB-4472-B4D8-D75B7C164022}");
-        To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
+
     }
 }

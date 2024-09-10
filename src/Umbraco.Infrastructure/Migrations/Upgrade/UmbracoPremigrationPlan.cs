@@ -54,5 +54,8 @@ public class UmbracoPremigrationPlan : MigrationPlan
 
         // To 14.0.0
         To<V_14_0_0.UpdateToOpenIddictV5>("{76FBF80E-37E6-462E-ADC1-25668F56151D}");
+
+        // To 15.0.0
+        To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
     }
 }
