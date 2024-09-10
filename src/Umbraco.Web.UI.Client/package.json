@@ -213,6 +213,8 @@
 	},
 	"dependencies": {
 		"@tiptap/core": "^2.6.6",
+		"@tiptap/extension-text-align": "^2.6.6",
+		"@tiptap/extension-underline": "^2.6.6",
 		"@tiptap/pm": "^2.6.6",
 		"@tiptap/starter-kit": "^2.6.6",
 		"@types/diff": "^5.2.1",
