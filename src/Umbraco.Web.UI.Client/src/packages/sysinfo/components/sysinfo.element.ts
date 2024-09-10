@@ -93,16 +93,17 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 					)}
 
 					<uui-button
-						@click=${this.#copyToClipboard}
-						slot="actions"
-						look="secondary"
-						label=${this.localize.term('clipboard_labelForCopyToClipboard')}></uui-button>
-
-					<uui-button
 						@click=${this._submitModal}
 						slot="actions"
 						look="secondary"
 						label=${this.localize.term('general_close')}></uui-button>
+
+					<uui-button
+						@click=${this.#copyToClipboard}
+						slot="actions"
+						look="primary"
+						color="positive"
+						label=${this.localize.term('clipboard_labelForCopyToClipboard')}></uui-button>
 				</uui-dialog-layout>
 			</uui-dialog>
 		`;
