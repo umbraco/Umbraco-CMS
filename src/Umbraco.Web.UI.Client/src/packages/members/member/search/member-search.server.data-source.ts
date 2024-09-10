@@ -43,6 +43,7 @@ export class UmbMemberSearchServerDataSource implements UmbSearchDataSource<UmbM
 					entityType: UMB_MEMBER_ENTITY_TYPE,
 					unique: item.id,
 					name: item.variants[0].name || '',
+					kind: item.kind,
 					memberType: {
 						unique: item.memberType.id,
 						icon: item.memberType.icon,

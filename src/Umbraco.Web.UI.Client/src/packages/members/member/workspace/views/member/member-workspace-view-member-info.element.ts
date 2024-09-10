@@ -1,5 +1,6 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
+import { UmbMemberKind, type UmbMemberKindType } from '../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -13,8 +14,10 @@ import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type
 export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	private _memberTypeUnique = '';
+
 	@state()
 	private _memberTypeName = '';
+
 	@state()
 	private _memberTypeIcon = '';
 
@@ -29,6 +32,9 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 	@state()
 	private _unique = '';
+
+	@state()
+	private _memberKind?: UmbMemberKindType;
 
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 	#memberTypeItemRepository: UmbMemberTypeItemRepository = new UmbMemberTypeItemRepository(this);
@@ -51,6 +57,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			this.observe(this.#workspaceContext.createDate, (date) => (this._createDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext.updateDate, (date) => (this._updateDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique || ''));
+			this.observe(this.#workspaceContext.kind, (kind) => (this._memberKind = kind));
 
 			const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
 			if (!memberType) return;
@@ -70,41 +77,45 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 	#renderGeneralSection() {
 		return html`
-			<div class="general-item">
-				<strong><umb-localize key="content_createDate">Created</umb-localize></strong>
-				<span> ${this._createDate} </span>
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="content_updateDate">Last edited</umb-localize></strong>
-				<span> ${this._updateDate} </span>
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="content_membertype">Member Type</umb-localize></strong>
-				<uui-ref-node
-					standalone
-					.name=${this._memberTypeName}
-					.href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}>
-					<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
-				</uui-ref-node>
-			</div>
-			<div class="general-item">
-				<strong><umb-localize key="template_id">Id</umb-localize></strong>
-				<span>${this._unique}</span>
-			</div>
+			<umb-stack look="compact">
+				<div>
+					<h4><umb-localize key="content_createDate">Created</umb-localize></h4>
+					<span> ${this._createDate} </span>
+				</div>
+				<div>
+					<h4><umb-localize key="content_updateDate">Last edited</umb-localize></h4>
+					<span> ${this._updateDate} </span>
+				</div>
+				<div>
+					<h4><umb-localize key="content_membertype">Member Type</umb-localize></h4>
+					<uui-ref-node
+						standalone
+						.name=${this._memberTypeName}
+						.href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}>
+						<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
+					</uui-ref-node>
+				</div>
+				<div>
+					<h4><umb-localize key="member_kind"></umb-localize></h4>
+					<span
+						>${this._memberKind === UmbMemberKind.API
+							? this.localize.term('member_memberKindApi')
+							: this.localize.term('member_memberKindDefault')}</span
+					>
+				</div>
+				<div>
+					<h4><umb-localize key="template_id">Id</umb-localize></h4>
+					<span>${this._unique}</span>
+				</div>
+			</umb-stack>
 		`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			.general-item {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-1);
-			}
-
-			.general-item:not(:last-child) {
-				margin-bottom: var(--uui-size-space-6);
+			h4 {
+				margin: 0;
 			}
 		`,
 	];
