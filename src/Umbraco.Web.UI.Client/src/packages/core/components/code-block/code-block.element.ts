@@ -44,7 +44,7 @@ export class UmbCodeBlockElement extends LitElement {
 				${when(
 					this.copy,
 					() => html`
-						<uui-button compat color=${this._copyState === 'idle' ? 'default' : 'positive'} @click=${this.copyCode}>
+						<uui-button color=${this._copyState === 'idle' ? 'default' : 'positive'} @click=${this.copyCode}>
 							${when(
 								this._copyState === 'idle',
 								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
