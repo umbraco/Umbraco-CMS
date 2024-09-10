@@ -13,6 +13,13 @@ internal interface IDatabaseCacheRepository
     IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys);
 
     /// <summary>
+    /// Gets all content keys of specific document types
+    /// </summary>
+    /// <param name="keys">The document types to find content using.</param>
+    /// <returns>The keys of all content use specific document types.</returns>
+    IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys);
+
+    /// <summary>
     ///     Refreshes the nucache database row for the given cache node />
     /// </summary>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>

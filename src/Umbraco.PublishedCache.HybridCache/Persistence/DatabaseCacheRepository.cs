@@ -208,11 +208,12 @@ AND cmsContentNu.nodeId IS NULL
         return CreateContentNodeKit(dto, serializer, preview);
     }
 
-    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys)
+    private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys)
     {
+        Guid[] keys = documentTypeKeys.ToArray();
         if (keys.Any() is false)
         {
-            yield break;
+            return [];
         }
 
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
@@ -222,16 +223,25 @@ AND cmsContentNu.nodeId IS NULL
             .WhereIn<NodeDto>(x => x.UniqueId, keys,"n")
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+        return GetContentNodeDtos(sql);
+    }
+
+    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys)
+    {
+        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys);
+
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
             yield return CreateContentNodeKit(row, serializer, row.Published is false);
         }
     }
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys)
+        => GetContentSourceByDocumentTypeKey(keys).Select(x => x.Key);
 
     public async Task<ContentCacheNode?> GetMediaSourceAsync(int id)
     {
