@@ -1,5 +1,4 @@
 import type { UmbUserGroupDetailModel } from '../index.js';
-import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -174,11 +173,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				alias="Umb.Workspace.UserGroup"
 				class="uui-text"
 				back-path="/section/user-management/view/user-groups">
-				${this.#renderHeader()}
-				<div id="main">
-					<div id="left-column">${this.#renderLeftColumn()}</div>
-					<div id="right-column">${this.#renderRightColumn()}</div>
-				</div>
+				${this.#renderHeader()} ${this.#renderMain()}
 			</umb-workspace-editor>
 		`;
 	}
@@ -225,40 +220,46 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					${umbFocus()}>
 				</umb-input-with-alias>
 			</div>
+
+			<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 		`;
 	}
 
-	#renderLeftColumn() {
+	#renderMain() {
 		if (!this._unique) return nothing;
 
 		return html`
-			<uui-box>
-				<div slot="headline"><umb-localize key="user_assignAccess"></umb-localize></div>
+			<div id="main">
+				<umb-stack>
+					<uui-box>
+						<div slot="headline"><umb-localize key="user_assignAccess"></umb-localize></div>
 
-				<umb-property-layout
-					label=${this.localize.term('main_sections')}
-					description=${this.localize.term('user_sectionsHelp')}>
-					<umb-input-section
-						slot="editor"
-						.selection=${this._sections}
-						@change=${this.#onSectionsChange}></umb-input-section>
-				</umb-property-layout>
+						<umb-property-layout
+							label=${this.localize.term('main_sections')}
+							description=${this.localize.term('user_sectionsHelp')}>
+							<umb-input-section
+								slot="editor"
+								.selection=${this._sections}
+								@change=${this.#onSectionsChange}></umb-input-section>
+						</umb-property-layout>
 
-				${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
-			</uui-box>
+						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
+					</uui-box>
 
-			<uui-box>
-				<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
+					<uui-box>
+						<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
 
-				<umb-property-layout label="Entity permissions" description="Assign permissions for an entity type">
-					<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
-				</umb-property-layout>
-			</uui-box>
+						<umb-property-layout label="Entity permissions" description="Assign permissions for an entity type">
+							<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
+						</umb-property-layout>
+					</uui-box>
 
-			<uui-box>
-				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
-				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
-			</uui-box>
+					<uui-box>
+						<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
+						<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
+					</uui-box>
+				</umb-stack>
+			</div>
 		`;
 	}
 
@@ -338,15 +339,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderRightColumn() {
-		return html`
-			<uui-box headline="Actions">
-				<umb-entity-action-list .entityType=${UMB_USER_GROUP_ENTITY_TYPE} .unique=${this._unique}>
-				</umb-entity-action-list>
-			</uui-box>
-		`;
-	}
-
 	static override styles = [
 		UmbTextStyles,
 		css`
@@ -375,23 +367,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#main {
-				display: grid;
-				grid-template-columns: 1fr 350px;
-				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
-			}
-
-			#left-column,
-			#right-column {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-
-			#right-column > uui-box > div {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-2);
 			}
 
 			uui-input {
