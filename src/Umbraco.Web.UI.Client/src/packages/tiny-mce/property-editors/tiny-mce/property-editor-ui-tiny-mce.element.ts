@@ -89,6 +89,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	constructor() {
 		super();
 
+		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
+			// Update manager:
+			this.#managerContext.setLayouts(layouts);
+		});
+
 		this.observe(this.#managerContext.layouts, (layouts) => {
 			this._value = {
 				...this._value,
