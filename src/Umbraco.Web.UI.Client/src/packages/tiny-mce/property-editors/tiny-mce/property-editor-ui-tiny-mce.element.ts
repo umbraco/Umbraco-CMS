@@ -6,6 +6,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import {
+	UmbBlockRteEntriesContext,
 	type UmbBlockRteLayoutModel,
 	UmbBlockRteManagerContext,
 	type UmbBlockRteTypeModel,
@@ -83,6 +84,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	private _latestMarkup = ''; // The latest value gotten from the TinyMCE editor.
 
 	#managerContext = new UmbBlockRteManagerContext(this);
+	#entriesContext = new UmbBlockRteEntriesContext(this);
 
 	constructor() {
 		super();
