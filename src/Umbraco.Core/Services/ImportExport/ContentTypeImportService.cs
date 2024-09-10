@@ -32,7 +32,7 @@ public class ContentTypeImportService : IContentTypeImportService
     /// Imports the contentType
     /// </summary>
     /// <param name="temporaryFileId"></param>
-    /// <param name="userId"></param>
+    /// <param name="userKey"></param>
     /// <param name="contentTypeId">the id of the contentType to overwrite, null if a new contentType should be created</param>
     /// <returns></returns>
     public async Task<Attempt<IContentType?, ContentTypeImportOperationStatus>> Import(

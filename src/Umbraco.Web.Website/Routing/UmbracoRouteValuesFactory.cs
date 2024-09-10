@@ -45,13 +45,8 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
             ControllerActionDescriptor? descriptor = _controllerActionSearcher.Find<IRenderController>(
                 new DefaultHttpContext(), // this actually makes no difference for this method
                 DefaultControllerName,
-                UmbracoRouteValues.DefaultActionName);
-
-            if (descriptor == null)
-            {
-                throw new InvalidOperationException(
+                UmbracoRouteValues.DefaultActionName) ?? throw new InvalidOperationException(
                     $"No controller/action found by name {DefaultControllerName}.{UmbracoRouteValues.DefaultActionName}");
-            }
 
             return descriptor;
         });
@@ -151,8 +146,8 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
                     $"The call to {nameof(IPublishedRouter.UpdateRequestAsync)} cannot return null");
             }
 
-			string? customActionName = GetTemplateName(request);
-			
+            string? customActionName = GetTemplateName(request);
+
             def = new UmbracoRouteValues(
                 request,
                 def.ControllerActionDescriptor,
@@ -167,7 +162,7 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
 
         return def;
     }
-	
+
 	private string? GetTemplateName(IPublishedRequest request)
     {
         // check that a template is defined), if it doesn't and there is a hijacked route it will just route
