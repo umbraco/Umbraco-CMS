@@ -85,7 +85,7 @@ export abstract class UmbBlockEntryContext<
 	readonly createAfterPath = this.#createAfterPath.asObservable();
 
 	#contentElementType = new UmbObjectState<UmbContentTypeModel | undefined>(undefined);
-	public readonly contentElementType = this.#contentElementType.asObservable();
+	//public readonly contentElementType = this.#contentElementType.asObservable();
 	public readonly contentElementTypeName = this.#contentElementType.asObservablePart((x) => x?.name);
 	public readonly contentElementTypeAlias = this.#contentElementType.asObservablePart((x) => x?.alias);
 	public readonly contentElementTypeIcon = this.#contentElementType.asObservablePart((x) => x?.icon);
@@ -376,6 +376,10 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentTypeOf(contentTypeKey),
 			(contentType) => {
+				/**
+				 * currently only using:
+				 * Name, Alias, Icon
+				 */
 				this.#contentElementType.setValue(contentType);
 				this._gotContentType(contentType);
 			},

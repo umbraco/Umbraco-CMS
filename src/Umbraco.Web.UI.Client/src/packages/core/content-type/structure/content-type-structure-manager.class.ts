@@ -77,7 +77,8 @@ export class UmbContentTypeStructureManager<
 	/**
 	 * loadType will load the ContentType and all inherited and composed ContentTypes.
 	 * This will give us all the structure for properties and containers.
-	 * @param unique
+	 * @param {string} unique - The unique of the ContentType to load.
+	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
 		this._reset();
