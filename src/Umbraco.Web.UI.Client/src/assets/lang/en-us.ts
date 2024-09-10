@@ -2299,6 +2299,7 @@ export default {
 		labelForArrayOfItems: 'Collection of %0%',
 		labelForRemoveAllEntries: 'Remove all items',
 		labelForClearClipboard: 'Clear clipboard',
+		labelForCopyToClipboard: 'Copy to clipboard',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',

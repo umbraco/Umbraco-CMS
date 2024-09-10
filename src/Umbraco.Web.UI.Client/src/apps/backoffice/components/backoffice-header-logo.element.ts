@@ -1,12 +1,18 @@
+import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
 
 @customElement('umb-backoffice-header-logo')
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	@state()
 	private _version?: string;
+
+	@state()
+	private _isUserAdmin = false;
 
 	constructor() {
 		super();
@@ -21,6 +27,12 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				'_observeVersion',
 			);
 		});
+
+		this.#isAdmin();
+	}
+
+	async #isAdmin() {
+		this._isUserAdmin = await isCurrentUserAnAdmin(this);
 	}
 
 	override render() {
@@ -31,13 +43,33 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 			<uui-popover-container id="logo-popover" placement="bottom-start">
 				<umb-popover-layout>
 					<div id="modal">
-						<img src="/umbraco/backoffice/assets/umbraco_logo_blue.svg" alt="Umbraco" loading="lazy" />
+						<img
+							src="/umbraco/backoffice/assets/umbraco_logo_blue.svg"
+							alt="Umbraco"
+							width="300"
+							height="82"
+							loading="lazy" />
 						<span>${this._version}</span>
 						<a href="https://umbraco.com" target="_blank" rel="noopener">Umbraco.com</a>
+
+						${this._isUserAdmin
+							? html`<uui-button
+									@click=${this.#openSystemInformation}
+									look="secondary"
+									label="System information"></uui-button>`
+							: ''}
 					</div>
 				</umb-popover-layout>
 			</uui-popover-container>
 		`;
+	}
+
+	async #openSystemInformation() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager
+			.open(this, UMB_SYSINFO_MODAL)
+			.onSubmit()
+			.catch(() => {});
 	}
 
 	static override styles = [

@@ -83,6 +83,7 @@
 		"./store": "./dist-cms/packages/core/store/index.js",
 		"./style": "./dist-cms/packages/core/style/index.js",
 		"./stylesheet": "./dist-cms/packages/templating/stylesheets/index.js",
+		"./sysinfo": "./dist-cms/packages/sysinfo/index.js",
 		"./tags": "./dist-cms/packages/tags/index.js",
 		"./template": "./dist-cms/packages/templating/templates/index.js",
 		"./temporary-file": "./dist-cms/packages/core/temporary-file/index.js",
