@@ -190,12 +190,16 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 
 	#renderAddButton() {
 		if (this.max === 1 && this.selection.length >= this.max) return nothing;
-		return html`<uui-button
-			id="btn-add"
-			look="placeholder"
-			@click=${this.#openPicker}
-			label=${this.localize.term('general_choose')}
-			?disabled=${this.readonly}></uui-button>`;
+		if (this.readonly && this.selection.length > 0) {
+			return nothing;
+		} else {
+			return html`<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}></uui-button>`;
+		}
 	}
 
 	#renderItem(item: UmbMemberGroupItemModel) {

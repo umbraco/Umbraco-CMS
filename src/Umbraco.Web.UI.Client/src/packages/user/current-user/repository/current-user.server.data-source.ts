@@ -118,19 +118,19 @@ export class UmbCurrentUserServerDataSource {
 
 	/**
 	 * Change the password for current user
-	 * @param id 
-	 * @param newPassword 
-	 * @param oldPassword 
-	 * @param isCurrentUser 
-	 * @returns 
+	 * @param id
+	 * @param newPassword
+	 * @param oldPassword
+	 * @param isCurrentUser
+	 * @returns
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
 		return tryExecuteAndNotify(
 			this.#host,
-			UserService.postCurrentUserByIdChangePassword({
+			UserService.postUserCurrentChangePassword({
 				requestBody: {
 					newPassword,
-					oldPassword
+					oldPassword,
 				},
 			}),
 		);

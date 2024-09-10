@@ -20,6 +20,14 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
+interface UmbBlockGridAreaTypeInvalidRuleType {
+	groupKey?: string;
+	key?: string;
+	name: string;
+	amount: number;
+	minRequirement: number;
+	maxRequirement: number;
+}
 export class UmbBlockGridEntriesContext
 	extends UmbBlockEntriesContext<
 		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
@@ -455,14 +463,7 @@ export class UmbBlockGridEntriesContext
 		}
 	}
 
-	#invalidBlockTypeLimits?: Array<{
-		groupKey?: string;
-		key?: string;
-		name: string;
-		amount: number;
-		minRequirement: number;
-		maxRequirement: number;
-	}>;
+	#invalidBlockTypeLimits?: Array<UmbBlockGridAreaTypeInvalidRuleType>;
 
 	getInvalidBlockTypeLimits() {
 		return this.#invalidBlockTypeLimits ?? [];
@@ -476,57 +477,58 @@ export class UmbBlockGridEntriesContext
 
 		const layoutEntries = this._layoutEntries.getValue();
 
-		this.#invalidBlockTypeLimits = [];
+		this.#invalidBlockTypeLimits = this.#areaType.specifiedAllowance
+			.map((rule) => {
+				const minAllowed = rule.minAllowed || 0;
+				const maxAllowed = rule.maxAllowed || 0;
 
-		const hasInvalidRules = this.#areaType.specifiedAllowance.some((rule) => {
-			const minAllowed = rule.minAllowed || 0;
-			const maxAllowed = rule.maxAllowed || 0;
+				// For block groups:
+				if (rule.groupKey) {
+					const groupElementTypeKeys =
+						this._manager
+							?.getBlockTypes()
+							.filter((blockType) => blockType.groupKey === rule.groupKey && blockType.allowInAreas === true)
+							.map((x) => x.contentElementTypeKey) ?? [];
+					const groupAmount = layoutEntries.filter((entry) => {
+						const contentTypeKey = this._manager!.getContentTypeKeyOfContentUdi(entry.contentUdi);
+						return contentTypeKey ? groupElementTypeKeys.indexOf(contentTypeKey) !== -1 : false;
+					}).length;
 
-			// For block groups:
-			if (rule.groupKey) {
-				const groupElementTypeKeys =
-					this._manager
-						?.getBlockTypes()
-						.filter((blockType) => blockType.groupKey === rule.groupKey && blockType.allowInAreas === true)
-						.map((x) => x.contentElementTypeKey) ?? [];
-				const groupAmount = layoutEntries.filter((entry) => {
-					const contentTypeKey = this._manager!.getContentTypeKeyOf(entry.contentUdi);
-					return contentTypeKey ? groupElementTypeKeys.indexOf(contentTypeKey) !== -1 : false;
-				}).length;
-
-				if (groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
-					this.#invalidBlockTypeLimits!.push({
-						groupKey: rule.groupKey,
-						name: this._manager!.getBlockGroupName(rule.groupKey) ?? '?',
-						amount: groupAmount,
-						minRequirement: minAllowed,
-						maxRequirement: maxAllowed,
-					});
-					return true;
+					if (groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
+						return {
+							groupKey: rule.groupKey,
+							name: this._manager!.getBlockGroupName(rule.groupKey) ?? '?',
+							amount: groupAmount,
+							minRequirement: minAllowed,
+							maxRequirement: maxAllowed,
+						};
+					}
+					return undefined;
 				}
-			}
-			// For specific elementTypes:
-			else if (rule.elementTypeKey) {
-				const amount = layoutEntries.filter((entry) => {
-					const contentTypeKey = this._manager!.getContentOf(entry.contentUdi)?.contentTypeKey;
-					return contentTypeKey === rule.elementTypeKey;
-				}).length;
-				if (amount < minAllowed || (maxAllowed > 0 ? amount > maxAllowed : false)) {
-					this.#invalidBlockTypeLimits!.push({
-						key: rule.elementTypeKey,
-						name: this._manager!.getContentTypeNameOf(rule.elementTypeKey) ?? '?',
-						amount: amount,
-						minRequirement: minAllowed,
-						maxRequirement: maxAllowed,
-					});
-					return true;
+				// For specific elementTypes:
+				else if (rule.elementTypeKey) {
+					const amount = layoutEntries.filter((entry) => {
+						const contentTypeKey = this._manager!.getContentOf(entry.contentUdi)?.contentTypeKey;
+						return contentTypeKey === rule.elementTypeKey;
+					}).length;
+					if (amount < minAllowed || (maxAllowed > 0 ? amount > maxAllowed : false)) {
+						return {
+							key: rule.elementTypeKey,
+							name: this._manager!.getContentTypeNameOf(rule.elementTypeKey) ?? '?',
+							amount: amount,
+							minRequirement: minAllowed,
+							maxRequirement: maxAllowed,
+						};
+					}
+					return undefined;
 				}
-			}
 
-			// Lets fail cause the rule was bad.
-			console.error('Invalid block type limit rule.', rule);
-			return false;
-		});
+				// Lets fail cause the rule was bad.
+				console.error('Invalid block type limit rule.', rule);
+				return undefined;
+			})
+			.filter((x) => x !== undefined) as Array<UmbBlockGridAreaTypeInvalidRuleType>;
+		const hasInvalidRules = this.#invalidBlockTypeLimits.length > 0;
 		return hasInvalidRules === false;
 	}
 

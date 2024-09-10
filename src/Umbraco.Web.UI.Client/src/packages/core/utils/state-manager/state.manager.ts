@@ -77,6 +77,15 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 	}
 
 	/**
+	 * Get all states from the state manager
+	 * @returns {StateType[]} {StateType[]} All states in the state manager
+	 * @memberof UmbStateManager
+	 */
+	getStates() {
+		return this._states.getValue();
+	}
+
+	/**
 	 * Clear all states from the state manager
 	 * @memberof UmbStateManager
 	 */

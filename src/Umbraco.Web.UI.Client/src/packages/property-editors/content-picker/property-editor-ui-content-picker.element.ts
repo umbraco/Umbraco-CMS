@@ -6,7 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -36,6 +35,15 @@ export class UmbPropertyEditorUIContentPickerElement
 		return this.#value;
 	}
 	#value?: UmbContentPickerValueType = [];
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	_type: UmbContentPickerSource['type'] = 'content';
@@ -114,13 +122,11 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
-		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
-		const unique = workspaceContext.getUnique();
-		if (!unique) return;
-
 		const menuStructureWorkspaceContext = (await this.getContext('UmbMenuStructureWorkspaceContext')) as any;
-		const parent = (await this.observe(menuStructureWorkspaceContext.parent, () => {})?.asPromise()) as any;
-		const parentUnique = parent?.unique;
+		const structure = (await this.observe(menuStructureWorkspaceContext.structure, () => {})?.asPromise()) as any[];
+		const [parentUnique, unique] = structure?.slice(-2).map((x) => x.unique) ?? [];
+
+		if (!unique) return;
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
@@ -150,6 +156,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				.startNode=${startNode}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
 				?showOpenButton=${this._showOpenButton}
+				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-content>
 		`;
 	}

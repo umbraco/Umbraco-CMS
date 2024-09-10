@@ -1,5 +1,6 @@
 import { UMB_BLOCK_ELEMENT_PROPERTY_DATASET_CONTEXT } from './block-element-property-dataset.context-token.js';
 import type { UmbBlockElementManager } from './block-element-manager.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -52,6 +53,16 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 			'umbObserveReadOnlyStates',
 		);
 		*/
+
+		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspace) => {
+			this.observe(
+				workspace.readOnlyState.isOn,
+				(value) => {
+					this.#currentVariantCultureIsReadOnly.setValue(value);
+				},
+				'umbObserveReadOnlyStates',
+			);
+		});
 
 		this.provideContext(UMB_BLOCK_ELEMENT_PROPERTY_DATASET_CONTEXT, this);
 	}
