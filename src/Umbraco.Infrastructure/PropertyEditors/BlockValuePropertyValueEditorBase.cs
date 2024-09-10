@@ -229,7 +229,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         }
     }
 
-    internal object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
+    internal virtual object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
     {
         if (sourceValue is null)
         {
@@ -248,13 +248,19 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             (targetValue is not null ? BlockEditorValues.DeserializeAndClean(targetValue) : null)
             ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(sourceBlockEditorValues.Layout));
 
+        TValue mergeResult = MergeBlockEditorDataForCulture(sourceBlockEditorValues.BlockValue, targetBlockEditorValues.BlockValue, culture);
+        return _jsonSerializer.Serialize(mergeResult);
+    }
+
+    protected TValue MergeBlockEditorDataForCulture(TValue sourceBlockValue, TValue targetBlockValue, string? culture)
+    {
         // structure is global, and layout follows structure
-        targetBlockEditorValues.BlockValue.Layout = sourceBlockEditorValues.BlockValue.Layout;
+        targetBlockValue.Layout = sourceBlockValue.Layout;
 
-        MergePartialPropertyValueForCulture(sourceBlockEditorValues.BlockValue.ContentData, targetBlockEditorValues.BlockValue.ContentData, culture);
-        MergePartialPropertyValueForCulture(sourceBlockEditorValues.BlockValue.SettingsData, targetBlockEditorValues.BlockValue.SettingsData, culture);
+        MergePartialPropertyValueForCulture(sourceBlockValue.ContentData, targetBlockValue.ContentData, culture);
+        MergePartialPropertyValueForCulture(sourceBlockValue.SettingsData, targetBlockValue.SettingsData, culture);
 
-        return _jsonSerializer.Serialize(targetBlockEditorValues.BlockValue);
+        return targetBlockValue;
     }
 
     private void MergePartialPropertyValueForCulture(List<BlockItemData> sourceBlockItems, List<BlockItemData> targetBlockItems, string? culture)
