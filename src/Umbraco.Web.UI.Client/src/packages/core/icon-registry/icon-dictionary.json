@@ -1983,7 +1983,7 @@
 		{
 			"name": "icon-shoe",
 			"file": "footprints.svg",
-			"legay": true
+			"legacy": true
 		},
 		{
 			"name": "icon-shopping-basket-alt-2",
