@@ -7,6 +7,8 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
+import '../../components/input-tiptap/input-tiptap.element.js';
+
 // Look at Tiny for correct types
 export interface UmbRichTextEditorValueType {
 	markup?: string;
