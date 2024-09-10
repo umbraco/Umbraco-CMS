@@ -45,7 +45,8 @@ export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuI
 			<umb-menu-item-layout
 				.href=${this._href}
 				.iconName=${this.manifest.meta.icon ?? ''}
-				.label=${this.localize.string(this.manifest.meta.label ?? this.manifest.name)}>
+				.label=${this.localize.string(this.manifest.meta.label ?? this.manifest.name)}
+				.entityType=${this.manifest.meta.entityType}>
 			</umb-menu-item-layout>
 		`;
 	}
