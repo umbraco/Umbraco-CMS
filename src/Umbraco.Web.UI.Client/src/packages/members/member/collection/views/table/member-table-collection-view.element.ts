@@ -21,6 +21,14 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 			alias: 'memberName',
 		},
 		{
+			name: this.localize.term('general_username'),
+			alias: 'memberUsername',
+		},
+		{
+			name: this.localize.term('general_email'),
+			alias: 'memberEmail',
+		},
+		{
 			name: this.localize.term('member_kind'),
 			alias: 'memberKind',
 		},
@@ -46,6 +54,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(members: Array<UmbMemberCollectionModel>) {
+		console.log('members', members);
 		this._tableItems = members.map((member) => {
 			// TODO: get correct variant name
 			const name = member.variants[0].name;
@@ -61,6 +70,14 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'memberName',
 						value: html`<a href=${'section/member-management/workspace/member/edit/' + member.unique}>${name}</a>`,
+					},
+					{
+						columnAlias: 'memberUsername',
+						value: member.username,
+					},
+					{
+						columnAlias: 'memberEmail',
+						value: member.email,
 					},
 					{
 						columnAlias: 'memberKind',
