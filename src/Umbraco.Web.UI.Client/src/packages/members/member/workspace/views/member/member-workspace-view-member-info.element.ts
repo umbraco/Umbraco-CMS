@@ -8,13 +8,16 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
+import { UmbMemberKind, UmbMemberKindType } from '../../../utils/index.js';
 
 @customElement('umb-member-workspace-view-member-info')
 export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	private _memberTypeUnique = '';
+
 	@state()
 	private _memberTypeName = '';
+
 	@state()
 	private _memberTypeIcon = '';
 
@@ -29,6 +32,9 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 
 	@state()
 	private _unique = '';
+
+	@state()
+	private _memberKind?: UmbMemberKindType;
 
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 	#memberTypeItemRepository: UmbMemberTypeItemRepository = new UmbMemberTypeItemRepository(this);
@@ -51,6 +57,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			this.observe(this.#workspaceContext.createDate, (date) => (this._createDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext.updateDate, (date) => (this._updateDate = this.#setDateFormat(date)));
 			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique || ''));
+			this.observe(this.#workspaceContext.kind, (kind) => (this._memberKind = kind));
 
 			const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
 			if (!memberType) return;
@@ -87,6 +94,14 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 						.href=${this._editMemberTypePath + 'edit/' + this._memberTypeUnique}>
 						<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
 					</uui-ref-node>
+				</div>
+				<div>
+					<h4><umb-localize key="member_kind"></umb-localize></h4>
+					<span
+						>${this._memberKind === UmbMemberKind.API
+							? this.localize.term('member_memberKindApi')
+							: this.localize.term('member_memberKindDefault')}</span
+					>
 				</div>
 				<div>
 					<h4><umb-localize key="template_id">Id</umb-localize></h4>
