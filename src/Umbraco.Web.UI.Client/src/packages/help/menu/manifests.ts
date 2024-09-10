@@ -9,24 +9,28 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	},
 	{
 		type: 'menuItem',
+		kind: 'link',
 		alias: 'Umb.MenuItem.Help.LearningBase',
 		name: 'Learning Base Help Menu Item',
 		weight: 200,
 		meta: {
+			menus: [UMB_HELP_MENU_ALIAS],
 			label: 'Umbraco Learning Base',
 			icon: 'icon-movie-alt',
-			menus: [UMB_HELP_MENU_ALIAS],
+			href: 'https://learn.umbraco.com',
 		},
 	},
 	{
 		type: 'menuItem',
+		kind: 'link',
 		alias: 'Umb.MenuItem.Help.CommunityWebsite',
 		name: 'Community Website Help Menu Item',
 		weight: 100,
 		meta: {
+			menus: [UMB_HELP_MENU_ALIAS],
 			label: 'Community Website',
 			icon: 'icon-hearts',
-			menus: [UMB_HELP_MENU_ALIAS],
+			href: 'https://our.umbraco.com',
 		},
 	},
 ];

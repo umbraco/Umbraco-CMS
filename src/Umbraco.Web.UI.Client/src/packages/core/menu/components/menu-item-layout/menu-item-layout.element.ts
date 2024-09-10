@@ -47,6 +47,14 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
 
+	#getTarget() {
+		if (this.href && this.href.startsWith('http')) {
+			return '_blank';
+		}
+
+		return '_self';
+	}
+
 	#checkIsActive() {
 		if (!this.href) {
 			this._isActive = false;
@@ -63,7 +71,8 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 			label=${this.label}
 			.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this.label}
 			?active=${this._isActive}
-			?has-children=${this.hasChildren}>
+			?has-children=${this.hasChildren}
+			target=${this.#getTarget()}>
 			<umb-icon slot="icon" name=${this.iconName}></umb-icon>
 			${this.entityType
 				? html`<umb-entity-actions-bundle
