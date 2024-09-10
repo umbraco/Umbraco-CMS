@@ -18,7 +18,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 			menus: [UMB_HELP_MENU_ALIAS],
 			label: 'Umbraco Learning Base',
 			icon: 'icon-movie-alt',
-			href: 'https://learn.umbraco.com',
+			href: 'https://umbra.co/ulb',
 		},
 		conditions: [
 			{
@@ -36,7 +36,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 			menus: [UMB_HELP_MENU_ALIAS],
 			label: 'Community Website',
 			icon: 'icon-hearts',
-			href: 'https://our.umbraco.com',
+			href: 'https://our.umbraco.com?utm_source=core&amp;utm_medium=help&amp;utm_content=link&amp;utm_campaign=our',
 		},
 		conditions: [
 			{
