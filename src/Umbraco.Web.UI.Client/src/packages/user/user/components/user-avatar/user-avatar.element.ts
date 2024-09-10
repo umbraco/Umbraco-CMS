@@ -118,7 +118,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		css`
 			uui-avatar {
 				background-color: transparent;
-				border: 1.5px solid var(--uui-color-divider-standalone);
+				border: 1.5px solid var(--uui-color-border);
 				color: inherit;
 			}
 
@@ -127,7 +127,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 			}
 
 			uui-avatar.api {
-				border-radius: var(--uui-border-radius);
+				border-radius: 9%;
 			}
 		`,
 	];
