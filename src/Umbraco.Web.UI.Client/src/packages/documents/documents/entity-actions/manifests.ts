@@ -12,6 +12,7 @@ import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
+import { manifests as notificationManifests } from './notifications/manifests.js';
 
 import type { ManifestEntityAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -143,4 +144,5 @@ export const manifests: Array<ManifestTypes> = [
 	...publicAccessManifests,
 	...sortChildrenOfManifests,
 	...entityActions,
+	...notificationManifests,
 ];
