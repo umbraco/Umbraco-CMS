@@ -58,7 +58,7 @@ export class UmbCodeBlockElement extends LitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
