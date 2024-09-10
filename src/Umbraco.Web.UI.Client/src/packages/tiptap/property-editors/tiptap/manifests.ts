@@ -8,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		element: () => import('./property-editor-ui-tiptap.element.js'),
 		meta: {
 			label: 'Tiptap Editor',
-			propertyEditorSchemaAlias: 'Umbraco.Tiptap',
+			propertyEditorSchemaAlias: 'Umbraco.Plain.Json',
 			icon: 'icon-document',
 			group: 'richText',
 		},
