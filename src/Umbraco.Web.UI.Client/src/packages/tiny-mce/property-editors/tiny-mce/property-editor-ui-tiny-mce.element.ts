@@ -3,8 +3,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-
-import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import {
 	UmbBlockRteEntriesContext,
 	type UmbBlockRteLayoutModel,
@@ -12,6 +10,8 @@ import {
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+
+import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
 export interface UmbRichTextEditorValueType {
 	markup: string;
