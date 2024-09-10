@@ -1,5 +1,4 @@
 import type { UmbUserGroupDetailModel } from '../index.js';
-import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
