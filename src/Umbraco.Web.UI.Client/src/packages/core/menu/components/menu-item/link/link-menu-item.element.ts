@@ -8,10 +8,21 @@ export class UmbLinkMenuItemElement extends UmbLitElement implements UmbMenuItem
 	@property({ type: Object, attribute: false })
 	manifest?: ManifestMenuItemLinkKind;
 
+	#getTarget() {
+		const href = this.manifest?.meta.href;
+
+		if (href && href.startsWith('http')) {
+			return '_blank';
+		}
+
+		return '_self';
+	}
+
 	override render() {
 		return html`
 			<umb-menu-item-layout
 				.href=${this.manifest?.meta.href}
+				target=${this.#getTarget()}
 				.iconName=${this.manifest?.meta.icon ?? ''}
 				.label=${this.localize.string(this.manifest?.meta.label ?? this.manifest?.name ?? '')}>
 			</umb-menu-item-layout>
