@@ -95,7 +95,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		// Check for an exact match
 		const exactMatch = this.#previewers.find((preview) => {
-			return preview.forMimeTypes.find((type) => type === mimeType);
+			return preview.forMimeTypes.includes(mimeType);
 		});
 		if (exactMatch) return exactMatch.alias;
 
