@@ -16,6 +16,7 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -37,6 +38,7 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+	#variantId?: UmbVariantId;
 
 	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).
 	getEntityType() {
@@ -293,6 +295,7 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#gotManager() {
+		this.#observeVariantId();
 		this.#observeBlockType();
 		this.#observeContentData();
 		this.#observeSettingsData();
@@ -367,6 +370,20 @@ export abstract class UmbBlockEntryContext<
 
 	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
 
+	#observeVariantId() {
+		if (!this._manager) return;
+
+		// observe blockType:
+		this.observe(
+			this._manager.variantId,
+			(variantId) => {
+				this.#variantId = variantId;
+				this.#gotVariantId();
+			},
+			'observeBlockType',
+		);
+	}
+
 	#observeBlockType() {
 		if (!this._manager) return;
 		const contentTypeKey = this.#content.getValue()?.contentTypeKey;
@@ -403,6 +420,11 @@ export abstract class UmbBlockEntryContext<
 				'observeContentTypeName',
 			);
 		}
+	}
+
+	#gotVariantId() {
+		if (!this.#variantId) return;
+		// TODO: Handle variantId changes
 	}
 
 	// Public methods:

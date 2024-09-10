@@ -5,16 +5,14 @@ import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase implements UmbPropertyDatasetContext {
 	#elementManager: UmbBlockElementManager;
-	#variantId: UmbVariantId;
 	public getVariantId() {
-		return this.#variantId;
+		return this.#elementManager.getVariantId();
 	}
 
 	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
@@ -34,12 +32,12 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	}
 	readonly name: Observable<string | undefined> = 'TODO: get label observable' as any;
 
-	constructor(host: UmbControllerHost, elementManager: UmbBlockElementManager, variantId?: UmbVariantId) {
+	constructor(host: UmbControllerHost, elementManager: UmbBlockElementManager) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, UMB_PROPERTY_DATASET_CONTEXT.toString());
 		this.#elementManager = elementManager;
-		this.#variantId = variantId ?? UmbVariantId.CreateInvariant();
 
+		// Niels: I think this should be implemented in the Block Element Manager...
 		/*
 		this.observe(
 			this.#elementManager.readOnlyState.states,
@@ -67,13 +65,6 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 		this.provideContext(UMB_BLOCK_ELEMENT_PROPERTY_DATASET_CONTEXT, this);
 	}
 
-	#createPropertyVariantId(property: UmbPropertyTypeModel) {
-		return UmbVariantId.Create({
-			culture: property.variesByCulture ? this.#variantId.culture : null,
-			segment: property.variesBySegment ? this.#variantId.segment : null,
-		});
-	}
-
 	propertyVariantId?(propertyAlias: string): Promise<Observable<UmbVariantId | undefined>> {
 		return this.#elementManager.propertyVariantId(propertyAlias);
 	}
@@ -96,16 +87,7 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	 * @description Set the value of this property.
 	 */
 	async setPropertyValue(alias: string, value: PromiseLike<unknown>) {
-		this.#elementManager.initiatePropertyValueChange();
-		// This is not reacting to if the property variant settings changes while running.
-		const property = await this.#elementManager.structure.getPropertyStructureByAlias(alias);
-		if (property) {
-			const variantId = this.#createPropertyVariantId(property);
-
-			// This is not reacting to if the property variant settings changes while running.
-			this.#elementManager.setPropertyValue(alias, await value, variantId);
-		}
-		this.#elementManager.finishPropertyValueChange();
+		this.#elementManager.setPropertyValue(alias, value);
 	}
 
 	/**
