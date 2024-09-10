@@ -6,7 +6,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbMemberItemRepository } from '../../../repository/index.js';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-member-table-collection-view')

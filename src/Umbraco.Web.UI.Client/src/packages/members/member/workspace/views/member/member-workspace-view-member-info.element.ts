@@ -1,5 +1,6 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
+import type { UmbMemberKindType } from '../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -8,7 +9,6 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
-import { UmbMemberKind, UmbMemberKindType } from '../../../utils/index.js';
 
 @customElement('umb-member-workspace-view-member-info')
 export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
