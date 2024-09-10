@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -45,8 +45,7 @@ export abstract class UmbBlockManagerContext<
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	variantId = this.#variantId.asObservable();
 
-	#contentTypes = new UmbArrayState(<Array<UmbContentTypeModel>>[], (x) => x.unique);
-	//public readonly contentTypes = this.#contentTypes.asObservable();
+	#structures: Array<UmbContentTypeStructureManager> = [];
 
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
@@ -124,36 +123,41 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	async #ensureContentType(unique: string) {
-		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
+		if (this.#structures.find((x) => x.getOwnerContentTypeUnique() === unique)) return;
 
-		const contentTypeRequest = this.#contentTypeRepository.requestByUnique(unique);
-		this.#contentTypeRequests.push(contentTypeRequest);
-		const { data } = await contentTypeRequest;
-		if (!data) {
-			this.#contentTypes.removeOne(unique);
-			return;
-		}
-
-		// We could have used the global store of Document Types, but to ensure we first react ones the latest is loaded then we have our own local store:
-		// TODO: Revisit if this is right to do. Notice this can potentially be proxied to the global store. In that way we do not need to observe and we can just use the global store for data.
-		this.#contentTypes.appendOne(data);
+		// Lets try to go with the UmbContentTypeModel, to make this as compatible with other ContentTypes as possible, but maybe if off with this as Blocks are always based on ElementTypes.. [NL]
+		const structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(this, this.#contentTypeRepository);
+		const initialRequest = structure.loadType(unique);
+		this.#contentTypeRequests.push(initialRequest);
+		this.#structures.push(structure);
 	}
 
 	getContentTypeKeyOfContentUdi(contentUdi: string) {
 		return this.getContentOf(contentUdi)?.contentTypeKey;
 	}
 	contentTypeOf(contentTypeKey: string) {
-		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey));
+		const structure = this.#structures.find((x) => x.getOwnerContentTypeUnique() === contentTypeKey);
+		if (!structure) return undefined;
+
+		return structure.ownerContentType;
 	}
 	contentTypeNameOf(contentTypeKey: string) {
-		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey)?.name);
+		const structure = this.#structures.find((x) => x.getOwnerContentTypeUnique() === contentTypeKey);
+		if (!structure) return undefined;
+
+		return structure.ownerContentTypePart((x) => x?.name);
 	}
 	getContentTypeNameOf(contentTypeKey: string) {
-		return this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.name;
+		const structure = this.#structures.find((x) => x.getOwnerContentTypeUnique() === contentTypeKey);
+		if (!structure) return undefined;
+
+		return structure.getOwnerContentType()?.name;
 	}
 	getContentTypeHasProperties(contentTypeKey: string) {
-		const properties = this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.properties;
-		return properties ? properties.length > 0 : false;
+		const structure = this.#structures.find((x) => x.getOwnerContentTypeUnique() === contentTypeKey);
+		if (!structure) return undefined;
+
+		return structure.getHasProperties();
 	}
 	blockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.asObservablePart((source) =>

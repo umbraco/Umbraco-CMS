@@ -220,6 +220,14 @@ export class UmbContentTypeStructureManager<
 		return this.#ownerContentTypeUnique;
 	}
 
+	/**
+	 * Figure out if any of the Content Types has a Property.
+	 * @returns {boolean} - true if any of the Content Type in this composition has a Property.
+	 */
+	getHasProperties() {
+		return this.#contentTypes.getValue().some((y) => y.properties.length > 0);
+	}
+
 	updateOwnerContentType(entry: Partial<T>) {
 		this.#contentTypes.updateOne(this.#ownerContentTypeUnique, entry);
 	}
