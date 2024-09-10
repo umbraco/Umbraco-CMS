@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -13,6 +14,7 @@ public interface IDocumentUrlService
     /// <returns></returns>
     Task InitAsync(bool forceEmpty, CancellationToken cancellationToken);
 
+    Task RebuildAllUrlsAsync();
     /// <summary>
     /// Gets the Url from a document key, culture and segment. Preview urls are returned if isPreview is true.
     /// </summary>
@@ -29,4 +31,8 @@ public interface IDocumentUrlService
     Task DeleteUrlsAsync(IEnumerable<IContent> documents);
 
     Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft);
+    //Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey);
+    Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key);
+    Task DeleteUrlsAndDescendantsAsync(Guid key);
+    Task CreateOrUpdateUrlSegmentsAsync(Guid key);
 }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
@@ -413,6 +414,52 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         return runnerKey;
+    }
+
+//     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
+//     {
+//         if(_documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out var ancestorsKeys))
+//         {
+//             var languages = await _languageService.GetAllAsync();
+//             var cultures = languages.Select(x=>x.IsoCode);
+//
+//             foreach (Guid ancestorKey in ancestorsKeys)
+//             {
+// TODO her skal vi lave skabe en full url med domainer.
+//
+//                 foreach (var culture in cultures)
+//                 {
+//                     if (_cache.TryGetValue(CreateCacheKey(ancestorKey, culture, false), out PublishedDocumentUrlSegment? urlSegment))
+//                     {
+//                         //yield return new UrlInfo(urlSegment.UrlSegment, true, culture);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+    public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
+    {
+        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+        IEnumerable<IContent> contents = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        await CreateOrUpdateUrlSegmentsAsync(contents);
+    }
+
+    public async Task DeleteUrlsAndDescendantsAsync(Guid key)
+    {
+        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+        IEnumerable<IContent> contents = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        await DeleteUrlsAsync(contents);
+    }
+
+    public async Task CreateOrUpdateUrlSegmentsAsync(Guid key)
+    {
+        IContent? content = _contentService.GetById(key);
+
+        if (content is not null)
+        {
+            await CreateOrUpdateUrlSegmentsAsync(content.Yield());
+        }
     }
 
     //TODO test cases:

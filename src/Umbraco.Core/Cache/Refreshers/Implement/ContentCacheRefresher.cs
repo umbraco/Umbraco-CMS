@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -14,9 +16,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     ContentCacheRefresher.JsonPayload>
 {
     private readonly IDomainService _domainService;
+    private readonly IDocumentUrlService _documentUrlService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedSnapshotService _publishedSnapshotService;
 
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -25,11 +29,34 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IDomainService domainService,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory)
+        : this(
+            appCaches,
+            serializer,
+            publishedSnapshotService,
+            idKeyMap,
+            domainService,
+            eventAggregator,
+            factory,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
+
+    }
+
+    public ContentCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IPublishedSnapshotService publishedSnapshotService,
+        IIdKeyMap idKeyMap,
+        IDomainService domainService,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IDocumentUrlService documentUrlService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _publishedSnapshotService = publishedSnapshotService;
         _idKeyMap = idKeyMap;
         _domainService = domainService;
+        _documentUrlService = documentUrlService;
     }
 
     #region Indirect
@@ -75,6 +102,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             // By GUID Key
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
 
+
             _idKeyMap.ClearCache(payload.Id);
 
             // remove those that are in the branch
@@ -89,6 +117,10 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             {
                 idsRemoved.Add(payload.Id);
             }
+
+
+            HandleRouting(payload);
+
         }
 
         if (idsRemoved.Count > 0)
@@ -127,6 +159,35 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
 
         base.Refresh(payloads);
+    }
+
+    private void HandleRouting(JsonPayload payload)
+    {
+        //TODO test at denne methode bliver kaldt ved save også.
+
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            _documentUrlService.DeleteUrlsAndDescendantsAsync(key).GetAwaiter().GetResult();
+        }
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            //TODO Force rebuilt instead
+            _documentUrlService.RebuildAllUrlsAsync().GetAwaiter().GetResult(); //TODO make async
+        }
+
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
+        }
+
+        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
+        }
+
     }
 
     // these events should never trigger

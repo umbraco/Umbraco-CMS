@@ -20,11 +20,11 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder
-            .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentUnpublishedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
+        // builder
+        //     .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>()
+        //     .AddNotificationAsyncHandler<ContentUnpublishedNotification, RoutingNotificationHandler>()
+        //     .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
+        //     .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
 
     }
     //

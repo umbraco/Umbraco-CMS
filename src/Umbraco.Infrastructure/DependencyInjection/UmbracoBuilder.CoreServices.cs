@@ -416,11 +416,11 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationAsyncHandler<ContentTypeSavedNotification, WarnDocumentTypeElementSwitchNotificationHandler>();
 
         // Handlers for routing
-        builder
-            .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentUnpublishedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
+        // builder
+        //     .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>()
+        //     .AddNotificationAsyncHandler<ContentUnpublishedNotification, RoutingNotificationHandler>()
+        //     .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
+        //     .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
 
         return builder;
     }
