@@ -5,7 +5,7 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import './tiptap-fixed-menu.element.js';
-import { Editor, StarterKit } from '@umbraco-cms/backoffice/external/tiptap';
+import { Editor, StarterKit, TextAlign, Underline } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-tiptap')
@@ -28,7 +28,13 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 		// TODO: Try Disable css inject to remove prosemirror css
 		this._editor = new Editor({
 			element: editor,
-			extensions: [StarterKit],
+			extensions: [
+				StarterKit,
+				TextAlign.configure({
+					types: ['heading', 'paragraph', 'blockquote', 'ordered_list', 'bullet_list'],
+				}),
+				Underline,
+			],
 			content: json,
 			onUpdate: ({ editor }) => {
 				const json = editor.getJSON();
@@ -44,7 +50,7 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	override render() {
 		return html`
-			<umb-tiptap-fixed-menu .editor=${this._editor}></umb-tiptap-fixed-menu>
+			<umb-tiptap-fixed-menu class="uui-text uui-font" .editor=${this._editor}></umb-tiptap-fixed-menu>
 			<div id="editor"></div>
 		`;
 	}
@@ -54,6 +60,9 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 			#editor {
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
+				border-top-left-radius: 0;
+				border-top-right-radius: 0;
+				border-top: 0;
 				margin: 0 auto;
 				box-sizing: border-box;
 				height: 100%;
@@ -62,6 +71,18 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				overflow: clip;
 				min-height: 400px;
 				display: grid; /* Don't ask me why this is needed, but it is. */
+			}
+
+			#editor pre {
+				background-color: var(--uui-color-surface-alt);
+				padding: var(--uui-size-space-2) var(--uui-size-space-4);
+				border-radius: calc(var(--uui-border-radius) * 2);
+			}
+
+			#editor code:not(pre > code) {
+				background-color: var(--uui-color-surface-alt);
+				padding: var(--uui-size-space-1) var(--uui-size-space-2);
+				border-radius: calc(var(--uui-border-radius) * 2);
 			}
 
 			#editor code {
@@ -77,12 +98,12 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				outline: none;
 				white-space: pre-wrap;
 			}
-			.ProseMirror p,
-			.ProseMirror h1,
-			.ProseMirror h2,
-			.ProseMirror h3 {
+			#editor p,
+			#editor h1,
+			#editor h2,
+			#editor h3 {
 				margin-top: 0;
-				margin-bottom: 0.1rem;
+				margin-bottom: 0.5em;
 			}
 		`,
 	];
