@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Content;
 public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel> : ManagementApiControllerBase
     where TContent : class, IContentBase
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
-    where TValueResponseModelBase : ValueModelBase
+    where TValueResponseModelBase : ValueResponseModelBase
     where TVariantResponseModel : VariantResponseModelBase
 {
     private readonly IUmbracoMapper _mapper;
