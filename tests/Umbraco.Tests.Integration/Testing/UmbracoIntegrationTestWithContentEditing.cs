@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
@@ -57,14 +58,25 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
-        ContentTypeCreateModel =
-            ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);
+        ContentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);
         ContentTypeCreateModel.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
         ContentTypeCreateModel.AllowedAsRoot = true;
-        ContentTypeCreateModel.AllowedContentTypes = new[] { new ContentTypeSort((Guid)ContentTypeCreateModel.Key, 0, ContentTypeCreateModel.Alias) };
-        var contentTypeResult = await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeResult.Success);
-        ContentType = contentTypeResult.Result;
+        // ContentTypeCreateModel.AllowedContentTypes = new ContentTypeSort[] { new (ContentTypeCreateModel.Key.Value, 1, ContentTypeCreateModel.Alias ) };
+        // ContentTypeCreateModel.AllowedContentTypes = new[] { new ContentTypeSort((Guid)ContentTypeCreateModel.Key, 0, ContentTypeCreateModel.Alias) };
+        var contentTypeAttempt =
+            await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeAttempt.Success);
+
+        var contentTypeResult = contentTypeAttempt.Result;
+        ContentTypeUpdateHelper contentTypeUpdateHelper = new ContentTypeUpdateHelper();
+        ContentTypeUpdateModel contentTypeUpdateModel = contentTypeUpdateHelper.CreateContentTypeUpdateModel(contentTypeResult); contentTypeUpdateModel.AllowedContentTypes = new[]
+        {
+            new ContentTypeSort((Guid)ContentTypeCreateModel.Key, 0, ContentTypeCreateModel.Alias)
+        };
+
+        var updatedContentTypeResult = await ContentTypeEditingService.UpdateAsync(contentTypeResult, contentTypeUpdateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updatedContentTypeResult.Success);
+        ContentType = updatedContentTypeResult.Result;
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentEditingBuilder.CreateSimpleContent(ContentTypeCreateModel);
