@@ -76,21 +76,19 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 						this._loading,
 						() => html`<uui-loader-bar></uui-loader-bar>`,
 						() => html`
-							<uui-box id="sysinfo-table">
-								<uui-scroll-container id="container">
-									<uui-table aria-label="System information">
-										<uui-table-column style="width: 20%"></uui-table-column>
-										<uui-table-column style="width: 80%"></uui-table-column>
+							<uui-scroll-container id="container">
+								<uui-table aria-label="System information">
+									<uui-table-column style="width: 20%"></uui-table-column>
+									<uui-table-column style="width: 80%"></uui-table-column>
 
-										<uui-table-head>
-											<uui-table-head-cell>Name</uui-table-head-cell>
-											<uui-table-head-cell>Data</uui-table-head-cell>
-										</uui-table-head>
+									<uui-table-head>
+										<uui-table-head-cell>Name</uui-table-head-cell>
+										<uui-table-head-cell>Data</uui-table-head-cell>
+									</uui-table-head>
 
-										${this.#renderServerKeyValues()}
-									</uui-table>
-								</uui-scroll-container>
-							</uui-box>
+									${this.#renderServerKeyValues()}
+								</uui-table>
+							</uui-scroll-container>
 						`,
 					)}
 
@@ -143,10 +141,6 @@ ${serverKeyValues}`;
 		css`
 			#container {
 				max-height: 300px;
-			}
-
-			#sysinfo-table {
-				--uui-box-default-padding: 0;
 			}
 
 			.data-cell {
