@@ -127,16 +127,15 @@ export abstract class UmbBlockEntryContext<
 	);
 
 	#content = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
-	public readonly content = this.#content.asObservable();
+	//public readonly content = this.#content.asObservable();
 	public readonly contentTypeKey = this.#content.asObservablePart((x) => x?.contentTypeKey);
 	public readonly contentValues = this.#content.asObservablePart((x) =>
+		// TODO: Combine Variant ID with DataSet Values.
 		x?.values.reduce((acc, curr) => {
 			acc[curr.alias] = curr.value;
 			return acc;
 		}, {} as UmbBlockDataType),
 	);
-
-	// TODO: Make sure changes to the Block Content / Settings are reflected back to Manager.
 
 	#settings = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
@@ -144,6 +143,7 @@ export abstract class UmbBlockEntryContext<
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
 	public readonly settingsValues = this.#content.asObservablePart((x) =>
+		// TODO: Combine Variant ID with DataSet Values.
 		x?.values.reduce((acc, curr) => {
 			acc[curr.alias] = curr.value;
 			return acc;

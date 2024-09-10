@@ -2,7 +2,7 @@ import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/block-grid-entry.con
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 import '@umbraco-cms/backoffice/ufm';
 import '../block-grid-areas-container/index.js';
@@ -21,14 +21,14 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	config?: UmbBlockEditorCustomViewConfiguration;
 
 	@state()
-	_content?: UmbBlockDataModel;
+	_content?: UmbBlockDataType;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.content,
+				context.contentValues,
 				(content) => {
 					this._content = content;
 				},
