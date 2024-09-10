@@ -97,18 +97,20 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 	#renderInfoList() {
 		return html`
-			${repeat(
-				this._userInfo,
-				(item) => item.labelKey,
-				(item) => this.#renderInfoItem(item.labelKey, item.value),
-			)}
+			<umb-stack look="compact">
+				${repeat(
+					this._userInfo,
+					(item) => item.labelKey,
+					(item) => this.#renderInfoItem(item.labelKey, item.value),
+				)}
+			</umb-stack>
 		`;
 	}
 
 	#renderInfoItem(labelKey: string, value?: string | number) {
 		return html`
-			<div class="user-info-item">
-				<b><umb-localize key=${labelKey}></umb-localize></b>
+			<div>
+				<h4><umb-localize key=${labelKey}></umb-localize></h4>
 				<span>${value}</span>
 			</div>
 		`;
@@ -125,15 +127,13 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				width: fit-content;
 			}
 
+			h4 {
+				margin: 0;
+			}
+
 			#state {
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding-bottom: var(--uui-size-space-4);
-			}
-
-			.user-info-item {
-				display: flex;
-				flex-direction: column;
-				margin-bottom: var(--uui-size-space-3);
 			}
 		`,
 	];
