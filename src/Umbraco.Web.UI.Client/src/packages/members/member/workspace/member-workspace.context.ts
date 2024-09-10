@@ -53,6 +53,7 @@ export class UmbMemberWorkspaceContext
 	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
 	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.memberType.unique);
+	readonly kind = this.#currentData.asObservablePart((data) => data?.kind);
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMemberTypeDetailRepository(this));
 
 	readonly varies = this.structure.ownerContentTypePart((x) =>
