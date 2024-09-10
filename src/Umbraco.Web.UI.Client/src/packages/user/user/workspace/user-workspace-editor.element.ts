@@ -13,6 +13,8 @@ import './components/user-workspace-access/user-workspace-access.element.js';
 import './components/user-workspace-info/user-workspace-info.element.js';
 import './components/user-workspace-avatar/user-workspace-avatar.element.js';
 import './components/user-workspace-client-credentials/user-workspace-client-credentials.element.js';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_USER_ROOT_WORKSPACE_PATH } from '../paths.js';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
@@ -50,7 +52,10 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.User" class="uui-text" back-path="section/user-management">
+			<umb-workspace-editor
+				alias=${UMB_USER_WORKSPACE_ALIAS}
+				class="uui-text"
+				back-path=${UMB_USER_ROOT_WORKSPACE_PATH}>
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
