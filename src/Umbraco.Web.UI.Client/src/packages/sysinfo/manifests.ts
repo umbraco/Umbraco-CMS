@@ -3,13 +3,13 @@ import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/exten
 const modalManifests: Array<ManifestModal> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Sysinfo.Modal',
+		alias: 'Umb.Modal.Sysinfo',
 		name: 'Sysinfo Modal',
 		js: () => import('./components/sysinfo.element.js'),
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.NewVersion.Modal',
+		alias: 'Umb.Modal.NewVersion',
 		name: 'New Version Modal',
 		js: () => import('./components/new-version.element.js'),
 	},
