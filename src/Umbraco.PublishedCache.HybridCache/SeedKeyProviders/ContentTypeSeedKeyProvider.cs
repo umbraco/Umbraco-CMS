@@ -7,7 +7,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
 
 internal class ContentTypeSeedKeyProvider : IDocumentSeedKeyProvider
 {
-    private Guid[]? _documentKeys = null;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly CacheSettings _cacheSettings;
@@ -22,17 +21,12 @@ internal class ContentTypeSeedKeyProvider : IDocumentSeedKeyProvider
         _cacheSettings = cacheSettings.Value;
     }
 
-    public IEnumerable<Guid> GetSeedKeys()
+    public ISet<Guid> GetSeedKeys()
     {
-        if (_documentKeys is not null)
-        {
-            return _documentKeys;
-        }
-
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _documentKeys = _databaseCacheRepository.GetContentKeysByContentTypeKeys(_cacheSettings.ContentTypeKeys).ToArray();
+        var documentKeys = _databaseCacheRepository.GetContentKeysByContentTypeKeys(_cacheSettings.ContentTypeKeys).ToHashSet();
         scope.Complete();
 
-        return _documentKeys;
+        return documentKeys;
     }
 }

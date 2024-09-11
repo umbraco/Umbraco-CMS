@@ -17,15 +17,15 @@ public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
         _cacheSettings = cacheSettings.Value;
     }
 
-    public IEnumerable<Guid> GetSeedKeys()
+    public ISet<Guid> GetSeedKeys()
     {
         Queue<Guid> keyQueue = new();
-        List<Guid> keys = new();
+        HashSet<Guid> keys = [];
         int keyCount = 0;
 
-        if(_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
         {
-            return [];
+            return new HashSet<Guid>();
         }
 
         foreach (Guid key in rootKeys)
@@ -33,7 +33,7 @@ public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
             keyCount++;
             keys.Add(key);
             keyQueue.Enqueue(key);
-            if(keyCount == _cacheSettings.BreadthFirstSeedCount)
+            if (keyCount == _cacheSettings.BreadthFirstSeedCount)
             {
                 return keys;
             }
@@ -52,10 +52,11 @@ public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
             {
                 keys.Add(childKey);
                 keyCount++;
-                if(keyCount == _cacheSettings.BreadthFirstSeedCount)
+                if (keyCount == _cacheSettings.BreadthFirstSeedCount)
                 {
                     return keys;
                 }
+
                 keyQueue.Enqueue(childKey);
             }
         }
