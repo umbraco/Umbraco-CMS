@@ -12,6 +12,7 @@ import {
 	heading3,
 	horizontalRule,
 	italic,
+	link,
 	orderedList,
 	strikethrough,
 	underline,
@@ -35,92 +36,130 @@ export class UmbTiptapFixedMenuElement extends LitElement {
 		{
 			name: 'bold',
 			icon: bold,
+			isActive: () => this.editor?.isActive('bold'),
 			command: () => this.editor?.chain().focus().toggleBold().run(),
 		},
 		{
 			name: 'italic',
 			icon: italic,
+			isActive: () => this.editor?.isActive('italic'),
 			command: () => this.editor?.chain().focus().toggleItalic().run(),
 		},
 		{
 			name: 'underline',
 			icon: underline,
+			isActive: () => this.editor?.isActive('underline'),
 			command: () => this.editor?.chain().focus().toggleUnderline().run(),
 		},
 		{
 			name: 'strikethrough',
 			icon: strikethrough,
+			isActive: () => this.editor?.isActive('strike'),
 			command: () => this.editor?.chain().focus().toggleStrike().run(),
 		},
 		{
 			name: 'h1',
 			icon: heading1,
+			isActive: () => this.editor?.isActive('heading', { level: 1 }),
 			command: () => this.editor?.chain().focus().toggleHeading({ level: 1 }).run(),
 		},
 		{
 			name: 'h2',
 			icon: heading2,
+			isActive: () => this.editor?.isActive('heading', { level: 2 }),
 			command: () => this.editor?.chain().focus().toggleHeading({ level: 2 }).run(),
 		},
 		{
 			name: 'h3',
 			icon: heading3,
+			isActive: () => this.editor?.isActive('heading', { level: 3 }),
 			command: () => this.editor?.chain().focus().toggleHeading({ level: 3 }).run(),
 		},
 		{
 			name: 'blockquote',
 			icon: blockquote,
+			isActive: () => this.editor?.isActive('blockquote'),
 			command: () => this.editor?.chain().focus().toggleBlockquote().run(),
 		},
 		{
 			name: 'code',
 			icon: code,
+			isActive: () => this.editor?.isActive('codeBlock'),
 			command: () => this.editor?.chain().focus().toggleCodeBlock().run(),
 		},
 		{
 			name: 'bullet-list',
 			icon: bulletList,
+			isActive: () => this.editor?.isActive('bulletList'),
 			command: () => this.editor?.chain().focus().toggleBulletList().run(),
 		},
 		{
 			name: 'ordered-list',
 			icon: orderedList,
+			isActive: () => this.editor?.isActive('orderedList'),
 			command: () => this.editor?.chain().focus().toggleOrderedList().run(),
 		},
 		{
 			name: 'horizontal-rule',
 			icon: horizontalRule,
+			isActive: () => this.editor?.isActive('horizontalRule'),
 			command: () => this.editor?.chain().focus().setHorizontalRule().run(),
 		},
 		{
 			name: 'align-left',
 			icon: alignLeft,
+			isActive: () => this.editor?.isActive({ textAlign: 'left' }),
 			command: () => this.editor?.chain().focus().setTextAlign('left').run(),
 		},
 		{
 			name: 'align-center',
 			icon: alignCenter,
+			isActive: () => this.editor?.isActive({ textAlign: 'center' }),
 			command: () => this.editor?.chain().focus().setTextAlign('center').run(),
 		},
 		{
 			name: 'align-right',
 			icon: alignRight,
+			isActive: () => this.editor?.isActive({ textAlign: 'right' }),
 			command: () => this.editor?.chain().focus().setTextAlign('right').run(),
 		},
 		{
 			name: 'align-justify',
 			icon: alignJustify,
+			isActive: () => this.editor?.isActive({ textAlign: 'justify' }),
 			command: () => this.editor?.chain().focus().setTextAlign('justify').run(),
+		},
+		{
+			name: 'link',
+			icon: link,
+			command: () => {
+				const url = prompt('Enter the URL');
+
+				if (url) {
+					this.editor?.chain().focus().setLink({ href: url, target: '_blank' }).run();
+				}
+			},
 		},
 	];
 
 	@property({ attribute: false })
 	editor?: Editor;
 
+	public onUpdate() {
+		//TODO: Find a better way to trigger a re-render of the menu when the editor is updated
+		// This is used to update the active state of the buttons
+		this.requestUpdate();
+		console.log('onUpdate');
+	}
+
 	override render() {
 		return html`
 			${this.actions.map(
-				(action) => html` <button @click=${action.command} title=${action.name}>${action.icon}</button> `,
+				(action) => html`
+					<button class=${action.isActive?.() ? 'active' : ''} @click=${action.command} title=${action.name}>
+						${action.icon}
+					</button>
+				`,
 			)}
 		`;
 	}
@@ -153,14 +192,22 @@ export class UmbTiptapFixedMenuElement extends LitElement {
 			box-sizing: border-box;
 		}
 
-		button img {
-			width: 100%;
-			height: 100%;
-		}
-
 		button:hover {
 			color: var(--uui-color-interactive-emphasis);
 			background-color: var(--uui-color-surface-alt);
+		}
+
+		button.active {
+			background-color: var(--uui-color-selected);
+			color: var(--uui-color-selected-contrast);
+		}
+		button.active:hover {
+			background-color: var(--uui-color-selected-emphasis);
+		}
+
+		button img {
+			width: 100%;
+			height: 100%;
 		}
 	`;
 }

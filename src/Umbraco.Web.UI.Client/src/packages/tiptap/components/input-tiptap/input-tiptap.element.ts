@@ -1,15 +1,17 @@
+import type { UmbTiptapFixedMenuElement } from './tiptap-fixed-menu.element.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import './tiptap-fixed-menu.element.js';
-import { Editor, StarterKit, TextAlign, Underline } from '@umbraco-cms/backoffice/external/tiptap';
+import { Editor, Link, StarterKit, TextAlign, Underline } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, '') {
+	@query('umb-tiptap-fixed-menu') _fixedMenuElement!: UmbTiptapFixedMenuElement;
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 
@@ -31,15 +33,25 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 			extensions: [
 				StarterKit,
 				TextAlign.configure({
-					types: ['heading', 'paragraph', 'blockquote', 'ordered_list', 'bullet_list'],
+					types: ['heading', 'paragraph', 'blockquote', 'orderedList', 'bulletList', 'codeBlock'],
 				}),
+				Link,
 				Underline,
 			],
 			content: json,
+			onSelectionUpdate: ({ editor }) => {
+				const { $from } = editor.state.selection;
+				const activeMarks = $from.node();
+
+				// Log the active marks
+				console.log('Active Marks:', activeMarks);
+				this._fixedMenuElement.onUpdate(); // TODO: This is a hack to force the fixed menu to update. We need to find a better way.
+			},
 			onUpdate: ({ editor }) => {
 				const json = editor.getJSON();
 				this.value = JSON.stringify(json);
 				this.dispatchEvent(new UmbChangeEvent());
+				this._fixedMenuElement.onUpdate(); // TODO: This is a hack to force the fixed menu to update. We need to find a better way.
 			},
 		});
 	}
@@ -50,7 +62,10 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	override render() {
 		return html`
-			<umb-tiptap-fixed-menu class="uui-text uui-font" .editor=${this._editor}></umb-tiptap-fixed-menu>
+			<umb-tiptap-fixed-menu
+				class="uui-text uui-font"
+				.activeNodeOrMark=${this._editor?.isActive('bold') ? 'bold' : null}
+				.editor=${this._editor}></umb-tiptap-fixed-menu>
 			<div id="editor"></div>
 		`;
 	}
@@ -77,6 +92,7 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				background-color: var(--uui-color-surface-alt);
 				padding: var(--uui-size-space-2) var(--uui-size-space-4);
 				border-radius: calc(var(--uui-border-radius) * 2);
+				overflow-x: auto;
 			}
 
 			#editor code:not(pre > code) {
@@ -97,6 +113,7 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				width: 100%;
 				outline: none;
 				white-space: pre-wrap;
+				min-width: 0;
 			}
 			#editor p,
 			#editor h1,

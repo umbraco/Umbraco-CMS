@@ -1,9 +1,10 @@
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
+const iconSize = '16px';
 export const bold = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -16,8 +17,8 @@ export const bold = html`<svg
 
 export const italic = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -32,8 +33,8 @@ export const italic = html`<svg
 
 export const underline = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -47,8 +48,8 @@ export const underline = html`<svg
 
 export const strikethrough = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -62,8 +63,8 @@ export const strikethrough = html`<svg
 </svg>`;
 export const heading1 = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -78,8 +79,8 @@ export const heading1 = html`<svg
 </svg>`;
 export const heading2 = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -94,8 +95,8 @@ export const heading2 = html`<svg
 </svg>`;
 export const heading3 = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -111,8 +112,8 @@ export const heading3 = html`<svg
 </svg>`;
 export const blockquote = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -127,8 +128,8 @@ export const blockquote = html`<svg
 </svg>`;
 export const code = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -141,8 +142,8 @@ export const code = html`<svg
 </svg>`;
 export const bulletList = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -159,8 +160,8 @@ export const bulletList = html`<svg
 </svg>`;
 export const orderedList = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -177,8 +178,8 @@ export const orderedList = html`<svg
 </svg>`;
 export const horizontalRule = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -192,8 +193,8 @@ export const horizontalRule = html`<svg
 </svg>`;
 export const alignLeft = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -207,8 +208,8 @@ export const alignLeft = html`<svg
 </svg>`;
 export const alignCenter = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -222,8 +223,8 @@ export const alignCenter = html`<svg
 </svg>`;
 export const alignRight = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -237,8 +238,8 @@ export const alignRight = html`<svg
 </svg>`;
 export const alignJustify = html`<svg
 	xmlns="http://www.w3.org/2000/svg"
-	width="16"
-	height="16"
+	width=${iconSize}
+	height=${iconSize}
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"
@@ -249,4 +250,19 @@ export const alignJustify = html`<svg
 	<line x1="3" x2="21" y1="6" y2="6" />
 	<line x1="3" x2="21" y1="12" y2="12" />
 	<line x1="3" x2="21" y1="18" y2="18" />
+</svg>`;
+
+export const link = html`<svg
+	xmlns="http://www.w3.org/2000/svg"
+	width=${iconSize}
+	height=${iconSize}
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="2"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	class="lucide lucide-link">
+	<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+	<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
 </svg>`;
