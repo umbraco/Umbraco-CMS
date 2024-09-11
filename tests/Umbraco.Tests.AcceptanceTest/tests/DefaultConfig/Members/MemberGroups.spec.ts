@@ -30,7 +30,7 @@ test('can create a member group', {tag: '@smoke'}, async ({page, umbracoApi, umb
 test('cannot create member group with empty name', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.memberGroup.clickMemberGroupsTab();
-  await umbracoUi.memberGroup.clickCreateButton(true);
+  await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.clickSaveButton();
 
   // Assert

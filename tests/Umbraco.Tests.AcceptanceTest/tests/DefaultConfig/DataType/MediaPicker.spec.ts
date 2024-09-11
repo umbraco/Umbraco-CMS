@@ -129,6 +129,7 @@ for (const dataTypeName of dataTypes) {
       const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
       const imageTypeData = await umbracoApi.mediaType.getByName('Image');
       const expectedFilterValue =
+        dataTypeName === "Image Media Picker" ||
         dataTypeName === "Multiple Image Media Picker"
           ? imageTypeData.id + "," + mediaTypeData.id
           : mediaTypeData.id;
