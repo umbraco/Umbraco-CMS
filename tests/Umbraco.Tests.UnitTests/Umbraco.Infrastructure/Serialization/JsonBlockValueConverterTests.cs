@@ -325,8 +325,8 @@ public class JsonBlockValueConverterTests
         var deserializedBlocks = deserialized.Blocks;
         Assert.IsNotNull(deserializedBlocks);
         Assert.AreEqual(1, deserializedBlocks.Layout.Count);
-        Assert.IsTrue(deserializedBlocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.TinyMce));
-        var layoutItems = deserializedBlocks.Layout[Constants.PropertyEditors.Aliases.TinyMce].OfType<RichTextBlockLayoutItem>().ToArray();
+        Assert.IsTrue(deserializedBlocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.RichText));
+        var layoutItems = deserializedBlocks.Layout[Constants.PropertyEditors.Aliases.RichText].OfType<RichTextBlockLayoutItem>().ToArray();
         Assert.AreEqual(2, layoutItems.Count());
         Assert.Multiple(() =>
         {
@@ -402,7 +402,7 @@ public class JsonBlockValueConverterTests
         {
             Layout =
             {
-                [Constants.PropertyEditors.Aliases.TinyMce] =
+                [Constants.PropertyEditors.Aliases.RichText] =
                 [
                     new RichTextBlockLayoutItem(contentElementKey1, settingsElementKey1)
                 ],

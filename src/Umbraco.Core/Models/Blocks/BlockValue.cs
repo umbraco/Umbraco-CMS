@@ -39,6 +39,9 @@ public abstract class BlockValue
     /// The property editor alias of the current layout.
     /// </value>
     public abstract string PropertyEditorAlias { get; }
+
+    [Obsolete("Will be removed in V18.")]
+    public virtual bool SupportsBlockLayoutAlias(string alias) => alias.Equals(PropertyEditorAlias);
 }
 
 /// <inheritdoc />

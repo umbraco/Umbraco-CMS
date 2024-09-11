@@ -167,12 +167,12 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 }
 
                 // did we encounter the concrete block value?
-                if (blockEditorAlias == blockValue.PropertyEditorAlias)
+                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias))
                 {
                     // yes, deserialize the block layout items as their concrete type (list of layoutItemType)
                     var layoutItems = JsonSerializer.Deserialize(ref reader, layoutItemsType, options);
-                    blockValue.Layout[blockEditorAlias] = layoutItems as IEnumerable<IBlockLayoutItem>
-                                                          ?? throw new JsonException($"Could not deserialize block editor layout items as type: {layoutItemType.FullName} while attempting to deserialize layout items for block editor alias: {blockEditorAlias} for type: {typeToConvert.FullName}.");
+                    blockValue.Layout[blockValue.PropertyEditorAlias] = layoutItems as IEnumerable<IBlockLayoutItem>
+                                                                        ?? throw new JsonException($"Could not deserialize block editor layout items as type: {layoutItemType.FullName} while attempting to deserialize layout items for block editor alias: {blockEditorAlias} for type: {typeToConvert.FullName}.");
                 }
                 else
                 {
