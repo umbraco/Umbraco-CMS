@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces
 {
     public interface IModelsGenerator
     {

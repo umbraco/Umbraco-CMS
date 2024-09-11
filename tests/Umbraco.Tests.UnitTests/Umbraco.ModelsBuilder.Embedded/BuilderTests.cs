@@ -10,15 +10,28 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded;
 
 [TestFixture]
 public class BuilderTests
 {
+    private (BuilderBase builderBase, TextBuilder textBuilder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) CreateBuilders(IEnumerable<TypeModel> types)
+    {
+        var builderBase = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builderBase);
+        var textBuilderActions = new TextBuilderActions(builderBase, textBuilderSubActions);
+
+        var builder = new TextBuilder(builderBase, textBuilderActions);
+
+        return (builderBase, builder, textBuilderActions, textBuilderSubActions);
+    }
+
     [Test]
     public void GenerateSimpleType()
-    {
+    { 
         // Umbraco returns nice, pascal-cased names.
         var type1 = new TypeModel
         {
@@ -40,11 +53,13 @@ public class BuilderTests
 
         TypeModel[] types = { type1 };
 
-        var modelsBuilderConfig = new ModelsBuilderSettings();
-        var builder = new TextBuilder(modelsBuilderConfig, types);
+        (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
+
+        builderBase.Prepare(types);
+
 
         var sb = new StringBuilder();
-        builder.Generate(sb, builder.GetModelsToGenerate().First());
+        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
         var gen = sb.ToString();
 
         var version = ApiVersion.Current.Version;
@@ -150,19 +165,20 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         TypeModel[] types = { type1, type2 };
 
-        var modelsBuilderConfig = new ModelsBuilderSettings();
-        var builder = new TextBuilder(modelsBuilderConfig, types)
-        {
-            ModelsNamespace = "Umbraco.Cms.Web.Common.PublishedModels",
-        };
+        (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
 
+        
+        builderBase.Prepare(types);
+
+        builderBase.ModelsNamespace = "Umbraco.Cms.Web.Common.PublishedModels";
+        
         var sb1 = new StringBuilder();
-        builder.Generate(sb1, builder.GetModelsToGenerate().Skip(1).First());
+        builder.Generate(sb1, builderBase.GetModelsToGenerate().Skip(1).First());
         var gen1 = sb1.ToString();
         Console.WriteLine(gen1);
 
         var sb = new StringBuilder();
-        builder.Generate(sb, builder.GetModelsToGenerate().First());
+        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
         var gen = sb.ToString();
 
         var version = ApiVersion.Current.Version;
@@ -224,9 +240,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
                        @""")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType(""foo"")]
-		public virtual global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace +
+		public virtual global::System.Collections.Generic.IEnumerable<global::" + builderBase.ModelsNamespace +
                        @".Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::" +
-                       modelsBuilderConfig.ModelsNamespace + @".Foo>>(_publishedValueFallback, ""foo"");
+                       builderBase.ModelsNamespace + @".Foo>>(_publishedValueFallback, ""foo"");
 	}
 }
 ";
@@ -267,14 +283,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         });
         TypeModel[] types = { type1 };
 
-        var modelsBuilderConfig = new ModelsBuilderSettings();
-        var builder = new TextBuilder(modelsBuilderConfig, types)
-        {
-            ModelsNamespace = "Umbraco.ModelsBuilder.Models", // forces conflict with Umbraco.ModelsBuilder.Umbraco
-        };
+        (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
+
+        
+        builderBase.Prepare(types);
 
         var sb = new StringBuilder();
-        foreach (var model in builder.GetModelsToGenerate())
+        foreach (var model in builderBase.GetModelsToGenerate())
         {
             builder.Generate(sb, model);
         }
@@ -323,11 +338,12 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         TypeModel[] docTypes = { parentType, childType };
 
-        var modelsBuilderConfig = new ModelsBuilderSettings();
-        var builder = new TextBuilder(modelsBuilderConfig, docTypes);
+        (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(docTypes);
+
+        builderBase.Prepare(docTypes);
 
         var sb = new StringBuilder();
-        builder.Generate(sb, builder.GetModelsToGenerate().First());
+        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
         var genParent = sb.ToString();
 
         var version = ApiVersion.Current.Version;
@@ -402,7 +418,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         Assert.AreEqual(expectedParent.ClearLf(), genParent);
 
         var sb2 = new StringBuilder();
-        builder.Generate(sb2, builder.GetModelsToGenerate().Skip(1).First());
+        builder.Generate(sb2, builderBase.GetModelsToGenerate().Skip(1).First());
         var genChild = sb2.ToString();
 
         var expectedChild = @"//------------------------------------------------------------------------------
@@ -509,16 +525,16 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ModelClrType = typeof(string),
         });
         type1.MixinTypes.Add(composition1);
-
         TypeModel[] types = { type1, composition1 };
 
-        var modelsBuilderConfig = new ModelsBuilderSettings();
-        var builder = new TextBuilder(modelsBuilderConfig, types);
+        (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
+
+        builderBase.Prepare(types);
 
         var version = ApiVersion.Current.Version;
 
         var sb = new StringBuilder();
-        builder.Generate(sb, builder.GetModelsToGenerate().First());
+        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
         var genComposed = sb.ToString();
 
         var expectedComposed = @"//------------------------------------------------------------------------------
@@ -600,7 +616,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         Assert.AreEqual(expectedComposed.ClearLf(), genComposed);
 
         var sb2 = new StringBuilder();
-        builder.Generate(sb2, builder.GetModelsToGenerate().Skip(1).First());
+        builder.Generate(sb2, builderBase.GetModelsToGenerate().Skip(1).First());
         var genComposition = sb2.ToString();
 
         var expectedComposition = @"//------------------------------------------------------------------------------
@@ -697,11 +713,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTests.Class1", typeof(Class1))]
     public void WriteClrType(string expected, Type input)
     {
+        
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
+        var builder = new BuilderBase() { ModelsNamespaceForTests = "ModelsNamespace" };
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, input);
+        textBuilderSubActions.WriteClrType(sb, input);
         Assert.AreEqual(expected, sb.ToString());
     }
 
@@ -713,22 +731,24 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     {
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        var builder = new TextBuilder();
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder");
         builder.ModelsNamespaceForTests = "ModelsNamespace";
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, input);
+        textBuilderSubActions.WriteClrType(sb, input);
         Assert.AreEqual(expected, sb.ToString());
     }
 
     [Test]
     public void WriteClrType_WithUsing()
     {
-        var builder = new TextBuilder();
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         builder.Using.Add("System.Text");
         builder.ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, typeof(StringBuilder));
+        textBuilderSubActions.WriteClrType(sb, typeof(StringBuilder));
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
@@ -738,24 +758,26 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrTypeAnother_WithoutUsing()
     {
-        var builder = new TextBuilder
-        {
-            ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models",
-        };
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
+
+        builder.ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
+
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, typeof(StringBuilder));
+        textBuilderSubActions.WriteClrType(sb, typeof(StringBuilder));
         Assert.AreEqual("global::System.Text.StringBuilder", sb.ToString());
     }
 
     [Test]
     public void WriteClrType_Ambiguous1()
     {
-        var builder = new TextBuilder();
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeRandomNamespace";
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
+        textBuilderSubActions.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
@@ -765,12 +787,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_Ambiguous()
     {
-        var builder = new TextBuilder();
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeBorkedNamespace";
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
+        textBuilderSubActions.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
@@ -780,12 +803,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_Ambiguous2()
     {
-        var builder = new TextBuilder();
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeRandomNamespace";
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, typeof(ASCIIEncoding));
+        textBuilderSubActions.WriteClrType(sb, typeof(ASCIIEncoding));
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
@@ -795,12 +819,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_AmbiguousNot()
     {
-        var builder = new TextBuilder();
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, typeof(ASCIIEncoding));
+        textBuilderSubActions.WriteClrType(sb, typeof(ASCIIEncoding));
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
@@ -810,12 +835,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     [Test]
     public void WriteClrType_AmbiguousWithNested()
     {
-        var builder = new TextBuilder();
+        var builder = new BuilderBase();
+        var textBuilderSubActions = new TextBuilderSubActions(builder);
         builder.Using.Add("System.Text");
         builder.Using.Add("Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
         builder.ModelsNamespaceForTests = "SomeRandomNamespace";
         var sb = new StringBuilder();
-        builder.WriteClrType(sb, typeof(ASCIIEncoding.Nested));
+        textBuilderSubActions.WriteClrType(sb, typeof(ASCIIEncoding.Nested));
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things

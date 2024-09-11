@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;

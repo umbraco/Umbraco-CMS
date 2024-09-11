@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder;

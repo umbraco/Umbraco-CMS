@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
@@ -9,17 +10,22 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 public class ModelsGenerator : IModelsGenerator
 {
     private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly ITextBuilder _textBuilder;
+    private readonly IBuilderBase _builderBase;
     private readonly OutOfDateModelsStatus _outOfDateModels;
     private readonly UmbracoServices _umbracoService;
     private ModelsBuilderSettings _config;
+    
 
     public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
-        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
+        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment, ITextBuilder textBuilder, IBuilderBase builderBase)
     {
         _umbracoService = umbracoService;
         _config = config.CurrentValue;
         _outOfDateModels = outOfDateModels;
         _hostingEnvironment = hostingEnvironment;
+        _textBuilder = textBuilder;
+        _builderBase = builderBase;
         config.OnChange(x => _config = x);
     }
 
@@ -37,13 +43,11 @@ public class ModelsGenerator : IModelsGenerator
         }
 
         IList<TypeModel> typeModels = _umbracoService.GetAllTypes();
-
-        var builder = new TextBuilder(_config, typeModels);
-
-        foreach (TypeModel typeModel in builder.GetModelsToGenerate())
+        _builderBase.Prepare(typeModels);
+        foreach (TypeModel typeModel in _builderBase.GetModelsToGenerate())
         {
             var sb = new StringBuilder();
-            builder.Generate(sb, typeModel);
+            _textBuilder.Generate(sb, typeModel);
             var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
             File.WriteAllText(filename, sb.ToString());
         }

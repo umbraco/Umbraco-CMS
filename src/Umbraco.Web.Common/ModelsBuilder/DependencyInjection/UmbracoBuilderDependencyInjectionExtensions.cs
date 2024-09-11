@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
@@ -135,6 +136,11 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         // Register required services for ModelsBuilderDashboardController
         builder.Services.AddSingleton<IModelsGenerator, ModelsGenerator>();
+        builder.Services.AddSingleton<IBuilderBase, BuilderBase>();
+        builder.Services.AddSingleton<ITextBuilder, TextBuilder>();
+        builder.Services.AddSingleton<ITextBuilderSubActions, TextBuilderSubActions>();
+        builder.Services.AddSingleton<ITextBuilderActions, TextBuilderActions>();
+        builder.Services.AddSingleton<ModelsBuilderSettings, ModelsBuilderSettings>();
 
         // TODO: Remove in v13 - this is only here in case someone is already using this generator directly
         builder.Services.AddSingleton<ModelsGenerator>();

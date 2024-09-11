@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
@@ -14,32 +15,19 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 /// <summary>
 ///     Provides a base class for all builders.
 /// </summary>
-public abstract class Builder
+public class BuilderBase : IBuilderBase
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Builder" /> class with a list of models to generate,
+    ///     Initializes a new instance of the <see cref="BuilderBase" /> class with a list of models to generate,
     ///     the result of code parsing, and a models namespace.
     /// </summary>
-    /// <param name="typeModels">The list of models to generate.</param>
     /// <param name="config">Configuration for modelsbuilder settings</param>
-    protected Builder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
+    public BuilderBase()
     {
-        TypeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
-
-        Config = config ?? throw new ArgumentNullException(nameof(config));
+        Config = new ModelsBuilderSettings();
 
         // can be null or empty, we'll manage
         ModelsNamespace = Config.ModelsNamespace;
-
-        // but we want it to prepare
-        Prepare();
-    }
-
-    // for unit tests only
-#pragma warning disable CS8618
-    protected Builder()
-#pragma warning restore CS8618
-    {
     }
 
     /// <summary>
@@ -48,10 +36,8 @@ public abstract class Builder
     /// <remarks>May be overriden by code attributes.</remarks>
     public string ModelsNamespace { get; set; }
 
-    protected Dictionary<string, string> ModelsMap { get; } = new();
-
     // the list of assemblies that will be 'using' by default
-    protected IList<string> TypesUsing { get; } = new List<string>
+    public IList<string> Using { get; set; } = new List<string>
     {
         "System",
         "System.Linq.Expressions",
@@ -63,15 +49,10 @@ public abstract class Builder
     };
 
     /// <summary>
-    ///     Gets the list of assemblies to add to the set of 'using' assemblies in each model file.
-    /// </summary>
-    public IList<string> Using => TypesUsing;
-
-    /// <summary>
     ///     Gets the list of all models.
     /// </summary>
     /// <remarks>Includes those that are ignored.</remarks>
-    public IList<TypeModel> TypeModels { get; }
+    private IList<TypeModel>? TypeModels { get; set; }
 
     public string? ModelsNamespaceForTests { get; set; }
 
@@ -81,7 +62,8 @@ public abstract class Builder
     ///     Gets the list of models to generate.
     /// </summary>
     /// <returns>The models to generate</returns>
-    public IEnumerable<TypeModel> GetModelsToGenerate() => TypeModels;
+    public IEnumerable<TypeModel> GetModelsToGenerate() => TypeModels ?? new List<TypeModel>();
+    private void SetModelsToGenerate(IEnumerable<TypeModel>  types) => TypeModels = types.ToList();
 
     public string GetModelsNamespace()
     {
@@ -107,7 +89,7 @@ public abstract class Builder
     // returns true if either
     // - more than 1 symbol is found (explicitely ambiguous)
     // - 1 symbol is found BUT not matching (implicitely ambiguous)
-    protected bool IsAmbiguousSymbol(string symbol, string match) =>
+    public bool IsAmbiguousSymbol(string symbol, string match) =>
 
         // cannot figure out is a symbol is ambiguous without Roslyn
         // so... let's say everything is ambiguous - code won't be
@@ -118,9 +100,10 @@ public abstract class Builder
     /// <summary>
     ///     Prepares generation by processing the result of code parsing.
     /// </summary>
-    private void Prepare()
+    public void Prepare(IEnumerable<TypeModel> types)
     {
-        TypeModel.MapModelTypes(TypeModels, ModelsNamespace);
+        SetModelsToGenerate(types);
+        TypeModel.MapModelTypes(GetModelsToGenerate().ToList(), ModelsNamespace);
 
         var isInMemoryMode = Config.ModelsMode == ModelsMode.InMemoryAuto;
 
@@ -130,7 +113,7 @@ public abstract class Builder
         // for the last one, don't throw in InMemory mode, see comment
 
         // ensure we have no duplicates type names
-        foreach (IGrouping<string, TypeModel> xx in TypeModels.GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
+        foreach (IGrouping<string, TypeModel> xx in GetModelsToGenerate().GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
         {
             throw new InvalidOperationException($"Type name \"{xx.Key}\" is used"
                                                 + $" for types with alias {string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Names have to be unique."
@@ -138,7 +121,7 @@ public abstract class Builder
         }
 
         // ensure we have no duplicates property names
-        foreach (TypeModel typeModel in TypeModels)
+        foreach (TypeModel typeModel in GetModelsToGenerate())
         {
             foreach (IGrouping<string, PropertyModel> xx in typeModel.Properties.GroupBy(x => x.ClrName)
                          .Where(x => x.Count() > 1))
@@ -151,7 +134,7 @@ public abstract class Builder
         }
 
         // ensure content & property type don't have identical name (csharp hates it)
-        foreach (TypeModel typeModel in TypeModels)
+        foreach (TypeModel typeModel in GetModelsToGenerate())
         {
             foreach (PropertyModel xx in typeModel.Properties.Where(x => x.ClrName == typeModel.ClrName))
             {
@@ -182,7 +165,7 @@ public abstract class Builder
         //        xx.Alias));
 
         // discover interfaces that need to be declared / implemented
-        foreach (TypeModel typeModel in TypeModels)
+        foreach (TypeModel typeModel in GetModelsToGenerate())
         {
             // collect all the (non-removed) types implemented at parent level
             // ie the parent content types and the mixins content types, recursively
@@ -215,7 +198,7 @@ public abstract class Builder
         }
 
         // ensure elements don't inherit from non-elements
-        foreach (TypeModel typeModel in TypeModels.Where(x => x.IsElement))
+        foreach (TypeModel typeModel in GetModelsToGenerate().Where(x => x.IsElement))
         {
             if (typeModel.BaseType != null && !typeModel.BaseType.IsElement)
             {
@@ -232,7 +215,7 @@ public abstract class Builder
         }
     }
 
-    protected string GetModelsBaseClassName(TypeModel type) =>
+    public string GetModelsBaseClassName(TypeModel type) =>
 
         // default
         type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
