@@ -26,14 +26,6 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		return data;
 	}
 
-	async #getVersionCheckPeriod(): Promise<number> {
-		if (!this.#serverConfiguration) {
-			this.#serverConfiguration = await this.requestServerConfiguration();
-		}
-
-		return this.#serverConfiguration?.versionCheckPeriod ?? 7;
-	}
-
 	async serverUpgradeCheck(): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
 		const versionCheckPeriod = await this.#getVersionCheckPeriod();
@@ -83,6 +75,14 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		}
 
 		return null;
+	}
+
+	async #getVersionCheckPeriod(): Promise<number> {
+		if (!this.#serverConfiguration) {
+			this.#serverConfiguration = await this.requestServerConfiguration();
+		}
+
+		return this.#serverConfiguration?.versionCheckPeriod ?? 7;
 	}
 
 	#getStoredServerUpgradeCheck(lastCheck: Date): UmbServerUpgradeCheck | null {
