@@ -34,24 +34,6 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 		return this.#serverConfiguration?.versionCheckPeriod ?? 7;
 	}
 
-	getStoredServerUpgradeCheck(lastCheck: Date): UmbServerUpgradeCheck | null {
-		const storedCheck = localStorage.getItem('umb:serverUpgradeCheck');
-		if (storedCheck) {
-			const upgradeCheck: UmbServerUpgradeCheck = JSON.parse(storedCheck);
-			// Check that the stored check is not older than the last check
-			const expiresAt = new Date(upgradeCheck.expires);
-			if (expiresAt.getTime() > lastCheck.getTime()) {
-				if (upgradeCheck.type.toLowerCase() !== 'none') {
-					return upgradeCheck;
-				}
-			} else {
-				localStorage.removeItem('umb:serverUpgradeCheck');
-			}
-		}
-
-		return null;
-	}
-
 	async serverUpgradeCheck(): Promise<UmbServerUpgradeCheck | null> {
 		// Check if we are allowed to check again
 		const versionCheckPeriod = await this.#getVersionCheckPeriod();
@@ -75,7 +57,7 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 
 			// If we should not check, then return what we have stored if it is still valid
 			if (!shouldCheck) {
-				return this.getStoredServerUpgradeCheck(lastCheckDate);
+				return this.#getStoredServerUpgradeCheck(lastCheckDate);
 			}
 		}
 
@@ -97,6 +79,24 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 			// Only return if we have a valid type
 			if (data.type.toLowerCase() !== 'none') {
 				return upgradeCheck;
+			}
+		}
+
+		return null;
+	}
+
+	#getStoredServerUpgradeCheck(lastCheck: Date): UmbServerUpgradeCheck | null {
+		const storedCheck = localStorage.getItem('umb:serverUpgradeCheck');
+		if (storedCheck) {
+			const upgradeCheck: UmbServerUpgradeCheck = JSON.parse(storedCheck);
+			// Check that the stored check is not older than the last check
+			const expiresAt = new Date(upgradeCheck.expires);
+			if (expiresAt.getTime() > lastCheck.getTime()) {
+				if (upgradeCheck.type.toLowerCase() !== 'none') {
+					return upgradeCheck;
+				}
+			} else {
+				localStorage.removeItem('umb:serverUpgradeCheck');
 			}
 		}
 
