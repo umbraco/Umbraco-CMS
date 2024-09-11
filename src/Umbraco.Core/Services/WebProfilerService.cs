@@ -46,7 +46,11 @@ internal sealed class WebProfilerService : IWebProfilerService
         //FIXME when we can get current user
         return Attempt.Succeed(-1);
 
+#pragma warning disable CS0162 // Unreachable code detected
+#pragma warning disable CS0618 // Type or member is obsolete
         Attempt<int>? userIdAttempt = _backOfficeSecurityAccessor?.BackOfficeSecurity?.GetUserId();
+#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0162 // Unreachable code detected
 
         return (userIdAttempt.HasValue && userIdAttempt.Value.Success)
             ? Attempt.Succeed(userIdAttempt.Value.Result)

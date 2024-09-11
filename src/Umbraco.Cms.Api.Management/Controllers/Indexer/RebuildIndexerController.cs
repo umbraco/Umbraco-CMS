@@ -38,7 +38,7 @@ public class RebuildIndexerController : IndexerControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
     {
-        if (!_examineManager.TryGetIndex(indexName, out var index))
+        if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
             var invalidModelProblem = new ProblemDetails
             {
