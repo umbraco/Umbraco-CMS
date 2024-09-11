@@ -62,7 +62,11 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 							loading="lazy" />
 						<span>${this._version}</span>
 
-						${this._serverUpgradeCheck ? html`<uui-button color="danger" label="Upgrade available"></uui-button>` : ''}
+						${this._serverUpgradeCheck
+							? html`<uui-button
+									color="danger"
+									label=${this.localize.term('general_newVersionAvailable')}></uui-button>`
+							: ''}
 
 						<a href="https://umbraco.com" target="_blank" rel="noopener">Umbraco.com</a>
 

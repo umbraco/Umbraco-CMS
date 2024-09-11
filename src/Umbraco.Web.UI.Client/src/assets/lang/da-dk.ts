@@ -907,6 +907,7 @@ export default {
 		lastUpdated: 'Last Updated',
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
+		newVersionAvailable: 'Ny version tilgængelig',
 	},
 	colors: {
 		blue: 'Blå',

@@ -918,6 +918,7 @@ export default {
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
 		restore: 'Restore',
+		newVersionAvailable: 'New version available',
 	},
 	colors: {
 		blue: 'Blue',
