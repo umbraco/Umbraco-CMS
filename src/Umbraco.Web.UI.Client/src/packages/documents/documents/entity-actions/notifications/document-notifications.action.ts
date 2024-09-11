@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_NOTIFICATIONS_MODAL } from './document-notifications-modal.token.js';
+import { UMB_DOCUMENT_NOTIFICATIONS_MODAL } from './modal/document-notifications-modal.token.js';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,7 +14,7 @@ export class UmbDocumentNotificationsEntityAction extends UmbEntityActionBase<ne
 		const modalContext = modalManager.open(this, UMB_DOCUMENT_NOTIFICATIONS_MODAL, {
 			data: { unique: this.args.unique },
 		});
-		await modalContext.onSubmit();
+		await modalContext.onSubmit().catch(() => undefined);
 	}
 }
 export default UmbDocumentNotificationsEntityAction;

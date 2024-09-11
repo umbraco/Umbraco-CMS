@@ -1,2 +1,2 @@
-export * from './document-notifications-modal.token.js';
+export * from './modal/index.js';
 export * from './repository/index.js';
