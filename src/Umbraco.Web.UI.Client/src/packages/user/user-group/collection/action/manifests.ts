@@ -1,3 +1,4 @@
+import { UMB_USER_GROUP_WORKSPACE_PATH } from '../../paths.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +10,7 @@ export const createManifest: ManifestTypes = {
 	weight: 200,
 	meta: {
 		label: '#general_create',
-		href: 'section/user-management/view/user-groups/user-group/create',
+		href: `${UMB_USER_GROUP_WORKSPACE_PATH}/create`,
 	},
 	conditions: [
 		{
