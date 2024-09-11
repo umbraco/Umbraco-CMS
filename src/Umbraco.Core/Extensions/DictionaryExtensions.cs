@@ -258,7 +258,7 @@ public static class DictionaryExtensions
     /// </summary>
     /// <param name="d"></param>
     /// <returns></returns>
-    public static string ToQueryString(this IDictionary<string, object> d)
+    public static string ToQueryString(this IDictionary<string, object?> d)
     {
         if (!d.Any())
         {
@@ -266,7 +266,7 @@ public static class DictionaryExtensions
         }
 
         var builder = new StringBuilder();
-        foreach (KeyValuePair<string, object> i in d)
+        foreach (KeyValuePair<string, object?> i in d)
         {
             builder.Append(string.Format("{0}={1}&", WebUtility.UrlEncode(i.Key), i.Value == null ? string.Empty : WebUtility.UrlEncode(i.Value.ToString())));
         }
