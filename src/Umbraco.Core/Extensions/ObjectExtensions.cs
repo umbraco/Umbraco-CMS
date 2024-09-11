@@ -41,28 +41,6 @@ public static class ObjectExtensions
     public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
 
     /// <summary>
-    ///     Provides a shortcut way of safely casting an input when you cannot guarantee the <typeparamref name="T" /> is
-    ///     an instance type (i.e., when the C# AS keyword is not applicable).
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="input">The input.</param>
-    /// <returns></returns>
-    public static T? SafeCast<T>(this object input)
-    {
-        if (ReferenceEquals(null, input) || ReferenceEquals(default(T), input))
-        {
-            return default;
-        }
-
-        if (input is T variable)
-        {
-            return variable;
-        }
-
-        return default;
-    }
-
-    /// <summary>
     ///     Attempts to convert the input object to the output type.
     /// </summary>
     /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
