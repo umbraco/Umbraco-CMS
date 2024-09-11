@@ -168,7 +168,7 @@ export abstract class UmbBlockEntryContext<
 	/**
 	 * Get the current value of this Blocks label.
 	 * @function getLabel
-	 * @returns {string}
+	 * @returns {string} - the value of the label.
 	 */
 	getLabel() {
 		return this.#label.value;
