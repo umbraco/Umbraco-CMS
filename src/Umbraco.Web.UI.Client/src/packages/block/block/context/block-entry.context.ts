@@ -101,9 +101,6 @@ export abstract class UmbBlockEntryContext<
 
 	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
-	/**
-	 * @obsolete Use `unique` instead. Cause we will most likely rename this in the future.
-	 */
 	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
 	public readonly settingsKey = this._layout.asObservablePart((x) => x?.settingsKey);
 	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
