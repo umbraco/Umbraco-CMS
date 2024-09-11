@@ -7,7 +7,6 @@ import { manifests as inviteManifests } from './invite/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as menuItemManifests } from './menu-item/manifests.js';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
@@ -22,7 +21,6 @@ export const manifests: Array<UmbManifestTypes | UmbBackofficeManifestKind> = [
 	...modalManifests,
 	...propertyEditorManifests,
 	...repositoryManifests,
-	...sectionViewManifests,
 	...workspaceManifests,
 	...menuItemManifests,
 ];
