@@ -1,16 +1,13 @@
-import { UMB_UFM_RENDER_CONTEXT } from '../components/ufm-render/index.js';
-import { customElement, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_UFM_RENDER_CONTEXT } from '../ufm-render/ufm-render.context.js';
+import { UmbUfmElementBase } from '../ufm-element-base.js';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 const elementName = 'ufm-label-value';
 
 @customElement(elementName)
-export class UmbUfmLabelValueElement extends UmbLitElement {
+export class UmbUfmLabelValueElement extends UmbUfmElementBase {
 	@property()
 	alias?: string;
-
-	@state()
-	private _value?: unknown;
 
 	constructor() {
 		super();
@@ -20,18 +17,14 @@ export class UmbUfmLabelValueElement extends UmbLitElement {
 				context.value,
 				(value) => {
 					if (this.alias !== undefined && value !== undefined && typeof value === 'object') {
-						this._value = (value as Record<string, unknown>)[this.alias];
+						this.value = (value as Record<string, unknown>)[this.alias];
 					} else {
-						this._value = value;
+						this.value = value;
 					}
 				},
 				'observeValue',
 			);
 		});
-	}
-
-	override render() {
-		return this._value !== undefined ? this._value : nothing;
 	}
 }
 
