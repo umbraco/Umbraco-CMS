@@ -4,7 +4,6 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
@@ -21,24 +20,11 @@ public static class ObjectExtensions
 {
     private static readonly ConcurrentDictionary<Type, Type?> NullableGenericCache = new();
     private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> InputTypeConverterCache = new();
-
-    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> DestinationTypeConverterCache =
-        new();
-
+    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> DestinationTypeConverterCache = new();
     private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> AssignableTypeCache = new();
     private static readonly ConcurrentDictionary<Type, bool> BoolConvertCache = new();
-
     private static readonly char[] NumberDecimalSeparatorsToNormalize = { '.', ',' };
     private static readonly CustomBooleanTypeConverter CustomBooleanTypeConverter = new();
-
-    // private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
-
-    /// <summary>
-    /// </summary>
-    /// <param name="input"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
 
     /// <summary>
     ///     Attempts to convert the input object to the output type.
@@ -236,94 +222,6 @@ public static class ObjectExtensions
         }
 
         return Attempt<object?>.Fail();
-    }
-
-    // public enum PropertyNamesCaseType
-    // {
-    //    CamelCase,
-    //    CaseInsensitive
-    // }
-
-    ///// <summary>
-    ///// Convert an object to a JSON string with camelCase formatting
-    ///// </summary>
-    ///// <param name="obj"></param>
-    ///// <returns></returns>
-    // public static string ToJsonString(this object obj)
-    // {
-    //    return obj.ToJsonString(PropertyNamesCaseType.CamelCase);
-    // }
-
-    ///// <summary>
-    ///// Convert an object to a JSON string with the specified formatting
-    ///// </summary>
-    ///// <param name="obj">The obj.</param>
-    ///// <param name="propertyNamesCaseType">Type of the property names case.</param>
-    ///// <returns></returns>
-    // public static string ToJsonString(this object obj, PropertyNamesCaseType propertyNamesCaseType)
-    // {
-    //    var type = obj.GetType();
-    //    var dateTimeStyle = "yyyy-MM-dd HH:mm:ss";
-
-    // if (type.IsPrimitive || typeof(string).IsAssignableFrom(type))
-    //    {
-    //        return obj.ToString();
-    //    }
-
-    // if (typeof(DateTime).IsAssignableFrom(type) || typeof(DateTimeOffset).IsAssignableFrom(type))
-    //    {
-    //        return Convert.ToDateTime(obj).ToString(dateTimeStyle);
-    //    }
-
-    // var serializer = new JsonSerializer();
-
-    // switch (propertyNamesCaseType)
-    //    {
-    //        case PropertyNamesCaseType.CamelCase:
-    //            serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
-    //            break;
-    //    }
-
-    // var dateTimeConverter = new IsoDateTimeConverter
-    //        {
-    //            DateTimeStyles = System.Globalization.DateTimeStyles.None,
-    //            DateTimeFormat = dateTimeStyle
-    //        };
-
-    // if (typeof(IDictionary).IsAssignableFrom(type))
-    //    {
-    //        return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    //    }
-
-    // if (type.IsArray || (typeof(IEnumerable).IsAssignableFrom(type)))
-    //    {
-    //        return JArray.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    //    }
-
-    // return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    // }
-
-    /// <summary>
-    ///     Converts an object into a dictionary
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TProperty"></typeparam>
-    /// <typeparam name="TVal"> </typeparam>
-    /// <param name="o"></param>
-    /// <param name="ignoreProperties"></param>
-    /// <returns></returns>
-    public static IDictionary<string, TVal>? ToDictionary<T, TProperty, TVal>(
-        this T o,
-        params Expression<Func<T, TProperty>>[] ignoreProperties) => o?.ToDictionary<TVal>(ignoreProperties
-        .Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
-
-    internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
-    {
-        // TODO: Localize this exception
-        if (isDisposed)
-        {
-            throw new ObjectDisposedException(objectname);
-        }
     }
 
     /// <summary>
@@ -620,7 +518,7 @@ public static class ObjectExtensions
                                         " to a string using ToXmlString as it is not supported by XmlConvert");
     }
 
-    internal static string? ToDebugString(this object? obj, int levels = 0)
+    private static string? ToDebugString(this object? obj, int levels = 0)
     {
         if (obj == null)
         {
@@ -694,33 +592,12 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    ///     Attempts to serialize the value to an XmlString using ToXmlString
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    internal static Attempt<string?> TryConvertToXmlString(this object value, Type type)
-    {
-        try
-        {
-            var output = value.ToXmlString(type);
-            return Attempt.Succeed(output);
-        }
-        catch (NotSupportedException ex)
-        {
-            return Attempt<string?>.Fail(ex);
-        }
-    }
-
-    /// <summary>
     ///     Returns an XmlSerialized safe string representation for the value and type
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="value"></param>
     /// <returns></returns>
     public static string ToXmlString<T>(this object value) => value.ToXmlString(typeof(T));
-
-    public static Guid AsGuid(this object value) => value is Guid guid ? guid : Guid.Empty;
 
     private static string? GetEnumPropertyDebugString(object enumItem, int levels)
     {
