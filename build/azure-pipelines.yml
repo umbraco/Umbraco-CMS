@@ -100,11 +100,30 @@ stages:
               projects: $(solution)
           - task: DotNetCoreCLI@2
             name: build
-            displayName: Run dotnet build and generate NuGet packages
+            displayName: Run dotnet build
             inputs:
               command: build
               projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
+              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true'
+          - task: PowerShell@2
+            displayName: Prepare nupkg
+            inputs:
+              targetType: inline
+              script: |
+                $umbracoVersion = "$(Build.BuildNumber)" -replace "\+",".g"
+                $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
+                echo "umbraco version: $umbracoVersion"
+
+                foreach ($templatePath in $templatePaths) {
+                  $a = Get-Content $templatePath -Raw | ConvertFrom-Json
+                  if ($a.symbols -and $a.symbols.UmbracoVersion) {
+                    $a.symbols.UmbracoVersion.defaultValue = $umbracoVersion
+                    $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
+                    echo $a.symbols.UmbracoVersion.defaultValue
+                  }
+                }
+
+                dotnet pack $(solution) --configuration $(buildConfiguration) -p:BuildProjectReferences=false --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
