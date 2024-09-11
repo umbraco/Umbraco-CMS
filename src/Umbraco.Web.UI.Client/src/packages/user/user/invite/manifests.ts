@@ -2,9 +2,9 @@ import { manifests as collectionActionManifests } from './collection-action/mani
 import { manifests as modalManifests } from './modal/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as entityActionManifests } from './entity-action/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...collectionActionManifests,
 	...modalManifests,
 	...repositoryManifests,
