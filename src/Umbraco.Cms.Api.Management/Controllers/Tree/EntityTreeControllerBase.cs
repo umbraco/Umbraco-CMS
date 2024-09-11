@@ -1,27 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Paging;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
 public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
     where TItem : EntityTreeItemResponseModel, new()
 {
-    private readonly string _itemUdiType;
-
     protected EntityTreeControllerBase(IEntityService entityService)
-    {
-        EntityService = entityService;
-
-        // ReSharper disable once VirtualMemberCallInConstructor
-        _itemUdiType = ItemObjectType.GetUdiType();
-    }
+        => EntityService = entityService;
 
     protected IEntityService EntityService { get; }
 
@@ -31,12 +24,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
-        {
-            return BadRequest(error);
-        }
-
-        IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
+        IEntitySlim[] rootEntities = GetPagedRootEntities(skip, take, out var totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
 
@@ -46,12 +34,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentId, int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
-        {
-            return BadRequest(error);
-        }
-
-        IEntitySlim[] children = GetPagedChildEntities(parentId, pageNumber, pageSize, out var totalItems);
+        IEntitySlim[] children = GetPagedChildEntities(parentId, skip, take, out var totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
 
@@ -59,54 +42,63 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<IEnumerable<TItem>>> GetItems(Guid[] ids)
+    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
-        if (ids.IsCollectionEmpty())
-        {
-            return await Task.FromResult(Ok(PagedViewModel(Array.Empty<TItem>(), 0)));
-        }
+        IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);
 
-        IEntitySlim[] itemEntities = GetEntities(ids);
+        TItem[] result = ancestorEntities
+            .Select(ancestor =>
+            {
+                IEntitySlim? parent = ancestor.ParentId > 0
+                    ? ancestorEntities.Single(a => a.Id == ancestor.ParentId)
+                    : null;
 
-        TItem[] treeItemViewModels = MapTreeItemViewModels(null, itemEntities);
-
-        return await Task.FromResult(Ok(treeItemViewModels));
-    }
-
-    protected virtual IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
-        => EntityService
-            .GetPagedChildren(
-                Constants.System.Root,
-                ItemObjectType,
-                pageNumber,
-                pageSize,
-                out totalItems,
-                ordering: ItemOrdering)
+                return MapTreeItemViewModel(parent?.Key, ancestor);
+            })
             .ToArray();
 
-    protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
+        return Ok(result);
+    }
+
+    protected virtual async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf)
     {
-        // EntityService is only able to get paged children by parent ID, so we must first map parent id to parent ID
-        Attempt<int> parentId = EntityService.GetId(parentKey, ItemObjectType);
-        if (parentId.Success == false)
+        IEntitySlim? entity = EntityService.Get(descendantKey, ItemObjectType);
+        if (entity is null)
         {
             // not much else we can do here but return nothing
-            totalItems = 0;
-            return Array.Empty<IEntitySlim>();
+            return await Task.FromResult(Array.Empty<IEntitySlim>());
         }
 
-        IEntitySlim[] children = EntityService.GetPagedChildren(
-                parentId.Result,
+        var ancestorIds = entity.AncestorIds();
+
+        IEnumerable<IEntitySlim> ancestors = ancestorIds.Any()
+            ? EntityService.GetAll(ItemObjectType, ancestorIds)
+            : Array.Empty<IEntitySlim>();
+        ancestors = ancestors.Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>());
+
+        return ancestors.OrderBy(item => item.Level).ToArray();
+    }
+
+    protected virtual IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
+        => EntityService
+            .GetPagedChildren(
+                Constants.System.RootKey,
                 ItemObjectType,
-                pageNumber,
-                pageSize,
+                skip,
+                take,
                 out totalItems,
                 ordering: ItemOrdering)
             .ToArray();
-        return children;
-    }
 
-    protected virtual IEntitySlim[] GetEntities(Guid[] ids) => EntityService.GetAll(ItemObjectType, ids).ToArray();
+    protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems) =>
+        EntityService.GetPagedChildren(
+                parentKey,
+                ItemObjectType,
+                skip,
+                take,
+                out totalItems,
+                ordering: ItemOrdering)
+            .ToArray();
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
@@ -115,12 +107,14 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     {
         var viewModel = new TItem
         {
-            Name = entity.Name!,
             Id = entity.Key,
-            Type = _itemUdiType,
             HasChildren = entity.HasChildren,
-            IsContainer = entity.IsContainer,
-            ParentId = parentKey
+            Parent = parentKey.HasValue
+                ? new ReferenceByIdModel
+                {
+                    Id = parentKey.Value
+                }
+                : null
         };
 
         return viewModel;

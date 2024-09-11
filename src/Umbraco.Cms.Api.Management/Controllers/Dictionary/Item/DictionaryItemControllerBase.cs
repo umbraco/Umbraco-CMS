@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Item;
 
-[ApiController]
-[VersionedApiBackOfficeRoute("dictionary")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDictionary)]
 public class DictionaryItemControllerBase : ManagementApiControllerBase
 {
 }

@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
 /// <summary>
 /// <para>
@@ -14,6 +16,11 @@ public class UserGroupBase
     /// The name of the user groups
     /// </summary>
     public required string Name { get; init; }
+
+    /// <summary>
+    /// The alias of the user groups
+    /// </summary>
+    public required string Alias { get; init; }
 
     /// <summary>
     /// The Icon for the user group
@@ -41,7 +48,15 @@ public class UserGroupBase
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
     /// </summary>
-    public Guid? DocumentStartNodeId { get; init; }
+    public ReferenceByIdModel? DocumentStartNode { get; init; }
+
+    /// <summary>
+    /// If the group should have access to the document root.
+    /// <remarks>
+    /// This will be ignored if an explicit start node has been specified in <see cref="DocumentStartNode"/>.
+    /// </remarks>
+    /// </summary>
+    public bool DocumentRootAccess { get; init; }
 
     /// <summary>
     /// The Id of the media that should act as root node for the user group
@@ -49,10 +64,19 @@ public class UserGroupBase
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
     /// </summary>
-    public Guid? MediaStartNodeId { get; init; }
+    public ReferenceByIdModel? MediaStartNode { get; init; }
 
     /// <summary>
-    /// Ad-hoc list of permissions provided, and maintained by the front-end. The server has no concept of what these mean.
+    /// If the group should have access to the media root.
+    /// <remarks>
+    /// This will be ignored if an explicit start node has been specified in <see cref="MediaStartNode"/>.
+    /// </remarks>
     /// </summary>
-    public required ISet<string> Permissions { get; init; }
+    public bool MediaRootAccess { get; init; }
+
+    /// <summary>
+    /// List of permissions provided, and maintained by the front-end. The server has no concept all of them, but some can be used on the server.
+    /// </summary>
+    public required ISet<string> FallbackPermissions { get; init; }
+    public required ISet<IPermissionPresentationModel> Permissions { get; init; }
 }

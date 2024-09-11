@@ -1,9 +1,6 @@
-using System.Xml.XPath;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Xml;
-using Umbraco.Cms.Core.Xml.XPath;
 using Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 using Umbraco.Extensions;
 
@@ -17,7 +14,7 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
     #region Constructors
 
     public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, IVariationContextAccessor variationContextAccessor)
-        : base(previewDefault)
+        : base(variationContextAccessor, previewDefault)
     {
         _snapshot = snapshot;
         _variationContextAccessor = variationContextAccessor;
@@ -90,89 +87,6 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
     }
 
     public override bool HasContent(bool preview) => _snapshot.IsEmpty == false;
-
-    #endregion
-
-    #region XPath
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetSingleByXPath(iterator);
-    }
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetSingleByXPath(iterator);
-    }
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetByXPath(iterator);
-    }
-
-    private static IPublishedContent? GetSingleByXPath(XPathNodeIterator iterator)
-    {
-        if (iterator.MoveNext() == false)
-        {
-            return null;
-        }
-
-        if (iterator.Current is not NavigableNavigator xnav)
-        {
-            return null;
-        }
-
-        var xcontent = xnav.UnderlyingObject as NavigableContent;
-        return xcontent?.InnerContent;
-    }
-
-    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetByXPath(iterator);
-    }
-
-    public override XPathNavigator CreateNavigator(bool preview)
-    {
-        var source = new Source(this, preview);
-        var navigator = new NavigableNavigator(source);
-        return navigator;
-    }
-
-    private static IEnumerable<IPublishedContent> GetByXPath(XPathNodeIterator iterator)
-    {
-        while (iterator.MoveNext())
-        {
-            if (iterator.Current is not NavigableNavigator xnav)
-            {
-                continue;
-            }
-
-            if (xnav.UnderlyingObject is not NavigableContent xcontent)
-            {
-                continue;
-            }
-
-            yield return xcontent.InnerContent;
-        }
-    }
-
-    public override XPathNavigator? CreateNodeNavigator(int id, bool preview)
-    {
-        var source = new Source(this, preview);
-        var navigator = new NavigableNavigator(source);
-        return navigator.CloneWithNewRoot(id, 0);
-    }
 
     #endregion
 

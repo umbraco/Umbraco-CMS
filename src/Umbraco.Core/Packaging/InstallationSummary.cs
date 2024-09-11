@@ -22,10 +22,6 @@ public class InstallationSummary
 
     public IEnumerable<IDictionaryItem> DictionaryItemsInstalled { get; set; } = Enumerable.Empty<IDictionaryItem>();
 
-    public IEnumerable<IMacro> MacrosInstalled { get; set; } = Enumerable.Empty<IMacro>();
-
-    public IEnumerable<IPartialView> MacroPartialViewsInstalled { get; set; } = Enumerable.Empty<IPartialView>();
-
     public IEnumerable<ITemplate> TemplatesInstalled { get; set; } = Enumerable.Empty<ITemplate>();
 
     public IEnumerable<IContentType> DocumentTypesInstalled { get; set; } = Enumerable.Empty<IContentType>();
@@ -74,14 +70,11 @@ public class InstallationSummary
             }
         }
 
-        WriteConflicts(Warnings?.ConflictingMacros, x => x?.Alias, "Conflicting macros found, they will be overwritten: ");
         WriteConflicts(Warnings?.ConflictingTemplates, x => x.Alias, "Conflicting templates found, they will be overwritten: ");
         WriteConflicts(Warnings?.ConflictingStylesheets, x => x?.Alias, "Conflicting stylesheets found, they will be overwritten: ");
         WriteCount("Data types installed: ", DataTypesInstalled);
         WriteCount("Languages installed: ", LanguagesInstalled);
         WriteCount("Dictionary items installed: ", DictionaryItemsInstalled);
-        WriteCount("Macros installed: ", MacrosInstalled);
-        WriteCount("Macro partial views installed: ", MacroPartialViewsInstalled);
         WriteCount("Templates installed: ", TemplatesInstalled);
         WriteCount("Document types installed: ", DocumentTypesInstalled);
         WriteCount("Media types installed: ", MediaTypesInstalled);

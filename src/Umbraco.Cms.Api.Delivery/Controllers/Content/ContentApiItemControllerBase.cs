@@ -1,22 +1,41 @@
-﻿using Umbraco.Cms.Core.DeliveryApi;
+﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 public abstract class ContentApiItemControllerBase : ContentApiControllerBase
 {
-    private readonly IPublicAccessService _publicAccessService;
-
     protected ContentApiItemControllerBase(
         IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService)
+        IApiContentResponseBuilder apiContentResponseBuilder)
         : base(apiPublishedContentCache, apiContentResponseBuilder)
-        => _publicAccessService = publicAccessService;
+    {
+    }
 
-    // NOTE: we're going to test for protected content at item endpoint level, because the check has already been
-    //       performed at content index time for the query endpoint and we don't want that extra overhead when
-    //       returning multiple items.
-    protected bool IsProtected(IPublishedContent content) => _publicAccessService.IsProtected(content.Path);
+    protected async Task<IActionResult?> HandleMemberAccessAsync(IPublishedContent contentItem, IRequestMemberAccessService requestMemberAccessService)
+    {
+        PublicAccessStatus accessStatus = await requestMemberAccessService.MemberHasAccessToAsync(contentItem);
+        return accessStatus is PublicAccessStatus.AccessAccepted
+            ? null
+            : accessStatus is PublicAccessStatus.AccessDenied
+                ? Forbidden()
+                : Unauthorized();
+    }
+
+    protected async Task<IActionResult?> HandleMemberAccessAsync(IEnumerable<IPublishedContent> contentItems, IRequestMemberAccessService requestMemberAccessService)
+    {
+        foreach (IPublishedContent content in contentItems)
+        {
+            IActionResult? result = await HandleMemberAccessAsync(content, requestMemberAccessService);
+            // if any of the content items yield an error based on the current member access, return that error
+            if (result is not null)
+            {
+                return result;
+            }
+        }
+
+        return null;
+    }
 }

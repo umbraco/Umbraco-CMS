@@ -9,13 +9,13 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionRestore : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const char ActionLetter = 'V';
+    public const string ActionLetter = "Umb.DocumentRecycleBin.Restore";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "restore";
 
     /// <inheritdoc/>
-    public char Letter => ActionLetter;
+    public string Letter => ActionLetter;
 
     /// <inheritdoc/>
     public string Alias => ActionAlias;

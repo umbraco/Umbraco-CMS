@@ -1,11 +1,11 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
-using ContentTypeCleanupViewModel = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeCleanup;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory, IDocumentTypeEditingPresentationFactory
+internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IContentType>, IDocumentTypeEditingPresentationFactory
 {
     public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
         : base(contentTypeService)
@@ -25,9 +25,12 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         MapCleanup(createModel, requestModel.Cleanup);
 
         createModel.Key = requestModel.Id;
-        createModel.ContainerKey = requestModel.ContainerId;
-        createModel.AllowedTemplateKeys = requestModel.AllowedTemplateIds;
-        createModel.DefaultTemplateKey = requestModel.DefaultTemplateId;
+        createModel.ContainerKey = requestModel.Parent?.Id;
+        createModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
+        createModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
+        createModel.ListView = requestModel.Collection?.Id;
+        createModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
+        createModel.Compositions = MapCompositions(requestModel.Compositions);
 
         return createModel;
     }
@@ -44,17 +47,33 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
 
         MapCleanup(updateModel, requestModel.Cleanup);
 
-        updateModel.AllowedTemplateKeys = requestModel.AllowedTemplateIds;
-        updateModel.DefaultTemplateKey = requestModel.DefaultTemplateId;
+        updateModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
+        updateModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
+        updateModel.ListView = requestModel.Collection?.Id;
+        updateModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
+        updateModel.Compositions = MapCompositions(requestModel.Compositions);
 
         return updateModel;
     }
 
-    private void MapCleanup(ContentTypeModelBase model, ContentTypeCleanupViewModel cleanup)
+    public IEnumerable<AvailableDocumentTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => compositionResults.Select(MapCompositionModel<AvailableDocumentTypeCompositionResponseModel>);
+
+    private void MapCleanup(ContentTypeModelBase model, DocumentTypeCleanup cleanup)
         => model.Cleanup = new ContentTypeCleanup
         {
             PreventCleanup = cleanup.PreventCleanup,
             KeepAllVersionsNewerThanDays = cleanup.KeepAllVersionsNewerThanDays,
             KeepLatestVersionPerDayForDays = cleanup.KeepLatestVersionPerDayForDays
         };
+
+    private IEnumerable<ContentTypeSort> MapAllowedContentTypes(IEnumerable<DocumentTypeSort> allowedDocumentTypes)
+        => MapAllowedContentTypes(allowedDocumentTypes
+            .DistinctBy(t => t.DocumentType.Id)
+            .ToDictionary(t => t.DocumentType.Id, t => t.SortOrder));
+
+    private IEnumerable<Composition> MapCompositions(IEnumerable<DocumentTypeComposition> documentTypeCompositions)
+        => MapCompositions(documentTypeCompositions
+            .DistinctBy(c => c.DocumentType.Id)
+            .ToDictionary(c => c.DocumentType.Id, c => c.CompositionType));
 }

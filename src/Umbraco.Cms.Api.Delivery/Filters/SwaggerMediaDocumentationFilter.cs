@@ -15,7 +15,9 @@ internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilt
     {
         operation.Parameters ??= new List<OpenApiParameter>();
 
-        AddExpand(operation);
+        AddExpand(operation, context);
+
+        AddFields(operation, context);
 
         AddApiKey(operation);
     }

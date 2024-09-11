@@ -5,12 +5,14 @@
     <Description>Contains the published cache assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.5.124" />
-    <PackageReference Include="Umbraco.CSharpTest.Net.Collections" Version="15.0.0" />
-    <PackageReference Include="K4os.Compression.LZ4" Version="1.3.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Umbraco.CSharpTest.Net.Collections" />
+    <PackageReference Include="MessagePack" />
+    <PackageReference Include="K4os.Compression.LZ4" />
   </ItemGroup>
 
   <ItemGroup>

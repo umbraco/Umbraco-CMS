@@ -2,6 +2,7 @@ using NPoco;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
@@ -21,7 +22,7 @@ internal static class UmbracoDatabaseExtensions
     /// <summary>
     ///     Gets a dictionary of key/values directly from the database, no scope, nothing.
     /// </summary>
-    /// <remarks>Used by <see cref="CoreRuntimeBootstrapper" /> to determine the runtime state.</remarks>
+    /// <remarks>Used by <see cref="RuntimeState" /> to determine the runtime state.</remarks>
     public static IReadOnlyDictionary<string, string?>? GetFromKeyValueTable(
         this IUmbracoDatabase? database,
         string keyPrefix)
@@ -76,7 +77,8 @@ internal static class UmbracoDatabaseExtensions
 
     public static long Count(this IUmbracoDatabase database, Sql sql)
     {
-        var query = new Sql().Select("COUNT(*)").From().Append("(").Append(sql).Append(")");
+        // We need to copy the sql into a new object, to avoid this method from changing the sql.
+        var query = new Sql().Select("COUNT(*)").From().Append("(").Append(new Sql(sql.SQL, sql.Arguments)).Append(") as count_query");
 
         return database.ExecuteScalar<long>(query);
     }

@@ -29,7 +29,9 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(SavedLogSearchResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByName(string name)
+    public async Task<IActionResult> ByName(
+        CancellationToken cancellationToken,
+        string name)
     {
         ILogViewerQuery? savedLogQuery = await _logViewerService.GetSavedLogQueryByNameAsync(name);
 

@@ -15,5 +15,5 @@ public interface IQueryRepository<TEntity> : IRepository
     /// <summary>
     ///     Counts entities.
     /// </summary>
-    int Count(IQuery<TEntity> query);
+    int Count(IQuery<TEntity>? query);
 }

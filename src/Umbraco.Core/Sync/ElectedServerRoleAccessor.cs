@@ -19,7 +19,6 @@ public sealed class ElectedServerRoleAccessor : IServerRoleAccessor
     ///     Initializes a new instance of the <see cref="ElectedServerRoleAccessor" /> class.
     /// </summary>
     /// <param name="registrationService">The registration service.</param>
-    /// <param name="options">Some options.</param>
     public ElectedServerRoleAccessor(IServerRegistrationService registrationService) => _registrationService =
         registrationService ?? throw new ArgumentNullException(nameof(registrationService));
 

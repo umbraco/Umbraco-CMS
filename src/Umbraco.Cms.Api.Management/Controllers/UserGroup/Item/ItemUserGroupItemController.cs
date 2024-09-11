@@ -20,11 +20,18 @@ public class ItemUserGroupItemController : UserGroupItemControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<UserGroupItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<UserGroupItemResponseModel>());
+        }
+
         IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(ids);
         List<UserGroupItemResponseModel> responseModels = _mapper.MapEnumerable<IUserGroup, UserGroupItemResponseModel>(userGroups);
         return Ok(responseModels);

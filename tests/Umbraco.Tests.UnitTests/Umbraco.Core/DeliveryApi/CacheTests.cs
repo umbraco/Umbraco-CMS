@@ -33,6 +33,7 @@ public class CacheTests : DeliveryApiTests
         propertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
         propertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(cacheLevel);
         propertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(cacheLevel);
+        propertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevelForExpansion(It.IsAny<IPublishedPropertyType>())).Returns(cacheLevel);
 
         var propertyType = SetupPublishedPropertyType(propertyValueConverter.Object, "something", "Some.Thing");
 

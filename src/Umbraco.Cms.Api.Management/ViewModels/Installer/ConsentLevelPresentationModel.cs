@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models;
 
@@ -8,5 +9,6 @@ public class ConsentLevelPresentationModel
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TelemetryLevel Level { get; set; }
 
+    [Required]
     public string Description { get; set; } = string.Empty;
 }

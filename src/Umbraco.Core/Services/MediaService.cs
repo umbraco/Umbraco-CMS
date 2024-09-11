@@ -1,5 +1,7 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -25,6 +27,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
 
         private readonly MediaFileManager _mediaFileManager;
 
@@ -39,7 +42,8 @@ namespace Umbraco.Cms.Core.Services
             IAuditRepository auditRepository,
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileManager = mediaFileManager;
@@ -48,6 +52,33 @@ namespace Umbraco.Cms.Core.Services
             _mediaTypeRepository = mediaTypeRepository;
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
+            _userIdKeyResolver = userIdKeyResolver;
+        }
+
+        [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditRepository auditRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper)
+            : this(
+                provider,
+                mediaFileManager,
+                loggerFactory,
+                eventMessagesFactory,
+                mediaRepository,
+                auditRepository,
+                mediaTypeRepository,
+                entityRepository,
+                shortStringHelper,
+                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>()
+                )
+        {
         }
 
         #endregion
@@ -725,6 +756,13 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                 {
+                    if (_entityRepository.Get(media.Key, UmbracoObjectTypes.Media.GetGuid()) is not null)
+                    {
+                        scope.Complete();
+                        return Attempt.Fail<OperationResult?>(
+                            new OperationResult(OperationResultType.FailedDuplicateKey, eventMessages));
+                    }
+
                     media.CreatorId = userId;
                 }
 
@@ -964,7 +1002,6 @@ namespace Umbraco.Cms.Core.Services
                 MoveToRecycleBinEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2)).ToArray();
                 scope.Notifications.Publish(new MediaMovedToRecycleBinNotification(moveInfo, messages).WithStateFrom(movingToRecycleBinNotification));
                 Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
-
                 scope.Complete();
             }
 
@@ -1089,6 +1126,9 @@ namespace Umbraco.Cms.Core.Services
             _mediaRepository.Save(media);
         }
 
+        public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
+            => EmptyRecycleBin(await _userIdKeyResolver.GetAsync(userId));
+
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
@@ -1199,7 +1239,7 @@ namespace Umbraco.Cms.Core.Services
 
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
@@ -1212,6 +1252,7 @@ namespace Umbraco.Cms.Core.Services
                     scope.Notifications.Publish(new MediaTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
                 }
 
+                scope.Complete();
                 return report;
             }
         }

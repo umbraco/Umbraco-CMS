@@ -67,7 +67,7 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
 
     private void DumpThreadAborts(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        if (!IsTimeoutThreadAbortException(logEvent.Exception))
+        if (logEvent.Exception is null || !IsTimeoutThreadAbortException(logEvent.Exception))
         {
             return;
         }

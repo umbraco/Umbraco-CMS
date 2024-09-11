@@ -39,16 +39,8 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
     /// </summary>
-    /// <param name="configuration">The ImageSharp configuration.</param>
-    [Obsolete("Use ctor with all params - This will be removed in Umbraco 13.")]
-    public ImageSharpImageUrlGenerator(Configuration configuration)
-        : this(configuration, StaticServiceProvider.Instance.GetService<RequestAuthorizationUtilities>(), StaticServiceProvider.Instance.GetRequiredService<IOptions<ImageSharpMiddlewareOptions>>())
-    { }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
-    /// </summary>
     /// <param name="supportedImageFileTypes">The supported image file types/extensions.</param>
+    /// <param name="options">The ImageSharp middleware options.</param>
     /// <param name="requestAuthorizationUtilities">Contains helpers that allow authorization of image requests.</param>
     /// <remarks>
     /// This constructor is only used for testing.
@@ -129,11 +121,7 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
         {
             var uri = QueryHelpers.AddQueryString(options.ImageUrl, queryString);
 
-            // It's important that we call the async version here.
-            // This is because if we call the synchronous version, we ImageSharp will start a new Task ever single time.
-            // This becomes a huge problem if the site is under load, and will result in massive spikes in response time.
-            // See https://github.com/SixLabors/ImageSharp.Web/blob/main/src/ImageSharp.Web/AsyncHelper.cs#L24
-            var token = _requestAuthorizationUtilities.ComputeHMACAsync(uri, CommandHandling.Sanitize).GetAwaiter().GetResult();
+            var token = _requestAuthorizationUtilities.ComputeHMAC(uri, CommandHandling.Sanitize);
             if (string.IsNullOrEmpty(token) is false)
             {
                 queryString.Add(RequestAuthorizationUtilities.TokenCommand, token);

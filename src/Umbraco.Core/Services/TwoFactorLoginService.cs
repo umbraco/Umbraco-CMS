@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -42,14 +40,18 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     /// <inheritdoc />
     public async Task DeleteUserLoginsAsync(Guid userOrMemberKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey);
+
+        scope.Complete();
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey) =>
         await GetEnabledProviderNamesAsync(userOrMemberKey);
 
+    /// <inheritdoc />
+    [Obsolete("Use DisableByCodeWithStatusAsync. This will be removed in Umbraco 15.")]
     public async Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code)
     {
         var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
@@ -69,6 +71,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
         return await DisableAsync(userOrMemberKey, providerName);
     }
 
+    [Obsolete("Use ValidateAndSaveWithStatusAsync. This will be removed in Umbraco 15.")]
     public async Task<bool> ValidateAndSaveAsync(string providerName, Guid userOrMemberKey, string secret, string code)
     {
         try
@@ -112,6 +115,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use GetSetupInfoWithStatusAsync(). This will be removed in Umbraco 15.")]
     public async Task<object?> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
     {
         var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
@@ -138,8 +142,12 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     /// <inheritdoc />
     public async Task<bool> DisableAsync(Guid userOrMemberKey, string providerName)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey, providerName);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        var result = await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey, providerName);
+
+        scope.Complete();
+
+        return result;
     }
 
     /// <inheritdoc />
@@ -156,9 +164,10 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     /// <inheritdoc />
     public Task SaveAsync(TwoFactorLogin twoFactorLogin)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _twoFactorLoginRepository.Save(twoFactorLogin);
 
+        scope.Complete();
         return Task.CompletedTask;
     }
 

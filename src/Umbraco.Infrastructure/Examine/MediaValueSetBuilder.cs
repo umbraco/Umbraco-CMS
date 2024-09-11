@@ -1,6 +1,7 @@
 using Examine;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -14,6 +15,7 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     private readonly ContentSettings _contentSettings;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IContentTypeService _contentTypeService;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
 
@@ -23,19 +25,23 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IUserService userService,
         IShortStringHelper shortStringHelper,
-        IOptions<ContentSettings> contentSettings)
+        IOptions<ContentSettings> contentSettings,
+        IContentTypeService contentTypeService)
         : base(propertyEditors, false)
     {
         _urlSegmentProviders = urlSegmentProviders;
         _mediaUrlGenerators = mediaUrlGenerators;
         _userService = userService;
         _shortStringHelper = shortStringHelper;
+        _contentTypeService = contentTypeService;
         _contentSettings = contentSettings.Value;
     }
 
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
     {
+        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAll().ToDictionary(x => x.Key);
+
         foreach (IMedia m in media)
         {
             var urlValue = m.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
@@ -65,7 +71,7 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
 
             foreach (IProperty property in m.Properties)
             {
-                AddPropertyValue(property, null, null, values, m.AvailableCultures);
+                AddPropertyValue(property, null, null, values, m.AvailableCultures, contentTypeDictionary);
             }
 
             var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values);

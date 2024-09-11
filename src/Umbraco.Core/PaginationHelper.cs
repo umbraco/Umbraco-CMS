@@ -2,7 +2,7 @@
 
 public static class PaginationHelper
 {
-    internal static void ConvertSkipTakeToPaging(int skip, int take, out long pageNumber, out int pageSize)
+    public static void ConvertSkipTakeToPaging(int skip, int take, out long pageNumber, out int pageSize)
     {
         if (skip % take != 0)
         {

@@ -27,7 +27,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         InstallationSummary = packagingService.InstallCompiledPackageData(xml);
 
         Root = InstallationSummary.ContentInstalled.First();
-        ContentService.SaveAndPublish(Root);
+        ContentService.Publish(Root, Root.AvailableCultures.ToArray());
 
         var cultures = new List<string>
         {
@@ -101,7 +101,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             }
         }
 
-        VerifyDomains(result.Result.ToArray());
+        VerifyDomains(result.Result.Domains.ToArray());
 
         // re-get and verify again
         var domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
@@ -135,7 +135,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             }
         }
 
-        VerifyDomains(result.Result.ToArray());
+        VerifyDomains(result.Result.Domains.ToArray());
 
         // re-get and verify again
         var domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
@@ -157,14 +157,14 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(3, result.Result.Count());
+        Assert.AreEqual(3, result.Result.Domains.Count());
 
         updateModel.Domains = Enumerable.Empty<DomainModel>();
 
         result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(0, result.Result.Count());
+        Assert.AreEqual(0, result.Result.Domains.Count());
 
         // re-get and verify again
         var domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
@@ -186,16 +186,16 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(3, result.Result.Count());
+        Assert.AreEqual(3, result.Result.Domains.Count());
 
         updateModel.Domains = new[] { updateModel.Domains.First(), updateModel.Domains.Last() };
 
         result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DomainOperationStatus.Success, result.Status);
-        Assert.AreEqual(2, result.Result.Count());
-        Assert.AreEqual(Cultures.First(), result.Result.First().LanguageIsoCode);
-        Assert.AreEqual(Cultures.Last(), result.Result.Last().LanguageIsoCode);
+        Assert.AreEqual(2, result.Result.Domains.Count());
+        Assert.AreEqual(Cultures.First(), result.Result.Domains.First().LanguageIsoCode);
+        Assert.AreEqual(Cultures.Last(), result.Result.Domains.Last().LanguageIsoCode);
     }
 
     [Test]
@@ -275,10 +275,10 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
 
         var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.Result.Count());
+        Assert.AreEqual(1, result.Result.Domains.Count());
 
         // default culture is represented as a wildcard domain
-        var domain = result.Result.First();
+        var domain = result.Result.Domains.First();
         Assert.IsTrue(domain.IsWildcard);
         Assert.AreEqual(culture, domain.LanguageIsoCode);
         Assert.AreEqual("*" + Root.Id, domain.DomainName);
@@ -332,11 +332,27 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         Assert.AreEqual(DomainOperationStatus.DuplicateDomainName, result.Status);
     }
 
+    [TestCase("https://*.umbraco.com")]
+    [TestCase("&#€%#€")]
+    [TestCase("¢”$¢”¢$≈{")]
+    public async Task Cannot_Assign_Invalid_Domains(string domainName)
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = new DomainModel { DomainName = domainName, IsoCode = Cultures.First() }.Yield()
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.InvalidDomainName, result.Status);
+    }
+
     [Test]
     public async Task Cannot_Assign_Already_Used_Domains()
     {
         var copy = ContentService.Copy(Root, Root.ParentId, false);
-        ContentService.SaveAndPublish(copy!);
+        ContentService.Publish(copy!, copy!.AvailableCultures.ToArray());
 
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
@@ -352,7 +368,15 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
 
         result = await domainService.UpdateDomainsAsync(copy.Key, updateModel);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(DomainOperationStatus.DuplicateDomainName, result.Status);
+        Assert.AreEqual(DomainOperationStatus.ConflictingDomainName, result.Status);
+
+        Assert.IsNotNull(result.Result.ConflictingDomains);
+        Assert.IsNotEmpty(result.Result.ConflictingDomains);
+        Assert.AreEqual(updateModel.Domains.Count(), result.Result.ConflictingDomains.Count());
+        foreach (var culture in Cultures)
+        {
+            Assert.IsNotNull(result.Result.ConflictingDomains.SingleOrDefault(c => c.RootContentId == Root.Id && c.DomainName == GetDomainUrlFromCultureCode(culture)));
+        }
     }
 
     private static string GetDomainUrlFromCultureCode(string culture) =>

@@ -1,8 +1,16 @@
 ﻿namespace Umbraco.Cms.Core.Snippets;
 
-public class PartialViewSnippet : Snippet
+/// <summary>
+/// Defines a partial view snippet.
+/// </summary>
+public class PartialViewSnippet : PartialViewSnippetSlim
 {
-    public PartialViewSnippet(string name, string content) : base(name, content)
-    {
-    }
+    public PartialViewSnippet(string id, string name, string content)
+        : base(id, name)
+        => Content = content;
+
+    /// <summary>
+    /// Gets the content of the snippet.
+    /// </summary>
+    public string Content { get; }
 }

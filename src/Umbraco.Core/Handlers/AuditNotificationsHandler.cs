@@ -82,7 +82,7 @@ public sealed class AuditNotificationsHandler :
         get
         {
             IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            IUser? user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
+            IUser? user = identity == null ? null : _userService.GetAsync(identity.Key).GetAwaiter().GetResult();
             return user ?? UnknownUser(_globalSettings);
         }
     }
@@ -123,7 +123,7 @@ public sealed class AuditNotificationsHandler :
         foreach (EntityPermission perm in perms)
         {
             IUserGroup? group = _userGroupService.GetAsync(perm.UserGroupId).Result;
-            var assigned = string.Join(", ", perm.AssignedPermissions ?? Array.Empty<string>());
+            var assigned = string.Join(", ", perm.AssignedPermissions);
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
             _auditService.Write(
@@ -238,10 +238,10 @@ public sealed class AuditNotificationsHandler :
             IUserGroup group = groupWithUser.UserGroup;
 
             var dp = string.Join(", ", ((UserGroup)group).GetWereDirtyProperties());
-            var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
+            var sections = ((UserGroup)group).WasPropertyDirty(nameof(group.AllowedSections))
                 ? string.Join(", ", group.AllowedSections)
                 : null;
-            var perms = ((UserGroup)group).WasPropertyDirty("Permissions") && group.Permissions is not null
+            var perms = ((UserGroup)group).WasPropertyDirty(nameof(group.Permissions))
                 ? string.Join(", ", group.Permissions)
                 : null;
 

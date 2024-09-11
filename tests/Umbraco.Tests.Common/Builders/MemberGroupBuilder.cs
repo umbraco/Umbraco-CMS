@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
@@ -16,7 +15,6 @@ public class MemberGroupBuilder
         IWithUpdateDateBuilder,
         IWithNameBuilder
 {
-    private GenericDictionaryBuilder<MemberGroupBuilder, string, object> _additionalDataBuilder;
     private DateTime? _createDate;
     private int? _creatorId;
 
@@ -61,13 +59,6 @@ public class MemberGroupBuilder
         set => _updateDate = value;
     }
 
-    public GenericDictionaryBuilder<MemberGroupBuilder, string, object> AddAdditionalData()
-    {
-        var builder = new GenericDictionaryBuilder<MemberGroupBuilder, string, object>(this);
-        _additionalDataBuilder = builder;
-        return builder;
-    }
-
     public override MemberGroup Build()
     {
         var id = _id ?? 1;
@@ -86,15 +77,6 @@ public class MemberGroupBuilder
             Name = name,
             CreatorId = creatorId
         };
-
-        if (_additionalDataBuilder != null)
-        {
-            var additionalData = _additionalDataBuilder.Build();
-            foreach (var kvp in additionalData)
-            {
-                memberGroup.AdditionalData.Add(kvp.Key, kvp.Value);
-            }
-        }
 
         return memberGroup;
     }

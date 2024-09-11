@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
+[ApiVersion("1.0")]
 public class GetDocumentPermissionsCurrentUserController : CurrentUserControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -30,7 +31,10 @@ public class GetDocumentPermissionsCurrentUserController : CurrentUserController
     [MapToApiVersion("1.0")]
     [HttpGet("permissions/document")]
     [ProducesResponseType(typeof(IEnumerable<UserPermissionsResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPermissions([FromQuery(Name = "id")] HashSet<Guid> ids)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetPermissions(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissionsAttempt = await _userService.GetDocumentPermissionsAsync(CurrentUserKey(_backOfficeSecurityAccessor), ids);
 

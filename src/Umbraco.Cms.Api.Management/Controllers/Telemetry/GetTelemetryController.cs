@@ -16,5 +16,6 @@ public class GetTelemetryController : TelemetryControllerBase
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TelemetryResponseModel), StatusCodes.Status200OK)]
-    public async Task<TelemetryRepresentationBase> Get() => await Task.FromResult(new TelemetryResponseModel { TelemetryLevel = _metricsConsentService.GetConsentLevel() });
+    public async Task<TelemetryRepresentationBase> Get(CancellationToken cancellationToken)
+        => await Task.FromResult(new TelemetryResponseModel { TelemetryLevel = _metricsConsentService.GetConsentLevel() });
 }

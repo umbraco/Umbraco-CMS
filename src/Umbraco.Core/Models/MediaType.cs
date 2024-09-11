@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -44,6 +45,21 @@ public class MediaType : ContentTypeCompositionBase, IMediaType
 
     /// <inheritdoc />
     public override ISimpleContentType ToSimple() => new SimpleContentType(this);
+
+    /// <inheritdoc />
+    public override string Alias
+    {
+        get => base.Alias;
+        set
+        {
+            if (this.IsSystemMediaType() && value != Alias)
+            {
+                throw new InvalidOperationException("Cannot change the alias of a system media type");
+            }
+
+            base.Alias = value;
+        }
+    }
 
     /// <inheritdoc />
     IMediaType IMediaType.DeepCloneWithResetIdentities(string newAlias) =>

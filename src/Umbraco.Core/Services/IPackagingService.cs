@@ -12,14 +12,14 @@ public interface IPackagingService : IService
     /// <summary>
     ///     Returns a <see cref="CompiledPackage" /> result from an umbraco package file (zip)
     /// </summary>
-    /// <param name="packageFile"></param>
+    /// <param name="packageXml"></param>
     /// <returns></returns>
     CompiledPackage GetCompiledPackageInfo(XDocument packageXml);
 
     /// <summary>
     ///     Installs the data, entities, objects contained in an umbraco package file (zip)
     /// </summary>
-    /// <param name="packageFile"></param>
+    /// <param name="packageXmlFile"></param>
     /// <param name="userId"></param>
     InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
 
@@ -29,7 +29,17 @@ public interface IPackagingService : IService
     ///     Returns the advertised installed packages
     /// </summary>
     /// <returns></returns>
+    [Obsolete("Use GetAllInstalledPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     IEnumerable<InstalledPackage> GetAllInstalledPackages();
+
+    /// <summary>
+    ///     Returns the advertised installed packages
+    /// </summary>
+    /// <returns></returns>
+    Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync()
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Task.FromResult(GetAllInstalledPackages());
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Returns installed packages collected from the package migration plans.

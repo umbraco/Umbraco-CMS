@@ -6,6 +6,4 @@ public abstract class CreateContentTypeRequestModelBase<TPropertyType, TProperty
     where TPropertyTypeContainer : PropertyTypeContainerModelBase
 {
     public Guid? Id { get; set; }
-
-    public Guid? ContainerId { get; set; }
 }

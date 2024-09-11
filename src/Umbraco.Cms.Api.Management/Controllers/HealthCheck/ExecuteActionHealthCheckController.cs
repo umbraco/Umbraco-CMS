@@ -38,9 +38,11 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HealthCheckResultResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(HealthCheckActionRequestModel action)
+    public async Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(
+        CancellationToken cancellationToken,
+        HealthCheckActionRequestModel action)
     {
-        Guid healthCheckKey = action.HealthCheckId;
+        Guid healthCheckKey = action.HealthCheck.Id;
 
         Core.HealthChecks.HealthCheck? healthCheck = _healthChecks
             .Where(x => _disabledCheckIds.Contains(healthCheckKey) == false)

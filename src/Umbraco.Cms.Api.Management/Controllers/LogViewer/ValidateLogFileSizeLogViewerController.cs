@@ -24,7 +24,10 @@ public class ValidateLogFileSizeLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> CanViewLogs(DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<IActionResult> CanViewLogs(
+        CancellationToken cancellationToken,
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null)
     {
         Attempt<bool, LogViewerOperationStatus> result = await _logViewerService.CanViewLogsAsync(startDate, endDate);
 

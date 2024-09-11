@@ -25,10 +25,14 @@ public class AllDictionaryController : DictionaryControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DictionaryOverviewResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<DictionaryOverviewResponseModel>>> All(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<DictionaryOverviewResponseModel>>> All(
+        CancellationToken cancellationToken,
+        string? filter = null,
+        int skip = 0,
+        int take = 100)
     {
         // unfortunately we can't paginate here...we'll have to get all and paginate in memory
-        IDictionaryItem[] items = (await _dictionaryItemService.GetDescendantsAsync(Constants.System.RootKey)).ToArray();
+        IDictionaryItem[] items = (await _dictionaryItemService.GetDescendantsAsync(Constants.System.RootKey, filter)).ToArray();
         var model = new PagedViewModel<DictionaryOverviewResponseModel>
         {
             Total = items.Length,

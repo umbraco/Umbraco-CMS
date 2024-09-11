@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,15 +18,22 @@ public class PublishedDataType
 {
     private readonly Lazy<object?> _lazyConfiguration;
 
+    [Obsolete("Please use the constructor that accepts editor UI alias too. Scheduled for removal in V16.")]
+    public PublishedDataType(int id, string editorAlias, Lazy<object?> lazyConfiguration)
+        : this(id, editorAlias, editorAlias, lazyConfiguration)
+    {
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedDataType" /> class.
     /// </summary>
-    public PublishedDataType(int id, string editorAlias, Lazy<object?> lazyConfiguration)
+    public PublishedDataType(int id, string editorAlias, string? editorUiAlias, Lazy<object?> lazyConfiguration)
     {
         _lazyConfiguration = lazyConfiguration;
 
         Id = id;
         EditorAlias = editorAlias;
+        EditorUiAlias = editorUiAlias ?? editorAlias;
     }
 
     /// <summary>
@@ -37,6 +45,11 @@ public class PublishedDataType
     ///     Gets the data type editor alias.
     /// </summary>
     public string EditorAlias { get; }
+
+    /// <summary>
+    ///     Gets the data type editor UI alias.
+    /// </summary>
+    public string EditorUiAlias { get; }
 
     /// <summary>
     ///     Gets the data type configuration object.

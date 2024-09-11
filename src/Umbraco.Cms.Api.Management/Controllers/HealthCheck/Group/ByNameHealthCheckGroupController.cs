@@ -31,7 +31,9 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupPresentationModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByName(string name)
+    public async Task<IActionResult> ByName(
+        CancellationToken cancellationToken,
+        string name)
     {
         IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupPresentationFactory
             .CreateGroupingFromHealthCheckCollection();

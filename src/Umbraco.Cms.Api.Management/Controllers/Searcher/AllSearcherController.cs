@@ -22,7 +22,10 @@ public class AllSearcherController : SearcherControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearcherResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<SearcherResponse>>> All(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<SearcherResponse>>> All(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         var searchers = new List<SearcherResponse>(
             _examineManager.RegisteredSearchers.Select(searcher => new SearcherResponse { Name = searcher.Name })

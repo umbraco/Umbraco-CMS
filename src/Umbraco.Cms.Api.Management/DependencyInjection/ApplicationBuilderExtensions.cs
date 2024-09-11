@@ -27,8 +27,7 @@ internal static class ApplicationBuilderExtensions
                 var officePath = settings.GetBackOfficePath(hostingEnvironment);
 
                 // Only use the API exception handler when we are requesting an API
-                // FIXME: magic string "management/api" is used several times across the codebase
-                return httpContext.Request.Path.Value?.StartsWith($"{officePath}/management/api/") ?? false;
+                return httpContext.Request.Path.Value?.StartsWith($"{officePath}{Constants.Web.ManagementApiPath}") ?? false;
             },
             innerBuilder =>
             {
@@ -65,8 +64,7 @@ internal static class ApplicationBuilderExtensions
             endpoints.MapControllers();
 
             // Serve contract
-            // FIXME: magic string "management/api" is used several times across the codebase
-            endpoints.MapGet($"{officePath}/management/api/openapi.json", async context =>
+            endpoints.MapGet($"{officePath}{Constants.Web.ManagementApiPath}openapi.json", async context =>
             {
                 await context.Response.SendFileAsync(new EmbeddedFileProvider(typeof(ManagementApiComposer).Assembly).GetFileInfo("OpenApi.json"));
             });

@@ -49,6 +49,7 @@ public class CacheTests
         var invocationCount = 0;
         propertyType.SetupGet(p => p.CacheLevel).Returns(cacheLevel);
         propertyType.SetupGet(p => p.DeliveryApiCacheLevel).Returns(cacheLevel);
+        propertyType.SetupGet(p => p.DeliveryApiCacheLevelForExpansion).Returns(cacheLevel);
         propertyType
             .Setup(p => p.ConvertInterToDeliveryApiObject(It.IsAny<IPublishedElement>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object?>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .Returns(() => $"Delivery API value: {++invocationCount}");

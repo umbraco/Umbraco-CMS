@@ -3,13 +3,13 @@ using System.Data.Common;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -20,7 +20,7 @@ using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
 
 namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
-public class CreateUserStep : IInstallStep
+public class CreateUserStep : StepBase, IInstallStep
 {
     private readonly IUserService _userService;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -31,6 +31,7 @@ public class CreateUserStep : IInstallStep
     private readonly IBackOfficeUserManager _userManager;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IMetricsConsentService _metricsConsentService;
+    private readonly IJsonSerializer _jsonSerializer;
 
     public CreateUserStep(
         IUserService userService,
@@ -41,7 +42,8 @@ public class CreateUserStep : IInstallStep
         ICookieManager cookieManager,
         IBackOfficeUserManager userManager,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
-        IMetricsConsentService metricsConsentService)
+        IMetricsConsentService metricsConsentService,
+        IJsonSerializer jsonSerializer)
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -52,14 +54,15 @@ public class CreateUserStep : IInstallStep
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
         _metricsConsentService = metricsConsentService;
+        _jsonSerializer = jsonSerializer;
     }
 
-    public async Task ExecuteAsync(InstallData model)
+    public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
-            IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);
-            if (admin == null)
+            IUser? admin = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+            if (admin is null)
             {
-                throw new InvalidOperationException("Could not find the super user!");
+                return FailWithMessage("Could not find the super user");
             }
 
             UserInstallData user = model.User;
@@ -72,29 +75,29 @@ public class CreateUserStep : IInstallStep
             BackOfficeIdentityUser? membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
             if (membershipUser == null)
             {
-                throw new InvalidOperationException(
+                return FailWithMessage(
                     $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
             }
 
-            //To change the password here we actually need to reset it since we don't have an old one to use to change
+            // To change the password here we actually need to reset it since we don't have an old one to use to change
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
             if (string.IsNullOrWhiteSpace(resetToken))
             {
-                throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
+                return FailWithMessage("Could not reset password: unable to generate internal reset token");
             }
 
             IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
             {
-                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
+                return FailWithMessage("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
             }
 
-            _metricsConsentService.SetConsentLevel(model.TelemetryLevel);
+            await _metricsConsentService.SetConsentLevelAsync(model.TelemetryLevel);
 
             if (model.User.SubscribeToNewsletter)
             {
                 var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
-                var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
+                var content = new StringContent(_jsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
 
                 HttpClient httpClient = _httpClientFactory.CreateClient();
 
@@ -104,6 +107,8 @@ public class CreateUserStep : IInstallStep
                 }
                 catch { /* fail in silence */ }
             }
+
+            return Success();
     }
 
     /// <inheritdoc/>

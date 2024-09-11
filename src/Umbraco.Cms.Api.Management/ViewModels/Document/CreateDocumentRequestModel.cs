@@ -1,10 +1,6 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.Document;
-
-public class CreateDocumentRequestModel : CreateContentRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
+public class CreateDocumentRequestModel : CreateDocumentRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
 {
-    public Guid ContentTypeId { get; set; }
-
-    public Guid? TemplateId { get; set; }
+    public required ReferenceByIdModel? Template { get; set; }
 }

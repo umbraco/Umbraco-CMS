@@ -22,6 +22,7 @@ public class ContentTypeBuilder
     private readonly List<TemplateBuilder> _templateBuilders = new();
     private ContentVariation? _contentVariation;
     private int? _defaultTemplateId;
+    private bool? _isElement;
     private PropertyTypeCollection _propertyTypeCollection;
 
     private int? _propertyTypeIdsIncrementingFrom;
@@ -45,6 +46,12 @@ public class ContentTypeBuilder
     public ContentTypeBuilder WithDefaultTemplateId(int templateId)
     {
         _defaultTemplateId = templateId;
+        return this;
+    }
+
+    public ContentTypeBuilder WithIsElement(bool isElement)
+    {
+        _isElement = isElement;
         return this;
     }
 
@@ -116,7 +123,8 @@ public class ContentTypeBuilder
         contentType.Thumbnail = GetThumbnail();
         contentType.CreatorId = GetCreatorId();
         contentType.Trashed = GetTrashed();
-        contentType.IsContainer = GetIsContainer();
+        contentType.ListView = GetListView();
+        contentType.IsElement = _isElement ?? false;
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;
@@ -499,14 +507,6 @@ public class ContentTypeBuilder
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
             .WithValueStorageType(ValueStorageType.Integer)
             .WithSortOrder(16)
-            .Done()
-            .AddPropertyType()
-            .WithAlias("mediaPicker")
-            .WithName("Media Picker")
-            .WithDataTypeId(1048)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MediaPicker)
-            .WithValueStorageType(ValueStorageType.Integer)
-            .WithSortOrder(17)
             .Done()
             .AddPropertyType()
             .WithAlias("memberPicker")

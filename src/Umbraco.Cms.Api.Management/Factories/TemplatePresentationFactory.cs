@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Template;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.Template;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -31,7 +32,7 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
         if (template.MasterTemplateAlias is not null)
         {
             ITemplate? parentTemplate = await _templateService.GetAsync(template.MasterTemplateAlias);
-            responseModel.MasterTemplateId = parentTemplate?.Key;
+            responseModel.MasterTemplate = ReferenceByIdModel.ReferenceOrNull(parentTemplate?.Key);
         }
 
         return responseModel;

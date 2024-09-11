@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
@@ -6,7 +7,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the MemberService, which is an easy access to operations involving (umbraco) members.
 /// </summary>
-public interface IMemberService : IMembershipMemberService
+public interface IMemberService : IMembershipMemberService, IContentServiceBase<IMember>
 {
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects
@@ -35,6 +36,41 @@ public interface IMemberService : IMembershipMemberService
     ///     Gets a list of paged <see cref="IMember" /> objects
     /// </summary>
     /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <param name="totalRecords">Total number of records found (out)</param>
+    /// <param name="orderBy">Field to order by</param>
+    /// <param name="orderDirection">Direction to order by</param>
+    /// <param name="memberTypeAlias"></param>
+    /// <param name="filter">Search text filter</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{T}" />
+    /// </returns>
+    IEnumerable<IMember> GetAll(
+        int skip,
+        int take,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        string? memberTypeAlias = null,
+        string filter = "")
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        return GetAll(
+            pageNumber,
+            pageSize,
+            out totalRecords,
+            orderBy,
+            orderDirection,
+            memberTypeAlias,
+            filter);
+    }
+
+    /// <summary>
+    ///     Gets a list of paged <see cref="IMember" /> objects
+    /// </summary>
+    /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
     /// <param name="pageIndex">Current page index</param>
     /// <param name="pageSize">Size of the page</param>
     /// <param name="totalRecords">Total number of records found (out)</param>
@@ -55,6 +91,13 @@ public interface IMemberService : IMembershipMemberService
         bool orderBySystemField,
         string? memberTypeAlias,
         string filter);
+
+    public Task<PagedModel<IMember>> FilterAsync(
+        MemberFilter memberFilter,
+        string orderBy = "username",
+        Direction orderDirection = Direction.Ascending,
+        int skip = 0,
+        int take = 100);
 
     /// <summary>
     ///     Creates an <see cref="IMember" /> object without persisting it
@@ -174,11 +217,25 @@ public interface IMemberService : IMembershipMemberService
     IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
 
     /// <summary>
+    ///     Saves a single <see cref="IMember" /> object
+    /// </summary>
+    /// <param name="media">The <see cref="IMember" /> to save</param>
+    /// <param name="userId">Id of the User saving the Member</param>
+    Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a list of <see cref="IMember" /> objects
+    /// </summary>
+    /// <param name="members">Collection of <see cref="IMember" /> to save</param>
+    /// <param name="userId">Id of the User saving the Members</param>
+    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
     /// </summary>
     /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
     /// <param name="memberTypeAlias">Optional alias for the MemberType when counting number of Members</param>
-    /// <returns><see cref="System.int" /> with number of Members</returns>
+    /// <returns><see cref="int" /> with number of Members</returns>
     int Count(string? memberTypeAlias = null);
 
     /// <summary>
@@ -204,7 +261,7 @@ public interface IMemberService : IMembershipMemberService
     /// <summary>
     ///     Gets a Member by its integer id
     /// </summary>
-    /// <param name="id"><see cref="System.int" /> Id</param>
+    /// <param name="id"><see cref="int" /> Id</param>
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
@@ -257,6 +314,13 @@ public interface IMemberService : IMembershipMemberService
     Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids);
 
     /// <summary>
+    ///     Permanently deletes an <see cref="IMember" /> object
+    /// </summary>
+    /// <param name="member">The <see cref="IMember" /> to delete</param>
+    /// <param name="userId">Id of the User deleting the Member</param>
+    Attempt<OperationResult?> Delete(IMember member, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Delete Members of the specified MemberType id
     /// </summary>
     /// <param name="memberTypeId">Id of the MemberType</param>
@@ -287,7 +351,7 @@ public interface IMemberService : IMembershipMemberService
     ///     Gets a list of Members based on a property search
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="System.string" /> Value to match</param>
+    /// <param name="value"><see cref="string" /> Value to match</param>
     /// <param name="matchType">
     ///     The type of match to make as <see cref="StringPropertyMatchType" />. Default is
     ///     <see cref="StringPropertyMatchType.Exact" />
@@ -304,7 +368,7 @@ public interface IMemberService : IMembershipMemberService
     ///     Gets a list of Members based on a property search
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="System.int" /> Value to match</param>
+    /// <param name="value"><see cref="int" /> Value to match</param>
     /// <param name="matchType">
     ///     The type of match to make as <see cref="StringPropertyMatchType" />. Default is
     ///     <see cref="StringPropertyMatchType.Exact" />
@@ -318,7 +382,7 @@ public interface IMemberService : IMembershipMemberService
     ///     Gets a list of Members based on a property search
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="System.bool" /> Value to match</param>
+    /// <param name="value"><see cref="bool" /> Value to match</param>
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>

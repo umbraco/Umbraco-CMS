@@ -18,7 +18,6 @@ public class ServiceContext
     private readonly Lazy<IKeyValueService>? _keyValueService;
     private readonly Lazy<ILocalizationService>? _localizationService;
     private readonly Lazy<ILocalizedTextService>? _localizedTextService;
-    private readonly Lazy<IMacroService>? _macroService;
     private readonly Lazy<IMediaService>? _mediaService;
     private readonly Lazy<IMediaTypeService>? _mediaTypeService;
     private readonly Lazy<IMemberGroupService>? _memberGroupService;
@@ -32,6 +31,7 @@ public class ServiceContext
     private readonly Lazy<IServerRegistrationService>? _serverRegistrationService;
     private readonly Lazy<ITagService>? _tagService;
     private readonly Lazy<IUserService>? _userService;
+    private readonly Lazy<IWebhookService>? _webhookService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ServiceContext" /> class with lazy services.
@@ -55,7 +55,6 @@ public class ServiceContext
         Lazy<IServerRegistrationService>? serverRegistrationService,
         Lazy<IEntityService>? entityService,
         Lazy<IRelationService>? relationService,
-        Lazy<IMacroService>? macroService,
         Lazy<IMemberTypeService>? memberTypeService,
         Lazy<IMemberGroupService>? memberGroupService,
         Lazy<INotificationService>? notificationService,
@@ -63,7 +62,8 @@ public class ServiceContext
         Lazy<IRedirectUrlService>? redirectUrlService,
         Lazy<IConsentService>? consentService,
         Lazy<IKeyValueService>? keyValueService,
-        Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider)
+        Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider,
+        Lazy<IWebhookService>? webhookService)
     {
         _publicAccessService = publicAccessService;
         _domainService = domainService;
@@ -83,7 +83,6 @@ public class ServiceContext
         _serverRegistrationService = serverRegistrationService;
         _entityService = entityService;
         _relationService = relationService;
-        _macroService = macroService;
         _memberTypeService = memberTypeService;
         _memberGroupService = memberGroupService;
         _notificationService = notificationService;
@@ -92,6 +91,7 @@ public class ServiceContext
         _consentService = consentService;
         _keyValueService = keyValueService;
         _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+        _webhookService = webhookService;
     }
 
     /// <summary>
@@ -128,11 +128,6 @@ public class ServiceContext
     ///     Gets the <see cref="ITagService" />
     /// </summary>
     public ITagService? TagService => _tagService?.Value;
-
-    /// <summary>
-    ///     Gets the <see cref="IMacroService" />
-    /// </summary>
-    public IMacroService? MacroService => _macroService?.Value;
 
     /// <summary>
     ///     Gets the <see cref="IEntityService" />
@@ -230,6 +225,11 @@ public class ServiceContext
     public IContentTypeBaseServiceProvider? ContentTypeBaseServices => _contentTypeBaseServiceProvider?.Value;
 
     /// <summary>
+    ///     Gets the WebhookService.
+    /// </summary>
+    public IWebhookService? WebhookService => _webhookService?.Value;
+
+    /// <summary>
     ///     Creates a partial service context with only some services (for tests).
     /// </summary>
     /// <remarks>
@@ -255,14 +255,14 @@ public class ServiceContext
         ILocalizedTextService? localizedTextService = null,
         IAuditService? auditService = null,
         IDomainService? domainService = null,
-        IMacroService? macroService = null,
         IPublicAccessService? publicAccessService = null,
         IExternalLoginWithKeyService? externalLoginService = null,
         IServerRegistrationService? serverRegistrationService = null,
         IRedirectUrlService? redirectUrlService = null,
         IConsentService? consentService = null,
         IKeyValueService? keyValueService = null,
-        IContentTypeBaseServiceProvider? contentTypeBaseServiceProvider = null)
+        IContentTypeBaseServiceProvider? contentTypeBaseServiceProvider = null,
+        IWebhookService? webhookService = null)
     {
         Lazy<T>? Lazy<T>(T? service)
         {
@@ -288,7 +288,6 @@ public class ServiceContext
             Lazy(serverRegistrationService),
             Lazy(entityService),
             Lazy(relationService),
-            Lazy(macroService),
             Lazy(memberTypeService),
             Lazy(memberGroupService),
             Lazy(notificationService),
@@ -296,6 +295,8 @@ public class ServiceContext
             Lazy(redirectUrlService),
             Lazy(consentService),
             Lazy(keyValueService),
-            Lazy(contentTypeBaseServiceProvider));
+            Lazy(contentTypeBaseServiceProvider),
+            Lazy(webhookService)
+            );
     }
 }

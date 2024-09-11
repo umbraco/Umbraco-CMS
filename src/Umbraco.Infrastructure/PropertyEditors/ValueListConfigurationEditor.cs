@@ -1,12 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -18,20 +14,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </remarks>
 public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
 {
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper)
-        : this(textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
-
-    public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
-        : base(ioHelper, editorConfigurationParser)
+    public ValueListConfigurationEditor(IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        : base(ioHelper)
     {
         ConfigurationField items = Fields.First(x => x.Key == "items");
-
-        // customize the items field
-        items.Name = textService.Localize("editdatatype", "addPrevalue");
-        items.Validators.Add(new ValueListUniqueValueValidator());
+        items.Validators.Add(new ValueListUniqueValueValidator(configurationEditorJsonSerializer));
     }
 }

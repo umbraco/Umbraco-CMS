@@ -1,35 +1,89 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 [ApiVersion("1.0")]
+[ApiVersion("2.0")]
 public class ByRouteContentApiController : ContentApiItemControllerBase
 {
-    private readonly IRequestRoutingService _requestRoutingService;
+    private readonly IApiContentPathResolver _apiContentPathResolver;
     private readonly IRequestRedirectService _requestRedirectService;
     private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
+    private const string PreviewContentRequestPathPrefix = $"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}";
 
+    [Obsolete($"Please use the constructor that accepts {nameof(IApiContentPathResolver)}. Will be removed in V15.")]
+    public ByRouteContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IRequestRoutingService requestRoutingService,
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberAccessService requestMemberAccessService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestRedirectService,
+            requestPreviewService,
+            requestMemberAccessService,
+            StaticServiceProvider.Instance.GetRequiredService<IApiContentPathResolver>())
+    {
+    }
+
+    [Obsolete($"Please use the non-obsolete constructor. Will be removed in V15.")]
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
         IPublicAccessService publicAccessService,
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService,
-        IRequestPreviewService requestPreviewService)
-        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberAccessService requestMemberAccessService,
+        IApiContentPathResolver apiContentPathResolver)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestRedirectService,
+            requestPreviewService,
+            requestMemberAccessService,
+            apiContentPathResolver)
     {
-        _requestRoutingService = requestRoutingService;
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ByRouteContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberAccessService requestMemberAccessService,
+        IApiContentPathResolver apiContentPathResolver)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
+    {
         _requestRedirectService = requestRedirectService;
         _requestPreviewService = requestPreviewService;
+        _requestMemberAccessService = requestMemberAccessService;
+        _apiContentPathResolver = apiContentPathResolver;
     }
+
+    [HttpGet("item/{*path}")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
+    public async Task<IActionResult> ByRoute(string path = "")
+        => await HandleRequest(path);
 
     /// <summary>
     ///     Gets a content item by route.
@@ -41,23 +95,26 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     /// </remarks>
     /// <returns>The content item or not found result.</returns>
     [HttpGet("item/{*path}")]
-    [MapToApiVersion("1.0")]
+    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByRoute(string path = "")
+    public async Task<IActionResult> ByRouteV20(string path = "")
+        => await HandleRequest(path);
+
+    private async Task<IActionResult> HandleRequest(string path)
     {
         path = DecodePath(path);
-
-        path = path.TrimStart("/");
         path = path.Length == 0 ? "/" : path;
 
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
         {
-            if (IsProtected(contentItem))
+            IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberAccessService);
+            if (deniedAccessResult is not null)
             {
-                return Unauthorized();
+                return deniedAccessResult;
             }
 
             return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
@@ -70,17 +127,12 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     }
 
     private IPublishedContent? GetContent(string path)
-        => path.StartsWith(Constants.DeliveryApi.Routing.PreviewContentPathPrefix)
+        => path.StartsWith(PreviewContentRequestPathPrefix)
             ? GetPreviewContent(path)
             : GetPublishedContent(path);
 
     private IPublishedContent? GetPublishedContent(string path)
-    {
-        var contentRoute = _requestRoutingService.GetContentRoute(path);
-
-        IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
-        return contentItem;
-    }
+        => _apiContentPathResolver.ResolveContentPath(path);
 
     private IPublishedContent? GetPreviewContent(string path)
     {
@@ -89,7 +141,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             return null;
         }
 
-        if (Guid.TryParse(path.AsSpan(Constants.DeliveryApi.Routing.PreviewContentPathPrefix.Length).TrimEnd("/"), out Guid contentId) is false)
+        if (Guid.TryParse(path.AsSpan(PreviewContentRequestPathPrefix.Length).TrimEnd("/"), out Guid contentId) is false)
         {
             return null;
         }

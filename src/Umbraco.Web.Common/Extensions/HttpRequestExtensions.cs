@@ -45,6 +45,9 @@ public static class HttpRequestExtensions
     public static string? ClientCulture(this HttpRequest request)
         => request.Headers.TryGetValue("X-UMB-CULTURE", out StringValues values) ? values[0] : null;
 
+    public static string? ClientSegment(this HttpRequest request)
+        => request.Headers.TryGetValue("X-UMB-SEGMENT", out StringValues values) ? values[0] : null;
+
     /// <summary>
     ///     Determines if a request is local.
     /// </summary>

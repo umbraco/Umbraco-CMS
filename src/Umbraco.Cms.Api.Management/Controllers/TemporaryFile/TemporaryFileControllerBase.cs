@@ -6,37 +6,33 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
-[ApiController]
-[VersionedApiBackOfficeRoute("temporaryfile")]
+[VersionedApiBackOfficeRoute("temporary-file")]
 [ApiExplorerSettings(GroupName = "Temporary File")]
 public abstract class TemporaryFileControllerBase : ManagementApiControllerBase
 {
     protected IActionResult TemporaryFileStatusResult(TemporaryFileOperationStatus operationStatus) =>
-        operationStatus switch
+        OperationStatusResult(operationStatus, problemDetailsBuilder => operationStatus switch
         {
-            TemporaryFileOperationStatus.FileExtensionNotAllowed => BadRequest(new ProblemDetailsBuilder()
+            TemporaryFileOperationStatus.FileExtensionNotAllowed => BadRequest(problemDetailsBuilder
                 .WithTitle("File extension not allowed")
                 .WithDetail("The file extension is not allowed.")
                 .Build()),
-
-            TemporaryFileOperationStatus.KeyAlreadyUsed => BadRequest(new ProblemDetailsBuilder()
+            TemporaryFileOperationStatus.KeyAlreadyUsed => BadRequest(problemDetailsBuilder
                 .WithTitle("Key already used")
                 .WithDetail("The specified key is already used.")
                 .Build()),
-
-            TemporaryFileOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("The temporary file was not found")
-                .Build()),
-            TemporaryFileOperationStatus.UploadBlocked => NotFound(new ProblemDetailsBuilder()
+            TemporaryFileOperationStatus.NotFound => TemporaryFileNotFound(problemDetailsBuilder),
+            TemporaryFileOperationStatus.UploadBlocked => NotFound(problemDetailsBuilder
                 .WithTitle("The temporary file was blocked by a validator")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown temporary file operation status.")
                 .Build()),
-        };
+        });
 
+    protected IActionResult TemporaryFileNotFound() => OperationStatusResult(TemporaryFileOperationStatus.NotFound, TemporaryFileNotFound);
 
-    protected IActionResult TemporaryFileNotFound() => NotFound(new ProblemDetailsBuilder()
+    private IActionResult TemporaryFileNotFound(ProblemDetailsBuilder problemDetailsBuilder) => NotFound(problemDetailsBuilder
         .WithTitle("The temporary file could not be found")
         .Build());
 }

@@ -1,20 +1,26 @@
 using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
 {
-    public MemberValueSetBuilder(PropertyEditorCollection propertyEditors)
+    private readonly IContentTypeService _contentTypeService;
+
+    public MemberValueSetBuilder(PropertyEditorCollection propertyEditors, IContentTypeService contentTypeService)
         : base(propertyEditors, false)
     {
+        _contentTypeService = contentTypeService;
     }
 
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IMember[] members)
     {
+        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAll().ToDictionary(x => x.Key);
+
         foreach (IMember m in members)
         {
             var values = new Dictionary<string, IEnumerable<object?>>
@@ -37,7 +43,7 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
 
             foreach (IProperty property in m.Properties)
             {
-                AddPropertyValue(property, null, null, values, m.AvailableCultures);
+                AddPropertyValue(property, null, null, values, m.AvailableCultures, contentTypeDictionary);
             }
 
             var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Member, m.ContentType.Alias, values);

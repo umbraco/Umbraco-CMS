@@ -4,36 +4,56 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 [ApiVersion("1.0")]
+[ApiVersion("2.0")]
 public class ByIdsContentApiController : ContentApiItemControllerBase
 {
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
+
     public ByIdsContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService)
-        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
-    {
-    }
+        IRequestMemberAccessService requestMemberAccessService)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
+        => _requestMemberAccessService = requestMemberAccessService;
+
+    [HttpGet("item")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+        => await HandleRequest(ids);
 
     /// <summary>
     ///     Gets content items by ids.
     /// </summary>
     /// <param name="ids">The unique identifiers of the content items to retrieve.</param>
     /// <returns>The content items.</returns>
-    [HttpGet("item")]
-    [MapToApiVersion("1.0")]
+    [HttpGet("items")]
+    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ItemsV20([FromQuery(Name = "id")] HashSet<Guid> ids)
+        => await HandleRequest(ids);
+
+    private async Task<IActionResult> HandleRequest(HashSet<Guid> ids)
     {
-        IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(ids);
+        IPublishedContent[] contentItems = ApiPublishedContentCache.GetByIds(ids).ToArray();
+
+        IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItems, _requestMemberAccessService);
+        if (deniedAccessResult is not null)
+        {
+            return deniedAccessResult;
+        }
 
         IApiContentResponse[] apiContentItems = contentItems
-            .Where(contentItem => !IsProtected(contentItem))
             .Select(ApiContentResponseBuilder.Build)
             .WhereNotNull()
             .ToArray();

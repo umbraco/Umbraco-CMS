@@ -29,10 +29,8 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
-    private IMacroService MacroService => GetRequiredService<IMacroService>();
-
     [HideFromTypeFinder]
-    [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c", "Editor1", "editor1")]
+    [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c")]
     public class Editor1 : DataEditor
     {
         public Editor1(IDataValueEditorFactory dataValueEditorFactory)
@@ -42,7 +40,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [HideFromTypeFinder]
-    [DataEditor("d15e1281-e456-4b24-aa86-1dda3e4299d5", "Editor2", "editor2")]
+    [DataEditor("d15e1281-e456-4b24-aa86-1dda3e4299d5")]
     public class Editor2 : DataEditor
     {
         public Editor2(IDataValueEditorFactory dataValueEditorFactory)
@@ -75,7 +73,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     ////     Builder.ComposeFileSystems();
     //// }
 
-    private PackageDataInstallation PackageDataInstallation => GetRequiredService<PackageDataInstallation>();
+    private IPackageDataInstallation PackageDataInstallation => GetRequiredService<IPackageDataInstallation>();
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
@@ -691,53 +689,6 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         foreach (var language in languages)
         {
             Assert.That(allLanguages.Any(x => x.IsoCode == language.IsoCode), Is.True);
-        }
-    }
-
-    [Test]
-    public void Can_Import_Macros()
-    {
-        // Arrange
-        var strXml = ImportResources.uBlogsy_Package;
-        var xml = XElement.Parse(strXml);
-        var macrosElement = xml.Descendants("Macros").First();
-
-        // Act
-        var macros = PackageDataInstallation.ImportMacros(
-            macrosElement.Elements("macro"),
-            -1).ToList();
-
-        // Assert
-        Assert.That(macros.Any(), Is.True);
-
-        var allMacros = MacroService.GetAll().ToList();
-        foreach (var macro in macros)
-        {
-            Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
-        }
-    }
-
-    [Test]
-    public void Can_Import_Macros_With_Properties()
-    {
-        // Arrange
-        var strXml = ImportResources.XsltSearch_Package;
-        var xml = XElement.Parse(strXml);
-        var macrosElement = xml.Descendants("Macros").First();
-
-        // Act
-        var macros = PackageDataInstallation.ImportMacros(
-            macrosElement.Elements("macro"),
-            -1).ToList();
-
-        // Assert
-        Assert.That(macros.Any(), Is.True);
-        Assert.That(macros.First().Properties.Values.Any(), Is.True);
-
-        var allMacros = MacroService.GetAll().ToList();
-        foreach (var macro in macros)
-        {
-            Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
         }
     }
 

@@ -690,8 +690,6 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
         for (var i = 0; i < entities.Length; i++)
         {
-            Assert.AreEqual(0, entities[i].AdditionalData.Count);
-
             if (i % 2 == 0)
             {
                 var doc = (IDocumentEntitySlim)entities[i];
@@ -701,10 +699,6 @@ public class EntityServiceTests : UmbracoIntegrationTest
                 Assert.AreEqual("Test " + i + " - FR", vals[0]);
                 Assert.AreEqual(_langEs.IsoCode.ToLowerInvariant(), keys[1].ToLowerInvariant());
                 Assert.AreEqual("Test " + i + " - ES", vals[1]);
-            }
-            else
-            {
-                Assert.AreEqual(0, entities[i].AdditionalData.Count);
             }
         }
     }

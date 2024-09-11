@@ -20,13 +20,20 @@ public class ItemDocumentTypeItemController : DocumentTypeItemControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<DocumentTypeItemResponseModel>());
+        }
+
         IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll(ids);
         List<DocumentTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IContentType, DocumentTypeItemResponseModel>(contentTypes);
-        return Ok(responseModels);
+        return await Task.FromResult(Ok(responseModels));
     }
 }

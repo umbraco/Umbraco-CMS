@@ -20,7 +20,7 @@ public class DeleteTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result = await _temporaryFileService.DeleteAsync(id);
 

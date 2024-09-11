@@ -30,7 +30,10 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LoggerResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         KeyValuePair<string, LogLevel>[] logLevels = _logViewerService
             .GetLogLevelsFromSinks()

@@ -18,7 +18,7 @@ public class StatusModelsBuilderController : ModelsBuilderControllerBase
     [HttpGet("status")]
     [ProducesResponseType(typeof(OutOfDateStatusResponseModel), StatusCodes.Status200OK)]
     [MapToApiVersion("1.0")]
-    public async Task<ActionResult<OutOfDateStatusResponseModel>> GetModelsOutOfDateStatus()
+    public async Task<ActionResult<OutOfDateStatusResponseModel>> GetModelsOutOfDateStatus(CancellationToken cancellationToken)
     {
         OutOfDateStatusResponseModel status = _outOfDateModelsStatus.IsEnabled
             ? _outOfDateModelsStatus.IsOutOfDate

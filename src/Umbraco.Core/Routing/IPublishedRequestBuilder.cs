@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Net;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
@@ -162,7 +163,7 @@ public interface IPublishedRequestBuilder
     ///         This flag is based on previous Umbraco versions but it is not clear how this flag can be set by developers
     ///         since
     ///         collission checking only occurs in the back office which is launched by
-    ///         <see cref="IPublishedRouter.TryRouteRequestAsync(IPublishedRequestBuilder)" />
+    ///         <see cref="PublishedRouter.TryRouteRequest(IPublishedRequestBuilder)" />
     ///         for which events do not execute.
     ///     </para>
     ///     <para>

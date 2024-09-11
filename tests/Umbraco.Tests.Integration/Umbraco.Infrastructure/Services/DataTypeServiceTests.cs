@@ -35,8 +35,6 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
 
-    private IEditorConfigurationParser EditorConfigurationParser => GetRequiredService<IEditorConfigurationParser>();
-
     [Test]
     public async Task Can_Create_New_DataTypeDefinition()
     {
@@ -85,7 +83,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         async Task<IDataType> CreateTextBoxDataType()
         {
             IDataType dataType =
-                new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser), ConfigurationEditorJsonSerializer)
+                new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
                     Name = Guid.NewGuid().ToString(),
                     DatabaseType = ValueStorageType.Nvarchar
@@ -141,15 +139,20 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task DataTypeService_Can_Delete_Textfield_DataType_And_Clear_Usages()
+    public async Task DataTypeService_Can_Delete_DataType_And_Clear_Usages()
     {
         // Arrange
-        var dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.TextBox);
+        var dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText);
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var doctype =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         ContentTypeService.Save(doctype);
+
+        // validate the assumptions used for assertions later in this test
+        var contentType = ContentTypeService.Get(doctype.Id);
+        Assert.AreEqual(3, contentType.PropertyTypes.Count());
+        Assert.IsNotNull(contentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
 
         // Act
         var definition = dataTypeDefinitions.First();
@@ -166,9 +169,9 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.That(deletedDefinition, Is.Null);
 
         // Further assertions against the ContentType that contains PropertyTypes based on the TextField
-        var contentType = ContentTypeService.Get(doctype.Id);
+        contentType = ContentTypeService.Get(doctype.Id);
         Assert.That(contentType.Alias, Is.EqualTo("umbTextpage"));
-        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -427,5 +430,20 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         dataType = await DataTypeService.GetAsync(dataType.Key);
         Assert.IsNotNull(dataType);
         Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+    }
+
+    [TestCase(Constants.DataTypes.Guids.LabelDateTime)]
+    [TestCase(Constants.DataTypes.Guids.Textstring)]
+    [TestCase(Constants.DataTypes.Guids.Checkbox)]
+    [TestCase(Constants.DataTypes.Guids.ListViewContent)]
+    [TestCase(Constants.DataTypes.Guids.ListViewMedia)]
+    public async Task Cannot_Delete_NonDeletable_DataType(string dataTypeKey)
+    {
+        var dataType = await DataTypeService.GetAsync(Guid.Parse(dataTypeKey));
+        Assert.IsNotNull(dataType);
+
+        var result = await DataTypeService.DeleteAsync(dataType.Key, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.NonDeletable, result.Status);
     }
 }

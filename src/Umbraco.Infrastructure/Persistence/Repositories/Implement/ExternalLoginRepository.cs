@@ -46,7 +46,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    public int Count(IQuery<IIdentityUserToken> query)
+    public int Count(IQuery<IIdentityUserToken>? query)
     {
         Sql<ISqlContext> sql = Sql().SelectCount().From<ExternalLoginDto>();
         return Database.ExecuteScalar<int>(sql);

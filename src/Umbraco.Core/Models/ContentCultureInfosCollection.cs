@@ -48,8 +48,6 @@ public class ContentCultureInfosCollection : ObservableDictionary<string, Conten
                 nameof(culture));
         }
 
-        culture = culture.ToLowerInvariant();
-
         if (TryGetValue(culture, out ContentCultureInfos item))
         {
             item.Name = name;

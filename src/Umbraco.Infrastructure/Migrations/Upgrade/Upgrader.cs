@@ -70,10 +70,6 @@ public class Upgrader
             return result;
         }
 
-        // We always save the final state of the migration plan, this is because a partial success is possible
-        // So we still want to save the place we got to in the database-
-        SetState(result.FinalState, scopeProvider, keyValueService);
-
         return result;
     }
 

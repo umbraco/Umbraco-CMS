@@ -16,6 +16,9 @@ public class DecimalValueConverter : PropertyValueConverterBase
         => PropertyCacheLevel.Element;
 
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+        => ParseDecimalValue(source);
+
+    internal static decimal ParseDecimalValue(object? source)
     {
         if (source == null)
         {
@@ -23,9 +26,9 @@ public class DecimalValueConverter : PropertyValueConverterBase
         }
 
         // is it already a decimal?
-        if (source is decimal)
+        if (source is decimal sourceDecimal)
         {
-            return source;
+            return sourceDecimal;
         }
 
         // is it a double?

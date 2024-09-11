@@ -1,13 +1,10 @@
 using System.Globalization;
-using System.Xml.XPath;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Xml;
-using Umbraco.Cms.Core.Xml.XPath;
 using Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 using Umbraco.Extensions;
 
@@ -36,7 +33,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         IDomainCache domainCache,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor variationContextAccessor)
-        : base(previewDefault)
+        : base(variationContextAccessor, previewDefault)
     {
         _snapshot = snapshot;
         _snapshotCache = snapshotCache;
@@ -359,82 +356,6 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         preview
             ? _snapshot.IsEmpty == false
             : _snapshot.GetAtRoot().Any(x => x.PublishedModel != null);
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetSingleByXPath(iterator);
-    }
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetSingleByXPath(iterator);
-    }
-
-    private static IPublishedContent? GetSingleByXPath(XPathNodeIterator iterator)
-    {
-        if (iterator.MoveNext() == false)
-        {
-            return null;
-        }
-
-        var xnav = iterator.Current as NavigableNavigator;
-        var xcontent = xnav?.UnderlyingObject as NavigableContent;
-        return xcontent?.InnerContent;
-    }
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetByXPath(iterator);
-    }
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetByXPath(iterator);
-    }
-
-    private static IEnumerable<IPublishedContent> GetByXPath(XPathNodeIterator iterator)
-    {
-        iterator = iterator.Clone();
-        while (iterator.MoveNext())
-        {
-            var xnav = iterator.Current as NavigableNavigator;
-            var xcontent = xnav?.UnderlyingObject as NavigableContent;
-            if (xcontent == null)
-            {
-                continue;
-            }
-
-            yield return xcontent.InnerContent;
-        }
-    }
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override XPathNavigator CreateNavigator(bool preview)
-    {
-        var source = new Source(this, preview);
-        var navigator = new NavigableNavigator(source);
-        return navigator;
-    }
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override XPathNavigator? CreateNodeNavigator(int id, bool preview)
-    {
-        var source = new Source(this, preview);
-        var navigator = new NavigableNavigator(source);
-        return navigator.CloneWithNewRoot(id, 0);
-    }
 
     public override IPublishedContentType? GetContentType(int id) => _snapshot.GetContentType(id);
 

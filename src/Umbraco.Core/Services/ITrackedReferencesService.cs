@@ -54,14 +54,13 @@ public interface ITrackedReferencesService
     ///     Gets a paged result of items which are in relation with the current item.
     ///     Basically, shows the items which depend on the current item.
     /// </summary>
-    /// <param name="id">The identifier of the entity to retrieve relations for.</param>
+    /// <param name="key">The identifier of the entity to retrieve relations for.</param>
     /// <param name="skip">The amount of items to skip</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="filterMustBeIsDependency">
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
-    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency);
 
@@ -95,7 +94,6 @@ public interface ITrackedReferencesService
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
-    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
     Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take,
         bool filterMustBeIsDependency);

@@ -2,49 +2,65 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Script tests', () => {
-  let scriptPath = "";
+  let scriptPath = '';
   const scriptName = 'scriptName.js';
 
-  test.beforeEach(async ({page, umbracoApi}) => {
-    await umbracoApi.script.ensureNameNotExistsAtRoot(scriptName);
+  test.beforeEach(async ({umbracoApi}) => {
+    await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
-  test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.script.delete(scriptPath);
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
-  test('can create a script', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a script', async ({umbracoApi}) => {
+    // Act
     scriptPath = await umbracoApi.script.create(scriptName, 'test');
+    await umbracoApi.script.get(scriptPath);
 
     // Assert
-    await expect(await umbracoApi.script.exists(scriptPath)).toBeTruthy();
+    expect(await umbracoApi.script.doesExist(scriptPath)).toBeTruthy();
   });
 
-  test('can update a script', async ({page, umbracoApi, umbracoUi}) => {
-    const newContent = 'Howdy';
+  test('can update script name', async ({umbracoApi}) => {
+    // Arrange
+    const oldName = 'RandomScriptName.js';
+    await umbracoApi.script.ensureNameNotExists(oldName);
+    const oldScriptPath = await umbracoApi.script.create(oldName, 'test');
 
-    scriptPath = await umbracoApi.script.create(scriptName, 'test');
-
-    const script = await umbracoApi.script.get(scriptPath);
-
-    script.content = newContent;
-
-    await umbracoApi.script.update(script);
+    // Act
+    scriptPath = await umbracoApi.script.updateName(oldScriptPath, scriptName);
 
     // Assert
     // Checks if the content was updated for the script
     const updatedScript = await umbracoApi.script.get(scriptPath);
-    await expect(updatedScript.content).toEqual(newContent);
+    expect(updatedScript.name).toEqual(scriptName);
   });
 
-  test('can delete a script', async ({page, umbracoApi, umbracoUi}) => {
+  test('can update script content', async ({umbracoApi}) => {
+    // Arrange
+    const newContent = 'BetterContent';
     scriptPath = await umbracoApi.script.create(scriptName, 'test');
+    await umbracoApi.script.get(scriptPath);
 
-    await expect(await umbracoApi.script.exists(scriptPath)).toBeTruthy();
+    // Act
+    await umbracoApi.script.updateContent(scriptPath, newContent);
 
+    // Assert
+    // Checks if the content was updated for the script
+    const updatedScript = await umbracoApi.script.get(scriptPath);
+    expect(updatedScript.content).toEqual(newContent);
+  });
+
+  test('can delete a script', async ({umbracoApi}) => {
+    // Arrange
+    scriptPath = await umbracoApi.script.create(scriptName, 'test');
+    expect(await umbracoApi.script.doesExist(scriptPath)).toBeTruthy();
+
+    // Act
     await umbracoApi.script.delete(scriptPath);
 
     // Assert
-    await expect(await umbracoApi.script.exists(scriptPath)).toBeFalsy();
+    expect(await umbracoApi.script.doesExist(scriptPath)).toBeFalsy();
   });
 });

@@ -15,21 +15,21 @@ public static partial class UmbracoBuilderExtensions
     ///     Gets the mappers collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static MapperCollectionBuilder? Mappers(this IUmbracoBuilder builder)
+    public static MapperCollectionBuilder Mappers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<MapperCollectionBuilder>();
 
     /// <summary>
     ///     Gets the NPoco mappers collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static NPocoMapperCollectionBuilder? NPocoMappers(this IUmbracoBuilder builder)
+    public static NPocoMapperCollectionBuilder NPocoMappers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<NPocoMapperCollectionBuilder>();
 
     /// <summary>
     ///     Gets the package migration plans collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static PackageMigrationPlanCollectionBuilder? PackageMigrationPlans(this IUmbracoBuilder builder)
+    public static PackageMigrationPlanCollectionBuilder PackageMigrationPlans(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PackageMigrationPlanCollectionBuilder>();
 
     /// <summary>

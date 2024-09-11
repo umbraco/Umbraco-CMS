@@ -81,7 +81,13 @@ public class ConfigurationEditor : IConfigurationEditor
         => configuration.IsNullOrWhiteSpace() ? new Dictionary<string, object>() : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configuration) ?? new Dictionary<string, object>();
 
     /// <inheritdoc />
-    public virtual IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration) => Array.Empty<ValidationResult>();
+    public virtual IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration)
+        => Fields
+            .SelectMany(field =>
+                configuration.TryGetValue(field.Key, out var value)
+                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, null))
+                    : Enumerable.Empty<ValidationResult>())
+            .ToArray();
 
     /// <summary>
     ///     Gets a field by its property name.

@@ -5,6 +5,8 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
 
@@ -26,25 +28,15 @@ public class ValidateDatabaseInstallController : InstallControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> ValidateDatabase(DatabaseInstallResponseModel responseModel)
+    public async Task<IActionResult> ValidateDatabase(
+        CancellationToken cancellationToken,
+        DatabaseInstallRequestModel viewModel)
     {
-        DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(responseModel)!;
+        DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(viewModel)!;
 
-        var success = _databaseBuilder.ConfigureDatabaseConnection(databaseModel, true);
+        Attempt<InstallOperationStatus> attempt = await _databaseBuilder.ValidateDatabaseConnectionAsync(databaseModel);
 
-        if (success)
-        {
-            return await Task.FromResult(Ok());
-        }
 
-        var invalidModelProblem = new ProblemDetails
-        {
-            Title = "Invalid database configuration",
-            Detail = "The provided database configuration is invalid",
-            Status = StatusCodes.Status400BadRequest,
-            Type = "Error",
-        };
-
-        return await Task.FromResult(BadRequest(invalidModelProblem));
+        return InstallOperationResult(attempt.Result);
     }
 }

@@ -48,7 +48,7 @@ public interface IMembershipMemberService<T> : IService
     ///     but that is how MS have made theirs so we'll follow that principal.
     /// </remarks>
     /// <param name="countType"><see cref="MemberCountType" /> to count by</param>
-    /// <returns><see cref="System.int" /> with number of Members or Users for passed in type</returns>
+    /// <returns><see cref="int" /> with number of Members or Users for passed in type</returns>
     int GetCount(MemberCountType countType);
 
     /// <summary>

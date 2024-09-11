@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Security;
@@ -19,16 +20,25 @@ public class PublicAccessChecker : IPublicAccessChecker
         _contentService = contentService;
     }
 
+    /// <inheritdoc/>
     public async Task<PublicAccessStatus> HasMemberAccessToContentAsync(int publishedContentId)
+        => await HasMemberAccessToContentAsync(publishedContentId, httpContext => httpContext.User);
+
+    /// <inheritdoc/>
+    public async Task<PublicAccessStatus> HasMemberAccessToContentAsync(int publishedContentId, ClaimsPrincipal claimsPrincipal)
+        => await HasMemberAccessToContentAsync(publishedContentId, _ => claimsPrincipal);
+
+    private async Task<PublicAccessStatus> HasMemberAccessToContentAsync(int publishedContentId, Func<HttpContext, ClaimsPrincipal> getClaimsPrincipal)
     {
         HttpContext httpContext = _httpContextAccessor.GetRequiredHttpContext();
         IMemberManager memberManager = httpContext.RequestServices.GetRequiredService<IMemberManager>();
-        if (httpContext.User.Identity == null || !httpContext.User.Identity.IsAuthenticated)
+        ClaimsPrincipal claimsPrincipal = getClaimsPrincipal(httpContext);
+        if (claimsPrincipal.Identity is not { IsAuthenticated: true })
         {
             return PublicAccessStatus.NotLoggedIn;
         }
 
-        MemberIdentityUser? currentMember = await memberManager.GetUserAsync(httpContext.User);
+        MemberIdentityUser? currentMember = await memberManager.GetUserAsync(claimsPrincipal);
         if (currentMember == null)
         {
             return PublicAccessStatus.NotLoggedIn;

@@ -40,8 +40,6 @@ public class DatabaseSchemaCreator
         typeof(LanguageTextDto),
         typeof(DomainDto),
         typeof(LogDto),
-        typeof(MacroDto),
-        typeof(MacroPropertyDto),
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),
@@ -66,9 +64,9 @@ public class DatabaseSchemaCreator
         typeof(LockDto),
         typeof(UserGroupDto),
         typeof(User2UserGroupDto),
-        typeof(UserGroup2NodePermissionDto),
         typeof(UserGroup2AppDto),
         typeof(UserGroup2PermissionDto),
+        typeof(UserGroup2GranularPermissionDto),
         typeof(UserStartNodeDto),
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
@@ -81,9 +79,15 @@ public class DatabaseSchemaCreator
         typeof(ContentScheduleDto),
         typeof(LogViewerQueryDto),
         typeof(ContentVersionCleanupPolicyDto),
-        typeof(UserGroup2NodeDto),
         typeof(CreatedPackageSchemaDto),
-        typeof(UserGroup2LanguageDto)
+        typeof(UserGroup2LanguageDto),
+        typeof(WebhookDto),
+        typeof(Webhook2ContentTypeKeysDto),
+        typeof(Webhook2EventsDto),
+        typeof(Webhook2HeadersDto),
+        typeof(WebhookLogDto),
+        typeof(WebhookRequestDto),
+        typeof(UserDataDto),
     };
 
     private readonly IUmbracoDatabase _database;
@@ -521,19 +525,8 @@ public class DatabaseSchemaCreator
     }
 
     /// <summary>
-    ///     Drops the table for the specified <typeparamref name="T" />.
+    ///     Drops the table for the specified <paramref name="tableName"/>
     /// </summary>
-    /// <typeparam name="T">The type representing the DTO/table.</typeparam>
-    /// <example>
-    ///     <code>
-    /// schemaHelper.DropTable&lt;MyDto&gt;);
-    /// </code>
-    /// </example>
-    /// <remarks>
-    ///     If <typeparamref name="T" /> has been decorated with an <see cref="TableNameAttribute" />, the name from that
-    ///     attribute will be used for the table name. If the attribute is not present, the name
-    ///     <typeparamref name="T" /> will be used instead.
-    /// </remarks>
     public void DropTable(string? tableName)
     {
         var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));

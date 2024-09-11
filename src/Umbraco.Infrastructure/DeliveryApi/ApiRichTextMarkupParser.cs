@@ -1,8 +1,8 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
@@ -14,10 +14,10 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 
     public ApiRichTextMarkupParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
-        IPublishedUrlProvider publishedUrlProvider,
+        IApiMediaUrlProvider mediaUrlProvider,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         ILogger<ApiRichTextMarkupParser> logger)
-        : base(apiContentRouteBuilder, publishedUrlProvider)
+        : base(apiContentRouteBuilder, mediaUrlProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _logger = logger;
@@ -35,6 +35,8 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 
             ReplaceLocalImages(doc, publishedSnapshot);
 
+            CleanUpBlocks(doc);
+
             return doc.DocumentNode.InnerHtml;
         }
         catch (Exception ex)
@@ -50,16 +52,26 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         foreach (HtmlNode link in links)
         {
             ReplaceLocalLinks(
-                publishedSnapshot,
+                    publishedSnapshot,
                 link.GetAttributeValue("href", string.Empty),
+                link.GetAttributeValue("type", "unknown"),
                 route =>
                 {
                     link.SetAttributeValue("href", route.Path);
                     link.SetAttributeValue("data-start-item-path", route.StartItem.Path);
                     link.SetAttributeValue("data-start-item-id", route.StartItem.Id.ToString("D"));
+                    link.Attributes["type"]?.Remove();
                 },
-                url => link.SetAttributeValue("href", url),
-                () => link.Attributes.Remove("href"));
+                url =>
+                {
+                    link.SetAttributeValue("href", url);
+                    link.Attributes["type"]?.Remove();
+                },
+                () =>
+                {
+                    link.Attributes.Remove("href");
+                    link.Attributes["type"]?.Remove();
+                });
         }
     }
 
@@ -89,6 +101,26 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                 // we don't want the "data-caption" attribute, it's already part of the output as <figcaption>
                 image.Attributes.Remove("data-caption");
             });
+        }
+    }
+
+    private void CleanUpBlocks(HtmlDocument doc)
+    {
+        HtmlNode[] blocks = doc.DocumentNode.SelectNodes("//*[starts-with(local-name(),'umb-rte-block')]")?.ToArray() ?? Array.Empty<HtmlNode>();
+        foreach (HtmlNode block in blocks)
+        {
+            var dataUdi = block.GetAttributeValue("data-content-udi", string.Empty);
+            if (UdiParser.TryParse<GuidUdi>(dataUdi, out GuidUdi? guidUdi) is false)
+            {
+                continue;
+            }
+
+            // swap the content UDI for the content ID
+            block.Attributes.Remove("data-content-udi");
+            block.SetAttributeValue("data-content-id", guidUdi.Guid.ToString("D"));
+
+            // remove the inner comment placed by the RTE
+            block.RemoveAllChildren();
         }
     }
 }

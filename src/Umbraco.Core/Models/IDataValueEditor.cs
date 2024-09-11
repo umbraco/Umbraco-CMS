@@ -12,11 +12,6 @@ namespace Umbraco.Cms.Core.Models;
 public interface IDataValueEditor
 {
     /// <summary>
-    ///     Gets the editor view.
-    /// </summary>
-    string? View { get; }
-
-    /// <summary>
     ///     Gets the type of the value.
     /// </summary>
     /// <remarks>The value has to be a valid <see cref="ValueTypes" /> value.</remarks>
@@ -28,15 +23,9 @@ public interface IDataValueEditor
     bool IsReadOnly { get; }
 
     /// <summary>
-    ///     Gets a value indicating whether to display the associated label.
-    /// </summary>
-    bool HideLabel { get; }
-
-    /// <summary>
     /// Gets a value indicating whether the IDataValueEditor supports readonly mode
     /// </summary>
     bool SupportsReadOnly => false;
-
 
     /// <summary>
     ///     Gets the validators to use to validate the edited value.
@@ -85,4 +74,6 @@ public interface IDataValueEditor
     XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
     string ConvertDbToString(IPropertyType propertyType, object? value);
+
+    IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 }

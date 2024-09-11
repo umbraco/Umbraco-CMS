@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
@@ -28,27 +28,26 @@ public class LogViewerConfig : ILogViewerConfig
     [Obsolete("Use ILogViewerService.AddSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]
     public IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
     {
-        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+        using IScope scope = _scopeProvider.CreateScope();
         _logViewerQueryRepository.Save(new LogViewerQuery(name, query));
 
+        scope.Complete();
         return GetSavedSearches();
     }
-
-    [Obsolete("Use the overload that only takes a 'name' parameter instead. This will be removed in Umbraco 14.")]
-    public IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query) => DeleteSavedSearch(name);
 
     [Obsolete("Use ILogViewerService.DeleteSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]
     public IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name)
     {
-        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+        using IScope scope = _scopeProvider.CreateScope();
         ILogViewerQuery? item = _logViewerQueryRepository.GetByName(name);
-
         if (item is not null)
         {
             _logViewerQueryRepository.Delete(item);
         }
 
         // Return the updated object - so we can instantly reset the entire array from the API response
-        return GetSavedSearches();
+        IReadOnlyList<SavedLogSearch> result =  GetSavedSearches()!;
+        scope.Complete();
+        return result;
     }
 }

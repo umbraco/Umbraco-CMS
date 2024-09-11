@@ -1,21 +1,16 @@
 using System.Net;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Website.Controllers;
@@ -51,56 +46,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IUmbracoVirtualPageRoute _umbracoVirtualPageRoute;
     private GlobalSettings _globalSettings;
-
-    [Obsolete("Please use constructor that is not obsolete, instead of this. This will be removed in Umbraco 13.")]
-    public UmbracoRouteValueTransformer(
-        ILogger<UmbracoRouteValueTransformer> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtime,
-        IUmbracoRouteValuesFactory routeValuesFactory,
-        IRoutableDocumentFilter routableDocumentFilter,
-        IDataProtectionProvider dataProtectionProvider,
-        IControllerActionSearcher controllerActionSearcher,
-        IEventAggregator eventAggregator,
-        IPublicAccessRequestHandler publicAccessRequestHandler)
-    : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler, StaticServiceProvider.Instance.GetRequiredService<IUmbracoVirtualPageRoute>(), StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>())
-    {
-    }
-
-    [Obsolete("Please use constructor that is not obsolete, instead of this. This will be removed in Umbraco 13.")]
-    public UmbracoRouteValueTransformer(
-        ILogger<UmbracoRouteValueTransformer> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter,
-        IRuntimeState runtime,
-        IUmbracoRouteValuesFactory routeValuesFactory,
-        IRoutableDocumentFilter routableDocumentFilter,
-        IDataProtectionProvider dataProtectionProvider,
-        IControllerActionSearcher controllerActionSearcher,
-        IPublicAccessRequestHandler publicAccessRequestHandler)
-        : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler, StaticServiceProvider.Instance.GetRequiredService<IUmbracoVirtualPageRoute>(), StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>())
-    {
-    }
-
-    [Obsolete("Please use constructor that is not obsolete, instead of this. This will be removed in Umbraco 13.")]
-    public UmbracoRouteValueTransformer(
-        ILogger<UmbracoRouteValueTransformer> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter,
-        IRuntimeState runtime,
-        IUmbracoRouteValuesFactory routeValuesFactory,
-        IRoutableDocumentFilter routableDocumentFilter,
-        IDataProtectionProvider dataProtectionProvider,
-        IControllerActionSearcher controllerActionSearcher,
-        IPublicAccessRequestHandler publicAccessRequestHandler,
-        IUmbracoVirtualPageRoute umbracoVirtualPageRoute)
-        : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler, StaticServiceProvider.Instance.GetRequiredService<IUmbracoVirtualPageRoute>(), StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>())
-
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
@@ -138,23 +83,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     public override async ValueTask<RouteValueDictionary> TransformAsync(
         HttpContext httpContext, RouteValueDictionary values)
     {
-        // If we aren't running, then we have nothing to route. We allow the frontend to continue while in upgrade mode.
-        if (_runtime.Level != RuntimeLevel.Run && _runtime.Level != RuntimeLevel.Upgrade)
-        {
-            if (_runtime.Level == RuntimeLevel.Install && !httpContext.Request.IsClientSideRequest())
-            {
-                return new RouteValueDictionary()
-                {
-                    //TODO figure out constants
-                    [ControllerToken] = "Install",
-                    [ActionToken] = "Index",
-                    [AreaToken] = Constants.Web.Mvc.InstallArea,
-                };
-            }
-
-            return null!;
-        }
-
         // will be null for any client side requests like JS, etc...
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
@@ -166,24 +94,9 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
             return null!;
         }
 
-        // Don't execute if there are already UmbracoRouteValues assigned.
-        // This can occur if someone else is dynamically routing and in which case we don't want to overwrite
-        // the routing work being done there.
-        UmbracoRouteValues? umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
-        if (umbracoRouteValues != null)
+        if (CheckActiveDynamicRoutingAndNoException(httpContext))
         {
             return null!;
-        }
-
-        // Check if the maintenance page should be shown
-        if (_runtime.Level == RuntimeLevel.Upgrade && _globalSettings.ShowMaintenancePageWhenInUpgradeState)
-        {
-            return new RouteValueDictionary
-            {
-                // Redirects to the RenderController who handles maintenance page in a filter, instead of having a dedicated controller
-                [ControllerToken] = ControllerExtensions.GetControllerName<RenderController>(),
-                [ActionToken] = nameof(RenderController.Index),
-            };
         }
 
         // Check if there is no existing content and return the no content controller
@@ -198,7 +111,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
 
         IPublishedRequest publishedRequest = await RouteRequestAsync(umbracoContext);
 
-        umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
+        UmbracoRouteValues? umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 
         // now we need to do some public access checks
         umbracoRouteValues =
@@ -241,6 +154,30 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         }
 
         return newValues;
+    }
+
+    /// <summary>
+    ///     Check whether dynamic routing is currently active in an request where no exception has occured.
+    /// </summary>
+    /// <returns>[true] if dynamic routing is active, [false] if inactive or an exception has occured.</returns>
+    private static bool CheckActiveDynamicRoutingAndNoException(HttpContext httpContext)
+    {
+        // Don't execute if there are already UmbracoRouteValues assigned.
+        // This can occur if someone else is dynamically routing and in which case we don't want to overwrite
+        // the routing work being done there.
+        UmbracoRouteValues? umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
+
+        // No dynamic routing is active currently.
+        if (umbracoRouteValues == null)
+        {
+            return false;
+        }
+
+        // There is dynamic routing active so we have to check whether an exception occured in the current request.
+        // If this is the case we do want dynamic routing since it might be an Umbraco content page which is used as an error page.
+        IExceptionHandlerFeature? exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
+
+        return exceptionHandlerFeature == null;
     }
 
     private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)

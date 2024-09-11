@@ -1,13 +1,15 @@
-﻿using Moq;
+﻿using System.Text.Json.Nodes;
+using Moq;
 using NUnit.Framework;
+using Org.BouncyCastle.Asn1.X500;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -67,9 +69,11 @@ public class MultiNodeTreePickerTests
     [Test]
     public void Can_Parse_Single_Value_From_Editor()
     {
-        var value = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString();
-        var fromEditor = FromEditor(new[] { value }) as string;
-        Assert.AreEqual(value, fromEditor);
+        var value = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
+        var editorValue = $"[{{\"type\" :\"{value.EntityType}\",\"unique\":\"{value.Guid}\"}}]";
+        var fromEditor =
+            FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()) as string;
+        Assert.AreEqual(value.ToString(), fromEditor);
     }
 
     [Test]
@@ -77,51 +81,65 @@ public class MultiNodeTreePickerTests
     {
         var values = new[]
         {
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString()
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())
         };
 
-        var fromEditor = FromEditor(values) as string;
-        Assert.AreEqual(string.Join(",", values), fromEditor);
+        var editorValue =
+            $"[{{\"type\" :\"{values[0].EntityType}\",\"unique\":\"{values[0].Guid}\"}},{{\"type\" :\"{values[1].EntityType}\",\"unique\":\"{values[1].Guid}\"}},{{\"type\" :\"{values[2].EntityType}\",\"unique\":\"{values[2].Guid}\"}}]";
+
+        var fromEditor = FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()) as string;
+        Assert.AreEqual(string.Join(",", values.Select(v => v.ToString())), fromEditor);
     }
 
     [Test]
     public void Can_Parse_Different_Entity_Types_From_Editor()
     {
-        var values = new[]
+        var expectedValues = new[]
         {
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Member, Guid.NewGuid()).ToString()
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Media, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Member, Guid.NewGuid())
         };
 
-        var fromEditor = FromEditor(values) as string;
-        Assert.AreEqual(string.Join(",", values), fromEditor);
+        var editorValue =
+            $"[{{\"type\" :\"{expectedValues[0].EntityType}\",\"unique\":\"{expectedValues[0].Guid}\"}},{{\"type\" :\"{expectedValues[1].EntityType}\",\"unique\":\"{expectedValues[1].Guid}\"}},{{\"type\" :\"{expectedValues[2].EntityType}\",\"unique\":\"{expectedValues[2].Guid}\"}}]";
+
+        var fromEditor = FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()) as string;
+        Assert.AreEqual(string.Join(",", expectedValues.Select(v => v.ToString())), fromEditor);
     }
 
     [Test]
-    public void Can_Skip_Invalid_Values_From_Editor()
+    public void From_Editor_Throws_Error_On_Invalid_Json()
     {
         var values = new[]
         {
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
-            "Invalid Value",
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString()
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())
         };
 
-        var fromEditor = FromEditor(values) as string;
-        Assert.AreEqual(string.Join(",", values.First(), values.Last()), fromEditor);
+        var editorValue =
+            $"[{{\"type\" :\"{values[0].EntityType}\",\"unique\":\"{values[0].Guid}\"}},{{\"invalidProperty\" :\"nonsenseValue\",\"otherWeirdProperty\":\"definitelyNotAGuid\"}},{{\"type\" :\"{values[1].EntityType}\",\"unique\":\"{values[1].Guid}\"}}]";
+
+        Assert.Catch<System.Text.Json.JsonException>(() =>
+            FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()));
     }
 
     [Test]
     public void Can_Parse_Single_Value_To_Editor()
     {
-        var value = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString();
-        var toEditor = ToEditor(value) as IEnumerable<string>;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(1, toEditor.Count());
-        Assert.AreEqual(value, toEditor.First());
+        var value = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
+        var toEditor = ToEditor(value.ToString()) as IEnumerable<MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.EditorEntityReference>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(toEditor);
+            Assert.AreEqual(1, toEditor.Count());
+            Assert.AreEqual(EditorEntityReferenceFromUdi(value).Type, toEditor.First().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(value).Unique, toEditor.First().Unique);
+        });
+
     }
 
     [Test]
@@ -129,16 +147,23 @@ public class MultiNodeTreePickerTests
     {
         var values = new[]
         {
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString()
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())
         };
-        var toEditor = ToEditor(string.Join(",", values)) as IEnumerable<string>;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(3, toEditor.Count());
-        Assert.AreEqual(values[0], toEditor.First());
-        Assert.AreEqual(values[1], toEditor.Skip(1).First());
-        Assert.AreEqual(values[2], toEditor.Last());
+        var toEditor = ToEditor(string.Join(",", values.Select(v => v.ToString()))) as IEnumerable<MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.EditorEntityReference>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(toEditor);
+            Assert.AreEqual(3, toEditor.Count());
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[0]).Type, toEditor.First().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[0]).Unique, toEditor.First().Unique);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[1]).Type, toEditor.Skip(1).First().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[1]).Unique, toEditor.Skip(1).First().Unique);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[2]).Type, toEditor.Last().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[2]).Unique, toEditor.Last().Unique);
+        });
     }
 
     [Test]
@@ -146,32 +171,46 @@ public class MultiNodeTreePickerTests
     {
         var values = new[]
         {
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString(),
-            new GuidUdi(Constants.UdiEntityType.Member, Guid.NewGuid()).ToString()
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Media, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Member, Guid.NewGuid())
         };
-        var toEditor = ToEditor(string.Join(",", values)) as IEnumerable<string>;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(3, toEditor.Count());
-        Assert.AreEqual(values[0], toEditor.First());
-        Assert.AreEqual(values[1], toEditor.Skip(1).First());
-        Assert.AreEqual(values[2], toEditor.Last());
+        var toEditor = ToEditor(string.Join(",", values.Select(v => v.ToString()))) as IEnumerable<MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.EditorEntityReference>;
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(toEditor);
+            Assert.AreEqual(3, toEditor.Count());
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[0]).Type, toEditor.First().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[0]).Unique, toEditor.First().Unique);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[1]).Type, toEditor.Skip(1).First().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[1]).Unique, toEditor.Skip(1).First().Unique);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[2]).Type, toEditor.Last().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(values[2]).Unique, toEditor.Last().Unique);
+        });
+
     }
 
     [Test]
     public void Can_Skip_Invalid_Values_To_Editor()
     {
+        var firstGuid = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
+        var secondGuid = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
         var values = new[]
         {
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString(),
+            firstGuid.ToString(),
             "Invalid Value",
-            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()).ToString()
+            secondGuid.ToString(),
         };
-        var toEditor = ToEditor(string.Join(",", values)) as IEnumerable<string>;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(2, toEditor.Count());
-        Assert.AreEqual(values[0], toEditor.First());
-        Assert.AreEqual(values[2], toEditor.Last());
+        var toEditor = ToEditor(string.Join(",", values)) as IEnumerable<MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.EditorEntityReference>;
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(toEditor);
+            Assert.AreEqual(2, toEditor.Count());
+            Assert.AreEqual(EditorEntityReferenceFromUdi(firstGuid).Type, toEditor.First().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(firstGuid).Unique, toEditor.First().Unique);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(secondGuid).Type, toEditor.Last().Type);
+            Assert.AreEqual(EditorEntityReferenceFromUdi(secondGuid).Unique, toEditor.Last().Unique);
+        });
     }
 
     [Test]
@@ -188,27 +227,36 @@ public class MultiNodeTreePickerTests
         Assert.IsNull(result);
     }
 
-    private static object? FromEditor(object? value, int max = 0)
-        => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
+    private static object? FromEditor(object? value, int max = 0, IJsonSerializer? jsonSerializer = null)
+        => CreateValueEditor(jsonSerializer)
+            .FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
 
-    private static object? ToEditor(object? value)
+    private static object? ToEditor(object? value, IJsonSerializer? jsonSerializer = null)
     {
         var property = new Mock<IProperty>();
         property
             .Setup(p => p.GetValue(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool>()))
             .Returns(value);
 
-        return CreateValueEditor().ToEditor(property.Object);
+        return CreateValueEditor(jsonSerializer).ToEditor(property.Object);
     }
 
-    private static MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor CreateValueEditor()
+    private static MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor CreateValueEditor(
+        IJsonSerializer? jsonSerializer = null)
     {
         var valueEditor = new MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
-            Mock.Of<IJsonSerializer>(),
+            jsonSerializer ?? Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias", "name", "view"));
+            new DataEditorAttribute("alias"));
         return valueEditor;
     }
+
+    private static MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.EditorEntityReference
+        EditorEntityReferenceFromUdi(GuidUdi udi) =>
+        new()
+        {
+            Type = udi.EntityType,
+            Unique = udi.Guid,
+        };
 }

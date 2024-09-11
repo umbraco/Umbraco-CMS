@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Net;
@@ -70,7 +71,9 @@ public class MemberSignInManagerTests
             Mock.Of<IAuthenticationSchemeProvider>(),
             Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
             Mock.Of<IMemberExternalLoginProviders>(),
-            Mock.Of<IEventAggregator>());
+            Mock.Of<IEventAggregator>(),
+            Mock.Of<IOptions<SecuritySettings>>(x => x.Value == new SecuritySettings()),
+            new DictionaryAppCache());
     }
 
     private static Mock<MemberManager> MockMemberManager()

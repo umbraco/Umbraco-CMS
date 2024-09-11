@@ -77,9 +77,6 @@ public static partial class Constants
         public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
         public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
         public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
-        // FIXME: remove this in favor of BackOfficeAuthenticationType when the old backoffice auth is no longer necessary
-        public const string NewBackOfficeAuthenticationType = "NewUmbracoBackOffice";
-
         public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
 
         public const string DefaultMemberTypeAlias = "Member";
@@ -96,12 +93,15 @@ public static partial class Constants
 
         public const string MemberExternalAuthenticationTypePrefix = "UmbracoMembers.";
 
+        [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
         public const string StartContentNodeIdClaimType =
             "http://umbraco.org/2015/02/identity/claims/backoffice/startcontentnode";
 
+        [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
         public const string StartMediaNodeIdClaimType =
             "http://umbraco.org/2015/02/identity/claims/backoffice/startmedianode";
 
+        [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
         public const string AllowedApplicationsClaimType =
             "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
 
@@ -114,6 +114,11 @@ public static partial class Constants
         ///     The claim type for the ASP.NET Identity security stamp
         /// </summary>
         public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
+
+        /// <summary>
+        ///     The claim type for the mandatory OpenIdDict sub claim
+        /// </summary>
+        public const string OpenIdDictSubClaimType = "sub";
 
         public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";
         public const string AspNetCoreV2PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V2";

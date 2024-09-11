@@ -37,10 +37,11 @@ public class AllMessageTemplateLogViewerController : LogViewerControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<LogTemplateResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> AllMessageTemplates(
+        CancellationToken cancellationToken,
         int skip = 0,
         int take = 100,
-        DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null)
     {
         Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate, skip, take);
 

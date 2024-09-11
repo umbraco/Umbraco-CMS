@@ -1,6 +1,6 @@
 using System.Data.Common;
+using System.Net.Http.Headers;
 using System.Reflection;
-using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -11,16 +11,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog.Extensions.Logging;
-using Smidge;
-using Smidge.Cache;
-using Smidge.FileProcessors;
-using Smidge.InMemory;
-using Smidge.Nuglify;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Blocks;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Diagnostics;
@@ -28,37 +24,38 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
+using Umbraco.Cms.Web.Common.Helpers;
 using Umbraco.Cms.Web.Common.Localization;
-using Umbraco.Cms.Web.Common.Macros;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Preview;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
-using Umbraco.Cms.Web.Common.RuntimeMinification;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
@@ -150,7 +147,6 @@ public static partial class UmbracoBuilderExtensions
 
         // WebRootFileProviderFactory is just a wrapper around the IWebHostEnvironment.WebRootFileProvider,
         // therefore no need to register it as singleton
-        builder.Services.AddSingleton<ILegacyPackageManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
         builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
         builder.Services.AddSingleton<IPackageManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
 
@@ -170,29 +166,34 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
+        builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
 
         return builder;
     }
 
     /// <summary>
-    ///     Add Umbraco hosted services
+    ///     Add Umbraco recurring background jobs
     /// </summary>
-    public static IUmbracoBuilder AddHostedServices(this IUmbracoBuilder builder)
+    public static IUmbracoBuilder AddRecurringBackgroundJobs(this IUmbracoBuilder builder)
     {
+        // Add background jobs
+        builder.Services.AddRecurringBackgroundJob<HealthCheckNotifierJob>();
+        builder.Services.AddRecurringBackgroundJob<LogScrubberJob>();
+        builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
+        builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
+        builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
+        builder.Services.AddRecurringBackgroundJob<TemporaryFileCleanupJob>();
+        builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
+        builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
+        builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
+        builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
+        builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
+
+
+        builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
+        builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
         builder.Services.AddHostedService<QueuedHostedService>();
-        builder.Services.AddHostedService<HealthCheckNotifier>();
-        builder.Services.AddHostedService<KeepAlive>();
-        builder.Services.AddHostedService<LogScrubber>();
-        builder.Services.AddHostedService<ContentVersionCleanup>();
-        builder.Services.AddHostedService<TemporaryFileCleanup>();
-        builder.Services.AddHostedService<ScheduledPublishing>();
-        builder.Services.AddHostedService<TempFileCleanup>();
-        builder.Services.AddHostedService<InstructionProcessTask>();
-        builder.Services.AddHostedService<TouchServerTask>();
-        builder.Services.AddHostedService(provider =>
-            new ReportSiteTask(
-                provider.GetRequiredService<ILogger<ReportSiteTask>>(),
-                provider.GetRequiredService<ITelemetryService>()));
+
         return builder;
     }
 
@@ -221,6 +222,11 @@ public static partial class UmbracoBuilderExtensions
                 ServerCertificateCustomValidationCallback =
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
             });
+        builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
+        {
+            var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.HttpClients.Headers.UserAgentProductName, productVersion));
+        });
         return builder;
     }
 
@@ -236,41 +242,6 @@ public static partial class UmbracoBuilderExtensions
         }
 
         mvcBuilding?.Invoke(mvcBuilder);
-
-        return builder;
-    }
-
-    /// <summary>
-    ///     Add runtime minifier support for Umbraco
-    /// </summary>
-    public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
-    {
-        // Add custom ISmidgeFileProvider to include the additional App_Plugins location
-        // to load assets from.
-        builder.Services.AddSingleton<ISmidgeFileProvider>(f =>
-        {
-            IWebHostEnvironment hostEnv = f.GetRequiredService<IWebHostEnvironment>();
-
-            return new SmidgeFileProvider(
-                hostEnv.WebRootFileProvider,
-                new GlobPatternFilterFileProvider(
-                    hostEnv.ContentRootFileProvider,
-                    // only include js or css files within App_Plugins
-                    new[] { "/App_Plugins/**/*.js", "/App_Plugins/**/*.css" }));
-        });
-
-        builder.Services.AddUnique<ICacheBuster, UmbracoSmidgeConfigCacheBuster>();
-        builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
-
-        // Replace the Smidge request helper, in order to discourage the use of brotli since it's super slow
-        builder.Services.AddUnique<IRequestHelper, SmidgeRequestHelper>();
-        builder.Services.AddSmidgeNuglify();
-        builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster
-
-        builder.Services.AddUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
-        builder.Services.AddSingleton<SmidgeHelperAccessor>();
-        builder.Services.AddTransient<IPreProcessor, SmidgeNuglifyJs>();
-        builder.Services.ConfigureOptions<SmidgeOptionsSetup>();
 
         return builder;
     }
@@ -295,15 +266,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
-            .Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor
-            .Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor
             .Transient<IApplicationModelProvider, VirtualPageApplicationModelProvider>());
 
         // AspNetCore specific services
         builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-        builder.AddNotificationHandler<UmbracoRequestBeginNotification, AspNetCoreRequestAccessor>();
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, ApplicationUrlRequestBeginNotificationHandler>();
 
         // Password hasher
@@ -319,25 +285,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
-        builder.Services.AddUnique<IMacroRenderer>(serviceProvider =>
-        {
-            return new MacroRenderer(
-                serviceProvider.GetRequiredService<IProfilingLogger>(),
-                serviceProvider.GetRequiredService<ILogger<MacroRenderer>>(),
-                serviceProvider.GetRequiredService<IUmbracoContextAccessor>(),
-                serviceProvider.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
-                serviceProvider.GetRequiredService<ILocalizedTextService>(),
-                serviceProvider.GetRequiredService<AppCaches>(),
-                serviceProvider.GetRequiredService<IMacroService>(),
-                serviceProvider.GetRequiredService<ICookieManager>(),
-                serviceProvider.GetRequiredService<ISessionManager>(),
-                serviceProvider.GetRequiredService<IRequestAccessor>(),
-                serviceProvider.GetRequiredService<PartialViewMacroEngine>(),
-                serviceProvider.GetRequiredService<IHttpContextAccessor>(),
-                serviceProvider.GetRequiredService<IWebHostEnvironment>());
-        });
-
-        builder.Services.AddSingleton<PartialViewMacroEngine>();
+        builder.Services.AddSingleton<IPartialViewBlockEngine, PartialViewBlockEngine>();
 
         // register the umbraco context factory
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
@@ -352,8 +300,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<UmbracoRequestMiddleware>();
         builder.Services.AddSingleton<BootFailedMiddleware>();
 
-        builder.Services.AddSingleton<UmbracoJsonModelBinder>();
-
         builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
         builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
@@ -365,6 +311,13 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 
         builder.AddHttpClients();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddHelpers(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<OAuthOptionsHelper>();
 
         return builder;
     }

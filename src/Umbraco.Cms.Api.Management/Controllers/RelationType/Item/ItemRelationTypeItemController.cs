@@ -20,11 +20,18 @@ public class ItemRelationTypeItemController : RelationTypeItemControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<RelationTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<RelationTypeItemResponseModel>());
+        }
+
         // relation service does not allow fetching a collection of relation types by their ids; instead it relies
         // heavily on caching, which means this is as fast as it gets - even if it looks less than performant
         IRelationType[] relationTypes = _relationService
@@ -33,6 +40,6 @@ public class ItemRelationTypeItemController : RelationTypeItemControllerBase
 
         List<RelationTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IRelationType, RelationTypeItemResponseModel>(relationTypes);
 
-        return Ok(responseModels);
+        return await Task.FromResult(Ok(responseModels));
     }
 }

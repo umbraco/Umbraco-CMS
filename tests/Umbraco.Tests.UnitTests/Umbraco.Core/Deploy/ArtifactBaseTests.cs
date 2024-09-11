@@ -1,12 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Deploy;
 
@@ -19,10 +18,16 @@ public class ArtifactBaseTests
         var udi = new GuidUdi("test", Guid.Parse("3382d5433b5749d08919bc9961422a1f"));
         var artifact = new TestArtifact(udi, new List<ArtifactDependency>()) { Name = "Test Name", Alias = "testAlias" };
 
-        var serialized = JsonConvert.SerializeObject(artifact);
+        var serialized = JsonSerializer.Serialize(artifact, new JsonSerializerOptions()
+        {
+            Converters =
+            {
+                new JsonUdiConverter(),
+            }
+        });
 
         var expected =
-            "{\"Udi\":\"umb://test/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
+            "{\"Udi\":\"umb://test/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
         Assert.AreEqual(expected, serialized);
     }
 
@@ -47,6 +52,71 @@ public class ArtifactBaseTests
         Assert.AreEqual(
             "umb://template-file/TestPage.cshtml,umb://template/d4651496fad24c1290a53ea4d55d945b",
             string.Join(",", artifact.Dependencies.Select(x => x.Udi.ToString())));
+    }
+
+    [Test]
+    public void Dependencies_Correctly_Updates_Mode()
+    {
+        var udi = Udi.Create(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
+
+        var dependencies = new ArtifactDependencyCollection
+        {
+            // Keep Match
+            new ArtifactDependency(udi, false, ArtifactDependencyMode.Match),
+            new ArtifactDependency(udi, false, ArtifactDependencyMode.Exist),
+        };
+
+        Assert.AreEqual(1, dependencies.Count);
+        var dependency = dependencies.First();
+        Assert.AreEqual(udi, dependency.Udi);
+        Assert.AreEqual(false, dependency.Ordering);
+        Assert.AreEqual(ArtifactDependencyMode.Match, dependency.Mode);
+        Assert.AreEqual(null, dependency.Checksum);
+    }
+
+    [Test]
+    public void Dependencies_Correctly_Updates_Ordering()
+    {
+        var udi = Udi.Create(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
+
+        var dependencies = new ArtifactDependencyCollection
+        {
+            // Keep ordering (regardless of mode)
+            new ArtifactDependency(udi, false, ArtifactDependencyMode.Match),
+            new ArtifactDependency(udi, false, ArtifactDependencyMode.Exist),
+            new ArtifactDependency(udi, true, ArtifactDependencyMode.Match),
+            new ArtifactDependency(udi, true, ArtifactDependencyMode.Exist),
+            new ArtifactDependency(udi, false, ArtifactDependencyMode.Match),
+            new ArtifactDependency(udi, false, ArtifactDependencyMode.Exist),
+        };
+
+        Assert.AreEqual(1, dependencies.Count);
+        var dependency = dependencies.First();
+        Assert.AreEqual(udi, dependency.Udi);
+        Assert.AreEqual(true, dependency.Ordering);
+        Assert.AreEqual(ArtifactDependencyMode.Match, dependency.Mode);
+        Assert.AreEqual(null, dependency.Checksum);
+    }
+
+    [Test]
+    public void Dependencies_Correctly_Updates_Checksum()
+    {
+        var udi = Udi.Create(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
+
+        var dependencies = new ArtifactDependencyCollection
+        {
+            // Keep checksum
+            new ArtifactDependency(udi, true, ArtifactDependencyMode.Match, "123"),
+            new ArtifactDependency(udi, true, ArtifactDependencyMode.Match, string.Empty),
+            new ArtifactDependency(udi, true, ArtifactDependencyMode.Match),
+        };
+
+        Assert.AreEqual(1, dependencies.Count);
+        var dependency = dependencies.First();
+        Assert.AreEqual(udi, dependency.Udi);
+        Assert.AreEqual(true, dependency.Ordering);
+        Assert.AreEqual(ArtifactDependencyMode.Match, dependency.Mode);
+        Assert.AreEqual("123", dependency.Checksum);
     }
 
     private class TestArtifact : ArtifactBase<GuidUdi>

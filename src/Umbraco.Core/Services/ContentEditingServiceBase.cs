@@ -18,9 +18,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataTypeService _dataTypeService;
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
-    private readonly ICoreScopeProvider _scopeProvider;
-    private readonly ITreeEntitySortingService _treeEntitySortingService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IContentValidationServiceBase<TContentType> _validationService;
 
     protected ContentEditingServiceBase(
         TContentService contentService,
@@ -30,14 +29,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        ITreeEntitySortingService treeEntitySortingService)
+        IContentValidationServiceBase<TContentType> validationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
-        _scopeProvider = scopeProvider;
         _userIdKeyResolver = userIdKeyResolver;
-        _treeEntitySortingService = treeEntitySortingService;
+        _validationService = validationService;
+        CoreScopeProvider = scopeProvider;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
     }
@@ -52,29 +51,32 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected abstract OperationResult? Delete(TContent content, int userId);
 
-    protected abstract IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total);
-
-    protected abstract ContentEditingOperationStatus Sort(IEnumerable<TContent> items, int userId);
+    protected ICoreScopeProvider CoreScopeProvider { get; }
 
     protected TContentService ContentService { get; }
 
     protected TContentTypeService ContentTypeService { get; }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> MapCreate(ContentCreationModelBase contentCreationModelBase)
+    protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
+        where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
-        TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus operationStatus);
+        TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus validationOperationStatus);
         if (contentType == null)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, null);
+            return Attempt.FailWithStatus(validationOperationStatus, new TContentCreateResult());
         }
 
-        TContent? parent = TryGetAndValidateParent(contentCreationModelBase.ParentKey, contentType, out operationStatus);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(contentCreationModelBase.ParentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, null);
+            return Attempt.FailWithStatus(parent.OperationStatus, new TContentCreateResult());
         }
 
-        TContent content = New(null, parent?.Id ?? Constants.System.Root, contentType);
+        // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
+        //       instead, the error state and validation errors will be communicated in the return value.
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
+
+        TContent content = New(null, parent.ParentId ?? Constants.System.Root, contentType);
         if (contentCreationModelBase.Key.HasValue)
         {
             content.Key = contentCreationModelBase.Key.Value;
@@ -83,43 +85,80 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         UpdateNames(contentCreationModelBase, content, contentType);
         await UpdateExistingProperties(contentCreationModelBase, content, contentType);
 
-        return Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content);
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentCreateResult { Content = content, ValidationResult = validationResult.Result });
     }
 
-    protected async Task<Attempt<ContentEditingOperationStatus>> MapUpdate(TContent content, ContentEditingModelBase contentEditingModelBase)
+    protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
+        where TContentUpdateResult : ContentUpdateResultBase<TContent>, new()
     {
         TContentType? contentType = TryGetAndValidateContentType(content.ContentType.Key, contentEditingModelBase, out ContentEditingOperationStatus operationStatus);
         if (contentType == null)
         {
-            return Attempt.Fail(operationStatus);
+            return Attempt.FailWithStatus(operationStatus, new TContentUpdateResult { Content = content });
         }
+
+        // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
+        //       instead, the error state and validation errors will be communicated in the return value.
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentEditingModelBase, contentType);
 
         UpdateNames(contentEditingModelBase, content, contentType);
         await UpdateExistingProperties(contentEditingModelBase, content, contentType);
         RemoveMissingProperties(contentEditingModelBase, content, contentType);
 
-        return Attempt.Succeed(ContentEditingOperationStatus.Success);
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationResult = validationResult.Result });
+    }
+
+    protected async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
+        => await _validationService.ValidateCulturesAsync(contentEditingModelBase);
+
+    protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey)
+    {
+        TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
+        }
+
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentType);
+    }
+
+    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        TContentType contentType)
+    {
+        ContentValidationResult result = await _validationService.ValidatePropertiesAsync(contentEditingModelBase, contentType);
+        return result.ValidationErrors.Any() is false
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, false, MoveToRecycleBin);
+        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustNotBeTrashed, MoveToRecycleBin);
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, true, Delete);
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
+        => await HandleDeletionAsync(key, userKey, mustBeTrashed ? ContentTrashStatusRequirement.MustBeTrashed : ContentTrashStatusRequirement.Irrelevant, Delete);
 
-    // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
-    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, bool mustBeTrashed, Func<TContent, int, OperationResult?> performDelete)
+    // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
+    // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
+    // DeleteAsync (irrelevant, Delete)
+    // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBin)
+    // DeleteFromRecycleBinAsync (MustBeTrashed, Delete)
+    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, ContentTrashStatusRequirement trashStatusRequirement, Func<TContent, int, OperationResult?> performDelete)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content == null)
         {
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
         }
 
-        if (content.Trashed != mustBeTrashed)
+        // checking the trash status is not done when it is irrelevant
+        if ((trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed && content.Trashed is false)
+            || (trashStatusRequirement is ContentTrashStatusRequirement.MustNotBeTrashed && content.Trashed is true))
         {
-            ContentEditingOperationStatus status = mustBeTrashed
+            ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
                 ? ContentEditingOperationStatus.NotInTrash
                 : ContentEditingOperationStatus.InTrash;
             return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content));
@@ -133,37 +172,48 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return OperationResultToAttempt(content, deleteResult);
     }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
         }
 
+        if (mustBeInRecycleBin && content.Trashed is false)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content));
+        }
+
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
 
-        TContent? parent = TryGetAndValidateParent(parentKey, contentType, out ContentEditingOperationStatus operationStatus);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
         // special case for move: short circuit the operation if the content is already under the correct parent.
-        if ((parent == null && content.ParentId == Constants.System.Root) || (parent != null && parent.Id == content.ParentId))
+        if ((parent.ParentId == null && content.ParentId == Constants.System.Root) || (parent.ParentId != null && parent.ParentId == content.ParentId))
         {
             return Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content);
         }
 
         // special case for move: do not allow moving an item beneath itself.
-        if (parent?.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Contains(content.Id) is true)
+        if (parentKey.HasValue)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
+            // at this point the parent MUST exist - unless someone starts using this move method
+            // e.g. for blueprints (which should be handled elsewhere).
+            TContent parentContent = ContentService.GetById(parentKey.Value) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
+            if (parentContent.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Contains(content.Id) is true)
+            {
+                return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
+            }
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent?.Id ?? Constants.System.Root, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
 
         scope.Complete();
 
@@ -172,7 +222,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
@@ -181,14 +231,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
 
-        TContent? parent = TryGetAndValidateParent(parentKey, contentType, out ContentEditingOperationStatus operationStatus);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
         var userId = await GetUserIdAsync(userKey);
-        TContent? copy = Copy(content, parent?.Id ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
+        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
@@ -196,48 +246,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return copy != null
             ? Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, copy)
             : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, null);
-    }
-
-    protected async Task<ContentEditingOperationStatus> HandleSortAsync(
-        Guid? parentKey,
-        IEnumerable<SortingModel> sortingModels,
-        Guid userKey)
-    {
-        var contentId = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)?.Id
-            : Constants.System.Root;
-
-        if (contentId.HasValue is false)
-        {
-            return await Task.FromResult(ContentEditingOperationStatus.NotFound);
-        }
-
-        const int pageSize = 500;
-        var pageNumber = 0;
-        IEnumerable<TContent> page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out var total);
-        var children = new List<TContent>((int)total);
-        children.AddRange(page);
-        while (pageNumber * pageSize < total)
-        {
-            page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out _);
-            children.AddRange(page);
-        }
-
-        try
-        {
-            TContent[] sortedChildren = _treeEntitySortingService
-                .SortEntities(children, sortingModels)
-                .ToArray();
-
-            var userId = await GetUserIdAsync(userKey);
-
-            return Sort(sortedChildren, userId);
-        }
-        catch (ArgumentException argumentException)
-        {
-            _logger.LogError(argumentException, "Invalid sorting instructions, see exception for details.");
-            return ContentEditingOperationStatus.SortingInvalid;
-        }
     }
 
     private Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult)
@@ -322,7 +330,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return contentType;
     }
 
-    private TContent? TryGetAndValidateParent(Guid? parentKey, TContentType contentType, out ContentEditingOperationStatus operationStatus)
+    protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
             ? ContentService.GetById(parentKey.Value)
@@ -330,22 +338,19 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         if (parentKey.HasValue && parent == null)
         {
-            operationStatus = ContentEditingOperationStatus.ParentNotFound;
-            return null;
+            return await Task.FromResult<(int? ParentId, ContentEditingOperationStatus OperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
         }
 
         if (parent == null && contentType.AllowedAsRoot == false)
         {
-            operationStatus = ContentEditingOperationStatus.NotAllowed;
-            return null;
+            return (null, ContentEditingOperationStatus.NotAllowed);
         }
 
         if (parent != null)
         {
             if (parent.Trashed)
             {
-                operationStatus = ContentEditingOperationStatus.InTrash;
-                return null;
+                return (null, ContentEditingOperationStatus.InTrash);
             }
 
             TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
@@ -354,13 +359,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
             if (allowedContentTypeKeys.Contains(contentType.Key) == false)
             {
-                operationStatus = ContentEditingOperationStatus.NotAllowed;
-                return null;
+                return (null, ContentEditingOperationStatus.NotAllowed);
             }
         }
 
-        operationStatus = ContentEditingOperationStatus.Success;
-        return parent;
+        return (parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success);
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
@@ -469,4 +472,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     private static Dictionary<string, IPropertyType> GetPropertyTypesByAlias(TContentType contentType)
         => contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
+
+    /// <summary>
+    /// Should never be made public, serves the purpose of a nullable bool but more readable.
+    /// </summary>
+    private enum ContentTrashStatusRequirement
+    {
+        Irrelevant,
+        MustBeTrashed,
+        MustNotBeTrashed
+    }
 }

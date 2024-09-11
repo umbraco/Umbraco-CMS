@@ -221,10 +221,17 @@ AND cmsContentNu.nodeId IS NULL
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+        // Use a more efficient COUNT query
+        Sql<ISqlContext>? sqlCountQuery = SqlContentSourcesCount()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document));
+
+        Sql<ISqlContext>? sqlCount =
+            SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql, sqlCount);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -239,10 +246,18 @@ AND cmsContentNu.nodeId IS NULL
             .Append(SqlWhereNodeIdX(SqlContext, id))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+        // Use a more efficient COUNT query
+        Sql<ISqlContext>? sqlCountQuery = SqlContentSourcesCount(SqlContentSourcesSelectUmbracoNodeJoin)
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeIdX(SqlContext, id));
+
+        Sql<ISqlContext>? sqlCount =
+            SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql, sqlCount);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -262,10 +277,18 @@ AND cmsContentNu.nodeId IS NULL
             .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+        // Use a more efficient COUNT query
+        Sql<ISqlContext> sqlCountQuery = SqlContentSourcesCount()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<ContentDto>(x => x.ContentTypeId, ids);
+
+        Sql<ISqlContext>? sqlCount =
+            SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql, sqlCount);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -301,7 +324,7 @@ AND cmsContentNu.nodeId IS NULL
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -319,7 +342,7 @@ AND cmsContentNu.nodeId IS NULL
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -342,7 +365,7 @@ AND cmsContentNu.nodeId IS NULL
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -990,7 +1013,7 @@ WHERE cmsContentNu.nodeId IN (
         return s;
     }
 
-    private IEnumerable<ContentSourceDto> GetContentNodeDtos(Sql<ISqlContext> sql)
+    private IEnumerable<ContentSourceDto> GetMediaNodeDtos(Sql<ISqlContext> sql)
     {
         // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
         // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
@@ -999,8 +1022,8 @@ WHERE cmsContentNu.nodeId IN (
         if (_nucacheSettings.Value.UsePagedSqlQuery)
         {
             // Use a more efficient COUNT query
-            Sql<ISqlContext>? sqlCountQuery = SqlContentSourcesCount()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document));
+            Sql<ISqlContext>? sqlCountQuery = SqlMediaSourcesCount()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media));
 
             Sql<ISqlContext>? sqlCount =
                 SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
@@ -1011,6 +1034,18 @@ WHERE cmsContentNu.nodeId IN (
         {
             dtos = Database.Fetch<ContentSourceDto>(sql);
         }
+
+        return dtos;
+    }
+
+    private IEnumerable<ContentSourceDto> GetContentNodeDtos(Sql<ISqlContext> sql, Sql<ISqlContext> sqlCount)
+    {
+        // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+        // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+        // QueryPaged is very slow on large sites however, so use fetch if UsePagedSqlQuery is disabled.
+        IEnumerable<ContentSourceDto> dtos = _nucacheSettings.Value.UsePagedSqlQuery ?
+            Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount) :
+            Database.Fetch<ContentSourceDto>(sql);
 
         return dtos;
     }

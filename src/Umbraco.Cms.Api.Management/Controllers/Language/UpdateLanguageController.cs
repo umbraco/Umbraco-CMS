@@ -14,7 +14,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessLanguages)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
 public class UpdateLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;
@@ -36,7 +36,10 @@ public class UpdateLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(string isoCode, UpdateLanguageRequestModel updateLanguageRequestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        string isoCode,
+        UpdateLanguageRequestModel updateLanguageRequestModel)
     {
         ILanguage? current = await _languageService.GetAsync(isoCode);
         if (current is null)

@@ -5,16 +5,25 @@
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Mvc" Version="7.0.1" />
-    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.1" />
-    <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0-rc.1.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0-rc.1.*" />
-    <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
-    <PackageReference Include="Smidge.InMemory" Version="4.3.0" />
-    <PackageReference Include="Smidge.Nuglify" Version="4.3.0" />
+    <PackageReference Include="Asp.Versioning.Mvc" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+    <PackageReference Include="Dazinator.Extensions.FileProviders" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
+    <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <!-- Take top-level depedendency on System.Net.Http, because Dazinator.Extensions.FileProviders depends on a vulnerable version -->
+    <PackageReference Include="System.Net.Http" />
+    <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <ItemGroup>

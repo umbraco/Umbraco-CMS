@@ -37,7 +37,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     protected ILogger<EntityRepositoryBase<TId, TEntity>> Logger { get; }
 
     /// <summary>
-    ///     Gets the isolated cache for the <see cref="TEntity" />
+    ///     Gets the isolated cache for the <typeparamref name="TEntity"/>
     /// </summary>
     protected IAppPolicyCache GlobalIsolatedCache => AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
 
@@ -181,11 +181,11 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     /// <summary>
     ///     Returns an integer with the count of entities found with the passed in query
     /// </summary>
-    public int Count(IQuery<TEntity> query)
+    public int Count(IQuery<TEntity>? query)
         => PerformCount(query);
 
     /// <summary>
-    ///     Get the entity id for the <see cref="TEntity" />
+    ///     Get the entity id for the <typeparamref name="TEntity"/>.
     /// </summary>
     protected virtual TId GetEntityId(TEntity entity)
         => (TId)(object)entity.Id;
@@ -221,9 +221,14 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         return count == 1;
     }
 
-    protected virtual int PerformCount(IQuery<TEntity> query)
+    protected virtual int PerformCount(IQuery<TEntity>? query)
     {
         Sql<ISqlContext> sqlClause = GetBaseQuery(true);
+        if (query is null)
+        {
+            return Database.ExecuteScalar<int>(sqlClause);
+        }
+
         var translator = new SqlTranslator<TEntity>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();
 

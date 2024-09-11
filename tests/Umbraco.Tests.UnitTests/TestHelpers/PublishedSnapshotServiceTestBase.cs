@@ -159,7 +159,7 @@ public class PublishedSnapshotServiceTestBase
 
     protected static DataType[] GetDefaultDataTypes()
     {
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
 
         // create data types, property types and content types
         var dataType =
@@ -212,7 +212,7 @@ public class PublishedSnapshotServiceTestBase
     }
 
     /// <summary>
-    ///     Initializes the <see cref="IPublishedSnapshotService'" /> with a source of data
+    ///     Initializes the <see cref="IPublishedSnapshotService" /> with a source of data.
     /// </summary>
     protected void InitializedCache(
         IEnumerable<ContentNodeKit> contentNodeKits,

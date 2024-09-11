@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.PublishedCache;
@@ -29,7 +30,7 @@ public class UmbracoContextPublishedSnapshotAccessor : IPublishedSnapshotAccesso
         set => throw new NotSupportedException(); // not ok to set
     }
 
-    public bool TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot)
+    public bool TryGetPublishedSnapshot([NotNullWhen(true)] out IPublishedSnapshot? publishedSnapshot)
     {
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {

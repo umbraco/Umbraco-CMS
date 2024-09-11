@@ -18,6 +18,8 @@ public interface IDataTypeService : IService
     [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
+    IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id) => throw new NotImplementedException();
+
     /// <summary>
     ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a <see cref="IDataType" />
     /// </summary>
@@ -26,7 +28,8 @@ public interface IDataTypeService : IService
     Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id);
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name,
+        int userId = Constants.Security.SuperUserId);
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
@@ -50,7 +53,8 @@ public interface IDataTypeService : IService
     Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name,
+        int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a <see cref="IDataType" /> by its Name
@@ -108,10 +112,22 @@ public interface IDataTypeService : IService
     Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys);
 
     /// <summary>
+    /// Gets multiple <see cref="IDataType"/> objects by their unique keys.
+    /// </summary>
+    /// <param name="name">Name to filter by.</param>
+    /// <param name="editorUiAlias">Editor ui alias to filter by.</param>
+    /// <param name="editorAlias">Editor alias to filter by.</param>
+    /// <param name="skip">Number of items to skip.</param>
+    /// <param name="take">Number of items to take.</param>
+    /// <returns>An attempt with the requested data types.</returns>
+    Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100);
+
+    /// <summary>
     ///     Gets all <see cref="IDataType" /> objects or those with the ids passed in
     /// </summary>
     /// <param name="ids">Optional array of Ids</param>
     /// <returns>An enumerable list of <see cref="IDataType" /> objects</returns>
+    [Obsolete("Please use GetAllAsync. Will be removed in V15.")]
     IEnumerable<IDataType> GetAll(params int[] ids);
 
     /// <summary>
@@ -202,10 +218,12 @@ public interface IDataTypeService : IService
     Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, Guid userKey);
 
     [Obsolete("Please use CopyASync instead. Will be removed in V15")]
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) => Copy(copying, containerId, Constants.Security.SuperUserId);
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) =>
+        Copy(copying, containerId, Constants.Security.SuperUserId);
 
     [Obsolete("Please use CopyASync instead. Will be removed in V15")]
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId,
+        int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies a <see cref="IDataType"/> to a given container
@@ -222,4 +240,11 @@ public interface IDataTypeService : IService
     /// <param name="dataType">The data type whose configuration to validate.</param>
     /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
     IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType);
+
+    /// <summary>
+    ///     Gets all <see cref="IDataType" /> for a set of property editors
+    /// </summary>
+    /// <param name="propertyEditorAlias">Aliases of the property editors</param>
+    /// <returns>Collection of <see cref="IDataType" /> configured for the property editors</returns>
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias);
 }

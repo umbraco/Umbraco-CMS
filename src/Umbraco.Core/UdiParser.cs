@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -70,13 +70,13 @@ public sealed class UdiParser
     /// <param name="s">The string to convert.</param>
     /// <param name="udi">An Udi instance that contains the value that was parsed.</param>
     /// <returns>A boolean value indicating whether the string could be parsed.</returns>
-    public static bool TryParse<T>(string? s, [MaybeNullWhen(false)] out T udi)
-        where T : Udi?
+    public static bool TryParse<T>(string? s, [NotNullWhen(true)] out T? udi)
+        where T : Udi
     {
         var result = ParseInternal(s, true, false, out Udi? parsed);
-        if (result && parsed is T)
+        if (result && parsed is T t)
         {
-            udi = (T)parsed;
+            udi = t;
             return true;
         }
 
@@ -204,14 +204,13 @@ public sealed class UdiParser
             { Constants.UdiEntityType.Element, UdiType.GuidUdi },
             { Constants.UdiEntityType.Document, UdiType.GuidUdi },
             { Constants.UdiEntityType.DocumentBlueprint, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DocumentBlueprintContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.Media, UdiType.GuidUdi },
             { Constants.UdiEntityType.Member, UdiType.GuidUdi },
             { Constants.UdiEntityType.DictionaryItem, UdiType.GuidUdi },
-            { Constants.UdiEntityType.Macro, UdiType.GuidUdi },
             { Constants.UdiEntityType.Template, UdiType.GuidUdi },
             { Constants.UdiEntityType.DocumentType, UdiType.GuidUdi },
             { Constants.UdiEntityType.DocumentTypeContainer, UdiType.GuidUdi },
-            { Constants.UdiEntityType.DocumentTypeBluePrints, UdiType.GuidUdi },
             { Constants.UdiEntityType.MediaType, UdiType.GuidUdi },
             { Constants.UdiEntityType.MediaTypeContainer, UdiType.GuidUdi },
             { Constants.UdiEntityType.DataType, UdiType.GuidUdi },
@@ -224,12 +223,11 @@ public sealed class UdiParser
             { Constants.UdiEntityType.FormsDataSource, UdiType.GuidUdi },
             { Constants.UdiEntityType.AnyString, UdiType.StringUdi },
             { Constants.UdiEntityType.Language, UdiType.StringUdi },
-            { Constants.UdiEntityType.MacroScript, UdiType.StringUdi },
             { Constants.UdiEntityType.MediaFile, UdiType.StringUdi },
             { Constants.UdiEntityType.TemplateFile, UdiType.StringUdi },
             { Constants.UdiEntityType.Script, UdiType.StringUdi },
             { Constants.UdiEntityType.PartialView, UdiType.StringUdi },
-            { Constants.UdiEntityType.PartialViewMacro, UdiType.StringUdi },
             { Constants.UdiEntityType.Stylesheet, UdiType.StringUdi },
+            { Constants.UdiEntityType.Webhook, UdiType.GuidUdi },
         };
 }

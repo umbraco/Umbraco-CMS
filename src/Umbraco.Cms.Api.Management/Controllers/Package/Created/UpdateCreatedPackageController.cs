@@ -38,7 +38,10 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(Guid id, UpdatePackageRequestModel updatePackageRequestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdatePackageRequestModel updatePackageRequestModel)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);
 
@@ -47,7 +50,6 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
             return CreatedPackageNotFound();
         }
 
-        // Macros are not included!
         PackageDefinition packageDefinition = _umbracoMapper.Map(updatePackageRequestModel, package);
 
         Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.UpdateCreatedPackageAsync(packageDefinition, CurrentUserKey(_backOfficeSecurityAccessor));

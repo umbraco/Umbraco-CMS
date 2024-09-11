@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
-using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -18,15 +19,20 @@ public class RootMediaTreeController : MediaTreeControllerBase
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IMediaPresentationFactory mediaPresentationFactory)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
     {
     }
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<MediaTreeItemResponseModel>>> Root(int skip = 0, int take = 100, Guid? dataTypeId = null)
+    public async Task<ActionResult<PagedViewModel<MediaTreeItemResponseModel>>> Root(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100,
+        Guid? dataTypeId = null)
     {
         IgnoreUserStartNodesForDataType(dataTypeId);
         return await GetRoot(skip, take);

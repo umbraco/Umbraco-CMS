@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;

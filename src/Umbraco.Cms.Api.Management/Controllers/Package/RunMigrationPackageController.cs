@@ -25,7 +25,7 @@ public class RunMigrationPackageController : PackageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RunMigrations(string name)
+    public async Task<IActionResult> RunMigrations(CancellationToken cancellationToken, string name)
     {
         Attempt<bool, PackageMigrationOperationStatus> result = await _packageMigrationRunner.RunPendingPackageMigrations(name);
 

@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -12,6 +15,7 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 [ApiExplorerSettings(GroupName = "Content")]
 [LocalizeFromAcceptLanguageHeader]
 [ValidateStartItem]
+[OutputCache(PolicyName = Constants.DeliveryApi.OutputCache.ContentCachePolicy)]
 public abstract class ContentApiControllerBase : DeliveryApiControllerBase
 {
     protected IApiPublishedContentCache ApiPublishedContentCache { get; }
@@ -44,4 +48,14 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
                 .WithDetail($"Content query status \"{status}\" was not expected here")
                 .Build()),
         };
+
+    /// <summary>
+    ///     Creates a 403 Forbidden result.
+    /// </summary>
+    /// <remarks>
+    ///     Use this method instead of <see cref="ControllerBase.Forbid()"/> on the controller base. The latter will yield
+    ///     a redirect to an access denied URL because of the default cookie auth scheme. This method ensures that a proper
+    ///     403 Forbidden status code is returned to the client.
+    /// </remarks>
+    protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
 }

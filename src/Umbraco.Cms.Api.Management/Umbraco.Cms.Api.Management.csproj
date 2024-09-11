@@ -7,10 +7,13 @@
     <AssemblyName>Umbraco.Cms.Api.Management</AssemblyName>
     <RootNamespace>Umbraco.Cms.Api.Management</RootNamespace>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="JsonPatch.Net" Version="2.0.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="JsonPatch.Net" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +22,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="OpenApi.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Security\Authorization\Dictionary\IDictionaryPermissionAuthorizer.cs" />
   </ItemGroup>
 </Project>

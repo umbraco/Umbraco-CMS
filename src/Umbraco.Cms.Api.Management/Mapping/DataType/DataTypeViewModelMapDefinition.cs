@@ -2,36 +2,24 @@
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.DataType;
 
 public class DataTypeViewModelMapDefinition : IMapDefinition
 {
-    private readonly PropertyEditorCollection _propertyEditors;
-    private readonly IDataTypeService _dataTypeService;
-
-    public DataTypeViewModelMapDefinition(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService)
-    {
-        _propertyEditors = propertyEditors;
-        _dataTypeService = dataTypeService;
-    }
-
     public void DefineMaps(IUmbracoMapper mapper)
-    {
-        mapper.Define<IDataType, DataTypeResponseModel>((_, _) => new DataTypeResponseModel(), Map);
-    }
+        => mapper.Define<IDataType, DataTypeResponseModel>((_, _) => new DataTypeResponseModel(), Map);
 
     // Umbraco.Code.MapAll
     private void Map(IDataType source, DataTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
-        target.ParentId = _dataTypeService.GetContainer(source.ParentId)?.Key;
         target.Name = source.Name ?? string.Empty;
-        target.PropertyEditorAlias = source.EditorAlias;
-        target.PropertyEditorUiAlias = source.EditorUiAlias;
+        target.EditorAlias = source.EditorAlias;
+        target.EditorUiAlias = source.EditorUiAlias ?? source.EditorAlias;
+        target.IsDeletable = source.IsDeletableDataType();
+        target.CanIgnoreStartNodes = source.IsBuildInDataType() is false;
 
         IConfigurationEditor? configurationEditor = source.Editor?.GetConfigurationEditor();
         IDictionary<string, object> configuration = configurationEditor?.ToConfigurationEditor(source.ConfigurationData)

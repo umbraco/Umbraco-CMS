@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 namespace Umbraco.Extensions;
 
 /// <summary>
-///     Provides extension methods to the <see cref="IFactory" /> class.
+///     Provides extension methods to the <see cref="IServiceProvider" /> class.
 /// </summary>
 public static class ServiceProviderExtensions
 {
@@ -28,7 +28,7 @@ public static class ServiceProviderExtensions
     /// <summary>
     ///     Creates an instance of a service, with arguments.
     /// </summary>
-    /// <param name="serviceProvider">The <see cref="IServiceProvider" /></param>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider" />.</param>
     /// <param name="type">The type of the instance.</param>
     /// <param name="args">Named arguments.</param>
     /// <returns>An instance of the specified type.</returns>

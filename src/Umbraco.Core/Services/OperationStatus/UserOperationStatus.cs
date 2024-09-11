@@ -1,5 +1,8 @@
 ﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
 
+/// <summary>
+/// Used to signal a user operation succeeded or an atomic failure reason
+/// </summary>
 public enum UserOperationStatus
 {
     Success,
@@ -8,6 +11,7 @@ public enum UserOperationStatus
     UserNameIsNotEmail,
     EmailCannotBeChanged,
     NoUserGroup,
+    AdminUserGroupMustNotBeEmpty,
     DuplicateUserName,
     InvalidEmail,
     DuplicateEmail,
@@ -21,7 +25,7 @@ public enum UserOperationStatus
     CannotDisableSelf,
     CannotDeleteSelf,
     CannotDisableInvitedUser,
-    OldPasswordRequired,
+    SelfOldPasswordRequired,
     InvalidAvatar,
     InvalidIsoCode,
     InvalidInviteToken,
@@ -30,6 +34,10 @@ public enum UserOperationStatus
     MediaStartNodeNotFound,
     ContentNodeNotFound,
     MediaNodeNotFound,
+    NodeNotFound,
     UnknownFailure,
-    CannotPasswordReset
+    CannotPasswordReset,
+    NotInInviteState,
+    SelfPasswordResetNotAllowed,
+    DuplicateId,
 }

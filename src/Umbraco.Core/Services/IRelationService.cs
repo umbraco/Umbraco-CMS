@@ -168,17 +168,17 @@ public interface IRelationService : IService
     /// <param name="relationTypeId"></param>
     /// <param name="pageIndex"></param>
     /// <param name="pageSize"></param>
-    /// <param name="totalChildren"></param>
+    /// <param name="totalRecords"></param>
+    /// <param name="ordering"></param>
     /// <returns></returns>
-    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);/// <summary>
+    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets a paged result of <see cref="IRelation" />
     /// </summary>
     /// <param name="key"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
     /// <param name="ordering"></param>
     /// <returns></returns>
     Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null);
@@ -225,6 +225,7 @@ public interface IRelationService : IService
     /// <param name="pageIndex"></param>
     /// <param name="pageSize"></param>
     /// <param name="totalChildren"></param>
+    /// <param name="entityTypes"></param>
     /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
     IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
@@ -235,6 +236,7 @@ public interface IRelationService : IService
     /// <param name="pageIndex"></param>
     /// <param name="pageSize"></param>
     /// <param name="totalChildren"></param>
+    /// <param name="entityTypes"></param>
     /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
     IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
@@ -394,4 +396,15 @@ public interface IRelationService : IService
     IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
 
     Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias);
+    int CountRelationTypes();
+
+    /// <summary>
+    /// Gets the Relation types in a paged manner.
+    /// Currently implements the paging in memory on the name attribute because the underlying repository does not support paging yet
+    /// </summary>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids);
 }

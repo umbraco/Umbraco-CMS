@@ -223,6 +223,14 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         return databaseSchemaValidationResult ?? new DatabaseSchemaResult();
     }
 
+    public int ExecuteNonQuery(DbCommand command)
+    {
+        OnExecutingCommand(command);
+        var i = command.ExecuteNonQuery();
+        OnExecutedCommand(command);
+        return i;
+    }
+
     /// <summary>
     ///     Returns true if Umbraco database tables are detected to be installed
     /// </summary>
@@ -390,7 +398,7 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     public new T ExecuteScalar<T>(string sql, params object[] args)
         => ExecuteScalar<T>(new Sql(sql, args));
 
-    /// <inheritdoc cref="Database.ExecuteScalar{T}(sql)" />
+    /// <inheritdoc cref="Database.ExecuteScalar{T}(Sql)" />
     public new T ExecuteScalar<T>(Sql sql)
         => ExecuteScalar<T>(sql.SQL, CommandType.Text, sql.Arguments);
 

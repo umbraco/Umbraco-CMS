@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 
@@ -27,11 +27,10 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock,
         IBackOfficeSignInManager backOfficeSignInManager,
         IUserService userService,
         IUmbracoMapper umbracoMapper)
-        : base(options, logger, encoder, clock)
+        : base(options, logger, encoder)
     {
         _backOfficeSignInManager = backOfficeSignInManager;
 

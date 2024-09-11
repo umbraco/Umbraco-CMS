@@ -3,7 +3,7 @@ using System.Text;
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
-///     Contains event data for the <see cref="ModelBindingException" /> event.
+///     Contains event data for the <see cref="T:Umbraco.Cms.Web.Common.ModelBinders.ModelBindingException" /> event.
 /// </summary>
 public class ModelBindingErrorNotification : INotification
 {

@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -14,17 +13,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Integer,
-    EditorType.PropertyValue | EditorType.MacroParameter,
-    "Numeric",
-    "integer",
     ValueType = ValueTypes.Integer,
     ValueEditorIsReusable = true)]
 public class IntegerPropertyEditor : DataEditor
 {
-    public IntegerPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory) =>
-        SupportsReadOnly = true;
+    public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
+        : base(dataValueEditorFactory)
+        => SupportsReadOnly = true;
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
@@ -36,13 +31,12 @@ public class IntegerPropertyEditor : DataEditor
     internal class IntegerPropertyValueEditor : DataValueEditor
     {
         public IntegerPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
-            Validators.Add(new IntegerValidator());
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+            => Validators.Add(new IntegerValidator());
 
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
             => TryParsePropertyValue(property.GetValue(culture, segment));

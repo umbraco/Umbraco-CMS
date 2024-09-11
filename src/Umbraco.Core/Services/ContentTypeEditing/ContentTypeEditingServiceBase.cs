@@ -33,8 +33,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         _shortStringHelper = shortStringHelper;
     }
 
-    protected abstract Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement);
-
     protected abstract TContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId);
 
     protected abstract bool SupportsPublishing { get; }
@@ -42,6 +40,29 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     protected abstract UmbracoObjectTypes ContentTypeObjectType { get; }
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
+
+    protected async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> FindAvailableCompositionsAsync(
+        Guid? key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases,
+        bool isElement = false)
+    {
+        TContentType? contentType = key.HasValue ? await _concreteContentTypeService.GetAsync(key.Value) : null;
+        IContentTypeComposition[] allContentTypes = _concreteContentTypeService.GetAll().ToArray();
+
+        var currentCompositionAliases = currentCompositeKeys.Any()
+            ? allContentTypes.Where(ct => currentCompositeKeys.Contains(ct.Key)).Select(ct => ct.Alias).ToArray()
+            : Array.Empty<string>();
+
+        ContentTypeAvailableCompositionsResults availableCompositions = _contentTypeService.GetAvailableCompositeContentTypes(
+            contentType,
+            allContentTypes,
+            currentCompositionAliases,
+            currentPropertyAliases.ToArray(),
+            isElement);
+
+        return availableCompositions.Results;
+    }
 
     protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> ValidateAndMapForCreationAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? containerKey)
     {
@@ -69,6 +90,8 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
+
+        await AdditionalCreateValidationAsync(model);
 
         // get the ID of the parent to create the content type under (we already validated that it exists)
         var parentId = GetParentId(model, containerKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
@@ -115,6 +138,10 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         contentType = await UpdateAsync(contentType, model, allContentTypeCompositions);
         return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
+
+    protected virtual async Task<ContentTypeOperationStatus> AdditionalCreateValidationAsync(
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+        => await Task.FromResult(ContentTypeOperationStatus.Success);
 
     #region Sanitization
 
@@ -177,6 +204,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         if (IsReservedContentTypeAlias(model.Alias) || IsUnsafeAlias(model.Alias))
         {
             return ContentTypeOperationStatus.InvalidAlias;
+        }
+
+        // Validate content type alias is not in use.
+        if (model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)))
+        {
+            return ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias;
         }
 
         // Validate properties for reserved aliases.
@@ -287,7 +320,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
         // verify that all compositions keys are allowed
-        Guid[] allowedCompositionKeys = GetAvailableCompositionKeys(contentType, allContentTypeCompositions, model.IsElement);
+        Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
+            .Results
+            .Where(x => x.Allowed)
+            .Select(x => x.Composition.Key)
+            .ToArray();
+
         if (allowedCompositionKeys.ContainsAll(compositionKeys) is false)
         {
             return ContentTypeOperationStatus.InvalidComposition;
@@ -317,6 +355,11 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
     private ContentTypeOperationStatus ValidateContainers(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
     {
+        if (model.Containers.Any(container => Enum.TryParse<PropertyGroupType>(container.Type, out _) is false))
+        {
+            return ContentTypeOperationStatus.InvalidContainerType;
+        }
+
         // all property container keys must be present in the model
         Guid[] modelContainerKeys = model.Containers.Select(c => c.Key).ToArray();
         if (model.Properties.Any(p => p.ContainerKey is not null && modelContainerKeys.Contains(p.ContainerKey.Value) is false))
@@ -379,8 +422,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             .Union(typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name))
             .ToArray();
 
-        return model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
-                                                   || reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
+        return model.Properties.Any(propertyType => reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
     }
 
     private bool IsUnsafeAlias(string alias) => alias.IsNullOrWhiteSpace()
@@ -401,6 +443,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         contentType.Name = model.Name;
         contentType.AllowedAsRoot = model.AllowedAsRoot;
         contentType.IsElement = model.IsElement;
+        contentType.ListView = model.ListView;
         contentType.SetVariesBy(ContentVariation.Culture, model.VariesByCulture);
         contentType.SetVariesBy(ContentVariation.Segment, model.VariesBySegment);
 
@@ -626,7 +669,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         => model.Properties.Select(property => property.DataTypeKey).Distinct().ToArray();
 
     private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
-        => (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray();
+    {
+        Guid[] dataTypeKeys = GetDataTypeKeys(model);
+        return dataTypeKeys.Any()
+            ? (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray()
+            : Array.Empty<IDataType>();
+    }
 
     private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
     {

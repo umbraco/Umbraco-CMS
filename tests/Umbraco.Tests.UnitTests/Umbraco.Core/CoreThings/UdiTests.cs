@@ -1,14 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
-using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings;
 
@@ -82,12 +78,12 @@ public class UdiTests
         // we want to keep the / in string udis
         var r = string.Join("/", "path/to/View[1].cshtml".Split('/').Select(Uri.EscapeDataString));
         Assert.AreEqual("path/to/View%5B1%5D.cshtml", r);
-        Assert.IsTrue(Uri.IsWellFormedUriString("umb://partial-view-macro/" + r, UriKind.Absolute));
+        Assert.IsTrue(Uri.IsWellFormedUriString("umb://partial-view/" + r, UriKind.Absolute));
 
         // with the proper fix in StringUdi this should work:
-        var udi1 = new StringUdi("partial-view-macro", "path/to/View[1].cshtml");
-        Assert.AreEqual("umb://partial-view-macro/path/to/View%5B1%5D.cshtml", udi1.ToString());
-        var udi2 = UdiParser.Parse("umb://partial-view-macro/path/to/View%5B1%5D.cshtml");
+        var udi1 = new StringUdi("partial-view", "path/to/View[1].cshtml");
+        Assert.AreEqual("umb://partial-view/path/to/View%5B1%5D.cshtml", udi1.ToString());
+        var udi2 = UdiParser.Parse("umb://partial-view/path/to/View%5B1%5D.cshtml");
         Assert.AreEqual("path/to/View[1].cshtml", ((StringUdi)udi2).Id);
     }
 
@@ -206,31 +202,42 @@ public class UdiTests
     }
 
     [Test]
-    public void SerializationTest()
+    [TestCase(Constants.DeploySelector.This)]
+    [TestCase(Constants.DeploySelector.ThisAndChildren)]
+    [TestCase(Constants.DeploySelector.ThisAndDescendants)]
+    [TestCase(Constants.DeploySelector.ChildrenOfThis)]
+    [TestCase(Constants.DeploySelector.DescendantsOfThis)]
+    [TestCase(Constants.DeploySelector.EntitiesOfType)]
+    public void RangeParseTest(string selector)
     {
-        var settings = new JsonSerializerSettings
-        {
-            Converters = new JsonConverter[] { new UdiJsonConverter(), new UdiRangeJsonConverter() },
-        };
+        var expected = new UdiRange(Udi.Create(Constants.UdiEntityType.AnyGuid, Guid.NewGuid()), selector);
+        var actual = UdiRange.Parse(expected.ToString());
 
-        var guid = Guid.NewGuid();
-        var udi = new GuidUdi(Constants.UdiEntityType.AnyGuid, guid);
-        var json = JsonConvert.SerializeObject(udi, settings);
-        Assert.AreEqual(string.Format("\"umb://any-guid/{0:N}\"", guid), json);
-
-        var dudi = JsonConvert.DeserializeObject<Udi>(json, settings);
-        Assert.AreEqual(Constants.UdiEntityType.AnyGuid, dudi.EntityType);
-        Assert.AreEqual(guid, ((GuidUdi)dudi).Guid);
-
-        var range = new UdiRange(udi, Constants.DeploySelector.ChildrenOfThis);
-        json = JsonConvert.SerializeObject(range, settings);
-        Assert.AreEqual(string.Format("\"umb://any-guid/{0:N}?children\"", guid), json);
-
-        var drange = JsonConvert.DeserializeObject<UdiRange>(json, settings);
-        Assert.AreEqual(udi, drange.Udi);
-        Assert.AreEqual(string.Format("umb://any-guid/{0:N}", guid), drange.Udi.UriValue.ToString());
-        Assert.AreEqual(Constants.DeploySelector.ChildrenOfThis, drange.Selector);
+        Assert.AreEqual(expected, actual);
     }
+
+    [Test]
+    public void TryParseTest()
+    {
+        // try parse to "Udi"
+        var stringUdiString = "umb://document/b9a56165-6c4e-4e79-8277-620430174ad3";
+        Assert.IsTrue(UdiParser.TryParse(stringUdiString, out Udi udi1));
+        Assert.AreEqual("b9a56165-6c4e-4e79-8277-620430174ad3", udi1 is GuidUdi guidUdi1 ? guidUdi1.Guid.ToString() : string.Empty);
+
+        // try parse to "Udi"
+        Assert.IsFalse(UdiParser.TryParse("nope", out Udi udi2));
+        Assert.IsNull(udi2);
+
+        // try parse to "GuidUdi?"
+        Assert.IsTrue(UdiParser.TryParse(stringUdiString, out GuidUdi? guidUdi3));
+        Assert.AreEqual("b9a56165-6c4e-4e79-8277-620430174ad3", guidUdi3.Guid.ToString());
+
+        // try parse to "GuidUdi?"
+        Assert.IsFalse(UdiParser.TryParse("nope", out GuidUdi? guidUdi4));
+        Assert.IsNull(guidUdi4);
+
+    }
+
 
     [Test]
     public void ValidateUdiEntityType()
@@ -304,7 +311,7 @@ public class UdiTests
     }
 
     [UdiDefinition("foo", UdiType.GuidUdi)]
-    public class FooConnector : IServiceConnector2
+    public class FooConnector : IServiceConnector
     {
         public IArtifact GetArtifact(Udi udi, IContextCache contextCache) => throw new NotImplementedException();
 

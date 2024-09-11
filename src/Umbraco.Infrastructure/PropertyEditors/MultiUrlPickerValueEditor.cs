@@ -2,50 +2,45 @@
 // See LICENSE for more details.
 
 using System.Runtime.Serialization;
-using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 {
-    private readonly IEntityService _entityService;
     private readonly ILogger<MultiUrlPickerValueEditor> _logger;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IContentService _contentService;
+    private readonly IMediaService _mediaService;
 
     public MultiUrlPickerValueEditor(
-        IEntityService entityService,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         ILogger<MultiUrlPickerValueEditor> logger,
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         DataEditorAttribute attribute,
         IPublishedUrlProvider publishedUrlProvider,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        IContentService contentService,
+        IMediaService mediaService)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
-        _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-        _publishedSnapshotAccessor = publishedSnapshotAccessor ??
-                                     throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _publishedUrlProvider = publishedUrlProvider;
 
         _jsonSerializer = jsonSerializer;
+        _contentService = contentService;
+        _mediaService = mediaService;
     }
 
     public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -84,26 +79,6 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         {
             List<LinkDto>? links = _jsonSerializer.Deserialize<List<LinkDto>>(value);
 
-            List<LinkDto>? documentLinks = links?.FindAll(link =>
-                link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
-            List<LinkDto>? mediaLinks = links?.FindAll(link =>
-                link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Media);
-
-            var entities = new List<IEntitySlim>();
-            if (documentLinks?.Count > 0)
-            {
-                entities.AddRange(
-                    _entityService.GetAll(
-                        UmbracoObjectTypes.Document,
-                        documentLinks.Select(link => link.Udi!.Guid).ToArray()));
-            }
-
-            if (mediaLinks?.Count > 0)
-            {
-                entities.AddRange(
-                    _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi!.Guid).ToArray()));
-            }
-
             var result = new List<LinkDisplay>();
             if (links is null)
             {
@@ -112,7 +87,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
             foreach (LinkDto dto in links)
             {
-                GuidUdi? udi = null;
+                GuidUdi? udi = dto.Udi;
                 var icon = "icon-link";
                 var published = true;
                 var trashed = false;
@@ -120,35 +95,30 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
                 if (dto.Udi != null)
                 {
-                    IUmbracoEntity? entity = entities.Find(e => e.Key == dto.Udi.Guid);
-                    if (entity == null)
+                    if (dto.Udi.EntityType == Constants.UdiEntityType.Document)
                     {
-                        continue;
-                    }
+                        url =  _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
+                        IContent? c = _contentService.GetById(dto.Udi.Guid);
 
-                    IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-                    if (entity is IDocumentEntitySlim documentEntity)
-                    {
-                        icon = documentEntity.ContentTypeIcon;
-                        published = culture == null
-                            ? documentEntity.Published
-                            : documentEntity.PublishedCultures.Contains(culture);
-                        udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                        url = publishedSnapshot.Content?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
-                        trashed = documentEntity.Trashed;
+                        if (c is not null)
+                        {
+                            published = culture == null
+                                ? c.Published
+                                : c.PublishedCultures.Contains(culture);
+                            icon = c.ContentType.Icon;
+                            trashed = c.Trashed;
+                        }
                     }
-                    else if (entity is IContentEntitySlim contentEntity)
+                    else if (dto.Udi.EntityType == Constants.UdiEntityType.Media)
                     {
-                        icon = contentEntity.ContentTypeIcon;
-                        published = !contentEntity.Trashed;
-                        udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                        url = publishedSnapshot.Media?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
-                        trashed = contentEntity.Trashed;
-                    }
-                    else
-                    {
-                        // Not supported
-                        continue;
+                        url = _publishedUrlProvider.GetMediaUrl(dto.Udi.Guid, UrlMode.Relative, culture);
+                        IMedia? m = _mediaService.GetById(dto.Udi.Guid);
+                        if (m is not null)
+                        {
+                            published = m.Trashed is false;
+                            icon = m.ContentType.Icon;
+                            trashed = m.Trashed;
+                        }
                     }
                 }
 
@@ -160,7 +130,9 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Trashed = trashed,
                     Published = published,
                     QueryString = dto.QueryString,
-                    Udi = udi,
+                    Type = dto.Udi is null ? LinkDisplay.Types.External
+                    : dto.Udi.EntityType,
+                    Unique = dto.Udi?.Guid,
                     Url = url ?? string.Empty,
                 });
             }
@@ -177,13 +149,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        // FIXME: get rid of Json.NET here
-        // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
-        var value = editorValue.Value is JArray jArray
-            ? jArray.ToString()
-            : editorValue.Value is JsonArray jsonArray
-                ? jsonArray.ToJsonString()
-                : string.Empty;
+        // the editor value is a JsonArray, which produces deserialize-able JSON with ToString() (deserialization happens later on)
+        var value = editorValue.Value?.ToString();
 
         if (string.IsNullOrEmpty(value))
         {
@@ -204,8 +171,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Name = link.Name,
                     QueryString = link.QueryString,
                     Target = link.Target,
-                    Udi = link.Udi,
-                    Url = link.Udi == null ? link.Url : null, // only save the URL for external links
+                    Udi = TypeIsUdiBased(link) ? new GuidUdi(link.Type!, link.Unique!.Value) : null,
+                    Url = TypeIsExternal(link) ? link.Url : null, // only save the URL for external links
                 }));
         }
         catch (Exception ex)
@@ -215,6 +182,14 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         return base.FromEditor(editorValue, currentValue);
     }
+
+    private static bool TypeIsExternal(LinkDisplay link) =>
+        link.Type is not null && link.Type.Equals(LinkDisplay.Types.External, StringComparison.InvariantCultureIgnoreCase);
+
+    private static bool TypeIsUdiBased(LinkDisplay link) =>
+        link.Type is not null && link.Unique is not null &&
+        (link.Type.Equals(LinkDisplay.Types.Document, StringComparison.InvariantCultureIgnoreCase)
+         || link.Type.Equals(LinkDisplay.Types.Media, StringComparison.InvariantCultureIgnoreCase));
 
     [DataContract]
     public class LinkDto

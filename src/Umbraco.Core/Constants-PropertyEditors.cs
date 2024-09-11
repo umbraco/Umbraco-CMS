@@ -101,11 +101,6 @@ public static partial class Constants
             public const string ListView = "Umbraco.ListView";
 
             /// <summary>
-            ///     Media Picker.
-            /// </summary>
-            public const string MediaPicker = "Umbraco.MediaPicker";
-
-            /// <summary>
             ///     Media Picker v.3.
             /// </summary>
             public const string MediaPicker3 = "Umbraco.MediaPicker3";
@@ -139,11 +134,6 @@ public static partial class Constants
             ///     Label.
             /// </summary>
             public const string Label = "Umbraco.Label";
-
-            /// <summary>
-            ///     No configuration String.
-            /// </summary>
-            public const string String = "Umbraco.String";
 
             /// <summary>
             ///     Picker Relations.
@@ -184,7 +174,7 @@ public static partial class Constants
             ///     TinyMCE
             /// </summary>
             [Obsolete("Please use RichText constant instead, scheduled for removal in v16")]
-            public const string TinyMce = "Umbraco.RichText";
+            public const string TinyMce = "Umbraco.TinyMCE";
 
             /// <summary>
             ///     Boolean.
@@ -220,6 +210,36 @@ public static partial class Constants
             ///     Alias for the multi URL picker editor.
             /// </summary>
             public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
+
+            /// <summary>
+            ///     Configuration-less string.
+            /// </summary>
+            public const string PlainString = "Umbraco.Plain.String";
+
+            /// <summary>
+            ///     Configuration-less JSON.
+            /// </summary>
+            public const string PlainJson = "Umbraco.Plain.Json";
+
+            /// <summary>
+            ///     Configuration-less decimal.
+            /// </summary>
+            public const string PlainDecimal = "Umbraco.Plain.Decimal";
+
+            /// <summary>
+            ///     Configuration-less integer.
+            /// </summary>
+            public const string PlainInteger = "Umbraco.Plain.Integer";
+
+            /// <summary>
+            ///     Configuration-less date/time.
+            /// </summary>
+            public const string PlainDateTime = "Umbraco.Plain.DateTime";
+
+            /// <summary>
+            ///     Configuration-less time.
+            /// </summary>
+            public const string PlainTime = "Umbraco.Plain.Time";
         }
 
         /// <summary>

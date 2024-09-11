@@ -50,27 +50,6 @@ public class PackageMigrationRunner
         _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
     }
 
-    [Obsolete("Use constructor that takes ILogger, this will be removed in V13")]
-    public PackageMigrationRunner(
-        IProfilingLogger profilingLogger,
-        ICoreScopeProvider scopeProvider,
-        PendingPackageMigrations pendingPackageMigrations,
-        PackageMigrationPlanCollection packageMigrationPlans,
-        IMigrationPlanExecutor migrationPlanExecutor,
-        IKeyValueService keyValueService,
-        IEventAggregator eventAggregator)
-        : this(
-            profilingLogger,
-            scopeProvider,
-            pendingPackageMigrations,
-            packageMigrationPlans,
-            migrationPlanExecutor,
-            keyValueService,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<PackageMigrationRunner>>())
-    {
-    }
-
     /// <summary>
     ///     Runs all migration plans for a package name if any are pending.
     /// </summary>

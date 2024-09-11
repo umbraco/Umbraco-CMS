@@ -14,7 +14,7 @@ public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : Cach
     where TNotification : CacheRefresherNotification
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="JsonCacheRefresherBase{TInstanceType}" />.
+    /// Initializes a new instance of the <see cref="JsonCacheRefresherBase{TNotification, TJsonPayload}"/> class.
     /// </summary>
     protected JsonCacheRefresherBase(
         AppCaches appCaches,

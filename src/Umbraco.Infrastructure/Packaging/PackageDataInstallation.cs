@@ -21,12 +21,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
-    public class PackageDataInstallation
+    public class PackageDataInstallation : IPackageDataInstallation
     {
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
         private readonly IFileService _fileService;
-        private readonly IMacroService _macroService;
         private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
@@ -43,7 +42,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
             IFileService fileService,
-            IMacroService macroService,
             ILocalizationService localizationService,
             IDataTypeService dataTypeService,
             IEntityService entityService,
@@ -59,7 +57,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
             _fileService = fileService;
-            _macroService = macroService;
             _localizationService = localizationService;
             _dataTypeService = dataTypeService;
             _entityService = entityService;
@@ -79,7 +76,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
             IFileService fileService,
-            IMacroService macroService,
             ILocalizationService localizationService,
             IDataTypeService dataTypeService,
             IEntityService entityService,
@@ -97,7 +93,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   dataValueEditorFactory,
                   logger,
                   fileService,
-                  macroService,
                   localizationService,
                   dataTypeService,
                   entityService,
@@ -125,8 +120,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                    MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
-                    MacroPartialViewsInstalled = ImportMacroPartialViews(compiledPackage.MacroPartialViews, userId),
                     TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
                     DocumentTypesInstalled =
                         ImportDocumentTypes(compiledPackage.DocumentTypes, userId,
@@ -597,7 +590,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //Iterate the sorted document types and create them as IContentType objects
             foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                var alias = GetEntityTypeAlias(documentType);
 
                 if (alias is not null && importedContentTypes.ContainsKey(alias) == false)
                 {
@@ -630,7 +623,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 //Update the structure here - we can't do it until all DocTypes have been created
                 foreach (XElement documentType in documentTypes)
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     XElement? structureElement = documentType.Element("Structure");
                     //Ensure that we only update ContentTypes which has actual structure-elements
                     if (structureElement == null || structureElement.Elements().Any() == false || alias is null)
@@ -668,7 +661,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                              // exist which contains it's folders
                                              && ((string?)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
 
                     XAttribute? folderKeysAttribute = documentType.Attribute("FolderKeys");
@@ -751,13 +744,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
         }
 
+        public Guid GetContentTypeKey(XElement contentType)
+            => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
+
+        public string? GetEntityTypeAlias(XElement entityType)
+            => entityType.Element("Info")?.Element("Alias")?.Value;
+
         private T CreateContentTypeFromXml<T>(
             XElement documentType,
             IReadOnlyDictionary<string, T> importedContentTypes,
             IContentTypeBaseService<T> service)
             where T : class, IContentTypeComposition
         {
-            var key = Guid.Parse(documentType.Element("Info")!.Element("Key")!.Value);
+            var key = GetContentTypeKey(documentType);
 
             XElement infoElement = documentType.Element("Info")!;
 
@@ -841,17 +840,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             contentType.Thumbnail = infoElement.Element("Thumbnail")?.Value;
             contentType.Description = infoElement.Element("Description")?.Value;
 
-            //NOTE AllowAtRoot, IsListView, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
+            //NOTE AllowAtRoot, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
             XElement? allowAtRoot = infoElement.Element("AllowAtRoot");
             if (allowAtRoot != null)
             {
                 contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
             }
 
-            XElement? isListView = infoElement.Element("IsListView");
-            if (isListView != null)
+            if (Guid.TryParse(infoElement.Element("ListView")?.Value, out Guid listView))
             {
-                contentType.IsContainer = isListView.Value.InvariantEquals("true");
+                contentType.ListView = listView;
             }
 
             XElement? isElement = infoElement.Element("IsElement");
@@ -1259,12 +1257,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         editor = new VoidEditor(_dataValueEditorFactory) {Alias = editorAlias ?? string.Empty};
                     }
 
+                    var editorUiAlias = dataTypeElement.Attribute("EditorUiAlias")?.Value?.Trim() ?? editorAlias;
+
                     var dataType = new DataType(editor, _serializer)
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
                         DatabaseType = databaseType,
-                        ParentId = parentId
+                        ParentId = parentId,
+                        EditorUiAlias = editorUiAlias,
                     };
 
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
@@ -1524,153 +1525,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #endregion
 
-        #region Macros
-
-        /// <summary>
-        /// Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro"/>
-        /// </summary>
-        /// <param name="macroElements">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation</param>
-        /// <returns></returns>
-        public IReadOnlyList<IMacro> ImportMacros(
-            IEnumerable<XElement> macroElements,
-            int userId)
-        {
-            var macros = macroElements.Select(ParseMacroElement).ToList();
-
-            foreach (IMacro macro in macros)
-            {
-                _macroService.Save(macro, userId);
-            }
-
-            return macros;
-        }
-
-        public IReadOnlyList<IPartialView> ImportMacroPartialViews(IEnumerable<XElement> macroPartialViewsElements,
-            int userId)
-        {
-            var result = new List<IPartialView>();
-
-            foreach (XElement macroPartialViewXml in macroPartialViewsElements)
-            {
-                var path = macroPartialViewXml.AttributeValue<string>("path");
-                if (path == null)
-                {
-                    throw new InvalidOperationException("No path attribute found");
-                }
-
-                // Remove prefix to maintain backwards compatibility
-                if (path.StartsWith(Constants.SystemDirectories.MacroPartials))
-                {
-                    path = path.Substring(Constants.SystemDirectories.MacroPartials.Length);
-                }
-                else if (path.StartsWith("~"))
-                {
-                    _logger.LogWarning(
-                        "Importing macro partial views outside of the Views/MacroPartials directory is not supported: {Path}",
-                        path);
-                    continue;
-                }
-
-                IPartialView? macroPartialView = _fileService.GetPartialViewMacro(path);
-
-                // only update if it doesn't exist
-                if (macroPartialView == null)
-                {
-                    var content = macroPartialViewXml.Value ?? string.Empty;
-
-                    macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) {Content = content};
-                    _fileService.SavePartialViewMacro(macroPartialView, userId);
-                    result.Add(macroPartialView);
-                }
-            }
-
-            return result;
-        }
-
-        private IMacro ParseMacroElement(XElement macroElement)
-        {
-            var macroKey = Guid.Parse(macroElement.Element("key")!.Value);
-            var macroName = macroElement.Element("name")?.Value;
-            var macroAlias = macroElement.Element("alias")!.Value;
-            var macroSource = macroElement.Element("macroSource")!.Value;
-
-            //Following xml elements are treated as nullable properties
-            XElement? useInEditorElement = macroElement.Element("useInEditor");
-            var useInEditor = false;
-            if (useInEditorElement != null && string.IsNullOrEmpty((string)useInEditorElement) == false)
-            {
-                useInEditor = bool.Parse(useInEditorElement.Value);
-            }
-
-            XElement? cacheDurationElement = macroElement.Element("refreshRate");
-            var cacheDuration = 0;
-            if (cacheDurationElement != null && string.IsNullOrEmpty((string)cacheDurationElement) == false)
-            {
-                cacheDuration = int.Parse(cacheDurationElement.Value, CultureInfo.InvariantCulture);
-            }
-
-            XElement? cacheByMemberElement = macroElement.Element("cacheByMember");
-            var cacheByMember = false;
-            if (cacheByMemberElement != null && string.IsNullOrEmpty((string)cacheByMemberElement) == false)
-            {
-                cacheByMember = bool.Parse(cacheByMemberElement.Value);
-            }
-
-            XElement? cacheByPageElement = macroElement.Element("cacheByPage");
-            var cacheByPage = false;
-            if (cacheByPageElement != null && string.IsNullOrEmpty((string)cacheByPageElement) == false)
-            {
-                cacheByPage = bool.Parse(cacheByPageElement.Value);
-            }
-
-            XElement? dontRenderElement = macroElement.Element("dontRender");
-            var dontRender = true;
-            if (dontRenderElement != null && string.IsNullOrEmpty((string)dontRenderElement) == false)
-            {
-                dontRender = bool.Parse(dontRenderElement.Value);
-            }
-
-            var existingMacro = _macroService.GetById(macroKey) as Macro;
-            Macro macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
-                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration) {Key = macroKey};
-
-            XElement? properties = macroElement.Element("properties");
-            if (properties != null)
-            {
-                int sortOrder = 0;
-                foreach (XElement property in properties.Elements())
-                {
-                    Guid propertyKey = property.RequiredAttributeValue<Guid>("key");
-                    var propertyName = property.Attribute("name")?.Value;
-                    var propertyAlias = property.Attribute("alias")!.Value;
-                    var editorAlias = property.Attribute("propertyType")!.Value;
-                    XAttribute? sortOrderAttribute = property.Attribute("sortOrder");
-                    if (sortOrderAttribute != null)
-                    {
-                        sortOrder = int.Parse(sortOrderAttribute.Value, CultureInfo.InvariantCulture);
-                    }
-
-                    if (macro.Properties.Values.Any(x =>
-                            string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        continue;
-                    }
-
-                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias)
-                    {
-                        Key = propertyKey
-                    });
-
-                    sortOrder++;
-                }
-            }
-
-            return macro;
-        }
-
-        #endregion
-
         public IReadOnlyList<IScript> ImportScripts(IEnumerable<XElement> scriptElements, int userId)
         {
             var result = new List<IScript>();
@@ -1723,7 +1577,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     var content = partialViewXml.Value ?? string.Empty;
 
-                    partialView = new PartialView(PartialViewType.PartialView, path) {Content = content};
+                    partialView = new PartialView(path) {Content = content};
                     _fileService.SavePartialView(partialView, userId);
                     result.Add(partialView);
                 }
