@@ -64,7 +64,6 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 
 		const lastCheck = localStorage.getItem('umb:lastUpgradeCheck');
 		const now = new Date();
-		localStorage.setItem('umb:lastUpgradeCheck', now.toISOString());
 		if (lastCheck) {
 			const lastCheckDate = new Date(lastCheck);
 			const diff = now.getTime() - lastCheckDate.getTime();
@@ -93,6 +92,7 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 			expiresAt.setDate(expiresAt.getDate() + versionCheckPeriod);
 			const upgradeCheck = { ...data, expires: expiresAt.toISOString() } satisfies UmbServerUpgradeCheck;
 			localStorage.setItem('umb:serverUpgradeCheck', JSON.stringify(upgradeCheck));
+			localStorage.setItem('umb:lastUpgradeCheck', now.toISOString());
 
 			// Only return if we have a valid type
 			if (data.type.toLowerCase() !== 'none') {
