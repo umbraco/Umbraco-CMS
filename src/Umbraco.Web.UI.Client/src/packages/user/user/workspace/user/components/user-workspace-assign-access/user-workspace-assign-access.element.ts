@@ -1,5 +1,5 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
-import type { UmbUserDetailModel } from '../../../types.js';
+import type { UmbUserDetailModel } from '../../../../types.js';
 import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

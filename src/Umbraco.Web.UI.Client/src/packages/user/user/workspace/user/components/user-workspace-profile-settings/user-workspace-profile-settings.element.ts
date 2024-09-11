@@ -1,11 +1,11 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
-import type { UmbUserDetailModel } from '../../../types.js';
+import type { UmbUserDetailModel } from '../../../../types.js';
+import { UmbUserKind } from '../../../../utils/index.js';
 import { html, customElement, state, ifDefined, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
-import { UmbUserKind } from '../../../utils/index.js';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
