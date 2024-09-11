@@ -37,7 +37,7 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	getStoredServerUpgradeCheck(lastCheck: Date): UmbServerUpgradeCheck | null {
 		const storedCheck = localStorage.getItem('umb:serverUpgradeCheck');
 		if (storedCheck) {
-			const upgradeCheck = JSON.parse(storedCheck) as UmbServerUpgradeCheck;
+			const upgradeCheck: UmbServerUpgradeCheck = JSON.parse(storedCheck);
 			// Check that the stored check is not older than the last check
 			const expiresAt = new Date(upgradeCheck.expires);
 			if (expiresAt.getTime() > lastCheck.getTime()) {
