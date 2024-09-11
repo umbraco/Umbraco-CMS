@@ -2,10 +2,10 @@ import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.j
 import type {
 	UmbDeleteUserClientCredentialRequestArgs,
 	UmbUserClientCredentialModel,
-} from '../../../client-credential/index.js';
-import { UmbUserClientCredentialRepository } from '../../../client-credential/index.js';
-import { UMB_CREATE_USER_CLIENT_CREDENTIAL_MODAL } from '../../../client-credential/create/modal/create-user-client-credential-modal.token.js';
-import { UmbUserKind } from '../../../utils/index.js';
+} from '../../../../client-credential/index.js';
+import { UmbUserClientCredentialRepository } from '../../../../client-credential/index.js';
+import { UMB_CREATE_USER_CLIENT_CREDENTIAL_MODAL } from '../../../../client-credential/create/modal/create-user-client-credential-modal.token.js';
+import { UmbUserKind } from '../../../../utils/index.js';
 import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

@@ -1,6 +1,8 @@
-import type { UmbUserDetailModel } from '../index.js';
+import type { UmbUserDetailModel } from '../../index.js';
+import { UMB_USER_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import type { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from './user-workspace.context-token.js';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -13,8 +15,6 @@ import './components/user-workspace-access/user-workspace-access.element.js';
 import './components/user-workspace-info/user-workspace-info.element.js';
 import './components/user-workspace-avatar/user-workspace-avatar.element.js';
 import './components/user-workspace-client-credentials/user-workspace-client-credentials.element.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_USER_ROOT_WORKSPACE_PATH } from '../paths.js';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {

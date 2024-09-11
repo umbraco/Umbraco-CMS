@@ -1,4 +1,4 @@
-import { UMB_USER_WORKSPACE_CONTEXT } from '../../../user/workspace/user-workspace.context-token.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../../../user/workspace/user/user-workspace.context-token.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
