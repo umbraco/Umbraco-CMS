@@ -46,6 +46,7 @@ import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestTree } from './tree.model.js';
 import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
+import type { ManifestUfmFilter } from './ufm-filter.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
 import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
 import type { ManifestWorkspaceAction, ManifestWorkspaceActionDefaultKind } from './workspace-action.model.js';
@@ -117,6 +118,7 @@ export type * from './tinymce-plugin.model.js';
 export type * from './tree-item.model.js';
 export type * from './tree.model.js';
 export type * from './ufm-component.model.js';
+export type * from './ufm-filter.model.js';
 export type * from './user-granular-permission.model.js';
 export type * from './user-profile-app.model.js';
 export type * from './workspace-action-menu-item.model.js';
@@ -210,6 +212,7 @@ export type ManifestTypes =
 	| ManifestTreeItem
 	| ManifestTreeStore
 	| ManifestUfmComponent
+	| ManifestUfmFilter
 	| ManifestUserProfileApp
 	| ManifestWorkspaceActionMenuItem
 	| ManifestWorkspaceActions
