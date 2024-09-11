@@ -213,6 +213,7 @@
 	},
 	"dependencies": {
 		"@tiptap/core": "^2.6.6",
+		"@tiptap/extension-link": "^2.6.6",
 		"@tiptap/extension-text-align": "^2.6.6",
 		"@tiptap/extension-underline": "^2.6.6",
 		"@tiptap/pm": "^2.6.6",
