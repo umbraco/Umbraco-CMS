@@ -8,6 +8,8 @@ internal interface IDatabaseCacheRepository
 
     Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false);
 
+    Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
+
     Task<ContentCacheNode?> GetMediaSourceAsync(int id);
 
     IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys);
