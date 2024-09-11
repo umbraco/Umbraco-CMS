@@ -8,7 +8,6 @@ public class PropertyTypeAppearanceBuilder
 {
     private bool? _labelOnTop;
 
-
     public PropertyTypeAppearanceBuilder(PropertyTypeEditingBuilder parentBuilder) : base(parentBuilder)
     {
     }

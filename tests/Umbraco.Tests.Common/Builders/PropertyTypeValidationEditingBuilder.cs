@@ -45,9 +45,9 @@ public class PropertyTypeValidationEditingBuilder
         var validation = new PropertyTypeValidation
         {
             Mandatory = _mandatory ?? false,
-            MandatoryMessage = _mandatoryMessage ?? string.Empty,
-            RegularExpression = _regularExpression ?? string.Empty,
-            RegularExpressionMessage = _regularExpressionMessage ?? string.Empty,
+            MandatoryMessage = _mandatoryMessage ?? null,
+            RegularExpression = _regularExpression ?? null,
+            RegularExpressionMessage = _regularExpressionMessage ?? null,
         };
 
         return validation;

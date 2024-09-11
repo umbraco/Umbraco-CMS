@@ -140,4 +140,10 @@ public class TemplateBuilder
             .WithName("Text page")
             .Build();
 
+    public static Template CreateTextPageTemplateWithId(string alias = "textPage", int id = 0) =>
+        (Template)new TemplateBuilder()
+            .WithAlias(alias)
+            .WithName("Text page")
+            .WithId(id)
+            .Build();
 }

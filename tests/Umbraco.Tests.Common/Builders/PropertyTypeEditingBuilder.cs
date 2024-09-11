@@ -22,7 +22,6 @@ public class PropertyTypeEditingBuilder
     private PropertyTypeValidationEditingBuilder _validationBuilder;
     private PropertyTypeAppearanceBuilder _appearanceBuilder;
 
-
     public PropertyTypeEditingBuilder(ContentTypeEditingBuilder parentBuilder) : base(parentBuilder)
     {
         _validationBuilder = new PropertyTypeValidationEditingBuilder(this);
@@ -103,14 +102,55 @@ public class PropertyTypeEditingBuilder
         return this;
     }
 
+    public PropertyTypeEditingBuilder WithSortOrder(int sortOrder)
+    {
+        _sortOrder = sortOrder;
+        return this;
+    }
+
+    public PropertyTypeEditingBuilder WithAlias(string alias)
+    {
+        _alias = alias;
+        return this;
+    }
+
+    public PropertyTypeEditingBuilder WithName(string name)
+    {
+        _name = name;
+        return this;
+    }
+
+    public PropertyTypeEditingBuilder WithDescription(string description)
+    {
+        _description = description;
+        return this;
+    }
+
+    public PropertyTypeEditingBuilder WithDataTypeKey(Guid dataTypeKey)
+    {
+        _dataTypeKey = dataTypeKey;
+        return this;
+    }
+
+    public PropertyTypeEditingBuilder WithVariesByCulture(bool variesByCulture)
+    {
+        _variesByCulture = variesByCulture;
+        return this;
+    }
+
+    public PropertyTypeEditingBuilder WithVariesBySegment(bool variesBySegment)
+    {
+        _variesBySegment = variesBySegment;
+        return this;
+    }
 
     public override ContentTypePropertyTypeModel Build()
     {
         var key = _key ?? Guid.NewGuid();
         var containerKey = _containerKey;
         var sortOrder = _sortOrder ?? 0;
-        var alias = _alias ?? "prop";
-        var name = _name ?? "Property";
+        var alias = _alias ?? "title";
+        var name = _name ?? "Title";
         var description = _description;
         var dataTypeKey = _dataTypeKey ?? Constants.DataTypes.Guids.TextareaGuid;
         var variesByCulture = _variesByCulture;

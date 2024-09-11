@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
+﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -24,12 +23,10 @@ public class ContentTypeEditingBuilder
     private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders = [];
     private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = [];
 
-
     public ContentTypeEditingBuilder()
         : base(null)
     {
     }
-
 
     public ContentTypeEditingBuilder(ContentEditingBuilder parentBuilder)
         : base(parentBuilder)
@@ -70,12 +67,29 @@ public class ContentTypeEditingBuilder
         return builder;
     }
 
-    public IEnumerable<Guid> AddAllowedTemplateKeys(IEnumerable<Guid> templateKeys)
+    public ContentTypeEditingBuilder AddAllowedTemplateKeys(IEnumerable<Guid> templateKeys)
     {
         _allowedTemplateKeys = templateKeys;
-        return _allowedTemplateKeys;
+        return this;
     }
 
+    public ContentTypeEditingBuilder WithAllowAtRoot(bool allowAtRoot)
+    {
+        _allowAtRoot = allowAtRoot;
+        return this;
+    }
+
+    public ContentTypeEditingBuilder WithVariesByCulture(bool variesByCulture)
+    {
+        _variesByCulture = variesByCulture;
+        return this;
+    }
+
+    public ContentTypeEditingBuilder WithVariesBySegment(bool variesBySegment)
+    {
+        _variesBySegment = variesBySegment;
+        return this;
+    }
 
     public override ContentTypeCreateModel Build()
     {
@@ -95,12 +109,10 @@ public class ContentTypeEditingBuilder
         contentType.Containers = _propertyTypeContainerBuilders.Select(x => x.Build());
         contentType.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build());
 
-
         return contentType;
     }
 
-    public static ContentTypeCreateModel CreateBasicContentType(string alias = "basePage", string name = "Base Page",
-        IContentType parent = null)
+    public static ContentTypeCreateModel CreateBasicContentType(string alias = "umbTextpage", string name = "TextPage", IContentType parent = null)
     {
         var builder = new ContentTypeEditingBuilder();
         return (ContentTypeCreateModel)builder
@@ -110,26 +122,119 @@ public class ContentTypeEditingBuilder
             .Build();
     }
 
-    public static ContentTypeCreateModel CreateSimpleContentType(string alias, string name, IContentType parent = null,
-        string propertyGroupName = "Content", Guid? defaultTemplateKey = null)
+    public static ContentTypeCreateModel CreateSimpleContentType(string alias = "umbTextpage", string name = "TextPage", IContentType parent = null, string propertyGroupName = "Content", Guid? defaultTemplateKey = null)
     {
         var containerKey = Guid.NewGuid();
         var builder = new ContentTypeEditingBuilder();
         return (ContentTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
+            .WithAllowAtRoot(true)
             .WithParentContentType(parent)
             .AddPropertyGroup()
-            .WithKey(containerKey)
-            .WithName(propertyGroupName)
-            .Done()
+                .WithKey(containerKey)
+                .WithName(propertyGroupName)
+                .Done()
             .AddPropertyType()
-            .WithAlias("title")
-            .WithDataTypeKey(Constants.DataTypes.Guids.TextareaGuid)
-            .WithName("Title")
-            .WithContainerKey(containerKey)
-            .Done()
+                .WithAlias("title")
+                .WithDataTypeKey(Constants.DataTypes.Guids.TextareaGuid)
+                .WithName("Title")
+                .WithContainerKey(containerKey)
+                .Done()
             .WithDefaultTemplateKey(defaultTemplateKey ?? Guid.Empty)
+            .AddAllowedTemplateKeys([defaultTemplateKey ?? Guid.Empty])
+            .Build();
+    }
+
+    public static ContentTypeCreateModel CreateTextPageContentType(string alias = "textPage", string name = "Text Page", Guid defaultTemplateKey = default)
+    {
+        var containerKeyOne = Guid.NewGuid();
+        var containerKeyTwo = Guid.NewGuid();
+
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithAllowAtRoot(true)
+            .AddPropertyGroup()
+                .WithName("Content")
+                .WithKey(containerKeyOne)
+                .WithSortOrder(1)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithContainerKey(containerKeyOne)
+                .WithSortOrder(1)
+                .Done()
+            .AddPropertyType()
+                .WithDataTypeKey(Constants.DataTypes.Guids.RichtextEditorGuid)
+                .WithAlias("bodyText")
+                .WithName("Body text")
+                .WithContainerKey(containerKeyOne)
+                .WithSortOrder(2)
+                .Done()
+            .AddPropertyGroup()
+                .WithName("Meta")
+                .WithSortOrder(2)
+                .WithKey(containerKeyTwo)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("keywords")
+                .WithName("Keywords")
+                .WithContainerKey(containerKeyTwo)
+                .WithSortOrder(1)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("description")
+                .WithName("Description")
+                .WithContainerKey(containerKeyTwo)
+                .WithSortOrder(2)
+                .Done()
+            .AddAllowedTemplateKeys([defaultTemplateKey])
+            .WithDefaultTemplateKey(defaultTemplateKey)
+            .Build();
+    }
+
+    public static ContentTypeCreateModel CreateElementType(string alias = "textElement", string name = "Text Element")
+    {
+        var containerKey = Guid.NewGuid();
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithIsElement(true)
+            .AddPropertyGroup()
+                .WithName("Content")
+                .WithKey(containerKey)
+                .Done()
+            .AddPropertyType()
+                .WithDataTypeKey(Constants.DataTypes.Guids.RichtextEditorGuid)
+                .WithAlias("bodyText")
+                .WithName("Body text")
+                .WithContainerKey(containerKey)
+                .Done()
+            .Build();
+    }
+
+    public static ContentTypeCreateModel CreateContentTypeWithDataTypeKey(Guid dataTypeKey, string alias = "textElement", string name = "Text Element" )
+    {
+        var containerKey = Guid.NewGuid();
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithIsElement(true)
+            .AddPropertyGroup()
+                .WithName("Content")
+                .WithKey(containerKey)
+                .Done()
+            .AddPropertyType()
+                .WithDataTypeKey(dataTypeKey)
+                .WithAlias("dataType")
+                .WithName("Data Type")
+                .WithContainerKey(containerKey)
+                .Done()
             .Build();
     }
 }
