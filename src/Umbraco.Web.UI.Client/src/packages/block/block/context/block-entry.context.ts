@@ -16,7 +16,7 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,

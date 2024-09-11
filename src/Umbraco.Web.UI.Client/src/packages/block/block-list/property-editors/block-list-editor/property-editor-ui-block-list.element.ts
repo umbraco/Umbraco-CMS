@@ -36,9 +36,6 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryE
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
 
-/**
- * @element umb-property-editor-ui-block-list
- */
 @customElement('umb-property-editor-ui-block-list')
 export class UmbPropertyEditorUIBlockListElement
 	extends UmbFormControlMixin<UmbBlockListValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
@@ -116,8 +113,7 @@ export class UmbPropertyEditorUIBlockListElement
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
-	 * @attr
-	 * @default false
+	 * @returns {boolean} - true if the editor is in readonly mode.
 	 */
 	@property({ type: Boolean, reflect: true })
 	public get readonly() {
@@ -219,6 +215,7 @@ export class UmbPropertyEditorUIBlockListElement
 			this._value = { ...this._value, settingsData: settings };
 			this.#fireChangeEvent();
 		});
+
 		this.observe(this.#managerContext.blockTypes, (blockTypes) => {
 			this._blocks = blockTypes;
 		});
