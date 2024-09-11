@@ -41,17 +41,6 @@ public static class ObjectExtensions
     public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
 
     /// <summary>
-    /// </summary>
-    /// <param name="input"></param>
-    public static void DisposeIfDisposable(this object input)
-    {
-        if (input is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
-    }
-
-    /// <summary>
     ///     Provides a shortcut way of safely casting an input when you cannot guarantee the <typeparamref name="T" /> is
     ///     an instance type (i.e., when the C# AS keyword is not applicable).
     /// </summary>

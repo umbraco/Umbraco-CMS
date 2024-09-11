@@ -57,7 +57,7 @@ public class ComponentCollection : BuilderCollectionBase<IComponent>
                     try
                     {
                         component.Terminate();
-                        component.DisposeIfDisposable();
+                        (component as IDisposable)?.Dispose();
                     }
                     catch (Exception ex)
                     {

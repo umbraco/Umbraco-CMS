@@ -135,7 +135,7 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
         {
             if (disposing)
             {
-                InnerCache.DisposeIfDisposable();
+                (InnerCache as IDisposable)?.Dispose();
             }
 
             _disposedValue = true;
