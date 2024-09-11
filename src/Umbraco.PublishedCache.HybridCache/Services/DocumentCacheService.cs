@@ -17,6 +17,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
     private readonly ICacheNodeFactory _cacheNodeFactory;
+    private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
 
 
     public DocumentCacheService(
@@ -25,7 +26,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         ICoreScopeProvider scopeProvider,
         Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache,
         IPublishedContentFactory publishedContentFactory,
-        ICacheNodeFactory cacheNodeFactory)
+        ICacheNodeFactory cacheNodeFactory,
+        IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -33,6 +35,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
         _cacheNodeFactory = cacheNodeFactory;
+        _seedKeyProviders = seedKeyProviders;
     }
 
     // TODO: Stop using IdKeyMap for these, but right now we both need key and id for caching..
@@ -73,14 +76,15 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public async Task SeedAsync(IReadOnlyCollection<Guid> contentTypeKeys)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        IEnumerable<ContentCacheNode> contentCacheNodes = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeKeys);
-        foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
-        {
-            if (contentCacheNode.IsDraft)
-            {
-                continue;
-            }
+        var keys = new HashSet<Guid>();
 
+        foreach (IDocumentSeedKeyProvider provider in _seedKeyProviders)
+        {
+            keys.UnionWith(provider.GetSeedKeys());
+        }
+
+        foreach (Guid key in keys)
+        {
             // TODO: Make these expiration dates configurable.
             // Never expire seeded values, we cannot do TimeSpan.MaxValue sadly, so best we can do is a year.
             var entryOptions = new HybridCacheEntryOptions
@@ -89,9 +93,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                 LocalCacheExpiration = TimeSpan.FromDays(365),
             };
 
-            await _hybridCache.SetAsync(
-                GetCacheKey(contentCacheNode.Key, false),
-                contentCacheNode,
+            // We'll use GetOrCreateAsync because it may be in the second level cache, in which case we don't have to re-seed.
+            await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+                GetCacheKey(key, false),
+                cancel => new ValueTask<ContentCacheNode?>(
+                    _databaseCacheRepository.GetContentSourceAsync(key, false)),
                 entryOptions);
         }
 
