@@ -6,6 +6,8 @@ import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends UmbLitElement {
+  protected fromId= 'umb-login-form';
+
   @property({type: Boolean, attribute: 'username-is-email'})
   usernameIsEmail = false;
 
@@ -41,7 +43,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
   }
 
   async #onSlotChanged() {
-    this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
+    this.#formElement = this.slottedElements?.find((el) => el.id === this.fromId);
 
     if (!this.#formElement) return;
 
@@ -52,6 +54,24 @@ export default class UmbLoginPageElement extends UmbLitElement {
       }
     });
     this.#formElement.onsubmit = this.#handleSubmit;
+  }
+
+  #togglePasswordVisibility(){
+    const exPasswordElement = document.querySelector<HTMLFormElement>('.was-password');
+    if(exPasswordElement)
+    {
+      exPasswordElement.type = 'password';
+      exPasswordElement.classList.remove("was-password");
+      return;
+    }
+    const loginForm = document.querySelector('#umb-login-form');
+    if (loginForm) {
+      const passwordField = loginForm.querySelector<HTMLFormElement>('input[type="password"]');
+      if (passwordField) {
+        passwordField.type = 'text';
+        passwordField.classList.add("was-password");
+      }
+    }
   }
 
   #handleSubmit = async (e: SubmitEvent) => {
@@ -136,9 +156,9 @@ export default class UmbLoginPageElement extends UmbLitElement {
       </header>
       <slot @slotchange=${this.#onSlotChanged}></slot>
       ${when(
-				 true, //this.allowShowPasswordCheckBox
+				this.allowShowPasswordCheckBox,
 				() => html` <div id="showPassword">
-					<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
+					<uui-checkbox @change="${this.#togglePasswordVisibility}" name="persist" .label=${this.localize.term('auth_rememberMe')}>
 						<umb-localize key="auth_showPassword">Show password</umb-localize>
 					</uui-checkbox>
 				</div>`
