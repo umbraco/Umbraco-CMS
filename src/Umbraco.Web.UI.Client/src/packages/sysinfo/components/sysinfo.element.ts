@@ -1,4 +1,4 @@
-import { UmbSysinfoRepository } from '../repository/sysinfo.repository.js';
+import { UmbSysinfoRepository } from '../repository/index.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
