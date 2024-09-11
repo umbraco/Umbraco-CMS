@@ -7,6 +7,7 @@ import type {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 const elementName = 'umb-create-user-client-credential-modal';
 @customElement(elementName)
@@ -17,9 +18,26 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<
 	@query('#CreateUserClientCredentialForm')
 	_form?: HTMLFormElement;
 
+	@query('#unique')
+	_inputUniqueElement?: UUIInputElement;
+
 	#userClientCredentialRepository = new UmbUserClientCredentialRepository(this);
 
 	#uniquePrefix = 'umbraco-back-office-';
+
+	protected override firstUpdated(): void {
+		// For some reason the pattern attribute is not working with this specific regex. It complains about the regex is invalid.
+		// TODO: investigate why this is happening.
+		this._inputUniqueElement?.addValidator(
+			'patternMismatch',
+			() => 'Only alphanumeric characters and hyphens are allowed',
+			() => {
+				const value = (this._inputUniqueElement?.value as string) || '';
+				// eslint-disable-next-line no-useless-escape
+				return !new RegExp(/^[a-zA-Z0-9\-]+$/).test(value);
+			},
+		);
+	}
 
 	async #onSubmit(e: SubmitEvent) {
 		e.preventDefault();
