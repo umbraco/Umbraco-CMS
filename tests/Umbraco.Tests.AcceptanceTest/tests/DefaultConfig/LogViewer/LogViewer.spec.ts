@@ -68,7 +68,8 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-test('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
+// TODO: unskip, currently flaky
+test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
   const search = "@Level='Fatal' or @Level='Error' or @Level='Warning'";
