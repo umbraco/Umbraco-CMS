@@ -10,9 +10,6 @@ namespace Umbraco.Cms.Core.Composing;
 /// <para>
 /// All components are terminated in reverse order when Umbraco terminates, and disposable components are disposed.
 /// </para>
-/// <para>
-/// The Dispose method may be invoked more than once, and components should ensure they support this.
-/// </para>
 /// </remarks>
 public interface IAsyncComponent
 {

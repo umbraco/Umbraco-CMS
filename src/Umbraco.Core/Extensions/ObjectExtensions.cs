@@ -53,22 +53,6 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// Disposes the object if it implements <see cref="IAsyncDisposable" /> or <see cref="IDisposable" />.
-    /// </summary>
-    /// <param name="input">The object.</param>
-    public static async Task DisposeAsyncIfDisposable(this object input)
-    {
-        if (input is IAsyncDisposable disposable)
-        {
-            await disposable.DisposeAsync();
-        }
-        else
-        {
-            input.DisposeIfDisposable();
-        }
-    }
-
-    /// <summary>
     ///     Provides a shortcut way of safely casting an input when you cannot guarantee the <typeparamref name="T" /> is
     ///     an instance type (i.e., when the C# AS keyword is not applicable).
     /// </summary>
