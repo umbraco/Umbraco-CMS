@@ -39,7 +39,6 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	}
 
 	override render() {
-		console.log('render ', this.content);
 		// TODO: apply `slot="name"` to the `umb-ufm-render` element, when UUI supports it. [NL]
 		return html`
 			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>

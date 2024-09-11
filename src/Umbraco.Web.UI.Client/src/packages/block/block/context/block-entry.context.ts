@@ -116,6 +116,15 @@ export abstract class UmbBlockEntryContext<
 		};
 	});
 
+	#settingsStructure?: UmbContentTypeStructureManager;
+	#settingsStructurePromiseResolve?: () => void;
+	#settingsStructurePromise = new Promise((resolve) => {
+		this.#settingsStructurePromiseResolve = () => {
+			resolve(undefined);
+			this.#settingsStructurePromiseResolve = undefined;
+		};
+	});
+
 	#createPropertyVariantId(property: UmbPropertyTypeModel, variantId: UmbVariantId) {
 		return UmbVariantId.Create({
 			culture: property.variesByCulture ? variantId.culture : null,
@@ -123,10 +132,9 @@ export abstract class UmbBlockEntryContext<
 		});
 	}
 
-	async propertyVariantId(propertyAlias: string) {
-		await this.#contentStructurePromise;
+	async propertyVariantId(structure: UmbContentTypeStructureManager, propertyAlias: string) {
 		return mergeObservables(
-			[await this.#contentStructure!.propertyStructureByAlias(propertyAlias), this._variantId],
+			[await structure.propertyStructureByAlias(propertyAlias), this._variantId],
 			([property, variantId]) =>
 				property && variantId ? this.#createPropertyVariantId(property, variantId) : undefined,
 		);
@@ -143,10 +151,11 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	async contentPropertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string) {
+		await this.#contentStructurePromise;
 		return mergeObservables(
 			[
 				this.#content.asObservablePart((data) => data?.values?.filter((x) => x?.alias === propertyAlias)),
-				await this.propertyVariantId(propertyAlias),
+				await this.propertyVariantId(this.#contentStructure!, propertyAlias),
 			],
 			([propertyValues, propertyVariantId]) => {
 				if (!propertyValues || !propertyVariantId) return;
@@ -155,13 +164,20 @@ export abstract class UmbBlockEntryContext<
 			},
 		);
 	}
-	/*
-	settingsPropertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#settings.asObservablePart(
-			(x) => x?.values.find((x) => x.alias === propertyAlias)?.value as ReturnType | undefined,
+	async settingsPropertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string) {
+		await this.#settingsStructurePromise;
+		return mergeObservables(
+			[
+				this.#content.asObservablePart((data) => data?.values?.filter((x) => x?.alias === propertyAlias)),
+				await this.propertyVariantId(this.#settingsStructure!, propertyAlias),
+			],
+			([propertyValues, propertyVariantId]) => {
+				if (!propertyValues || !propertyVariantId) return;
+
+				return propertyValues.find((x) => propertyVariantId.compare(x))?.value as PropertyValueType;
+			},
 		);
 	}
-	*/
 
 	#content = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	protected readonly _contentValueArray = this.#content.asObservablePart((x) => x?.values);
@@ -187,28 +203,18 @@ export abstract class UmbBlockEntryContext<
 		return this.#contentValuesObservable;
 	}
 
-	/*
-	this.#content.asObservablePart((x) => {
-		// TODO: Combine Variant ID with DataSet Values.
-		return x?.values.reduce((acc, curr) => {
-			acc[curr.alias] = curr.value;
-			return acc;
-		}, {} as UmbBlockDataType);
-	});
-	*/
-
 	#settings = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	//public readonly settings = this.#settings.asObservable();
 	protected readonly _settingsValueArray = this.#content.asObservablePart((x) => x?.values);
 	private readonly settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
+	#settingsValuesObservable?: Observable<UmbBlockDataType | undefined>;
 	public async settingsValues() {
-		await this.#contentStructurePromise;
-		/*
-		if (!this.#contentValuesObservable) {
-			this.#contentValuesObservable = mergeObservables(
-				[this._contentValueArray, this.#contentStructure!.contentTypeProperties, this._variantId],
+		await this.#settingsStructurePromise;
+		if (!this.#settingsValuesObservable) {
+			this.#settingsValuesObservable = mergeObservables(
+				[this._settingsValueArray, this.#settingsStructure!.contentTypeProperties, this._variantId],
 				([propertyValues, properties, variantId]) => {
 					if (!propertyValues || !properties || !variantId) return;
 
@@ -221,14 +227,7 @@ export abstract class UmbBlockEntryContext<
 				},
 			);
 		}
-		return this.#contentValuesObservable;
-		*/
-		return this.#settings.asObservablePart((x) =>
-			x?.values.reduce((acc, curr) => {
-				acc[curr.alias] = curr.value;
-				return acc;
-			}, {} as UmbBlockDataType),
-		);
+		return this.#settingsValuesObservable;
 	}
 
 	abstract readonly showContentEdit: Observable<boolean>;
