@@ -4,7 +4,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
+import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
 
 @customElement('umb-backoffice-header-logo')
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
@@ -64,6 +64,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 						${this._serverUpgradeCheck
 							? html`<uui-button
+									@click=${this.#openNewVersion}
 									color="danger"
 									label=${this.localize.term('general_newVersionAvailable')}></uui-button>`
 							: ''}
@@ -86,6 +87,14 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		modalManager
 			.open(this, UMB_SYSINFO_MODAL)
+			.onSubmit()
+			.catch(() => {});
+	}
+
+	async #openNewVersion() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager
+			.open(this, UMB_NEWVERSION_MODAL)
 			.onSubmit()
 			.catch(() => {});
 	}
