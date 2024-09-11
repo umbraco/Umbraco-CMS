@@ -46,8 +46,13 @@ export class UmbContentTypeStructureManager<
 		(x) => x.find((y) => y.unique === this.#ownerContentTypeUnique)?.compositions,
 	);
 
-	readonly #contentTypeContainers = this.#contentTypes.asObservablePart(() => {
-		return this.#contentTypes.getValue().flatMap((x) => x.containers ?? []);
+	readonly #contentTypeContainers = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.containers ?? []);
+	});
+	readonly contentTypeProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.properties ?? []);
 	});
 	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
 	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));

@@ -17,8 +17,8 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
-	@state()
-	_content?: UmbBlockDataType;
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
 
 	@property()
 	_workspaceEditPath?: string;
@@ -27,15 +27,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		super();
 
 		// UMB_BLOCK_LIST_ENTRY_CONTEXT
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.observe(
-				context.contentValues,
-				(content) => {
-					this._content = content;
-				},
-				'observeContent',
-			);
-
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, async (context) => {
 			this.observe(
 				context.workspaceEditContentPath,
 				(workspaceEditPath) => {
@@ -47,11 +39,12 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	}
 
 	override render() {
+		console.log('render ', this.content);
 		// TODO: apply `slot="name"` to the `umb-ufm-render` element, when UUI supports it. [NL]
 		return html`
 			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
+				<umb-ufm-render inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			</uui-ref-node>
 		`;
 	}

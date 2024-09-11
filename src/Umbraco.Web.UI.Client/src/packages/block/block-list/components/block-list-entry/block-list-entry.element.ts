@@ -159,20 +159,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.contentValues,
-			(content) => {
-				this.#updateBlockViewProps({ content });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settingsValues,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
-			},
-			null,
-		);
+		this.#observeData();
+
 		this.observe(
 			this.#context.settingsKey,
 			(settingsKey) => {
@@ -205,6 +193,23 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			(path) => {
 				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
+	}
+
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
 			},
 			null,
 		);
@@ -248,11 +253,19 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block .label=${this._label} .icon=${this._icon}></umb-ref-list-block>`;
+		return html`<umb-ref-list-block
+			.label=${this._label}
+			.icon=${this._icon}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-ref-list-block>`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block .label=${this._label} .icon=${this._icon}></umb-inline-list-block>`;
+		return html`<umb-inline-list-block
+			.label=${this._label}
+			.icon=${this._icon}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-inline-list-block>`;
 	}
 
 	#renderBlock() {

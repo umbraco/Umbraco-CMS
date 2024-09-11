@@ -189,20 +189,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.contentValues,
-			(content) => {
-				this.#updateBlockViewProps({ content });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settingsValues,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
-			},
-			null,
-		);
+		this.#observeData();
 
 		this.observe(
 			this.#context.settingsKey,
@@ -256,6 +243,23 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			(path) => {
 				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
+	}
+
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
 			},
 			null,
 		);

@@ -103,20 +103,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
-		this.observe(
-			this.#context.contentValues,
-			(content) => {
-				this.#updateBlockViewProps({ content });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settingsValues,
-			(settings) => {
-				this.#updateBlockViewProps({ settings });
-			},
-			null,
-		);
+
+		this.#observeData();
+
 		// TODO: Implement validation for RTE Blocks: [NL]
 		/*
 		this.observe(
@@ -152,6 +141,23 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			(path) => {
 				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, editSettingsPath: path } });
+			},
+			null,
+		);
+	}
+
+	async #observeData() {
+		this.observe(
+			await this.#context.contentValues(),
+			(content) => {
+				this.#updateBlockViewProps({ content });
+			},
+			null,
+		);
+		this.observe(
+			await this.#context.settingsValues(),
+			(settings) => {
+				this.#updateBlockViewProps({ settings });
 			},
 			null,
 		);

@@ -110,6 +110,10 @@ export abstract class UmbBlockManagerContext<
 		this.#structures.push(structure);
 	}
 
+	getStructure(unique: string) {
+		return this.#structures.find((x) => x.getOwnerContentTypeUnique() === unique);
+	}
+
 	getContentTypeKeyOfContentKey(contentKey: string) {
 		return this.getContentOf(contentKey)?.contentTypeKey;
 	}

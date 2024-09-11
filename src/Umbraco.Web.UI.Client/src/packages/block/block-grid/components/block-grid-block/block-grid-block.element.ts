@@ -26,9 +26,9 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
+		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, async (context) => {
 			this.observe(
-				context.contentValues,
+				await context.contentValues(),
 				(content) => {
 					this._content = content;
 				},
