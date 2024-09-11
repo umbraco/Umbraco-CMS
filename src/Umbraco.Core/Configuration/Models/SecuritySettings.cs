@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class SecuritySettings
 {
     internal const bool StaticMemberBypassTwoFactorForExternalLogins = true;
+    internal const bool StaticAllowShowPasswordCheckBox = true;
     internal const bool StaticUserBypassTwoFactorForExternalLogins = true;
     internal const bool StaticKeepUserLoggedIn = false;
     internal const bool StaticHideDisabledUsersInBackOffice = false;
     internal const bool StaticAllowPasswordReset = true;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticAllowConcurrentLogins = false;
-    internal const bool StaticAllowShowPasswordCheckBox = false;
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     internal const string StaticAllowedUserNameCharacters =
