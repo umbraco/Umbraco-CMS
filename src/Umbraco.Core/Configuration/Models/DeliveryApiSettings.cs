@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -13,6 +13,8 @@ public class DeliveryApiSettings
     private const bool StaticPublicAccess = true;
 
     private const bool StaticRichTextOutputAsJson = false;
+
+    private const bool StaticAlwaysExpandMediaProperties = false;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the Delivery API should be enabled.
@@ -48,6 +50,13 @@ public class DeliveryApiSettings
     /// <value><c>true</c> if the Delivery API should output rich text values as JSON; <c>false</c> they should be output as HTML (default).</value>
     [DefaultValue(StaticRichTextOutputAsJson)]
     public bool RichTextOutputAsJson { get; set; } = StaticRichTextOutputAsJson;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the Delivery API should extend the values of MediaProperties by default.
+    /// </summary>
+    /// <value><c>true</c> if the Delivery API should extend the values of MediaProperties by default; <c>false</c> they should be extended manually (default).</value>
+    [DefaultValue(StaticAlwaysExpandMediaProperties)]
+    public bool AlwaysExpandMediaProperties { get; set; } = StaticAlwaysExpandMediaProperties;
 
     /// <summary>
     ///     Gets or sets the settings for the Media APIs of the Delivery API.
