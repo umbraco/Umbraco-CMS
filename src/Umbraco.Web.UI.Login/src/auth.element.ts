@@ -265,7 +265,9 @@ export default class UmbAuthElement extends UmbLitElement {
         return html`
           <umb-login-page
             ?allow-password-reset=${this.allowPasswordReset}
-            ?username-is-email=${this.usernameIsEmail}>
+            ?username-is-email=${this.usernameIsEmail}
+            ?allow-show-password-check-box=${this.allowShowPasswordCheckBox}
+            >
             <slot></slot>
             <slot name="subheadline" slot="subheadline"></slot>
           </umb-login-page>`;

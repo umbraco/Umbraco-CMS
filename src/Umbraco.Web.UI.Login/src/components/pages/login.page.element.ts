@@ -15,6 +15,9 @@ export default class UmbLoginPageElement extends UmbLitElement {
   @property({type: Boolean, attribute: 'allow-password-reset'})
   allowPasswordReset = false;
 
+  @property({ type: Boolean, attribute: 'allow-show-password-check-box' })
+  allowShowPasswordCheckBox = false;
+
   @state()
   private _loginState?: UUIButtonState;
 
@@ -132,6 +135,15 @@ export default class UmbLoginPageElement extends UmbLitElement {
         <slot name="subheadline"></slot>
       </header>
       <slot @slotchange=${this.#onSlotChanged}></slot>
+      ${when(
+				 true, //this.allowShowPasswordCheckBox
+				() => html` <div id="showPassword">
+					<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
+						<umb-localize key="auth_showPassword">Show password</umb-localize>
+					</uui-checkbox>
+				</div>`
+			)}
+
       <div id="secondary-actions">
         ${when(
           this.supportPersistLogin,
@@ -226,6 +238,13 @@ export default class UmbLoginPageElement extends UmbLitElement {
         margin-bottom: var(--uui-size-space-3);
       }
 
+      #showPassword {
+				margin-top: -10px;
+				font-weight: 500;
+				font-size: 13px;
+				color: #666;
+				cursor: pointer;
+			}
       #forgot-password:hover {
         color: var(--uui-color-interactive-emphasis);
       }

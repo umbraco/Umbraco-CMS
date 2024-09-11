@@ -16,6 +16,7 @@ export default {
     requestPasswordResetConfirmation: 'An email with password reset instructions will be sent to the specified address if it matched our records',
     setPasswordConfirmation: 'Your password has been updated',
     rememberMe: 'Remember me',
+    showPassword: 'Show password',
     error: 'Error',
     defaultError: 'An error occurred while processing your request.',
     errorInPasswordFormat: 'The password must be at least {0} characters long and contain at least {1} special characters.',
