@@ -1,4 +1,4 @@
-import { WorkspaceAliasConditionConfig } from '@umbraco-cms/backoffice/workspace';
+import type { WorkspaceAliasConditionConfig } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestElementWithElementName,
 	ManifestKind,
