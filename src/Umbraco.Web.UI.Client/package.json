@@ -110,6 +110,7 @@
 		"./external/router-slot": "./dist-cms/external/router-slot/index.js",
 		"./external/rxjs": "./dist-cms/external/rxjs/index.js",
 		"./external/tinymce": "./dist-cms/external/tinymce/index.js",
+		"./external/tiptap": "./dist-cms/external/tiptap/index.js",
 		"./external/uui": "./dist-cms/external/uui/index.js",
 		"./external/uuid": "./dist-cms/external/uuid/index.js"
 	},
