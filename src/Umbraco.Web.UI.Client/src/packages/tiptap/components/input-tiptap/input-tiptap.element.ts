@@ -6,6 +6,7 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import './tiptap-fixed-menu.element.js';
+import './tiptap-hover-menu.element.js';
 import { Editor, Link, StarterKit, TextAlign, Underline } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -35,23 +36,18 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				TextAlign.configure({
 					types: ['heading', 'paragraph', 'blockquote', 'orderedList', 'bulletList', 'codeBlock'],
 				}),
-				Link,
+				Link.configure({ openOnClick: false }),
 				Underline,
 			],
 			content: json,
 			onSelectionUpdate: ({ editor }) => {
 				const { $from } = editor.state.selection;
 				const activeMarks = $from.node();
-
-				// Log the active marks
-				console.log('Active Marks:', activeMarks);
-				this._fixedMenuElement.onUpdate(); // TODO: This is a hack to force the fixed menu to update. We need to find a better way.
 			},
 			onUpdate: ({ editor }) => {
 				const json = editor.getJSON();
 				this.value = JSON.stringify(json);
 				this.dispatchEvent(new UmbChangeEvent());
-				this._fixedMenuElement.onUpdate(); // TODO: This is a hack to force the fixed menu to update. We need to find a better way.
 			},
 		});
 	}
@@ -62,10 +58,8 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	override render() {
 		return html`
-			<umb-tiptap-fixed-menu
-				class="uui-text uui-font"
-				.activeNodeOrMark=${this._editor?.isActive('bold') ? 'bold' : null}
-				.editor=${this._editor}></umb-tiptap-fixed-menu>
+			<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
+			<umb-tiptap-fixed-menu .editor=${this._editor}></umb-tiptap-fixed-menu>
 			<div id="editor"></div>
 		`;
 	}
@@ -108,7 +102,7 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				font-size: 0.8rem;
 				padding: 0;
 			}
-			.ProseMirror {
+			.tiptap {
 				height: 100%;
 				width: 100%;
 				outline: none;

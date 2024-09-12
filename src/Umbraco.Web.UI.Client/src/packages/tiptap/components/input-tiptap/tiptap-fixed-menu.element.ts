@@ -17,6 +17,7 @@ import {
 	strikethrough,
 	underline,
 } from './icons.js';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { LitElement, css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
@@ -133,24 +134,41 @@ export class UmbTiptapFixedMenuElement extends LitElement {
 			name: 'link',
 			icon: link,
 			command: () => {
+				const text = prompt('Enter the text');
 				const url = prompt('Enter the URL');
 
-				if (url) {
-					this.editor?.chain().focus().setLink({ href: url, target: '_blank' }).run();
+				if (url && text && this.editor) {
+					const { from } = this.editor.state.selection;
+					this.editor
+						.chain()
+						.focus()
+						.insertContent(text)
+						.setTextSelection({ from: from, to: from + text.length })
+						.setLink({ href: url, target: '_blank' })
+						.run();
 				}
 			},
 		},
 	];
 
 	@property({ attribute: false })
-	editor?: Editor;
-
-	public onUpdate() {
-		//TODO: Find a better way to trigger a re-render of the menu when the editor is updated
-		// This is used to update the active state of the buttons
-		this.requestUpdate();
-		console.log('onUpdate');
+	get editor() {
+		return this.#editor;
 	}
+	set editor(value) {
+		const oldValue = this.#editor;
+		if (value === oldValue) {
+			return;
+		}
+		this.#editor = value;
+		this.#editor?.on('selectionUpdate', this.#onUpdate);
+		this.#editor?.on('update', this.#onUpdate);
+	}
+	#editor?: Editor;
+
+	#onUpdate = () => {
+		this.requestUpdate();
+	};
 
 	override render() {
 		return html`
