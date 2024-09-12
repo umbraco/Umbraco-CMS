@@ -6,8 +6,9 @@ import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbrac
 
 /**
  *
- * @param previousValue
- * @param currentValue
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
  */
 function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: Array<T>,
@@ -26,8 +27,9 @@ function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 
 /**
  *
- * @param previousValue
- * @param currentValue
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
  */
 function extensionAndKindMatchArrayMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
@@ -57,8 +59,9 @@ function extensionAndKindMatchArrayMemoization<
 
 /**
  *
- * @param previousValue
- * @param currentValue
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
  */
 function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: T | undefined,
@@ -72,8 +75,9 @@ function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 
 /**
  *
- * @param previousValue
- * @param currentValue
+ * @param previousValue {Array<ManifestBase>} - previous value
+ * @param currentValue {Array<ManifestBase>} - current value
+ * @returns {boolean} - true if value is assumed to be the same as previous value.
  */
 function extensionAndKindMatchSingleMemoization<
 	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
