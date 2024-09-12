@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.Collections;
 namespace Umbraco.Extensions;
 
 /// <summary>
-///     Provides object extension methods.
+/// Provides object extension methods.
 /// </summary>
 public static class ObjectExtensions
 {
@@ -27,7 +27,125 @@ public static class ObjectExtensions
     private static readonly CustomBooleanTypeConverter CustomBooleanTypeConverter = new();
 
     /// <summary>
-    ///     Attempts to convert the input object to the output type.
+    /// Returns an XML serialized safe string representation for the value and type.
+    /// </summary>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// The XML serialized safe string representation.
+    /// </returns>
+    public static string ToXmlString<T>(this object value) => value.ToXmlString(typeof(T));
+
+    /// <summary>
+    /// Returns an XML serialized safe string representation for the value and type.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <param name="type">The type of the value. This can only be a primitive type or <see cref="Guid" /> and <see cref="T:byte[]" />, otherwise an exception is thrown.</param>
+    /// <returns>
+    /// The XML serialized safe string representation.
+    /// </returns>
+    public static string ToXmlString(this object value, Type type)
+    {
+        if (value == null)
+        {
+            return string.Empty;
+        }
+
+        if (type == typeof(string))
+        {
+            return value.ToString().OrIfNullOrWhiteSpace(string.Empty);
+        }
+
+        if (type == typeof(bool))
+        {
+            return XmlConvert.ToString((bool)value);
+        }
+
+        if (type == typeof(byte))
+        {
+            return XmlConvert.ToString((byte)value);
+        }
+
+        if (type == typeof(char))
+        {
+            return XmlConvert.ToString((char)value);
+        }
+
+        if (type == typeof(DateTime))
+        {
+            return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.Unspecified);
+        }
+
+        if (type == typeof(DateTimeOffset))
+        {
+            return XmlConvert.ToString((DateTimeOffset)value);
+        }
+
+        if (type == typeof(decimal))
+        {
+            return XmlConvert.ToString((decimal)value);
+        }
+
+        if (type == typeof(double))
+        {
+            return XmlConvert.ToString((double)value);
+        }
+
+        if (type == typeof(float))
+        {
+            return XmlConvert.ToString((float)value);
+        }
+
+        if (type == typeof(Guid))
+        {
+            return XmlConvert.ToString((Guid)value);
+        }
+
+        if (type == typeof(int))
+        {
+            return XmlConvert.ToString((int)value);
+        }
+
+        if (type == typeof(long))
+        {
+            return XmlConvert.ToString((long)value);
+        }
+
+        if (type == typeof(sbyte))
+        {
+            return XmlConvert.ToString((sbyte)value);
+        }
+
+        if (type == typeof(short))
+        {
+            return XmlConvert.ToString((short)value);
+        }
+
+        if (type == typeof(TimeSpan))
+        {
+            return XmlConvert.ToString((TimeSpan)value);
+        }
+
+        if (type == typeof(uint))
+        {
+            return XmlConvert.ToString((uint)value);
+        }
+
+        if (type == typeof(ulong))
+        {
+            return XmlConvert.ToString((ulong)value);
+        }
+
+        if (type == typeof(ushort))
+        {
+            return XmlConvert.ToString((ushort)value);
+        }
+
+        throw new NotSupportedException($"Cannot convert type {type.FullName} to a string using ToXmlString, as it is not supported by XmlConvert.");
+    }
+
+    /// <summary>
+    /// Attempts to convert the input object to the output type.
     /// </summary>
     /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
     /// <typeparam name="T">The type to convert to</typeparam>
@@ -383,113 +501,6 @@ public static class ObjectExtensions
         return null; // we can't decide...
     }
 
-    /// <summary>
-    ///     Returns an XmlSerialized safe string representation for the value
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="type">The Type can only be a primitive type or Guid and byte[] otherwise an exception is thrown</param>
-    /// <returns></returns>
-    public static string ToXmlString(this object value, Type type)
-    {
-        if (value == null)
-        {
-            return string.Empty;
-        }
-
-        if (type == typeof(string))
-        {
-            return value.ToString().IsNullOrWhiteSpace() ? string.Empty : value.ToString()!;
-        }
-
-        if (type == typeof(bool))
-        {
-            return XmlConvert.ToString((bool)value);
-        }
-
-        if (type == typeof(byte))
-        {
-            return XmlConvert.ToString((byte)value);
-        }
-
-        if (type == typeof(char))
-        {
-            return XmlConvert.ToString((char)value);
-        }
-
-        if (type == typeof(DateTime))
-        {
-            return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.Unspecified);
-        }
-
-        if (type == typeof(DateTimeOffset))
-        {
-            return XmlConvert.ToString((DateTimeOffset)value);
-        }
-
-        if (type == typeof(decimal))
-        {
-            return XmlConvert.ToString((decimal)value);
-        }
-
-        if (type == typeof(double))
-        {
-            return XmlConvert.ToString((double)value);
-        }
-
-        if (type == typeof(float))
-        {
-            return XmlConvert.ToString((float)value);
-        }
-
-        if (type == typeof(Guid))
-        {
-            return XmlConvert.ToString((Guid)value);
-        }
-
-        if (type == typeof(int))
-        {
-            return XmlConvert.ToString((int)value);
-        }
-
-        if (type == typeof(long))
-        {
-            return XmlConvert.ToString((long)value);
-        }
-
-        if (type == typeof(sbyte))
-        {
-            return XmlConvert.ToString((sbyte)value);
-        }
-
-        if (type == typeof(short))
-        {
-            return XmlConvert.ToString((short)value);
-        }
-
-        if (type == typeof(TimeSpan))
-        {
-            return XmlConvert.ToString((TimeSpan)value);
-        }
-
-        if (type == typeof(uint))
-        {
-            return XmlConvert.ToString((uint)value);
-        }
-
-        if (type == typeof(ulong))
-        {
-            return XmlConvert.ToString((ulong)value);
-        }
-
-        if (type == typeof(ushort))
-        {
-            return XmlConvert.ToString((ushort)value);
-        }
-
-        throw new NotSupportedException("Cannot convert type " + type.FullName +
-                                        " to a string using ToXmlString as it is not supported by XmlConvert");
-    }
-
     private static string? ToDebugString(this object? obj, int levels = 0)
     {
         if (obj == null)
@@ -562,14 +573,6 @@ public static class ObjectExtensions
 
         return null;
     }
-
-    /// <summary>
-    ///     Returns an XmlSerialized safe string representation for the value and type
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public static string ToXmlString<T>(this object value) => value.ToXmlString(typeof(T));
 
     private static string? GetEnumPropertyDebugString(object enumItem, int levels)
     {
