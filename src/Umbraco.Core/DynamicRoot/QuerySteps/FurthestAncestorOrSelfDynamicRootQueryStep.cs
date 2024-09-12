@@ -1,6 +1,4 @@
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 
@@ -30,7 +28,9 @@ public class FurthestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        var result = (await _nodeFilterRepository.FurthestAncestorOrSelfAsync(origins, filter))?.ToSingleItemCollection() ?? Array.Empty<Guid>();
+        var result = (await _nodeFilterRepository.FurthestAncestorOrSelfAsync(origins, filter)) is Guid key
+            ? [key]
+            : Array.Empty<Guid>();
 
         return Attempt<ICollection<Guid>>.Succeed(result);
     }
