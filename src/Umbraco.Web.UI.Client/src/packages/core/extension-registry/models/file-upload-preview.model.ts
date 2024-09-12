@@ -8,5 +8,5 @@ export interface ManifestFileUploadPreview extends ManifestElement<UmbFileUpload
 	 * @examples [["image/png", "image/jpeg"], "image/*"]
 	 * @required
 	 */
-	forMimeTypes: Array<string>;
+	forMimeTypes: string | Array<string>;
 }
