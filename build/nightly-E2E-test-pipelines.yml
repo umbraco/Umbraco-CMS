@@ -102,6 +102,7 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
+        timeoutInMinutes: 120
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
