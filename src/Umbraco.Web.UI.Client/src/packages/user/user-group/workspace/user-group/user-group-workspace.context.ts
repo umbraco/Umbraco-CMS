@@ -1,5 +1,5 @@
-import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
-import type { UmbUserGroupDetailModel } from '../types.js';
+import { UmbUserGroupDetailRepository } from '../../repository/detail/index.js';
+import type { UmbUserGroupDetailModel } from '../../types.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
