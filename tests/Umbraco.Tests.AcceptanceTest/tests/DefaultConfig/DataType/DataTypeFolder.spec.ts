@@ -126,7 +126,7 @@ test('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi
   let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-  await umbracoApi.dataType.create(dataTypeName, editorAlias,editorUiAlias, [], dataTypeFolderId);
+  await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, [], dataTypeFolderId);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   await umbracoUi.reloadPage();
 

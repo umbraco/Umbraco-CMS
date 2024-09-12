@@ -38,7 +38,7 @@ test('cannot create member group with empty name', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
 });
 
-// TOOD: unskip, currently flaky
+// TODO: unskip, currently flaky
 test.skip('cannot create member group with duplicate name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.memberGroup.create(memberGroupName);
