@@ -75,10 +75,7 @@ export class UmbContentPropertyDatasetContext<
 		this.observe(
 			this.#workspace.readOnlyState.states,
 			(states) => {
-				const isReadOnly = states.some(
-					(state) => state.unique.startsWith('UMB_CULTURE_') && state.variantId.equal(this.#variantId),
-				);
-
+				const isReadOnly = states.some((state) => state.variantId.equal(this.#variantId));
 				this.#currentVariantCultureIsReadOnly.setValue(isReadOnly);
 			},
 			'umbObserveReadOnlyStates',
