@@ -56,9 +56,9 @@ export const serverInformationHandlers = [
 			// Respond with a 200 status code
 			ctx.status(200),
 			ctx.json<GetServerUpgradeCheckResponse>({
-				type: 'Major',
-				comment: 'A new version is available',
-				url: 'https://our.umbraco.com/download/releases',
+				type: 'Minor',
+				comment: "14.2.0.0 is released. Upgrade today - it's free!",
+				url: 'http://our.umbraco.org/contribute/releases/1420',
 			}),
 		);
 	}),
@@ -67,8 +67,8 @@ export const serverInformationHandlers = [
 			// Respond with a 200 status code
 			ctx.status(200),
 			ctx.json<GetServerInformationResponse>({
-				version: '14.0.0-preview004',
-				assemblyVersion: '14.0.0-preview004',
+				version: '14.0.0',
+				assemblyVersion: '14.0.0',
 				baseUtcOffset: '01:00:00',
 				runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT,
 			}),
