@@ -28,7 +28,6 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 		const json = this.value && typeof this.value === 'string' ? JSON.parse(this.value) : this.value;
 
-		// TODO: Try Disable css inject to remove prosemirror css
 		this._editor = new Editor({
 			element: editor,
 			extensions: [
@@ -40,10 +39,6 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				Underline,
 			],
 			content: json,
-			onSelectionUpdate: ({ editor }) => {
-				const { $from } = editor.state.selection;
-				const activeMarks = $from.node();
-			},
 			onUpdate: ({ editor }) => {
 				const json = editor.getJSON();
 				this.value = JSON.stringify(json);

@@ -17,7 +17,6 @@ import {
 	strikethrough,
 	underline,
 } from './icons.js';
-import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { LitElement, css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 

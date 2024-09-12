@@ -1,4 +1,4 @@
-import { LitElement, PropertyValues, css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { LitElement, css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 @customElement('umb-tiptap-hover-menu')
