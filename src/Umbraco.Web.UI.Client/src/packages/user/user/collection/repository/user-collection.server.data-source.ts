@@ -86,6 +86,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					lastLockoutDate: item.lastLockoutDate || null,
 					lastPasswordChangeDate: item.lastPasswordChangeDate || null,
 					isAdmin: item.isAdmin,
+					kind: item.kind,
 				};
 
 				return userDetail;

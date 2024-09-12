@@ -19,6 +19,7 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 import './column-layouts/name/user-table-name-column-layout.element.js';
 import './column-layouts/status/user-table-status-column-layout.element.js';
+import { UmbUserKind } from '../../../utils/index.js';
 
 @customElement('umb-user-table-collection-view')
 export class UmbUserTableCollectionViewElement extends UmbLitElement {
@@ -114,7 +115,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = this._users.map((user) => {
 			return {
 				id: user.unique,
-				icon: 'icon-user',
+				icon: user.kind === UmbUserKind.API ? 'icon-unplug' : 'icon-user',
 				data: [
 					{
 						columnAlias: 'userName',
@@ -122,6 +123,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 							unique: user.unique,
 							name: user.name,
 							avatarUrls: user.avatarUrls,
+							kind: user.kind,
 						},
 					},
 					{

@@ -1971,6 +1971,10 @@ name: "icon-unlocked",
 
 path: () => import("./icons/icon-unlocked.js"),
 },{
+name: "icon-unplug",
+
+path: () => import("./icons/icon-unplug.js"),
+},{
 name: "icon-untitled",
 legacy: true,
 path: () => import("./icons/icon-untitled.js"),

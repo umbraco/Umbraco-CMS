@@ -59,14 +59,19 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 	}
 
 	#createBlock() {
+		if (!this.#entriesContext) {
+			console.error('[Block Picker] No entries context available.');
+			return;
+		}
+
 		// TODO: Missing solution to skip catalogue if only one type available. [NL]
 		let createPath: string | undefined = undefined;
 
 		if (this._blocks?.length === 1) {
 			const elementKey = this._blocks[0].contentElementTypeKey;
-			createPath = this.#entriesContext?.getPathForCreateBlock() + 'modal/umb-modal-workspace/create/' + elementKey;
+			createPath = this.#entriesContext.getPathForCreateBlock() + 'modal/umb-modal-workspace/create/' + elementKey;
 		} else {
-			createPath = this.#entriesContext?.getPathForCreateBlock();
+			createPath = this.#entriesContext.getPathForCreateBlock();
 		}
 
 		if (createPath) {

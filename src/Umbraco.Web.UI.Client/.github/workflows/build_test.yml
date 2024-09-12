@@ -8,10 +8,12 @@ on:
     branches:
       - main
       - release/*
+      - v*/dev
   pull_request:
     branches:
       - main
       - release/*
+      - v*/dev
 
   # Allows GitHub to use this workflow to validate the merge queue
   merge_group:

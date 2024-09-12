@@ -2314,6 +2314,10 @@
 			"file": "lock-open.svg"
 		},
 		{
+			"name": "icon-unplug",
+			"file": "unplug.svg"
+		},
+		{
 			"name": "icon-untitled",
 			"file": "box.svg",
 			"legacy": true

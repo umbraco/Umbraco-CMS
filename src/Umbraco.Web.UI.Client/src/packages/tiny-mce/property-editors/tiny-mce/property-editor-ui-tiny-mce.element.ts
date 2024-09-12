@@ -3,15 +3,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-
-import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import {
+	UmbBlockRteEntriesContext,
 	type UmbBlockRteLayoutModel,
 	UmbBlockRteManagerContext,
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+
+import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
 export interface UmbRichTextEditorValueType {
 	markup: string;
@@ -84,6 +85,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	private _latestMarkup = ''; // The latest value gotten from the TinyMCE editor.
 
 	#managerContext = new UmbBlockRteManagerContext(this);
+	#entriesContext = new UmbBlockRteEntriesContext(this);
 
 	constructor() {
 		super();
@@ -123,6 +125,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 				},
 				'observeDataPath',
 			);
+		});
+
+		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
+			// Update manager:
+			this.#managerContext.setLayouts(layouts);
 		});
 
 		this.observe(this.#managerContext.layouts, (layouts) => {
