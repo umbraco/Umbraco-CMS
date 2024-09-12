@@ -355,6 +355,7 @@ public class ContentService : RepositoryService, IContentService
         }
 
         IContentType contentType = GetContentType(contentTypeAlias)
+            // causes rollback
             ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
         var content = new Content(name, parent, contentType, userId);
