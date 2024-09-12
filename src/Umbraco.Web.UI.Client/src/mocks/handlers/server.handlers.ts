@@ -58,7 +58,7 @@ export const serverInformationHandlers = [
 			ctx.json<GetServerUpgradeCheckResponse>({
 				type: 'Minor',
 				comment: "14.2.0.0 is released. Upgrade today - it's free!",
-				url: 'http://our.umbraco.org/contribute/releases/1420',
+				url: 'https://our.umbraco.com/download/releases/1420',
 			}),
 		);
 	}),
