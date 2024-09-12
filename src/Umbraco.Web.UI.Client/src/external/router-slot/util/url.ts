@@ -1,4 +1,4 @@
-import { ISlashOptions, Params, Query } from '../model';
+import type { ISlashOptions, Query } from '../model.js';
 
 const $anchor = document.createElement('a');
 
