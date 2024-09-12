@@ -32,7 +32,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	#validationContext = new UmbValidationContext(this).provide();
 	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
-	#context = new UmbBlockGridManagerContext(this);
+	#managerContext = new UmbBlockGridManagerContext(this);
 	//
 	private _value: UmbBlockGridValueModel = {
 		layout: {},
@@ -44,15 +44,15 @@ export class UmbPropertyEditorUIBlockGridElement
 		if (!config) return;
 
 		const blocks = config.getValueByAlias<Array<UmbBlockGridTypeModel>>('blocks') ?? [];
-		this.#context.setBlockTypes(blocks);
+		this.#managerContext.setBlockTypes(blocks);
 
 		const blockGroups = config.getValueByAlias<Array<UmbBlockTypeGroup>>('blockGroups') ?? [];
-		this.#context.setBlockGroups(blockGroups);
+		this.#managerContext.setBlockGroups(blockGroups);
 
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
 		//config.useLiveEditing, is covered by the EditorConfiguration of context. [NL]
-		this.#context.setEditorConfiguration(config);
+		this.#managerContext.setEditorConfiguration(config);
 	}
 
 	@state()
@@ -66,9 +66,9 @@ export class UmbPropertyEditorUIBlockGridElement
 		buildUpValue.settingsData ??= [];
 		this._value = buildUpValue as UmbBlockGridValueModel;
 
-		this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
-		this.#context.setContents(this._value.contentData);
-		this.#context.setSettings(this._value.settingsData);
+		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
+		this.#managerContext.setContents(this._value.contentData);
+		this.#managerContext.setSettings(this._value.settingsData);
 	}
 	public override get value(): UmbBlockGridValueModel {
 		return this._value;
@@ -99,7 +99,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		// TODO: Prevent initial notification from these observes
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
-				observeMultiple([this.#context.layouts, this.#context.contents, this.#context.settings]),
+				observeMultiple([this.#managerContext.layouts, this.#managerContext.contents, this.#managerContext.settings]),
 				([layouts, contents, settings]) => {
 					this._value = {
 						...this._value,
@@ -114,20 +114,20 @@ export class UmbPropertyEditorUIBlockGridElement
 			this.observe(
 				propertyContext?.alias,
 				(alias) => {
-					this.#context.setPropertyAlias(alias);
+					this.#managerContext.setPropertyAlias(alias);
 				},
 				'observePropertyAlias',
 			);
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#context.setVariantId(context.getVariantId());
+			this.#managerContext.setVariantId(context.getVariantId());
 		});
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
-		this.observe(this.#context.gridColumns, (gridColumns) => {
+		this.observe(this.#managerContext.gridColumns, (gridColumns) => {
 			if (gridColumns) {
 				this._layoutColumns = gridColumns;
 				this.style.setProperty('--umb-block-grid--grid-columns', gridColumns.toString());
