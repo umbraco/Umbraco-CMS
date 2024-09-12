@@ -9,7 +9,7 @@ import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-interface UmbDocumentNotificationSettings extends GetDocumentByIdNotificationsResponse {}
+type UmbDocumentNotificationSettings = GetDocumentByIdNotificationsResponse;
 
 @customElement('umb-document-notifications-modal')
 export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
