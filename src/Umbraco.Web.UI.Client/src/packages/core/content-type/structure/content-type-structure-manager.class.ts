@@ -46,8 +46,13 @@ export class UmbContentTypeStructureManager<
 		(x) => x.find((y) => y.unique === this.#ownerContentTypeUnique)?.compositions,
 	);
 
-	readonly #contentTypeContainers = this.#contentTypes.asObservablePart(() => {
-		return this.#contentTypes.getValue().flatMap((x) => x.containers ?? []);
+	readonly #contentTypeContainers = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.containers ?? []);
+	});
+	readonly contentTypeProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.flatMap((x) => x.properties ?? []);
 	});
 	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
 	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));
@@ -77,7 +82,8 @@ export class UmbContentTypeStructureManager<
 	/**
 	 * loadType will load the ContentType and all inherited and composed ContentTypes.
 	 * This will give us all the structure for properties and containers.
-	 * @param unique
+	 * @param {string} unique - The unique of the ContentType to load.
+	 * @returns {Promise} - Promise resolved
 	 */
 	public async loadType(unique?: string) {
 		this._reset();
@@ -217,6 +223,14 @@ export class UmbContentTypeStructureManager<
 
 	getOwnerContentTypeUnique() {
 		return this.#ownerContentTypeUnique;
+	}
+
+	/**
+	 * Figure out if any of the Content Types has a Property.
+	 * @returns {boolean} - true if any of the Content Type in this composition has a Property.
+	 */
+	getHasProperties() {
+		return this.#contentTypes.getValue().some((y) => y.properties.length > 0);
 	}
 
 	updateOwnerContentType(entry: Partial<T>) {
