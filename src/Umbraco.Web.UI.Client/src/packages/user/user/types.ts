@@ -1,4 +1,5 @@
 import type { UmbUserEntityType } from './entity.js';
+import type { UmbUserKindType } from './utils/index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import {
 	type UserConfigurationResponseModel,
@@ -26,6 +27,7 @@ export interface UmbUserDetailModel extends UmbUserStartNodesModel {
 	updateDate: string | null;
 	userGroupUniques: Array<UmbReferenceByUnique>;
 	userName: string;
+	kind: UmbUserKindType;
 }
 
 export interface UmbUserStartNodesModel {

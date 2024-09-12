@@ -1,6 +1,6 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
-import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
@@ -185,7 +185,14 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [UmbTextStyles];
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: block;
+			}
+		`,
+	];
 }
 
 declare global {

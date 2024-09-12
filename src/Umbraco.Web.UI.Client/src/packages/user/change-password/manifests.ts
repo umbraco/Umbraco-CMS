@@ -14,6 +14,11 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 			icon: 'icon-key',
 			label: '#user_changePassword',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowChangePassword',
+			},
+		],
 	},
 	{
 		type: 'modal',

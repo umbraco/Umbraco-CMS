@@ -208,34 +208,36 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		return html`
 			<div id="right-column">
 				<uui-box>
-					<div class="general-item">
-						<strong><umb-localize key="user_failedPasswordAttempts">Failed login attempts</umb-localize></strong>
-						<span>${this._workspaceContext.failedPasswordAttempts}</span>
-					</div>
-					<div class="general-item">
-						<strong><umb-localize key="user_lastLockoutDate">Last lockout date</umb-localize></strong>
-						<span>
-							${this._workspaceContext.lastLockOutDate
-								? this.localize.date(this._workspaceContext.lastLockOutDate, TimeFormatOptions)
-								: this.localize.term('general_never')}
-						</span>
-					</div>
-					<div class="general-item">
-						<strong><umb-localize key="user_lastLogin">Last login</umb-localize></strong>
-						<span>
-							${this._workspaceContext.lastLoginDate
-								? this.localize.date(this._workspaceContext.lastLoginDate, TimeFormatOptions)
-								: this.localize.term('general_never')}
-						</span>
-					</div>
-					<div class="general-item">
-						<strong><umb-localize key="user_passwordChangedGeneric">Password changed</umb-localize></strong>
-						<span>
-							${this._workspaceContext.lastPasswordChangeDate
-								? this.localize.date(this._workspaceContext.lastPasswordChangeDate, TimeFormatOptions)
-								: this.localize.term('general_never')}
-						</span>
-					</div>
+					<umb-stack look="compact">
+						<div>
+							<h4><umb-localize key="user_failedPasswordAttempts">Failed login attempts</umb-localize></h4>
+							<span>${this._workspaceContext.failedPasswordAttempts}</span>
+						</div>
+						<div>
+							<h4><umb-localize key="user_lastLockoutDate">Last lockout date</umb-localize></h4>
+							<span>
+								${this._workspaceContext.lastLockOutDate
+									? this.localize.date(this._workspaceContext.lastLockOutDate, TimeFormatOptions)
+									: this.localize.term('general_never')}
+							</span>
+						</div>
+						<div>
+							<h4><umb-localize key="user_lastLogin">Last login</umb-localize></h4>
+							<span>
+								${this._workspaceContext.lastLoginDate
+									? this.localize.date(this._workspaceContext.lastLoginDate, TimeFormatOptions)
+									: this.localize.term('general_never')}
+							</span>
+						</div>
+						<div>
+							<h4><umb-localize key="user_passwordChangedGeneric">Password changed</umb-localize></h4>
+							<span>
+								${this._workspaceContext.lastPasswordChangeDate
+									? this.localize.date(this._workspaceContext.lastPasswordChangeDate, TimeFormatOptions)
+									: this.localize.term('general_never')}
+							</span>
+						</div>
+					</umb-stack>
 				</uui-box>
 
 				<uui-box>
@@ -291,14 +293,8 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				color: var(--uui-color-danger);
 			}
 
-			.general-item {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-1);
-			}
-
-			.general-item:not(:last-child) {
-				margin-bottom: var(--uui-size-space-6);
+			h4 {
+				margin: 0;
 			}
 		`,
 	];
