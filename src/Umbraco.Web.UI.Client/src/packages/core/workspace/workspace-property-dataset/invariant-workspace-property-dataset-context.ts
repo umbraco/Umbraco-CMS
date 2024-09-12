@@ -15,8 +15,8 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	extends UmbContextBase<UmbPropertyDatasetContext>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
-	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
-	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
+	#readOnly = new UmbBooleanState(false);
+	public readOnly = this.#readOnly.asObservable();
 
 	#workspace: WorkspaceType;
 
@@ -66,7 +66,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 		return this.#workspace.setPropertyValue(propertyAlias, value);
 	}
 
-	getCurrentVariantCultureIsReadOnly() {
-		return this.#currentVariantCultureIsReadOnly.getValue();
+	getReadOnly() {
+		return this.#readOnly.getValue();
 	}
 }
