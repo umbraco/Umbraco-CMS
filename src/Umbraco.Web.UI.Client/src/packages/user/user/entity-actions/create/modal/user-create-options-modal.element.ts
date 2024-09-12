@@ -9,7 +9,7 @@ import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/e
 
 interface UmbUserCreateOptionModel {
 	label: string;
-	description: string;
+	description?: string;
 	icon: string;
 	kind: UmbUserKindType;
 }
@@ -20,13 +20,11 @@ export class UmbUserCreateOptionsModalElement extends UmbModalBaseElement {
 	#options: Array<UmbUserCreateOptionModel> = [
 		{
 			label: this.localize.term('user_userKindDefault'),
-			description: 'Donec augue nunc, ullamcorper non turpis ut, maximus facilisis lorem. Nunc id sagittis magna.',
 			icon: 'icon-user',
 			kind: UmbUserKind.DEFAULT,
 		},
 		{
 			label: this.localize.term('user_userKindApi'),
-			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			icon: 'icon-unplug',
 			kind: UmbUserKind.API,
 		},
