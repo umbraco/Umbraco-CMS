@@ -15,7 +15,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import '../../components/block-grid-entries/index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
@@ -111,6 +111,16 @@ export class UmbPropertyEditorUIBlockGridElement
 				},
 				'motherObserver',
 			);
+			this.observe(
+				propertyContext?.alias,
+				(alias) => {
+					this.#context.setPropertyAlias(alias);
+				},
+				'observePropertyAlias',
+			);
+		});
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#context.setVariantId(context.getVariantId());
 		});
 	}
 

@@ -20,26 +20,12 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
 
-	@state()
-	_content?: UmbBlockDataType;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, async (context) => {
-			this.observe(
-				await context.contentValues(),
-				(content) => {
-					this._content = content;
-				},
-				'observeContent',
-			);
-		});
-	}
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
 
 	override render() {
 		return html`<umb-ref-grid-block standalone href=${this.config?.editContentPath ?? ''}>
-			<umb-ufm-render inline .markdown=${this.label} .value=${this._content}></umb-ufm-render>
+			<umb-ufm-render inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 		</umb-ref-grid-block>`;
 	}

@@ -374,13 +374,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderInlineEditBlock() {
 		return html`<umb-block-grid-block-inline
 			class="umb-block-grid__block--view"
-			.label=${this._label}></umb-block-grid-block-inline>`;
+			.label=${this._label}
+			.icon=${this._icon}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
 	}
 
 	#renderRefBlock() {
 		return html`<umb-block-grid-block
 			class="umb-block-grid__block--view"
-			.label=${this._label}></umb-block-grid-block>`;
+			.label=${this._label}
+			.icon=${this._icon}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {
