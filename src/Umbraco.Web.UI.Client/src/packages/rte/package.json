@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-backoffice/tiptap",
+	"name": "@umbraco-backoffice/rte",
 	"private": true,
 	"type": "module",
 	"scripts": {
