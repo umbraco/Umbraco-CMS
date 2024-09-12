@@ -101,7 +101,8 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
+				.variantLanguageOptions=${this._options}
+				.pickableFilter=${this.data?.pickableFilter}></umb-document-variant-language-picker>
 
 			<p>
 				<umb-localize key="prompt_confirmUnpublish">

@@ -272,15 +272,19 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.urls && this.urls.length >= this.max) return;
-		return html`
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				label=${this.localize.term('general_add')}
-				.href=${this._modalRoute?.({ index: -1 })}
-				?disabled=${this.readonly}></uui-button>
-		`;
+		if (this.max === 1 && this.urls && this.urls.length >= this.max) return nothing;
+		if (this.readonly && this.urls.length > 0) {
+			return nothing;
+		} else {
+			return html`
+				<uui-button
+					id="btn-add"
+					look="placeholder"
+					label=${this.localize.term('general_add')}
+					.href=${this._modalRoute?.({ index: -1 })}
+					?disabled=${this.readonly}></uui-button>
+			`;
+		}
 	}
 
 	#renderItems() {

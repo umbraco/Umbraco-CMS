@@ -3,7 +3,7 @@ import { UmbCurrentUserRepository } from './repository/index.js';
 import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
@@ -14,7 +14,7 @@ import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 
 export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
-	readonly currentUser = this.#currentUser.asObservable();
+	readonly currentUser = this.#currentUser.asObservable().pipe(filter((user) => !!user));
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
 	readonly avatarUrls = this.#currentUser.asObservablePart((user) => user?.avatarUrls);
 	readonly documentStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.documentStartNodeUniques);

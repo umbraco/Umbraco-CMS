@@ -72,7 +72,7 @@ const handlers = [
 	...userGroupsHandlers,
 	...userHandlers,
 	...documentBlueprintHandlers,
-	serverHandlers.serverInformationHandler,
+	...serverHandlers.serverInformationHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

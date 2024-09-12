@@ -101,7 +101,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 						label="Select Property Editor"
 						look="placeholder"
 						color="default"
-						@focus=${() => {
+						@blur=${() => {
 							this.pristine = false;
 						}}
 						.href=${this._createRoute}></uui-button>
