@@ -16,7 +16,7 @@ export class UmbUserRootWorkspaceElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` <umb-body-layout main-no-padding headline="Users">
+		return html` <umb-body-layout main-no-padding headline=${this.localize.term('treeHeaders_users')}>
 			<umb-collection alias=${UMB_USER_COLLECTION_ALIAS}></umb-collection>;
 		</umb-body-layout>`;
 	}

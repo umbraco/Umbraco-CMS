@@ -1,7 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, LitElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('example-sorter-item')
 export class ExampleSorterItem extends UmbElementMixin(LitElement) {

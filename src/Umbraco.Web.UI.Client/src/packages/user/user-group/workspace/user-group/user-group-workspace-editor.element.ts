@@ -1,5 +1,5 @@
-import type { UmbUserGroupDetailModel } from '../index.js';
-import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH } from '../paths.js';
+import type { UmbUserGroupDetailModel } from '../../index.js';
+import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
 import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
