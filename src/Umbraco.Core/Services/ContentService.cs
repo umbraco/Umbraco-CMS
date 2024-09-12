@@ -380,7 +380,9 @@ public class ContentService : RepositoryService, IContentService
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContentType contentType = GetContentType(contentTypeAlias) ??
+            IContentType contentType = GetContentType(contentTypeAlias)
+                // + locks
+                ??
                 // causes rollback
                 throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
