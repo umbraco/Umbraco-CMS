@@ -2,6 +2,7 @@ import type { UmbUserDisplayStatus } from '../../../utils.js';
 import { TimeFormatOptions, getDisplayStateFromUserStatus } from '../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
+import { UmbUserKind } from '../../../utils/index.js';
 import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -43,6 +44,13 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 		this._userInfo = [
 			{
+				labelKey: 'user_kind',
+				value:
+					user.kind === UmbUserKind.API
+						? this.localize.term('user_userKindApi')
+						: this.localize.term('user_userKindDefault'),
+			},
+			{
 				labelKey: 'user_lastLogin',
 				value: user.lastLoginDate
 					? this.localize.date(user.lastLoginDate, TimeFormatOptions)
@@ -65,6 +73,11 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			{ labelKey: 'user_updateDate', value: this.localize.date(user.updateDate!, TimeFormatOptions) },
 			{ labelKey: 'general_id', value: user.unique },
 		];
+
+		if (user.kind === UmbUserKind.API) {
+			const include = ['user_kind', 'user_createDate', 'user_updateDate', 'general_id'];
+			this._userInfo = this._userInfo.filter((item) => include.includes(item.labelKey));
+		}
 	};
 
 	override render() {
@@ -84,18 +97,20 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 	#renderInfoList() {
 		return html`
-			${repeat(
-				this._userInfo,
-				(item) => item.labelKey,
-				(item) => this.#renderInfoItem(item.labelKey, item.value),
-			)}
+			<umb-stack look="compact">
+				${repeat(
+					this._userInfo,
+					(item) => item.labelKey,
+					(item) => this.#renderInfoItem(item.labelKey, item.value),
+				)}
+			</umb-stack>
 		`;
 	}
 
 	#renderInfoItem(labelKey: string, value?: string | number) {
 		return html`
-			<div class="user-info-item">
-				<b><umb-localize key=${labelKey}></umb-localize></b>
+			<div>
+				<h4><umb-localize key=${labelKey}></umb-localize></h4>
 				<span>${value}</span>
 			</div>
 		`;
@@ -104,23 +119,21 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+			}
+
 			uui-tag {
 				width: fit-content;
 			}
 
-			#user-info {
-				margin-bottom: var(--uui-size-space-4);
+			h4 {
+				margin: 0;
 			}
 
 			#state {
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding-bottom: var(--uui-size-space-4);
-			}
-
-			.user-info-item {
-				display: flex;
-				flex-direction: column;
-				margin-bottom: var(--uui-size-space-3);
 			}
 		`,
 	];

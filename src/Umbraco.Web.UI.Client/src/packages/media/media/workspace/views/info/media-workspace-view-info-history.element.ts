@@ -2,7 +2,7 @@ import type { UmbMediaAuditLogModel } from '../../../audit-log/types.js';
 import { UmbMediaAuditLogRepository } from '../../../audit-log/index.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
 import { TimeOptions, getMediaHistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, nothing, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -102,13 +102,15 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						(item) => {
 							const { text, style } = getMediaHistoryTagStyleAndText(item.logType);
 							const user = this.#userMap.get(item.user.unique);
-							const userName = user?.name ?? 'Unknown';
-							const avatarUrl = user && Array.isArray(user.avatarUrls) ? user.avatarUrls[1] : undefined;
 
 							return html`<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
 								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
-								<uui-avatar slot="avatar" .name="${userName}" img-src=${ifDefined(avatarUrl)}></uui-avatar>
+								<umb-user-avatar
+									slot="avatar"
+									.name=${user?.name}
+									.kind=${user?.kind}
+									.imgUrls=${user?.avatarUrls ?? []}></umb-user-avatar>
 
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}>
