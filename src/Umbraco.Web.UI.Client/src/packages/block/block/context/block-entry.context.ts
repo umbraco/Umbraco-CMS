@@ -287,6 +287,11 @@ export abstract class UmbBlockEntryContext<
 			this.#observeContentType();
 			this.#observeBlockType();
 		});
+		this.observe(this.settingsDataContentTypeKey, (settingsElementTypeKey) => {
+			if (!settingsElementTypeKey) return;
+
+			this.#getSettingsStructure(settingsElementTypeKey);
+		});
 
 		// Observe blockType:
 		this.observe(this.blockType, (blockType) => {
@@ -467,7 +472,7 @@ export abstract class UmbBlockEntryContext<
 
 	#getContentStructure() {
 		if (!this._manager) return;
-		// TODO: Make this an observer?
+
 		const contentTypeKey = this.#content.getValue()?.contentTypeKey;
 		if (!contentTypeKey) return;
 
@@ -476,7 +481,13 @@ export abstract class UmbBlockEntryContext<
 		this.#contentStructurePromiseResolve?.();
 	}
 
-	// TODO: Make a getSettingsStructure?..
+	#getSettingsStructure(contentTypeKey: string | undefined) {
+		if (!this._manager || !contentTypeKey) return;
+
+		// observe blockType:
+		this.#settingsStructure = this._manager.getStructure(contentTypeKey);
+		this.#settingsStructurePromiseResolve?.();
+	}
 
 	#observeBlockType() {
 		if (!this._manager) return;
