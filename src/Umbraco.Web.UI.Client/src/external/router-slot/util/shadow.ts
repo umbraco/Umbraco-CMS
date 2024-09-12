@@ -1,5 +1,5 @@
-import { ROUTER_SLOT_TAG_NAME } from '../config';
-import { IRouterSlot } from '../model';
+import { ROUTER_SLOT_TAG_NAME } from '../config.js';
+import type { IRouterSlot } from '../model.js';
 
 /**
  * Queries the parent router.
