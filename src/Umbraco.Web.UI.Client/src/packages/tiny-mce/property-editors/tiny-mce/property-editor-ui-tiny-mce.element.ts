@@ -10,7 +10,7 @@ import {
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
@@ -118,13 +118,9 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 				},
 				'observePropertyAlias',
 			);
-			this.observe(
-				context.variantId,
-				(variantId) => {
-					this.#managerContext.setVariantId(variantId);
-				},
-				'observeDataPath',
-			);
+		});
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#managerContext.setVariantId(context.getVariantId());
 		});
 
 		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
