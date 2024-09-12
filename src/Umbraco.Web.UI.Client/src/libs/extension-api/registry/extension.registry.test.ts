@@ -518,7 +518,7 @@ describe('Add Conditions', () => {
 		const conditionToAdd: UmbConditionConfigBase = {
 			alias: 'Umb.Test.Condition.Valid',
 		};
-		await extensionRegistry.addCondition('Umb.Test.Section.1', conditionToAdd);
+		await extensionRegistry.appendCondition('Umb.Test.Section.1', conditionToAdd);
 
 		// Check new condition is registered
 		expect(extensionRegistry.isRegistered('Umb.Test.Condition.Valid')).to.be.true;
@@ -529,13 +529,17 @@ describe('Add Conditions', () => {
 		expect(updatedExt.conditions?.[0]?.alias).to.equal('Umb.Test.Condition.Invalid');
 		expect(updatedExt.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Valid');
 
+		// Verify the other extension was not updated:
+		const otherExt = extensionRegistry.getByAlias('Umb.Test.Section.2') as ManifestWithDynamicConditions;
+		expect(otherExt.conditions).to.be.undefined;
+
 		// Add a condition with a specific config to Section2
 		const workspaceCondition: WorkspaceAliasConditionConfig = {
 			alias: 'Umb.Condition.WorkspaceAlias',
 			match: 'Umb.Workspace.Document',
 		};
 
-		await extensionRegistry.addCondition('Umb.Test.Section.2', workspaceCondition);
+		await extensionRegistry.appendCondition('Umb.Test.Section.2', workspaceCondition);
 
 		const updatedWorkspaceExt = extensionRegistry.getByAlias('Umb.Test.Section.2') as ManifestWithDynamicConditions;
 		expect(updatedWorkspaceExt.conditions?.length).to.equal(1);
@@ -556,7 +560,7 @@ describe('Add Conditions', () => {
 			} as WorkspaceAliasConditionConfig,
 		];
 
-		await extensionRegistry.addConditions('Umb.Test.Section.1', conditions);
+		await extensionRegistry.appendConditions('Umb.Test.Section.1', conditions);
 
 		const extUpdated = extensionRegistry.getByAlias('Umb.Test.Section.1') as ManifestWithDynamicConditions;
 		expect(extUpdated.conditions?.length).to.equal(3);
@@ -565,47 +569,115 @@ describe('Add Conditions', () => {
 		expect(extUpdated.conditions?.[2]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
 	});
 
-	// it('allows conditions to be prepended when an extension is loaded later on', async () => {
-	// 	const conditions: Array<UmbConditionConfigBase> = [
-	// 		{
-	// 			alias: 'Umb.Test.Condition.Invalid',
-	// 		},
-	// 		{
-	// 			alias: 'Umb.Condition.WorkspaceAlias',
-	// 			match: 'Umb.Workspace.Document',
-	// 		} as WorkspaceAliasConditionConfig,
-	// 	];
+	it('allows conditions to be prepended when an extension is loaded later on', async () => {
+		const conditions: Array<UmbConditionConfigBase> = [
+			{
+				alias: 'Umb.Test.Condition.Invalid',
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Document',
+			} as WorkspaceAliasConditionConfig,
+		];
 
-	// 	console.log('About to go KABOOM..');
+		// Prepend the conditions, but do not await this.
+		extensionRegistry.appendConditions('Late.Extension.To.Be.Loaded', conditions);
 
-	// 	// Prepend the conditions
-	// 	// [WB] HELP: Why is this fine when using in in an entrypoint
-	// 	// /src/packages/property-editors/entry-point.ts
-	// 	// But this TEST implodes if it can't find the extension that is not yet registered
-	// 	await extensionRegistry.addConditions('Late.Extension.To.Be.Loaded', conditions);
+		// Make sure the extension is not registered YET
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.false;
 
-	// 	// Make sure the extension is not registered YET
-	// 	expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.false;
+		// Register the extension LATE/after the conditions have been added
+		extensionRegistry.register({
+			type: 'section',
+			name: 'Late Section Extension with one condition',
+			alias: 'Late.Extension.To.Be.Loaded',
+			weight: 200,
+			conditions: [
+				{
+					alias: 'Umb.Test.Condition.Valid',
+				},
+			],
+		});
 
-	// 	// Register the extension LATE/after the conditions have been added
-	// 	extensionRegistry.register({
-	// 		type: 'section',
-	// 		name: 'Late Section Extension with one condition',
-	// 		alias: 'Late.Extension.To.Be.Loaded',
-	// 		weight: 200,
-	// 		conditions: [
-	// 			{
-	// 				alias: 'Umb.Test.Condition.Valid',
-	// 			},
-	// 		],
-	// 	});
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.true;
 
-	// 	expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.true;
+		const extUpdated = extensionRegistry.getByAlias('Late.Extension.To.Be.Loaded') as ManifestWithDynamicConditions;
 
-	// 	const extUpdated = extensionRegistry.getByAlias('Late.Extension.To.Be.Loaded') as ManifestWithDynamicConditions;
-	// 	expect(extUpdated.conditions?.length).to.equal(3);
-	// 	expect(extUpdated.conditions?.[0]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
-	// 	expect(extUpdated.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Invalid');
-	// 	expect(extUpdated.conditions?.[2]?.alias).to.equal('Umb.Test.Condition.Valid');
-	// });
+		expect(extUpdated.conditions?.length).to.equal(3);
+		expect(extUpdated.conditions?.[0]?.alias).to.equal('Umb.Test.Condition.Valid');
+		expect(extUpdated.conditions?.[1]?.alias).to.equal('Umb.Test.Condition.Invalid');
+		expect(extUpdated.conditions?.[2]?.alias).to.equal('Umb.Condition.WorkspaceAlias');
+	});
+
+	/**
+	 * As of current state, it is by design without further reasons to why, but it is made so additional conditions are only added to a current or next time registered manifest.
+	 * Meaning if it happens to be unregistered and re-registered it does not happen again.
+	 * Unless the exact same appending of conditions happens again. [NL]
+	 *
+	 * This makes sense if extensions gets offloaded and re-registered, but the extension that registered additional conditions didn't get loaded/registered second time. Therefor they need to be re-registered for such to work. [NL]
+	 */
+	it('only append conditions to the next time the extension is registered', async () => {
+		const conditions: Array<UmbConditionConfigBase> = [
+			{
+				alias: 'Umb.Test.Condition.Invalid',
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Document',
+			} as WorkspaceAliasConditionConfig,
+		];
+
+		// Prepend the conditions, but do not await this.
+		extensionRegistry.appendConditions('Late.Extension.To.Be.Loaded', conditions);
+
+		// Make sure the extension is not registered YET
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.false;
+
+		// Register the extension LATE/after the conditions have been added
+		extensionRegistry.register({
+			type: 'section',
+			name: 'Late Section Extension with one condition',
+			alias: 'Late.Extension.To.Be.Loaded',
+			weight: 200,
+			conditions: [
+				{
+					alias: 'Umb.Test.Condition.Valid',
+				},
+			],
+		});
+
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.true;
+
+		const extUpdateFirstTime = extensionRegistry.getByAlias(
+			'Late.Extension.To.Be.Loaded',
+		) as ManifestWithDynamicConditions;
+		expect(extUpdateFirstTime.conditions?.length).to.equal(3);
+
+		extensionRegistry.unregister('Late.Extension.To.Be.Loaded');
+
+		// Make sure the extension is not registered YET
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.false;
+
+		// Register the extension LATE/after the conditions have been added
+		extensionRegistry.register({
+			type: 'section',
+			name: 'Late Section Extension with one condition',
+			alias: 'Late.Extension.To.Be.Loaded',
+			weight: 200,
+			conditions: [
+				{
+					alias: 'Umb.Test.Condition.Valid',
+				},
+			],
+		});
+
+		expect(extensionRegistry.isRegistered('Late.Extension.To.Be.Loaded')).to.be.true;
+
+		const extUpdateSecondTime = extensionRegistry.getByAlias(
+			'Late.Extension.To.Be.Loaded',
+		) as ManifestWithDynamicConditions;
+
+		expect(extUpdateSecondTime.conditions?.length).to.equal(1);
+		expect(extUpdateSecondTime.conditions?.[0]?.alias).to.equal('Umb.Test.Condition.Valid');
+	});
 });
