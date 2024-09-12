@@ -11,8 +11,8 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase implements UmbPropertyDatasetContext {
 	#entryContext: UmbBlockGridEntryContext;
 
-	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
-	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
+	#readOnly = new UmbBooleanState(false);
+	public readOnly = this.#readOnly.asObservable();
 
 	// default data:
 
@@ -67,7 +67,7 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	 * @returns {*}  {boolean}
 	 * @memberof UmbBlockGridInlinePropertyDatasetContext
 	 */
-	getCurrentVariantCultureIsReadOnly(): boolean {
-		return this.#currentVariantCultureIsReadOnly.getValue();
+	getReadOnly(): boolean {
+		return this.#readOnly.getValue();
 	}
 }

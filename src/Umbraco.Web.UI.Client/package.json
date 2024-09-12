@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "14.3.0",
+	"version": "15.0.0",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -83,6 +83,7 @@
 		"./store": "./dist-cms/packages/core/store/index.js",
 		"./style": "./dist-cms/packages/core/style/index.js",
 		"./stylesheet": "./dist-cms/packages/templating/stylesheets/index.js",
+		"./sysinfo": "./dist-cms/packages/sysinfo/index.js",
 		"./tags": "./dist-cms/packages/tags/index.js",
 		"./template": "./dist-cms/packages/templating/templates/index.js",
 		"./temporary-file": "./dist-cms/packages/core/temporary-file/index.js",
@@ -132,35 +133,7 @@
 		"url": "https://umbraco.com"
 	},
 	"workspaces": [
-		"./src/packages/block",
-		"./src/packages/code-editor",
-		"./src/packages/core",
-		"./src/packages/data-type",
-		"./src/packages/dictionary",
-		"./src/packages/documents",
-		"./src/packages/health-check",
-		"./src/packages/language",
-		"./src/packages/log-viewer",
-		"./src/packages/markdown-editor",
-		"./src/packages/media",
-		"./src/packages/members",
-		"./src/packages/models-builder",
-		"./src/packages/multi-url-picker",
-		"./src/packages/packages",
-		"./src/packages/performance-profiling",
-		"./src/packages/property-editors",
-		"./src/packages/publish-cache",
-		"./src/packages/relations",
-		"./src/packages/search",
-		"./src/packages/static-file",
-		"./src/packages/tags",
-		"./src/packages/telemetry",
-		"./src/packages/templating",
-		"./src/packages/tiny-mce",
-		"./src/packages/ufm",
-		"./src/packages/umbraco-news",
-		"./src/packages/user",
-		"./src/packages/webhook"
+		"./src/packages/*"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
