@@ -3460,6 +3460,7 @@ public class ContentService : RepositoryService, IContentService
 
         IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
         IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault()
+            // causes rollback
             ?? throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
             $" was found");
 
