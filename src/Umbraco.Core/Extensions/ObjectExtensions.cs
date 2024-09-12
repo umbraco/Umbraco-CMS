@@ -18,13 +18,13 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ObjectExtensions
 {
-    private static readonly ConcurrentDictionary<Type, Type?> NullableGenericCache = new();
-    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> InputTypeConverterCache = new();
-    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> DestinationTypeConverterCache = new();
-    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> AssignableTypeCache = new();
-    private static readonly ConcurrentDictionary<Type, bool> BoolConvertCache = new();
-    private static readonly char[] NumberDecimalSeparatorsToNormalize = { '.', ',' };
-    private static readonly CustomBooleanTypeConverter CustomBooleanTypeConverter = new();
+    private static readonly ConcurrentDictionary<Type, Type?> _nullableGenericCache = new();
+    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> _inputTypeConverterCache = new();
+    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> _destinationTypeConverterCache = new();
+    private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> _assignableTypeCache = new();
+    private static readonly ConcurrentDictionary<Type, bool> _boolConvertCache = new();
+    private static readonly char[] _numberDecimalSeparatorsToNormalize = ['.', ','];
+    private static readonly CustomBooleanTypeConverter _customBooleanTypeConverter = new();
 
     /// <summary>
     /// Returns an XML serialized safe string representation for the value and type.
@@ -147,10 +147,14 @@ public static class ObjectExtensions
     /// <summary>
     /// Attempts to convert the input object to the output type.
     /// </summary>
-    /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
-    /// <typeparam name="T">The type to convert to</typeparam>
+    /// <typeparam name="T">The type to convert to.</typeparam>
     /// <param name="input">The input.</param>
-    /// <returns>The <see cref="Attempt{T}" /></returns>
+    /// <returns>
+    /// The <see cref="Attempt{T}" />.
+    /// </returns>
+    /// <remarks>
+    /// This code is an optimized version of the original Umbraco method.
+    /// </remarks>
     public static Attempt<T> TryConvertTo<T>(this object? input)
     {
         Attempt<object?> result = TryConvertTo(input, typeof(T));
@@ -177,19 +181,23 @@ public static class ObjectExtensions
         {
             return Attempt<T>.Succeed((T)input);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return Attempt<T>.Fail(e);
+            return Attempt<T>.Fail(ex);
         }
     }
 
     /// <summary>
-    ///     Attempts to convert the input object to the output type.
+    /// Attempts to convert the input object to the output type.
     /// </summary>
-    /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
     /// <param name="input">The input.</param>
-    /// <param name="target">The type to convert to</param>
-    /// <returns>The <see cref="Attempt{Object}" /></returns>
+    /// <param name="target">The type to convert to.</param>
+    /// <returns>
+    /// The <see cref="T:Attempt{object?}" />.
+    /// </returns>
+    /// <remarks>
+    /// This code is an optimized version of the original Umbraco method.
+    /// </remarks>
     public static Attempt<object?> TryConvertTo(this object? input, Type target)
     {
         if (target == null)
@@ -219,7 +227,7 @@ public static class ObjectExtensions
                 return Attempt.Succeed(input);
             }
 
-            // Check for string so that overloaders of ToString() can take advantage of the conversion.
+            // Check for string so that overloads of ToString() can take advantage of the conversion.
             if (target == typeof(string))
             {
                 return Attempt<object?>.Succeed(input.ToString());
@@ -286,13 +294,13 @@ public static class ObjectExtensions
             {
                 if (GetCachedCanConvertToBoolean(inputType))
                 {
-                    return Attempt.Succeed(CustomBooleanTypeConverter.ConvertFrom(input!));
+                    return Attempt.Succeed(_customBooleanTypeConverter.ConvertFrom(input!));
                 }
             }
 
             if (target == typeof(DateTime) && input is DateTimeOffset dateTimeOffset)
             {
-                // IMPORTANT: for compatability with various editors, we must discard any Offset information and assume UTC time here
+                // IMPORTANT: for compatibility with various editors, we must discard any Offset information and assume UTC time here
                 return Attempt.Succeed((object?)new DateTime(
                     new DateOnly(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day),
                     new TimeOnly(dateTimeOffset.Hour, dateTimeOffset.Minute, dateTimeOffset.Second, dateTimeOffset.Millisecond, dateTimeOffset.Microsecond),
@@ -301,7 +309,7 @@ public static class ObjectExtensions
 
             if (target == typeof(DateTimeOffset) && input is DateTime dateTime)
             {
-                // IMPORTANT: for compatability with various editors, we must discard any DateTimeKind information and assume UTC time here
+                // IMPORTANT: for compatibility with various editors, we must discard any DateTimeKind information and assume UTC time here
                 return Attempt.Succeed((object?)new DateTimeOffset(
                     new DateOnly(dateTime.Year, dateTime.Month, dateTime.Day),
                     new TimeOnly(dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond, dateTime.Microsecond),
@@ -343,12 +351,16 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    ///     Attempts to convert the input string to the output type.
+    /// Attempts to convert the input string to the output type.
     /// </summary>
-    /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
     /// <param name="input">The input.</param>
     /// <param name="target">The type to convert to</param>
-    /// <returns>The <see cref="Nullable{Attempt}" /></returns>
+    /// <returns>
+    /// The <see cref="T:Attempt{object?}" />
+    /// </returns>
+    /// <remarks>
+    /// This code is an optimized version of the original Umbraco method.
+    /// </remarks>
     private static Attempt<object?>? TryConvertToFromString(this string input, Type target)
     {
         // Easy
@@ -602,7 +614,7 @@ public static class ObjectExtensions
     private static string NormalizeNumberDecimalSeparator(string s)
     {
         var normalized = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-        return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
+        return s.ReplaceMany(_numberDecimalSeparatorsToNormalize, normalized);
     }
 
     // gets a converter for source, that can convert to target, or null if none exists
@@ -611,7 +623,7 @@ public static class ObjectExtensions
     {
         var key = new CompositeTypeTypeKey(source, target);
 
-        if (InputTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
+        if (_inputTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
         {
             return typeConverter;
         }
@@ -619,10 +631,10 @@ public static class ObjectExtensions
         TypeConverter converter = TypeDescriptor.GetConverter(source);
         if (converter.CanConvertTo(target))
         {
-            return InputTypeConverterCache[key] = converter;
+            return _inputTypeConverterCache[key] = converter;
         }
 
-        InputTypeConverterCache[key] = null;
+        _inputTypeConverterCache[key] = null;
         return null;
     }
 
@@ -632,7 +644,7 @@ public static class ObjectExtensions
     {
         var key = new CompositeTypeTypeKey(source, target);
 
-        if (DestinationTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
+        if (_destinationTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
         {
             return typeConverter;
         }
@@ -640,10 +652,10 @@ public static class ObjectExtensions
         TypeConverter converter = TypeDescriptor.GetConverter(target);
         if (converter.CanConvertFrom(source))
         {
-            return DestinationTypeConverterCache[key] = converter;
+            return _destinationTypeConverterCache[key] = converter;
         }
 
-        DestinationTypeConverterCache[key] = null;
+        _destinationTypeConverterCache[key] = null;
         return null;
     }
 
@@ -651,7 +663,7 @@ public static class ObjectExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Type? GetCachedGenericNullableType(Type type)
     {
-        if (NullableGenericCache.TryGetValue(type, out Type? underlyingType))
+        if (_nullableGenericCache.TryGetValue(type, out Type? underlyingType))
         {
             return underlyingType;
         }
@@ -659,10 +671,10 @@ public static class ObjectExtensions
         if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
         {
             Type? underlying = Nullable.GetUnderlyingType(type);
-            return NullableGenericCache[type] = underlying;
+            return _nullableGenericCache[type] = underlying;
         }
 
-        NullableGenericCache[type] = null;
+        _nullableGenericCache[type] = null;
         return null;
     }
 
@@ -671,7 +683,7 @@ public static class ObjectExtensions
     private static bool GetCachedCanAssign(object input, Type source, Type target)
     {
         var key = new CompositeTypeTypeKey(source, target);
-        if (AssignableTypeCache.TryGetValue(key, out var canConvert))
+        if (_assignableTypeCache.TryGetValue(key, out var canConvert))
         {
             return canConvert;
         }
@@ -680,26 +692,26 @@ public static class ObjectExtensions
         // We can use it to very quickly determine whether true/false
         if (input is IConvertible && target.IsAssignableFrom(source))
         {
-            return AssignableTypeCache[key] = true;
+            return _assignableTypeCache[key] = true;
         }
 
-        return AssignableTypeCache[key] = false;
+        return _assignableTypeCache[key] = false;
     }
 
     // determines whether a type can be converted to boolean
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool GetCachedCanConvertToBoolean(Type type)
     {
-        if (BoolConvertCache.TryGetValue(type, out var result))
+        if (_boolConvertCache.TryGetValue(type, out var result))
         {
             return result;
         }
 
-        if (CustomBooleanTypeConverter.CanConvertFrom(type))
+        if (_customBooleanTypeConverter.CanConvertFrom(type))
         {
-            return BoolConvertCache[type] = true;
+            return _boolConvertCache[type] = true;
         }
 
-        return BoolConvertCache[type] = false;
+        return _boolConvertCache[type] = false;
     }
 }
