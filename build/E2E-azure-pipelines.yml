@@ -1,0 +1,49 @@
+﻿stages:
+  ###############################################
+  ## Build
+  ###############################################
+  - stage: Build
+    jobs:
+      - job: A
+        displayName: Build Umbraco CMS
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            submodules: true
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - template: templates/backoffice-install.yml
+          - script: npm run build:for:cms
+            displayName: Run build (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            displayName: Run npm ci (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - script: npm run build
+            displayName: Run npm build (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet restore
+            inputs:
+              command: restore
+              projects: $(solution)
+          - task: DotNetCoreCLI@2
+            name: build
+            displayName: Run dotnet build and generate NuGet packages
+            inputs:
+              command: build
+              projects: $(solution)
+              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
+          - task: PublishPipelineArtifact@1
+            displayName: Publish nupkg
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/nupkg
+              artifactName: nupkg
+          - task: PublishPipelineArtifact@1
+            displayName: Publish build artifacts
+            inputs:
+              targetPath: $(Build.SourcesDirectory)
+              artifactName: build_output
