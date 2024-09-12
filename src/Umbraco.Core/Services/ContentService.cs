@@ -381,7 +381,8 @@ public class ContentService : RepositoryService, IContentService
             scope.WriteLock(Constants.Locks.ContentTree);
 
             IContentType contentType = GetContentType(contentTypeAlias) ??
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // + locks
+                // causes rollback
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             IContent? parent = parentId > 0 ? GetById(parentId) : null; // + locks
             if (parentId > 0 && parent == null)
@@ -424,6 +425,7 @@ public class ContentService : RepositoryService, IContentService
             scope.WriteLock(Constants.Locks.ContentTree);
 
             IContentType contentType = GetContentType(contentTypeAlias)
+                // causes rollback
                 ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // + locks
 
             var content = new Content(name, parent, contentType, userId);
@@ -3460,8 +3462,9 @@ public class ContentService : RepositoryService, IContentService
 
         IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
         IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault()
-            // causes rollback
-            ?? throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
+            ??
+        // causes rollback
+            throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
             $" was found");
 
         return contentType;
