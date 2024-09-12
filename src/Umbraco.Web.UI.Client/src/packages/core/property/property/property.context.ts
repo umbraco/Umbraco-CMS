@@ -128,7 +128,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 			'observeValue',
 		);
 
-		this.observe(this.#datasetContext.currentVariantCultureIsReadOnly, (value) => {
+		this.observe(this.#datasetContext.readOnly, (value) => {
 			this.#isReadOnly.setValue(value);
 		});
 	}
