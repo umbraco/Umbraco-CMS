@@ -1,6 +1,6 @@
 import { UmbSysinfoRepository } from '../repository/sysinfo.repository.js';
 import type { UmbServerUpgradeCheck } from '../types.js';
-import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -41,7 +41,7 @@ export class UmbNewVersionElement extends UmbModalBaseElement {
 								color="positive"
 								label=${this.localize.term('general_readMore')}>
 								<umb-localize key="general_readMore">Read more</umb-localize>
-								<umb-icon name="icon-out"></umb-icon>
+								<umb-icon slot="extra" name="icon-out"></umb-icon>
 							</uui-button>`
 						: ''}
 				</uui-dialog-layout>
@@ -49,7 +49,14 @@ export class UmbNewVersionElement extends UmbModalBaseElement {
 		`;
 	}
 
-	static override readonly styles = [UmbTextStyles];
+	static override readonly styles = [
+		UmbTextStyles,
+		css`
+			umb-icon {
+				margin-left: var(--uui-size-2);
+			}
+		`,
+	];
 }
 
 export default UmbNewVersionElement;
