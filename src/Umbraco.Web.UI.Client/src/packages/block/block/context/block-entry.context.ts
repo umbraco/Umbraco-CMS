@@ -284,7 +284,6 @@ export abstract class UmbBlockEntryContext<
 			if (!contentElementTypeKey) return;
 
 			this.#getContentStructure();
-			this.#observeContentType();
 			this.#observeBlockType();
 		});
 		this.observe(this.settingsDataContentTypeKey, (settingsElementTypeKey) => {
@@ -433,27 +432,6 @@ export abstract class UmbBlockEntryContext<
 		}
 	}
 
-	// TODO: Stop observing this..
-	#observeContentType() {
-		if (!this._manager) return;
-		const contentTypeKey = this.#content.getValue()?.contentTypeKey;
-		if (!contentTypeKey) return;
-
-		// observe blockType:
-		this.observe(
-			this._manager.contentTypeOf(contentTypeKey),
-			(contentType) => {
-				/**
-				 * currently only using:
-				 * Name, Alias, Icon
-				 */
-				this.#contentElementType.setValue(contentType);
-				this._gotContentType(contentType);
-			},
-			'observeContentElementType',
-		);
-	}
-
 	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
 
 	#observeVariantId() {
@@ -479,6 +457,19 @@ export abstract class UmbBlockEntryContext<
 		// observe blockType:
 		this.#contentStructure = this._manager.getStructure(contentTypeKey);
 		this.#contentStructurePromiseResolve?.();
+
+		this.observe(
+			this.#contentStructure?.ownerContentType,
+			(contentType) => {
+				/**
+				 * currently only using:
+				 * Name, Alias, Icon
+				 */
+				this.#contentElementType.setValue(contentType);
+				this._gotContentType(contentType);
+			},
+			'observeContentElementType',
+		);
 	}
 
 	#getSettingsStructure(contentTypeKey: string | undefined) {
