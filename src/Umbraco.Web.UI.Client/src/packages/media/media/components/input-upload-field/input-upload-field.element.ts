@@ -69,12 +69,12 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	#manager = new UmbTemporaryFileManager(this);
 
-	#previewers: Array<ManifestFileUploadPreview> = [];
+	#manifests: Array<ManifestFileUploadPreview> = [];
 
 	constructor() {
 		super();
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (previews) => {
-			this.#previewers = previews.map((preview) => preview.manifest);
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'fileUploadPreview', null, (manifests) => {
+			this.#manifests = manifests.map((manifest) => manifest.manifest);
 		});
 	}
 
@@ -88,23 +88,24 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	#getPreviewElementAlias() {
-		const fallbackAlias = this.#previewers.find((preview) => preview.forMimeTypes.includes('*/*'))?.alias;
+		const fallbackAlias = this.#manifests.find((manifest) => manifest.forMimeTypes.includes('*/*'))?.alias;
 
 		const mimeType = this.#getMimeTypeFromPath(this._src);
 		if (!mimeType) return fallbackAlias;
 
 		// Check for an exact match
-		const exactMatch = this.#previewers.find((preview) => {
-			return preview.forMimeTypes.includes(mimeType);
+		const exactMatch = this.#manifests.find((manifest) => {
+			return manifest.forMimeTypes.includes(mimeType);
 		});
 		if (exactMatch) return exactMatch.alias;
 
 		// Check for wildcard match (e.g. image/*)
-		const wildcardMatch = this.#previewers.find((preview) => {
-			return preview.forMimeTypes.find((type) => {
+		const wildcardMatch = this.#manifests.find((manifest) => {
+			const forMimeTypes = Array.isArray(manifest.forMimeTypes) ? manifest.forMimeTypes : [manifest.forMimeTypes];
+			return forMimeTypes.find((type) => {
 				const snippet = type.replace(/\*/g, '');
-				if (mimeType.startsWith(snippet)) return preview.alias;
-				if (mimeType.endsWith(snippet)) return preview.alias;
+				if (mimeType.startsWith(snippet)) return manifest.alias;
+				if (mimeType.endsWith(snippet)) return manifest.alias;
 				return undefined;
 			});
 		});
