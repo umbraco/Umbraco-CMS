@@ -37,7 +37,7 @@ export interface UmbracoPackage {
 	 * @title An array of Umbraco package manifest types that will be installed
 	 * @required
 	 */
-	extensions: UmbManifestTypes[];
+	extensions: UmbExtensionManifest[];
 
 	/**
 	 * @title The importmap for the package

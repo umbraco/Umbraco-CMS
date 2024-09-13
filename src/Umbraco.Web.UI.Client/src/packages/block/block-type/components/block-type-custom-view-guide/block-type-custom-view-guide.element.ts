@@ -89,7 +89,7 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 	async #generateManifest() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
-		const manifest: UmbManifestTypes = {
+		const manifest: UmbExtensionManifest = {
 			type: 'blockEditorCustomView',
 			alias: 'Local.blockEditorCustomView.' + this.#contentTypeAlias,
 			name: 'Block Editor Custom View for ' + this.#contentTypeName,

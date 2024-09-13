@@ -1,4 +1,4 @@
-export const manifests: Array<UmbManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'blockEditorCustomView',
 		alias: 'Umb.blockEditorCustomView.TestView',

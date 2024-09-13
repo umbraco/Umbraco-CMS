@@ -242,5 +242,5 @@ declare global {
 	 * This global type provides a union of all declared manifest types.
 	 * If this is a local package that declares additional Manifest Types, then these will also be included in this union.
 	 */
-	type UmbManifestTypes = UnionOfProperties<UmbManifestType>;
+	type UmbExtensionManifest = UnionOfProperties<UmbManifestType>;
 }
