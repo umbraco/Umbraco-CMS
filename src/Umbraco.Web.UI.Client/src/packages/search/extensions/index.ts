@@ -1,2 +1,2 @@
-export * from './search-provider.model.js';
-export * from './search-result-item.model.js';
+export * from './search-provider.extension.js';
+export * from './search-result-item.extension.js';
