@@ -1,1 +1,1 @@
-export * from './conditions/types.js';
+export type * from './conditions/types.js';
