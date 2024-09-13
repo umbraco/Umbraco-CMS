@@ -1,5 +1,5 @@
-import { umbExtensionsRegistry } from '../registry.js';
 import type { UmbExtensionCollectionFilterModel } from './types.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';

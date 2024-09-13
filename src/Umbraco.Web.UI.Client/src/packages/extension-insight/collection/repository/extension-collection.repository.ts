@@ -1,6 +1,6 @@
-import { umbExtensionsRegistry } from '../../registry.js';
 import type { UmbExtensionCollectionFilterModel, UmbExtensionDetailModel } from '../types.js';
 import { UMB_EXTENSION_ENTITY_TYPE } from '../../entity.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
