@@ -1,7 +1,7 @@
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_USER_ENTITY_TYPE } from '@umbraco-cms/backoffice/user';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
 	{
 		type: 'entityAction',
 		kind: 'default',

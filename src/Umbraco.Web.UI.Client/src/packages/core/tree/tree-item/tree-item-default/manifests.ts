@@ -1,6 +1,6 @@
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-const kind: UmbBackofficeManifestKind = {
+const kind: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.TreeItem.Default',
 	matchKind: 'default',
@@ -12,4 +12,4 @@ const kind: UmbBackofficeManifestKind = {
 	},
 };
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [kind];
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [kind];

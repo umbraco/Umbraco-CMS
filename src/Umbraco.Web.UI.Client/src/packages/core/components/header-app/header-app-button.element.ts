@@ -1,14 +1,11 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	ManifestHeaderAppButtonKind,
-	UmbBackofficeManifestKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestHeaderAppButtonKind, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const manifest: UmbBackofficeManifestKind = {
+const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.Button',
 	matchKind: 'button',
