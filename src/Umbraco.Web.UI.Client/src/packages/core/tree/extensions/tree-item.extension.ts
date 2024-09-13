@@ -8,3 +8,9 @@ export interface ManifestTreeItem
 	type: 'treeItem';
 	forEntityTypes: Array<string>;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbTreeItem: ManifestTreeItem;
+	}
+}
