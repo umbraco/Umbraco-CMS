@@ -87,10 +87,34 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 					id: 'all-properties-group-key',
 				},
 				alias: 'richTextEditor',
-				name: 'Rich Text editor',
+				name: 'Rich Text editor (Tiptap)',
 				description: 'Some description to test with a long description.',
 				dataType: {
-					id: 'dt-richTextEditor',
+					id: 'dt-richTextEditorTiptap',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: '1',
+				container: {
+					id: 'all-properties-group-key',
+				},
+				alias: 'richTextEditorTinyMce',
+				name: 'Rich Text editor (TinyMce)',
+				description: 'Some description to test with a long description.',
+				dataType: {
+					id: 'dt-richTextEditorTinyMce',
 				},
 				variesByCulture: false,
 				variesBySegment: false,
@@ -1720,5 +1744,91 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 		properties: [],
 		containers: [],
+	},
+	{
+		allowedTemplates: [],
+		defaultTemplate: { id: 'all-rtes-document-type-id' },
+		id: 'all-rtes-document-type-id',
+		alias: 'allRtesDocumentType',
+		name: 'All RTEs document type',
+		description: null,
+		icon: 'icon-document',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [
+			{
+				id: '1dd0d4d2-cda8-4ac2-affd-a69fc10382b1',
+				container: { id: 'the-simplest-document-type-id-container' },
+				alias: 'tiptap',
+				name: 'Tiptap',
+				description:
+					'This is to test the default configuration for the Tiptap editor.\n\nSearch for **dt-richTextEditorTiptap** in the codebase to find the configuration and add configuration values.',
+				dataType: { id: 'dt-richTextEditorTiptap' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: '2dd0d4d2-cda8-4ac2-affd-a69fc10382b1',
+				container: { id: 'the-simplest-document-type-id-container' },
+				alias: 'tinymce',
+				name: 'TinyMCE',
+				description: `
+This is to test the default configuration of the TinyMCE editor.
+
+Search for **dt-richTextEditorTinyMce** in the codebase to find the configuration and add configuration values.
+
+**NB!** If this throws an error in console, go to \`input-tiny-mce.defaults.ts\` and comment out the script append on line 126:
+
+\`\`\`js
+script.text = \`import "@umbraco-cms/backoffice/extension-registry";\`;
+script.text = \`import "\${UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH}";\`;
+//editor.dom.doc.head.appendChild(script);
+\`\`\``,
+				dataType: { id: 'dt-richTextEditorTinyMce' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				id: 'the-simplest-document-type-id-container',
+				parent: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
 	},
 ];

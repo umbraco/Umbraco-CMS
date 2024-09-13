@@ -93,20 +93,20 @@ export const data: Array<UmbMockDocumentModel> = [
 	<li>Aenean massa cum sociis natoque penatibus.</li>
 </ul>
 <p>
-	Lorem ipsum dolor sit amet, consectetuer adipiscing 
+	Lorem ipsum dolor sit amet, consectetuer adipiscing
 	elit. Aenean commodo ligula eget dolor.
 </p>
 <p>
 	<blockquote>
-		Lorem ipsum dolor sit amet, consectetuer 
-		adipiscing elit. Aenean commodo ligula eget dolor. 
-		Aenean massa <strong>strong</strong>. Cum sociis 
-		natoque penatibus et magnis dis parturient montes, 
-		nascetur ridiculus mus. Donec quam felis, ultricies 
-		nec, pellentesque eu, pretium quis, sem. Nulla consequat 
-		massa quis enim. Donec pede justo, fringilla vel, 
-		aliquet nec, vulputate eget, arcu. In <em>em</em> 
-		enim justo, rhoncus ut, imperdiet a, venenatis vitae, 
+		Lorem ipsum dolor sit amet, consectetuer
+		adipiscing elit. Aenean commodo ligula eget dolor.
+		Aenean massa <strong>strong</strong>. Cum sociis
+		natoque penatibus et magnis dis parturient montes,
+		nascetur ridiculus mus. Donec quam felis, ultricies
+		nec, pellentesque eu, pretium quis, sem. Nulla consequat
+		massa quis enim. Donec pede justo, fringilla vel,
+		aliquet nec, vulputate eget, arcu. In <em>em</em>
+		enim justo, rhoncus ut, imperdiet a, venenatis vitae,
 		justo. Nullam <a class="external ext" href="#">link</a>
 		dictum felis eu pede mollis pretium.
 	</blockquote>
@@ -799,6 +799,70 @@ export const data: Array<UmbMockDocumentModel> = [
 				culture: null,
 				segment: null,
 				value: null,
+			},
+		],
+	},
+	{
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
+		template: null,
+		id: 'all-rtes-id',
+		parent: null,
+		documentType: {
+			id: 'all-rtes-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: null,
+				segment: null,
+				name: 'All RTEs',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+			},
+		],
+		values: [
+			{
+				alias: 'tiptap',
+				culture: null,
+				segment: null,
+				value: {
+					blocks: undefined,
+					markup: `
+						<p>
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+						</p>
+						<p>
+							<img alt src="/umbraco/backoffice/login.jpg" />
+						</p>
+						<p>End of test content</p>
+					`,
+				},
+			},
+			{
+				alias: 'tinymce',
+				culture: null,
+				segment: null,
+				value: {
+					blocks: undefined,
+					markup: `
+						<p>
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
+						</p>
+						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+						<p>End of test content</p>
+					`,
+				},
 			},
 		],
 	},
