@@ -7,16 +7,7 @@ import type { UmbMultipleAppLanguageConditionConfig } from './multiple-app-langu
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbDocumentUserPermissionConditionConfig } from '@umbraco-cms/backoffice/document';
 
-// temp location to avoid circular dependencies
-export type BlockWorkspaceHasSettingsConditionConfig =
-	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
-
-export type BlockEntryShowContentEditConditionConfig =
-	UmbConditionConfigBase<'Umb.Condition.BlockEntryShowContentEdit'>;
-
 export type ConditionTypes =
-	| BlockEntryShowContentEditConditionConfig
-	| BlockWorkspaceHasSettingsConditionConfig
 	| CollectionAliasConditionConfig
 	| CollectionBulkActionPermissionConditionConfig
 	| SectionAliasConditionConfig
