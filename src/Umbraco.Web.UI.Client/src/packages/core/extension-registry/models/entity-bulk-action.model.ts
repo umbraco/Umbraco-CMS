@@ -1,4 +1,3 @@
-import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbEntityBulkActionElement } from '../../entity-bulk-action/entity-bulk-action-element.interface.js';
 import type { UmbEntityBulkAction } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
@@ -9,7 +8,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  */
 export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction = MetaEntityBulkAction>
 	extends ManifestElementAndApi<UmbEntityBulkActionElement, UmbEntityBulkAction<MetaType>>,
-		ManifestWithDynamicConditions<ConditionTypes> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'entityBulkAction';
 	forEntityTypes: Array<string>;
 	meta: MetaType;
