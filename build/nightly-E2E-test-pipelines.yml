@@ -29,9 +29,6 @@ parameters:
     displayName: Run the Sql Server E2e Tests
     type: boolean
     default: false
-    values:
-      - true
-      - false
 
 stages:
   ###############################################
