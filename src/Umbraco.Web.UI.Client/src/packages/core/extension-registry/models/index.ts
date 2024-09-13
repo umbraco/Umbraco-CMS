@@ -61,8 +61,6 @@ import type {
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
-import type { ManifestSearchProvider } from './search-provider.model.js';
-import type { ManifestSearchResultItem } from './search-result-item.model.js';
 import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
 import type { ManifestEntryPoint } from './entry-point.model.js';
@@ -99,8 +97,6 @@ export type * from './preview-app.model.js';
 export type * from './property-action.model.js';
 export type * from './property-editor.model.js';
 export type * from './repository.model.js';
-export type * from './search-provider.model.js';
-export type * from './search-result-item.model.js';
 export type * from './section-sidebar-app.model.js';
 export type * from './section-view.model.js';
 export type * from './section.model.js';
@@ -187,8 +183,6 @@ export type ManifestTypes =
 	| ManifestPropertyEditorSchema
 	| ManifestPropertyEditorUi
 	| ManifestRepository
-	| ManifestSearchProvider
-	| ManifestSearchResultItem
 	| ManifestSection
 	| ManifestSectionRoute
 	| ManifestSectionSidebarApp
