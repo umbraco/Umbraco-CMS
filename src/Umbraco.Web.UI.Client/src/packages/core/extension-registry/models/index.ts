@@ -1,6 +1,4 @@
 import type { ManifestAuthProvider } from './auth-provider.model.js';
-import type { ManifestCollection } from './collection.models.js';
-import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type {
@@ -61,7 +59,6 @@ import type {
 } from './workspace-view.model.js';
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
-import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type { ManifestSearchProvider } from './search-provider.model.js';
 import type { ManifestSearchResultItem } from './search-result-item.model.js';
@@ -76,9 +73,6 @@ import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-c
 export type * from './app-entry-point.model.js';
 export type * from './auth-provider.model.js';
 export type * from './backoffice-entry-point.model.js';
-export type * from './collection-action.model.js';
-export type * from './collection-view.model.js';
-export type * from './collection.models.js';
 export type * from './current-user-action.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
@@ -158,9 +152,6 @@ export type ManifestTypes =
 	| ManifestAuthProvider
 	| ManifestBackofficeEntryPoint
 	| ManifestBundle<ManifestTypes>
-	| ManifestCollection
-	| ManifestCollectionAction
-	| ManifestCollectionView
 	| ManifestCondition
 	| ManifestCurrentUserAction
 	| ManifestCurrentUserActionDefaultKind

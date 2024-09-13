@@ -934,6 +934,7 @@ export default {
 		media: 'Media',
 		revert: 'Revert',
 		validate: 'Validate',
+		newVersionAvailable: 'New version available',
 	},
 	colors: {
 		blue: 'Blue',

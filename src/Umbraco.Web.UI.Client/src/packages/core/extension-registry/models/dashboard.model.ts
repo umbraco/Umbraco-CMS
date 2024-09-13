@@ -1,10 +1,9 @@
-import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbDashboardElement } from '../interfaces/index.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestDashboard
 	extends ManifestElement<UmbDashboardElement>,
-		ManifestWithDynamicConditions<ConditionTypes> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'dashboard';
 	meta: MetaDashboard;
 }

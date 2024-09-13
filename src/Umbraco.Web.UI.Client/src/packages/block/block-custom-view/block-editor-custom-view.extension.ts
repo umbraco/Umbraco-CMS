@@ -21,6 +21,6 @@ export interface ManifestBlockEditorCustomView extends ManifestElement<UmbBlockE
 
 declare global {
 	interface UmbExtensionManifestMap {
-		blockEditorCustomView: ManifestBlockEditorCustomView;
+		umbBlockEditorCustomView: ManifestBlockEditorCustomView;
 	}
 }
