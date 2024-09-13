@@ -2149,6 +2149,7 @@ export type ServerConfigurationItemResponseModel = {
 
 export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
+    versionCheckPeriod: number;
 };
 
 export type ServerInformationResponseModel = {
@@ -2606,6 +2607,12 @@ export type UpdateWebhookRequestModel = {
         [key: string]: (string);
     };
     events: Array<(string)>;
+};
+
+export type UpgradeCheckResponseModel = {
+    type: string;
+    comment: string;
+    url: string;
 };
 
 export type UpgradeSettingsResponseModel = {
@@ -4666,6 +4673,8 @@ export type GetServerInformationResponse = ((ServerInformationResponseModel));
 export type GetServerStatusResponse = ((ServerStatusResponseModel));
 
 export type GetServerTroubleshootingResponse = ((ServerTroubleshootingResponseModel));
+
+export type GetServerUpgradeCheckResponse = ((UpgradeCheckResponseModel));
 
 export type GetItemStaticFileData = {
     path?: Array<(string)>;
