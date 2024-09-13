@@ -4,13 +4,13 @@ import type {
 	ManifestMenu,
 	ManifestSectionSidebarAppBaseMenu,
 	ManifestSectionSidebarAppMenuKind,
-	UmbBackofficeManifestKind,
+	UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // TODO: Move to separate file:
-const manifest: UmbBackofficeManifestKind = {
+const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.SectionSidebarAppMenu',
 	matchKind: 'menu',

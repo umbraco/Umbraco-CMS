@@ -4,7 +4,7 @@ import { manifests as menuManifests } from './menu/manifests.js';
 import type {
 	ManifestSection,
 	ManifestTypes,
-	UmbBackofficeManifestKind,
+	UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const section: ManifestSection = {
@@ -24,7 +24,7 @@ const section: ManifestSection = {
 	],
 };
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
 	section,
 	...sectionSidebarAppManifests,
 	...menuManifests,

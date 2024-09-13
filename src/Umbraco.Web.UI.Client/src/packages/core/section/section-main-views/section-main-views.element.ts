@@ -12,7 +12,6 @@ import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
-// TODO: this might need a new name, since it's both views and dashboards
 @customElement('umb-section-main-views')
 export class UmbSectionMainViewElement extends UmbLitElement {
 	@property({ type: String, attribute: 'section-alias' })
@@ -48,12 +47,12 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	#constructDashboardPath(manifest: ManifestDashboard) {
-		const dashboardName = manifest.meta.label ?? manifest.name;
+		const dashboardName = manifest.meta.label ?? manifest.name ?? manifest.alias;
 		return 'dashboard/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(dashboardName));
 	}
 
 	#constructViewPath(manifest: ManifestSectionView) {
-		const viewName = manifest.meta.label ?? manifest.name;
+		const viewName = manifest.meta.label ?? manifest.name ?? manifest.alias;
 		return 'view/' + (manifest.meta.pathname ? manifest.meta.pathname : pathFolderName(viewName));
 	}
 
@@ -119,7 +118,9 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							return html`
 								<uui-tab
 									href="${this._routerPath}/${dashboardPath}"
-									label="${dashboard.meta.label ? this.localize.string(dashboard.meta.label) : dashboard.name}"
+									label="${dashboard.meta.label
+										? this.localize.string(dashboard.meta.label)
+										: (dashboard.name ?? dashboard.alias)}"
 									?active="${this._activePath === dashboardPath}"></uui-tab>
 							`;
 						})}
@@ -134,7 +135,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
-							const viewName = view.meta.label ? this.localize.string(view.meta.label) : view.name;
+							const viewName = view.meta.label ? this.localize.string(view.meta.label) : (view.name ?? view.alias);
 							const viewPath = this.#constructViewPath(view);
 							return html`
 								<uui-tab

@@ -1,6 +1,6 @@
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbBackofficeManifestKind> = [
+export const manifests: Array<UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
 		alias: 'Umb.Kind.WorkspaceView.Collection',

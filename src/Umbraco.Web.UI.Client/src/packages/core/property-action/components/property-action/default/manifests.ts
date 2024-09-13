@@ -1,4 +1,4 @@
 import { manifest as defaultKindManifest } from './default.action.kind.js';
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [defaultKindManifest];
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [defaultKindManifest];

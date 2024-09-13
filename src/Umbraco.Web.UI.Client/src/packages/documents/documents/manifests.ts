@@ -14,9 +14,9 @@ import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
 	...collectionManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
