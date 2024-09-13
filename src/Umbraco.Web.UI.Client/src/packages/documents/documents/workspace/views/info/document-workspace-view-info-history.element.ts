@@ -1,4 +1,4 @@
-import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
+import { UMB_ROLLBACK_MODAL } from '../../../rollback/modal/index.js';
 import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
 import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
