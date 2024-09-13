@@ -1,9 +1,9 @@
+import { UMB_MEMBER_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_MEMBER_ROOT_WORKSPACE_PATH } from '../../paths.js';
 
 @customElement('umb-member-workspace-split-view')
 export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
