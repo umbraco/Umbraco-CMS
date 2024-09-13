@@ -1,5 +1,5 @@
-import { UmbMemberGroupDetailRepository } from '../repository/index.js';
-import type { UmbMemberGroupDetailModel } from '../types.js';
+import { UmbMemberGroupDetailRepository } from '../../repository/index.js';
+import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
