@@ -1,7 +1,8 @@
-import type { ConditionTypes } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestCollection extends ManifestElementAndApi, ManifestWithDynamicConditions<ConditionTypes> {
+export interface ManifestCollection
+	extends ManifestElementAndApi,
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'collection';
 	meta: MetaCollection;
 }

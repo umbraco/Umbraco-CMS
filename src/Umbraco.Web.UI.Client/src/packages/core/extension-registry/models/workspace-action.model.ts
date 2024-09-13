@@ -1,4 +1,3 @@
-import type { ConditionTypes } from '../conditions/types.js';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
@@ -6,7 +5,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 
 export interface ManifestWorkspaceAction<MetaType extends MetaWorkspaceAction = MetaWorkspaceAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceAction<MetaType>>,
-		ManifestWithDynamicConditions<ConditionTypes> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'workspaceAction';
 	meta: MetaType;
 }
