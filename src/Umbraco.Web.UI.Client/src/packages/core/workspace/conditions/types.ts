@@ -44,3 +44,12 @@ export type WorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<'Umb.Con
 export type WorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<
 	typeof UMB_WORKSPACE_HAS_COLLECTION_CONDITION
 >;
+
+declare global {
+	interface UmbExtensionConditionMap {
+		UmbWorkspaceAlias: WorkspaceAliasConditionConfig;
+		UmbWorkspaceContentTypeAlias: WorkspaceContentTypeAliasConditionConfig;
+		UmbWorkspaceEntityType: WorkspaceEntityTypeConditionConfig;
+		UmbWorkspaceHasCollection: WorkspaceHasCollectionConditionConfig;
+	}
+}
