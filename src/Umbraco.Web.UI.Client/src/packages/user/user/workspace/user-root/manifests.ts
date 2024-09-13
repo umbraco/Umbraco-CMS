@@ -1,7 +1,7 @@
 import { UMB_USER_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
 	{
 		type: 'workspace',
 		alias: 'Umb.Workspace.UserRoot',

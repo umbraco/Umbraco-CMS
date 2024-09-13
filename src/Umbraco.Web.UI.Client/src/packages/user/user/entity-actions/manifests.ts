@@ -3,7 +3,7 @@ import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 
 import { manifests as createManifests } from './create/manifests.js';
 
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
@@ -96,4 +96,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [...entityActions, ...createManifests];
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...entityActions, ...createManifests];

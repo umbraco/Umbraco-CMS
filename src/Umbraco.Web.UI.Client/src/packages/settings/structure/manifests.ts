@@ -1,8 +1,8 @@
 import { UMB_SETTINGS_SECTION_ALIAS } from '../section/index.js';
 import { UMB_STRUCTURE_SETTINGS_MENU_ALIAS } from './constants.js';
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
 	{
 		type: 'menu',
 		alias: UMB_STRUCTURE_SETTINGS_MENU_ALIAS,
