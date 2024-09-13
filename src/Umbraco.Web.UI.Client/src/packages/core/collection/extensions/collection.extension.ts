@@ -10,3 +10,9 @@ export interface ManifestCollection
 export interface MetaCollection {
 	repositoryAlias: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbCollection: ManifestCollection;
+	}
+}

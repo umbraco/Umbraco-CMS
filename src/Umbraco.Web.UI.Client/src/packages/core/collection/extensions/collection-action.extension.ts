@@ -16,3 +16,9 @@ export interface MetaCollectionAction {
 	label: string;
 	href?: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbCollectionAction: ManifestCollectionAction;
+	}
+}

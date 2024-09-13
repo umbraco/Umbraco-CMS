@@ -1,4 +1,4 @@
-import type { ManifestCollectionView } from '../extension-registry/models/index.js';
+import type { ManifestCollectionView } from './extensions/index.js';
 import { umbExtensionsRegistry } from '../extension-registry/index.js';
 import { UmbCollectionViewManager } from './collection-view.manager.js';
 import { expect } from '@open-wc/testing';

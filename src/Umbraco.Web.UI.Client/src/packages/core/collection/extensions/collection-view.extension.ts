@@ -36,3 +36,9 @@ export interface ConditionsCollectionView {
 	 */
 	entityType: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbCollectionView: ManifestCollectionView;
+	}
+}

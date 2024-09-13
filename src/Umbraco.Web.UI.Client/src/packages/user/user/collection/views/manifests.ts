@@ -1,6 +1,7 @@
 import { UMB_COLLECTION_VIEW_USER_GRID, UMB_COLLECTION_VIEW_USER_TABLE } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/collection';
 
 const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
