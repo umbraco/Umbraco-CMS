@@ -8,3 +8,4 @@ export * from './section-sidebar-menu-with-entity-actions/index.js';
 export * from './section-sidebar-menu/index.js';
 export * from './section-sidebar/index.js';
 export * from './section.context.js';
+export * from './types.js';
