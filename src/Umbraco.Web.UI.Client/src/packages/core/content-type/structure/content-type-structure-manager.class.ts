@@ -54,6 +54,10 @@ export class UmbContentTypeStructureManager<
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.flatMap((x) => x.properties ?? []);
 	});
+	readonly contentTypeHasProperties = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes.some((x) => x.properties.length > 0);
+	});
 	readonly contentTypePropertyAliases = this.#contentTypes.asObservablePart((contentTypes) => {
 		return contentTypes.flatMap((x) => x.properties ?? []).map((x) => x.alias);
 	});
