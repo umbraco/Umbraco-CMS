@@ -1,6 +1,7 @@
 import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS, UMB_MEDIA_TABLE_COLLECTION_VIEW_ALIAS } from './index.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/collection';
 
 const gridViewManifest: ManifestCollectionView = {
 	type: 'collectionView',
