@@ -149,7 +149,8 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 			...this._value,
 			markup: markup,
 		};
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+
+		this.#fireChangeEvent();
 	}
 
 	override render() {
