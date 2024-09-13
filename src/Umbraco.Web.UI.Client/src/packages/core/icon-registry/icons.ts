@@ -879,6 +879,10 @@ name: "icon-help",
 
 path: () => import("./icons/icon-help.js"),
 },{
+name: "icon-history",
+
+path: () => import("./icons/icon-history.js"),
+},{
 name: "icon-home",
 
 path: () => import("./icons/icon-home.js"),
