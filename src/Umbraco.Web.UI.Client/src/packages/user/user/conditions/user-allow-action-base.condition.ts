@@ -1,5 +1,5 @@
 import type { UmbUserStateEnum } from '../types.js';
-import { UMB_USER_WORKSPACE_CONTEXT } from '../workspace/user-workspace.context-token.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../workspace/user/user-workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import type {
