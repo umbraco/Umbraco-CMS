@@ -1,14 +1,21 @@
-import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ROLLBACK_MODAL } from '../modal/rollback-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<never> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
-		super(host, args);
-	}
+	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
-		debugger;
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
+
+		await modalContext.onSubmit();
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext.peek('positive', {
+			data: { message: this.#localize.term('rollback_documentRolledBack') },
+		});
 	}
 }
 
