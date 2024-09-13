@@ -3,6 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MEMBER_ROOT_WORKSPACE_PATH } from '../../paths.js';
 
 @customElement('umb-member-workspace-split-view')
 export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
@@ -11,8 +12,6 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 
 	@state()
 	_variants?: Array<ActiveVariant>;
-
-	#BACK_PATH = '/section/member-management/view/members';
 
 	constructor() {
 		super();
@@ -45,7 +44,7 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 							(view) => html`
 								<umb-workspace-split-view
 									alias="Umb.Workspace.Member"
-									back-path=${this.#BACK_PATH}
+									back-path=${UMB_MEMBER_ROOT_WORKSPACE_PATH}
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}>
 								</umb-workspace-split-view>
