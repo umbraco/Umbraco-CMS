@@ -1,4 +1,5 @@
 import type { UmbLanguageEntityType } from './entity.js';
+export type * from './conditions/types.js';
 
 export interface UmbLanguageDetailModel {
 	entityType: UmbLanguageEntityType;

@@ -1,13 +1,10 @@
 import { isDocumentUserPermission } from '../utils.js';
+import type { UmbDocumentUserPermissionConditionConfig } from './types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
-import type {
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-	UmbExtensionCondition,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -108,22 +105,5 @@ export class UmbDocumentUserPermissionCondition
 		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 }
-
-export type UmbDocumentUserPermissionConditionConfig =
-	UmbConditionConfigBase<'Umb.Condition.UserPermission.Document'> & {
-		/**
-		 * The user must have all of the permissions in this array for the condition to be met.
-		 * @example
-		 * ["Umb.Document.Save", "Umb.Document.Publish"]
-		 */
-		allOf?: Array<string>;
-
-		/**
-		 * The user must have at least one of the permissions in this array for the condition to be met.
-		 * @example
-		 * ["Umb.Document.Save", "Umb.Document.Publish"]
-		 */
-		oneOf?: Array<string>;
-	};
 
 export { UmbDocumentUserPermissionCondition as api };
