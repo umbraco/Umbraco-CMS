@@ -1,6 +1,6 @@
-import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
+import { type UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import { UMB_BLOCK_RTE_TYPE } from '@umbraco-cms/backoffice/block-rte';
-import type { UmbBlockTypeBaseModel, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,

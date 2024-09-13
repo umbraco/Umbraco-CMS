@@ -3,9 +3,9 @@ import { UmbBlockGridInlinePropertyDatasetContext } from './block-grid-inline-pr
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/extension-registry';
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 /**
  * @element umb-block-grid-block-inline

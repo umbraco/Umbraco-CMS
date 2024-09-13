@@ -1,5 +1,4 @@
 import type { ManifestAuthProvider } from './auth-provider.model.js';
-import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
@@ -30,7 +29,7 @@ import type { ManifestHealthCheck } from './health-check.model.js';
 import type { ManifestIcons } from './icons.model.js';
 import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestMenu } from './menu.model.js';
-import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.model.js';
+import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
 import type { ManifestModal } from './modal.model.js';
 import type { ManifestPackageView } from './package-view.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
@@ -78,7 +77,6 @@ import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-c
 export type * from './app-entry-point.model.js';
 export type * from './auth-provider.model.js';
 export type * from './backoffice-entry-point.model.js';
-export type * from './block-editor-custom-view.model.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
 export type * from './collection.models.js';
@@ -160,7 +158,6 @@ export type ManifestTypes =
 	| ManifestAppEntryPoint
 	| ManifestAuthProvider
 	| ManifestBackofficeEntryPoint
-	| ManifestBlockEditorCustomView
 	| ManifestBundle<ManifestTypes>
 	| ManifestCollection
 	| ManifestCollectionAction
@@ -188,6 +185,7 @@ export type ManifestTypes =
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
+	| ManifestMenuItemLinkKind
 	| ManifestMfaLoginProvider
 	| ManifestModal
 	| ManifestMonacoMarkdownEditorAction
@@ -221,3 +219,36 @@ export type ManifestTypes =
 	| ManifestWorkspaces
 	| ManifestWorkspaceViews
 	| ManifestBase;
+
+type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
+
+declare global {
+	/**
+	 * This global type allows to declare manifests types from its own module.
+	 * @example
+	 ```js
+ 	 	declare global {
+ 	 		interface UmbExtensionManifestMap {
+ 	 			My_UNIQUE_MANIFEST_NAME: MyExtensionManifestType;
+  		}
+  	}
+  	```
+	 If you have multiple types, you can declare them in this way:
+	 ```js
+		declare global {
+			interface UmbExtensionManifestMap {
+				My_UNIQUE_MANIFEST_NAME: MyExtensionManifestTypeA | MyExtensionManifestTypeB;
+			}
+		}
+	 ```
+	 */
+	interface UmbExtensionManifestMap {
+		UMB_CORE: ManifestTypes;
+	}
+
+	/**
+	 * This global type provides a union of all declared manifest types.
+	 * If this is a local package that declares additional Manifest Types, then these will also be included in this union.
+	 */
+	type UmbExtensionManifest = UnionOfProperties<UmbExtensionManifestMap>;
+}

@@ -26,3 +26,13 @@ export interface MetaMenuItemTreeKind extends MetaMenuItem {
 	treeAlias: string;
 	hideTreeRoot?: boolean;
 }
+
+export interface ManifestMenuItemLinkKind extends ManifestMenuItem {
+	type: 'menuItem';
+	kind: 'link';
+	meta: MetaMenuItemLinkKind;
+}
+
+export interface MetaMenuItemLinkKind extends MetaMenuItem {
+	href: string;
+}

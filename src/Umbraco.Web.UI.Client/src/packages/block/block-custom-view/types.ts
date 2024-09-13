@@ -1,29 +1,8 @@
-import type { ManifestBlockEditorCustomView } from '../index.js';
-import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-// Shared with the Property Editor
-export interface UmbBlockTypeBaseModel {
-	contentElementTypeKey: string;
-	settingsElementTypeKey?: string;
-	label?: string;
-	thumbnail?: string;
-	iconColor?: string;
-	backgroundColor?: string;
-	editorSize?: UUIModalSidebarSize;
-	forceHideContentEditorInOverlay: boolean;
-}
+import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.extension.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
-// Shared with the Property Editor
-export interface UmbBlockLayoutBaseModel {
-	contentUdi: string;
-	settingsUdi?: string | null;
-}
-
-// Shared with the Property Editor
-export interface UmbBlockDataType {
-	udi: string;
-	contentTypeKey: string;
-	[key: string]: unknown;
-}
+export type * from './block-editor-custom-view.extension.js';
 
 export interface UmbBlockEditorCustomViewConfiguration {
 	editContentPath?: string;
