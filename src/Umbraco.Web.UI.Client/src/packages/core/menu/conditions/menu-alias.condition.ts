@@ -1,16 +1,12 @@
-import { UMB_MENU_CONTEXT } from '../../menu/components/menu/menu.context.js';
-import { UmbConditionBase } from './condition-base.controller.js';
+import { UMB_MENU_CONTEXT } from '../components/menu/menu.context.js';
+import { UmbConditionBase } from '../../extension-registry/conditions/condition-base.controller.js';
+import type { MenuAliasConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestCondition,
-	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
-
-export type MenuAliasConditionConfig = UmbConditionConfigBase & {
-	match: string;
-};
 
 export class UmbMenuAliasCondition extends UmbConditionBase<MenuAliasConditionConfig> implements UmbExtensionCondition {
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<MenuAliasConditionConfig>) {

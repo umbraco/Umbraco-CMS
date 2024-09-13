@@ -65,16 +65,16 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	override render() {
-		return html` 
-		<uui-select
+		return html`
+			<uui-select
 				style="margin-top: var(--uui-size-space-1)"
 				@change=${this.#onCustomValidationChange}
-				.options=${this._options.map(e => ({
+				.options=${this._options.map((e) => ({
 					name: e.name,
 					value: e.value,
-					selected: e.value == this.value
+					selected: e.value == this.value,
 				}))}></uui-select>
-			`;
+		`;
 	}
 
 	static override styles = [
