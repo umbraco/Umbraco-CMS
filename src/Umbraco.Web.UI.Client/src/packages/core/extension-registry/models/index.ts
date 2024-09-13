@@ -226,15 +226,23 @@ declare global {
 	/**
 	 * This global type allows to declare manifests types from its own module.
 	 * @example
-	 * ```js
-	declare global {
-		interface UmbManifestType {
-			My_UNIQUE_MANIFEST_NAME: ManifestTypes;
+	 ```js
+ 	 	declare global {
+ 	 		interface UmbExtensionManifestMap {
+ 	 			My_UNIQUE_MANIFEST_NAME: MyExtensionManifestType;
+  		}
+  	}
+  	```
+	 If you have multiple types, you can declare them in this way:
+	 ```js
+		declare global {
+			interface UmbExtensionManifestMap {
+				My_UNIQUE_MANIFEST_NAME: MyExtensionManifestTypeA | MyExtensionManifestTypeB;
+			}
 		}
-	}
-	 * ```
+	 ```
 	 */
-	interface UmbManifestType {
+	interface UmbExtensionManifestMap {
 		UMB_CORE: ManifestTypes;
 	}
 
@@ -242,5 +250,5 @@ declare global {
 	 * This global type provides a union of all declared manifest types.
 	 * If this is a local package that declares additional Manifest Types, then these will also be included in this union.
 	 */
-	type UmbExtensionManifest = UnionOfProperties<UmbManifestType>;
+	type UmbExtensionManifest = UnionOfProperties<UmbExtensionManifestMap>;
 }
