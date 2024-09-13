@@ -1,4 +1,4 @@
-import type { UmbMemberVariantOptionModel } from '../types.js';
+import type { UmbMemberVariantOptionModel } from '../../types.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
 import { UmbMemberWorkspaceSplitViewElement } from './member-workspace-split-view.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

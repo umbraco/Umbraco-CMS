@@ -7,7 +7,7 @@ import { manifests as propertyEditorManifests } from './property-editor/manifest
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
-import { manifests as workspaceManifests } from './workspace/manifests.js';
+import { manifests as workspaceManifests } from './workspace/member/manifests.js';
 
 import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 

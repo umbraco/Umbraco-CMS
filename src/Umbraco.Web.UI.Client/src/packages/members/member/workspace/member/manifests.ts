@@ -1,4 +1,4 @@
-import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,

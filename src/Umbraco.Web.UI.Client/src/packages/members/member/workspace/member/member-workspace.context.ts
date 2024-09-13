@@ -1,6 +1,6 @@
-import { UmbMemberDetailRepository } from '../repository/index.js';
-import type { UmbMemberDetailModel, UmbMemberVariantModel, UmbMemberVariantOptionModel } from '../types.js';
-import { UmbMemberPropertyDatasetContext } from '../property-dataset-context/member-property-dataset-context.js';
+import { UmbMemberDetailRepository } from '../../repository/index.js';
+import type { UmbMemberDetailModel, UmbMemberVariantModel, UmbMemberVariantOptionModel } from '../../types.js';
+import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset-context.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { type UmbMemberTypeDetailModel, UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
