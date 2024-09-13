@@ -8,6 +8,6 @@ export type BlockEntryShowContentEditConditionConfig =
 
 declare global {
 	interface UmbExtensionConditionMap {
-		UmbBlock: BlockEntryShowContentEditConditionConfig | BlockWorkspaceHasSettingsConditionConfig;
+		umbBlock: BlockEntryShowContentEditConditionConfig | BlockWorkspaceHasSettingsConditionConfig;
 	}
 }
