@@ -233,6 +233,7 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
+        timeoutInMinutes: 120
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
