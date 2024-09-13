@@ -1,4 +1,3 @@
-import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbAction } from '../../action/action.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
@@ -24,7 +23,7 @@ export interface UmbCurrentUserAction<ArgsMetaType = never> extends UmbAction<Um
 
 export interface ManifestCurrentUserAction<MetaType extends MetaCurrentUserAction = MetaCurrentUserAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbCurrentUserAction<MetaType>>,
-		ManifestWithDynamicConditions<ConditionTypes> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'currentUserAction';
 	meta: MetaType;
 }

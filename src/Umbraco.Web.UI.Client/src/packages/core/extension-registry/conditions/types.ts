@@ -12,11 +12,6 @@ import type {
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbDocumentUserPermissionConditionConfig } from '@umbraco-cms/backoffice/document';
 
-/* TODO: in theory should't the core package import from other packages.
-Are there any other way we can do this?
-Niels: Sadly I don't see any other solutions currently. But are very open for ideas :-) now that I think about it maybe there is some ability to extend a global type, similar to the 'declare global' trick we use on Elements.
-*/
-
 // temp location to avoid circular dependencies
 export type BlockWorkspaceHasSettingsConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
@@ -38,3 +33,36 @@ export type ConditionTypes =
 	| WorkspaceAliasConditionConfig
 	| WorkspaceContentTypeAliasConditionConfig
 	| WorkspaceEntityTypeConditionConfig;
+
+type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
+
+declare global {
+	/**
+	 * This global type allows to declare condition types from its own module.
+	 * @example
+	 ```js
+ 	 	declare global {
+ 	 		interface UmbExtensionConditionMap {
+ 	 			My_UNIQUE_CONDITION_NAME: MyExtensionConditionType;
+  		}
+  	}
+  	```
+	 If you have multiple types, you can declare them in this way:
+	 ```js
+		declare global {
+			interface UmbExtensionConditionMap {
+				My_UNIQUE_CONDITION_NAME: MyExtensionConditionTypeA | MyExtensionConditionTypeB;
+			}
+		}
+	 ```
+	 */
+	interface UmbExtensionConditionMap {
+		UMB_CORE: ConditionTypes;
+	}
+
+	/**
+	 * This global type provides a union of all declared manifest types.
+	 * If this is a local package that declares additional Manifest Types, then these will also be included in this union.
+	 */
+	type UmbExtensionCondition = UnionOfProperties<UmbExtensionConditionMap>;
+}
