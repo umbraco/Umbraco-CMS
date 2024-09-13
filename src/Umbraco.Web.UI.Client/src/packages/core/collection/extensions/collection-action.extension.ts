@@ -1,4 +1,4 @@
-import type { ConditionTypes } from '../conditions/types.js';
+import type { ConditionTypes } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
@@ -14,4 +14,10 @@ export interface ManifestCollectionAction extends ManifestElementAndApi, Manifes
 export interface MetaCollectionAction {
 	label: string;
 	href?: string;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbCollectionAction: ManifestCollectionAction;
+	}
 }

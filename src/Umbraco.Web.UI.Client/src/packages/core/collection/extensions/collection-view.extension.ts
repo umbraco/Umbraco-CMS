@@ -1,4 +1,4 @@
-import type { ConditionTypes } from '../conditions/types.js';
+import type { ConditionTypes } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestCollectionView extends ManifestElement, ManifestWithDynamicConditions<ConditionTypes> {
@@ -36,4 +36,10 @@ export interface ConditionsCollectionView {
 	 * @examples ["media"]
 	 */
 	entityType: string;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbCollectionView: ManifestCollectionView;
+	}
 }

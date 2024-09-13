@@ -1,7 +1,7 @@
 import type { UmbCollectionConfiguration } from './types.js';
+import type { ManifestCollection } from './extensions/index.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 const elementName = 'umb-collection';
