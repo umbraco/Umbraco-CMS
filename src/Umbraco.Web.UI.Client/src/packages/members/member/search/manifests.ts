@@ -1,8 +1,7 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEMBER_SEARCH_PROVIDER_ALIAS } from './constants.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		name: 'Member Search Provider',
 		alias: UMB_MEMBER_SEARCH_PROVIDER_ALIAS,
