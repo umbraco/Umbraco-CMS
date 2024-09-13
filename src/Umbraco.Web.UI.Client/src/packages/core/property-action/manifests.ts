@@ -2,7 +2,7 @@ import { manifests as defaultManifests } from './components/property-action/mani
 import type {
 	ManifestPropertyActions,
 	ManifestTypes,
-	UmbBackofficeManifestKind,
+	UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UMB_WRITABLE_PROPERTY_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
@@ -44,7 +44,7 @@ export const propertyActionManifests: Array<ManifestPropertyActions> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
 	...defaultManifests,
 	...propertyActionManifests,
 ];

@@ -1,4 +1,4 @@
-import { umbExtensionsRegistry } from '../../registry.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
