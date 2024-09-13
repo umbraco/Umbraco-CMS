@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbBlockEditorCustomViewProperties } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockEditorCustomViewProperties } from '@umbraco-cms/backoffice/block-custom-view';
 
 import '../ref-rte-block/index.js';
 

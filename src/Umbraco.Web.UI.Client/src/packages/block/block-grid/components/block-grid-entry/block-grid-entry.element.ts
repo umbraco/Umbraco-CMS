@@ -10,11 +10,11 @@ import '../block-grid-block-inline/index.js';
 import '../block-grid-block/index.js';
 import '../block-scale-handler/index.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
-import {
-	type ManifestBlockEditorCustomView,
-	UmbDataPathBlockElementDataQuery,
-	type UmbBlockEditorCustomViewProperties,
-} from '@umbraco-cms/backoffice/block';
+import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+} from '@umbraco-cms/backoffice/block-custom-view';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 /**

@@ -5,7 +5,7 @@ import { css, customElement, html, property, state } from '@umbraco-cms/backoffi
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import '../block-grid-areas-container/index.js';
 import '../ref-grid-block/index.js';
-import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 /**
  * @element umb-block-grid-block-inline

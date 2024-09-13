@@ -8,7 +8,10 @@ import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import type { ManifestBlockEditorCustomView, UmbBlockEditorCustomViewProperties } from '@umbraco-cms/backoffice/block';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+} from '@umbraco-cms/backoffice/block-custom-view';
 
 /**
  * @element umb-block-list-entry
