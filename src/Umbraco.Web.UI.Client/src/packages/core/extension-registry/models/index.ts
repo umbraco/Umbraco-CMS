@@ -30,7 +30,7 @@ import type { ManifestHealthCheck } from './health-check.model.js';
 import type { ManifestIcons } from './icons.model.js';
 import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestMenu } from './menu.model.js';
-import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.model.js';
+import type { ManifestMenuItem, ManifestMenuItemLinkKind, ManifestMenuItemTreeKind } from './menu-item.model.js';
 import type { ManifestModal } from './modal.model.js';
 import type { ManifestPackageView } from './package-view.model.js';
 import type { ManifestPreviewAppProvider } from './preview-app.model.js';
@@ -188,6 +188,7 @@ export type ManifestTypes =
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
+	| ManifestMenuItemLinkKind
 	| ManifestMfaLoginProvider
 	| ManifestModal
 	| ManifestMonacoMarkdownEditorAction

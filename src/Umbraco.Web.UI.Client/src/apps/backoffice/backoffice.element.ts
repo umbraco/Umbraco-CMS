@@ -18,6 +18,7 @@ const CORE_PACKAGES = [
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
 	import('../../packages/health-check/umbraco-package.js'),
+	import('../../packages/help/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
 	import('../../packages/markdown-editor/umbraco-package.js'),
