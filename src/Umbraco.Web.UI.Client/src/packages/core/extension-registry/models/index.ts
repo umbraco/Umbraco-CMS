@@ -74,7 +74,6 @@ export type * from './app-entry-point.model.js';
 export type * from './auth-provider.model.js';
 export type * from './backoffice-entry-point.model.js';
 export type * from './current-user-action.model.js';
-export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
