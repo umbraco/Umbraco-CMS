@@ -1,4 +1,3 @@
-import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbWorkspaceViewElement } from '../interfaces/workspace-view-element.interface.js';
 import type {
 	ManifestWithDynamicConditions,
@@ -8,7 +7,7 @@ import type {
 
 export interface ManifestWorkspaceView<MetaType extends MetaWorkspaceView = MetaWorkspaceView>
 	extends ManifestWithView<UmbWorkspaceViewElement>,
-		ManifestWithDynamicConditions<ConditionTypes> {
+		ManifestWithDynamicConditions<UmbExtensionManifest> {
 	type: 'workspaceView';
 	meta: MetaType;
 }

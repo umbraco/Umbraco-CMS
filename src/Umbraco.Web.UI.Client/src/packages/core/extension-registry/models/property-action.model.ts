@@ -1,11 +1,10 @@
-import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbPropertyAction } from '../../property-action/components/property-action/property-action.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = MetaPropertyAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbPropertyAction<MetaType>>,
-		ManifestWithDynamicConditions<ConditionTypes> {
+		ManifestWithDynamicConditions<UmbExtensionManifest> {
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];
 	meta: MetaType;
