@@ -8,7 +8,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  */
 export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction = MetaEntityBulkAction>
 	extends ManifestElementAndApi<UmbEntityBulkActionElement, UmbEntityBulkAction<MetaType>>,
-		ManifestWithDynamicConditions<UmbExtensionManifest> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'entityBulkAction';
 	forEntityTypes: Array<string>;
 	meta: MetaType;

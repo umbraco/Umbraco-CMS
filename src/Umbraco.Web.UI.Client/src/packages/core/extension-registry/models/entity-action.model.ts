@@ -8,7 +8,7 @@ import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@um
  */
 export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEntityAction>
 	extends ManifestElementAndApi<UmbEntityActionElement, UmbEntityAction<MetaType>>,
-		ManifestWithDynamicConditions<UmbExtensionManifest> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'entityAction';
 	forEntityTypes: Array<string>;
 	meta: MetaType;

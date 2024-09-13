@@ -7,7 +7,7 @@ import type {
 
 export interface ManifestWorkspaceView<MetaType extends MetaWorkspaceView = MetaWorkspaceView>
 	extends ManifestWithView<UmbWorkspaceViewElement>,
-		ManifestWithDynamicConditions<UmbExtensionManifest> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'workspaceView';
 	meta: MetaType;
 }

@@ -3,7 +3,7 @@ import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cm
 
 export interface ManifestSectionSidebarApp
 	extends ManifestElement<UmbSectionSidebarAppElement>,
-		ManifestWithDynamicConditions<UmbExtensionManifest> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'sectionSidebarApp';
 }
 

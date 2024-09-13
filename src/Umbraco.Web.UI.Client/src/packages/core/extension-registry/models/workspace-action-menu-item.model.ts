@@ -5,7 +5,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 export interface ManifestWorkspaceActionMenuItem<
 	MetaType extends MetaWorkspaceActionMenuItem = MetaWorkspaceActionMenuItem,
 > extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceActionMenuItem<MetaType>>,
-		ManifestWithDynamicConditions<UmbExtensionManifest> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'workspaceActionMenuItem';
 	/**
 	 * Define which workspace actions this menu item should be shown for.
