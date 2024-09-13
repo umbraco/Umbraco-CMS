@@ -1,9 +1,9 @@
 import { UmbConditionBase } from '../../extension-registry/conditions/condition-base.controller.js';
+import type { WorkspaceContentTypeAliasConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestCondition,
-	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
@@ -48,22 +48,6 @@ export class UmbWorkspaceContentTypeAliasCondition
 		}
 	}
 }
-
-export type WorkspaceContentTypeAliasConditionConfig =
-	UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
-		/**
-		 * Define a content type alias in which workspace this extension should be available
-		 * @example
-		 * Depends on implementation, but i.e. "article", "image", "blockPage"
-		 */
-		match?: string;
-		/**
-		 * Define one or more content type aliases in which workspace this extension should be available
-		 * @example
-		 * ["article", "image", "blockPage"]
-		 */
-		oneOf?: Array<string>;
-	};
 
 export const manifest: ManifestCondition = {
 	type: 'condition',

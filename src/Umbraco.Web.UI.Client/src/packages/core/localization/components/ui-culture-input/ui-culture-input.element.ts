@@ -1,6 +1,6 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, query, state, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestLocalization } from '@umbraco-cms/backoffice/extension-registry';
@@ -59,24 +59,22 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 		return this._selectElement;
 	}
 
-	#onChange(event: UUIComboboxEvent) {
-		event.stopPropagation();
-		const target = event.target as UUIComboboxElement;
-
-		if (typeof target?.value === 'string') {
-			this.value = target.value;
-			this.dispatchEvent(new UmbChangeEvent());
-		}
+	#onCustomValidationChange(event: UUISelectEvent) {
+		this.value = event.target.value.toString();
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
-		return html` <uui-combobox value="${this.value}" @change=${this.#onChange}>
-			<uui-combobox-list>
-				${this._options.map(
-					(option) => html`<uui-combobox-list-option value="${option.value}">${option.name}</uui-combobox-list-option>`,
-				)}
-			</uui-combobox-list>
-		</uui-combobox>`;
+		return html`
+			<uui-select
+				style="margin-top: var(--uui-size-space-1)"
+				@change=${this.#onCustomValidationChange}
+				.options=${this._options.map((e) => ({
+					name: e.name,
+					value: e.value,
+					selected: e.value == this.value,
+				}))}></uui-select>
+		`;
 	}
 
 	static override styles = [

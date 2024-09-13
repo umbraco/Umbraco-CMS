@@ -1,10 +1,25 @@
-import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/extension-registry';
-export type {
-	UmbBlockDataType,
-	UmbBlockDataModel,
-	UmbBlockDataValueModel,
-	UmbBlockLayoutBaseModel,
-} from '@umbraco-cms/backoffice/extension-registry';
+export interface UmbBlockLayoutBaseModel {
+	contentUdi: string;
+	settingsUdi?: string | null;
+}
+
+export interface UmbBlockDataValueModel<ValueType = unknown> {
+	culture: string | null;
+	segment: string | null;
+	alias: string;
+	value: ValueType;
+}
+export interface UmbBlockDataModel {
+	key: string;
+	contentTypeKey: string;
+	values: Array<UmbBlockDataValueModel>;
+}
+
+export interface UmbBlockDataType {
+	//udi: string; // I want to try to leave these out for now [NL]
+	//contentTypeKey: string; // I want to try to leave these out for now [NL]
+	[key: string]: unknown;
+}
 
 export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel> {
 	layout: { [key: string]: Array<BlockLayoutType> | undefined };

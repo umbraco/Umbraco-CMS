@@ -9,6 +9,7 @@ import { manifests as entityBulkActionManifests } from './entity-bulk-action/man
 import { manifests as extensionManifests } from './extension-registry/manifests.js';
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
+import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
@@ -21,9 +22,9 @@ import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
-import type { ManifestTypes, UmbBackofficeManifestKind } from './extension-registry/index.js';
+import type { ManifestTypes, UmbExtensionManifestKind } from './extension-registry/index.js';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
 	...authManifests,
 	...collectionManifests,
 	...contentManifests,
@@ -35,6 +36,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...extensionManifests,
 	...iconRegistryManifests,
 	...localizationManifests,
+	...menuManifests,
 	...modalManifests,
 	...pickerManifests,
 	...propertyActionManifests,

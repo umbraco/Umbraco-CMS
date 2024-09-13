@@ -17,7 +17,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
 } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import { manifests as conditionManifests } from './condition/manifests.js';
+import { manifests as conditionManifests } from './conditions/manifests.js';
 import type {
 	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,

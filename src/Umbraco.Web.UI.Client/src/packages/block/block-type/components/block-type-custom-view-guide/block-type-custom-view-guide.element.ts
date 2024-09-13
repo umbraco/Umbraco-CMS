@@ -2,11 +2,12 @@ import { UMB_MANIFEST_VIEWER_MODAL } from '../../../modals/manifest-viewer/index
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, state, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { umbExtensionsRegistry, type ManifestBlockEditorCustomView } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { ManifestBlockEditorCustomView } from '@umbraco-cms/backoffice/block-custom-view';
 
 @customElement('umb-block-type-custom-view-guide')
 export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
@@ -88,7 +89,7 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 	async #generateManifest() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
-		const manifest = {
+		const manifest: UmbExtensionManifest = {
 			type: 'blockEditorCustomView',
 			alias: 'Local.blockEditorCustomView.' + this.#contentTypeAlias,
 			name: 'Block Editor Custom View for ' + this.#contentTypeName,

@@ -2,16 +2,16 @@ import { UmbBlockListEntryContext } from '../../context/block-list-entry.context
 import { UMB_BLOCK_LIST, type UmbBlockListLayoutModel } from '../../types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	ManifestBlockEditorCustomView,
-	UmbBlockEditorCustomViewProperties,
-	UmbPropertyEditorUiElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+} from '@umbraco-cms/backoffice/block-custom-view';
 
 /**
  * @element umb-block-list-entry

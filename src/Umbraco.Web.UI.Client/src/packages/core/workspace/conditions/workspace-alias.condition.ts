@@ -1,8 +1,8 @@
 import { UMB_WORKSPACE_CONTEXT, type UmbWorkspaceContext } from '../contexts/index.js';
+import type { WorkspaceAliasConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
-	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
@@ -33,21 +33,6 @@ export class UmbWorkspaceAliasCondition
 		}
 	}
 }
-
-export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceAlias'> & {
-	/**
-	 * Define the workspace that this extension should be available in
-	 * @example
-	 * "Umb.Workspace.Document"
-	 */
-	match?: string;
-	/**
-	 * Define one or more workspaces that this extension should be available in
-	 * @example
-	 * ["Umb.Workspace.Document", "Umb.Workspace.Media"]
-	 */
-	oneOf?: Array<string>;
-};
 
 export const manifest: ManifestCondition = {
 	type: 'condition',

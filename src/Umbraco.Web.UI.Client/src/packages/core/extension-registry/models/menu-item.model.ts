@@ -1,10 +1,9 @@
 import type { UmbMenuItemElement } from '../interfaces/menu-item-element.interface.js';
-import type { ConditionTypes } from '../conditions/types.js';
 import type { ManifestWithDynamicConditions, ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestMenuItem
 	extends ManifestElement<UmbMenuItemElement>,
-		ManifestWithDynamicConditions<ConditionTypes> {
+		ManifestWithDynamicConditions<UmbExtensionCondition> {
 	type: 'menuItem';
 	meta: MetaMenuItem;
 }
@@ -25,4 +24,14 @@ export interface ManifestMenuItemTreeKind extends ManifestMenuItem {
 export interface MetaMenuItemTreeKind extends MetaMenuItem {
 	treeAlias: string;
 	hideTreeRoot?: boolean;
+}
+
+export interface ManifestMenuItemLinkKind extends ManifestMenuItem {
+	type: 'menuItem';
+	kind: 'link';
+	meta: MetaMenuItemLinkKind;
+}
+
+export interface MetaMenuItemLinkKind extends MetaMenuItem {
+	href: string;
 }

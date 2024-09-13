@@ -1,6 +1,6 @@
-import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST: UmbBackofficeManifestKind = {
+export const UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.EntityBulkAction.Default',
 	matchKind: 'default',

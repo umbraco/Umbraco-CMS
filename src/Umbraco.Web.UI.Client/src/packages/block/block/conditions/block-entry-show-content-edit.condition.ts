@@ -1,5 +1,5 @@
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../context/block-entry.context-token.js';
-import type { BlockEntryShowContentEditConditionConfig } from '@umbraco-cms/backoffice/extension-registry';
+import type { BlockEntryShowContentEditConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

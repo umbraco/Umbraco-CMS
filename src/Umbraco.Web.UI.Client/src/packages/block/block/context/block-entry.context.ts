@@ -20,7 +20,7 @@ import type {
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export abstract class UmbBlockEntryContext<

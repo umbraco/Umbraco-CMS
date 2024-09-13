@@ -1,6 +1,9 @@
 import { UMB_USER_DETAIL_REPOSITORY_ALIAS, UMB_USER_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+import { manifests as createManifests } from './create/manifests.js';
+
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
@@ -93,4 +96,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [...entityActions];
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...entityActions, ...createManifests];

@@ -879,6 +879,7 @@ export default {
 		header: 'Kopf',
 		systemField: 'System Feld',
 		lastUpdated: 'Zuletzt geändert',
+		newVersionAvailable: 'Neue Version verfügbar',
 	},
 	colors: {
 		blue: 'Blau',
