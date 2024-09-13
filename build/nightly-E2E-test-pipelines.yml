@@ -186,6 +186,10 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             workingDirectory: $(Agent.BuildDirectory)/app
 
+          # Ensures we have the package wait-on installed
+          - pwsh: npm install wait-on
+            displayName: Install wait-on package
+
           # Wait for application to start responding to requests
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
             displayName: Wait for application
@@ -324,6 +328,10 @@ stages:
             displayName: Run application (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             workingDirectory: $(Agent.BuildDirectory)/app
+          
+          # Ensures we have the package wait-on installed
+          - pwsh: npm install wait-on
+            displayName: Install wait-on package
 
           # Wait for application to start responding to requests
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
