@@ -19,14 +19,10 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 	@state()
 	_editor!: Editor;
 
-	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-
+	protected override firstUpdated(): void {
 		const editor = this.shadowRoot?.querySelector('#editor');
 
 		if (!editor) return;
-
-		const json = this.value && typeof this.value === 'string' ? JSON.parse(this.value) : this.value;
 
 		this._editor = new Editor({
 			element: editor,
@@ -38,10 +34,9 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				Link.configure({ openOnClick: false }),
 				Underline,
 			],
-			content: json,
+			content: this.value.toString(),
 			onUpdate: ({ editor }) => {
-				const json = editor.getJSON();
-				this.value = JSON.stringify(json);
+				this.value = editor.getHTML();
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
