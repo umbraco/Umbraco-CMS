@@ -3,7 +3,6 @@ import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
-import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
 import type {
 	ManifestEntityAction,
 	ManifestEntityActionDeleteKind,
@@ -166,7 +165,6 @@ export type ManifestTypes =
 	| ManifestCurrentUserAction
 	| ManifestCurrentUserActionDefaultKind
 	| ManifestDashboard
-	| ManifestDashboardCollection
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
 	| ManifestEntityActions
