@@ -1,4 +1,9 @@
-import type { ManifestBase, ManifestKind } from '../types/index.js';
+import type {
+	ManifestBase,
+	ManifestKind,
+	ManifestWithDynamicConditions,
+	UmbConditionConfigBase,
+} from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
@@ -100,7 +105,25 @@ export class UmbExtensionRegistry<
 
 	private _kinds = new UmbBasicState<Array<ManifestKind<ManifestTypes>>>([]);
 	public readonly kinds = this._kinds.asObservable();
+
 	#exclusions: Array<string> = [];
+
+	#additionalConditions: Map<string, Array<UmbConditionConfigBase>> = new Map();
+	#appendAdditionalConditions(manifest: ManifestTypes) {
+		const newConditions = this.#additionalConditions.get(manifest.alias);
+		if (newConditions) {
+			// Append the condition to the extensions conditions array
+			if ((manifest as ManifestWithDynamicConditions).conditions) {
+				for (const condition of newConditions) {
+					(manifest as ManifestWithDynamicConditions).conditions!.push(condition);
+				}
+			} else {
+				(manifest as ManifestWithDynamicConditions).conditions = newConditions;
+			}
+			this.#additionalConditions.delete(manifest.alias);
+		}
+		return manifest;
+	}
 
 	defineKind(kind: ManifestKind<ManifestTypes>): void {
 		const extensionsValues = this._extensions.getValue();
@@ -136,12 +159,25 @@ export class UmbExtensionRegistry<
 	};
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
-		const isValid = this.#checkExtension(manifest);
+		const isValid = this.#validateExtension(manifest);
 		if (!isValid) {
 			return;
 		}
 
-		this._extensions.setValue([...this._extensions.getValue(), manifest as ManifestTypes]);
+		if (manifest.type === 'kind') {
+			this.defineKind(manifest as ManifestKind<ManifestTypes>);
+			return;
+		}
+
+		const isApproved = this.#isExtensionApproved(manifest);
+		if (!isApproved) {
+			return;
+		}
+
+		this._extensions.setValue([
+			...this._extensions.getValue(),
+			this.#appendAdditionalConditions(manifest as ManifestTypes),
+		]);
 	}
 
 	getAllExtensions(): Array<ManifestTypes> {
@@ -177,7 +213,7 @@ export class UmbExtensionRegistry<
 		return false;
 	}
 
-	#checkExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
+	#validateExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
 		if (!manifest.type) {
 			console.error(`Extension is missing type`, manifest);
 			return false;
@@ -188,11 +224,9 @@ export class UmbExtensionRegistry<
 			return false;
 		}
 
-		if (manifest.type === 'kind') {
-			this.defineKind(manifest as ManifestKind<ManifestTypes>);
-			return false;
-		}
-
+		return true;
+	}
+	#isExtensionApproved(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
 		if (!this.#acceptExtension(manifest as ManifestTypes)) {
 			return false;
 		}
@@ -429,5 +463,42 @@ export class UmbExtensionRegistry<
 			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
+	}
+
+	/**
+	 * Append a new condition to an existing extension
+	 * Useful to add a condition for example the Save And Publish workspace action shipped by core.
+	 * @param {string} alias - The alias of the extension to append the condition to.
+	 * @param  {UmbConditionConfigBase} newCondition - The condition to append to the extension.
+	 */
+	appendCondition(alias: string, newCondition: UmbConditionConfigBase) {
+		this.appendConditions(alias, [newCondition]);
+	}
+
+	/**
+	 * Appends an array of conditions to an existing extension
+	 * @param {string} alias  - The alias of the extension to append the condition to
+	 * @param {Array<UmbConditionConfigBase>} newConditions  - An array of conditions to be appended to an extension manifest.
+	 */
+	appendConditions(alias: string, newConditions: Array<UmbConditionConfigBase>) {
+		const existingConditionsToBeAdded = this.#additionalConditions.get(alias);
+		this.#additionalConditions.set(
+			alias,
+			existingConditionsToBeAdded ? [...existingConditionsToBeAdded, ...newConditions] : newConditions,
+		);
+
+		const allExtensions = this._extensions.getValue();
+		for (const extension of allExtensions) {
+			if (extension.alias === alias) {
+				// Replace the existing extension with the updated one
+				allExtensions[allExtensions.indexOf(extension)] = this.#appendAdditionalConditions(extension as ManifestTypes);
+
+				// Update the main extensions collection/observable
+				this._extensions.setValue(allExtensions);
+
+				//Stop the search:
+				break;
+			}
+		}
 	}
 }
