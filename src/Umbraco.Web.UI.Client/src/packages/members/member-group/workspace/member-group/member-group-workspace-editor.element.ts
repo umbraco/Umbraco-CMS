@@ -1,3 +1,4 @@
+import { UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -50,7 +51,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.MemberGroup" back-path="/section/member-management/view/member-groups">
+			<umb-workspace-editor alias="Umb.Workspace.MemberGroup" back-path=${UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH}>
 				${this.#renderActions()}
 				<div id="header" slot="header">
 					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}" ${umbFocus()}></uui-input>
