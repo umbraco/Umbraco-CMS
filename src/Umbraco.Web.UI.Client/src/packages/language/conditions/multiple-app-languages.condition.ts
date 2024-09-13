@@ -1,14 +1,12 @@
-import { UmbConditionBase } from './condition-base.controller.js';
+import type { UmbMultipleAppLanguageConditionConfig } from './types.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestCondition,
-	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
-
-export type UmbMultipleAppLanguageConditionConfig = UmbConditionConfigBase;
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbMultipleAppLanguageCondition
 	extends UmbConditionBase<UmbMultipleAppLanguageConditionConfig>
