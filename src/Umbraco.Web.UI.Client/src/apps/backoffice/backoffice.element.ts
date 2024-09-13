@@ -17,7 +17,7 @@ const CORE_PACKAGES = [
 	import('../../packages/data-type/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
-	import('../../packages/extension-insight/umbraco-package.js'),
+	import('../../packages/extension-insights/umbraco-package.js'),
 	import('../../packages/health-check/umbraco-package.js'),
 	import('../../packages/help/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
