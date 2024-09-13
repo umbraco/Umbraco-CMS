@@ -17,6 +17,7 @@
 		"./action": "./dist-cms/packages/core/action/index.js",
 		"./audit-log": "./dist-cms/packages/core/audit-log/index.js",
 		"./auth": "./dist-cms/packages/core/auth/index.js",
+		"./block-custom-view": "./dist-cms/packages/block/block-custom-view/index.js",
 		"./block-grid": "./dist-cms/packages/block/block-grid/index.js",
 		"./block-list": "./dist-cms/packages/block/block-list/index.js",
 		"./block-rte": "./dist-cms/packages/block/block-rte/index.js",
