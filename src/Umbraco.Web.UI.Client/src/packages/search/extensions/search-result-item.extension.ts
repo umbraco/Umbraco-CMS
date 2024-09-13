@@ -7,3 +7,9 @@ export interface ManifestSearchResultItem extends ManifestElement {
 	type: 'searchResultItem';
 	forEntityTypes: Array<string>;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbSearchResultItem: ManifestSearchResultItem;
+	}
+}

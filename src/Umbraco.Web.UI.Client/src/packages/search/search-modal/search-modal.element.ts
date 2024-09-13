@@ -10,13 +10,13 @@ import {
 	state,
 	property,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 import '../search-result/search-result-item.element.js';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import type { ManifestSearchResultItem } from '../extensions/index.js';
 
 type SearchProvider = {
 	name: string;

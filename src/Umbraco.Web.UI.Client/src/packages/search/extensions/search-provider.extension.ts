@@ -1,4 +1,4 @@
-import type { UmbSearchProvider, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchProvider, UmbSearchResultItemModel } from '../types.js';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
@@ -15,4 +15,10 @@ export interface MetaSearchProvider {
 	 * The label of the provider that is shown to the user.
 	 */
 	label?: string;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbSearchProvider: ManifestSearchProvider;
+	}
 }
