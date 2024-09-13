@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-backoffice/log-viewer",
+	"name": "@umbraco-backoffice/extension-insights",
 	"private": true,
 	"type": "module",
 	"scripts": {
