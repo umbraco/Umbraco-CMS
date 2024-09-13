@@ -1,7 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, LitElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import type { UmbBlockDataType, UmbBlockEditorCustomViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockEditorCustomViewElement } from '@umbraco-cms/backoffice/block-custom-view';
 
 // eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('example-block-custom-view')

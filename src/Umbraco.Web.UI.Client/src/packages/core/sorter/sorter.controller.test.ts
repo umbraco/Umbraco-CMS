@@ -148,10 +148,14 @@ describe('UmbSorterController', () => {
 	});
 
 	describe('enable', () => {
-		it('sets all allowed items to draggable', () => {
-			// [NL] I have experienced an issue with this test, it may need a little delay before testing for this. As the test relies on DOM.
+		it('sets all allowed items to draggable', async () => {
 			const items = element.getSortableItems();
 			expect(items.length).to.equal(3);
+
+			await aTimeout(100);
+			await element.updateComplete;
+
+			// Expect all items to be draggable
 			items.forEach((item) => {
 				expect(item.draggable).to.be.true;
 			});

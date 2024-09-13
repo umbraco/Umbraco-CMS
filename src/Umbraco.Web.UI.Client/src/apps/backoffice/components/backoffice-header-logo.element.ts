@@ -1,10 +1,10 @@
-import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
+import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
+import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
 
 @customElement('umb-backoffice-header-logo')
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
@@ -13,6 +13,11 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 	@state()
 	private _isUserAdmin = false;
+
+	@state()
+	private _serverUpgradeCheck = false;
+
+	#backofficeContext?: typeof UMB_BACKOFFICE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -26,6 +31,8 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				},
 				'_observeVersion',
 			);
+
+			this.#backofficeContext = context;
 		});
 
 		this.#isAdmin();
@@ -33,6 +40,10 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 	async #isAdmin() {
 		this._isUserAdmin = await isCurrentUserAnAdmin(this);
+
+		if (this._isUserAdmin) {
+			this._serverUpgradeCheck = this.#backofficeContext ? await this.#backofficeContext.serverUpgradeCheck() : false;
+		}
 	}
 
 	override render() {
@@ -50,6 +61,14 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 							height="82"
 							loading="lazy" />
 						<span>${this._version}</span>
+
+						${this._serverUpgradeCheck
+							? html`<uui-button
+									@click=${this.#openNewVersion}
+									color="danger"
+									label=${this.localize.term('general_newVersionAvailable')}></uui-button>`
+							: ''}
+
 						<a href="https://umbraco.com" target="_blank" rel="noopener">Umbraco.com</a>
 
 						${this._isUserAdmin
@@ -68,6 +87,14 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		modalManager
 			.open(this, UMB_SYSINFO_MODAL)
+			.onSubmit()
+			.catch(() => {});
+	}
+
+	async #openNewVersion() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager
+			.open(this, UMB_NEWVERSION_MODAL)
 			.onSubmit()
 			.catch(() => {});
 	}

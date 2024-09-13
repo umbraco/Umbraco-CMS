@@ -1,6 +1,4 @@
-import type { ManifestBlockEditorCustomView } from '@umbraco-cms/backoffice/extension-registry';
-
-export const manifests: Array<ManifestBlockEditorCustomView> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'blockEditorCustomView',
 		alias: 'Umb.blockEditorCustomView.TestView',

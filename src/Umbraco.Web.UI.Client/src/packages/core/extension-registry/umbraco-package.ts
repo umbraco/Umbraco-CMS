@@ -1,4 +1,4 @@
-import type { ManifestTypes } from './models/index.js';
+import './models/index.js';
 
 /**
  * Umbraco package manifest JSON
@@ -37,7 +37,7 @@ export interface UmbracoPackage {
 	 * @title An array of Umbraco package manifest types that will be installed
 	 * @required
 	 */
-	extensions: ManifestTypes[];
+	extensions: UmbExtensionManifest[];
 
 	/**
 	 * @title The importmap for the package
