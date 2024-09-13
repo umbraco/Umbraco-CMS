@@ -30,8 +30,8 @@ export class UmbContentPropertyDatasetContext<
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
 
-	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
-	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
+	#readOnly = new UmbBooleanState(false);
+	public readOnly = this.#readOnly.asObservable();
 
 	getEntityType(): string {
 		return this.#workspace.getEntityType();
@@ -49,8 +49,8 @@ export class UmbContentPropertyDatasetContext<
 		return this.#workspace.getVariant(this.#variantId);
 	}
 
-	getCurrentVariantCultureIsReadOnly() {
-		return this.#currentVariantCultureIsReadOnly.getValue();
+	getReadOnly() {
+		return this.#readOnly.getValue();
 	}
 
 	constructor(
@@ -76,7 +76,7 @@ export class UmbContentPropertyDatasetContext<
 			this.#workspace.readOnlyState.states,
 			(states) => {
 				const isReadOnly = states.some((state) => state.variantId.equal(this.#variantId));
-				this.#currentVariantCultureIsReadOnly.setValue(isReadOnly);
+				this.#readOnly.setValue(isReadOnly);
 			},
 			'umbObserveReadOnlyStates',
 		);

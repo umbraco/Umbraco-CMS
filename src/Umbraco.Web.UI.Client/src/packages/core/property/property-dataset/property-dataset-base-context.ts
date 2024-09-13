@@ -24,8 +24,8 @@ export class UmbPropertyDatasetContextBase
 	private _entityType!: string;
 	private _unique!: string;
 
-	#currentVariantCultureIsReadOnly = new UmbBooleanState(false);
-	public currentVariantCultureIsReadOnly = this.#currentVariantCultureIsReadOnly.asObservable();
+	#readOnly = new UmbBooleanState(false);
+	public readOnly = this.#readOnly.asObservable();
 
 	getEntityType() {
 		return this._entityType;
@@ -85,7 +85,7 @@ export class UmbPropertyDatasetContextBase
 	 * @return {*}  {boolean}
 	 * @memberof UmbBlockGridInlinePropertyDatasetContext
 	 */
-	getCurrentVariantCultureIsReadOnly(): boolean {
-		return this.#currentVariantCultureIsReadOnly.getValue();
+	getReadOnly(): boolean {
+		return this.#readOnly.getValue();
 	}
 }
