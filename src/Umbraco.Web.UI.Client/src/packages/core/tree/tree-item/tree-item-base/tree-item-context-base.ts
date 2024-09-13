@@ -8,10 +8,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
-import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -69,9 +68,9 @@ export abstract class UmbTreeItemContextBase<
 	readonly foldersOnly = this.#foldersOnly.asObservable();
 
 	treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
-	#sectionContext?: UmbSectionContext;
-	#sectionSidebarContext?: UmbSectionSidebarContext;
-	#actionEventContext?: UmbActionEventContext;
+	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
+	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	// TODO: get this from the tree context
 	#paging = {
