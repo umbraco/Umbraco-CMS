@@ -26,7 +26,7 @@ variables:
 
 parameters:
   - name: runSqlServerE2ETests
-    displayName: Run the Sql Server E2e Tests
+    displayName: Run the SQL Server E2E Tests
     type: boolean
     default: false
 
