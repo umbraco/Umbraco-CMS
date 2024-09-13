@@ -56,6 +56,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 				<div id="header" slot="header">
 					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}" ${umbFocus()}></uui-input>
 				</div>
+				<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>
 			</umb-workspace-editor>
 		`;
 	}
