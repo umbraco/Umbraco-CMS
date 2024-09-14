@@ -3,7 +3,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceContext',
 		name: 'Example Counter Workspace Context',
 		alias: 'example.workspaceCounter.counter',
-		js: () => import('./counter-workspace-context.js'),
+		api: () => import('./counter-workspace-context.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',

@@ -5,7 +5,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.RTE.Settings',
 		name: 'Block List Type Workspace Settings View',
-		js: () => import('./block-rte-type-workspace-view.element.js'),
+		element: () => import('./block-rte-type-workspace-view.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_settings',

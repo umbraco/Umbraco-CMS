@@ -34,7 +34,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Content',
 		name: 'Block Workspace Content View',
-		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_content',
@@ -59,7 +59,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Settings',
 		name: 'Block Workspace Settings View',
-		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 900,
 		meta: {
 			label: '#general_settings',

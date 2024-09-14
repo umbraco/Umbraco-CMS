@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.BlockGrid',
 		name: 'Block Grid Property Editor UI',
-		js: () => import('./property-editor-ui-block-grid.element.js'),
+		element: () => import('./property-editor-ui-block-grid.element.js'),
 		meta: {
 			label: 'Block Grid',
 			propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS,

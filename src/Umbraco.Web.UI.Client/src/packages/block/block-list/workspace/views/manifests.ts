@@ -5,7 +5,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockType.List.Settings',
 		name: 'Block List Type Workspace Settings View',
-		js: () => import('./block-list-type-workspace-view.element.js'),
+		element: () => import('./block-list-type-workspace-view.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#blockEditor_tabBlockSettings',

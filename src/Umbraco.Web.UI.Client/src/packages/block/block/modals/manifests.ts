@@ -5,7 +5,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.BlockCatalogue',
 		name: 'Block Catalogue Modal',
-		js: () => import('./block-catalogue/block-catalogue-modal.element.js'),
+		element: () => import('./block-catalogue/block-catalogue-modal.element.js'),
 	},
 ];
 

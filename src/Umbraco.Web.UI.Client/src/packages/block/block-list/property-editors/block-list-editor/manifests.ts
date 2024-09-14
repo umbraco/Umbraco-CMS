@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.BlockList',
 		name: 'Block List Property Editor UI',
-		js: () => import('./property-editor-ui-block-list.element.js'),
+		element: () => import('./property-editor-ui-block-list.element.js'),
 		meta: {
 			label: 'Block List',
 			propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS,
