@@ -43,7 +43,7 @@ public interface IMigrationContext
     /// </summary>
     [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
     void AddPostMigration<TMigration>()
-        where TMigration : MigrationBase;
+        where TMigration : AsyncMigrationBase;
 
     bool IsCompleted { get; }
 

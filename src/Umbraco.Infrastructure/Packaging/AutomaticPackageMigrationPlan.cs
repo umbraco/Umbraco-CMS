@@ -21,8 +21,7 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
     /// <param name="packageName">The package name that the plan is for. If the package has a package.manifest these must match.</param>
     protected AutomaticPackageMigrationPlan(string packageName)
         : this(packageName, packageName)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AutomaticPackageMigrationPlan" /> class.
@@ -31,8 +30,7 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
     /// <param name="planName">The plan name for the package. This should be the same name as the package name, if there is only one plan in the package.</param>
     protected AutomaticPackageMigrationPlan(string packageName, string planName)
         : this(null!, packageName, planName)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AutomaticPackageMigrationPlan" /> class.
@@ -42,8 +40,7 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
     /// <param name="planName">The plan name for the package. This should be the same name as the package name, if there is only one plan in the package.</param>
     protected AutomaticPackageMigrationPlan(string packageId, string packageName, string planName)
         : base(packageId, packageName, planName)
-    {
-    }
+    { }
 
     /// <inheritdoc />
     protected sealed override void DefinePlan()
@@ -59,7 +56,7 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
     /// <summary>
     /// Provides a migration that imports an embedded package data manifest.
     /// </summary>
-    private class MigrateToPackageData : PackageMigrationBase
+    private sealed class MigrateToPackageData : AsyncPackageMigrationBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrateToPackageData" /> class.
@@ -82,15 +79,16 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
             IMigrationContext context,
             IOptions<PackageMigrationSettings> options)
             : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context, options)
-        {
-        }
+        { }
 
         /// <inheritdoc />
-        protected override void Migrate()
+        protected override Task MigrateAsync()
         {
             var plan = (AutomaticPackageMigrationPlan)Context.Plan;
 
             ImportPackage.FromEmbeddedResource(plan.GetType()).Do();
+
+            return Task.CompletedTask;
         }
     }
 }

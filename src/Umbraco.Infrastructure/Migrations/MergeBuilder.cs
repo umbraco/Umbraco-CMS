@@ -25,7 +25,7 @@ public class MergeBuilder
     ///     Adds a transition to a target state through a migration.
     /// </summary>
     public MergeBuilder To<TMigration>(string targetState)
-        where TMigration : MigrationBase
+        where TMigration : AsyncMigrationBase
         => To(targetState, typeof(TMigration));
 
     /// <summary>

@@ -115,9 +115,9 @@ public class MigrationPlan
             throw new ArgumentNullException(nameof(migration));
         }
 
-        if (!migration.Implements<MigrationBase>())
+        if (!migration.Implements<AsyncMigrationBase>())
         {
-            throw new ArgumentException($"Type {migration.Name} does not implement IMigration.", nameof(migration));
+            throw new ArgumentException($"Type {migration.Name} does not implement AsyncMigrationBase.", nameof(migration));
         }
 
         sourceState = sourceState.Trim();
@@ -155,11 +155,11 @@ public class MigrationPlan
     ///     Adds a transition to a target state through a migration.
     /// </summary>
     public MigrationPlan To<TMigration>(string targetState)
-        where TMigration : MigrationBase
+        where TMigration : AsyncMigrationBase
         => To(targetState, typeof(TMigration));
 
     public MigrationPlan To<TMigration>(Guid targetState)
-        where TMigration : MigrationBase
+        where TMigration : AsyncMigrationBase
         => To(targetState, typeof(TMigration));
 
     /// <summary>
@@ -191,8 +191,8 @@ public class MigrationPlan
     /// </param>
     /// <param name="targetState">The new target state.</param>
     public MigrationPlan ToWithReplace<TMigrationNew, TMigrationRecover>(string recoverState, string targetState)
-        where TMigrationNew : MigrationBase
-        where TMigrationRecover : MigrationBase
+        where TMigrationNew : AsyncMigrationBase
+        where TMigrationRecover : AsyncMigrationBase
     {
         To<TMigrationNew>(targetState);
         From(recoverState).To<TMigrationRecover>(targetState);
@@ -206,7 +206,7 @@ public class MigrationPlan
     /// <param name="recoverState">The previous target state, which we can recover from directly.</param>
     /// <param name="targetState">The new target state.</param>
     public MigrationPlan ToWithReplace<TMigrationNew>(string recoverState, string targetState)
-        where TMigrationNew : MigrationBase
+        where TMigrationNew : AsyncMigrationBase
     {
         To<TMigrationNew>(targetState);
         From(recoverState).To(targetState);

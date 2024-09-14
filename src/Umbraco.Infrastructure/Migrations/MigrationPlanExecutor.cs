@@ -117,8 +117,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
     }
 
-    public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
-
     /// <summary>
     ///     Executes the plan.
     /// </summary>
@@ -129,13 +127,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
     /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
     /// </remarks>
-    public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState)
+    public async Task<ExecutedMigrationPlan> ExecutePlanAsync(MigrationPlan plan, string fromState)
     {
         plan.Validate();
 
-        ExecutedMigrationPlan result = RunMigrationPlan(plan, fromState);
+        ExecutedMigrationPlan result = await RunMigrationPlanAsync(plan, fromState).ConfigureAwait(false);
 
-        HandlePostMigrations(result);
+        await HandlePostMigrationsAsync(result).ConfigureAwait(false);
 
         // If any completed migration requires us to rebuild cache we'll do that.
         if (_rebuildCache)
@@ -147,14 +145,14 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         // If any completed migration requires us to sign out the user we'll do that.
         if (_invalidateBackofficeUserAccess)
         {
-            RevokeBackofficeTokens().GetAwaiter().GetResult(); // should async all the way up at some point
+            await RevokeBackofficeTokens().ConfigureAwait(false);
         }
 
         return result;
     }
 
     [Obsolete]
-    private void HandlePostMigrations(ExecutedMigrationPlan result)
+    private async Task HandlePostMigrationsAsync(ExecutedMigrationPlan result)
     {
         // prepare and de-duplicate post-migrations, only keeping the 1st occurence
         var executedTypes = new HashSet<Type>();
@@ -171,8 +169,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     }
 
                     _logger.LogInformation("PostMigration: {migrationContextFullName}.", migrationContextPostMigration.FullName);
-                    MigrationBase postMigration = _migrationBuilder.Build(migrationContextPostMigration, executedMigrationContext);
-                    postMigration.Run();
+                    AsyncMigrationBase postMigration = _migrationBuilder.Build(migrationContextPostMigration, executedMigrationContext);
+                    await postMigration.RunAsync().ConfigureAwait(false);
 
                     executedTypes.Add(migrationContextPostMigration);
                 }
@@ -180,7 +178,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
     }
 
-    private ExecutedMigrationPlan RunMigrationPlan(MigrationPlan plan, string fromState)
+    private async Task<ExecutedMigrationPlan> RunMigrationPlanAsync(MigrationPlan plan, string fromState)
     {
         _logger.LogInformation("Starting '{MigrationName}'...", plan.Name);
         var nextState = fromState;
@@ -201,13 +199,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
             try
             {
-                if (transition.MigrationType.IsAssignableTo(typeof(UnscopedMigrationBase)))
+                if (transition.MigrationType.IsAssignableTo(typeof(UnscopedAsyncMigrationBase)))
                 {
-                    executedMigrationContexts.Add(RunUnscopedMigration(transition, plan));
+                    executedMigrationContexts.Add(await RunUnscopedMigrationAsync(transition, plan).ConfigureAwait(false));
                 }
                 else
                 {
-                    executedMigrationContexts.Add(RunScopedMigration(transition, plan));
+                    executedMigrationContexts.Add(await RunScopedMigrationAsync(transition, plan).ConfigureAwait(false));
                 }
             }
             catch (Exception exception)
@@ -226,7 +224,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     ExecutedMigrationContexts = executedMigrationContexts
                 };
             }
-
 
             IEnumerable<IMigrationContext> nonCompletedMigrationsContexts = executedMigrationContexts.Where(x => x.IsCompleted is false);
             if (nonCompletedMigrationsContexts.Any())
@@ -283,12 +280,12 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         };
     }
 
-    private MigrationContext RunUnscopedMigration(MigrationPlan.Transition transition, MigrationPlan plan)
+    private async Task<MigrationContext> RunUnscopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
         var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), () => OnComplete(plan, transition.TargetState));
 
-        RunMigration(transition.MigrationType, context);
+        await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
 
         return context;
     }
@@ -298,7 +295,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _keyValueService.SetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, targetState);
     }
 
-    private MigrationContext RunScopedMigration(MigrationPlan.Transition transition, MigrationPlan plan)
+    private async Task<MigrationContext> RunScopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         // We want to suppress scope (service, etc...) notifications during a migration plan
         // execution. This is because if a package that doesn't have their migration plan
@@ -313,7 +310,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                 _loggerFactory.CreateLogger<MigrationContext>(),
                 () => OnComplete(plan, transition.TargetState));
 
-            RunMigration(transition.MigrationType, context);
+            await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
 
             // Ensure we mark the context as complete before the scope completes
             context.Complete();
@@ -324,10 +321,10 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
     }
 
-    private void RunMigration(Type migrationType, MigrationContext context)
+    private async Task RunMigrationAsync(Type migrationType, MigrationContext context)
     {
-        MigrationBase migration = _migrationBuilder.Build(migrationType, context);
-        migration.Run();
+        AsyncMigrationBase migration = _migrationBuilder.Build(migrationType, context);
+        await migration.RunAsync().ConfigureAwait(false);
 
         // If the migration requires clearing the cache set the flag, this will automatically only happen if it succeeds
         // Otherwise it'll error out before and return.

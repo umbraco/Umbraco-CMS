@@ -1,14 +1,12 @@
+
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
-public class NoopMigration : MigrationBase
+public class NoopMigration : AsyncMigrationBase
 {
     public NoopMigration(IMigrationContext context)
         : base(context)
-    {
-    }
+    { }
 
-    protected override void Migrate()
-    {
-        // nop
-    }
+    protected override Task MigrateAsync()
+        => Task.CompletedTask;
 }
