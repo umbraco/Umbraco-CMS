@@ -1,7 +1,6 @@
 import { UMB_CREATE_USER_CLIENT_CREDENTIAL_MODAL_ALIAS } from './constants.js';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: UMB_CREATE_USER_CLIENT_CREDENTIAL_MODAL_ALIAS,

@@ -1,3 +1,3 @@
 import { manifests as modalManifests } from './modal/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [...modalManifests];
+export const manifests: Array<UmbExtensionManifest> = [...modalManifests];
