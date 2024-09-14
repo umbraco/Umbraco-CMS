@@ -73,7 +73,7 @@ export class UmbMemberCreateOptionsModalElement extends UmbModalBaseElement<
 					(option) => html`
 						<uui-ref-node
 							.name=${this.localize.string(option.label)}
-							@open=${(event) => this.#onOpen(event, option.unique)}>
+							@open=${(event: Event) => this.#onOpen(event, option.unique)}>
 							<umb-icon slot="icon" name=${option.icon || 'icon-circle-dotted'}></umb-icon>
 						</uui-ref-node>
 					`,
