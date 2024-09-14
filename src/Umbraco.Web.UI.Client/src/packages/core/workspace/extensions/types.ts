@@ -14,28 +14,11 @@ import type {
 } from './workspace-view.model.js';
 import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
 
-export type {
-	ManifestWorkspaceAction,
-	MetaWorkspaceAction,
-	ManifestWorkspaceActionDefaultKind,
-	MetaWorkspaceActionDefaultKind,
-} from './workspace-action.model.js';
-export type {
-	ManifestWorkspaceFooterApp,
-	ManifestWorkspaceFooterAppMenuBreadcrumbKind,
-	ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
-} from './workspace-footer-app.model.js';
-export type {
-	UmbWorkspaceViewElement,
-	ManifestWorkspaceView,
-	ManifestWorkspaceViewContentTypeDesignEditorKind,
-} from './workspace-view.model.js';
-export type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
-export type {
-	ManifestWorkspaceActionMenuItem,
-	ManifestWorkspaceActionMenuItemDefaultKind,
-	MetaWorkspaceActionMenuItemDefaultKind,
-} from './workspace-action-menu-item.model.js';
+export type * from './workspace-action.model.js';
+export type * from './workspace-footer-app.model.js';
+export type * from './workspace-view.model.js';
+export type * from './workspace.model.js';
+export type * from './workspace-action-menu-item.model.js';
 
 export type ManifestWorkspaceFooterApps =
 	| ManifestWorkspaceFooterApp
