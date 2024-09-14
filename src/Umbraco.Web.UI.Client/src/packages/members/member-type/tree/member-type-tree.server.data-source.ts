@@ -2,10 +2,7 @@ import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '.
 import type { UmbMemberTypeTreeItemModel } from './types.js';
 import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type {
-	MemberTypeTreeItemResponseModel,
-	NamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { MemberTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

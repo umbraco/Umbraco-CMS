@@ -1,3 +1,4 @@
+import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import type {
 	UmbMemberCreateOptionsModalData,
 	UmbMemberCreateOptionsModalValue,
@@ -7,7 +8,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 import { UmbMemberTypeTreeRepository } from '@umbraco-cms/backoffice/member-type';
-import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN, UMB_MEMBER_WORKSPACE_PATH } from '../../paths.js';
 
 const elementName = 'umb-member-create-options-modal';
 @customElement(elementName)
