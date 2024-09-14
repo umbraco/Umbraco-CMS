@@ -1,6 +1,7 @@
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
+import { UmbUserKind } from '../../../utils/index.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -19,7 +20,6 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 import './column-layouts/name/user-table-name-column-layout.element.js';
 import './column-layouts/status/user-table-status-column-layout.element.js';
-import { UmbUserKind } from '../../../utils/index.js';
 
 @customElement('umb-user-table-collection-view')
 export class UmbUserTableCollectionViewElement extends UmbLitElement {

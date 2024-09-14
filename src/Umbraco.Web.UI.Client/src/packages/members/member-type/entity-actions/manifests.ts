@@ -29,4 +29,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			itemRepositoryAlias: UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS,
 		},
 	},
+	...duplicateManifests,
 ];

@@ -104,7 +104,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
 	 * @attr
-	 * @default false
+	 * @default
 	 */
 	@property({ type: Boolean, reflect: true })
 	public get readonly() {
