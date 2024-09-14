@@ -16,3 +16,11 @@ export interface ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind extends Man
 	type: 'workspaceFooterApp';
 	kind: 'variantMenuBreadcrumb';
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		ManifestWorkspaceFooterApp: ManifestWorkspaceFooterApp;
+		ManifestWorkspaceFooterAppMenuBreadcrumbKind: ManifestWorkspaceFooterAppMenuBreadcrumbKind;
+		ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind: ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
+	}
+}

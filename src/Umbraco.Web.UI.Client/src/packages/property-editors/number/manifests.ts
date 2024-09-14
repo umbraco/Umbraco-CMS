@@ -1,8 +1,7 @@
 import { manifests as decimalSchemaManifests } from './Umbraco.Decimal.js';
 import { manifests as integerSchemaManifests } from './Umbraco.Integer.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Decimal',

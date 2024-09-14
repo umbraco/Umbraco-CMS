@@ -1,7 +1,6 @@
 import { UMB_RELATION_TYPE_ROOT_ENTITY_TYPE } from '../relation-types/index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		alias: 'Umb.MenuItem.Relations',

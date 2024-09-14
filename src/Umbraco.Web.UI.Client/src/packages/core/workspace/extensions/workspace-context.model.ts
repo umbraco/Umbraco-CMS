@@ -5,3 +5,9 @@ export interface ManifestWorkspaceContext
 		ManifestApi<UmbApi> {
 	type: 'workspaceContext';
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		ManifestWorkspaceContext: ManifestWorkspaceContext;
+	}
+}

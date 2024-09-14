@@ -3,9 +3,8 @@ import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js
 import { UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS } from '../repository/item/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as renameManifests } from './rename/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const partialViewActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
@@ -17,6 +16,6 @@ const partialViewActions: Array<ManifestTypes> = [
 			itemRepositoryAlias: UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS,
 		},
 	},
+	...createManifests,
+	...renameManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...partialViewActions, ...createManifests, ...renameManifests];

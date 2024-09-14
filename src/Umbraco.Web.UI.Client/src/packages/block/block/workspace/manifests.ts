@@ -1,8 +1,7 @@
 import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',

@@ -4,7 +4,7 @@ import type { UmbInputTemplateElement } from '@umbraco-cms/backoffice/template';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 import '@umbraco-cms/backoffice/template'; // TODO: This is needed to register the <umb-input-template> element, but it should be done in a better way without importing the whole module.
 

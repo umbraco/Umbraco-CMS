@@ -1,6 +1,5 @@
 import { manifest as textBoxSchemaManifest } from './Umbraco.TextBox.js';
 import { manifest as emailSchemaManifest } from './Umbraco.EmailAddress.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: we don't really want this config value to be changed from the UI. We need a way to handle hidden config properties.
 const inputTypeConfig = {
@@ -10,7 +9,7 @@ const inputTypeConfig = {
 	propertyEditorUiAlias: 'Umb.PropertyEditorUi.Label',
 };
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.TextBox',

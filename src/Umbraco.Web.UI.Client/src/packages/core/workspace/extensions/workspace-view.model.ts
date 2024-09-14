@@ -1,9 +1,12 @@
-import type { UmbWorkspaceViewElement } from '../interfaces/workspace-view-element.interface.js';
 import type {
 	ManifestWithDynamicConditions,
 	ManifestWithView,
 	MetaManifestWithView,
 } from '@umbraco-cms/backoffice/extension-api';
+
+export interface UmbWorkspaceViewElement extends HTMLElement {
+	manifest?: ManifestWorkspaceView;
+}
 
 export interface ManifestWorkspaceView<MetaType extends MetaWorkspaceView = MetaWorkspaceView>
 	extends ManifestWithView<UmbWorkspaceViewElement>,
@@ -28,4 +31,12 @@ export interface ManifestWorkspaceViewContentTypeDesignEditorKind extends Manife
 
 export interface MetaWorkspaceViewContentTypeDesignEditorKind extends MetaWorkspaceView {
 	compositionRepositoryAlias?: string;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		ManifestWorkspaceView: ManifestWorkspaceView;
+		ManifestWorkspaceViewCollectionKind: ManifestWorkspaceViewCollectionKind;
+		ManifestWorkspaceViewContentTypeDesignEditorKind: ManifestWorkspaceViewContentTypeDesignEditorKind;
+	}
 }

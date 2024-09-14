@@ -17,7 +17,7 @@ import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from 
 import type {
 	ManifestWorkspaceViewContentTypeDesignEditorKind,
 	UmbWorkspaceViewElement,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

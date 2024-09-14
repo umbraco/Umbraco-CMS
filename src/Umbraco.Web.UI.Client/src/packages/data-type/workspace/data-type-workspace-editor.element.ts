@@ -3,7 +3,7 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 /**
  * @element umb-data-type-workspace-editor

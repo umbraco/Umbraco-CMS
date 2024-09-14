@@ -1,24 +1,18 @@
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: 'Umb.Workspace.UserGroup',
-	name: 'User Group Workspace',
-	api: () => import('./user-group-workspace.context.js'),
-	meta: {
-		entityType: 'user-group',
-	},
-};
+export const UMB_USER_GROUP_WORKSPACE_ALIAS = 'Umb.Workspace.UserGroup';
 
-const workspaceViews: Array<ManifestWorkspaceView> = [];
-const workspaceActions: Array<ManifestWorkspaceActions> = [
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_USER_GROUP_WORKSPACE_ALIAS,
+		name: 'User Group Workspace',
+		api: () => import('./user-group-workspace.context.js'),
+		meta: {
+			entityType: 'user-group',
+		},
+	},
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -33,10 +27,8 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_USER_GROUP_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

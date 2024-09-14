@@ -8,7 +8,7 @@ import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
 

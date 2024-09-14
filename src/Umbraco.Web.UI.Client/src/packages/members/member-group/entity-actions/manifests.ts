@@ -3,9 +3,8 @@ import {
 	UMB_MEMBER_GROUP_ITEM_REPOSITORY_ALIAS,
 } from '../repository/index.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
@@ -18,5 +17,3 @@ const entityActions: Array<ManifestTypes> = [
 		},
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions];

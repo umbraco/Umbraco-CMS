@@ -1,7 +1,6 @@
 import type { ManifestLocalization } from '../extension-registry/models/localization.model.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const localizationManifests: Array<ManifestLocalization> = [
+export const manifests: Array<ManifestLocalization> = [
 	{
 		type: 'localization',
 		alias: 'Umb.Localization.Bs',
@@ -253,5 +252,3 @@ const localizationManifests: Array<ManifestLocalization> = [
 		js: () => import('../../../assets/lang/zh-tw.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...localizationManifests];
