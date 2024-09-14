@@ -8,3 +8,9 @@ export interface ManifestTree extends ManifestElementAndApi, ManifestWithDynamic
 export interface MetaTree {
 	repositoryAlias: string;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		umbTree: ManifestTree;
+	}
+}

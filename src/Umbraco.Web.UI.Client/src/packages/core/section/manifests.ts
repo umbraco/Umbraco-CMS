@@ -1,4 +1,4 @@
-import { manifest as sectionUserPermissionConditionManifest } from './conditions/section-user-permission.condition.js';
+import { manifests as sectionUserPermissionConditionManifests } from './conditions/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -8,6 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Section Picker Modal',
 		element: () => import('./section-picker-modal/section-picker-modal.element.js'),
 	},
-	sectionUserPermissionConditionManifest,
+	...sectionUserPermissionConditionManifests,
 	...repositoryManifests,
 ];
