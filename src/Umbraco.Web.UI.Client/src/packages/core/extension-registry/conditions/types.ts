@@ -1,14 +1,12 @@
 import type { CollectionAliasConditionConfig } from '../../collection/collection-alias.manifest.js';
 import type { CollectionBulkActionPermissionConditionConfig } from '../../collection/collection-bulk-action-permission.manifest.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
-import type { UmbMultipleAppLanguageConditionConfig } from './multiple-app-languages.condition.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
 export type ConditionTypes =
 	| CollectionAliasConditionConfig
 	| CollectionBulkActionPermissionConditionConfig
 	| SwitchConditionConfig
-	| UmbMultipleAppLanguageConditionConfig
 	| UmbConditionConfigBase;
 
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
