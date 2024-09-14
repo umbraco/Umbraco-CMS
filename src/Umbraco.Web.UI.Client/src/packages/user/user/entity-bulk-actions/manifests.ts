@@ -1,9 +1,8 @@
 import { UMB_USER_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
-import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
-const entityActions: Array<ManifestEntityBulkAction> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	/* TODO: Implement SetGroup entity action
 	{
 		type: 'entityBulkAction',
@@ -75,5 +74,3 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions];

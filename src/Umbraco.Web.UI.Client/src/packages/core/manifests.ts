@@ -22,9 +22,9 @@ import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
-import type { ManifestTypes, UmbExtensionManifestKind } from './extension-registry/index.js';
+import type { UmbExtensionManifestKind } from './extension-registry/index.js';
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...authManifests,
 	...collectionManifests,
 	...contentManifests,

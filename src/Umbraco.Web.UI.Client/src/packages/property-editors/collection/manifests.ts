@@ -3,7 +3,7 @@ import { manifest as columnConfiguration } from './config/column/manifests.js';
 import { manifest as layoutConfiguration } from './config/layout/manifests.js';
 import { manifest as orderBy } from './config/order-by/manifests.js';
 import { manifest as schema } from './Umbraco.ListView.js';
-import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -95,7 +95,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	propertyEditorUiManifest,
 	bulkActionPermissions,
 	columnConfiguration,

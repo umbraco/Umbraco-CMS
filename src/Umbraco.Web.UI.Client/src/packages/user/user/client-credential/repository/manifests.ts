@@ -1,7 +1,6 @@
 import { UMB_USER_CLIENT_CREDENTIAL_REPOSITORY_ALIAS } from './constants.js';
-import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'repository',
 		alias: UMB_USER_CLIENT_CREDENTIAL_REPOSITORY_ALIAS,
