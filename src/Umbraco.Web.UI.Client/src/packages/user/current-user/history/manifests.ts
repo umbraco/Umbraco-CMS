@@ -1,6 +1,4 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const userProfileApps: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'userProfileApp',
 		alias: 'Umb.UserProfileApp.CurrentUser.History',
@@ -19,4 +17,3 @@ export const userProfileApps: Array<ManifestTypes> = [
 		api: () => import('./current-user-history.store.js'),
 	},
 ];
-export const manifests: Array<ManifestTypes> = [...userProfileApps];

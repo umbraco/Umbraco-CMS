@@ -3,9 +3,8 @@ import { UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/in
 import { UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbCreateMemberTypeEntityAction } from './create.action.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -30,6 +29,5 @@ const entityActions: Array<ManifestTypes> = [
 			itemRepositoryAlias: UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS,
 		},
 	},
+	...duplicateManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...duplicateManifests];

@@ -5,10 +5,10 @@ import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
+	type ManifestWorkspace,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbClassState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { decodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import {

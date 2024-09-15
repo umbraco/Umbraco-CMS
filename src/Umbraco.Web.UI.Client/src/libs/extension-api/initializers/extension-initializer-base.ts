@@ -3,7 +3,6 @@ import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
@@ -11,7 +10,7 @@ import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
  */
 export abstract class UmbExtensionInitializerBase<
 	Key extends string,
-	T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
+	T extends ManifestBase = SpecificManifestTypeOrManifestBase<UmbExtensionManifest, Key>,
 > extends UmbControllerBase {
 	protected host;
 	protected extensionRegistry;

@@ -5,9 +5,8 @@ import {
 } from '../index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
@@ -19,6 +18,6 @@ const entityActions: Array<ManifestTypes> = [
 			itemRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_ITEM_REPOSITORY_ALIAS,
 		},
 	},
+	...createManifests,
+	...moveManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...createManifests, ...moveManifests];

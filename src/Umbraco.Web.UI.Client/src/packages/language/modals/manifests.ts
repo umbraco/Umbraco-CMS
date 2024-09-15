@@ -1,6 +1,4 @@
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const modals: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.LanguagePicker',
@@ -8,5 +6,3 @@ const modals: Array<ManifestModal> = [
 		js: () => import('./language-picker/language-picker-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...modals];

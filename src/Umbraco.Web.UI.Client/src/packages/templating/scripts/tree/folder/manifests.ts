@@ -1,18 +1,15 @@
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.Script.Folder';
-
-const folderRepository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS,
-	name: 'Script Folder Repository',
-	api: () => import('./script-folder.repository.js'),
-};
-
 export const UMB_DELETE_SCRIPT_FOLDER_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Script.Folder.Delete';
 
-const entityActions = [
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'repository',
+		alias: UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS,
+		name: 'Script Folder Repository',
+		api: () => import('./script-folder.repository.js'),
+	},
 	{
 		type: 'entityAction',
 		kind: 'folderDelete',
@@ -24,5 +21,3 @@ const entityActions = [
 		},
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];

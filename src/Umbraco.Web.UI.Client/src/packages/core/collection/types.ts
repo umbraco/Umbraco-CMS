@@ -2,6 +2,8 @@ import type { ManifestCollection } from './extensions/index.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
+export type * from './extensions/index.js';
+
 export interface UmbCollectionBulkActionPermissions {
 	allowBulkCopy: boolean;
 	allowBulkDelete: boolean;

@@ -2,9 +2,8 @@ import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DICTIONARY_TREE_ALIAS, UMB_DICTIONARY_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
 import { UMB_MOVE_DICTIONARY_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'moveTo',
@@ -17,6 +16,5 @@ const entityActions: Array<ManifestTypes> = [
 			treeAlias: UMB_DICTIONARY_TREE_ALIAS,
 		},
 	},
+	...repositoryManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...repositoryManifests];

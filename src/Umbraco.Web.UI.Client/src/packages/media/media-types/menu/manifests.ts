@@ -1,7 +1,6 @@
 import { UMB_MEDIA_TYPE_TREE_ALIAS } from '../tree/index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',

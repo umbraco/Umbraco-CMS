@@ -1,25 +1,22 @@
-import type { ManifestSection, ManifestSectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
 const sectionAlias = 'Umb.Section.Packages';
 
-const section: ManifestSection = {
-	type: 'section',
-	alias: sectionAlias,
-	name: 'Packages Section',
-	weight: 700,
-	meta: {
-		label: '#sections_packages',
-		pathname: 'packages',
-	},
-	conditions: [
-		{
-			alias: 'Umb.Condition.SectionUserPermission',
-			match: sectionAlias,
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'section',
+		alias: sectionAlias,
+		name: 'Packages Section',
+		weight: 700,
+		meta: {
+			label: '#sections_packages',
+			pathname: 'packages',
 		},
-	],
-};
-
-const sectionsViews: Array<ManifestSectionView> = [
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionUserPermission',
+				match: sectionAlias,
+			},
+		],
+	},
 	{
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Packages.Marketplace',
@@ -75,5 +72,3 @@ const sectionsViews: Array<ManifestSectionView> = [
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [section, ...sectionsViews];

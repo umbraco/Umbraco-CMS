@@ -3,10 +3,9 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...createManifests,
 	{
 		type: 'entityAction',
@@ -24,6 +23,6 @@ const entityActions: Array<ManifestTypes> = [
 			},
 		],
 	},
+	...moveManifests,
+	...sortChildrenOfManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...moveManifests, ...sortChildrenOfManifests];

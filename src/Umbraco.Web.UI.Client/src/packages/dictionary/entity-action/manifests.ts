@@ -1,9 +1,8 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -54,9 +53,6 @@ const entityActions: Array<ManifestTypes> = [
 			detailRepositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
-];
-
-const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Dictionary.Export',
@@ -69,6 +65,5 @@ const modals: Array<ManifestModal> = [
 		name: 'Import Dictionary Modal',
 		element: () => import('./import/import-dictionary-modal.element.js'),
 	},
+	...moveManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...modals, ...moveManifests];

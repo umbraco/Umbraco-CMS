@@ -3,7 +3,7 @@ import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.con
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 

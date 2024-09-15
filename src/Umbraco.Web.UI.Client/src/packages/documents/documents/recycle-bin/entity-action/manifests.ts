@@ -7,13 +7,12 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_MOVE,
 } from '../../user-permissions/constants.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/recycle-bin';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'trash',

@@ -1,4 +1,4 @@
-import type { UmbWorkspaceActionMenuItem } from '../../workspace/components/workspace-action-menu-item/workspace-action-menu-item.interface.js';
+import type { UmbWorkspaceActionMenuItem } from '../components/workspace-action-menu-item/workspace-action-menu-item.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
@@ -47,4 +47,11 @@ export interface MetaWorkspaceActionMenuItemDefaultKind extends MetaWorkspaceAct
 	 * ]
 	 */
 	label: string;
+}
+
+declare global {
+	interface UmbExtensionManifestMap {
+		ManifestWorkspaceActionMenuItem: ManifestWorkspaceActionMenuItem;
+		ManifestWorkspaceActionMenuItemDefaultKind: ManifestWorkspaceActionMenuItemDefaultKind;
+	}
 }

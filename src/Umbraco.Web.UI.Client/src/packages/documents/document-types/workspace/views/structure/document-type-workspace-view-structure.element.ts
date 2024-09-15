@@ -6,7 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-type-workspace-view-structure')

@@ -8,9 +8,9 @@ import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
-import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...collectionManifests,
 	...entityActionManifests,
 	...memberPickerModalManifests,
