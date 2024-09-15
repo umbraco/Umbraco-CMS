@@ -1,11 +1,10 @@
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_MEMBER_GROUP_WORKSPACE_ALIAS = 'Umb.Workspace.MemberGroup';
 
@@ -62,4 +61,4 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceActions, ...workspaceViews];
+export const manifests: Array<UmbExtensionManifest> = [workspace, ...workspaceActions, ...workspaceViews];
