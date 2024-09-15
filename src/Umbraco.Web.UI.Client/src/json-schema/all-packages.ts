@@ -3,7 +3,6 @@ import '@umbraco-cms/backoffice/class-api';
 import '@umbraco-cms/backoffice/context-api';
 import '@umbraco-cms/backoffice/controller-api';
 import '@umbraco-cms/backoffice/element-api';
-
 import '@umbraco-cms/backoffice/extension-api';
 import '@umbraco-cms/backoffice/formatting-api';
 import '@umbraco-cms/backoffice/localization-api';
@@ -52,7 +51,6 @@ import '@umbraco-cms/backoffice/member-type';
 import '@umbraco-cms/backoffice/member';
 import '@umbraco-cms/backoffice/menu';
 import '@umbraco-cms/backoffice/modal';
-import '@umbraco-cms/backoffice/models';
 import '@umbraco-cms/backoffice/multi-url-picker';
 import '@umbraco-cms/backoffice/notification';
 import '@umbraco-cms/backoffice/object-type';
