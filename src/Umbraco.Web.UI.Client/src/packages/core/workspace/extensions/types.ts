@@ -14,11 +14,12 @@ import type {
 } from './workspace-view.model.js';
 import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
 
+export type * from './workspace-action-menu-item.model.js';
 export type * from './workspace-action.model.js';
+export type * from './workspace-context.model.js';
 export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
 export type * from './workspace.model.js';
-export type * from './workspace-action-menu-item.model.js';
 
 export type ManifestWorkspaceFooterApps =
 	| ManifestWorkspaceFooterApp

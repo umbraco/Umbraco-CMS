@@ -1,8 +1,7 @@
 import { writeFileSync } from 'fs';
-import { format, resolveConfig } from 'prettier';
 import { createImportMap } from '../importmap/index.js';
 
-const tsPath = './src/all-packages.ts';
+const tsPath = './src/json-schema/all-packages.ts';
 
 const importmap = createImportMap({
 	rootDir: './src',

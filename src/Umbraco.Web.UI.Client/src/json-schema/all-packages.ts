@@ -1,9 +1,9 @@
-
 import '@umbraco-cms/backoffice/app';
 import '@umbraco-cms/backoffice/class-api';
 import '@umbraco-cms/backoffice/context-api';
 import '@umbraco-cms/backoffice/controller-api';
 import '@umbraco-cms/backoffice/element-api';
+
 import '@umbraco-cms/backoffice/extension-api';
 import '@umbraco-cms/backoffice/formatting-api';
 import '@umbraco-cms/backoffice/localization-api';
