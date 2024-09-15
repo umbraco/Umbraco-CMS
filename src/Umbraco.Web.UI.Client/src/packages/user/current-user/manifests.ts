@@ -7,10 +7,9 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as profileManifests } from './profile/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as themeManifests } from './theme/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const headerApps: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'globalContext',
 		alias: 'Umb.GlobalContext.CurrentUser',
@@ -24,13 +23,9 @@ export const headerApps: Array<ManifestTypes> = [
 		element: () => import('./current-user-header-app.element.js'),
 		weight: 0,
 	},
-];
-
-export const manifests = [
 	actionDefaultKindManifest,
 	...conditionManifests,
 	...externalLoginProviderManifests,
-	...headerApps,
 	...historyManifests,
 	...mfaLoginProviderManifests,
 	...modalManifests,

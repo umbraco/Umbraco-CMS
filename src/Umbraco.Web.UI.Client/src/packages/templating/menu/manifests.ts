@@ -1,29 +1,26 @@
-import type { ManifestMenu, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
 const sectionAlias = 'Umb.Section.Settings';
 
-const menu: ManifestMenu = {
-	type: 'menu',
-	alias: 'Umb.Menu.Templating',
-	name: 'Templating Menu',
-};
-
-const menuSectionSidebarApp: ManifestTypes = {
-	type: 'sectionSidebarApp',
-	kind: 'menu',
-	alias: 'Umb.SectionSidebarMenu.Templating',
-	name: 'Templating Section Sidebar Menu',
-	weight: 200,
-	meta: {
-		label: '#treeHeaders_templatingGroup',
-		menu: 'Umb.Menu.Templating',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'menu',
+		alias: 'Umb.Menu.Templating',
+		name: 'Templating Menu',
 	},
-	conditions: [
-		{
-			alias: 'Umb.Condition.SectionAlias',
-			match: sectionAlias,
+	{
+		type: 'sectionSidebarApp',
+		kind: 'menu',
+		alias: 'Umb.SectionSidebarMenu.Templating',
+		name: 'Templating Section Sidebar Menu',
+		weight: 200,
+		meta: {
+			label: '#treeHeaders_templatingGroup',
+			menu: 'Umb.Menu.Templating',
 		},
-	],
-};
-
-export const manifests: Array<ManifestTypes> = [menu, menuSectionSidebarApp];
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: sectionAlias,
+			},
+		],
+	},
+];

@@ -1,8 +1,7 @@
 import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../constants.js';
 import { UMB_USER_MANAGEMENT_MENU_ALIAS } from '../menu/index.js';
-import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'sectionSidebarApp',
 		kind: 'menu',

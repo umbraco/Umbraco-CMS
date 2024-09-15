@@ -1,7 +1,6 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'pickerSearchResultItem',
 		kind: 'default',

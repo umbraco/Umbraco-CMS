@@ -1,25 +1,18 @@
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 
-const DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
+const UMB_DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: DATA_TYPE_WORKSPACE_ALIAS,
-	name: 'Data Type Workspace',
-	api: () => import('./data-type-workspace.context.js'),
-	meta: {
-		entityType: 'data-type',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_DATA_TYPE_WORKSPACE_ALIAS,
+		name: 'Data Type Workspace',
+		api: () => import('./data-type-workspace.context.js'),
+		meta: {
+			entityType: 'data-type',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DataType.Edit',
@@ -34,7 +27,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DATA_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -52,13 +45,10 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DATA_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -73,10 +63,8 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DATA_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

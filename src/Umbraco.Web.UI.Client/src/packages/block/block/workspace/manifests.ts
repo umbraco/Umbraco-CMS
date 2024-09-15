@@ -1,8 +1,7 @@
 import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -35,7 +34,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Content',
 		name: 'Block Workspace Content View',
-		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
 			label: '#general_content',
@@ -60,7 +59,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Settings',
 		name: 'Block Workspace Settings View',
-		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 900,
 		meta: {
 			label: '#general_settings',

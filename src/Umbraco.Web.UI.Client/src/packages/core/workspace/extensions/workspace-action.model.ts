@@ -23,3 +23,10 @@ export interface MetaWorkspaceActionDefaultKind extends MetaWorkspaceAction {
 	look?: UUIInterfaceLook;
 	color?: UUIInterfaceColor;
 }
+
+declare global {
+	interface UmbExtensionManifestMap {
+		ManifestWorkspaceAction: ManifestWorkspaceAction;
+		ManifestWorkspaceActionDefaultKind: ManifestWorkspaceActionDefaultKind;
+	}
+}

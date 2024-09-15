@@ -5,8 +5,11 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { ManifestWorkspaceAction, MetaWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestWorkspaceAction,
+	MetaWorkspaceAction,
+	UmbWorkspaceActionArgs,
+} from '@umbraco-cms/backoffice/workspace';
 
 /**
  *

@@ -1,7 +1,7 @@
 import { UMB_SETTINGS_SECTION_ALIAS } from './constants.js';
-import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'section',
 		alias: UMB_SETTINGS_SECTION_ALIAS,

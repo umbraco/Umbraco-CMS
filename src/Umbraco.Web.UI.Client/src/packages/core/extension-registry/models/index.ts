@@ -42,19 +42,6 @@ import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
 import type { ManifestUfmFilter } from './ufm-filter.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
-import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
-import type { ManifestWorkspaceAction, ManifestWorkspaceActionDefaultKind } from './workspace-action.model.js';
-import type { ManifestWorkspaceActionMenuItem } from './workspace-action-menu-item.model.js';
-import type { ManifestWorkspaceContext } from './workspace-context.model.js';
-import type {
-	ManifestWorkspaceFooterApp,
-	ManifestWorkspaceFooterAppMenuBreadcrumbKind,
-	ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
-} from './workspace-footer-app.model.js';
-import type {
-	ManifestWorkspaceView,
-	ManifestWorkspaceViewContentTypeDesignEditorKind,
-} from './workspace-view.model.js';
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
@@ -103,12 +90,6 @@ export type * from './ufm-component.model.js';
 export type * from './ufm-filter.model.js';
 export type * from './user-granular-permission.model.js';
 export type * from './user-profile-app.model.js';
-export type * from './workspace-action-menu-item.model.js';
-export type * from './workspace-action.model.js';
-export type * from './workspace-context.model.js';
-export type * from './workspace-footer-app.model.js';
-export type * from './workspace-view.model.js';
-export type * from './workspace.model.js';
 
 export type ManifestEntityActions =
 	| ManifestEntityAction
@@ -126,17 +107,7 @@ export type ManifestEntityActions =
 	| ManifestEntityActionTrashKind
 	| ManifestEntityActionUpdateFolderKind;
 
-export type ManifestWorkspaceFooterApps =
-	| ManifestWorkspaceFooterApp
-	| ManifestWorkspaceFooterAppMenuBreadcrumbKind
-	| ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
-
 export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyActionDefaultKind;
-
-export type ManifestWorkspaceActions = ManifestWorkspaceAction | ManifestWorkspaceActionDefaultKind;
-
-export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKind | ManifestWorkspaceRoutableKind;
-export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
 	| ManifestAppEntryPoint
@@ -188,12 +159,6 @@ export type ManifestTypes =
 	| ManifestUfmComponent
 	| ManifestUfmFilter
 	| ManifestUserProfileApp
-	| ManifestWorkspaceActionMenuItem
-	| ManifestWorkspaceActions
-	| ManifestWorkspaceContext
-	| ManifestWorkspaceFooterApps
-	| ManifestWorkspaces
-	| ManifestWorkspaceViews
 	| ManifestBase;
 
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;

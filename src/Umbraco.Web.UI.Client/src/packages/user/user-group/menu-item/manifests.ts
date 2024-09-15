@@ -1,8 +1,7 @@
 import { UMB_USER_MANAGEMENT_MENU_ALIAS } from '../../section/menu/constants.js';
 import { UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		alias: 'Umb.MenuItem.UserGroups',

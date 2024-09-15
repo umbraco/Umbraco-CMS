@@ -1,7 +1,6 @@
 import { manifest as trueFalseSchemaManifest } from './Umbraco.TrueFalse.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Toggle',

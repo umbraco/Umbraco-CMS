@@ -1,26 +1,19 @@
 import { UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/index.js';
-import type {
-	ManifestWorkspaces,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceViews,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_MEMBER_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MemberType';
 
-const workspace: ManifestWorkspaces = {
-	type: 'workspace',
-	kind: 'routable',
-	alias: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
-	name: 'Member Type Workspace',
-	api: () => import('./member-type-workspace.context.js'),
-	meta: {
-		entityType: 'member-type',
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'workspace',
+		kind: 'routable',
+		alias: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
+		name: 'Member Type Workspace',
+		api: () => import('./member-type-workspace.context.js'),
+		meta: {
+			entityType: 'member-type',
+		},
 	},
-};
-
-const workspaceViews: Array<ManifestWorkspaceViews> = [
 	{
 		type: 'workspaceView',
 		kind: 'contentTypeDesignEditor',
@@ -39,9 +32,6 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 			},
 		],
 	},
-];
-
-const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -56,10 +46,8 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];
