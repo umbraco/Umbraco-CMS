@@ -12,5 +12,5 @@ public class CacheSettings
         new();
 
 
-    public int BreadthFirstSeedCount = 10;
+    public int BreadthFirstSeedCount { get; set; } = 100;
 }
