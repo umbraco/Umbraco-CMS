@@ -9,7 +9,7 @@ schedules:
   branches:
     include:
     - v14/dev
-   ## Uncomment after merged to v15/dev 
+   ## Uncomment after merged to v15/dev
    ## - v15/dev
 
 variables:
@@ -42,7 +42,6 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
-            fetchDepth: 10
             submodules: true
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
@@ -335,7 +334,7 @@ stages:
             displayName: Run application (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             workingDirectory: $(Agent.BuildDirectory)/app
-          
+
           # Ensures we have the package wait-on installed
           - pwsh: npm install wait-on
             displayName: Install wait-on package
