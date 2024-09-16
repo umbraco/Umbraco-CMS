@@ -18,18 +18,17 @@ public class SubTypeSelector(IOptions<GlobalSettings> settings,
         var backOfficePath =  settings.Value.GetBackOfficePath(hostingEnvironment);
         if (httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments($"{backOfficePath}/swagger/") ?? false)
         {
-            var segments = httpContextAccessor.HttpContext.Request.Path.Value!.TrimStart('/').Split('/');
-            if (segments.Length >= 3)
-            {
-                // Extract the document name from the path
-                var documentName = segments[2];
+            // Split the path into segments
+            var segments = httpContextAccessor.HttpContext.Request.Path.Value!.TrimStart($"{backOfficePath}/swagger/").Split('/');
 
-                // Find the first handler that can handle the type / document name combination
-                ISubTypeHandler? handler = subTypeHandlers.FirstOrDefault(h => h.CanHandle(type, documentName));
-                if (handler != null)
-                {
-                    return handler.Handle(type);
-                }
+            // Extract the document name from the path
+            var documentName = segments[0];
+
+            // Find the first handler that can handle the type / document name combination
+            ISubTypeHandler? handler = subTypeHandlers.FirstOrDefault(h => h.CanHandle(type, documentName));
+            if (handler != null)
+            {
+                return handler.Handle(type);
             }
         }
 
