@@ -18,6 +18,9 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	#multiple = new UmbBooleanState(false);
 	public readonly multiple = this.#multiple.asObservable();
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	#selectionFilter = (unique: ValueType) => true;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
@@ -109,6 +112,9 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	public select(unique: ValueType) {
 		if (this.getSelectable() === false) return;
 		if (this.isSelected(unique)) return;
+		if (this.#selectionFilter(unique) === false) {
+			throw new Error('The selection filter does not allow this item to be selected.');
+		}
 		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
 		this.#selection.setValue(newSelection);
 		this.getHostElement().dispatchEvent(new UmbSelectedEvent(unique));
@@ -145,5 +151,14 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	public clearSelection() {
 		if (this.getSelectable() === false) return;
 		this.#selection.setValue([]);
+	}
+
+	/**
+	 * Sets the selection filter.
+	 * @param filter The selection filter.
+	 * @memberof UmbSelectionManager
+	 */
+	public setFilter(filter: (unique: ValueType) => boolean): void {
+		this.#selectionFilter = filter;
 	}
 }
