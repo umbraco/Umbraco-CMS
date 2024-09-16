@@ -9,7 +9,7 @@ public interface IDocumentCacheService
 
     Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false);
 
-    Task SeedAsync(IReadOnlyCollection<Guid> contentTypeKeys);
+    Task SeedAsync();
 
     Task<bool> HasContentByIdAsync(int id, bool preview = false);
 

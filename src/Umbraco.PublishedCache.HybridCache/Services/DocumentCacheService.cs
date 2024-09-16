@@ -73,7 +73,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
 
-    public async Task SeedAsync(IReadOnlyCollection<Guid> contentTypeKeys)
+    public async Task SeedAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         var keys = new HashSet<Guid>();
