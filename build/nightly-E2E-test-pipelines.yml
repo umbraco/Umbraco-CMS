@@ -42,7 +42,7 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
-            fetchDepth: 100 # Remove before merged to v14/dev.
+            fetchDepth: 10
             submodules: true
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
