@@ -5,7 +5,7 @@
         appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
-        $exceptionHandler, uploadTracker) {        
+        $exceptionHandler, uploadTracker) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -756,20 +756,25 @@
                                 //ensure error messages are displayed
                                 formHelper.showNotifications(err.data);
                                 clearNotifications($scope.content);
-                                
+
                               handleHttpException(err);
+                              $scope.$broadcast("formSubmittedValidationFailed");
                               deferred.reject(err);
                             });
                         },
                         close: function () {
                             overlayService.close();
+                            // Well, it did not actually submit, but we did not have validation failed. And we need to fire an event to re-enable properties.
+                            $scope.$broadcast("formSubmitted");
                             deferred.reject();
                         }
                     };
                     overlayService.open(dialog);
                 }
                 else {
+                    $scope.page.buttonGroupState = "error";
                     showValidationNotification();
+                    $scope.$broadcast("formSubmittedValidationFailed");
                     deferred.reject();
                 }
             }
