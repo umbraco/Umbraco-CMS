@@ -290,19 +290,31 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						?checked=${this._data?.visibility?.memberCanView}
 						@change=${this.#onToggleShowOnMemberProfile}
 						label=${this.localize.term('contentTypeEditor_showOnMemberProfile')}></uui-toggle>
-					<small>${this.localize.term('contentTypeEditor_showOnMemberProfileDescription')}</small>
+					<small>
+						<umb-localize key="contentTypeEditor_showOnMemberProfileDescription">
+							Allow this property value to be displayed on the member profile page
+						</umb-localize>
+					</small>
 
 					<uui-toggle
 						?checked=${this._data?.visibility?.memberCanEdit}
 						@change=${this.#onToggleMemberCanEdit}
 						label=${this.localize.term('contentTypeEditor_memberCanEdit')}></uui-toggle>
-					<small>${this.localize.term('contentTypeEditor_memberCanEditDescription')}</small>
+					<small>
+						<umb-localize key="contentTypeEditor_memberCanEditDescription">
+							Allow this property value to be edited by the member on their profile page
+						</umb-localize>
+					</small>
 
 					<uui-toggle
 						?checked=${this._data?.isSensitive}
 						@change=${this.#onToggleIsSensitiveData}
 						label=${this.localize.term('contentTypeEditor_isSensitiveData')}></uui-toggle>
-					<small>${this.localize.term('contentTypeEditor_isSensitiveDataDescription')}</small>
+					<small>
+						<umb-localize key="contentTypeEditor_isSensitiveDataDescription">
+							Hide this property value from content editors that don't have access to view sensitive information
+						</umb-localize>
+					</small>
 				</div>
 			</div>`;
 	}
