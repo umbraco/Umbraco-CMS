@@ -132,14 +132,32 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-        await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
+
         await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
+        _scopeProvider.Context?.Enlist($"UpdateMemoryCache_Draft_{content.Key}", completed =>
+        {
+            if(completed is false)
+            {
+                return;
+            }
+
+            _hybridCache.SetAsync(GetCacheKey(content.Key, true), draftCacheNode).GetAwaiter().GetResult();
+        }, 1);
 
         if (content.PublishedState == PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, false));
+
             await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
+            _scopeProvider.Context?.Enlist($"UpdateMemoryCache_{content.Key}", completed =>
+            {
+                if(completed is false)
+                {
+                    return;
+                }
+
+                _hybridCache.SetAsync(GetCacheKey(content.Key, false), publishedCacheNode).GetAwaiter().GetResult();
+            }, 1);
         }
 
         scope.Complete();
