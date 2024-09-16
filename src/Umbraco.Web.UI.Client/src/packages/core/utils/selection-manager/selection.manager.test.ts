@@ -76,6 +76,10 @@ describe('UmbSelectionManager', () => {
 			it('has a clearSelection method', () => {
 				expect(manager).to.have.property('clearSelection').that.is.a('function');
 			});
+
+			it('has a setFilter method', () => {
+				expect(manager).to.have.property('setFilter').that.is.a('function');
+			});
 		});
 	});
 
@@ -149,6 +153,15 @@ describe('UmbSelectionManager', () => {
 			manager.setSelectable(false);
 			manager.select('3');
 			expect(manager.getSelection()).to.deep.equal([]);
+		});
+
+		it('can not select an item if it does not pass the filter', () => {
+			manager.setFilter((item) => item !== '2');
+			manager.select('2');
+			expect(manager.getSelection()).to.deep.equal([]);
+
+			manager.select('1');
+			expect(manager.getSelection()).to.deep.equal(['1']);
 		});
 	});
 
