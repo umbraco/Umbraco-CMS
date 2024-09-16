@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public class SubTypesesSelector(IOptions<GlobalSettings> settings,
+public class SubTypesSelector(IOptions<GlobalSettings> settings,
     IHostingEnvironment hostingEnvironment,
     IHttpContextAccessor httpContextAccessor,
     IEnumerable<ISubTypesHandler> subTypeHandlers,
