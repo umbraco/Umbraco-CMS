@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
@@ -14,6 +15,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
 {
     private readonly IOperationIdSelector _operationIdSelector;
     private readonly ISchemaIdSelector _schemaIdSelector;
+    private readonly ISubTypeSelector _subTypeSelector;
 
     [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
     public ConfigureUmbracoSwaggerGenOptions(
@@ -24,12 +26,21 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     {
     }
 
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,
         ISchemaIdSelector schemaIdSelector)
+        : this(operationIdSelector, schemaIdSelector, StaticServiceProvider.Instance.GetRequiredService<ISubTypeSelector>())
+    { }
+
+    public ConfigureUmbracoSwaggerGenOptions(
+        IOperationIdSelector operationIdSelector,
+        ISchemaIdSelector schemaIdSelector,
+        ISubTypeSelector subTypeSelector)
     {
         _operationIdSelector = operationIdSelector;
         _schemaIdSelector = schemaIdSelector;
+        _subTypeSelector = subTypeSelector;
     }
 
     public void Configure(SwaggerGenOptions swaggerGenOptions)
@@ -62,6 +73,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);
+        swaggerGenOptions.SelectSubTypesUsing(_subTypeSelector.SubTypes);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
     }
 
