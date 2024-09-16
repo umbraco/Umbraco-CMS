@@ -19,7 +19,7 @@ export interface UmbRichTextEditorValueType {
 	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }
 
-const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.TinyMCE'; // Not rich text, cause this has not been migrated [NL]
+const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.RichText'; // Not rich text, cause this has not been migrated [NL]
 
 /**
  * @element umb-property-editor-ui-tiny-mce
