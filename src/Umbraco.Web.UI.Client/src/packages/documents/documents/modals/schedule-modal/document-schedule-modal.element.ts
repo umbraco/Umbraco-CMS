@@ -41,6 +41,15 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
+		const pickableFilter = this.data?.pickableFilter;
+
+		if (pickableFilter) {
+			this.#selectionManager.setFilter((unique) => {
+				const option = this.data?.options.find((o) => o.unique === unique);
+				return option ? pickableFilter(option) : true;
+			});
+		}
+
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
 		this._options =
 			this.data?.options.filter(
