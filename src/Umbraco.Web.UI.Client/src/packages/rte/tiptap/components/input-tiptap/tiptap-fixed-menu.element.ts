@@ -1,29 +1,13 @@
-import {
-	alignCenter,
-	alignJustify,
-	alignLeft,
-	alignRight,
-	blockquote,
-	bold,
-	bulletList,
-	code,
-	heading1,
-	heading2,
-	heading3,
-	horizontalRule,
-	italic,
-	link,
-	orderedList,
-	strikethrough,
-	underline,
-} from './icons.js';
-import { LitElement, css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import * as icons from './icons.js';
+import type { UmbTiptapExtensionBase, UmbTiptapToolbarButton } from './tiptap-extension.js';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 @customElement('umb-tiptap-fixed-menu')
-export class UmbTiptapFixedMenuElement extends LitElement {
+export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	@state()
-	actions = [
+	actions: Array<UmbTiptapToolbarButton> = [
 		// TODO: I don't think we need a paragraph button. It's the default state.
 		// {
 		// 	name: 'paragraph',
@@ -31,107 +15,108 @@ export class UmbTiptapFixedMenuElement extends LitElement {
 		// 		<path fill="none" d="M0 0h24v24H0z" />
 		// 		<path d="M12 6v15h-2v-5a6 6 0 1 1 0-12h10v2h-3v15h-2V6h-3zm-2 0a4 4 0 1 0 0 8V6z" fill="currentColor" />
 		// 	</svg>`,
-		// 	command: () => this.editor?.chain().focus().setParagraph().run(),
+		// 	command: (editor) => editor?.chain().focus().setParagraph().run(),
 		// },
 		{
 			name: 'bold',
-			icon: bold,
-			isActive: () => this.editor?.isActive('bold'),
-			command: () => this.editor?.chain().focus().toggleBold().run(),
+			icon: icons.bold,
+			isActive: (editor) => editor?.isActive('bold'),
+			command: (editor) => editor?.chain().focus().toggleBold().run(),
 		},
 		{
 			name: 'italic',
-			icon: italic,
-			isActive: () => this.editor?.isActive('italic'),
-			command: () => this.editor?.chain().focus().toggleItalic().run(),
+			icon: icons.italic,
+			isActive: (editor) => editor?.isActive('italic'),
+			command: (editor) => editor?.chain().focus().toggleItalic().run(),
 		},
 		{
 			name: 'underline',
-			icon: underline,
-			isActive: () => this.editor?.isActive('underline'),
-			command: () => this.editor?.chain().focus().toggleUnderline().run(),
+			icon: icons.underline,
+			isActive: (editor) => editor?.isActive('underline'),
+			command: (editor) => editor?.chain().focus().toggleUnderline().run(),
 		},
 		{
 			name: 'strikethrough',
-			icon: strikethrough,
-			isActive: () => this.editor?.isActive('strike'),
-			command: () => this.editor?.chain().focus().toggleStrike().run(),
+			icon: icons.strikethrough,
+			isActive: (editor) => editor?.isActive('strike'),
+			command: (editor) => editor?.chain().focus().toggleStrike().run(),
 		},
 		{
 			name: 'h1',
-			icon: heading1,
-			isActive: () => this.editor?.isActive('heading', { level: 1 }),
-			command: () => this.editor?.chain().focus().toggleHeading({ level: 1 }).run(),
+			icon: icons.heading1,
+			isActive: (editor) => editor?.isActive('heading', { level: 1 }),
+			command: (editor) => editor?.chain().focus().toggleHeading({ level: 1 }).run(),
 		},
 		{
 			name: 'h2',
-			icon: heading2,
-			isActive: () => this.editor?.isActive('heading', { level: 2 }),
-			command: () => this.editor?.chain().focus().toggleHeading({ level: 2 }).run(),
+			icon: icons.heading2,
+			isActive: (editor) => editor?.isActive('heading', { level: 2 }),
+			command: (editor) => editor?.chain().focus().toggleHeading({ level: 2 }).run(),
 		},
 		{
 			name: 'h3',
-			icon: heading3,
-			isActive: () => this.editor?.isActive('heading', { level: 3 }),
-			command: () => this.editor?.chain().focus().toggleHeading({ level: 3 }).run(),
+			icon: icons.heading3,
+			isActive: (editor) => editor?.isActive('heading', { level: 3 }),
+			command: (editor) => editor?.chain().focus().toggleHeading({ level: 3 }).run(),
 		},
 		{
 			name: 'blockquote',
-			icon: blockquote,
-			isActive: () => this.editor?.isActive('blockquote'),
-			command: () => this.editor?.chain().focus().toggleBlockquote().run(),
+			icon: icons.blockquote,
+			isActive: (editor) => editor?.isActive('blockquote'),
+			command: (editor) => editor?.chain().focus().toggleBlockquote().run(),
 		},
 		{
 			name: 'code',
-			icon: code,
-			isActive: () => this.editor?.isActive('codeBlock'),
-			command: () => this.editor?.chain().focus().toggleCodeBlock().run(),
+			icon: icons.code,
+			isActive: (editor) => editor?.isActive('codeBlock'),
+			command: (editor) => editor?.chain().focus().toggleCodeBlock().run(),
 		},
 		{
 			name: 'bullet-list',
-			icon: bulletList,
-			isActive: () => this.editor?.isActive('bulletList'),
-			command: () => this.editor?.chain().focus().toggleBulletList().run(),
+			icon: icons.bulletList,
+			isActive: (editor) => editor?.isActive('bulletList'),
+			command: (editor) => editor?.chain().focus().toggleBulletList().run(),
 		},
 		{
 			name: 'ordered-list',
-			icon: orderedList,
-			isActive: () => this.editor?.isActive('orderedList'),
-			command: () => this.editor?.chain().focus().toggleOrderedList().run(),
+			icon: icons.orderedList,
+			isActive: (editor) => editor?.isActive('orderedList'),
+			command: (editor) => editor?.chain().focus().toggleOrderedList().run(),
 		},
 		{
 			name: 'horizontal-rule',
-			icon: horizontalRule,
-			isActive: () => this.editor?.isActive('horizontalRule'),
-			command: () => this.editor?.chain().focus().setHorizontalRule().run(),
+			icon: icons.horizontalRule,
+			isActive: (editor) => editor?.isActive('horizontalRule'),
+			command: (editor) => editor?.chain().focus().setHorizontalRule().run(),
 		},
 		{
 			name: 'align-left',
-			icon: alignLeft,
-			isActive: () => this.editor?.isActive({ textAlign: 'left' }),
-			command: () => this.editor?.chain().focus().setTextAlign('left').run(),
+			icon: icons.alignLeft,
+			isActive: (editor) => editor?.isActive({ textAlign: 'left' }),
+			command: (editor) => editor?.chain().focus().setTextAlign('left').run(),
 		},
 		{
 			name: 'align-center',
-			icon: alignCenter,
-			isActive: () => this.editor?.isActive({ textAlign: 'center' }),
-			command: () => this.editor?.chain().focus().setTextAlign('center').run(),
+			icon: icons.alignCenter,
+			isActive: (editor) => editor?.isActive({ textAlign: 'center' }),
+			command: (editor) => editor?.chain().focus().setTextAlign('center').run(),
 		},
 		{
 			name: 'align-right',
-			icon: alignRight,
-			isActive: () => this.editor?.isActive({ textAlign: 'right' }),
-			command: () => this.editor?.chain().focus().setTextAlign('right').run(),
+			icon: icons.alignRight,
+			isActive: (editor) => editor?.isActive({ textAlign: 'right' }),
+			command: (editor) => editor?.chain().focus().setTextAlign('right').run(),
 		},
 		{
 			name: 'align-justify',
-			icon: alignJustify,
-			isActive: () => this.editor?.isActive({ textAlign: 'justify' }),
-			command: () => this.editor?.chain().focus().setTextAlign('justify').run(),
+			icon: icons.alignJustify,
+			isActive: (editor) => editor?.isActive({ textAlign: 'justify' }),
+			command: (editor) => editor?.chain().focus().setTextAlign('justify').run(),
 		},
 		{
 			name: 'link',
-			icon: link,
+			icon: icons.link,
+			isActive: (editor) => editor?.isActive('link'),
 			command: () => {
 				const text = prompt('Enter the text');
 				const url = prompt('Enter the URL');
@@ -151,9 +136,6 @@ export class UmbTiptapFixedMenuElement extends LitElement {
 	];
 
 	@property({ attribute: false })
-	get editor() {
-		return this.#editor;
-	}
 	set editor(value) {
 		const oldValue = this.#editor;
 		if (value === oldValue) {
@@ -163,18 +145,36 @@ export class UmbTiptapFixedMenuElement extends LitElement {
 		this.#editor?.on('selectionUpdate', this.#onUpdate);
 		this.#editor?.on('update', this.#onUpdate);
 	}
+	get editor() {
+		return this.#editor;
+	}
 	#editor?: Editor;
+
+	@property({ attribute: false })
+	extensions: Array<UmbTiptapExtensionBase> = [];
 
 	#onUpdate = () => {
 		this.requestUpdate();
 	};
 
+	protected override firstUpdated() {
+		const buttons = this.extensions.flatMap((ext) => ext.getToolbarButtons());
+		this.actions.push(...buttons);
+	}
+
 	override render() {
 		return html`
 			${this.actions.map(
 				(action) => html`
-					<button class=${action.isActive?.() ? 'active' : ''} @click=${action.command} title=${action.name}>
-						${action.icon}
+					<button
+						class=${action.isActive?.(this.editor) ? 'active' : ''}
+						title=${action.name}
+						@click=${() => action.command(this.editor)}>
+						${when(
+							typeof action.icon === 'string',
+							() => html`<umb-icon name=${action.icon}></umb-icon>`,
+							() => action.icon,
+						)}
 					</button>
 				`,
 			)}
