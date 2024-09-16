@@ -8,9 +8,9 @@ schedules:
   displayName: Daily midnight build
   branches:
     include:
-    - v14/QA/new-E2E-pipeline
-   ## Uncomment after merged to v14/dev
-   ## - v14/dev
+    - v14/dev
+   ## Uncomment after merged to v15/dev 
+   ## - v15/dev
 
 variables:
   nodeVersion: 20
