@@ -332,6 +332,16 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+            return await Task.FromResult(dataTypes);
+        }
+
+        /// <inheritdoc />
         public Task<IEnumerable<IDataType>> GetByEditorUiAlias(string editorUiAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -545,7 +555,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.DuplicateKey, dataType);
             }
 
-            var result = await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
+            Attempt<IDataType, DataTypeOperationStatus> result = await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
 
             scope.Complete();
 

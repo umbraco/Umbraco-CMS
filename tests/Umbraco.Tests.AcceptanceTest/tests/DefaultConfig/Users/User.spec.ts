@@ -224,12 +224,11 @@ test('can remove a content start node from a user', {tag: '@smoke'}, async ({umb
 
 test('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const mediaTypeName = 'File';
   const mediaName = 'TestMediaFile';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
+  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
   await umbracoUi.user.goToSection(ConstantHelper.sections.users);
 
   // Act
@@ -249,15 +248,14 @@ test('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi
 
 test('can add multiple media start nodes for a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const mediaTypeName = 'File';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   const mediaName = 'TestMediaFile';
   const secondMediaName = 'SecondMediaFile';
   await umbracoApi.media.ensureNameNotExists(mediaName);
   await umbracoApi.media.ensureNameNotExists(secondMediaName);
-  const firstMediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
-  const secondMediaId = await umbracoApi.media.createDefaultMedia(secondMediaName, mediaTypeName);
+  const firstMediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
+  const secondMediaId = await umbracoApi.media.createDefaultMediaFile(secondMediaName);
   // Adds the media start node to the user
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   userData.mediaStartNodeIds.push({id: firstMediaId});
@@ -283,12 +281,11 @@ test('can add multiple media start nodes for a user', async ({umbracoApi, umbrac
 
 test('can remove a media start node from a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const mediaTypeName = 'File';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   const mediaName = 'TestMediaFile';
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
+  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
   // Adds the media start node to the user
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   userData.mediaStartNodeIds.push({id: mediaId});
@@ -374,12 +371,11 @@ test('can see if the user has the correct access based on content start nodes', 
 
 test('can see if the user has the correct access based on media start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const mediaTypeName = 'File';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   const mediaName = 'TestMediaFile';
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
+  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
   // Adds the media start node to the user
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   userData.mediaStartNodeIds.push({id: mediaId});

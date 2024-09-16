@@ -92,10 +92,7 @@ public class FilePermissionHelper : IFilePermissionHelper
                 continue;
             }
 
-            if (temp == null)
-            {
-                temp = new List<string>();
-            }
+            temp ??= new List<string>();
 
             temp.Add(dir.TrimStart(_basePath));
             success = false;
@@ -117,10 +114,7 @@ public class FilePermissionHelper : IFilePermissionHelper
                 continue;
             }
 
-            if (temp == null)
-            {
-                temp = new List<string>();
-            }
+            temp ??= new List<string>();
 
             temp.Add(file.TrimStart(_basePath));
             success = false;
@@ -145,10 +139,7 @@ public class FilePermissionHelper : IFilePermissionHelper
                 continue;
             }
 
-            if (temp == null)
-            {
-                temp = new List<string>();
-            }
+            temp ??= new List<string>();
 
             temp.Add(dir);
             success = false;

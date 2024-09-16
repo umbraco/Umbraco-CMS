@@ -115,12 +115,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
         // Mostly no-op just check that we didn't end up ReadUncommitted for real.
         private void ObtainReadLock()
         {
-            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
-
-            if (efCoreScope is null)
-            {
-                throw new PanicException("No current ambient scope");
-            }
+            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope ?? throw new PanicException("No current ambient scope");
 
             efCoreScope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -136,12 +131,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
         // lock occurs for entire database as opposed to row/table.
         private void ObtainWriteLock()
         {
-            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
-
-            if (efCoreScope is null)
-            {
-                throw new PanicException("No ambient scope");
-            }
+            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope ?? throw new PanicException("No ambient scope");
 
             efCoreScope.ExecuteWithContextAsync<Task>(async database =>
             {

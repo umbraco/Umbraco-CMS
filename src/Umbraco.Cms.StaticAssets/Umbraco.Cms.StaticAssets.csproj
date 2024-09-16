@@ -6,6 +6,11 @@
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--  TODO: [NU5123] Rename files so path is shorter -->
+    <WarningsNotAsErrors>NU5123</WarningsNotAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
