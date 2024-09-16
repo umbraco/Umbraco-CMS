@@ -7,23 +7,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public class SubTypesSelector(IOptions<GlobalSettings> settings,
+public class SubTypesSelector(
+    IOptions<GlobalSettings> settings,
     IHostingEnvironment hostingEnvironment,
     IHttpContextAccessor httpContextAccessor,
     IEnumerable<ISubTypesHandler> subTypeHandlers,
-    IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver) : ISubTypesSelector
+    IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver)
+    : OpenApiSelectorBase(settings, hostingEnvironment, httpContextAccessor), ISubTypesSelector
 {
     public IEnumerable<Type> SubTypes(Type type)
     {
-        var backOfficePath =  settings.Value.GetBackOfficePath(hostingEnvironment);
-        if (httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments($"{backOfficePath}/swagger/") ?? false)
+        var documentName = ResolveOpenApiDocumentName();
+        if (!string.IsNullOrEmpty(documentName))
         {
-            // Split the path into segments
-            var segments = httpContextAccessor.HttpContext.Request.Path.Value!.TrimStart($"{backOfficePath}/swagger/").Split('/');
-
-            // Extract the document name from the path
-            var documentName = segments[0];
-
             // Find the first handler that can handle the type / document name combination
             ISubTypesHandler? handler = subTypeHandlers.FirstOrDefault(h => h.CanHandle(type, documentName));
             if (handler != null)

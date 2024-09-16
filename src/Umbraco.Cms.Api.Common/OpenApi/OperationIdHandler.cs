@@ -14,18 +14,24 @@ public class OperationIdHandler : IOperationIdHandler
     public OperationIdHandler(IOptions<ApiVersioningOptions> apiVersioningOptions)
         => _apiVersioningOptions = apiVersioningOptions.Value;
 
+    [Obsolete("Use CanHandle(ApiDescription apiDescription, string documentName) instead. Will be removed in v16.")]
     public bool CanHandle(ApiDescription apiDescription)
+        => CanHandle(apiDescription, string.Empty);
+
+    public bool CanHandle(ApiDescription apiDescription, string documentName)
     {
         if (apiDescription.ActionDescriptor is not ControllerActionDescriptor controllerActionDescriptor)
         {
             return false;
         }
 
-        return CanHandle(apiDescription, controllerActionDescriptor);
+        return CanHandle(apiDescription, controllerActionDescriptor, documentName);
     }
 
     protected virtual bool CanHandle(ApiDescription apiDescription, ControllerActionDescriptor controllerActionDescriptor)
         => controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("Umbraco.Cms.Api") is true;
+    protected virtual bool CanHandle(ApiDescription apiDescription, ControllerActionDescriptor controllerActionDescriptor, string documentName)
+        => CanHandle(apiDescription, controllerActionDescriptor);
 
     public virtual string Handle(ApiDescription apiDescription)
         => UmbracoOperationId(apiDescription);
