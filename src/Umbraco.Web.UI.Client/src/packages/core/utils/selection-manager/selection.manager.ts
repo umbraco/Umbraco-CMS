@@ -19,7 +19,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	public readonly multiple = this.#multiple.asObservable();
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	#selectionFilter = (unique: ValueType) => true;
+	#disallow = (unique: ValueType) => true;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -112,7 +112,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	public select(unique: ValueType) {
 		if (this.getSelectable() === false) return;
 		if (this.isSelected(unique)) return;
-		if (this.#selectionFilter(unique) === false) {
+		if (this.#disallow(unique) === false) {
 			throw new Error('The selection filter does not allow this item to be selected.');
 		}
 		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
@@ -154,11 +154,11 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	}
 
 	/**
-	 * Sets the selection filter.
-	 * @param filter The selection filter.
+	 * Sets a function that determines if an item is selectable or not.
+	 * @param compareFn A function that determines if an item is selectable or not.
 	 * @memberof UmbSelectionManager
 	 */
-	public setFilter(filter: (unique: ValueType) => boolean): void {
-		this.#selectionFilter = filter;
+	public setDisallow(compareFn: (unique: ValueType) => boolean): void {
+		this.#disallow = compareFn;
 	}
 }

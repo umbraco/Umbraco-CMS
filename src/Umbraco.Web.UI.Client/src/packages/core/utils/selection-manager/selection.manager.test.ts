@@ -77,8 +77,8 @@ describe('UmbSelectionManager', () => {
 				expect(manager).to.have.property('clearSelection').that.is.a('function');
 			});
 
-			it('has a setFilter method', () => {
-				expect(manager).to.have.property('setFilter').that.is.a('function');
+			it('has a setDisallow method', () => {
+				expect(manager).to.have.property('setDisallow').that.is.a('function');
 			});
 		});
 	});
@@ -155,8 +155,8 @@ describe('UmbSelectionManager', () => {
 			expect(manager.getSelection()).to.deep.equal([]);
 		});
 
-		it('can not select an item if it does not pass the filter', () => {
-			manager.setFilter((item) => item !== '2');
+		it('can not select an item if it does not pass the disallow function', () => {
+			manager.setDisallow((item) => item !== '2');
 			manager.select('2');
 			expect(manager.getSelection()).to.deep.equal([]);
 
