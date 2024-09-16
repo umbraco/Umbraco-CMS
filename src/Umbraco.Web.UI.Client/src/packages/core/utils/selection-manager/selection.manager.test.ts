@@ -77,8 +77,8 @@ describe('UmbSelectionManager', () => {
 				expect(manager).to.have.property('clearSelection').that.is.a('function');
 			});
 
-			it('has a setDisallow method', () => {
-				expect(manager).to.have.property('setDisallow').that.is.a('function');
+			it('has a setAllow method', () => {
+				expect(manager).to.have.property('setAllow').that.is.a('function');
 			});
 		});
 	});
