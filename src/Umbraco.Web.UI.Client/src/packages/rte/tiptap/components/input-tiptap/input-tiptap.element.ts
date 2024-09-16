@@ -1,41 +1,65 @@
-import type { UmbTiptapFixedMenuElement } from './tiptap-fixed-menu.element.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTiptapExtensionBase } from './tiptap-extension.js';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { Editor, Link, StarterKit, TextAlign, Underline } from '@umbraco-cms/backoffice/external/tiptap';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import './tiptap-fixed-menu.element.js';
 import './tiptap-hover-menu.element.js';
-import { Editor, Link, StarterKit, TextAlign, Underline } from '@umbraco-cms/backoffice/external/tiptap';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-tiptap')
-export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, '') {
-	@query('umb-tiptap-fixed-menu') _fixedMenuElement!: UmbTiptapFixedMenuElement;
+export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, '') {
+	@state()
+	private _extensions: Array<UmbTiptapExtensionBase> = [];
+
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	_editor!: Editor;
+	private _editor!: Editor;
 
-	protected override firstUpdated(): void {
-		const editor = this.shadowRoot?.querySelector('#editor');
+	protected override async firstUpdated() {
+		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
+	}
 
-		if (!editor) return;
+	async #loadExtensions() {
+		await new Promise<void>((resolve) => {
+			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
+				this._extensions = [];
 
-		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
+				for (const manifest of manifests) {
+					if (manifest.api) {
+						const extension = await loadManifestApi(manifest.api);
+						if (extension) {
+							this._extensions.push(new extension(this));
+						}
+					}
+				}
+
+				this.requestUpdate('_extensions');
+
+				resolve();
+			});
+		});
+	}
+
+	async #loadEditor() {
+		const element = this.shadowRoot?.querySelector('#editor');
+		if (!element) return;
+
 		const maxWidth = this.configuration?.getValueByAlias<number>('maxWidth');
 		const maxHeight = this.configuration?.getValueByAlias<number>('maxHeight');
-		const mode = this.configuration?.getValueByAlias<string>('mode');
-
 		this.setAttribute('style', `max-width: ${maxWidth}px;`);
-		editor.setAttribute('style', `max-height: ${maxHeight}px;`);
+		element.setAttribute('style', `max-height: ${maxHeight}px;`);
 
-		if (!editor) return;
+		const extensions = this._extensions.map((ext) => ext.getExtensions()).flat();
 
 		this._editor = new Editor({
-			element: editor,
+			element: element,
 			extensions: [
 				StarterKit,
 				TextAlign.configure({
@@ -43,6 +67,7 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 				}),
 				Link.configure({ openOnClick: false }),
 				Underline,
+				...extensions,
 			],
 			content: this.value.toString(),
 			onUpdate: ({ editor }) => {
@@ -52,13 +77,10 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 		});
 	}
 
-	protected getFormElement() {
-		return null;
-	}
-
 	override render() {
+		if (!this._extensions?.length) return html`<uui-loader></uui-loader>`;
 		return html`
-			<umb-tiptap-fixed-menu .editor=${this._editor}></umb-tiptap-fixed-menu>
+			<umb-tiptap-fixed-menu .editor=${this._editor} .extensions=${this._extensions}></umb-tiptap-fixed-menu>
 			<div id="editor"></div>
 		`;
 	}
