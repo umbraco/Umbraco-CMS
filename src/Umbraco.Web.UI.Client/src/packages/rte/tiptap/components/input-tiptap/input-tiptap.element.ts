@@ -24,6 +24,16 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 		if (!editor) return;
 
+		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
+		const maxWidth = this.configuration?.getValueByAlias<number>('maxWidth');
+		const maxHeight = this.configuration?.getValueByAlias<number>('maxHeight');
+		const mode = this.configuration?.getValueByAlias<string>('mode');
+
+		this.setAttribute('style', `max-width: ${maxWidth}px;`);
+		editor.setAttribute('style', `max-height: ${maxHeight}px;`);
+
+		if (!editor) return;
+
 		this._editor = new Editor({
 			element: editor,
 			extensions: [
@@ -48,7 +58,6 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	override render() {
 		return html`
-			<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
 			<umb-tiptap-fixed-menu .editor=${this._editor}></umb-tiptap-fixed-menu>
 			<div id="editor"></div>
 		`;
@@ -56,18 +65,20 @@ export class UmbInputTiptapElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	static override styles = [
 		css`
+			:host {
+				display: block;
+			}
 			#editor {
+				overflow: auto;
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
+				padding: 1rem;
 				border-top-left-radius: 0;
 				border-top-right-radius: 0;
 				border-top: 0;
-				margin: 0 auto;
 				box-sizing: border-box;
 				height: 100%;
 				width: 100%;
-				padding: 1rem;
-				overflow: clip;
 				min-height: 400px;
 				display: grid; /* Don't ask me why this is needed, but it is. */
 			}
