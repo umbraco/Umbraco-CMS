@@ -44,7 +44,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const pickableFilter = this.data?.pickableFilter;
 
 		if (pickableFilter) {
-			this.#selectionManager.setDisallow((unique) => {
+			this.#selectionManager.setAllow((unique) => {
 				const option = this.data?.options.find((o) => o.unique === unique);
 				return option ? pickableFilter(option) : true;
 			});

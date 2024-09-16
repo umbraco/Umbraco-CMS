@@ -50,7 +50,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		super.updated(_changedProperties);
 
 		if (this.selectionManager && this.pickableFilter) {
-			this.#selectionManager.setDisallow((unique) => {
+			this.#selectionManager.setAllow((unique) => {
 				const option = this.variantLanguageOptions.find((o) => o.unique === unique);
 				return option ? this.pickableFilter!(option) : true;
 			});

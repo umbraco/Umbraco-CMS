@@ -155,9 +155,9 @@ describe('UmbSelectionManager', () => {
 			expect(manager.getSelection()).to.deep.equal([]);
 		});
 
-		it('can not select an item if it does not pass the disallow function', () => {
-			manager.setDisallow((item) => item !== '2');
-			manager.select('2');
+		it('can not select an item if it does not pass the allow function', () => {
+			manager.setAllow((item) => item !== '2');
+			expect(() => manager.select('2')).to.throw();
 			expect(manager.getSelection()).to.deep.equal([]);
 
 			manager.select('1');
