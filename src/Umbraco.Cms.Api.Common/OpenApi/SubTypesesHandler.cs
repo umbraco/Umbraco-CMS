@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public class SubTypeHandler(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver) : ISubTypeHandler
+public class SubTypesesHandler(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver) : ISubTypesHandler
 {
     public virtual bool CanHandle(Type type)
         => type.Namespace?.StartsWith("Umbraco.Cms") is true;

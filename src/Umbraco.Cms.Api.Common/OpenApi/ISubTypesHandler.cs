@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public interface ISubTypeHandler
+public interface ISubTypesHandler
 {
     bool CanHandle(Type type, string documentName);
 

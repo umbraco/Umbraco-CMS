@@ -7,11 +7,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public class SubTypeSelector(IOptions<GlobalSettings> settings,
+public class SubTypesesSelector(IOptions<GlobalSettings> settings,
     IHostingEnvironment hostingEnvironment,
     IHttpContextAccessor httpContextAccessor,
-    IEnumerable<ISubTypeHandler> subTypeHandlers,
-    IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver) : ISubTypeSelector
+    IEnumerable<ISubTypesHandler> subTypeHandlers,
+    IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver) : ISubTypesSelector
 {
     public IEnumerable<Type> SubTypes(Type type)
     {
@@ -25,7 +25,7 @@ public class SubTypeSelector(IOptions<GlobalSettings> settings,
             var documentName = segments[0];
 
             // Find the first handler that can handle the type / document name combination
-            ISubTypeHandler? handler = subTypeHandlers.FirstOrDefault(h => h.CanHandle(type, documentName));
+            ISubTypesHandler? handler = subTypeHandlers.FirstOrDefault(h => h.CanHandle(type, documentName));
             if (handler != null)
             {
                 return handler.Handle(type);

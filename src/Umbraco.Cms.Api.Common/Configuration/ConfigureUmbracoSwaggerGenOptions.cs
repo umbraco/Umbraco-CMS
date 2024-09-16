@@ -15,7 +15,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
 {
     private readonly IOperationIdSelector _operationIdSelector;
     private readonly ISchemaIdSelector _schemaIdSelector;
-    private readonly ISubTypeSelector _subTypeSelector;
+    private readonly ISubTypesSelector _subTypesSelector;
 
     [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
     public ConfigureUmbracoSwaggerGenOptions(
@@ -30,17 +30,17 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,
         ISchemaIdSelector schemaIdSelector)
-        : this(operationIdSelector, schemaIdSelector, StaticServiceProvider.Instance.GetRequiredService<ISubTypeSelector>())
+        : this(operationIdSelector, schemaIdSelector, StaticServiceProvider.Instance.GetRequiredService<ISubTypesSelector>())
     { }
 
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,
         ISchemaIdSelector schemaIdSelector,
-        ISubTypeSelector subTypeSelector)
+        ISubTypesSelector subTypesSelector)
     {
         _operationIdSelector = operationIdSelector;
         _schemaIdSelector = schemaIdSelector;
-        _subTypeSelector = subTypeSelector;
+        _subTypesSelector = subTypesSelector;
     }
 
     public void Configure(SwaggerGenOptions swaggerGenOptions)
@@ -73,7 +73,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);
-        swaggerGenOptions.SelectSubTypesUsing(_subTypeSelector.SubTypes);
+        swaggerGenOptions.SelectSubTypesUsing(_subTypesSelector.SubTypes);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
     }
 

@@ -23,8 +23,8 @@ public static class UmbracoBuilderApiExtensions
         builder.Services.AddSingleton<IOperationIdHandler, OperationIdHandler>();
         builder.Services.AddSingleton<ISchemaIdSelector, SchemaIdSelector>();
         builder.Services.AddSingleton<ISchemaIdHandler, SchemaIdHandler>();
-        builder.Services.AddSingleton<ISubTypeSelector, SubTypeSelector>();
-        builder.Services.AddSingleton<ISubTypeHandler, SubTypeHandler>();
+        builder.Services.AddSingleton<ISubTypesSelector, SubTypesesSelector>();
+        builder.Services.AddSingleton<ISubTypesHandler, SubTypesesHandler>();
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new SwaggerRouteTemplatePipelineFilter("UmbracoApiCommon")));
 
         return builder;
