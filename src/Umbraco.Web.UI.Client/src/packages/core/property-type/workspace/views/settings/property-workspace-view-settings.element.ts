@@ -285,24 +285,24 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<b style="margin-bottom: var(--uui-size-space-3)">
 					<umb-localize key="general_options">Options</umb-localize>
 				</b>
-				<div>
+				<div class="options">
 					<uui-toggle
 						?checked=${this._data?.visibility?.memberCanView}
 						@change=${this.#onToggleShowOnMemberProfile}
 						label=${this.localize.term('contentTypeEditor_showOnMemberProfile')}></uui-toggle>
-					<div>${this.localize.term('contentTypeEditor_showOnMemberProfileDescription')}</div>
+					<small>${this.localize.term('contentTypeEditor_showOnMemberProfileDescription')}</small>
 
 					<uui-toggle
 						?checked=${this._data?.visibility?.memberCanEdit}
 						@change=${this.#onToggleMemberCanEdit}
 						label=${this.localize.term('contentTypeEditor_memberCanEdit')}></uui-toggle>
-					<div>${this.localize.term('contentTypeEditor_memberCanEditDescription')}</div>
+					<small>${this.localize.term('contentTypeEditor_memberCanEditDescription')}</small>
 
 					<uui-toggle
 						?checked=${this._data?.isSensitive}
 						@change=${this.#onToggleIsSensitiveData}
 						label=${this.localize.term('contentTypeEditor_isSensitiveData')}></uui-toggle>
-					<div>${this.localize.term('contentTypeEditor_isSensitiveDataDescription')}</div>
+					<small>${this.localize.term('contentTypeEditor_isSensitiveDataDescription')}</small>
 				</div>
 			</div>`;
 	}
