@@ -1,11 +1,7 @@
-import { UmbConditionBase } from './condition-base.controller.js';
+import { UmbConditionBase } from '../../extension-registry/conditions/condition-base.controller.js';
+import type { SectionAliasConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	ManifestCondition,
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-	UmbExtensionCondition,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 
 export class UmbSectionAliasCondition
@@ -35,24 +31,3 @@ export class UmbSectionAliasCondition
 		}
 	}
 }
-
-export type SectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.SectionAlias'> & {
-	/**
-	 * Define the section that this extension should be available in
-	 * @example "Umb.Section.Content"
-	 */
-	match: string;
-	/**
-	 * Define one or more workspaces that this extension should be available in
-	 * @example
-	 * ["Umb.Section.Content", "Umb.Section.Media"]
-	 */
-	oneOf?: Array<string>;
-};
-
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'Section Alias Condition',
-	alias: 'Umb.Condition.SectionAlias',
-	api: UmbSectionAliasCondition,
-};

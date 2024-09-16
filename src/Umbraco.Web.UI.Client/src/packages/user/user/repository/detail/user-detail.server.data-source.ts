@@ -1,5 +1,6 @@
 import type { UmbUserDetailModel, UmbUserStartNodesModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
+import { UmbUserKind } from '../../utils/index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -10,7 +11,6 @@ import type {
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbUserKind } from '../../utils/index.js';
 
 /**
  * A data source for the User that fetches data from the server

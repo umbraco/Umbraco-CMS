@@ -4,7 +4,7 @@ import { manifests as duplicateToManifests } from './duplicate-to/manifests.js';
 import { manifests as moveToManifests } from './move-to/manifests.js';
 import { manifests as trashManifests } from './trash/manifests.js';
 import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
-import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_COLLECTION_ALIAS_CONDITION,
 	UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
@@ -59,7 +59,7 @@ export const entityBulkActions: Array<ManifestEntityBulkAction> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...entityBulkActions,
 	...duplicateToManifests,
 	...moveToManifests,

@@ -1,19 +1,13 @@
 import { UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS } from './constants.js';
-import type {
-	ManifestEntityAction,
-	ManifestRepository,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 
-const folderRepository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS,
-	name: 'Media Type Folder Repository',
-	api: () => import('./media-type-folder.repository.js'),
-};
-
-const entityActions: Array<ManifestEntityAction> = [
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'repository',
+		alias: UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS,
+		name: 'Media Type Folder Repository',
+		api: () => import('./media-type-folder.repository.js'),
+	},
 	{
 		type: 'entityAction',
 		kind: 'folderUpdate',
@@ -35,5 +29,3 @@ const entityActions: Array<ManifestEntityAction> = [
 		},
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];

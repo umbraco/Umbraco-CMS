@@ -5,9 +5,8 @@ import { UMB_USER_PERMISSION_DOCUMENT_SORT } from '../../user-permissions/index.
 import { UMB_SORT_CHILDREN_OF_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	{
 		type: 'entityAction',

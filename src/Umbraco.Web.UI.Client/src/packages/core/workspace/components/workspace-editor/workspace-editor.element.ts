@@ -3,7 +3,7 @@ import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbra
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 
 /**

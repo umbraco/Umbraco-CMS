@@ -3,13 +3,13 @@ import type { UmbUserCollectionContext } from '../../user-collection.context.js'
 import type { UmbUserDetailModel } from '../../../types.js';
 import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
 import { UMB_USER_WORKSPACE_PATH } from '../../../paths.js';
+import { UmbUserKind } from '../../../utils/index.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
-import { UmbUserKind } from '../../../utils/index.js';
 
 @customElement('umb-user-grid-collection-view')
 export class UmbUserGridCollectionViewElement extends UmbLitElement {

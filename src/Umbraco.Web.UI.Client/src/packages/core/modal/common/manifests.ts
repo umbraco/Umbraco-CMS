@@ -1,6 +1,4 @@
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const modals: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Confirm',
@@ -32,5 +30,3 @@ const modals: Array<ManifestModal> = [
 		element: () => import('./item-picker/item-picker-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...modals];

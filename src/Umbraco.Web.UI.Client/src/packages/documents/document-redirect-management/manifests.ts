@@ -1,6 +1,4 @@
-import type { ManifestDashboard, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const dashboards: Array<ManifestDashboard> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.RedirectManagement',
@@ -19,5 +17,3 @@ const dashboards: Array<ManifestDashboard> = [
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...dashboards];

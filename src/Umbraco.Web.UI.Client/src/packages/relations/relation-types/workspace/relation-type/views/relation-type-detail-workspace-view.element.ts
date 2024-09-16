@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRelationDetailModel } from '@umbraco-cms/backoffice/relations';
 import { UmbRelationCollectionRepository } from '@umbraco-cms/backoffice/relations';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';

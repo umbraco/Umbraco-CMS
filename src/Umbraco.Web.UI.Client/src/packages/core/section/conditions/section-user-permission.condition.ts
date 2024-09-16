@@ -27,10 +27,3 @@ export class UmbSectionUserPermissionCondition extends UmbControllerBase impleme
 		});
 	}
 }
-
-export const manifest = {
-	type: 'condition',
-	name: 'Section User Permission Condition',
-	alias: 'Umb.Condition.SectionUserPermission',
-	api: UmbSectionUserPermissionCondition,
-};

@@ -5,9 +5,8 @@ import { manifests as userAllowEnableActionManifests } from './allow-enable/mani
 import { manifests as userAllowExternalLoginActionManifests } from './allow-external-login/manifests.js';
 import { manifests as userAllowMfaActionManifests } from './allow-mfa/manifests.js';
 import { manifests as userAllowUnlockActionManifests } from './allow-unlock/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...userAllowChangePasswordActionManifests,
 	...userAllowDeleteActionManifests,
 	...userAllowDisableActionManifests,

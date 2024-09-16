@@ -1,14 +1,13 @@
 import { manifest as blockGridSchemaManifest } from './Umbraco.BlockGrid.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockGrid';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.BlockGrid',
 		name: 'Block Grid Property Editor UI',
-		js: () => import('./property-editor-ui-block-grid.element.js'),
+		element: () => import('./property-editor-ui-block-grid.element.js'),
 		meta: {
 			label: 'Block Grid',
 			propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS,

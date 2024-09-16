@@ -1,4 +1,4 @@
-import './models/index.js';
+import './all-packages.js';
 
 /**
  * Umbraco package manifest JSON

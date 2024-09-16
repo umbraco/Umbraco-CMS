@@ -1,6 +1,4 @@
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
-
-const workspace: ManifestWorkspaceView = {
+const workspace: UmbExtensionManifest = {
 	type: 'workspaceView',
 	alias: 'Example.WorkspaceView.EntityContentTypeCondition',
 	name: 'Example Workspace View With Entity Content Type Condition',

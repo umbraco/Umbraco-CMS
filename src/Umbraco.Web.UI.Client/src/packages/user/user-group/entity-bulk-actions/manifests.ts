@@ -1,9 +1,8 @@
 import { UMB_USER_GROUP_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../entity.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestEntityBulkAction> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityBulkAction',
 		alias: 'Umb.EntityBulkAction.UserGroup.Delete',
@@ -22,5 +21,3 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions];
