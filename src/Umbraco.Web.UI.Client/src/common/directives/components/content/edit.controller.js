@@ -652,6 +652,7 @@
                     },
                     close: function () {
                         overlayService.close();
+                        formHelper.resetForm({ scope: $scope });
                     }
                 };
 
@@ -697,6 +698,7 @@
                         },
                         close: function () {
                             overlayService.close();
+                            formHelper.resetForm({ scope: $scope });
                         }
                     };
 
@@ -758,14 +760,12 @@
                                 clearNotifications($scope.content);
 
                               handleHttpException(err);
-                              $scope.$broadcast("formSubmittedValidationFailed");
                               deferred.reject(err);
                             });
                         },
                         close: function () {
                             overlayService.close();
-                            // Well, it did not actually submit, but we did not have validation failed. And we need to fire an event to re-enable properties.
-                            $scope.$broadcast("formSubmitted");
+                            formHelper.resetForm({ scope: $scope });
                             deferred.reject();
                         }
                     };
@@ -774,7 +774,7 @@
                 else {
                     $scope.page.buttonGroupState = "error";
                     showValidationNotification();
-                    $scope.$broadcast("formSubmittedValidationFailed");
+                    formHelper.resetForm({ scope: $scope, errors: true });
                     deferred.reject();
                 }
             }
@@ -792,7 +792,6 @@
                 }, function (err) {
                     $scope.page.buttonGroupState = "error";
                     handleHttpException(err);
-                    $scope.$broadcast("formSubmittedValidationFailed")
                     deferred.reject(err);
                 });
             }
@@ -874,6 +873,7 @@
                         $scope.page.saveButtonState = "error";
                     }
                     handleHttpException(err);
+                    $scope.$broadcast("formSubmittedValidationFailed")
                     deferred.reject();
                 });
             }
@@ -918,6 +918,7 @@
                             formHelper.showNotifications(data);
                             clearNotifications($scope.content);
                             overlayService.close();
+                            formHelper.resetForm({ scope: $scope });
                             return $q.when(data);
                         }, function (err) {
                             clearDirtyState($scope.content.variants);
@@ -933,6 +934,7 @@
 
                     },
                     close: function () {
+                      formHelper.resetForm({ scope: $scope });
                         overlayService.close();
                     }
                 };
@@ -992,6 +994,7 @@
 
                     },
                     close: function () {
+                        formHelper.resetForm({ scope: $scope });
                         overlayService.close();
                     }
                 };
@@ -1007,7 +1010,7 @@
             const openPreviewWindow = (url, target) => {
                 // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
-              
+
               const previewWindow = $window.open(url, target);
 
               previewWindow.addEventListener('load', () => {
