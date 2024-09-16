@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Member;
 
-public class MemberResponseModel : ContentResponseModelBase<MemberValueModel, MemberVariantResponseModel>
+public class MemberResponseModel : ContentResponseModelBase<MemberValueResponseModel, MemberVariantResponseModel>
 {
     public string Email { get; set; } = string.Empty;
 

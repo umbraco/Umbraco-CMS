@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
 public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantViewModel>
     where TContent : IContentBase
-    where TValueViewModel : ValueModelBase, new()
+    where TValueViewModel : ValueResponseModelBase, new()
     where TVariantViewModel : VariantResponseModelBase, new()
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
@@ -36,7 +36,8 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                         Culture = propertyValue.Culture,
                         Segment = propertyValue.Segment,
                         Alias = property.Alias,
-                        Value = propertyEditor.GetValueEditor().ToEditor(property, propertyValue.Culture, propertyValue.Segment)
+                        Value = propertyEditor.GetValueEditor().ToEditor(property, propertyValue.Culture, propertyValue.Segment),
+                        EditorAlias = propertyEditor.Alias
                     };
                     additionalPropertyMapping?.Invoke(propertyEditor, variantViewModel);
                     return variantViewModel;
