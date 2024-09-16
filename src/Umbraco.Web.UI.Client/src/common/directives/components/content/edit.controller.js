@@ -774,7 +774,7 @@
                 else {
                     $scope.page.buttonGroupState = "error";
                     showValidationNotification();
-                    formHelper.resetForm({ scope: $scope, errors: true });
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     deferred.reject();
                 }
             }
@@ -873,7 +873,6 @@
                         $scope.page.saveButtonState = "error";
                     }
                     handleHttpException(err);
-                    $scope.$broadcast("formSubmittedValidationFailed")
                     deferred.reject();
                 });
             }
