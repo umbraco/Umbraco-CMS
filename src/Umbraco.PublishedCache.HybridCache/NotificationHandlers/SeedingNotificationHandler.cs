@@ -9,13 +9,11 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 internal class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
 {
     private readonly IDocumentCacheService _documentCacheService;
-    private readonly CacheSettings _cacheSettings;
 
-    public SeedingNotificationHandler(IDocumentCacheService documentCacheService, IOptions<CacheSettings> cacheSettings)
+    public SeedingNotificationHandler(IDocumentCacheService documentCacheService)
     {
         _documentCacheService = documentCacheService;
-        _cacheSettings = cacheSettings.Value;
     }
 
-    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken) => await _documentCacheService.SeedAsync(_cacheSettings.ContentTypeKeys);
+    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken) => await _documentCacheService.SeedAsync();
 }
