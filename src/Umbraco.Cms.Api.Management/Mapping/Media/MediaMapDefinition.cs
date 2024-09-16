@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Media;
 
-public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueModel, MediaVariantResponseModel>, IMapDefinition
+public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueResponseModel, MediaVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
 

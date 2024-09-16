@@ -36349,7 +36349,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -36434,7 +36434,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -36687,7 +36687,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -37369,6 +37369,35 @@
         },
         "additionalProperties": false
       },
+      "DocumentValueResponseModel": {
+        "required": [
+          "alias",
+          "editorAlias"
+        ],
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "nullable": true
+          },
+          "editorAlias": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentVariantItemResponseModel": {
         "required": [
           "name",
@@ -37527,7 +37556,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentValueModel"
+                  "$ref": "#/components/schemas/DocumentValueResponseModel"
                 }
               ]
             }
@@ -38569,7 +38598,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MediaValueModel"
+                  "$ref": "#/components/schemas/MediaValueResponseModel"
                 }
               ]
             }
@@ -38752,7 +38781,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MediaValueModel"
+                  "$ref": "#/components/schemas/MediaValueResponseModel"
                 }
               ]
             }
@@ -39340,6 +39369,35 @@
         },
         "additionalProperties": false
       },
+      "MediaValueResponseModel": {
+        "required": [
+          "alias",
+          "editorAlias"
+        ],
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "nullable": true
+          },
+          "editorAlias": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaVariantRequestModel": {
         "required": [
           "name"
@@ -39508,7 +39566,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/MemberValueModel"
+                  "$ref": "#/components/schemas/MemberValueResponseModel"
                 }
               ]
             }
@@ -39989,6 +40047,35 @@
           },
           "value": {
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MemberValueResponseModel": {
+        "required": [
+          "alias",
+          "editorAlias"
+        ],
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "nullable": true
+          },
+          "editorAlias": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
