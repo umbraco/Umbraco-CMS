@@ -1633,7 +1633,7 @@ export default {
 		memberCanEditDescription: 'Tillad at denne egenskab kan redigeres af medlemmet på dets profil.',
 		isSensitiveData: 'Er følsom data',
 		isSensitiveDataDescription:
-			'Skjul værdien af denne egenskab for indholdsredaktører der ikke har adgang\n      til at se følsomme data\n    ',
+			'Skjul værdien af denne egenskab for indholdsredaktører der ikke har adgang til at se følsomme data',
 		showOnMemberProfile: 'Vis på medlemsprofil',
 		showOnMemberProfileDescription: 'Tillad at denne egenskab kan vises på medlemmets profil.',
 		tabHasNoSortOrder: 'fane har ingen sorteringsrækkefølge',
