@@ -1492,14 +1492,12 @@ export default {
 		andAllMediaItems: 'en alle media items van dit type',
 		andAllMembers: 'en alle leden van dit type',
 		memberCanEdit: 'Lid kan bewerken',
-		memberCanEditDescription:
-			'Toestaan dat deze eigenschap kan worden gewijzigd door het lid op zijn profiel\n      pagina.\n    ',
+		memberCanEditDescription: 'Toestaan dat deze eigenschap kan worden gewijzigd door het lid op zijn profiel pagina.',
 		isSensitiveData: 'Omvat gevoelige gegevens',
 		isSensitiveDataDescription:
-			'Verberg deze eigenschap voor de content editor die geen toegang heeft tot\n      het bekijken van gevoelige informatie.\n    ',
+			'Verberg deze eigenschap voor de content editor die geen toegang heeft tot het bekijken van gevoelige informatie.',
 		showOnMemberProfile: 'Toon in het profiel van leden',
-		showOnMemberProfileDescription:
-			'Toelaten dat deze eigenschap wordt getoond op de profiel pagina van het\n      lid.\n    ',
+		showOnMemberProfileDescription: 'Toelaten dat deze eigenschap wordt getoond op de profiel pagina van het lid.',
 		tabHasNoSortOrder: 'tab heeft geen sorteervolgorde',
 		compositionUsageHeading: 'Waar wordt deze compositie gebruikt?',
 		compositionUsageSpecification:

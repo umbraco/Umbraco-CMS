@@ -8,6 +8,7 @@ import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as rollbackManifests } from './rollback/manifests.js';
 import { manifests as searchProviderManifests } from './search/manifests.js';
 import { manifests as trackedReferenceManifests } from './reference/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
@@ -27,6 +28,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyEditorManifests,
 	...recycleBinManifests,
 	...repositoryManifests,
+	...rollbackManifests,
 	...searchProviderManifests,
 	...trackedReferenceManifests,
 	...treeManifests,

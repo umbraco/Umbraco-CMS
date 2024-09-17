@@ -1,13 +1,13 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UmbRollbackRepository } from '../repository/rollback.repository.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
-import { UmbRollbackRepository } from './repository/rollback.repository.js';
 import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
 import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-import '../shared/document-variant-language-picker.element.js';
+import '../../modals/shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
