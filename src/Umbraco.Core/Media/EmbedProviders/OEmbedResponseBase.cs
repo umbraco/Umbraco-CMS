@@ -34,7 +34,7 @@ public abstract class OEmbedResponseBase<T>
     public string? ThumbnailUrl { get; set; }
 
     [DataMember(Name = "thumbnail_height")]
-    public T? ThumbnailHeight { get; set; }
+    public virtual T? ThumbnailHeight { get; set; }
 
     [DataMember(Name = "thumbnail_width")]
     public T? ThumbnailWidth { get; set; }
