@@ -1555,14 +1555,13 @@ export default {
 		andAllMediaItems: 'e tutti i media che usano questo tipo',
 		andAllMembers: 'e tutti i membri che usano questo tipo',
 		memberCanEdit: 'Il membro può modificare',
-		memberCanEditDescription:
-			'Abilita il membro alla modifica di questo valore dalla pagina del suo\n      profilo.\n    ',
+		memberCanEditDescription: 'Abilita il membro alla modifica di questo valore dalla pagina del suo profilo.',
 		isSensitiveData: 'Dati sensibili',
 		isSensitiveDataDescription:
 			"Nascondi il valore di questa proprietà dagli editors che non hanno l'accesso per visualizzare i dati sensibili",
 		showOnMemberProfile: 'Visualizza sul profilo del membro',
 		showOnMemberProfileDescription:
-			'Permette a questo valore di essere visualizzato sulla pagina del profilo\n      del membro\n    ',
+			'Permette a questo valore di essere visualizzato sulla pagina del profilo del membro',
 		tabHasNoSortOrder: 'la scheda non ha un ordine',
 		compositionUsageHeading: 'Dove è usata questa composizione?',
 		compositionUsageSpecification: 'Questa composizione è usata nella composizione dei seguenti tipi di contenuto:',

@@ -312,6 +312,21 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 								<span>* ${this.localize.term('general_mandatory')}</span>
 							</uui-tag>`
 						: nothing}
+					${this.property.visibility?.memberCanView === true
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-eye"></uui-icon> ${this.localize.term('contentTypeEditor_showOnMemberProfile')}
+							</uui-tag>`
+						: nothing}
+					${this.property.visibility?.memberCanEdit === true
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-edit"></uui-icon> ${this.localize.term('contentTypeEditor_memberCanEdit')}
+							</uui-tag>`
+						: nothing}
+					${this.property.isSensitive === true
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-lock"></uui-icon> ${this.localize.term('contentTypeEditor_isSensitiveData')}
+							</uui-tag>`
+						: nothing}
 				</div>`
 			: nothing;
 	}
@@ -433,6 +448,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			.types > div uui-icon,
 			.inherited uui-icon {
 				vertical-align: sub;
+				margin-right: var(--uui-size-space-1);
 			}
 
 			.inherited {
@@ -446,6 +462,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				top: var(--uui-size-space-2);
 				left: var(--uui-size-space-2);
 				display: flex;
+				flex-flow: wrap;
 				gap: var(--uui-size-space-2);
 			}
 
