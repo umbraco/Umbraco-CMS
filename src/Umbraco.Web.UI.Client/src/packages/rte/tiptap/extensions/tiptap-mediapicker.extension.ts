@@ -1,4 +1,4 @@
-import { UmbTiptapExtensionBase } from '../components/input-tiptap/tiptap-extension.js';
+import { UmbTiptapExtensionBase } from './tiptap-extension.js';
 import { mergeAttributes, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';

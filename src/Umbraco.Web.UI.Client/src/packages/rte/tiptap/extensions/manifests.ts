@@ -1,4 +1,4 @@
-import type { ManifestTiptapExtension } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTiptapExtension } from './tiptap-extension.js';
 
 export const manifests: Array<ManifestTiptapExtension> = [
 	{

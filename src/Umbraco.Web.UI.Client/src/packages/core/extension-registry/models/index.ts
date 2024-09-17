@@ -42,7 +42,6 @@ import type { ManifestSectionView } from './section-view.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
 import type { ManifestTheme } from './theme.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
-import type { ManifestTiptapExtension } from './tiptap-extension.model.js';
 import type { ManifestTree } from './tree.model.js';
 import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUfmComponent } from './ufm-component.model.js';
@@ -114,7 +113,6 @@ export type * from './section.model.js';
 export type * from './store.model.js';
 export type * from './theme.model.js';
 export type * from './tinymce-plugin.model.js';
-export type * from './tiptap-extension.model.js';
 export type * from './tree-item.model.js';
 export type * from './tree.model.js';
 export type * from './ufm-component.model.js';
@@ -208,7 +206,6 @@ export type ManifestTypes =
 	| ManifestStore
 	| ManifestTheme
 	| ManifestTinyMcePlugin
-	| ManifestTiptapExtension
 	| ManifestTree
 	| ManifestTreeItem
 	| ManifestTreeStore
