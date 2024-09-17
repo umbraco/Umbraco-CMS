@@ -158,7 +158,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	 * @param compareFn A function that determines if an item is selectable or not.
 	 * @memberof UmbSelectionManager
 	 */
-	public setAllow(compareFn: (unique: ValueType) => boolean): void {
+	public setAllowLimitation(compareFn: (unique: ValueType) => boolean): void {
 		this.#allow = compareFn;
 	}
 }

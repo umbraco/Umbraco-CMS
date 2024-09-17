@@ -77,8 +77,8 @@ describe('UmbSelectionManager', () => {
 				expect(manager).to.have.property('clearSelection').that.is.a('function');
 			});
 
-			it('has a setAllow method', () => {
-				expect(manager).to.have.property('setAllow').that.is.a('function');
+			it('has a setAllowLimitation method', () => {
+				expect(manager).to.have.property('setAllowLimitation').that.is.a('function');
 			});
 		});
 	});
@@ -156,7 +156,7 @@ describe('UmbSelectionManager', () => {
 		});
 
 		it('can not select an item if it does not pass the allow function', () => {
-			manager.setAllow((item) => item !== '2');
+			manager.setAllowLimitation((item) => item !== '2');
 			expect(() => manager.select('2')).to.throw();
 			expect(manager.getSelection()).to.deep.equal([]);
 
