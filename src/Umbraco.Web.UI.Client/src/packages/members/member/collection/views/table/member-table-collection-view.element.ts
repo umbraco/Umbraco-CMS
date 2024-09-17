@@ -8,6 +8,8 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
 
+import './member-table-entity-actions-column-layout.element.js';
+
 @customElement('umb-member-table-collection-view')
 export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	@state()
@@ -36,6 +38,11 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 		{
 			name: this.localize.term('member_kind'),
 			alias: 'memberKind',
+		},
+		{
+			name: '',
+			alias: 'entityActions',
+			elementName: 'umb-member-table-entity-actions-column-layout',
 		},
 	];
 
@@ -96,6 +103,13 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'memberKind',
 						value: kind,
+					},
+					{
+						columnAlias: 'entityActions',
+						value: {
+							entityType: member.entityType,
+							unique: member.unique,
+						},
 					},
 				],
 			};
