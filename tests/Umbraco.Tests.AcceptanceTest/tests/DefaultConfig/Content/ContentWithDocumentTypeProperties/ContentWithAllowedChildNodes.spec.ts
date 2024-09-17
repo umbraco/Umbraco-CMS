@@ -15,6 +15,29 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
+test('can create a content with allowed child node is enabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childDocumentTypeName = 'Test Child Document Type';
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickSaveButton();
+  
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+});
+
 test('cannot create a child content if allowed child node is not enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const noAllowedDocumentTypeAvailableMessage = 'There are no allowed Document Types available for creating content here';
@@ -30,7 +53,6 @@ test('cannot create a child content if allowed child node is not enabled', async
   await umbracoUi.content.isDocumentTypeNameVisible(documentTypeName, false);
   await umbracoUi.content.doesModalHaveText(noAllowedDocumentTypeAvailableMessage);
 });
-
 
 test('can create multiple child nodes with different document types', async ({umbracoApi, umbracoUi}) => {
   // Arrange
@@ -74,4 +96,3 @@ test('can create multiple child nodes with different document types', async ({um
   await umbracoApi.documentType.ensureNameNotExists(firstChildDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(secondChildDocumentTypeName);
 });
-
