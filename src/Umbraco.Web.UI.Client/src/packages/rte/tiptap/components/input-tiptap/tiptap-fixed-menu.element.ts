@@ -144,6 +144,7 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 		this.#editor = value;
 		this.#editor?.on('selectionUpdate', this.#onUpdate);
 		this.#editor?.on('update', this.#onUpdate);
+		// todo add listener for commands
 	}
 	get editor() {
 		return this.#editor;
