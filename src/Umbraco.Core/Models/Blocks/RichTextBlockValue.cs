@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
@@ -19,6 +21,7 @@ public class RichTextBlockValue : BlockValue<RichTextBlockLayoutItem>
         => Layout[PropertyEditorAlias] = layouts;
 
     /// <inheritdoc />
+    [JsonIgnore]
     public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.RichText;
 
     // RTE block layouts uses "Umbraco.TinyMCE" in V14 and below, but should use "Umbraco.RichText" for V15+
