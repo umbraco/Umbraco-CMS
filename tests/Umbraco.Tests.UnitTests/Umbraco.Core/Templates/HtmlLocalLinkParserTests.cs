@@ -29,9 +29,8 @@ public class HtmlLocalLinkParserTests
 </p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" />
 <a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
 </p>";
-
-        var umbracoContextAccessor = new TestUmbracoContextAccessor();
-        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+        
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
 
@@ -56,8 +55,7 @@ public class HtmlLocalLinkParserTests
 <a href=""{locallink:umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2}"">hello</a>
 </p>";
 
-        var umbracoContextAccessor = new TestUmbracoContextAccessor();
-        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
 
@@ -90,8 +88,7 @@ public class HtmlLocalLinkParserTests
 <a type=""media"" href=""/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}"" title=""media"">media</a>
 </p>";
 
-        var umbracoContextAccessor = new TestUmbracoContextAccessor();
-        var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
 
         var result = parser.FindUdisFromLocalLinks(input).ToList();
 
@@ -204,7 +201,7 @@ public class HtmlLocalLinkParserTests
             mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
             mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
+            var linkParser = new HtmlLocalLinkParser(publishedUrlProvider);
 
             var output = linkParser.EnsureInternalLinks(input);
 

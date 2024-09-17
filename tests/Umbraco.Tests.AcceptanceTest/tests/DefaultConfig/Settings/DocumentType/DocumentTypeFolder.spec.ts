@@ -49,6 +49,7 @@ test('can delete a document type folder', {tag: '@smoke'}, async ({umbracoApi, u
 test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const oldFolderName = 'OldName';
+  await umbracoApi.documentType.ensureNameNotExists(oldFolderName);
   await umbracoApi.documentType.createFolder(oldFolderName);
 
   // Act
@@ -57,7 +58,7 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.clickActionsMenuForName(oldFolderName);
   await umbracoUi.documentType.clickRenameFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
-  await umbracoUi.documentType.clickUpdateFolderButton();
+  await umbracoUi.documentType.clickConfirmRenameFolderButton();
 
   // Assert
   await umbracoUi.documentType.isSuccessNotificationVisible();

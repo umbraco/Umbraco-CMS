@@ -42,7 +42,7 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     /// <summary>
     ///     The type of user.
     /// </summary>
-    UserType Type { get; set; }
+    UserKind Kind { get; set; }
 
     void RemoveGroup(string group);
 

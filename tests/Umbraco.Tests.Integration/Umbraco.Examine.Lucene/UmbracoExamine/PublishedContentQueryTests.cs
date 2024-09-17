@@ -59,8 +59,8 @@ public class PublishedContentQueryTests : ExamineBaseTest
                     new Dictionary<string, object>
                     {
                         [name] = "Hello world, there are products here",
-                        [UmbracoExamineFieldNames.VariesByCultureFieldName] = culture.IsNullOrEmpty() ? "n" : "y",
-                        [culture.IsNullOrEmpty() ? UmbracoExamineFieldNames.PublishedFieldName : $"{UmbracoExamineFieldNames.PublishedFieldName}_{culture}"] = "y"
+                        [UmbracoExamineFieldNames.VariesByCultureFieldName] = string.IsNullOrEmpty(culture) ? "n" : "y",
+                        [string.IsNullOrEmpty(culture) ? UmbracoExamineFieldNames.PublishedFieldName : $"{UmbracoExamineFieldNames.PublishedFieldName}_{culture}"] = "y"
                     }));
             }
         }

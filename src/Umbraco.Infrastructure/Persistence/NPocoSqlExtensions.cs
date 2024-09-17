@@ -66,6 +66,21 @@ namespace Umbraco.Extensions
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>
         /// <param name="field">An expression specifying the field.</param>
+        /// <param name="values">The values.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values, string alias)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field, alias);
+            sql.Where(fieldName + " IN (@values)", new { values });
+            return sql;
+        }
+
+        /// <summary>
+        /// Appends a WHERE IN clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the field.</param>
         /// <param name="values">A subquery returning the value.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, Sql<ISqlContext>? values)
