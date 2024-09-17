@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const dataTypeName = 'List View - Media';
@@ -58,9 +58,9 @@ test('can add more columns to the list in the media section', async ({umbracoApi
   // Arrange
   const expectedColumns = ['Name', 'Last edited', 'Updated by', 'Size'];
   const updatedValue = [
-    {"alias":"updateDate","header":"Last edited","isSystem":true},
-    {"alias":"creator","header":"Updated by","isSystem":true},
-    {"alias":"umbracoBytes","header":"Size","isSystem":0}
+    {"alias": "updateDate", "header": "Last edited", "isSystem": true},
+    {"alias": "creator", "header": "Updated by", "isSystem": true},
+    {"alias": "umbracoBytes", "header": "Size", "isSystem": 0}
   ];
 
   // Act
@@ -75,7 +75,15 @@ test('can add more columns to the list in the media section', async ({umbracoApi
 
 test('can disable one view in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const updatedValue = [{"name":"List","collectionView":"Umb.CollectionView.Media.Table","icon":"icon-list","isSystem":true,"selected":true}];
+  const updatedValue = [
+    {
+      "name": "List",
+      "collectionView": "Umb.CollectionView.Media.Table",
+      "icon": "icon-list",
+      "isSystem": true,
+      "selected": true
+    }
+  ];
   
   // Act
   await umbracoApi.dataType.updateListViewMediaDataType('layouts', updatedValue);
@@ -90,11 +98,11 @@ test('can disable one view in the media section', async ({umbracoApi, umbracoUi}
 test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedValue = {
-    "allowBulkPublish":false,
-    "allowBulkUnpublish":false,
-    "allowBulkCopy":false,
-    "allowBulkDelete":true,
-    "allowBulkMove":false
+    "allowBulkPublish": false,
+    "allowBulkUnpublish": false,
+    "allowBulkCopy": false,
+    "allowBulkDelete": true,
+    "allowBulkMove": false
   };
   
   // Act
@@ -118,11 +126,11 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   // Arrange
   const mediaFolderName = 'Test Folder Name';
   const updatedValue = {
-    "allowBulkPublish":false,
-    "allowBulkUnpublish":false,
-    "allowBulkCopy":false,
-    "allowBulkDelete":false,
-    "allowBulkMove":true
+    "allowBulkPublish": false,
+    "allowBulkUnpublish": false,
+    "allowBulkCopy": false,
+    "allowBulkDelete": false,
+    "allowBulkMove": true
   };
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
@@ -145,4 +153,3 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
 });
-

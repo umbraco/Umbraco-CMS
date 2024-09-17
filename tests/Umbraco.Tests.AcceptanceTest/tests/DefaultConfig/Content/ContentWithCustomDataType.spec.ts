@@ -86,7 +86,7 @@ test('can create content with the custom data type with decimal property editor'
 test('can add decimal number to the decimal in the content section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Decimal';
-  const decmial = 3.9;
+  const decimal = 3.9;
   const customDataTypeId = await umbracoApi.dataType.createDecimalDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -95,7 +95,7 @@ test('can add decimal number to the decimal in the content section', async ({umb
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.enterNumeric(decmial);
+  await umbracoUi.content.enterNumeric(decimal);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -103,7 +103,7 @@ test('can add decimal number to the decimal in the content section', async ({umb
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(decmial);
+  expect(contentData.values[0].value).toEqual(decimal);
 });
 
 // Skip this test as currently there is no code editor property editor available.
@@ -129,7 +129,6 @@ test.skip('can create content with the custom data type with code editor propert
   expect(contentData.values).toEqual([]);
 });
 
-// Skip this test as currently there is no code editor property editor available.
 test('can add javascript code to the code editor in the content section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Code Editor';
@@ -175,7 +174,7 @@ test('can create content with the custom data type with markdown editor property
   expect(contentData.values).toEqual([]);
 });
 
-test('can add code to the markdown editor', async ({umbracoApi, umbracoUi}) => {
+test('can add code to the markdown editor in the content section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Markdown Editor';
   const inputText = '# This is test heading\r\n> This is test quote';
@@ -316,6 +315,3 @@ test('can save content after changing the property editor of the custom data typ
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
 });
-
-
-
