@@ -2,7 +2,7 @@
     'use strict';
 
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
-    function tabbedContentDirective($timeout, $filter, contentEditingHelper, contentTypeHelper) {
+    function tabbedContentDirective($timeout, $filter, contentEditingHelper, contentTypeHelper, eventsService) {
 
         function link($scope, $element) {
 
@@ -156,14 +156,13 @@
                 }
             });
 
-            $scope.$on("formSubmitting", function() {
-              $scope.allowUpdate = false;
+            eventsService.on("form.lock", function() {
+              $scope.$evalAsync(() => {
+                $scope.allowUpdate = false;
+              });
             });
 
-            $scope.$on("formSubmitted", function() {
-                setAllowUpdate();
-            });
-            $scope.$on("formSubmittedValidationFailed", function() {
+            eventsService.on("form.unlock", function() {
                 setAllowUpdate();
             });
 
