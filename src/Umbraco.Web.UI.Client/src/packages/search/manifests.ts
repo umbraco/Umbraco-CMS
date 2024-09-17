@@ -1,9 +1,8 @@
 import { manifests as examineManifests } from './examine-management-dashboard/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 import './examine-management-dashboard/index.js';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.Search',

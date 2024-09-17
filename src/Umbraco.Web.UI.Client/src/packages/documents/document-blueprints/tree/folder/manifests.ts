@@ -1,16 +1,14 @@
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DocumentBlueprint.Folder';
 
-const folderRepository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
-	name: 'Document Blueprint Folder Repository',
-	api: () => import('./document-blueprint-folder.repository.js'),
-};
-
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'repository',
+		alias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
+		name: 'Document Blueprint Folder Repository',
+		api: () => import('./document-blueprint-folder.repository.js'),
+	},
 	{
 		type: 'entityAction',
 		kind: 'folderUpdate',
@@ -32,5 +30,3 @@ const entityActions: Array<ManifestTypes> = [
 		},
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];

@@ -1,12 +1,8 @@
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const modals: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.BlockCatalogue',
 		name: 'Block Catalogue Modal',
-		js: () => import('./block-catalogue/block-catalogue-modal.element.js'),
+		element: () => import('./block-catalogue/block-catalogue-modal.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...modals];

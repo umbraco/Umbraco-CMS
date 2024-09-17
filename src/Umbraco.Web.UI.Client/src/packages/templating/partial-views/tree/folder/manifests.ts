@@ -1,18 +1,15 @@
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Folder';
-
-const folderRepository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
-	name: 'Partial View Folder Repository',
-	api: () => import('./partial-view-folder.repository.js'),
-};
-
 export const UMB_DELETE_PARTIAL_VIEW_FOLDER_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.PartialView.Folder.Delete';
 
-const entityActions = [
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'repository',
+		alias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
+		name: 'Partial View Folder Repository',
+		api: () => import('./partial-view-folder.repository.js'),
+	},
 	{
 		type: 'entityAction',
 		kind: 'folderDelete',
@@ -24,5 +21,3 @@ const entityActions = [
 		},
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];

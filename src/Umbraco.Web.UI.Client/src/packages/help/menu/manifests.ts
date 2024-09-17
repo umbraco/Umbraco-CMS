@@ -1,8 +1,7 @@
 import { UMB_HELP_MENU_ALIAS } from './constants.js';
 import { UMB_CURRENT_USER_IS_ADMIN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/current-user';
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menu',
 		alias: UMB_HELP_MENU_ALIAS,

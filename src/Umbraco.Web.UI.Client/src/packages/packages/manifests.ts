@@ -2,9 +2,8 @@ import { manifests as repositoryManifests } from './package/repository/manifests
 import { manifests as packageBuilderManifests } from './package-builder/manifests.js';
 import { manifests as packageRepoManifests } from './package-repo/manifests.js';
 import { manifests as packageSectionManifests } from './package-section/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	...packageBuilderManifests,
 	...packageRepoManifests,

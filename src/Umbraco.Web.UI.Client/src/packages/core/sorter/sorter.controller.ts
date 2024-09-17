@@ -298,7 +298,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	/**
 	 * Enables the sorter, this will allow sorting to happen.
-	 * @return {*}  {void}
+	 * @returns {*}  {void}
 	 * @memberof UmbSorterController
 	 */
 	enable(): void {
@@ -311,7 +311,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	/**
 	 * Disables the sorter, this will prevent any sorting to happen.
-	 * @return {*}  {void}
+	 * @returns {*}  {void}
 	 * @memberof UmbSorterController
 	 */
 	disable(): void {
@@ -331,7 +331,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	/**
 	 * Returns the model of the sorter.
-	 * @return {Array<T>}
+	 * @returns {Array<T>}
 	 * @memberof UmbSorterController
 	 */
 	getModel(): Array<T> {

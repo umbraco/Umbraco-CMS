@@ -8,15 +8,16 @@ import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as rollbackManifests } from './rollback/manifests.js';
 import { manifests as searchProviderManifests } from './search/manifests.js';
 import { manifests as trackedReferenceManifests } from './reference/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...collectionManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
@@ -27,6 +28,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...propertyEditorManifests,
 	...recycleBinManifests,
 	...repositoryManifests,
+	...rollbackManifests,
 	...searchProviderManifests,
 	...trackedReferenceManifests,
 	...treeManifests,

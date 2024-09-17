@@ -1097,6 +1097,10 @@
 			"file": "life-buoy.svg"
 		},
 		{
+			"name": "icon-history",
+			"file": "history.svg"
+		},
+		{
 			"name": "icon-home",
 			"file": "house.svg"
 		},

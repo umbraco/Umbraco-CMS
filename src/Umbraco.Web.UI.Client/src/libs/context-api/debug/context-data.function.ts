@@ -48,7 +48,7 @@ function contextItemData(contextInstance: any): UmbDebugContextItemData {
 
 					case 'object':
 						// Check if the object is an observable (by checking if it has a subscribe method/function)
-						const isSubscribeLike = 'subscribe' in value && typeof value['subscribe'] === 'function';
+						const isSubscribeLike = value && 'subscribe' in value && typeof value['subscribe'] === 'function';
 						const isWebComponent = value instanceof HTMLElement;
 
 						let valueToDisplay = 'Complex Object';

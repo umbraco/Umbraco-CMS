@@ -7,7 +7,7 @@ import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-t
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 
 @customElement('umb-create-media-collection-action')

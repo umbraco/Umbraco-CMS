@@ -12,7 +12,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  * UmbUserClientCredentialRepository
  * @export
  * @class UmbUserClientCredentialRepository
- * @extends {UmbRepositoryBase}
+ * @augments {UmbRepositoryBase}
  */
 export class UmbUserClientCredentialRepository extends UmbRepositoryBase {
 	#source: UmbUserClientCredentialDataSource;
