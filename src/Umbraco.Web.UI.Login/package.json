@@ -19,7 +19,7 @@
     "@umbraco-ui/uui-css": "^1.8.0",
     "msw": "^2.3.0",
 		"typescript": "^5.4.5",
-		"vite": "^5.2.11",
+		"vite": "^5.4.6",
 		"vite-tsconfig-paths": "^4.3.2"
 	},
 	"msw": {
