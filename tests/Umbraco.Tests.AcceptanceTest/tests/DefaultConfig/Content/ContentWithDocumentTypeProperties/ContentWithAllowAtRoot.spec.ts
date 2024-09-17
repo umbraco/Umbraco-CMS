@@ -25,4 +25,3 @@ test('cannot create any content if allow at root is not enabled', async ({umbrac
   await umbracoUi.content.isDocumentTypeNameVisible(documentTypeName, false);
   await umbracoUi.content.doesModalHaveText(noAllowedDocumentTypeAvailableMessage);
 });
-
