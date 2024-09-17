@@ -2,7 +2,7 @@ import { html, customElement, property, css } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-upload-field-image')
-export class UmbInputUploadFieldImageElement extends UmbLitElement {
+export default class UmbInputUploadFieldImageElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
@@ -12,7 +12,7 @@ export class UmbInputUploadFieldImageElement extends UmbLitElement {
 		return html`<img src=${this.path} alt="" />`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: flex;

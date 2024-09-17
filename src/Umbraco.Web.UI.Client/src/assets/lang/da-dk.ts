@@ -1081,8 +1081,8 @@ export default {
 		relateToOriginal: 'Relater det kopierede element til originalen',
 	},
 	notifications: {
-		editNotifications: 'Vælg dine notificeringer for <strong>%0%</strong>',
-		notificationsSavedFor: 'Notificeringer er gemt for',
+		editNotifications: 'Vælg dine notificeringer for %0%',
+		notificationsSavedFor: 'Notificeringer er gemt for %0%',
 		notifications: 'Notificeringer',
 	},
 	packager: {
