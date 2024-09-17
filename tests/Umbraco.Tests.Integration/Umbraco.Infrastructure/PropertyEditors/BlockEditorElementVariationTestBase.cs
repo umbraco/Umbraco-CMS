@@ -54,6 +54,7 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
 
         builder.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         builder.Services.AddUnique(mockHttpContextAccessor.Object);
+        builder.AddUmbracoHybridCache();
         builder.AddNuCache();
     }
 
