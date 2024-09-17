@@ -208,7 +208,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				position: relative;
