@@ -6,9 +6,7 @@ const elementName = 'umb-member-group-root-workspace';
 @customElement(elementName)
 export class UmbMemberGroupRootWorkspaceElement extends UmbLitElement {
 	override render() {
-		return html` <umb-body-layout main-no-padding headline=${this.localize.term('treeHeaders_memberGroups')}>
-			<umb-collection alias=${UMB_MEMBER_GROUP_COLLECTION_ALIAS}></umb-collection>;
-		</umb-body-layout>`;
+		return html` <umb-collection alias=${UMB_MEMBER_GROUP_COLLECTION_ALIAS}></umb-collection>`;
 	}
 }
 
