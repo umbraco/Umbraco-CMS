@@ -103,7 +103,7 @@ export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-toggle {
