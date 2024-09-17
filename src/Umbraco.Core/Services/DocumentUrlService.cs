@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -30,6 +31,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IKeyValueService _keyValueService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IDomainCache _domainCache;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
     private bool _isInitialized = false;
@@ -46,7 +48,8 @@ public class DocumentUrlService : IDocumentUrlService
         ILanguageService languageService,
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
-        IDocumentNavigationQueryService documentNavigationQueryService)
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDomainCache domainCache)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -60,6 +63,7 @@ public class DocumentUrlService : IDocumentUrlService
         _keyValueService = keyValueService;
         _idKeyMap = idKeyMap;
         _documentNavigationQueryService = documentNavigationQueryService;
+        _domainCache = domainCache;
     }
 
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -416,27 +420,72 @@ public class DocumentUrlService : IDocumentUrlService
         return runnerKey;
     }
 
-//     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
-//     {
-//         if(_documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out var ancestorsKeys))
-//         {
-//             var languages = await _languageService.GetAllAsync();
-//             var cultures = languages.Select(x=>x.IsoCode);
-//
-//             foreach (Guid ancestorKey in ancestorsKeys)
-//             {
-// TODO her skal vi lave skabe en full url med domainer.
-//
-//                 foreach (var culture in cultures)
-//                 {
-//                     if (_cache.TryGetValue(CreateCacheKey(ancestorKey, culture, false), out PublishedDocumentUrlSegment? urlSegment))
-//                     {
-//                         //yield return new UrlInfo(urlSegment.UrlSegment, true, culture);
-//                     }
-//                 }
-//             }
-//         }
-//     }
+    public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
+    {
+        // TODO change to not use logic from _documentNavigationQueryService, as this endpoint is a management endpoint it clould also go to another interface
+        var result = new List<UrlInfo>();
+        if(_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(contentKey, out var ancestorsOrSelfKeys))
+        {
+            IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
+            IEnumerable<string> cultures = languages.Select(x=>x.IsoCode);
+
+            var ancestorOrSelfKeyToDomains = ancestorsOrSelfKeys.ToDictionary(x => x, ancestorKey =>
+            {
+                var ancestorIdAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
+
+
+                return ancestorIdAttempt.Success
+                    ? _domainCache.GetAssigned(ancestorIdAttempt.Result, false).ToDictionary(x=>x.Culture!)
+                    : new Dictionary<string, Domain>();
+            });
+
+            var urlSegments = new List<string>();
+            foreach (var culture in cultures)
+            {
+                Domain? foundDomain = null;
+                ancestorsOrSelfKeys.Reverse();
+                foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeys)
+                {
+                    if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Dictionary<string, Domain>? domainDictionary))
+                    {
+                        if (domainDictionary.TryGetValue(culture, out Domain? domain))
+                        {
+                            foundDomain = domain;
+                            break;
+                        }
+                    }
+
+                    if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, culture, false), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+                    {
+                        urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+                    }
+                }
+
+                var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeys.Last();
+                result.Add(new UrlInfo(
+                    text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
+                    isUrl: true,
+                    culture: culture
+                ));
+
+            }
+        }
+
+        return result;
+    }
+
+    private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, Domain? foundDomain)
+    {
+        var urlSegments = new List<string>(reversedUrlSegments);
+        urlSegments.Reverse();
+
+        if (foundDomain is not null)
+        {
+            return foundDomain.Name + string.Join('/', urlSegments);
+        }
+
+        return '/' + string.Join('/', urlSegments.Skip(_globalSettings.HideTopLevelNodeFromPath && isRootFirstItem ? 1 : 0));
+    }
 
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
     {

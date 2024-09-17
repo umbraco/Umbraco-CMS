@@ -31,7 +31,7 @@ public interface IDocumentUrlService
     Task DeleteUrlsAsync(IEnumerable<IContent> documents);
 
     Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft);
-    //Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey);
+    Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey);
     Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key);
     Task DeleteUrlsAndDescendantsAsync(Guid key);
     Task CreateOrUpdateUrlSegmentsAsync(Guid key);

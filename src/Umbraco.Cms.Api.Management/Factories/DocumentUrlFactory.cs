@@ -80,19 +80,19 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
-      //  var urls = await _documentUrlService.ListUrlsAsync(content.Key);
+        IEnumerable<UrlInfo> urlInfos = await _documentUrlService.ListUrlsAsync(content.Key);
 
         //TODO replace with documentUrlService
-        IEnumerable<UrlInfo> urlInfos = await content.GetContentUrlsAsync(
-            _publishedRouter,
-            umbracoContext,
-            _languageService,
-            _localizedTextService,
-            _contentService,
-            _variationContextAccessor,
-            _loggerFactory.CreateLogger<IContent>(),
-            _uriUtility,
-            _publishedUrlProvider);
+        // IEnumerable<UrlInfo> urlInfos = await content.GetContentUrlsAsync(
+        //     _publishedRouter,
+        //     umbracoContext,
+        //     _languageService,
+        //     _localizedTextService,
+        //     _contentService,
+        //     _variationContextAccessor,
+        //     _loggerFactory.CreateLogger<IContent>(),
+        //     _uriUtility,
+        //     _publishedUrlProvider);
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)

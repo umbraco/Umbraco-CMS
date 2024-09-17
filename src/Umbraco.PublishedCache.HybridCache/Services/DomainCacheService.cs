@@ -37,7 +37,7 @@ public class DomainCacheService : IDomainCacheService
     {
         // probably this could be optimized with an index
         // but then we'd need a custom DomainStore of some sort
-        IEnumerable<Domain> list = _domains.Select(x => x.Value).Where(x => x.ContentId == documentId);
+        IEnumerable<Domain> list = _domains.Values.Where(x => x.ContentId == documentId);
         if (includeWildcards == false)
         {
             list = list.Where(x => x.IsWildcard == false);
