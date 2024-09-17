@@ -1085,8 +1085,8 @@ export default {
 		relateToOriginal: 'Relate copied items to original',
 	},
 	notifications: {
-		editNotifications: 'Select your notification for <strong>%0%</strong>',
-		notificationsSavedFor: 'Notification settings saved for',
+		editNotifications: 'Select your notification for %0%',
+		notificationsSavedFor: 'Notification settings saved for %0%',
 		notifications: 'Notifications',
 	},
 	packager: {

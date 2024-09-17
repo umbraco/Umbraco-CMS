@@ -990,14 +990,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: 'Bewerk de notificatie voor %0%',
-		notificationsSavedFor: 'Notificatie instellingen opgeslagen voor',
-		mailBody:
-			"\n    Hallo %0%,\n\n    Dit is een geautomatiseerd bericht om u te informeren dat de taak '%1%'\n    is uitgevoerd op pagina '%2%'\n    door gebruiker '%3%'.\n\n    Ga naar http://%4%/#/content/content/edit/%5% om dit te bewerken.\n\n    Een prettige dag!\n\n    Dit is een bericht van uw Content Management Systeem.\n\n    ",
-		mailBodyVariantSummary: 'De volgende talen zijn gewijzigd %0%',
-		mailBodyHtml:
-			'<p>Hi %0%</p>\n\n\t\t  <p>Dit is een geautomatiseerde mail om u op de hoogte te brengen dat de taak <strong>\'%1%\'</strong>\n\t\t  is uitgevoerd op pagina <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a>\n\t\t  door gebruiker <strong>\'%3%\'</strong>\n\t  </p>\n\t\t  <div class="buttons">\n\t\t\t\t<br />\n\t\t\t\t<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\t\t  <p>\n\t\t\t  <h3>Update samenvatting:</h3>\n\t\t\t  <table class="updateSummary">\n\t\t\t\t\t\t   %6%\n\t\t\t\t\t   </table>\n\t\t\t </p>\n\n\t\t  <div class="buttons">\n\t\t\t\t<br />\n\t\t\t\t<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\n\t\t  <p>Een prettige dag!<br /><br />\n\t\t\t  Dit is een bericht van uw Content Management Systeem.\n\t\t  </p>\n        ',
-		mailBodyVariantHtmlSummary: '<p>De volgende talen zijn gewijzigd:</p>\n        %0%\n    ',
-		mailSubject: '[%0%] Notificatie over %1% uitgevoerd op %2%',
+		notificationsSavedFor: 'Notificatie instellingen opgeslagen voor %0%',
 		notifications: 'Notificaties',
 	},
 	packager: {
