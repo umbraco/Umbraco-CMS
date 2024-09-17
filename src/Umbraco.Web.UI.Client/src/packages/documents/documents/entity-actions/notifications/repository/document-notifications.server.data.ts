@@ -6,7 +6,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Document Culture and Hostnames that fetches data from the server
  * @class UmbDocumentNotificationsServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentNotificationsServerDataSource {
 	#host: UmbControllerHost;
@@ -22,7 +21,7 @@ export class UmbDocumentNotificationsServerDataSource {
 
 	/**
 	 * Fetches the Culture and Hostnames for the given Document unique
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the Document
 	 * @memberof UmbDocumentNotificationsServerDataSource
 	 */
 	async read(unique: string) {
@@ -32,8 +31,8 @@ export class UmbDocumentNotificationsServerDataSource {
 
 	/**
 	 * Updates Culture and Hostnames for the given Document unique
-	 * @param {string} unique
-	 * @param {UpdateDocumentNotificationsRequestModel} data
+	 * @param {string} unique - The unique identifier of the Document
+	 * @param {UpdateDocumentNotificationsRequestModel} data - The data to update
 	 * @memberof UmbDocumentNotificationsServerDataSource
 	 */
 	async update(unique: string, data: UpdateDocumentNotificationsRequestModel) {
