@@ -9,9 +9,12 @@ export class UmbDefaultWorkspaceElement extends UmbLitElement {
 	manifest?: ManifestWorkspaceDefaultKind;
 
 	override render() {
+		if (this.manifest === undefined) return html` <div>No Manifest</div> `;
 		const headline = this.manifest?.meta.headline;
-		return html`<umb-body-layout headline=${ifDefined(headline ? this.localize.string(headline) : undefined)}>
-		</umb-body-layout>`;
+
+		return html` <umb-workspace-editor
+			alias=${this.manifest.alias}
+			headline=${ifDefined(headline ? this.localize.string(headline) : undefined)}></umb-workspace-editor>`;
 	}
 
 	static override styles = [UmbTextStyles];
