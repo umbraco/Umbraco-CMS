@@ -8,7 +8,7 @@
     "test": "npx playwright test DefaultConfig",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig/Content"
+    "smokeTest": "npx playwright test DefaultConfig/Content Defaultconfig/Media"
   },
   "devDependencies": {
     "@playwright/test": "^1.43",
