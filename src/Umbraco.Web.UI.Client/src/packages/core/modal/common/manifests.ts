@@ -1,3 +1,5 @@
+import { manifests as discardChangesManifests } from './discard-changes/manifests.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
@@ -29,4 +31,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Item Picker Modal',
 		element: () => import('./item-picker/item-picker-modal.element.js'),
 	},
+	...discardChangesManifests,
 ];
