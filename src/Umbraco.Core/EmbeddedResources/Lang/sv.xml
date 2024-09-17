@@ -4,9 +4,6 @@
     <name>The Umbraco community</name>
     <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
-  <area alias="apps">
-    <key alias="umbContent">Innehåll</key>
-  </area>
   <area alias="actions">
     <key alias="assigndomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
