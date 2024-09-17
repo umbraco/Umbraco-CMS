@@ -328,15 +328,19 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     }
 
     // with one domain, not at root
-    [TestCase(1001, "http://domain1.com", false, "/1001/")]
-    [TestCase(10011, "http://domain1.com", false, "/")]
-    [TestCase(100111, "http://domain1.com", false, "/1001-1-1/")]
-    [TestCase(1002, "http://domain1.com", false, "/1002/")]
-    public void Get_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
+    [TestCase(1001, "http://domain1.com", false, "/1001/", false)]
+    [TestCase(10011, "http://domain1.com", false, "/", false)]
+    [TestCase(100111, "http://domain1.com", false, "/1001-1-1/", false)]
+    [TestCase(1002, "http://domain1.com", false, "/1002/", false)]
+    [TestCase(1001, "http://domain1.com", false, "/1001/", true)]
+    [TestCase(10011, "http://domain1.com", false, "http://domain1.com/", true)]
+    [TestCase(100111, "http://domain1.com", false, "http://domain1.com/1001-1-1/", true)]
+    [TestCase(1002, "http://domain1.com", false, "/1002/", true)]
+    public void Get_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected, bool useAbsoluteUrlForAutoWhenDomainMatches)
     {
         SetDomains3();
 
-        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true, UseAbsoluteUrlForAutoWhenDomainMatches = useAbsoluteUrlForAutoWhenDomainMatches };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");

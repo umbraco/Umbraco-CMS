@@ -16,6 +16,7 @@ public class RequestHandlerSettings
     internal const bool StaticAddTrailingSlash = true;
     internal const string StaticConvertUrlsToAscii = "try";
     internal const bool StaticEnableDefaultCharReplacements = true;
+    internal const bool StaticUseAbsoluteUrlForAutoWhenDomainMatches = false;
 
     internal static readonly CharItem[] DefaultCharCollection =
     {
@@ -83,4 +84,10 @@ public class RequestHandlerSettings
     ///     Add additional character replacements, or override defaults
     /// </summary>
     public IEnumerable<CharItem>? UserDefinedCharCollection { get; set; }
+
+    /// <summary>
+    ///  Gets or Sets a value indicating whether to use UrlMode.Absolute or UrlMode.Relative when UrlMode.Auto is used and the domain Authority matches.
+    /// </summary>
+    [DefaultValue(StaticUseAbsoluteUrlForAutoWhenDomainMatches)]
+    public bool UseAbsoluteUrlForAutoWhenDomainMatches { get; set; } = StaticUseAbsoluteUrlForAutoWhenDomainMatches;
 }
