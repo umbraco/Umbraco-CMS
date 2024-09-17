@@ -1,3 +1,4 @@
+import { UmbDocumentItemRepository } from '../../../repository/index.js';
 import { UmbDocumentNotificationsRepository } from '../repository/document-notifications.repository.js';
 import type { UmbDocumentNotificationsModalData } from './document-notifications-modal.token.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -19,9 +20,23 @@ export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 	@state()
 	private _settings: UmbDocumentNotificationSettings = [];
 
+	@state()
+	private _documentName = '';
+
 	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#readNotificationSettings();
+		this.#getDocumentName();
+	}
+
+	async #getDocumentName() {
+		if (!this.#unique) return;
+		// Should this be done here or in the action file?
+		const { data } = await new UmbDocumentItemRepository(this).requestItems([this.#unique]);
+		if (!data) return;
+		const item = data[0];
+		//TODO How do we ensure we get the correct variant?
+		this._documentName = item.variants[0]?.name;
 	}
 
 	async #readNotificationSettings() {
@@ -36,9 +51,13 @@ export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 		if (!this.#unique) return;
 
 		const subscribedActionIds = this._settings.filter((x) => x.subscribed).map((x) => x.actionId);
-		const { error } = await this.#documentNotificationsRepository.updateNotifications(this.#unique, {
-			subscribedActionIds,
-		});
+		const { error } = await this.#documentNotificationsRepository.updateNotifications(
+			this.#unique,
+			this._documentName,
+			{
+				subscribedActionIds,
+			},
+		);
 
 		if (error) return;
 		this._submitModal();
@@ -57,7 +76,7 @@ export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('notifications_notifications')}>
-				<uui-box>
+				<uui-box .headline=${this.localize.term('notifications_editNotifications', this._documentName)}>
 					${repeat(
 						this._settings,
 						(setting) => setting.actionId,
