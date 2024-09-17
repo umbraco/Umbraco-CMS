@@ -1,14 +1,13 @@
+import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+
 export interface UmbBlockLayoutBaseModel {
 	contentKey: string;
 	settingsKey?: string | null;
 }
 
-export interface UmbBlockDataValueModel<ValueType = unknown> {
-	culture: string | null;
-	segment: string | null;
-	alias: string;
-	value: ValueType;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbBlockDataValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}
+
 export interface UmbBlockDataModel {
 	key: string;
 	contentTypeKey: string;
@@ -21,7 +20,7 @@ export interface UmbBlockDataType {
 	[key: string]: unknown;
 }
 
-export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel> {
+export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel> {
 	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 	contentData: Array<UmbBlockDataModel>;
 	settingsData: Array<UmbBlockDataModel>;

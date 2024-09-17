@@ -24,6 +24,7 @@
 		"./block-type": "./dist-cms/packages/block/block-type/index.js",
 		"./block": "./dist-cms/packages/block/block/index.js",
 		"./code-editor": "./dist-cms/packages/code-editor/index.js",
+		"./clipboard": "./dist-cms/packages/core/clipboard/index.js",
 		"./collection": "./dist-cms/packages/core/collection/index.js",
 		"./components": "./dist-cms/packages/core/components/index.js",
 		"./content-type": "./dist-cms/packages/core/content-type/index.js",

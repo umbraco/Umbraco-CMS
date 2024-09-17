@@ -2,6 +2,7 @@ import type { UmbDocumentEntityType } from './entity.js';
 import type { UmbVariantModel, UmbVariantOptionModel, UmbVariantPublishModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 export { UmbDocumentVariantState };
 
 export interface UmbDocumentDetailModel {
@@ -28,12 +29,8 @@ export interface UmbDocumentUrlInfoModel {
 	url: string;
 }
 
-export interface UmbDocumentValueModel<ValueType = unknown> {
-	culture: string | null;
-	segment: string | null;
-	alias: string;
-	value: ValueType;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbDocumentValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentVariantOptionModel extends UmbVariantOptionModel<UmbDocumentVariantModel> {}
