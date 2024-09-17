@@ -2,7 +2,30 @@ import type { UmbTiptapExtensionBase } from './tiptap-extension.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { Editor, Link, StarterKit, TextAlign, Underline } from '@umbraco-cms/backoffice/external/tiptap';
+import {
+	Blockquote,
+	Bold,
+	BulletList,
+	Code,
+	CodeBlock,
+	Document,
+	Dropcursor,
+	Editor,
+	Gapcursor,
+	HardBreak,
+	History,
+	HorizontalRule,
+	Image,
+	Italic,
+	Link,
+	ListItem,
+	OrderedList,
+	Paragraph,
+	Strike,
+	Text,
+	TextAlign,
+	Underline,
+} from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -61,11 +84,30 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 		this._editor = new Editor({
 			element: element,
 			extensions: [
-				StarterKit,
+				// REQUIRED EXTENSIONS START
+				Document,
+				Dropcursor,
+				Gapcursor,
+				HardBreak,
+				History,
+				Paragraph,
+				Text,
+				// REQUIRED EXTENSIONS END
+				Blockquote,
+				Bold,
+				BulletList,
+				Code,
+				CodeBlock,
+				HorizontalRule,
+				Image,
+				Italic,
+				Link.configure({ openOnClick: false }),
+				ListItem, // This is needed for BulletList and OrderedList. When moving to an umbraco-extension, how should we handle shared extensions?
+				OrderedList,
+				Strike,
 				TextAlign.configure({
 					types: ['heading', 'paragraph', 'blockquote', 'orderedList', 'bulletList', 'codeBlock'],
 				}),
-				Link.configure({ openOnClick: false }),
 				Underline,
 				...extensions,
 			],
