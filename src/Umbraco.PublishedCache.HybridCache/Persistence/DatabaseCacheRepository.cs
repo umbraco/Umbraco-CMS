@@ -264,8 +264,8 @@ AND cmsContentNu.nodeId IS NULL
     }
 
     /// <inheritdoc />
-    public IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys)
-        => GetContentSourceByDocumentTypeKey(keys).Select(x => x.Key);
+    public IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
+        => GetContentSourceByDocumentTypeKey(keys).Where(x => x.Published == published).Select(x => x.Key);
 
     public async Task<ContentCacheNode?> GetMediaSourceAsync(int id)
     {

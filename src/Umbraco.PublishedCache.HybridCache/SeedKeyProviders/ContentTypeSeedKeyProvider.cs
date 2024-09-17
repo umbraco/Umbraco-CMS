@@ -24,7 +24,7 @@ internal class ContentTypeSeedKeyProvider : IDocumentSeedKeyProvider
     public ISet<Guid> GetSeedKeys()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        var documentKeys = _databaseCacheRepository.GetContentKeysByContentTypeKeys(_cacheSettings.ContentTypeKeys).ToHashSet();
+        var documentKeys = _databaseCacheRepository.GetContentKeysByContentTypeKeys(_cacheSettings.ContentTypeKeys, published: true).ToHashSet();
         scope.Complete();
 
         return documentKeys;

@@ -19,7 +19,7 @@ internal interface IDatabaseCacheRepository
     /// </summary>
     /// <param name="keys">The document types to find content using.</param>
     /// <returns>The keys of all content use specific document types.</returns>
-    IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys);
+    IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false);
 
     /// <summary>
     ///     Refreshes the nucache database row for the given cache node />
