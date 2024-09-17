@@ -1,8 +1,5 @@
 import { UmbDocumentNotificationsRepository } from '../repository/document-notifications.repository.js';
-import type {
-	UmbDocumentNotificationsModalData,
-	UmbDocumentNotificationsModalValue,
-} from './document-notifications-modal.token.js';
+import type { UmbDocumentNotificationsModalData } from './document-notifications-modal.token.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { GetDocumentByIdNotificationsResponse } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -14,7 +11,7 @@ type UmbDocumentNotificationSettings = GetDocumentByIdNotificationsResponse;
 @customElement('umb-document-notifications-modal')
 export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 	UmbDocumentNotificationsModalData,
-	UmbDocumentNotificationsModalValue
+	never
 > {
 	#unique?: UmbEntityUnique;
 	#documentNotificationsRepository = new UmbDocumentNotificationsRepository(this);

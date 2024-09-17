@@ -5,14 +5,13 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbDocumentNotificationsModalData {
 	unique: UmbEntityUnique;
 }
-export interface UmbDocumentNotificationsModalValue {}
 
-export const UMB_DOCUMENT_NOTIFICATIONS_MODAL = new UmbModalToken<
-	UmbDocumentNotificationsModalData,
-	UmbDocumentNotificationsModalValue
->(UMB_DOCUMENT_NOTIFICATIONS_MODAL_ALIAS, {
-	modal: {
-		type: 'sidebar',
-		size: 'small',
+export const UMB_DOCUMENT_NOTIFICATIONS_MODAL = new UmbModalToken<UmbDocumentNotificationsModalData, never>(
+	UMB_DOCUMENT_NOTIFICATIONS_MODAL_ALIAS,
+	{
+		modal: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
-});
+);
