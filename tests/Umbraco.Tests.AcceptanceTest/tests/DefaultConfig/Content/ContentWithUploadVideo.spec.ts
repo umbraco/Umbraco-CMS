@@ -62,7 +62,8 @@ test('can publish content with the upload video data type', async ({umbracoApi, 
 
 const uploadVideos = [
   {fileExtension: 'mp4', fileName: 'Video.mp4'},
-  {fileExtension: 'webm', fileName: 'Webm.webm'}
+  {fileExtension: 'webm', fileName: 'Webm.webm'},
+  {fileExtension: 'ogv', fileName: 'Ogv.ogv'}
 ];
 for (const uploadVideo of uploadVideos) {
   test(`can upload a video with the ${uploadVideo.fileExtension} extension in the content`, async ({umbracoApi, umbracoUi}) => {
