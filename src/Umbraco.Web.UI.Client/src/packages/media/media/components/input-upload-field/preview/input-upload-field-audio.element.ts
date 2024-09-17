@@ -1,30 +1,26 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-input-upload-field-video')
-export class UmbInputUploadFieldVideoElement extends UmbLitElement {
+@customElement('umb-input-upload-field-audio')
+export default class UmbInputUploadFieldAudioElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
-		return html`
-			<video controls>
-				<source src=${this.path} />
-				Video format not supported
-			</video>
-		`;
+		return html`<audio controls src=${this.path}></audio>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: flex;
+				width: 999px;
+				max-width: 100%;
 			}
-			video {
+			audio {
 				width: 100%;
-				max-width: 800px;
 			}
 		`,
 	];
@@ -32,6 +28,6 @@ export class UmbInputUploadFieldVideoElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-upload-field-video': UmbInputUploadFieldVideoElement;
+		'umb-input-upload-field-audio': UmbInputUploadFieldAudioElement;
 	}
 }
