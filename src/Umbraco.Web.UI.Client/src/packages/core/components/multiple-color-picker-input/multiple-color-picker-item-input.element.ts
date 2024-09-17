@@ -84,10 +84,23 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
+	#onLabelKeydown(event: KeyboardEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUIInputElement;
+		if (event.key === 'Enter' && target.value) {
+			this.dispatchEvent(new CustomEvent('enter'));
+		}
+	}
+
 	#onLabelChange(event: UUIInputEvent) {
 		event.stopPropagation();
 		this.label = event.target.value as string;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#onValueKeydown(event: KeyboardEvent) {
+		event.stopPropagation();
+		if (event.key === 'Enter') this.#onColorClick();
 	}
 
 	#onValueChange(event: UUIInputEvent) {
@@ -145,6 +158,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 							placeholder=${this.localize.term('general_value')}
 							required=${this.required}
 							required-message="Value is missing"
+							@keydown=${this.#onValueKeydown}
 							@input=${this.#onValueInput}
 							@change=${this.#onValueChange}>
 							<uui-color-swatch
@@ -162,6 +176,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 								label=${this.localize.term('placeholders_label')}
 								placeholder=${this.localize.term('placeholders_label')}
 								value=${ifDefined(this.label)}
+								@keydown=${this.#onLabelKeydown}
 								@input="${this.#onLabelInput}"
 								@change="${this.#onLabelChange}"
 								?disabled=${this.disabled}
@@ -208,6 +223,12 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 
 			uui-color-swatch {
 				padding: var(--uui-size-1);
+			}
+
+			uui-color-swatch:focus-within {
+				outline: 2px solid var(--uui-color-selected);
+				outline-offset: 0;
+				border-radius: var(--uui-border-radius);
 			}
 
 			.color-wrapper {
