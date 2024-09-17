@@ -205,6 +205,31 @@ test('can sort list by name', async ({page, umbracoApi, umbracoUi}) => {
 
 test('can publish child content from list', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Published';
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
+  const publishData = {"publishSchedules": [{"culture": null}]};
+  await umbracoApi.document.publish(documentId, publishData);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.selectContentWithNameInListView(childContentName);
+  await umbracoUi.content.clickPublishSelectedListItems();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  const childContentData = await umbracoApi.document.getByName(childContentName);
+  expect(childContentData.variants[0].state).toBe(expectedState);
+});
+
+test('can not publish child content from list when parent is not published', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
   const expectedState = 'Draft';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
@@ -217,7 +242,13 @@ test('can publish child content from list', async ({page, umbracoApi, umbracoUi}
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await page.pause();
+  await umbracoUi.content.selectContentWithNameInListView(childContentName);
+  await umbracoUi.content.clickPublishSelectedListItems();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible();
+  const childContentData = await umbracoApi.document.getByName(childContentName);
+  expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
 test('can unpublish child content from list', async ({page, umbracoApi, umbracoUi}) => {
