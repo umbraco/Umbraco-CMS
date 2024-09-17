@@ -6,6 +6,6 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: UMB_ROLLBACK_MODAL_ALIAS,
 		name: 'Document Rollback Modal',
-		js: () => import('./rollback-modal.element.js'),
+		element: () => import('./rollback-modal.element.js'),
 	},
 ];
