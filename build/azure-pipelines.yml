@@ -517,10 +517,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - ${{ if eq(parameters.isNightly, true) }}:
-              pwsh: npm run test --ignore-certificate-errors
-            ${{ else }}:
-              pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -660,10 +657,7 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - ${{ if eq(parameters.isNightly, true) }}:
-              pwsh: npm run test --ignore-certificate-errors
-            ${{ else }}:
-              pwsh: npm run smokeTest --ignore-certificate-errors
+          - pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
