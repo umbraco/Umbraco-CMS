@@ -16,21 +16,6 @@ export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 	#unique?: UmbEntityUnique;
 	#documentNotificationsRepository = new UmbDocumentNotificationsRepository(this);
 
-	#localizationKeys = [
-		{ actionId: 'Umb.Document.Duplicate', key: 'actions_copy' },
-		{ actionId: 'Umb.Document.Delete', key: 'actions_delete' },
-		{ actionId: 'Umb.Document.Move', key: 'actions_move' },
-		{ actionId: 'Umb.Document.Create', key: 'actions_create' },
-		{ actionId: 'Umb.Document.PublicAccess', key: 'actions_protect' },
-		{ actionId: 'Umb.Document.Publish', key: 'actions_publish' },
-		{ actionId: 'Umb.DocumentRecycleBin.Restore', key: 'actions_restore' },
-		{ actionId: 'Umb.Document.Permissions', key: 'actions_rights' },
-		{ actionId: 'Umb.Document.Rollback', key: 'actions_rollback' },
-		{ actionId: 'Umb.Document.Sort', key: 'actions_sort' },
-		{ actionId: 'Umb.Document.SendForApproval', key: 'actions_sendtopublish' },
-		{ actionId: 'Umb.Document.Update', key: 'actions_update' },
-	];
-
 	@state()
 	private _settings: UmbDocumentNotificationSettings = [];
 
@@ -77,11 +62,16 @@ export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 						this._settings,
 						(setting) => setting.actionId,
 						(setting) => {
-							const localization = this.#localizationKeys.find((x) => x.actionId === setting.actionId);
+							const localizationKey = `actions_${setting.alias}`;
+							let localization = this.localize.term(localizationKey);
+							if (localization === localizationKey) {
+								// Fallback to alias if no localization is found
+								localization = setting.alias;
+							}
 							return html`<uui-toggle
 								id=${setting.actionId}
 								@change=${() => this.#updateSubscription(setting.actionId)}
-								.label=${localization ? this.localize.term(localization.key) : setting.actionId}
+								.label=${localization}
 								?checked=${setting.subscribed}></uui-toggle>`;
 						},
 					)}
