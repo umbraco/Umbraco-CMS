@@ -21,12 +21,6 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder
-            .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentUnpublishedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
-
         builder.Services.Configure<GlobalSettings>(x => x.HideTopLevelNodeFromPath = false);
     }
 
