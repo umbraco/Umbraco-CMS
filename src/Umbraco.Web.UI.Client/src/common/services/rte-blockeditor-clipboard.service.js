@@ -50,13 +50,13 @@
 
 
         function rawRteBlockResolver(propertyValue, propPasteResolverMethod) {
-          if (propertyValue != null && typeof propertyValue === "object") {
+          if (propertyValue && typeof propertyValue === "object" && propertyValue.markup) {
 
               // object property of 'blocks' holds the data for the Block Editor.
               var value = propertyValue.blocks;
 
               // we got an object, and it has these three props then we are most likely dealing with a Block Editor.
-              if ((value.layout !== undefined && value.contentData !== undefined && value.settingsData !== undefined)) {
+              if ((value && value.layout !== undefined && value.contentData !== undefined && value.settingsData !== undefined)) {
 
                   // replaceUdisOfObject replaces udis of the value object(by instance reference), but also returns the updated markup (as we cant update the reference of a string).
                   propertyValue.markup = replaceUdisOfObject(value.layout, value, propertyValue.markup);
