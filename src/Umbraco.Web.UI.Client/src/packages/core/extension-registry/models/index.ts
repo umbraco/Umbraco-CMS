@@ -19,6 +19,7 @@ import type {
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
+import type { ManifestFileUploadPreview } from './file-upload-preview.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
 import type { ManifestGlobalContext } from './global-context.model.js';
 import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.model.js';
@@ -63,6 +64,7 @@ export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
 export type * from './entity-user-permission.model.js';
 export type * from './entry-point.model.js';
+export type * from './file-upload-preview.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './global-context.model.js';
 export type * from './header-app.model.js';
@@ -124,6 +126,7 @@ export type ManifestTypes =
 	| ManifestEntityBulkAction
 	| ManifestEntityUserPermission
 	| ManifestEntryPoint
+	| ManifestFileUploadPreview
 	| ManifestExternalLoginProvider
 	| ManifestGlobalContext
 	| ManifestGranularUserPermission
