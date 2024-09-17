@@ -5,7 +5,6 @@ export const UMB_DOCUMENT_PUBLISH_MODAL_ALIAS = 'Umb.Modal.DocumentPublish';
 export const UMB_DOCUMENT_UNPUBLISH_MODAL_ALIAS = 'Umb.Modal.DocumentUnpublish';
 export const UMB_DOCUMENT_SCHEDULE_MODAL_ALIAS = 'Umb.Modal.DocumentSchedule';
 export const UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL_ALIAS = 'Umb.Modal.DocumentPublishWithDescendants';
-export const UMB_DOCUMENT_NOTIFICATIONS_MODAL_ALIAS = 'Umb.Modal.DocumentNotifications';
 
 const modals: Array<ManifestModal> = [
 	{
