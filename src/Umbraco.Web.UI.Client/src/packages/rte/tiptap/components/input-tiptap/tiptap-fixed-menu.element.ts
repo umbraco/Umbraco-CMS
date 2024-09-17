@@ -1,4 +1,4 @@
-import type { UmbTiptapExtensionBase, UmbTiptapToolbarButton } from '../../extensions/tiptap-extension.js';
+import type { UmbTiptapExtensionBase, UmbTiptapToolbarButton } from '../../extensions/types.js';
 import * as icons from './icons.js';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
