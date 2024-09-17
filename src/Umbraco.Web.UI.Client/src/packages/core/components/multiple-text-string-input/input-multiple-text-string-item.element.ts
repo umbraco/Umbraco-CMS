@@ -49,6 +49,14 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
+	#onKeydown(event: KeyboardEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUIInputElement;
+		if (event.key === 'Enter' && target.value) {
+			this.dispatchEvent(new CustomEvent('enter'));
+		}
+	}
+
 	#onChange(event: UUIInputEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UUIInputElement;
@@ -84,6 +92,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 					id="input"
 					label="Value"
 					value=${this.value}
+					@keydown=${this.#onKeydown}
 					@input=${this.#onInput}
 					@change=${this.#onChange}
 					?disabled=${this.disabled}
