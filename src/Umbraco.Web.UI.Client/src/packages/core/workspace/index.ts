@@ -8,3 +8,7 @@ export * from './paths.js';
 
 export type * from './conditions/index.js';
 export type * from './types.js';
+
+export * from './workspace.context-token.js';
+export * from './workspace-context.interface.js';
+export * from './workspace.element.js';

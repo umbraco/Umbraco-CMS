@@ -1,5 +1,5 @@
-import { UMB_WORKSPACE_CONTEXT } from './tokens/workspace.context-token.js';
-import type { UmbWorkspaceContext } from './tokens/workspace-context.interface.js';
+import { UMB_WORKSPACE_CONTEXT } from '../../workspace.context-token.js';
+import type { UmbWorkspaceContext } from '../../workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
