@@ -108,7 +108,7 @@ public class ContentService : RepositoryService, IContentService
     {
     }
 
-    [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V16.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -121,8 +121,7 @@ public class ContentService : RepositoryService, IContentService
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
         IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver)
+        ICultureImpactFactory cultureImpactFactory)
         : this(
             provider,
             loggerFactory,
