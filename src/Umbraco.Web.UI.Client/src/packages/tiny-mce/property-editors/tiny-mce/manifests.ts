@@ -22,6 +22,7 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Toolbar',
 					description: 'Pick the toolbar options that should be available when editing',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.ToolbarConfiguration',
+					weight: 10,
 					config: [
 						{
 							alias: 'toolbar',
@@ -68,18 +69,21 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Stylesheets',
 					description: 'Pick the stylesheets whose editor styles should be available when editing',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.StylesheetsConfiguration',
+					weight: 20,
 				},
 				{
 					alias: 'dimensions',
 					label: 'Dimensions',
 					description: 'Set the editor dimensions',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
+					weight: 30,
 				},
 				{
 					alias: 'maxImageSize',
 					label: 'Maximum size for inserted images',
 					description: 'Maximum width or height - enter 0 to disable resizing',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
+					weight: 40,
 				},
 				{
 					alias: 'mode',
@@ -87,17 +91,20 @@ const manifest: ManifestPropertyEditorUi = {
 					description: 'Select the mode for the editor',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 					config: [{ alias: 'items', value: ['Classic', 'Inline'] }],
+					weight: 50,
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
 					description: 'Select the width of the overlay (link picker)',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+					weight: 81,
 				},
 				{
 					alias: 'hideLabel',
 					label: 'Hide Label',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+					weight: 82,
 				},
 			],
 			defaultData: [

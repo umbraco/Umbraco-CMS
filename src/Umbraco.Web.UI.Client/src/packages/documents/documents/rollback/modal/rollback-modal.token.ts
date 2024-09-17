@@ -1,4 +1,4 @@
-import { UMB_ROLLBACK_MODAL_ALIAS } from '../manifests.js';
+import { UMB_ROLLBACK_MODAL_ALIAS } from './constants.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

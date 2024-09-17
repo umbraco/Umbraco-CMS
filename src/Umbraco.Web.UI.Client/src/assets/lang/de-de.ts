@@ -879,6 +879,7 @@ export default {
 		header: 'Kopf',
 		systemField: 'System Feld',
 		lastUpdated: 'Zuletzt geändert',
+		newVersionAvailable: 'Neue Version verfügbar',
 	},
 	colors: {
 		blue: 'Blau',
@@ -1551,11 +1552,10 @@ export default {
 		andAllMediaItems: 'und alle Medienelemente, die auf diesem Typ basieren',
 		andAllMembers: 'und alle Mitglieder, die auf diesem Typ basieren',
 		memberCanEdit: 'Mitglied kann bearbeiten',
-		memberCanEditDescription:
-			'\n      Diese Eigenschaft zur Bearbeitung des Mitglieds auf seiner Profileseite freigeben\n    ',
+		memberCanEditDescription: 'Diese Eigenschaft zur Bearbeitung des Mitglieds auf seiner Profileseite freigeben',
 		isSensitiveData: 'sensibelle Daten',
 		isSensitiveDataDescription:
-			'\n      Diese Eigenschaft für Editoren, die keine Berechtigung für sensibelle Daten haben, verbergen\n    ',
+			'Diese Eigenschaft für Editoren, die keine Berechtigung für sensibelle Daten haben, verbergen',
 		showOnMemberProfile: 'Auf Mitgliedsprofil anzeigen',
 		showOnMemberProfileDescription:
 			'Diesen Eigenschaftswert für die Anzeige auf der Profilseite des Mitglieds zulassen',

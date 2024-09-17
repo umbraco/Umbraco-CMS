@@ -1,6 +1,5 @@
 import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_ROLLBACK_MODAL_ALIAS = 'Umb.Modal.Rollback';
 export const UMB_DOCUMENT_SAVE_MODAL_ALIAS = 'Umb.Modal.DocumentSave';
 export const UMB_DOCUMENT_PUBLISH_MODAL_ALIAS = 'Umb.Modal.DocumentPublish';
 export const UMB_DOCUMENT_UNPUBLISH_MODAL_ALIAS = 'Umb.Modal.DocumentUnpublish';
@@ -9,12 +8,6 @@ export const UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL_ALIAS = 'Umb.Modal.Docu
 export const UMB_DOCUMENT_NOTIFICATIONS_MODAL_ALIAS = 'Umb.Modal.DocumentNotifications';
 
 const modals: Array<ManifestModal> = [
-	{
-		type: 'modal',
-		alias: UMB_ROLLBACK_MODAL_ALIAS,
-		name: 'Rollback Modal',
-		js: () => import('./rollback/rollback-modal.element.js'),
-	},
 	{
 		type: 'modal',
 		alias: UMB_DOCUMENT_SAVE_MODAL_ALIAS,
