@@ -19,6 +19,11 @@ public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
 
     public ISet<Guid> GetSeedKeys()
     {
+        if (_cacheSettings.BreadthFirstSeedCount == 0)
+        {
+            return new HashSet<Guid>();
+        }
+
         Queue<Guid> keyQueue = new();
         HashSet<Guid> keys = [];
         int keyCount = 0;
