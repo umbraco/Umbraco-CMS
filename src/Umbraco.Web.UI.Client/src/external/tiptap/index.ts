@@ -22,3 +22,4 @@ export { OrderedList } from '@tiptap/extension-ordered-list';
 export { Strike } from '@tiptap/extension-strike';
 export { TextAlign } from '@tiptap/extension-text-align';
 export { Underline } from '@tiptap/extension-underline';
+export { Image } from '@tiptap/extension-image';

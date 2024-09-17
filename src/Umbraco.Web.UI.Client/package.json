@@ -202,6 +202,7 @@
 		"@tiptap/extension-heading": "^2.7.0",
 		"@tiptap/extension-history": "^2.7.0",
 		"@tiptap/extension-horizontal-rule": "^2.7.0",
+		"@tiptap/extension-image": "^2.7.0",
 		"@tiptap/extension-italic": "^2.7.0",
 		"@tiptap/extension-link": "^2.6.6",
 		"@tiptap/extension-list-item": "^2.7.0",
