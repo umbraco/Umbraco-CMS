@@ -12,6 +12,7 @@ import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
+import { manifests as notificationManifests } from './notifications/manifests.js';
 
 import type { ManifestEntityAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -108,30 +109,6 @@ const entityActions: Array<ManifestEntityAction> = [
 		],
 	},
 	*/
-	/* TODO: Implement Notifications Entity Action
-	{
-		type: 'entityAction',
-		kind: 'default',
-		alias: 'Umb.EntityAction.Document.Notifications',
-		name: 'Notifications Document Entity Action',
-		weight: 100,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		api: () => import('./permissions.action.js'),
-		meta: {
-			icon: 'icon-megaphone',
-			label: '#actions_notify',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS],
-			},
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
-	},
-	*/
 ];
 
 export const manifests: Array<ManifestTypes> = [
@@ -143,4 +120,5 @@ export const manifests: Array<ManifestTypes> = [
 	...publicAccessManifests,
 	...sortChildrenOfManifests,
 	...entityActions,
+	...notificationManifests,
 ];

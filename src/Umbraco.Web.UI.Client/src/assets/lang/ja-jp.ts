@@ -594,11 +594,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: '%0% への通知を編集',
-		mailBody:
-			"\n      前略 %0% さま\n\n      ユーザー '%3%' により\n      ページ '%2%' 上のタスク'%1%'から\n      自動的にメールします。\n\n      編集はこちらから: http://%4%/#/content/content/edit/%5%\n\n      早々\n\n      Umbracoのロボットより\n    ",
-		mailBodyHtml:
-			'<p>前略 %0% さま</p>\n\n\t\t\t<p>ユーザー <strong>\'%3%\'</strong> によりページ <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a> 上のタスク <strong>\'%1%\'</strong> から自動的にメールします。</p>\n\t\t\t<div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\t\t  <p>\n\t\t\t  <h3>更新のまとめ:</h3>\n\t\t\t  <table style="width: 100%;">\n\t\t\t\t\t\t   %6%\n\t\t\t\t</table>\n\t\t\t </p>\n\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\n\t\t  <p>早々<br /><br />\n\t\t\t  Umbracoのロボットより\n\t\t  </p>',
-		mailSubject: '[%0%] に通知: ページ %2% 上の %1% について',
+		notificationsSavedFor: '%0% への通知が保存されました',
 		notifications: '通知',
 	},
 	packager: {

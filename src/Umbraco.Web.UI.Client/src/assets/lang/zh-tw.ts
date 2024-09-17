@@ -605,11 +605,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: '為 %0% 編寫通知',
-		mailBody:
-			'\n      哈嘍 %0%\n\n      這是一封自動產生的信件來通知您 %1% 工作\n      已經在頁面 %2% 上由使用者 %3% 執行完成\n\n\n      請移至下列網址編輯： http://%4%/#/content/content/edit/%5%\n\n      祝您有美好的一天！\n\n      Umbraco機器人 謹上\n    ',
-		mailBodyHtml:
-			'<p>哈嘍 %0%</p>\n\n\t\t  <p>這是一封自動產生的信件來通知您<strong> %1% </strong>工作\n\t\t 已經在頁面 <strong>%2%</strong> 上由使用者 <strong>%3%</strong> 執行完成\n\t  </p>\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編輯&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\t\t  <p>\n\t\t\t  <h3>更新摘要：</h3>\n\t\t\t  <table style="width: 100%;">\n\t\t\t\t\t\t   %6%\n\t\t\t\t</table>\n\t\t\t </p>\n\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編輯&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\n\t\t  <p>祝您有美好的一天！<br /><br />\n\t\t\t  Umbraco機器人 謹上\n\t\t  </p>',
-		mailSubject: '在 %2%，[%0%] 關於 %1% 的通告已執行。',
+		notificationsSavedFor: '通知已經為 %0% 保存',
 		notifications: '通知',
 	},
 	packager: {
