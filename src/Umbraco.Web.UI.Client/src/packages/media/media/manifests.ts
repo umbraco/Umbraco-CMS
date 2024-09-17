@@ -11,6 +11,7 @@ import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import { manifests as fileUploadPreviewManifests } from './components/input-upload-field/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -27,4 +28,5 @@ export const manifests: Array<ManifestTypes> = [
 	...sectionViewManifests,
 	...treeManifests,
 	...workspaceManifests,
+	...fileUploadPreviewManifests,
 ];

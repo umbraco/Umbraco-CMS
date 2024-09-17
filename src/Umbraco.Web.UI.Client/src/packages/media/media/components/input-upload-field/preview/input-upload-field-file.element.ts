@@ -4,7 +4,7 @@ import { html, customElement, property, state, css } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-upload-field-file')
-export class UmbInputUploadFieldFileElement extends UmbLitElement {
+export default class UmbInputUploadFieldFileElement extends UmbLitElement {
 	@property({ type: String })
 	path: string = '';
 
@@ -45,21 +45,20 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 			if (this.#serverUrl) {
 				if (this.file) return;
 
-				this.extension = this.path.split('.').pop() || '';
+				this.extension = this.path.split('.').pop() ?? '';
 				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : 'loading...';
 			}
 		}
 	}
 
 	#getExtensionFromMime(mime: string): string {
-		//TODO Temporary solution.
 		if (!mime) return ''; //folders
+
 		const extension = mime.split('/')[1];
-		switch (extension) {
-			case 'svg+xml':
-				return 'svg';
-			default:
-				return extension;
+		if (extension === 'svg+xml') {
+			return 'svg';
+		} else {
+			return extension;
 		}
 	}
 
@@ -83,7 +82,7 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			#main {
 				display: grid;
