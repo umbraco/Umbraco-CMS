@@ -8,4 +8,6 @@ public sealed class BlockPropertyValue : ValueModelBase
     // Used during deserialization to populate the property value/property type of a block item content property
     [JsonIgnore]
     public IPropertyType? PropertyType { get; set; }
+
+    public string? EditorAlias => PropertyType?.PropertyEditorAlias;
 }
