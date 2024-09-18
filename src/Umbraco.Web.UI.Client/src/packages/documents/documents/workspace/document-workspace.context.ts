@@ -415,6 +415,7 @@ export class UmbDocumentWorkspaceContext
 	}
 	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		variantId ??= UmbVariantId.CreateInvariant();
+		//const property = await this.structure.getPropertyStructureByAlias(alias);
 
 		const entry = { ...variantId.toObject(), alias, value } as UmbDocumentValueModel<ValueType>;
 		const currentData = this.getData();

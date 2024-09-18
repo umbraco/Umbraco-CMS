@@ -26,7 +26,7 @@ export class CultureService {
             }
         });
     }
-
+    
 }
 
 export class DataTypeService {
@@ -51,7 +51,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -72,7 +72,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -95,7 +95,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -121,7 +121,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -146,7 +146,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -167,7 +167,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -192,7 +192,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -213,7 +213,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -228,7 +228,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -250,7 +250,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -271,7 +271,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -294,7 +294,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -320,7 +320,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -348,7 +348,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -367,7 +367,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
@@ -390,7 +390,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -410,7 +410,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -436,7 +436,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -460,7 +460,7 @@ export class DataTypeService {
             }
         });
     }
-
+    
 }
 
 export class DictionaryService {
@@ -487,7 +487,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -510,7 +510,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -531,7 +531,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -554,7 +554,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -580,7 +580,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -605,7 +605,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -631,7 +631,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -653,7 +653,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -672,7 +672,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -692,7 +692,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -716,7 +716,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -738,7 +738,7 @@ export class DictionaryService {
             }
         });
     }
-
+    
 }
 
 export class DocumentBlueprintService {
@@ -763,7 +763,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -784,7 +784,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -807,7 +807,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -833,7 +833,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -858,7 +858,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -880,7 +880,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -901,7 +901,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -924,7 +924,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -950,7 +950,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -971,7 +971,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -990,7 +990,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -1010,7 +1010,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -1036,7 +1036,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -1060,7 +1060,7 @@ export class DocumentBlueprintService {
             }
         });
     }
-
+    
 }
 
 export class DocumentTypeService {
@@ -1085,7 +1085,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1106,7 +1106,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1128,7 +1128,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1154,7 +1154,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1181,7 +1181,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1208,7 +1208,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1230,7 +1230,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1256,7 +1256,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1277,7 +1277,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1303,7 +1303,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1329,7 +1329,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -1351,7 +1351,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -1370,7 +1370,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -1385,7 +1385,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -1407,7 +1407,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1428,7 +1428,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1451,7 +1451,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1477,7 +1477,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -1499,7 +1499,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1518,7 +1518,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
@@ -1541,7 +1541,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -1561,7 +1561,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -1587,7 +1587,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -1611,7 +1611,7 @@ export class DocumentTypeService {
             }
         });
     }
-
+    
 }
 
 export class DocumentVersionService {
@@ -1642,7 +1642,7 @@ export class DocumentVersionService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1664,7 +1664,7 @@ export class DocumentVersionService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1691,7 +1691,7 @@ export class DocumentVersionService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1718,7 +1718,7 @@ export class DocumentVersionService {
             }
         });
     }
-
+    
 }
 
 export class DocumentService {
@@ -1759,7 +1759,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -1781,7 +1781,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1802,7 +1802,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1825,7 +1825,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1851,7 +1851,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1881,7 +1881,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1906,7 +1906,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1927,7 +1927,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1954,7 +1954,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -1979,7 +1979,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2002,7 +2002,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2023,7 +2023,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2048,7 +2048,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2073,7 +2073,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2095,7 +2095,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2116,7 +2116,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2141,7 +2141,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2167,7 +2167,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2193,7 +2193,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2219,7 +2219,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2245,7 +2245,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2271,7 +2271,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2297,7 +2297,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2321,7 +2321,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -2336,7 +2336,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -2358,7 +2358,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2378,7 +2378,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -2400,7 +2400,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2419,12 +2419,13 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
      * @param data.skip
      * @param data.take
+     * @param data.parentId
      * @returns unknown OK
      * @throws ApiError
      */
@@ -2435,14 +2436,15 @@ export class DocumentService {
             query: {
                 query: data.query,
                 skip: data.skip,
-                take: data.take
+                take: data.take,
+                parentId: data.parentId
             },
             errors: {
                 401: 'The resource is protected and requires an authentication token'
             }
         });
     }
-
+    
     /**
      * @returns string OK
      * @throws ApiError
@@ -2459,7 +2461,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2482,7 +2484,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2504,7 +2506,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -2530,7 +2532,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -2554,7 +2556,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -2576,7 +2578,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -2596,7 +2598,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -2622,7 +2624,7 @@ export class DocumentService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -2646,7 +2648,7 @@ export class DocumentService {
             }
         });
     }
-
+    
 }
 
 export class DynamicRootService {
@@ -2668,7 +2670,7 @@ export class DynamicRootService {
             }
         });
     }
-
+    
     /**
      * @returns string OK
      * @throws ApiError
@@ -2683,7 +2685,7 @@ export class DynamicRootService {
             }
         });
     }
-
+    
 }
 
 export class HealthCheckService {
@@ -2708,7 +2710,7 @@ export class HealthCheckService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.name
@@ -2729,7 +2731,7 @@ export class HealthCheckService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.name
@@ -2750,7 +2752,7 @@ export class HealthCheckService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -2770,7 +2772,7 @@ export class HealthCheckService {
             }
         });
     }
-
+    
 }
 
 export class HelpService {
@@ -2801,7 +2803,7 @@ export class HelpService {
             }
         });
     }
-
+    
 }
 
 export class ImagingService {
@@ -2830,7 +2832,7 @@ export class ImagingService {
             }
         });
     }
-
+    
 }
 
 export class ImportService {
@@ -2854,7 +2856,7 @@ export class ImportService {
             }
         });
     }
-
+    
 }
 
 export class IndexerService {
@@ -2878,7 +2880,7 @@ export class IndexerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.indexName
@@ -2898,7 +2900,7 @@ export class IndexerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.indexName
@@ -2921,7 +2923,7 @@ export class IndexerService {
             }
         });
     }
-
+    
 }
 
 export class InstallService {
@@ -2938,7 +2940,7 @@ export class InstallService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -2957,7 +2959,7 @@ export class InstallService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -2976,7 +2978,7 @@ export class InstallService {
             }
         });
     }
-
+    
 }
 
 export class LanguageService {
@@ -2998,7 +3000,7 @@ export class LanguageService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -3012,7 +3014,7 @@ export class LanguageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -3033,7 +3035,7 @@ export class LanguageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -3055,7 +3057,7 @@ export class LanguageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.isoCode
@@ -3075,7 +3077,7 @@ export class LanguageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.isoCode
@@ -3098,7 +3100,7 @@ export class LanguageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.isoCode
@@ -3124,7 +3126,7 @@ export class LanguageService {
             }
         });
     }
-
+    
 }
 
 export class LogViewerService {
@@ -3149,7 +3151,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.startDate
@@ -3172,7 +3174,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -3204,7 +3206,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -3231,7 +3233,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -3253,7 +3255,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -3274,7 +3276,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.name
@@ -3295,7 +3297,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.name
@@ -3317,7 +3319,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.startDate
@@ -3340,7 +3342,7 @@ export class LogViewerService {
             }
         });
     }
-
+    
 }
 
 export class ManifestService {
@@ -3358,7 +3360,7 @@ export class ManifestService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -3373,7 +3375,7 @@ export class ManifestService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -3384,7 +3386,7 @@ export class ManifestService {
             url: '/umbraco/management/api/v1/manifest/manifest/public'
         });
     }
-
+    
 }
 
 export class MediaTypeService {
@@ -3406,7 +3408,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.fileExtension
@@ -3429,7 +3431,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -3450,7 +3452,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
@@ -3473,7 +3475,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -3495,7 +3497,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3516,7 +3518,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3538,7 +3540,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3564,7 +3566,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3591,7 +3593,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3613,7 +3615,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3639,7 +3641,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3660,7 +3662,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3686,7 +3688,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3712,7 +3714,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -3734,7 +3736,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -3753,7 +3755,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -3768,7 +3770,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -3790,7 +3792,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3811,7 +3813,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3834,7 +3836,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -3860,7 +3862,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -3882,7 +3884,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -3902,7 +3904,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -3928,7 +3930,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -3952,7 +3954,7 @@ export class MediaTypeService {
             }
         });
     }
-
+    
 }
 
 export class MediaService {
@@ -3989,7 +3991,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4008,12 +4010,13 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
      * @param data.skip
      * @param data.take
+     * @param data.parentId
      * @returns unknown OK
      * @throws ApiError
      */
@@ -4024,14 +4027,15 @@ export class MediaService {
             query: {
                 query: data.query,
                 skip: data.skip,
-                take: data.take
+                take: data.take,
+                parentId: data.parentId
             },
             errors: {
                 401: 'The resource is protected and requires an authentication token'
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -4053,7 +4057,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4074,7 +4078,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4097,7 +4101,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4123,7 +4127,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4153,7 +4157,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4178,7 +4182,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4201,7 +4205,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4227,7 +4231,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4253,7 +4257,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4279,7 +4283,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4303,7 +4307,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -4318,7 +4322,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -4340,7 +4344,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4360,7 +4364,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -4382,7 +4386,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @returns string OK
      * @throws ApiError
@@ -4399,7 +4403,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4422,7 +4426,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4444,7 +4448,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4470,7 +4474,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -4494,7 +4498,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -4516,7 +4520,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -4536,7 +4540,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -4562,7 +4566,7 @@ export class MediaService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -4586,7 +4590,7 @@ export class MediaService {
             }
         });
     }
-
+    
 }
 
 export class MemberGroupService {
@@ -4608,7 +4612,7 @@ export class MemberGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -4630,7 +4634,7 @@ export class MemberGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -4651,7 +4655,7 @@ export class MemberGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4672,7 +4676,7 @@ export class MemberGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4695,7 +4699,7 @@ export class MemberGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4721,7 +4725,7 @@ export class MemberGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -4743,7 +4747,7 @@ export class MemberGroupService {
             }
         });
     }
-
+    
 }
 
 export class MemberTypeService {
@@ -4765,7 +4769,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
@@ -4788,7 +4792,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -4810,7 +4814,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4831,7 +4835,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4853,7 +4857,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4879,7 +4883,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4901,7 +4905,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -4924,7 +4928,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -4943,7 +4947,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -4958,7 +4962,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -4980,7 +4984,7 @@ export class MemberTypeService {
             }
         });
     }
-
+    
 }
 
 export class MemberService {
@@ -5020,7 +5024,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5039,7 +5043,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
@@ -5062,7 +5066,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -5084,7 +5088,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5105,7 +5109,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5128,7 +5132,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5154,7 +5158,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5180,7 +5184,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -5195,7 +5199,7 @@ export class MemberService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -5217,7 +5221,7 @@ export class MemberService {
             }
         });
     }
-
+    
 }
 
 export class ModelsBuilderService {
@@ -5237,7 +5241,7 @@ export class ModelsBuilderService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -5252,7 +5256,7 @@ export class ModelsBuilderService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -5267,7 +5271,7 @@ export class ModelsBuilderService {
             }
         });
     }
-
+    
 }
 
 export class ObjectTypesService {
@@ -5291,7 +5295,7 @@ export class ObjectTypesService {
             }
         });
     }
-
+    
 }
 
 export class OEmbedService {
@@ -5318,7 +5322,7 @@ export class OEmbedService {
             }
         });
     }
-
+    
 }
 
 export class PackageService {
@@ -5344,7 +5348,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -5359,7 +5363,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -5381,7 +5385,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -5403,7 +5407,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5424,7 +5428,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5446,7 +5450,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5471,7 +5475,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5492,7 +5496,7 @@ export class PackageService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -5514,7 +5518,7 @@ export class PackageService {
             }
         });
     }
-
+    
 }
 
 export class PartialViewService {
@@ -5536,7 +5540,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -5558,7 +5562,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -5579,7 +5583,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -5602,7 +5606,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -5628,7 +5632,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -5654,7 +5658,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -5676,7 +5680,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -5697,7 +5701,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -5720,7 +5724,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -5742,7 +5746,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -5763,7 +5767,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantPath
@@ -5783,7 +5787,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentPath
@@ -5807,7 +5811,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -5829,7 +5833,7 @@ export class PartialViewService {
             }
         });
     }
-
+    
 }
 
 export class PreviewService {
@@ -5844,7 +5848,7 @@ export class PreviewService {
             responseHeader: 'Umb-Notifications'
         });
     }
-
+    
     /**
      * @returns string OK
      * @throws ApiError
@@ -5859,7 +5863,7 @@ export class PreviewService {
             }
         });
     }
-
+    
 }
 
 export class ProfilingService {
@@ -5877,7 +5881,7 @@ export class ProfilingService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -5897,7 +5901,7 @@ export class ProfilingService {
             }
         });
     }
-
+    
 }
 
 export class PropertyTypeService {
@@ -5923,7 +5927,7 @@ export class PropertyTypeService {
             }
         });
     }
-
+    
 }
 
 export class PublishedCacheService {
@@ -5941,7 +5945,7 @@ export class PublishedCacheService {
             }
         });
     }
-
+    
     /**
      * @returns string OK
      * @throws ApiError
@@ -5956,7 +5960,7 @@ export class PublishedCacheService {
             }
         });
     }
-
+    
     /**
      * @returns string OK
      * @throws ApiError
@@ -5971,7 +5975,7 @@ export class PublishedCacheService {
             }
         });
     }
-
+    
     /**
      * @returns string OK
      * @throws ApiError
@@ -5985,7 +5989,7 @@ export class PublishedCacheService {
             }
         });
     }
-
+    
 }
 
 export class RedirectManagementService {
@@ -6013,7 +6017,7 @@ export class RedirectManagementService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -6039,7 +6043,7 @@ export class RedirectManagementService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -6060,7 +6064,7 @@ export class RedirectManagementService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -6075,7 +6079,7 @@ export class RedirectManagementService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.status
@@ -6096,7 +6100,7 @@ export class RedirectManagementService {
             }
         });
     }
-
+    
 }
 
 export class RelationTypeService {
@@ -6118,7 +6122,7 @@ export class RelationTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -6140,7 +6144,7 @@ export class RelationTypeService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -6161,7 +6165,7 @@ export class RelationTypeService {
             }
         });
     }
-
+    
 }
 
 export class RelationService {
@@ -6191,7 +6195,7 @@ export class RelationService {
             }
         });
     }
-
+    
 }
 
 export class ScriptService {
@@ -6213,7 +6217,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -6235,7 +6239,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6256,7 +6260,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6279,7 +6283,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6305,7 +6309,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6331,7 +6335,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -6353,7 +6357,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6374,7 +6378,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6397,7 +6401,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantPath
@@ -6417,7 +6421,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentPath
@@ -6441,7 +6445,7 @@ export class ScriptService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -6463,7 +6467,7 @@ export class ScriptService {
             }
         });
     }
-
+    
 }
 
 export class SearcherService {
@@ -6487,7 +6491,7 @@ export class SearcherService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.searcherName
@@ -6515,7 +6519,7 @@ export class SearcherService {
             }
         });
     }
-
+    
 }
 
 export class SecurityService {
@@ -6533,7 +6537,7 @@ export class SecurityService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -6554,7 +6558,7 @@ export class SecurityService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -6576,7 +6580,7 @@ export class SecurityService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -6595,7 +6599,7 @@ export class SecurityService {
             }
         });
     }
-
+    
 }
 
 export class SegmentService {
@@ -6621,7 +6625,7 @@ export class SegmentService {
             }
         });
     }
-
+    
 }
 
 export class ServerService {
@@ -6638,7 +6642,7 @@ export class ServerService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -6652,7 +6656,7 @@ export class ServerService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -6666,7 +6670,7 @@ export class ServerService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -6680,7 +6684,7 @@ export class ServerService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -6695,7 +6699,7 @@ export class ServerService {
             }
         });
     }
-
+    
 }
 
 export class StaticFileService {
@@ -6717,7 +6721,7 @@ export class StaticFileService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantPath
@@ -6736,7 +6740,7 @@ export class StaticFileService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentPath
@@ -6759,7 +6763,7 @@ export class StaticFileService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -6780,7 +6784,7 @@ export class StaticFileService {
             }
         });
     }
-
+    
 }
 
 export class StylesheetService {
@@ -6802,7 +6806,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -6824,7 +6828,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6845,7 +6849,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6868,7 +6872,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6894,7 +6898,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6920,7 +6924,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -6942,7 +6946,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6963,7 +6967,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.path
@@ -6986,7 +6990,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantPath
@@ -7006,7 +7010,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentPath
@@ -7030,7 +7034,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -7052,7 +7056,7 @@ export class StylesheetService {
             }
         });
     }
-
+    
 }
 
 export class TagService {
@@ -7082,7 +7086,7 @@ export class TagService {
             }
         });
     }
-
+    
 }
 
 export class TelemetryService {
@@ -7107,7 +7111,7 @@ export class TelemetryService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -7122,7 +7126,7 @@ export class TelemetryService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7143,7 +7147,7 @@ export class TelemetryService {
             }
         });
     }
-
+    
 }
 
 export class TemplateService {
@@ -7165,7 +7169,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.query
@@ -7188,7 +7192,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7210,7 +7214,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7231,7 +7235,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7254,7 +7258,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7280,7 +7284,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -7295,7 +7299,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7314,7 +7318,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -7329,7 +7333,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.descendantId
@@ -7349,7 +7353,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.parentId
@@ -7373,7 +7377,7 @@ export class TemplateService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -7395,7 +7399,7 @@ export class TemplateService {
             }
         });
     }
-
+    
 }
 
 export class TemporaryFileService {
@@ -7418,7 +7422,7 @@ export class TemporaryFileService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7439,7 +7443,7 @@ export class TemporaryFileService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7461,7 +7465,7 @@ export class TemporaryFileService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -7475,7 +7479,7 @@ export class TemporaryFileService {
             }
         });
     }
-
+    
 }
 
 export class UpgradeService {
@@ -7496,7 +7500,7 @@ export class UpgradeService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -7512,7 +7516,7 @@ export class UpgradeService {
             }
         });
     }
-
+    
 }
 
 export class UserDataService {
@@ -7536,7 +7540,7 @@ export class UserDataService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.groups
@@ -7561,7 +7565,7 @@ export class UserDataService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7582,7 +7586,7 @@ export class UserDataService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7602,7 +7606,7 @@ export class UserDataService {
             }
         });
     }
-
+    
 }
 
 export class UserGroupService {
@@ -7631,7 +7635,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7650,7 +7654,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7671,7 +7675,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7692,7 +7696,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -7714,7 +7718,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7735,7 +7739,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7757,7 +7761,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7782,7 +7786,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7807,7 +7811,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7832,7 +7836,7 @@ export class UserGroupService {
             }
         });
     }
-
+    
 }
 
 export class UserService {
@@ -7869,7 +7873,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7888,7 +7892,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7910,7 +7914,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -7931,7 +7935,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -7954,7 +7958,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7975,7 +7979,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -7998,7 +8002,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8024,7 +8028,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8045,7 +8049,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8070,7 +8074,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8091,7 +8095,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8117,7 +8121,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8142,7 +8146,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8162,7 +8166,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8186,7 +8190,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8208,7 +8212,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8231,7 +8235,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8257,7 +8261,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -8272,7 +8276,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -8286,7 +8290,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -8300,7 +8304,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.providerName
@@ -8326,7 +8330,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.providerName
@@ -8350,7 +8354,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.providerName
@@ -8371,7 +8375,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8391,7 +8395,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8411,7 +8415,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -8426,7 +8430,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @returns unknown OK
      * @throws ApiError
@@ -8440,7 +8444,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8460,7 +8464,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8480,7 +8484,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8500,7 +8504,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8522,7 +8526,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8544,7 +8548,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8566,7 +8570,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8587,7 +8591,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8609,7 +8613,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8629,7 +8633,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8649,7 +8653,7 @@ export class UserService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8670,7 +8674,7 @@ export class UserService {
             }
         });
     }
-
+    
 }
 
 export class WebhookService {
@@ -8692,7 +8696,7 @@ export class WebhookService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -8713,7 +8717,7 @@ export class WebhookService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.requestBody
@@ -8735,7 +8739,7 @@ export class WebhookService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8755,7 +8759,7 @@ export class WebhookService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8778,7 +8782,7 @@ export class WebhookService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.id
@@ -8804,7 +8808,7 @@ export class WebhookService {
             }
         });
     }
-
+    
     /**
      * @param data The data for the request.
      * @param data.skip
@@ -8825,5 +8829,5 @@ export class WebhookService {
             }
         });
     }
-
+    
 }
