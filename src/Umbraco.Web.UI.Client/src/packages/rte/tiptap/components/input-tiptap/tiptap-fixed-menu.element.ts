@@ -6,6 +6,9 @@ import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 @customElement('umb-tiptap-fixed-menu')
 export class UmbTiptapFixedMenuElement extends UmbLitElement {
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	actions: Array<UmbTiptapToolbarButton> = [
 		// TODO: I don't think we need a paragraph button. It's the default state.
@@ -181,7 +184,7 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = css`
+	static override readonly styles = css`
 		:host {
 			border-radius: var(--uui-border-radius);
 			border: 1px solid var(--uui-color-border);
@@ -194,6 +197,11 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			left: 0px;
 			right: 0px;
 			padding: 4px;
+		}
+
+		:host([readonly]) {
+			pointer-events: none;
+			background-color: var(--uui-color-surface-alt);
 		}
 
 		button {
