@@ -3,16 +3,13 @@ import type { UmbWorkspaceContext } from '../../workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/workspace';
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
-export abstract class UmbDefaultWorkspaceContext
+export class UmbDefaultWorkspaceContext
 	extends UmbContextBase<UmbDefaultWorkspaceContext>
 	implements UmbWorkspaceContext
 {
 	public workspaceAlias!: string;
-
-	#entityType!: string;
-	#unique: string | null = null;
 
 	#entityContext = new UmbEntityContext(this);
 
@@ -22,18 +19,23 @@ export abstract class UmbDefaultWorkspaceContext
 
 	set manifest(manifest: ManifestWorkspace) {
 		this.workspaceAlias = manifest.alias;
-		this.#entityType = manifest.meta.entityType;
-
-		this.#entityContext.setEntityType(this.#entityType);
-		this.#entityContext.setUnique(this.#unique);
+		this.setEntityType(manifest.meta.entityType);
 	}
 
-	getUnique(): string | null {
-		return this.#unique;
+	setUnique(unique: UmbEntityUnique): void {
+		this.#entityContext.setUnique(unique);
+	}
+
+	getUnique(): UmbEntityUnique {
+		return this.#entityContext.getUnique();
+	}
+
+	setEntityType(entityType: string): void {
+		this.#entityContext.setEntityType(entityType);
 	}
 
 	getEntityType(): string {
-		return this.#entityType;
+		return this.#entityContext.getEntityType()!;
 	}
 }
 
