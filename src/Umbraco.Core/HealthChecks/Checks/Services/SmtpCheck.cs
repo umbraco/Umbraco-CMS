@@ -34,7 +34,7 @@ public class SmtpCheck : HealthCheck
     /// <summary>
     ///     Get the status for this health check
     /// </summary>
-    public override Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+    public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
         Task.FromResult(CheckSmtpSettings().Yield());
 
     /// <summary>

@@ -26,7 +26,7 @@ public class HealthCheckResultsTests
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action) =>
             throw new NotImplementedException();
 
-        public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+        public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
             new List<HealthCheckStatus> { new(_message) { ResultType = _resultType } };
     }
 
@@ -56,7 +56,7 @@ public class HealthCheckResultsTests
         {
         }
 
-        public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+        public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
             throw new Exception("Check threw exception");
     }
 
