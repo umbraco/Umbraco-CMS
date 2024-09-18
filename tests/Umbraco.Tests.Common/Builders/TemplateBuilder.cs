@@ -41,11 +41,6 @@ public class TemplateBuilder
     {
     }
 
-    public TemplateBuilder(ContentTypeEditingBuilder parentBuilder) :
-        base(null)
-    {
-    }
-
     string IWithAliasBuilder.Alias
     {
         get => _alias;
@@ -138,12 +133,5 @@ public class TemplateBuilder
         (Template)new TemplateBuilder()
             .WithAlias(alias)
             .WithName("Text page")
-            .Build();
-
-    public static Template CreateTextPageTemplateWithId(string alias = "textPage", int id = 0) =>
-        (Template)new TemplateBuilder()
-            .WithAlias(alias)
-            .WithName("Text page")
-            .WithId(id)
             .Build();
 }
