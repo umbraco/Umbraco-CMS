@@ -35,12 +35,18 @@ import './tiptap-fixed-menu.element.js';
 import './tiptap-hover-menu.element.js';
 
 @customElement('umb-input-tiptap')
-export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, '') {
-	@state()
-	private _extensions: Array<UmbTiptapExtensionBase> = [];
-
+export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, undefined) {
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
+	@state()
+	private _extensions: Array<UmbTiptapExtensionBase> = [];
 
 	@state()
 	private _editor!: Editor;
@@ -78,6 +84,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 
 		this._editor = new Editor({
 			element: element,
+			editable: !this.readonly,
 			extensions: [
 				// REQUIRED EXTENSIONS START
 				Document,
@@ -106,7 +113,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 				Underline,
 				...extensions,
 			],
-			content: this.value.toString(),
+			content: this.value?.toString(),
 			onUpdate: ({ editor }) => {
 				this.value = editor.getHTML();
 				this.dispatchEvent(new UmbChangeEvent());
@@ -118,13 +125,24 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 		if (!this._extensions?.length) return html`<uui-loader></uui-loader>`;
 		return html`
 			<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
-			<umb-tiptap-fixed-menu .editor=${this._editor} .extensions=${this._extensions}></umb-tiptap-fixed-menu>
+			<umb-tiptap-fixed-menu
+				?readonly=${this.readonly}
+				.editor=${this._editor}
+				.extensions=${this._extensions}></umb-tiptap-fixed-menu>
 			<div id="editor"></div>
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
+			:host([readonly]) {
+				pointer-events: none;
+
+				#editor {
+					background-color: var(--uui-color-surface-alt);
+				}
+			}
+
 			#editor {
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
