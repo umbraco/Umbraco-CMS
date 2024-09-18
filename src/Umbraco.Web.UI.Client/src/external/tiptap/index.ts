@@ -23,3 +23,5 @@ export { Strike } from '@tiptap/extension-strike';
 export { TextAlign } from '@tiptap/extension-text-align';
 export { Underline } from '@tiptap/extension-underline';
 export { Image } from '@tiptap/extension-image';
+// CUSTOM EXTENSIONS
+export * from './extensions/tiptap-umb-image.extension.js';
