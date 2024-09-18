@@ -1,3 +1,4 @@
+import { UMB_MEMBER_COLLECTION_ALIAS } from '../../collection/manifests.js';
 import { UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_ROOT_WORKSPACE_ALIAS } from './constants.js';
 
@@ -14,13 +15,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceView',
+		kind: 'collection',
 		alias: 'Umb.WorkspaceView.MemberRoot.Collection',
 		name: 'Member Root Collection Workspace View',
-		element: () => import('./member-root-workspace.element.js'),
 		meta: {
 			label: 'Collection',
 			pathname: 'collection',
 			icon: 'icon-layers',
+			collectionAlias: UMB_MEMBER_COLLECTION_ALIAS,
 		},
 		conditions: [
 			{
