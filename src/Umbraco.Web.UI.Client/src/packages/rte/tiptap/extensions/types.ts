@@ -4,14 +4,15 @@ import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export abstract class UmbTiptapExtensionBase extends UmbControllerBase implements UmbApi {
+export abstract class UmbTiptapExtensionApi extends UmbControllerBase implements UmbApi {
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
 
-	abstract getExtensions(): Array<Extension | Mark | Node>;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	execute(editor?: Editor) {}
 
-	abstract getToolbarButtons(): Array<UmbTiptapToolbarButton>;
+	abstract getTiptapExtensions(): Array<Extension | Mark | Node>;
 }
 
 export interface UmbTiptapToolbarButton {
