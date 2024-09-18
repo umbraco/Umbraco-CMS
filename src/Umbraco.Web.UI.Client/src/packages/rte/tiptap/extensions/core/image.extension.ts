@@ -10,7 +10,7 @@ export const manifest: ManifestTiptapExtension = {
 	meta: {},
 };
 
-export default class UmbTiptapImageExtension extends UmbTiptapExtensionApi {
+export default class UmbTiptapImageExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions() {
 		return [UmbImage.configure({ inline: true })];
 	}

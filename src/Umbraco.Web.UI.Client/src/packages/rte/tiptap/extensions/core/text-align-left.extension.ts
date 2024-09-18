@@ -17,7 +17,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapTextAlignLeftPlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapTextAlignLeftExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions = () => [
 		TextAlign.configure({
 			types: ['heading', 'paragraph', 'blockquote', 'orderedList', 'bulletList', 'codeBlock'],

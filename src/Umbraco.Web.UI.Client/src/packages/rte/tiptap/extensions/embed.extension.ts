@@ -15,7 +15,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapEmbedPlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapEmbedExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions = () => [];
 
 	override async execute(editor?: Editor) {

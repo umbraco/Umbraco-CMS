@@ -17,7 +17,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapItalicPlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapItalicExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions = () => [Italic];
 
 	override execute(editor?: Editor) {

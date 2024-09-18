@@ -17,7 +17,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapBlockquotePlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapBlockquoteExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions = () => [Blockquote];
 
 	override execute(editor?: Editor) {

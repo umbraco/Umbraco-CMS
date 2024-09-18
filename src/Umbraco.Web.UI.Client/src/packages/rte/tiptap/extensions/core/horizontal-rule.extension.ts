@@ -17,7 +17,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapHorizontalRulePlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapHorizontalRuleExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions = () => [HorizontalRule];
 
 	override execute(editor?: Editor) {

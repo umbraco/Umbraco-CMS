@@ -18,7 +18,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapMediaPickerPlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions() {
 		return [
 			Node.create({

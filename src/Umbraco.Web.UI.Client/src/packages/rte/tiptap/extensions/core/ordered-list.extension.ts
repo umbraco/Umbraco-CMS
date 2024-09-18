@@ -17,7 +17,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapOrderedListPlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapOrderedListExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions = () => [OrderedList, ListItem];
 
 	override execute(editor?: Editor) {

@@ -16,7 +16,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapUrlPickerPlugin extends UmbTiptapExtensionApi {
+export default class UmbTiptapUrlPickerExtensionApi extends UmbTiptapExtensionApi {
 	getTiptapExtensions() {
 		return [Link.extend({ openOnClick: false })];
 	}
