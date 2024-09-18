@@ -12,6 +12,7 @@ import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
+	DocumentValueResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocumentBlueprintModel> {
@@ -65,7 +66,7 @@ const createMockDocumentBlueprintMapper = (request: CreateDocumentRequestModel):
 		isTrashed: false,
 		noAccess: false,
 		parent: request.parent,
-		values: request.values,
+		values: request.values as DocumentValueResponseModel[],
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
