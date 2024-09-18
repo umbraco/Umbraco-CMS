@@ -78,8 +78,6 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentEditingBuilder.CreateSimpleContent(ContentType.Key);
-        Textpage.TemplateKey = template.Key;
-        Textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
         var createContentResultTextPage = await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
         Assert.IsTrue(createContentResultTextPage.Success);
 
