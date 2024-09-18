@@ -1,4 +1,5 @@
-import type { UmbTiptapExtensionBase, UmbTiptapToolbarButton } from '../../extensions/types.js';
+import type { UmbTiptapToolbarButton } from '../../extensions/types.js';
+import type { ManifestTiptapExtension } from '../../extensions/tiptap-extension.js';
 import * as icons from './icons.js';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -153,17 +154,9 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	}
 	#editor?: Editor;
 
-	@property({ attribute: false })
-	extensions: Array<UmbTiptapExtensionBase> = [];
-
 	#onUpdate = () => {
 		this.requestUpdate();
 	};
-
-	protected override firstUpdated() {
-		const buttons = this.extensions.flatMap((ext) => ext.getToolbarButtons());
-		this.actions.push(...buttons);
-	}
 
 	override render() {
 		return html`
@@ -181,6 +174,11 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 					</button>
 				`,
 			)}
+			<umb-extension-with-api-slot
+				type="tiptapExtension"
+				.filter=${(ext: ManifestTiptapExtension) => !!ext.kind || !!ext.element}
+				.elementProps=${{ editor: this.editor }}>
+			</umb-extension-with-api-slot>
 		`;
 	}
 

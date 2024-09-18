@@ -1,5 +1,5 @@
-import type { UmbTiptapExtensionBase } from '../../extensions/types.js';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -13,6 +13,7 @@ import {
 	Editor,
 	Gapcursor,
 	HardBreak,
+	Heading,
 	History,
 	HorizontalRule,
 	Italic,
@@ -34,7 +35,12 @@ import './tiptap-fixed-menu.element.js';
 import './tiptap-hover-menu.element.js';
 
 @customElement('umb-input-tiptap')
-export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, undefined) {
+export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
+	#requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
+
+	@state()
+	private _extensions: Array<UmbTiptapExtensionApi> = [];
+
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 
@@ -43,9 +49,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, un
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
-
-	@state()
-	private _extensions: Array<UmbTiptapExtensionBase> = [];
 
 	@state()
 	private _editor!: Editor;
@@ -58,7 +61,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, un
 		await new Promise<void>((resolve) => {
 			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
 				this._extensions = [];
-
 				for (const manifest of manifests) {
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
@@ -67,38 +69,29 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, un
 						}
 					}
 				}
-
-				this.requestUpdate('_extensions');
-
 				resolve();
 			});
 		});
 	}
 
 	async #loadEditor() {
+
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
 
-		const extensions = this._extensions.map((ext) => ext.getExtensions()).flat();
+		const extensions = this._extensions.map((ext) => ext.getTiptapExtensions()).flat();
 
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
 			extensions: [
-				// REQUIRED EXTENSIONS START
-				Document,
-				Dropcursor,
-				Gapcursor,
-				HardBreak,
-				History,
-				Paragraph,
-				Text,
-				// REQUIRED EXTENSIONS END
+				...this.#requiredExtensions,
 				Blockquote,
 				Bold,
 				BulletList,
 				Code,
 				CodeBlock,
+				Heading,
 				HorizontalRule,
 				Italic,
 				Link.configure({ openOnClick: false }),
@@ -111,7 +104,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, un
 				Underline,
 				...extensions,
 			],
-			content: this.value?.toString(),
+			content: this.value,
 			onUpdate: ({ editor }) => {
 				this.value = editor.getHTML();
 				this.dispatchEvent(new UmbChangeEvent());
@@ -120,13 +113,18 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, un
 	}
 
 	override render() {
-		if (!this._extensions?.length) return html`<uui-loader></uui-loader>`;
 		return html`
-			<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
-			<umb-tiptap-fixed-menu
-				?readonly=${this.readonly}
-				.editor=${this._editor}
-				.extensions=${this._extensions}></umb-tiptap-fixed-menu>
+			${when(
+				!this._editor && !this._extensions?.length,
+				() => html`<uui-loader></uui-loader>`,
+				() => html`
+					<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
+					<umb-tiptap-fixed-menu
+						.editor=${this._editor}
+						.extensions=${this._extensions}
+						?readonly=${this.readonly}></umb-tiptap-fixed-menu>
+				`,
+			)}
 			<div id="editor"></div>
 		`;
 	}

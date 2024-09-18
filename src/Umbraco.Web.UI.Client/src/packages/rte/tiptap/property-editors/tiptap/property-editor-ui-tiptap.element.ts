@@ -138,11 +138,13 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	}
 
 	override render() {
-		return html`<umb-input-tiptap
-			.value=${this._markup}
-			@change=${this.#onChange}
-			.configuration=${this._config}
-			?readonly=${this.readonly}></umb-input-tiptap>`;
+		return html`
+			<umb-input-tiptap
+				.configuration=${this._config}
+				.value=${this._markup}
+				?readonly=${this.readonly}
+				@change=${this.#onChange}></umb-input-tiptap>
+		`;
 	}
 }
 
