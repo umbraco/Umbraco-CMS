@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -15,21 +17,25 @@ public class DocumentHybridCacheTemplateTests : UmbracoIntegrationTestWithConten
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
+    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     [Test]
     public async Task Can_Get_Document_After_Removing_Template()
     {
         // Arrange
         var textPageBefore = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
         Assert.AreEqual(textPageBefore.TemplateId, TemplateId);
-        var updatedContentType = ContentTypeUpdateModel;
-        updatedContentType.DefaultTemplateKey = null;
-        updatedContentType.AllowedTemplateKeys = new List<Guid>();
+        var updateModel = new ContentUpdateModel();
+        {
+            updateModel.TemplateKey = null;
+            updateModel.InvariantName = textPageBefore.Name;
+        }
 
         // Act
-        var updatedContentTypeResult = await ContentTypeEditingService.UpdateAsync(ContentType, updatedContentType, Constants.Security.SuperUserKey);
+        var updateContentResult = await ContentEditingService.UpdateAsync(textPageBefore.Key, updateModel, Constants.Security.SuperUserKey);
 
         // Assert
-        Assert.AreEqual(updatedContentTypeResult.Status, ContentTypeOperationStatus.Success);
+        Assert.AreEqual(updateContentResult.Status, ContentEditingOperationStatus.Success);
         var textPageAfter = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
         // Should this not be null?
         Assert.AreEqual(textPageAfter.TemplateId, null);
