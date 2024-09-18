@@ -22,3 +22,28 @@ export const UmbImage = Image.extend({
 		};
 	},
 });
+
+declare module '@tiptap/core' {
+	interface Commands<ReturnType> {
+		umbImage: {
+			/**
+			 * Add an image
+			 * @param options The image attributes
+			 * @example
+			 * editor
+			 *   .commands
+			 *   .setImage({ src: 'https://tiptap.dev/logo.png', alt: 'tiptap', title: 'tiptap logo' })
+			 */
+			setImage: (options: {
+				src: string;
+				alt?: string;
+				title?: string;
+				width?: string;
+				height?: string;
+				loading?: string;
+				srcset?: string;
+				sizes?: string;
+			}) => ReturnType;
+		};
+	}
+}
