@@ -175,7 +175,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 			<div id="sorter-wrapper">
 				${repeat(
 					this._items,
-					(item) => item.value,
+					(item, index) => index,
 					(item, index) => html`
 						<umb-multiple-color-picker-item-input
 							label=${item.label}
@@ -185,6 +185,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 							?disabled=${this.disabled}
 							?readonly=${this.readonly}
 							?showLabels=${this.showLabels}
+							@enter=${this.#onAdd}
 							@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
 							@delete=${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}>
 						</umb-multiple-color-picker-item-input>
