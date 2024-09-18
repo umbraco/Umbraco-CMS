@@ -1,6 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, css, html, property, state, repeat, render } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -47,21 +47,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			}
 		}
 
-		this._selectedValuesNew = [
-			[
-				[
-					{
-						alias: 'undo',
-						label: 'Undo',
-						icon: 'undo',
-						selected: false,
-						group: 'clipboard',
-					},
-				],
-			],
-			[[]],
-		];
-
 		this.#selectedValues.forEach((alias) => {
 			const row = Math.floor(Math.random() * 2);
 			const group = Math.floor(Math.random() * 2);
@@ -98,10 +83,12 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	@state()
 	private _toolbarConfig: Array<ToolbarConfig> = [];
 
-	#selectedValues: string[] = [];
-
 	@state()
 	_selectedValuesNew: ToolbarConfig[][][] = [[[]]];
+
+	#selectedValues: string[] = [];
+
+	#hoveredDropzone: HTMLElement | null = null;
 
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
@@ -183,23 +170,26 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#onDragOver = (event: DragEvent) => {
 		event.preventDefault();
-		const element = event.target as HTMLElement;
-		if (!element) return;
-		element.classList.add('drag-over');
 	};
 
-	#onDragEnd(event: DragEvent) {
-		const element = event.target as HTMLElement;
-		if (!element) return;
-		element.classList.remove('drag-over');
-	}
+	#onDragEnter = (event: DragEvent) => {
+		const dropzone = event
+			.composedPath()
+			.find((v) => v instanceof HTMLElement && v.classList.contains('selected-group') && v.hasAttribute('dropzone'));
 
-	#onDrop(event: DragEvent) {
+		this.#hoveredDropzone = (dropzone as HTMLElement) || null;
+	};
+
+	#onDrop = (event: DragEvent) => {
 		event.preventDefault();
-		const groupElement = event.target as HTMLElement;
-		if (!groupElement) return;
 
-		groupElement.classList.remove('drag-over');
+		const groupElement = event
+			.composedPath()
+			.find(
+				(v) => v instanceof HTMLElement && v.classList.contains('selected-group') && v.hasAttribute('dropzone'),
+			) as HTMLElement;
+
+		if (!groupElement) return;
 
 		const alias = event.dataTransfer!.getData('text/plain');
 		if (!alias) return;
@@ -221,7 +211,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		);
 
 		this.#onExtensionSelect(item, rowIndex, groupIndex);
-	}
+	};
 
 	#renderRow(row: ToolbarConfig[][], rowIndex: number) {
 		return html`<div class="selected-row">
@@ -234,11 +224,11 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#renderGroup(group: ToolbarConfig[], groupIndex: number, rowIndex: number) {
 		return html`<div
-			class="selected-group"
+			class=${`selected-group`}
 			umb-data-group=${groupIndex}
 			umb-data-row=${rowIndex}
 			@dragover=${this.#onDragOver}
-			@dragend=${this.#onDragEnd}
+			@dragenter=${this.#onDragEnter}
 			@drop=${this.#onDrop}
 			dropzone="move">
 			${group.map((item) => {
@@ -260,7 +250,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	override render() {
-		console.log('RENDER');
 		return html`
 			<div class="selected-bar">
 				${repeat(this._selectedValuesNew, (row, index) => this.#renderRow(row, index))}
@@ -269,20 +258,27 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			<div class="extensions">
 				${repeat(
 					this._toolbarItems,
-					(group) => html`
-						<p class="group-name">${group.name}</p>
+					(category) => html`
+						<p class="category-name">
+							${category.name}
+							<span style="margin-left: auto; font-size: 0.8em; opacity: 0.5;">Hide in toolbar</span>
+						</p>
 						${repeat(
-							group.items,
+							category.items,
 							(item) =>
-								html`<uui-button
-									compact
-									look="outline"
-									class=${item.selected ? 'selected' : ''}
-									label=${item.label}
-									.value=${item.alias}
-									@click=${() => this.#onExtensionSelect(item)}
-									><uui-icon .svg=${tinyIconSet?.icons[item.icon ?? 'alignjustify']}></uui-icon
-								></uui-button>`,
+								html`<div class="extension-item">
+									<uui-button
+										compact
+										look="outline"
+										class=${item.selected ? 'selected' : ''}
+										label=${item.label}
+										.value=${item.alias}
+										@click=${() => this.#onExtensionSelect(item)}
+										><uui-icon .svg=${tinyIconSet?.icons[item.icon ?? 'alignjustify']}></uui-icon
+									></uui-button>
+									<span>${item.label}</span>
+									<uui-checkbox aria-label="Hide in toolbar"></uui-checkbox>
+								</div>`,
 						)}
 					`,
 				)}
@@ -319,19 +315,24 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				border-radius: var(--uui-border-radius);
 				display: flex;
 				gap: 6px;
-			}
-			.selected-group.drag-over uui-button {
-				pointer-events: none;
+				position: relative;
 			}
 			.extensions {
-				display: grid;
+				/* display: grid;
 				grid-template-columns: repeat(auto-fit, 36px);
-				gap: 10px;
+				gap: 10px; */
+				max-width: 400px;
 			}
-			.group-name {
+			.extension-item {
+				display: grid;
+				grid-template-columns: 36px 1fr auto;
+				grid-template-rows: 1fr;
+			}
+			.category-name {
 				grid-column: 1 / -1;
 				margin-bottom: 0;
 				font-weight: bold;
+				display: flex;
 			}
 		`,
 	];
