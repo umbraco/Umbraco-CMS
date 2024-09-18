@@ -430,7 +430,7 @@ export class UmbDocumentWorkspaceContext
 
 		//const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
 		//const editorAlias = dataType.editorAlias;
-		const editorAlias = 'Umbraco.TextBox';
+		const editorAlias = (value as any).layout ? 'Umbraco.BlockList' : 'Umbraco.TextBox';
 
 		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbDocumentValueModel<ValueType>;
 
@@ -567,36 +567,20 @@ export class UmbDocumentWorkspaceContext
 		if (!data.unique) throw new Error('Unique is missing');
 		const invariantVariantId = UmbVariantId.CreateInvariant();
 		if (this.#varies === false) {
-			// If we do not vary, we wil just do this for the invariant variant id.
+			// If we do not vary, we wil just pick the invariant variant id.
 			selectedVariants = [invariantVariantId];
+		} else {
+			selectedVariants = [...selectedVariants, invariantVariantId];
 		}
 
 		const persistedData = this.#persistedData.getValue();
-
-		const variantIdsToParseForValues = [...selectedVariants];
-		if (this.#varies === true) {
-			// If we vary then We need to include the invariant variant id for invariant values to be saved, as we always want to save the invariant values.
-			variantIdsToParseForValues.push(invariantVariantId);
-		}
 
 		// Combine data and persisted data depending on the selectedVariants. Always use the invariant values from the data.
 		// loops over each entry in values, determine wether the value should be from the data or the persisted data, depending on wether its a selectedVariant or an invariant value.
 		// loops over each entry in variants, determine wether the variant should be from the data or the persisted data, depending on the selectedVariants.
 		return {
 			...data,
-			values: data.values
-				.map((value) => {
-					// Should this value be saved?
-					if (variantIdsToParseForValues.some((x) => x.compare(value))) {
-						return value;
-					} else {
-						// If not, then we will find the value in the persisted data and use that instead.
-						return persistedData?.values.find(
-							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
-						);
-					}
-				})
-				.filter((x) => x !== undefined) as Array<UmbDocumentValueModel<unknown>>,
+			values: this.#buildSaveValues(persistedData?.values, data.values, selectedVariants),
 			variants: data.variants
 				.map((variant) => {
 					// Should this value be saved?
@@ -609,6 +593,26 @@ export class UmbDocumentWorkspaceContext
 				})
 				.filter((x) => x !== undefined) as Array<UmbDocumentVariantModel>,
 		};
+	}
+
+	#buildSaveValues(
+		persistedValues: Array<UmbDocumentValueModel> | undefined,
+		draftValues: Array<UmbDocumentValueModel>,
+		selectedVariants: Array<UmbVariantId>,
+	) {
+		return draftValues
+			.map((value) => {
+				// Should this value be saved?
+				if (selectedVariants.some((x) => x.compare(value))) {
+					return value;
+				} else {
+					// If not, then we will find the value in the persisted data and use that instead.
+					return persistedValues?.find(
+						(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
+					);
+				}
+			})
+			.filter((x) => x !== undefined) as Array<UmbDocumentValueModel<unknown>>;
 	}
 
 	async #performSaveOrCreate(saveData: UmbDocumentDetailModel): Promise<void> {
