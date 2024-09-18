@@ -65,8 +65,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
-        // always refresh the edited data
-        await OnRepositoryRefreshed(serializer, contentCacheNode, true);
+        // We always cache draft and published separately, so we only want to cache drafts if the node is a draft type.
+        if (contentCacheNode.IsDraft)
+        {
+            await OnRepositoryRefreshed(serializer, contentCacheNode, true);
+            // if it's a draft node we don't need to worry about the published state
+            return;
+        }
 
         switch (publishedState)
         {

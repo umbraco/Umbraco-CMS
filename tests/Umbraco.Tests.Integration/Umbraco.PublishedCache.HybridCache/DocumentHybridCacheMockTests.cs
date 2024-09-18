@@ -51,7 +51,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             null);
 
 
-        var testCacheNode = new ContentCacheNode()
+        var draftTestCacheNode = new ContentCacheNode()
         {
             ContentTypeId = Textpage.ContentTypeId,
             CreatorId = Textpage.CreatorId,
@@ -63,16 +63,34 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
             IsDraft = true,
         };
 
-        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<int>(), It.IsAny<bool>()))
-            .ReturnsAsync(testCacheNode);
+        var publishedTestCacheNode = new ContentCacheNode()
+        {
+            ContentTypeId = Textpage.ContentTypeId,
+            CreatorId = Textpage.CreatorId,
+            CreateDate = Textpage.CreateDate,
+            Id = Textpage.Id,
+            Key = Textpage.Key,
+            SortOrder = 0,
+            Data = contentData,
+            IsDraft = false,
+        };
 
-        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
-            .ReturnsAsync(testCacheNode);
+        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<int>(), true))
+            .ReturnsAsync(draftTestCacheNode);
+
+        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<int>(), false))
+            .ReturnsAsync(publishedTestCacheNode);
+
+        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), true))
+            .ReturnsAsync(draftTestCacheNode);
+
+        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), false))
+            .ReturnsAsync(publishedTestCacheNode);
 
         _mockedNucacheRepository.Setup(r => r.GetContentByContentTypeKey(It.IsAny<IReadOnlyCollection<Guid>>())).Returns(
             new List<ContentCacheNode>()
             {
-                testCacheNode
+                draftTestCacheNode,
             });
 
         _mockedNucacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
