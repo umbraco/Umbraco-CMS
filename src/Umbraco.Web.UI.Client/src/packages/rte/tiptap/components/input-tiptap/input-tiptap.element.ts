@@ -15,7 +15,6 @@ import {
 	HardBreak,
 	History,
 	HorizontalRule,
-	UmbImage,
 	Italic,
 	Link,
 	ListItem,
@@ -94,7 +93,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 				Code,
 				CodeBlock,
 				HorizontalRule,
-				UmbImage.configure({ inline: true }),
 				Italic,
 				Link.configure({ openOnClick: false }),
 				ListItem, // This is needed for BulletList and OrderedList. When moving to an umbraco-extension, how should we handle shared extensions?
