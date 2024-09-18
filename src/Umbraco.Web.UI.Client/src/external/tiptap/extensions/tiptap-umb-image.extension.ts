@@ -1,5 +1,4 @@
-import { nodeInputRule } from '@tiptap/core';
-import Image, { inputRegex } from '@tiptap/extension-image';
+import Image from '@tiptap/extension-image';
 
 export const UmbImage = Image.extend({
 	addAttributes() {
