@@ -71,7 +71,6 @@ import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { manifest } from './conditions/document-is-not-trashed.condition.manifest.js';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
