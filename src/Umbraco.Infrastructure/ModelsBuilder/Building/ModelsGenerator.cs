@@ -11,7 +11,6 @@ public class ModelsGenerator : IModelsGenerator
 {
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ITextBuilder _textBuilder;
-    private readonly IBuilderBase _builderBase;
     private readonly OutOfDateModelsStatus _outOfDateModels;
     private readonly UmbracoServices _umbracoService;
     private ModelsBuilderSettings _config;
@@ -22,15 +21,13 @@ public class ModelsGenerator : IModelsGenerator
         IOptionsMonitor<ModelsBuilderSettings> config,
         OutOfDateModelsStatus outOfDateModels,
         IHostingEnvironment hostingEnvironment,
-        ITextBuilder textBuilder,
-        IBuilderBase builderBase)
+        ITextBuilder textBuilder)
     {
         _umbracoService = umbracoService;
         _config = config.CurrentValue;
         _outOfDateModels = outOfDateModels;
         _hostingEnvironment = hostingEnvironment;
         _textBuilder = textBuilder;
-        _builderBase = builderBase;
         config.OnChange(x => _config = x);
     }
 
@@ -49,7 +46,7 @@ public class ModelsGenerator : IModelsGenerator
 
         IList<TypeModel> typeModels = _umbracoService.GetAllTypes();
 
-        foreach (TypeModel typeModel in _builderBase.GetModelsToGenerate())
+        foreach (TypeModel typeModel in typeModels)
         {
             var sb = new StringBuilder();
             _textBuilder.Generate(sb, typeModel);

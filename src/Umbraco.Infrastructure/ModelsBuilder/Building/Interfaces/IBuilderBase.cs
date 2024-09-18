@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces
         string GetModelsBaseClassName(TypeModel type);
 
         /// <summary>
-        ///    Gets and sets the list of using directives added to the generated model
+        ///    Gets or sets and sets the list of using directives added to the generated model
         /// </summary>
         IList<string> Using { get; set; }
     }

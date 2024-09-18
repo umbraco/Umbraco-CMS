@@ -1,6 +1,9 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
@@ -15,10 +18,17 @@ public class BuilderBase : IBuilderBase
     ///     the result of code parsing, and a models namespace.
     /// </summary>
     /// <param name="umbracoService"></param>
-    public BuilderBase(UmbracoServices umbracoService)
+    public BuilderBase(
+        IContentTypeService contentTypeService,
+        IMediaTypeService mediaTypeService,
+        IMemberTypeService memberTypeService,
+        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IShortStringHelper shortStringHelper
+        )
     {
         Config = new ModelsBuilderSettings();
 
+        var umbracoService = new UmbracoServices(contentTypeService,mediaTypeService,memberTypeService,publishedContentTypeFactory, shortStringHelper);
         // can be null or empty, we'll manage
         ModelsNamespace = Config.ModelsNamespace;
         IList<TypeModel> allTypes = umbracoService.GetAllTypes();
@@ -217,4 +227,6 @@ public class BuilderBase : IBuilderBase
 
         // default
         type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
+
+
 }
