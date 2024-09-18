@@ -64,6 +64,7 @@ test('can create a child content under a collection', async ({umbracoApi, umbrac
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   // verify that the child content displays in collection list after reloading tree
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
@@ -99,6 +100,7 @@ test('can create multiple child contents under a collection', async ({umbracoApi
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   expect(childData[1].variants[0].name).toBe(secondChildContentName);
   // verify that the child content displays in collection list after reloading tree
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadButton();
   await umbracoUi.content.goToContentWithName(contentName);
