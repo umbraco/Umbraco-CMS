@@ -1,8 +1,8 @@
+import { UMB_RELATIONS_ROOT_WORKSPACE_PATH } from '../../../workspace/paths.js';
 import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from './relation-type-workspace.context-token.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_RELATIONS_ROOT_WORKSPACE_PATH } from 'src/packages/relations/workspace/paths.js';
 
 /**
  * @element umb-relation-type-workspace-editor
@@ -39,7 +39,7 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.RelationType" back-path="${UMB_RELATIONS_ROOT_WORKSPACE_PATH}">
 				<div id="header" slot="header">
-					<uui-input id="name" .value=${this._name} readonly>
+					<uui-input id="name" .value=${this._name ?? ''} readonly>
 						<div id="alias" slot="append">${this._alias}</div>
 					</uui-input>
 				</div>
