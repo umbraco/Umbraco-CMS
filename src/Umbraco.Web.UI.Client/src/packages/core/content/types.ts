@@ -5,3 +5,9 @@ export interface UmbContentValueModel<ValueType = unknown> extends UmbPropertyVa
 	culture: string | null;
 	segment: string | null;
 }
+
+export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbPropertyValueData<ValueType> {
+	editorAlias?: string;
+	culture?: string | null;
+	segment?: string | null;
+}

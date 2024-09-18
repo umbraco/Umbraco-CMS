@@ -1,31 +1,38 @@
-import type { UmbBlockValueType } from '../types.js';
+import type { UmbBlockDataValueModel, UmbBlockValueType } from '../types.js';
 import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockValueResolver
-	implements UmbPropertyValueResolver<UmbContentValueModel<UmbBlockValueType>, UmbContentValueModel>
+	implements UmbPropertyValueResolver<UmbContentValueModel<UmbBlockValueType>, UmbBlockDataValueModel>
 {
-	process(
+	async process(
 		property: UmbContentValueModel<UmbBlockValueType>,
-		propertyValueMethod: (entry: UmbContentValueModel) => UmbContentValueModel,
+		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
 	) {
-		const value = property.value
-			? {
+		if (property.value) {
+			const contentData = await Promise.all(
+				property.value.contentData?.map(async (entry) => ({
+					...entry,
+					values: (await valuesCallback(entry.values)) ?? [],
+				})),
+			);
+			const settingsData = await Promise.all(
+				property.value.settingsData?.map(async (entry) => ({
+					...entry,
+					values: (await valuesCallback(entry.values)) ?? [],
+				})),
+			);
+
+			return {
+				...property,
+				value: {
 					...property.value,
-					contentData: property.value.contentData?.map((entry) => ({
-						...entry,
-						values: entry.values.map((value) => propertyValueMethod(value)),
-					})),
-					settingsData: property.value.settingsData.map((entry) => ({
-						...entry,
-						values: entry.values.map((value) => propertyValueMethod(value)),
-					})),
-				}
-			: undefined;
-		return {
-			...property,
-			value,
-		};
+					contentData,
+					settingsData,
+				},
+			};
+		}
+		return property;
 	}
 
 	destroy(): void {}

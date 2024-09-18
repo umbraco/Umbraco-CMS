@@ -7,13 +7,13 @@ export interface UmbPropertyValueResolver<
 	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
 	InnerPropertyValueType extends UmbPropertyValueData = PropertyValueType,
 > extends UmbApi {
-	process: UmbPropertyValueResolverProcessMethod<PropertyValueType, InnerPropertyValueType> | undefined;
+	process: UmbPropertyValuesCallbackMethod<PropertyValueType, InnerPropertyValueType>;
 }
 
-export type UmbPropertyValueResolverProcessMethod<
+export type UmbPropertyValuesCallbackMethod<
 	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
 	InnerPropertyValueType extends UmbPropertyValueData = PropertyValueType,
 > = (
 	value: PropertyValueType,
-	valueProcessor: (value: InnerPropertyValueType) => InnerPropertyValueType,
-) => PropertyValueType | undefined;
+	valueProcessor: (value: Array<InnerPropertyValueType>) => Promise<Array<InnerPropertyValueType> | undefined>,
+) => PromiseLike<PropertyValueType | undefined>;

@@ -23,6 +23,10 @@ export class UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
 	}
 
+	public static CreateFromPartial(variantData: Partial<UmbObjectWithVariantProperties>): UmbVariantId {
+		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
+	}
+
 	public static CreateInvariant(): UmbVariantId {
 		return Object.freeze(new UmbVariantId(null, null));
 	}
