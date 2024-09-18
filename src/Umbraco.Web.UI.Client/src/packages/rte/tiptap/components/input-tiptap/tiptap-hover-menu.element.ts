@@ -38,7 +38,7 @@ export class UmbTiptapHoverMenuElement extends LitElement {
 		return html`<uui-popover-container></uui-popover-container>`;
 	}
 
-	static override styles = css`
+	static override readonly styles = css`
 		:host {
 			position: fixed;
 			background-color: var(--uui-color-surface-alt);

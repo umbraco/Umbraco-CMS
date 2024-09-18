@@ -184,7 +184,7 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = css`
+	static override readonly styles = css`
 		:host {
 			border-radius: var(--uui-border-radius);
 			border: 1px solid var(--uui-color-border);
