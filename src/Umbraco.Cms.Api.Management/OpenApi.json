@@ -9875,6 +9875,14 @@
               "format": "int32",
               "default": 100
             }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -15544,6 +15552,14 @@
               "type": "integer",
               "format": "int32",
               "default": 100
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -36551,11 +36567,15 @@
       "DocumentNotificationResponseModel": {
         "required": [
           "actionId",
+          "alias",
           "subscribed"
         ],
         "type": "object",
         "properties": {
           "actionId": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "subscribed": {
@@ -38243,7 +38263,9 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {
+              "nullable": true
+            },
             "nullable": true
           }
         },
