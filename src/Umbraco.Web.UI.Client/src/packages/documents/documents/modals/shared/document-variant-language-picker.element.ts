@@ -1,5 +1,14 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	repeat,
+	state,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -36,6 +45,17 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	 */
 	@property({ attribute: false })
 	public pickableFilter?: (item: UmbDocumentVariantOptionModel) => boolean;
+
+	protected override updated(_changedProperties: PropertyValues): void {
+		super.updated(_changedProperties);
+
+		if (this.selectionManager && this.pickableFilter) {
+			this.#selectionManager.setAllowLimitation((unique) => {
+				const option = this.variantLanguageOptions.find((o) => o.unique === unique);
+				return option ? this.pickableFilter!(option) : true;
+			});
+		}
+	}
 
 	override render() {
 		return this.variantLanguageOptions.length
