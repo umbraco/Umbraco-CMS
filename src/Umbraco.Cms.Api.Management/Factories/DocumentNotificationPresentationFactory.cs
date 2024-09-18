@@ -27,13 +27,14 @@ internal sealed class DocumentNotificationPresentationFactory : IDocumentNotific
                                           .ToArray()
                                       ?? Array.Empty<string>();
 
-        var availableActionIds = _actionCollection.Where(a => a.ShowInNotifier).Select(a => a.Letter.ToString()).ToArray();
-
-        return await Task.FromResult(
-            availableActionIds.Select(actionId => new DocumentNotificationResponseModel
+        return await Task.FromResult(_actionCollection
+            .Where(action => action.ShowInNotifier)
+            .Select(action => new DocumentNotificationResponseModel
             {
-                ActionId = actionId,
-                Subscribed = subscribedActionIds.Contains(actionId)
-            }).ToArray());
+                ActionId = action.Letter,
+                Alias = action.Alias,
+                Subscribed = subscribedActionIds.Contains(action.Letter)
+            })
+            .ToArray());
     }
 }
