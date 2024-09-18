@@ -93,18 +93,35 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     }
 
     public async Task SeedAsync()
-    { ;
+    {
         ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         foreach (Guid key in SeedKeys)
         {
-            // TODO: Ensure only published items are seeded.
+            var cacheKey = GetCacheKey(key, false);
+
             // We'll use GetOrCreateAsync because it may be in the second level cache, in which case we don't have to re-seed.
-            await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
-                GetCacheKey(key, false),
-                cancel => new ValueTask<ContentCacheNode?>(
-                    _databaseCacheRepository.GetContentSourceAsync(key, false)),
+            ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+                cacheKey,
+                async cancel =>
+                {
+                    ContentCacheNode? cacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
+
+                    // We don't want to seed drafts
+                    if (cacheNode is null || cacheNode.IsDraft)
+                    {
+                        return null;
+                    }
+
+                    return cacheNode;
+                },
                 GetSeedEntryOptions());
+
+            // If the value is null, it's likely because
+            if (cachedValue is null)
+            {
+                await _hybridCache.RemoveAsync(cacheKey);
+            }
         }
 
         scope.Complete();
