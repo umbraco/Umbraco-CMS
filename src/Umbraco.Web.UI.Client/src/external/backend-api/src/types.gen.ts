@@ -658,6 +658,7 @@ export type DocumentItemResponseModel = {
 
 export type DocumentNotificationResponseModel = {
     actionId: string;
+    alias: string;
     subscribed: boolean;
 };
 
@@ -3545,6 +3546,7 @@ export type GetItemDocumentData = {
 export type GetItemDocumentResponse = (Array<(DocumentItemResponseModel)>);
 
 export type GetItemDocumentSearchData = {
+    parentId?: string;
     query?: string;
     skip?: number;
     take?: number;
@@ -3998,6 +4000,7 @@ export type GetItemMediaData = {
 export type GetItemMediaResponse = (Array<(MediaItemResponseModel)>);
 
 export type GetItemMediaSearchData = {
+    parentId?: string;
     query?: string;
     skip?: number;
     take?: number;
