@@ -68,6 +68,7 @@ import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -129,6 +130,8 @@ export class UmbDocumentWorkspaceContext
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
 	#varies?: boolean;
+	// TODO: Maybe wrap this into a Data Type Item Manager.
+	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
@@ -178,6 +181,10 @@ export class UmbDocumentWorkspaceContext
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));
+		// TODO: dobservable part which gives data type uniques:
+		this.observe(this.structure.contentTypeProperties, (dataTypeUniques: Array<string>) => {
+			this.#dataTypeItemManager.setUniques(dataTypeUniques);
+		});
 
 		this.loadLanguages();
 
@@ -415,9 +422,18 @@ export class UmbDocumentWorkspaceContext
 	}
 	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		variantId ??= UmbVariantId.CreateInvariant();
-		//const property = await this.structure.getPropertyStructureByAlias(alias);
+		const property = await this.structure.getPropertyStructureByAlias(alias);
 
-		const entry = { ...variantId.toObject(), alias, value } as UmbDocumentValueModel<ValueType>;
+		if (!property) {
+			throw new Error(`Property alias "${alias}" not found.`);
+		}
+
+		//const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
+		//const editorAlias = dataType.editorAlias;
+		const editorAlias = 'Umbraco.TextBox';
+
+		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbDocumentValueModel<ValueType>;
+
 		const currentData = this.getData();
 		if (currentData) {
 			const values = appendToFrozenArray(

@@ -5,12 +5,15 @@ import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/bac
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
+const ObserveRepositoryAlias = Symbol();
+
 export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbControllerBase {
 	//
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
 	#init: Promise<unknown>;
+	#currentRequest?: Promise<unknown>;
 
 	// the init promise is used externally for recognizing when the manager is ready.
 	public get init() {
@@ -50,6 +53,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 				return;
 			}
 
+			// TODO: This could be optimized so we only load the appended items, but this requires that the response checks that an item is still present in uniques. [NL]
 			// Check if we already have the items, and then just sort them:
 			const items = this.#items.getValue();
 			if (
@@ -76,13 +80,32 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		return this.#items.getValue();
 	}
 
+	itemByUnique(unique: string) {
+		return this.#items.asObservablePart((items) => items.find((item) => this.#getUnique(item) === unique));
+	}
+
+	async getItemByUnique(unique: string) {
+		// TODO: Make an observeOnce feature, to avoid this amount of code: [NL]
+		const ctrl = this.observe(this.itemByUnique(unique), () => {}, null);
+		const result = await ctrl.asPromise();
+		ctrl.destroy();
+		return result;
+	}
+
 	async #requestItems(): Promise<void> {
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
 		// This is where this.#getUnique comes in play. Unless that can come from the repository, but that collides with the idea of having a multi-type repository. If that happens.
-		const { asObservable } = await this.repository.requestItems(this.getUniques());
+		const request = this.repository.requestItems(this.getUniques());
+		this.#currentRequest = request;
+		const { asObservable } = await request;
+
+		if (this.#currentRequest === request) {
+			// You are not the newest request, so please back out.
+			return;
+		}
 
 		if (asObservable) {
 			this.observe(
@@ -90,7 +113,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 				(data) => {
 					this.#items.setValue(this.#sortByUniques(data));
 				},
-				'_observeRequestedItems',
+				ObserveRepositoryAlias,
 			);
 		}
 	}
