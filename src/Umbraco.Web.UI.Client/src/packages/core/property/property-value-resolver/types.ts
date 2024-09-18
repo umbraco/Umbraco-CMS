@@ -3,11 +3,17 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './property-value-resolver.extension.js';
 
-export interface UmbPropertyValueResolver<PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData>
-	extends UmbApi {
-	process: UmbPropertyValueResolverProcessMethod<PropertyValueType> | undefined;
+export interface UmbPropertyValueResolver<
+	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
+	InnerPropertyValueType extends UmbPropertyValueData = PropertyValueType,
+> extends UmbApi {
+	process: UmbPropertyValueResolverProcessMethod<PropertyValueType, InnerPropertyValueType> | undefined;
 }
 
 export type UmbPropertyValueResolverProcessMethod<
 	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
-> = (value: PropertyValueType, valueProcessor: (value: PropertyValueType) => PropertyValueType) => PropertyValueType;
+	InnerPropertyValueType extends UmbPropertyValueData = PropertyValueType,
+> = (
+	value: PropertyValueType,
+	valueProcessor: (value: InnerPropertyValueType) => InnerPropertyValueType,
+) => PropertyValueType | undefined;
