@@ -3,13 +3,13 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 export const manifests: Array<UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
-		alias: 'Umb.Kind.WorkspaceView.Collection',
-		matchKind: 'collection',
+		alias: 'Umb.Kind.WorkspaceView.Content.Collection',
+		matchKind: 'contentCollection',
 		matchType: 'workspaceView',
 		manifest: {
 			type: 'workspaceView',
-			kind: 'collection',
-			element: () => import('./workspace-view-collection.element.js'),
+			kind: 'contentCollection',
+			element: () => import('./content-collection-workspace-view.element.js'),
 			weight: 300,
 			meta: {
 				label: 'Collection',

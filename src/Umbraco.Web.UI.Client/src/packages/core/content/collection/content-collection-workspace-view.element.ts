@@ -1,14 +1,15 @@
-import type { UmbCollectionBulkActionPermissions, UmbCollectionConfiguration } from '../../../collection/types.js';
+import type { UmbCollectionBulkActionPermissions, UmbCollectionConfiguration } from '../../collection/types.js';
+import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from './content-collection-workspace.context.js';
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-workspace-view-collection')
-export class UmbWorkspaceViewCollectionElement extends UmbLitElement implements UmbWorkspaceViewElement {
+const elementName = 'umb-content-collection-workspace-view';
+@customElement('umb-content-collection-workspace-view')
+export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	private _loading = true;
 
@@ -29,7 +30,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement implements 
 	}
 
 	async #observeConfig() {
-		this.consumeContext(UMB_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._collectionAlias = workspaceContext.getCollectionAlias();
 			this._documentUnique = workspaceContext.getUnique() ?? '';
 
@@ -78,10 +79,10 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement implements 
 	}
 }
 
-export default UmbWorkspaceViewCollectionElement;
+export { UmbContentCollectionWorkspaceViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-collection': UmbWorkspaceViewCollectionElement;
+		[elementName]: UmbContentCollectionWorkspaceViewElement;
 	}
 }
