@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -17,17 +16,16 @@ public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithCo
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
-    private IPublishedContentTypeCache PublishedContentTypeCache => GetRequiredService<IPublishedContentTypeCache>();
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     [Test]
     public async Task Can_Get_Draft_Content_By_Id()
     {
         //Act
-        var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
+        await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
 
         ContentType.RemovePropertyType("title");
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Assert
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
@@ -38,10 +36,10 @@ public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithCo
     public async Task Can_Get_Draft_Content_By_Key()
     {
         // Act
-        var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
+        await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
 
         ContentType.RemovePropertyType("title");
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
         //Assert
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
         Assert.IsNull(newTextPage.Value("title"));
@@ -58,27 +56,5 @@ public class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithCo
 
         var textpageAgain = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, preview: true);
         Assert.IsNull(textpageAgain);
-    }
-
-
-    // TODO: Copy this into PublishedContentTypeCache
-    [Test]
-    public async Task Can_Get_Published_DocumentType_By_Key()
-    {
-        var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
-        Assert.IsNotNull(contentType);
-        var contentTypeAgain = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
-        Assert.IsNotNull(contentType);
-    }
-
-    [Test]
-    public async Task Published_DocumentType_Gets_Deleted()
-    {
-        var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
-        Assert.IsNotNull(contentType);
-
-        await ContentTypeService.DeleteAsync(contentType.Key, Constants.Security.SuperUserKey);
-        // PublishedContentTypeCache just explodes if it doesn't exist
-        Assert.Catch(() => PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey));
     }
 }
