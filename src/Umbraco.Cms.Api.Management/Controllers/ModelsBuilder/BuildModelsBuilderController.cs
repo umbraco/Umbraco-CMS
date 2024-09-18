@@ -74,7 +74,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
                 return new ObjectResult(problemDetailsModel) { StatusCode = StatusCodes.Status428PreconditionRequired };
             }
 
-            _modelGenerator.GenerateModels();
+            _modelGenerator.GenerateModels(Core.Constants.ModelsBuilder.DefaultOutputFileExtension);
             _mbErrors.Clear();
         }
         catch (Exception e)

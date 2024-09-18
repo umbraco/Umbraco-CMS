@@ -112,7 +112,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
                     _logger.LogDebug("Generate models...");
                 }
                 _logger.LogInformation("Generate models now.");
-                _modelGenerator.GenerateModels();
+                _modelGenerator.GenerateModels(Core.Constants.ModelsBuilder.DefaultModelsNamespace);
                 _mbErrors.Clear();
                 _logger.LogInformation("Generated.");
             }

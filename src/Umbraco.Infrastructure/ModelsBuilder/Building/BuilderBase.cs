@@ -5,13 +5,6 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
-// NOTE
-// The idea was to have different types of builder, because I wanted to experiment with
-// building code with CodeDom. Turns out more complicated than I thought and maybe not
-// worth it at the moment, to we're using TextBuilder and its Generate method is specific.
-//
-// Keeping the code as-is for the time being...
-
 /// <summary>
 ///     Provides a base class for all builders.
 /// </summary>
@@ -21,7 +14,22 @@ public class BuilderBase : IBuilderBase
     ///     Initializes a new instance of the <see cref="BuilderBase" /> class with a list of models to generate,
     ///     the result of code parsing, and a models namespace.
     /// </summary>
-    /// <param name="config">Configuration for modelsbuilder settings</param>
+    /// <param name="umbracoService"></param>
+    public BuilderBase(UmbracoServices umbracoService)
+    {
+        Config = new ModelsBuilderSettings();
+
+        // can be null or empty, we'll manage
+        ModelsNamespace = Config.ModelsNamespace;
+        IList<TypeModel> allTypes = umbracoService.GetAllTypes();
+        Prepare(allTypes);
+    }
+
+    /// <summary>
+    ///     For testing purposes only.
+    ///     Parameterless constructor.
+    ///     You WILL have to call Prepare(types) to set the models to generate.
+    /// </summary>
     public BuilderBase()
     {
         Config = new ModelsBuilderSettings();
@@ -36,9 +44,9 @@ public class BuilderBase : IBuilderBase
     /// <remarks>May be overriden by code attributes.</remarks>
     public string ModelsNamespace { get; set; }
 
-    // the list of assemblies that will be 'using' by default
-    public IList<string> Using { get; set; } = new List<string>
-    {
+    /// <inheritdoc/>
+    public IList<string> Using { get; set; } =
+    [
         "System",
         "System.Linq.Expressions",
         "Umbraco.Cms.Core.Models.PublishedContent",
@@ -46,25 +54,27 @@ public class BuilderBase : IBuilderBase
         "Umbraco.Cms.Infrastructure.ModelsBuilder",
         "Umbraco.Cms.Core",
         "Umbraco.Extensions",
-    };
+    ];
 
     /// <summary>
-    ///     Gets the list of all models.
+    ///     Gets or sets the list of all models.
     /// </summary>
     /// <remarks>Includes those that are ignored.</remarks>
     private IList<TypeModel>? TypeModels { get; set; }
 
+    /// <summary>
+    ///     For testing purposes only.
+    /// </summary>
     public string? ModelsNamespaceForTests { get; set; }
 
     protected ModelsBuilderSettings Config { get; }
 
-    /// <summary>
-    ///     Gets the list of models to generate.
-    /// </summary>
-    /// <returns>The models to generate</returns>
+
+    /// <inheritdoc/>
     public IEnumerable<TypeModel> GetModelsToGenerate() => TypeModels ?? new List<TypeModel>();
     private void SetModelsToGenerate(IEnumerable<TypeModel>  types) => TypeModels = types.ToList();
 
+    /// <inheritdoc/>
     public string GetModelsNamespace()
     {
         if (ModelsNamespaceForTests != null)
@@ -83,19 +93,6 @@ public class BuilderBase : IBuilderBase
             ? Constants.ModelsBuilder.DefaultModelsNamespace
             : Config.ModelsNamespace;
     }
-
-    // looking for a simple symbol eg 'Umbraco' or 'String'
-    // expecting to match eg 'Umbraco' or 'System.String'
-    // returns true if either
-    // - more than 1 symbol is found (explicitely ambiguous)
-    // - 1 symbol is found BUT not matching (implicitely ambiguous)
-    public bool IsAmbiguousSymbol(string symbol, string match) =>
-
-        // cannot figure out is a symbol is ambiguous without Roslyn
-        // so... let's say everything is ambiguous - code won't be
-        // pretty but it'll work
-        // Essentially this means that a `global::` syntax will be output for the generated models
-        true;
 
     /// <summary>
     ///     Prepares generation by processing the result of code parsing.
@@ -215,6 +212,7 @@ public class BuilderBase : IBuilderBase
         }
     }
 
+    /// <inheritdoc/>
     public string GetModelsBaseClassName(TypeModel type) =>
 
         // default

@@ -2,6 +2,6 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces
 {
     public interface IModelsGenerator
     {
-        void GenerateModels();
+        void GenerateModels(string outputFileExtension);
     }
 }

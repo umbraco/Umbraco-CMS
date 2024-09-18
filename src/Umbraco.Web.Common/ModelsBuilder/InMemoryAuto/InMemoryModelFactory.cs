@@ -534,7 +534,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             }
 
             // generate code, save
-            var code = GenerateModelsCode(typeModels);
+            var code = GenerateModelsCode();
 
             // add extra attributes,
             //  IsLive=true helps identifying Assemblies that contain live models
@@ -543,7 +543,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _ver++;
             string mbAssemblyDirective = $@"[assembly:ModelsBuilderAssembly(IsInMemory = true, SourceHash = ""{currentHash}"")]
 [assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]";
-            code = code.Replace("//ASSATTR", mbAssemblyDirective);
+            code = code.Replace(Core.Constants.ModelsBuilder.DefaultAssemblyMarker, mbAssemblyDirective);
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
@@ -706,20 +706,20 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
-        private string GenerateModelsCode(IList<TypeModel> typeModels)
+        private string GenerateModelsCode()
         {
             if (!Directory.Exists(_pureLiveDirectory.Value))
             {
                 Directory.CreateDirectory(_pureLiveDirectory.Value);
             }
 
-            foreach (var file in Directory.GetFiles(_pureLiveDirectory.Value, "*.generated.cs"))
+            foreach (var file in Directory.GetFiles(_pureLiveDirectory.Value, "*." + Core.Constants.ModelsBuilder.DefaultOutputFileExtension))
             {
                 File.Delete(file);
             }
 
             var codeBuilder = new StringBuilder();
-            _textBuilder.Generate(codeBuilder, _builderBase.GetModelsToGenerate());
+            _textBuilder.Generate(codeBuilder, _builderBase.GetModelsToGenerate(), true);
             var code = codeBuilder.ToString();
 
             return code;

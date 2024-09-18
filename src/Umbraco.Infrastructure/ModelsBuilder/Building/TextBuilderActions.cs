@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building.Interfaces;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
@@ -16,6 +12,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             _builderBase = builderBase;
             _textBuilderSubActions = textBuilderSubActions;
         }
+
+        /// <inheritdoc/>
         public void WriteHeader(StringBuilder sb)
         {
             sb.Append("//------------------------------------------------------------------------------\n");
@@ -29,6 +27,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             sb.Append("//------------------------------------------------------------------------------\n");
             sb.Append("\n");
         }
+
+        /// <inheritdoc/>
         public void WriteUsing(StringBuilder sb, IEnumerable<string> typeUsing)
         {
             foreach (var t in typeUsing)
@@ -37,12 +37,15 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             }
         }
 
+        /// <inheritdoc/>
         public void WriteNamespace(StringBuilder sb, string modelNamespace)
         {
             sb.Append("\n");
             sb.AppendFormat("namespace {0}\n", modelNamespace);
             sb.Append("{\n");
         }
+
+        /// <inheritdoc/>
         public void WriteContentType(StringBuilder sb, TypeModel type, bool lineBreak)
         {
             string sep;
@@ -164,10 +167,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             sb.AppendFormat(
                 "\n\n\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedValueFallback publishedValueFallback)\n\t\t\t: base(content, publishedValueFallback)\n\t\t{{\n\t\t\t_publishedValueFallback = publishedValueFallback;\n\t\t}}\n\n",
                 type.ClrName, type.IsElement ? "Element" : "Content");
-
-            
         }
 
+        /// <inheritdoc/>
         public void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
             sb.Append("\t\t// properties\n");
@@ -198,12 +200,15 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
                     }
                 }
             }
-
-            // close the class declaration
-            sb.Append("\t}\n");
         }
 
-        public void WriteCloseClass(StringBuilder sb) => sb.Append("}\n");
-        public void WriteAssemblyAttributesMarker(StringBuilder sb) => sb.Append("\n//ASSATTR\n");
+        /// <inheritdoc/>
+        public void WriteAssemblyAttributesMarker(StringBuilder sb) => sb.Append($"\n{Core.Constants.ModelsBuilder.DefaultAssemblyMarker}\n");
+
+        /// <inheritdoc/>
+        public void WriteCustomCodeBeforeClassClose(StringBuilder sb, TypeModel typeMode)
+        {
+            // left blank, this is thought as an extension point for custom code
+        }
     }
 }
