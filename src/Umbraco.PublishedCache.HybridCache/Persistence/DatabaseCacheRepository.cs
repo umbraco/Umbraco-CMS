@@ -208,11 +208,36 @@ AND cmsContentNu.nodeId IS NULL
         return CreateContentNodeKit(dto, serializer, preview);
     }
 
-    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys)
+    public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
     {
+        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeKey(SqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+
+        if (dto == null)
+        {
+            return null;
+        }
+
+        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
+        {
+            return null;
+        }
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+        return CreateContentNodeKit(dto, serializer, preview);
+    }
+
+    private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys)
+    {
+        Guid[] keys = documentTypeKeys.ToArray();
         if (keys.Any() is false)
         {
-            yield break;
+            return [];
         }
 
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
@@ -222,16 +247,25 @@ AND cmsContentNu.nodeId IS NULL
             .WhereIn<NodeDto>(x => x.UniqueId, keys,"n")
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+        return GetContentNodeDtos(sql);
+    }
+
+    public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys)
+    {
+        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys);
+
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
             yield return CreateContentNodeKit(row, serializer, row.Published is false);
         }
     }
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetContentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
+        => GetContentSourceByDocumentTypeKey(keys).Where(x => x.Published == published).Select(x => x.Key);
 
     public async Task<ContentCacheNode?> GetMediaSourceAsync(int id)
     {
@@ -639,6 +673,19 @@ WHERE cmsContentNu.nodeId IN (
                 builder.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id")));
 
         Sql<ISqlContext> sql = sqlTemplate.Sql(id);
+        return sql;
+    }
+
+    private Sql<ISqlContext> SqlWhereNodeKey(ISqlContext sqlContext, Guid key)
+    {
+        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
+
+        SqlTemplate sqlTemplate = sqlContext.Templates.Get(
+            Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeKey,
+            builder =>
+                builder.Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("key")));
+
+        Sql<ISqlContext> sql = sqlTemplate.Sql(key);
         return sql;
     }
 

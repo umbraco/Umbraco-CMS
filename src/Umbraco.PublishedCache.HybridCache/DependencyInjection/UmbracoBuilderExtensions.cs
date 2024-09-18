@@ -11,6 +11,7 @@ using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -62,6 +63,15 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SeedingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
+        builder.AddCacheSeeding();
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddCacheSeeding(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IDocumentSeedKeyProvider, ContentTypeSeedKeyProvider>();
+        builder.Services.AddSingleton<IDocumentSeedKeyProvider, BreadthFirstKeyProvider>();
+
         return builder;
     }
 }

@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Hybrid;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,7 +20,29 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
     private readonly ICacheNodeFactory _cacheNodeFactory;
+    private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
+    private readonly CacheSettings _cacheSettings;
 
+    private HashSet<Guid>? _seedKeys;
+    private HashSet<Guid> SeedKeys
+    {
+        get
+        {
+            if (_seedKeys is not null)
+            {
+                return _seedKeys;
+            }
+
+            _seedKeys = [];
+
+            foreach (IDocumentSeedKeyProvider provider in _seedKeyProviders)
+            {
+                _seedKeys.UnionWith(provider.GetSeedKeys());
+            }
+
+            return _seedKeys;
+        }
+    }
 
     public DocumentCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
@@ -25,7 +50,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         ICoreScopeProvider scopeProvider,
         Microsoft.Extensions.Caching.Hybrid.HybridCache hybridCache,
         IPublishedContentFactory publishedContentFactory,
-        ICacheNodeFactory cacheNodeFactory)
+        ICacheNodeFactory cacheNodeFactory,
+        IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
+        IOptions<CacheSettings> cacheSettings)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -33,22 +60,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
         _cacheNodeFactory = cacheNodeFactory;
+        _seedKeyProviders = seedKeyProviders;
+        _cacheSettings = cacheSettings.Value;
     }
 
-    // TODO: Stop using IdKeyMap for these, but right now we both need key and id for caching..
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool preview = false)
     {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
-        if (idAttempt.Success is false)
-        {
-            return null;
-        }
-
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             GetCacheKey(key, preview), // Unique key to the cache entry
-            async cancel => await _databaseCacheRepository.GetContentSourceAsync(idAttempt.Result, preview));
+            async cancel => await _databaseCacheRepository.GetContentSourceAsync(key, preview));
 
         scope.Complete();
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
@@ -70,33 +92,29 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
 
-    public async Task SeedAsync(IReadOnlyCollection<Guid> contentTypeKeys)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        IEnumerable<ContentCacheNode> contentCacheNodes = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeKeys);
-        foreach (ContentCacheNode contentCacheNode in contentCacheNodes)
+    public async Task SeedAsync()
+    { ;
+        ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        foreach (Guid key in SeedKeys)
         {
-            if (contentCacheNode.IsDraft)
-            {
-                continue;
-            }
-
-            // TODO: Make these expiration dates configurable.
-            // Never expire seeded values, we cannot do TimeSpan.MaxValue sadly, so best we can do is a year.
-            var entryOptions = new HybridCacheEntryOptions
-            {
-                Expiration = TimeSpan.FromDays(365),
-                LocalCacheExpiration = TimeSpan.FromDays(365),
-            };
-
-            await _hybridCache.SetAsync(
-                GetCacheKey(contentCacheNode.Key, false),
-                contentCacheNode,
-                entryOptions);
+            // TODO: Ensure only published items are seeded.
+            // We'll use GetOrCreateAsync because it may be in the second level cache, in which case we don't have to re-seed.
+            await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+                GetCacheKey(key, false),
+                cancel => new ValueTask<ContentCacheNode?>(
+                    _databaseCacheRepository.GetContentSourceAsync(key, false)),
+                GetSeedEntryOptions());
         }
 
         scope.Complete();
     }
+
+    private HybridCacheEntryOptions GetSeedEntryOptions() => new()
+    {
+        Expiration = _cacheSettings.SeedCacheDuration,
+        LocalCacheExpiration = _cacheSettings.SeedCacheDuration
+    };
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)
     {
@@ -122,21 +140,61 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
+        bool isSeeded = SeedKeys.Contains(content.Key);
+
+        // TODO: We want to remove this however this will not work (currently)
+        // This doesn't work because DeleteItemAsync(int ID) uses idKeyMap to get the key from the id
+        // HOWEVER this doesn't really work here, because at this time the entity has already been removed from the umbracoNode table.
+        _idKeyMap.GetIdForKey(content.Key, UmbracoObjectTypes.Document);
         // Always set draft node
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
-        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-        await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
+        ContentCacheNode draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+
         await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
+        _scopeProvider.Context?.Enlist($"UpdateMemoryCache_Draft_{content.Key}", completed =>
+        {
+            if(completed is false)
+            {
+                return;
+            }
+
+            RefreshHybridCache(draftCacheNode, GetCacheKey(content.Key, true), isSeeded).GetAwaiter().GetResult();
+        }, 1);
 
         if (content.PublishedState == PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, false));
+
             await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
+            _scopeProvider.Context?.Enlist($"UpdateMemoryCache_{content.Key}", completed =>
+            {
+                if(completed is false)
+                {
+                    return;
+                }
+
+                RefreshHybridCache(publishedCacheNode, GetCacheKey(content.Key, false), isSeeded).GetAwaiter().GetResult();
+            }, 1);
         }
 
         scope.Complete();
+    }
+
+    private async Task RefreshHybridCache(ContentCacheNode cacheNode, string cacheKey, bool isSeeded)
+    {
+        // If it's seeded we want it to stick around the cache for longer.
+        if (isSeeded)
+        {
+            await _hybridCache.SetAsync(
+                cacheKey,
+                cacheNode,
+                GetSeedEntryOptions());
+        }
+        else
+        {
+            await _hybridCache.SetAsync(cacheKey, cacheNode);
+        }
     }
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
