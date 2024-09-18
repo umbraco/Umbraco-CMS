@@ -1,8 +1,22 @@
 import { UmbTiptapExtensionApi } from './types.js';
+import type { ManifestTiptapExtension } from './tiptap-extension.js';
 import { mergeAttributes, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+
+export const manifest: ManifestTiptapExtension = {
+	type: 'tiptapExtension',
+	kind: 'button',
+	alias: 'Umb.Tiptap.MediaPicker',
+	name: 'Media Picker Tiptap Extension',
+	api: () => import('./mediapicker.extension.js'),
+	meta: {
+		alias: 'umb-media',
+		icon: 'umbraco',
+		label: 'Media picker',
+	},
+};
 
 export default class UmbTiptapMediaPickerPlugin extends UmbTiptapExtensionApi {
 	getTiptapExtensions() {

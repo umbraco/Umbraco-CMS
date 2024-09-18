@@ -24,7 +24,6 @@ export class UmbTiptapHoverMenuElement extends LitElement {
 	}
 
 	#onUpdate = () => {
-		console.log('LINK ACTIVE');
 		if (this.editor?.isActive('link')) {
 			// show the popover
 			this.showPopover();
@@ -34,7 +33,6 @@ export class UmbTiptapHoverMenuElement extends LitElement {
 	};
 
 	override render() {
-		console.log('RENDER HOVER MENU');
 		return html`<uui-popover-container></uui-popover-container>`;
 	}
 

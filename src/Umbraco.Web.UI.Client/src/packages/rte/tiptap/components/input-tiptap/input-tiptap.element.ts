@@ -3,28 +3,14 @@ import { css, customElement, html, property, state, when } from '@umbraco-cms/ba
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
-	Blockquote,
-	Bold,
-	BulletList,
-	Code,
-	CodeBlock,
 	Document,
 	Dropcursor,
 	Editor,
 	Gapcursor,
 	HardBreak,
-	Heading,
 	History,
-	HorizontalRule,
-	Italic,
-	Link,
-	ListItem,
-	OrderedList,
 	Paragraph,
-	Strike,
 	Text,
-	TextAlign,
-	Underline,
 } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -83,26 +69,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
-			extensions: [
-				...this.#requiredExtensions,
-				Blockquote,
-				Bold,
-				BulletList,
-				Code,
-				CodeBlock,
-				Heading,
-				HorizontalRule,
-				Italic,
-				Link.configure({ openOnClick: false }),
-				ListItem, // This is needed for BulletList and OrderedList. When moving to an umbraco-extension, how should we handle shared extensions?
-				OrderedList,
-				Strike,
-				TextAlign.configure({
-					types: ['heading', 'paragraph', 'blockquote', 'orderedList', 'bulletList', 'codeBlock'],
-				}),
-				Underline,
-				...extensions,
-			],
+			extensions: [...this.#requiredExtensions, ...extensions],
 			content: this.value,
 			onUpdate: ({ editor }) => {
 				this.value = editor.getHTML();
