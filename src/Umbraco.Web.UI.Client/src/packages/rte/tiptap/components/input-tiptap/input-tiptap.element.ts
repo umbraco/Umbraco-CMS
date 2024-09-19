@@ -75,7 +75,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	async #loadEditor() {
-
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
 
@@ -119,10 +118,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				() => html`<uui-loader></uui-loader>`,
 				() => html`
 					<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
-					<umb-tiptap-fixed-menu
-						.editor=${this._editor}
-						.extensions=${this._extensions}
-						?readonly=${this.readonly}></umb-tiptap-fixed-menu>
+					<umb-tiptap-fixed-menu .editor=${this._editor} ?readonly=${this.readonly}></umb-tiptap-fixed-menu>
 				`,
 			)}
 			<div id="editor"></div>
