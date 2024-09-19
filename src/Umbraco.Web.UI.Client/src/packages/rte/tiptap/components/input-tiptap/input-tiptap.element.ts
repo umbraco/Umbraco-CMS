@@ -43,7 +43,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@property({ type: String })
 	override set value(value: string) {
-		console.log('update scheduled', value);
 		this.#markup = value;
 
 		// Try to set the value to the editor if it is ready.
