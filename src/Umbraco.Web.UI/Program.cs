@@ -9,7 +9,6 @@ builder.CreateUmbracoBuilder()
     .AddDeliveryApi()
 #endif
     .AddComposers()
-    .SetCustomMemberLoginPath()
     .Build();
 
 WebApplication app = builder.Build();
