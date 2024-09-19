@@ -80,7 +80,7 @@ export class UmbDocumentTypeWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DocumentType');
 
-		this.addValidationContext(new UmbValidationContext(this).provide());
+		this.addValidationContext(new UmbValidationContext(this));
 
 		// General for content types:
 		//this.data = this.structure.ownerContentType;
