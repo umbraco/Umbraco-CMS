@@ -113,7 +113,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders()
     {
         _cacheSettings = new CacheSettings();
-        _cacheSettings.BreadthFirstSeedCount = 0;
+        _cacheSettings.DocumentBreadthFirstSeedCount = 0;
 
         var mock = new Mock<IOptions<CacheSettings>>();
         mock.Setup(m => m.Value).Returns(() => _cacheSettings);

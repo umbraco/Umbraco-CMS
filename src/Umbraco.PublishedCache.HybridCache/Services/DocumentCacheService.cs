@@ -94,7 +94,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task SeedAsync()
     {
-        ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         foreach (Guid key in SeedKeys)
         {
