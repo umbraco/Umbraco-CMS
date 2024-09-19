@@ -4,14 +4,12 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
@@ -156,7 +154,7 @@ internal class UserService : RepositoryService, IUserService
         if (permissions.Any(x => x.EntityId == nodeId))
         {
             EntityPermission found = permissions.First(x => x.EntityId == nodeId);
-            var assignedPermissionsArray = found.AssignedPermissions;
+            ISet<string> assignedPermissionsArray = found.AssignedPermissions;
 
             // Working with permissions assigned directly to a user AND to their groups, so maybe several per node
             // and we need to get the most permissive set
@@ -668,7 +666,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserCreationResult());
         }
 
-        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
+        IUserGroup[] userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
 
         if (userGroups.Length != model.UserGroupKeys.Count)
         {
@@ -789,7 +787,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserInvitationResult());
         }
 
-        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
+        IUserGroup[] userGroups = _userGroupRepository.GetMany().Where(x => model.UserGroupKeys.Contains(x.Key)).ToArray();
 
         if (userGroups.Length != model.UserGroupKeys.Count)
         {
@@ -2298,7 +2296,7 @@ internal class UserService : RepositoryService, IUserService
         var results = new List<NodePermissions>();
         foreach (KeyValuePair<Guid, int> node in nodes)
         {
-            var permissions = permissionsCollection.GetAllPermissions(node.Value);
+            ISet<string> permissions = permissionsCollection.GetAllPermissions(node.Value);
             results.Add(new NodePermissions { NodeKey = node.Key, Permissions = permissions });
         }
 
@@ -2361,7 +2359,7 @@ internal class UserService : RepositoryService, IUserService
         var results = new List<NodePermissions>();
         foreach (int nodeId in idKeyMap.Keys)
         {
-            var permissions = permissionCollection.GetAllPermissions(nodeId);
+            ISet<string> permissions = permissionCollection.GetAllPermissions(nodeId);
             results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
         }
 
