@@ -18,17 +18,11 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			return;
 		}
 		this.#editor = value;
-		this.#editor?.on('selectionUpdate', this.#onUpdate);
-		this.#editor?.on('update', this.#onUpdate);
 	}
 	get editor() {
 		return this.#editor;
 	}
 	#editor?: Editor;
-
-	#onUpdate = () => {
-		this.requestUpdate();
-	};
 
 	#registry = new UmbTiptapIconRegistry();
 

@@ -1,9 +1,9 @@
-import { UmbTiptapExtensionApi } from '../types.js';
-import type { ManifestTiptapExtension } from '../tiptap-extension.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import type { ManifestTiptapExtensionButtonKind } from '../tiptap-extension.js';
 import { Code, CodeBlock } from '@umbraco-cms/backoffice/external/tiptap';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export const manifest: ManifestTiptapExtension = {
+export const manifest: ManifestTiptapExtensionButtonKind = {
 	type: 'tiptapExtension',
 	kind: 'button',
 	alias: 'Umb.Tiptap.CodeBlock',
@@ -11,13 +11,13 @@ export const manifest: ManifestTiptapExtension = {
 	api: () => import('./code-block.extension.js'),
 	weight: 994,
 	meta: {
-		alias: 'code-block',
+		alias: 'codeBlock',
 		icon: 'code-block',
 		label: 'Code Block',
 	},
 };
 
-export default class UmbTiptapCodeBlockExtensionApi extends UmbTiptapExtensionApi {
+export default class UmbTiptapCodeBlockExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions = () => [Code, CodeBlock];
 
 	override execute(editor?: Editor) {

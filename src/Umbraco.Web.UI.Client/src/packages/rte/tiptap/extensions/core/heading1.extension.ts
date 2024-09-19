@@ -1,9 +1,9 @@
-import { UmbTiptapExtensionApi } from '../types.js';
-import type { ManifestTiptapExtension } from '../tiptap-extension.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import type { ManifestTiptapExtensionButtonKind } from '../tiptap-extension.js';
 import { Heading } from '@umbraco-cms/backoffice/external/tiptap';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export const manifest: ManifestTiptapExtension = {
+export const manifest: ManifestTiptapExtensionButtonKind = {
 	type: 'tiptapExtension',
 	kind: 'button',
 	alias: 'Umb.Tiptap.Heading1',
@@ -17,8 +17,12 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapHeading1ExtensionApi extends UmbTiptapExtensionApi {
+export default class UmbTiptapHeading1ExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions = () => [Heading];
+
+	override isActive(editor?: Editor) {
+		return editor?.isActive('heading', { level: 1 }) === true;
+	}
 
 	override execute(editor?: Editor) {
 		editor?.chain().focus().toggleHeading({ level: 1 }).run();

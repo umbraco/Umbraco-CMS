@@ -1,9 +1,9 @@
-import { UmbTiptapExtensionApi } from '../types.js';
-import type { ManifestTiptapExtension } from '../tiptap-extension.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import type { ManifestTiptapExtensionButtonKind } from '../tiptap-extension.js';
 import { BulletList, ListItem } from '@umbraco-cms/backoffice/external/tiptap';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export const manifest: ManifestTiptapExtension = {
+export const manifest: ManifestTiptapExtensionButtonKind = {
 	type: 'tiptapExtension',
 	kind: 'button',
 	alias: 'Umb.Tiptap.BulletList',
@@ -11,13 +11,13 @@ export const manifest: ManifestTiptapExtension = {
 	api: () => import('./bullet-list.extension.js'),
 	weight: 993,
 	meta: {
-		alias: 'bullet-list',
+		alias: 'bulletList',
 		icon: 'bullet-list',
 		label: 'Bullet List',
 	},
 };
 
-export default class UmbTiptapBulletListExtensionApi extends UmbTiptapExtensionApi {
+export default class UmbTiptapBulletListExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions = () => [BulletList, ListItem];
 
 	override execute(editor?: Editor) {

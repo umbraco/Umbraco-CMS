@@ -1,9 +1,9 @@
-import { UmbTiptapExtensionApi } from '../types.js';
-import type { ManifestTiptapExtension } from '../tiptap-extension.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import type { ManifestTiptapExtensionButtonKind } from '../tiptap-extension.js';
 import { TextAlign } from '@umbraco-cms/backoffice/external/tiptap';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export const manifest: ManifestTiptapExtension = {
+export const manifest: ManifestTiptapExtensionButtonKind = {
 	type: 'tiptapExtension',
 	kind: 'button',
 	alias: 'Umb.Tiptap.TextAlignJustify',
@@ -17,12 +17,16 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapTextAlignJustifyExtensionApi extends UmbTiptapExtensionApi {
+export default class UmbTiptapTextAlignJustifyExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions = () => [
 		TextAlign.configure({
 			types: ['heading', 'paragraph', 'blockquote', 'orderedList', 'bulletList', 'codeBlock'],
 		}),
 	];
+
+	override isActive(editor?: Editor) {
+		return editor?.isActive({ textAlign: 'justify' }) === true;
+	}
 
 	override execute(editor?: Editor) {
 		editor?.chain().focus().setTextAlign('justify').run();

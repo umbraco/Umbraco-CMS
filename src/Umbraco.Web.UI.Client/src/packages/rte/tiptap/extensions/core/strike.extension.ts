@@ -1,9 +1,9 @@
-import { UmbTiptapExtensionApi } from '../types.js';
-import type { ManifestTiptapExtension } from '../tiptap-extension.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import type { ManifestTiptapExtensionButtonKind } from '../tiptap-extension.js';
 import { Strike } from '@umbraco-cms/backoffice/external/tiptap';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export const manifest: ManifestTiptapExtension = {
+export const manifest: ManifestTiptapExtensionButtonKind = {
 	type: 'tiptapExtension',
 	kind: 'button',
 	alias: 'Umb.Tiptap.Strike',
@@ -17,7 +17,7 @@ export const manifest: ManifestTiptapExtension = {
 	},
 };
 
-export default class UmbTiptapStrikeExtensionApi extends UmbTiptapExtensionApi {
+export default class UmbTiptapStrikeExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions = () => [Strike];
 
 	override execute(editor?: Editor) {
