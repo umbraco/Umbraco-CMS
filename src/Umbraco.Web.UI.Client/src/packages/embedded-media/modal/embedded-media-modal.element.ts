@@ -1,8 +1,9 @@
 import { UmbOEmbedRepository } from '../repository/oembed.repository.js';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from './embedded-media-modal.token.js';
 import { css, html, unsafeHTML, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-embedded-media-modal')
@@ -27,6 +28,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 	override connectedCallback() {
 		super.connectedCallback();
+
 		if (this.data?.width) this._width = this.data.width;
 		if (this.data?.height) this._height = this.data.height;
 		if (this.data?.constrain) this.value = { ...this.value, constrain: this.data.constrain };
@@ -81,7 +83,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 				<uui-box>
 					<umb-property-layout label=${this.localize.term('general_url')} orientation="vertical">
 						<div slot="editor">
-							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true">
+							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true" ${umbFocus()}>
 								<uui-button
 									slot="append"
 									look="primary"
