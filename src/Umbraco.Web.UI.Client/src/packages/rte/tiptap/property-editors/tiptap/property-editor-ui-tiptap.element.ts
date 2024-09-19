@@ -33,7 +33,13 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 		this._config = config;
 	}
 
-	@property({ attribute: false })
+	@property({
+		attribute: false,
+		type: Object,
+		hasChanged: (value?: UmbRichTextEditorValueType, oldValue?: UmbRichTextEditorValueType) => {
+			return value?.markup !== oldValue?.markup;
+		},
+	})
 	public set value(value: UmbRichTextEditorValueType | undefined) {
 		const buildUpValue: Partial<UmbRichTextEditorValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
@@ -42,10 +48,7 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
-
-		if (this._latestMarkup !== this._value.markup) {
-			this._markup = this._value.markup;
-		}
+		this._markup = buildUpValue.markup;
 
 		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.blocks.contentData);
@@ -72,10 +75,8 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 		blocks: { layout: {}, contentData: [], settingsData: [] },
 	};
 
-	// Separate state for markup, to avoid re-rendering/re-setting the value of the Tiptap editor when the value does not really change.
 	@state()
 	private _markup = '';
-	private _latestMarkup = ''; // The latest value gotten from the Tiptap editor.
 
 	#managerContext = new UmbBlockRteManagerContext(this);
 	#entriesContext = new UmbBlockRteEntriesContext(this);
@@ -111,7 +112,6 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const value = event.target.value as string;
-		this._latestMarkup = value;
 
 		// TODO: Validate blocks
 		// Loop through used, to remove the classes on these.
@@ -131,7 +131,7 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 
 		this._value = {
 			...this._value,
-			markup: this._latestMarkup,
+			markup: value,
 		};
 
 		this.#fireChangeEvent();
