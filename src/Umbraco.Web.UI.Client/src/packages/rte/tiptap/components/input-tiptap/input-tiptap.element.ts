@@ -122,7 +122,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				!this._editor && !this._extensions?.length,
 				() => html`<uui-loader></uui-loader>`,
 				() => html`
-					<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
 					<umb-tiptap-fixed-menu .editor=${this._editor} ?readonly=${this.readonly}></umb-tiptap-fixed-menu>
 				`,
 			)}
