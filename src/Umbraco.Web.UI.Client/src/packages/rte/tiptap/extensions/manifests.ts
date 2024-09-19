@@ -1,5 +1,6 @@
 import type { ManifestTiptapExtension } from './tiptap-extension.js';
 import { manifests as core } from './core/manifests.js';
+import { manifest as codeEditor } from './code-editor.extension.js';
 import { manifest as embed } from './embed.extension.js';
 import { manifest as mediaPicker } from './mediapicker.extension.js';
 import { manifest as urlPicker } from './urlpicker.extension.js';
@@ -17,6 +18,6 @@ const kinds: Array<UmbExtensionManifestKind> = [
 	},
 ];
 
-const extensions: Array<ManifestTiptapExtension> = [...core, embed, mediaPicker, urlPicker];
+const extensions: Array<ManifestTiptapExtension> = [...core, codeEditor, embed, mediaPicker, urlPicker];
 
 export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...kinds, ...extensions];
