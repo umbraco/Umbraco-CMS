@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	extends UmbFormControlMixin<UmbBlockGridValueModel, typeof UmbLitElement>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
-	#validationContext = new UmbValidationContext(this).provide();
+	#validationContext = new UmbValidationContext(this);
 	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#context = new UmbBlockGridManagerContext(this);
