@@ -88,7 +88,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#selectedValues: string[] = [];
 
-	#hoveredDropzone: HTMLElement | null = null;
+	#hoveredDropzone: HTMLElement | null = null; // Will be used to sort extensions in a group in the toolbar
 
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
@@ -178,6 +178,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			.find((v) => v instanceof HTMLElement && v.classList.contains('selected-group') && v.hasAttribute('dropzone'));
 
 		this.#hoveredDropzone = (dropzone as HTMLElement) || null;
+		console.log('hovered dropzone', this.#hoveredDropzone);
 	};
 
 	#onDrop = (event: DragEvent) => {
