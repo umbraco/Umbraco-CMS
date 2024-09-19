@@ -218,8 +218,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
         await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
         await _hybridCache.RemoveAsync(GetCacheKey(content.Key, false));
-        _idKeyMap.ClearCache(content.Key);
-        _idKeyMap.ClearCache(content.Id);
         scope.Complete();
     }
 
