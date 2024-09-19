@@ -2,10 +2,11 @@ import type { UmbDocumentDetailModel } from '../../types.js';
 import {
 	type CreateDocumentRequestModel,
 	DocumentService,
-	type UpdateDocumentRequestModel,
+	type ValidateUpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A server data source for Document Validation
@@ -32,18 +33,27 @@ export class UmbDocumentValidationServerDataSource {
 	 * @param parentUnique
 	 * @returns {*}
 	 */
-	async validateCreate(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
+	async validateCreate(
+		model: UmbDocumentDetailModel,
+		parentUnique: string | null = null,
+		variantIds: Array<UmbVariantId>,
+	) {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
+		if (parentUnique === undefined) throw new Error('Parent unique is missing');
+		if (!variantIds) throw new Error('Variant ids are missing');
+
+		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentRequestModel = {
+		const requestBody: ValidateCreateDocumentRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
+			cultures,
 		};
 
 		// Maybe use: tryExecuteAndNotify
@@ -60,20 +70,23 @@ export class UmbDocumentValidationServerDataSource {
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @returns {*}
 	 */
-	async validateUpdate(model: UmbDocumentDetailModel) {
+	async validateUpdate(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
 		if (!model.unique) throw new Error('Unique is missing');
 
+		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null);
+
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentRequestModel = {
+		const requestBody: ValidateUpdateDocumentRequestModel = {
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
+			cultures,
 		};
 
 		// Maybe use: tryExecuteAndNotify
 		return tryExecute(
 			//this.#host,
-			DocumentService.putDocumentByIdValidate({
+			DocumentService.putUmbracoManagementApiV11DocumentByIdValidate11({
 				id: model.unique,
 				requestBody,
 			}),
