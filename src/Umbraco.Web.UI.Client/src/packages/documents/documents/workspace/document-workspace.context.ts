@@ -172,8 +172,7 @@ export class UmbDocumentWorkspaceContext
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
 		window.addEventListener('willchangestate', this.#onWillNavigate);
-
-		this.addValidationContext(new UmbValidationContext(this).provide());
+		this.addValidationContext(new UmbValidationContext(this));
 
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
@@ -538,11 +537,15 @@ export class UmbDocumentWorkspaceContext
 		const selected = activeVariantIds.concat(changedVariantIds);
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 
+		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
+		const selectedCultures = selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		const writable = selectedCultures.filter((x) => readOnlyCultures.includes(x) === false);
+
 		const options = await firstValueFrom(this.variantOptions);
 
 		return {
 			options,
-			selected: selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i),
+			selected: writable,
 		};
 	}
 
