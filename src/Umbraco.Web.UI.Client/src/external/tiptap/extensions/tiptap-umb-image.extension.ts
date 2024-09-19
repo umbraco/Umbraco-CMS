@@ -1,6 +1,7 @@
 import Image from '@tiptap/extension-image';
 
 export const UmbImage = Image.extend({
+	name: 'umbImage',
 	addAttributes() {
 		return {
 			...this.parent?.(),
