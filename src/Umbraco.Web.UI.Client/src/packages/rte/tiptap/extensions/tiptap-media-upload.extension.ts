@@ -8,6 +8,7 @@ import { type Editor, UmbImage } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi {
 	/**
@@ -28,6 +29,7 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 
 	#manager = new UmbTemporaryFileManager(this);
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -45,7 +47,7 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 				addAttributes() {
 					return {
 						...this.parent?.(),
-						dataTmpimg: { default: null },
+						'data-tmpimg': { default: null },
 					};
 				},
 				onCreate() {
@@ -76,7 +78,7 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		const filteredFiles = this.#filterFiles(files);
 		const fileModels = filteredFiles.map((file) => this.#mapFileToTemporaryFile(file));
 
-		this.dispatchEvent(new CustomEvent('rte.file.uploading', { bubbles: true, detail: fileModels }));
+		this.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true, detail: fileModels }));
 
 		const uploads = await this.#manager.upload(fileModels);
 
@@ -84,8 +86,8 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 			if (upload.status !== TemporaryFileStatus.SUCCESS) {
 				this.#notificationContext?.peek('danger', {
 					data: {
-						headline: 'Rich Text Editor',
-						message: `Failed to upload file ${upload.file.name}`,
+						headline: upload.file.name,
+						message: this.#localize.term('errors_dissallowedMediaType'),
 					},
 				});
 				return;
@@ -97,12 +99,12 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 				.setImage({
 					src: URL.createObjectURL(upload.file),
 					width: this.maxWidth.toString(),
-					dataTmpimg: upload.temporaryUnique,
+					'data-tmpimg': upload.temporaryUnique,
 				})
 				.run();
 		});
 
-		this.dispatchEvent(new CustomEvent('rte.file.uploaded', { bubbles: true, detail: uploads }));
+		this.dispatchEvent(new CustomEvent('rte.file.uploaded', { composed: true, bubbles: true, detail: uploads }));
 	}
 
 	#mapFileToTemporaryFile(file: File): UmbTemporaryFileModel {
@@ -137,7 +139,7 @@ declare module '@tiptap/core' {
 				loading?: string;
 				srcset?: string;
 				sizes?: string;
-				dataTmpimg?: string;
+				'data-tmpimg'?: string;
 			}) => ReturnType;
 		};
 	}
