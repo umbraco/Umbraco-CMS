@@ -42,7 +42,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	private _extensions: Array<UmbTiptapExtensionApi> = [];
 
 	@property({ attribute: false })
-	configuration?: UmbPropertyEditorConfigCollection;
+	configuration!: UmbPropertyEditorConfigCollection;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -78,7 +78,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
 
-		const extensions = this._extensions.map((ext) => ext.getTiptapExtensions()).flat();
+		const extensions = this._extensions
+			.map((ext) => ext.getTiptapExtensions({ configuration: this.configuration }))
+			.flat();
 
 		this._editor = new Editor({
 			element: element,
