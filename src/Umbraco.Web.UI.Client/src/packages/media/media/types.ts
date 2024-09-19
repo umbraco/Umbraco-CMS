@@ -1,9 +1,9 @@
 import type { UmbMediaEntityType } from './entity.js';
 import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 
-export interface UmbMediaDetailModel {
+export interface UmbMediaDetailModel extends UmbContentDetailModel {
 	mediaType: {
 		unique: string;
 		collection: UmbReferenceByUnique | null;

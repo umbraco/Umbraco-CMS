@@ -1,4 +1,5 @@
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbContentValueModel<ValueType = unknown> extends UmbPropertyValueData<ValueType> {
 	editorAlias: string;
@@ -10,4 +11,12 @@ export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbP
 	editorAlias?: string;
 	culture?: string | null;
 	segment?: string | null;
+}
+
+export interface UmbContentDetailModel {
+	unique: string;
+	entityType: string;
+	isTrashed: boolean;
+	values: Array<UmbContentValueModel>;
+	variants: Array<UmbVariantModel>;
 }

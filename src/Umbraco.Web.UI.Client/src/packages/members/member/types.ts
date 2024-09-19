@@ -1,9 +1,9 @@
 import type { UmbMemberEntityType } from './entity.js';
 import type { UmbMemberKindType } from './utils/index.js';
 import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 
-export interface UmbMemberDetailModel {
+export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	email: string;
 	entityType: UmbMemberEntityType;
 	failedPasswordAttempts: number;
