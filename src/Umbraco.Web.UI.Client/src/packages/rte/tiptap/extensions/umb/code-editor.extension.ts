@@ -1,21 +1,6 @@
-import { UmbTiptapToolbarElementApiBase } from './types.js';
-import type { ManifestTiptapExtensionButtonKind } from './tiptap-extension.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_CODE_EDITOR_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-
-export const manifest: ManifestTiptapExtensionButtonKind = {
-	type: 'tiptapExtension',
-	kind: 'button',
-	alias: 'Umb.Tiptap.CodeEditor',
-	name: 'Code Editor Tiptap Extension',
-	api: () => import('./code-editor.extension.js'),
-	weight: 1000,
-	meta: {
-		alias: 'umb-code-editor',
-		icon: 'icon-code',
-		label: '#general_viewSourceCode',
-	},
-};
 
 export default class UmbTiptapCodeEditorExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions = () => [];

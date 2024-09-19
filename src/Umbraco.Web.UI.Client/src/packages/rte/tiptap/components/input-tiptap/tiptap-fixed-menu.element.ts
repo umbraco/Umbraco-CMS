@@ -43,6 +43,7 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			color: var(--color-text);
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
+			gap: 4px;
 			position: sticky;
 			top: -25px;
 			left: 0px;
