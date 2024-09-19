@@ -43,6 +43,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@property({ type: String })
 	override set value(value: string) {
+		console.log('update scheduled', value);
 		this.#markup = value;
 
 		// Try to set the value to the editor if it is ready.
@@ -51,7 +52,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		}
 	}
 	override get value() {
-		return this._editor?.getHTML() ?? this.#markup;
+		return this.#markup;
 	}
 
 	#markup = '';
@@ -122,6 +123,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			],
 			content: this.#markup,
 			onUpdate: () => {
+				this.#markup = this._editor.getHTML();
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
