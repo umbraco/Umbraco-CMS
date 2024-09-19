@@ -47,27 +47,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			}
 		}
 
-		this.#selectedValues.forEach((alias) => {
-			const row = Math.floor(Math.random() * 2);
-			const group = Math.floor(Math.random() * 2);
-			const item = this._toolbarConfig.find((value) => value.alias === alias);
-
-			if (!item) return;
-
-			// Ensure the row exists
-			if (!this._selectedValuesNew[row]) {
-				this._selectedValuesNew[row] = []; // Initialize the row if it doesn't exist
-			}
-
-			// Ensure the group exists within the row
-			if (!this._selectedValuesNew[row][group]) {
-				this._selectedValuesNew[row][group] = []; // Initialize the group if it doesn't exist
-			}
-
-			// Add the item to the selectedValuesNew array
-			this._selectedValuesNew[row][group].push(item);
-		});
-
 		this.requestUpdate('#selectedValuesNew');
 	}
 	get value(): string[] {
