@@ -57,7 +57,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#markup = '';
 
 	@property({ attribute: false })
-	configuration!: UmbPropertyEditorConfigCollection;
+	configuration?: UmbPropertyEditorConfigCollection;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
