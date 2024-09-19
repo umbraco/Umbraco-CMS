@@ -2,14 +2,14 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.Navigation;
 
-namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
+namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 
-public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
+public class DocumentBreadthFirstKeyProvider : IDocumentSeedKeyProvider
 {
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly CacheSettings _cacheSettings;
 
-    public BreadthFirstKeyProvider(
+    public DocumentBreadthFirstKeyProvider(
         IDocumentNavigationQueryService documentNavigationQueryService,
         IOptions<CacheSettings> cacheSettings)
     {

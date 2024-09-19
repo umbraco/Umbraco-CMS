@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
-namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
+namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 
 internal class ContentTypeSeedKeyProvider : IDocumentSeedKeyProvider
 {

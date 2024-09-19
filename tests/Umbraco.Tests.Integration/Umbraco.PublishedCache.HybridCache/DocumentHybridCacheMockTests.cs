@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
-using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -121,7 +121,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         return new List<IDocumentSeedKeyProvider>
         {
             new ContentTypeSeedKeyProvider(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<IDatabaseCacheRepository>(), mock.Object),
-            new BreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object),
+            new DocumentBreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object),
         };
     }
 
