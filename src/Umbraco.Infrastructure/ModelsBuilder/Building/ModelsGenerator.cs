@@ -49,7 +49,7 @@ public class ModelsGenerator : IModelsGenerator
         foreach (TypeModel typeModel in typeModels)
         {
             var sb = new StringBuilder();
-            _textBuilder.Generate(sb, typeModel);
+            _textBuilder.Generate(sb, typeModel, typeModels);
             var filename = Path.Combine(modelsDirectory, typeModel.ClrName + outputFileExtension);
             File.WriteAllText(filename, sb.ToString());
         }

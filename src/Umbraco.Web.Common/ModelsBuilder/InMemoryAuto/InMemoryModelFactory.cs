@@ -534,7 +534,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             }
 
             // generate code, save
-            var code = GenerateModelsCode();
+            var code = GenerateModelsCode(typeModels);
 
             // add extra attributes,
             //  IsLive=true helps identifying Assemblies that contain live models
@@ -706,7 +706,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
-        private string GenerateModelsCode()
+        private string GenerateModelsCode(IList<TypeModel> typeModels)
         {
             if (!Directory.Exists(_pureLiveDirectory.Value))
             {
@@ -719,7 +719,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             }
 
             var codeBuilder = new StringBuilder();
-            _textBuilder.Generate(codeBuilder, _builderBase.GetModelsToGenerate(), true);
+            _textBuilder.Generate(codeBuilder, typeModels, typeModels, true);
             var code = codeBuilder.ToString();
 
             return code;

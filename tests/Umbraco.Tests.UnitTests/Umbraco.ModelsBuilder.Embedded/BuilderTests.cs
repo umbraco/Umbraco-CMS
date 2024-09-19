@@ -55,11 +55,8 @@ public class BuilderTests
 
         (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
 
-        builderBase.Prepare(types);
-
-
         var sb = new StringBuilder();
-        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
+        builder.Generate(sb, types.First(), types);
         var gen = sb.ToString();
 
         var version = ApiVersion.Current.Version;
@@ -167,18 +164,15 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
 
-        
-        builderBase.Prepare(types);
-
         builderBase.ModelsNamespace = "Umbraco.Cms.Web.Common.PublishedModels";
-        
+
         var sb1 = new StringBuilder();
-        builder.Generate(sb1, builderBase.GetModelsToGenerate().Skip(1).First());
+        builder.Generate(sb1, types.Skip(1).First(),types);
         var gen1 = sb1.ToString();
         Console.WriteLine(gen1);
 
         var sb = new StringBuilder();
-        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
+        builder.Generate(sb, types.First(), types);
         var gen = sb.ToString();
 
         var version = ApiVersion.Current.Version;
@@ -285,13 +279,10 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
 
-        
-        builderBase.Prepare(types);
-
         var sb = new StringBuilder();
-        foreach (var model in builderBase.GetModelsToGenerate())
+        foreach (var model in types)
         {
-            builder.Generate(sb, model);
+            builder.Generate(sb, model, types);
         }
 
         var gen = sb.ToString();
@@ -340,10 +331,8 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(docTypes);
 
-        builderBase.Prepare(docTypes);
-
         var sb = new StringBuilder();
-        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
+        builder.Generate(sb, docTypes.First(), docTypes);
         var genParent = sb.ToString();
 
         var version = ApiVersion.Current.Version;
@@ -418,7 +407,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         Assert.AreEqual(expectedParent.ClearLf(), genParent);
 
         var sb2 = new StringBuilder();
-        builder.Generate(sb2, builderBase.GetModelsToGenerate().Skip(1).First());
+        builder.Generate(sb2, docTypes.Skip(1).First(), docTypes);
         var genChild = sb2.ToString();
 
         var expectedChild = @"//------------------------------------------------------------------------------
@@ -529,12 +518,10 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         (BuilderBase builderBase, TextBuilder builder, TextBuilderActions textBuilderActions, TextBuilderSubActions textBuilderSubActions) = CreateBuilders(types);
 
-        builderBase.Prepare(types);
-
         var version = ApiVersion.Current.Version;
 
         var sb = new StringBuilder();
-        builder.Generate(sb, builderBase.GetModelsToGenerate().First());
+        builder.Generate(sb, types.First(), types);
         var genComposed = sb.ToString();
 
         var expectedComposed = @"//------------------------------------------------------------------------------
@@ -616,7 +603,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         Assert.AreEqual(expectedComposed.ClearLf(), genComposed);
 
         var sb2 = new StringBuilder();
-        builder.Generate(sb2, builderBase.GetModelsToGenerate().Skip(1).First());
+        builder.Generate(sb2, types.Skip(1).First(), types);
         var genComposition = sb2.ToString();
 
         var expectedComposition = @"//------------------------------------------------------------------------------

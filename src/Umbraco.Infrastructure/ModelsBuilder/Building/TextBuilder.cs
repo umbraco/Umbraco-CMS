@@ -23,11 +23,13 @@ public class TextBuilder : ITextBuilder
     }
 
     /// <inheritdoc/>
-    public void Generate(StringBuilder sb, TypeModel typeModel) => Generate(sb, [typeModel], false);
+    public void Generate(StringBuilder sb, TypeModel typeModel, IEnumerable<TypeModel> availableTypes) => Generate(sb, [typeModel], availableTypes, false);
 
     /// <inheritdoc/>
-    public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels, bool addAssemblyMarker)
+    public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels, IEnumerable<TypeModel> availableTypes, bool addAssemblyMarker)
     {
+        _builderBase.Prepare(availableTypes);
+
         _textBuilderActions.WriteHeader(sb);
 
         _textBuilderActions.WriteUsing(sb, _builderBase.Using);
