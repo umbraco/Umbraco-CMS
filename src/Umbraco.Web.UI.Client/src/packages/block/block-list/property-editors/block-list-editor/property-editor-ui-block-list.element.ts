@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIBlockListElement
 		},
 	});
 
-	#validationContext = new UmbValidationContext(this).provide();
+	#validationContext = new UmbValidationContext(this);
 	#contentDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 	#settingsDataPathTranslator?: UmbBlockElementDataValidationPathTranslator;
 
