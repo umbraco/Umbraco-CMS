@@ -1,4 +1,4 @@
-import { UmbTiptapExtensionApi } from './types.js';
+import { UmbTiptapExtensionApi, type UmbTiptapExtensionArgs } from './types.js';
 import {
 	TemporaryFileStatus,
 	UmbTemporaryFileManager,
@@ -9,27 +9,31 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi {
+	#configuration?: UmbPropertyEditorConfigCollection;
+
 	/**
-	 * TODO: Implement this method when the configuration is available to extensions
-	 * @returns The maximum width of uploaded images
+	 * @returns {number} The maximum width of uploaded images
 	 */
-	get maxWidth() {
-		return 500;
+	get maxWidth(): number {
+		const maxImageSize = parseInt(this.#configuration?.getValueByAlias('maxImageSize') ?? '', 10);
+		return isNaN(maxImageSize) ? 500 : maxImageSize;
 	}
 
 	/**
-	 * TODO: Implement this method when the configuration is available to extensions
-	 * @returns The allowed file types for uploads
+	 * @returns {Array<string>} The allowed mime types for uploads
 	 */
-	get allowedFileTypes() {
-		return ['image/jpeg', 'image/png', 'image/gif'];
+	get allowedFileTypes(): string[] {
+		return (
+			this.#configuration?.getValueByAlias<string[]>('allowedFileTypes') ?? ['image/jpeg', 'image/png', 'image/gif']
+		);
 	}
 
 	#manager = new UmbTemporaryFileManager(this);
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -38,7 +42,9 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		});
 	}
 
-	getTiptapExtensions() {
+	getTiptapExtensions(args: UmbTiptapExtensionArgs) {
+		this.#configuration = args?.configuration;
+
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const self = this;
 		return [
@@ -72,15 +78,22 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		];
 	}
 
-	async #uploadTemporaryFile(files: FileList, editor: Editor) {
+	/**
+	 * Uploads the files to the server and inserts them into the editor as data URIs.
+	 * The server will replace the data URI with a proper URL when the content is saved.
+	 * @param {FileList} files The files to upload.
+	 * @param {Editor} editor The editor to insert the images into.
+	 */
+	async #uploadTemporaryFile(files: FileList, editor: Editor): Promise<void> {
 		const filteredFiles = this.#filterFiles(files);
 		const fileModels = filteredFiles.map((file) => this.#mapFileToTemporaryFile(file));
 
 		this.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true, detail: fileModels }));
 
 		const uploads = await this.#manager.upload(fileModels);
+		const maxImageSize = this.maxWidth;
 
-		uploads.forEach((upload) => {
+		uploads.forEach(async (upload) => {
 			if (upload.status !== TemporaryFileStatus.SUCCESS) {
 				this.#notificationContext?.peek('danger', {
 					data: {
@@ -91,12 +104,21 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 				return;
 			}
 
+			let { width, height } = await this.#imageSize(URL.createObjectURL(upload.file));
+
+			if (maxImageSize > 0 && width > maxImageSize) {
+				const ratio = maxImageSize / width;
+				width = maxImageSize;
+				height = Math.round(height * ratio);
+			}
+
 			editor
 				.chain()
 				.focus()
 				.setImage({
 					src: URL.createObjectURL(upload.file),
-					width: this.maxWidth.toString(),
+					width: width.toString(),
+					height: height.toString(),
 					'data-tmpimg': upload.temporaryUnique,
 				})
 				.run();
@@ -114,6 +136,35 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 
 	#filterFiles(files: FileList): File[] {
 		return Array.from(files).filter((file) => this.allowedFileTypes.includes(file.type));
+	}
+
+	/**
+	 * Get the dimensions of an image from a URL.
+	 * @param {string} url The URL of the image. It can be a local file (blob url) or a remote file.
+	 * @returns {Promise<{width: number, height: number}>} The width and height of the image as downloaded from the URL.
+	 */
+	#imageSize(url: string): Promise<{ width: number; height: number }> {
+		const img = new Image();
+
+		const promise = new Promise<{ width: number; height: number }>((resolve, reject) => {
+			img.onload = () => {
+				// Natural size is the actual image size regardless of rendering.
+				// The 'normal' `width`/`height` are for the **rendered** size.
+				const width = img.naturalWidth;
+				const height = img.naturalHeight;
+
+				// Resolve promise with the width and height
+				resolve({ width, height });
+			};
+
+			// Reject promise on error
+			img.onerror = reject;
+		});
+
+		// Setting the source makes it start downloading and eventually call `onload`
+		img.src = url;
+
+		return promise;
 	}
 }
 
