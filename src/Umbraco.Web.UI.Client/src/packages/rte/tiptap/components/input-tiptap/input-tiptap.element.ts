@@ -57,6 +57,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
 	}
 
+	protected override updated(changedProperties: Map<string | number | symbol, unknown>) {
+		if (changedProperties.has('value') && this._editor) {
+			this._editor.commands.setContent(this.value, true);
+		}
+	}
+
 	async #loadExtensions() {
 		await new Promise<void>((resolve) => {
 			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
