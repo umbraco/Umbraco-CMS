@@ -12,6 +12,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Media;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -72,6 +73,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDocumentSeedKeyProvider, ContentTypeSeedKeyProvider>();
         builder.Services.AddSingleton<IDocumentSeedKeyProvider, DocumentBreadthFirstKeyProvider>();
 
+
+        builder.Services.AddSingleton<IMediaSeedKeyProvider, MediaBreadthFirstKeyProvider>();
         return builder;
     }
 }
