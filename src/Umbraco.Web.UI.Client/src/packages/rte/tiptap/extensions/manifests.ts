@@ -1,4 +1,8 @@
 import type { ManifestTiptapExtension } from './tiptap-extension.js';
+import { manifests as core } from './core/manifests.js';
+import { manifest as embed } from './embed.extension.js';
+import { manifest as mediaPicker } from './mediapicker.extension.js';
+import { manifest as urlPicker } from './urlpicker.extension.js';
 import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const kinds: Array<UmbExtensionManifestKind> = [
@@ -13,36 +17,6 @@ const kinds: Array<UmbExtensionManifestKind> = [
 	},
 ];
 
-const extensions: Array<ManifestTiptapExtension> = [
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.Image',
-		name: 'Image Tiptap Extension',
-		weight: 1000,
-		api: () => import('./tiptap-image.extension.js'),
-		meta: {},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.MediaUpload',
-		name: 'Media Upload Tiptap Extension',
-		weight: 900,
-		api: () => import('./tiptap-media-upload.extension.js'),
-		meta: {},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.MediaPicker',
-		name: 'Media Picker Tiptap Extension',
-		weight: 900,
-		api: () => import('./tiptap-mediapicker.extension.js'),
-		meta: {
-			alias: 'umb-media',
-			icon: 'icon-picture',
-			label: 'Media picker',
-		},
-	},
-];
+const extensions: Array<ManifestTiptapExtension> = [...core, embed, mediaPicker, urlPicker];
 
 export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...kinds, ...extensions];

@@ -3,28 +3,14 @@ import { css, customElement, html, property, state, when } from '@umbraco-cms/ba
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
-	Blockquote,
-	Bold,
-	BulletList,
-	Code,
-	CodeBlock,
 	Document,
 	Dropcursor,
 	Editor,
 	Gapcursor,
 	HardBreak,
-	Heading,
 	History,
-	HorizontalRule,
-	Italic,
-	Link,
-	ListItem,
-	OrderedList,
 	Paragraph,
-	Strike,
 	Text,
-	TextAlign,
-	Underline,
 } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -34,7 +20,9 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import './tiptap-fixed-menu.element.js';
 import './tiptap-hover-menu.element.js';
 
-@customElement('umb-input-tiptap')
+const elementName = 'umb-input-tiptap';
+
+@customElement(elementName)
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	#requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
 
@@ -100,26 +88,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
-			extensions: [
-				...this.#requiredExtensions,
-				Blockquote,
-				Bold,
-				BulletList,
-				Code,
-				CodeBlock,
-				Heading,
-				HorizontalRule,
-				Italic,
-				Link.configure({ openOnClick: false }),
-				ListItem, // This is needed for BulletList and OrderedList. When moving to an umbraco-extension, how should we handle shared extensions?
-				OrderedList,
-				Strike,
-				TextAlign.configure({
-					types: ['heading', 'paragraph', 'blockquote', 'orderedList', 'bulletList', 'codeBlock'],
-				}),
-				Underline,
-				...extensions,
-			],
+			extensions: [...this.#requiredExtensions, ...extensions],
 			content: this.#markup,
 			onUpdate: ({ editor }) => {
 				this.#markup = editor.getHTML();
@@ -152,6 +121,14 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				}
 			}
 
+			.tiptap {
+				height: 100%;
+				width: 100%;
+				outline: none;
+				white-space: pre-wrap;
+				min-width: 0;
+			}
+
 			#editor {
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
@@ -166,50 +143,42 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				overflow: clip;
 				min-height: 400px;
 				display: grid; /* Don't ask me why this is needed, but it is. */
-			}
 
-			#editor pre {
-				background-color: var(--uui-color-surface-alt);
-				padding: var(--uui-size-space-2) var(--uui-size-space-4);
-				border-radius: calc(var(--uui-border-radius) * 2);
-				overflow-x: auto;
-			}
+				pre {
+					background-color: var(--uui-color-surface-alt);
+					padding: var(--uui-size-space-2) var(--uui-size-space-4);
+					border-radius: calc(var(--uui-border-radius) * 2);
+					overflow-x: auto;
+				}
 
-			#editor code:not(pre > code) {
-				background-color: var(--uui-color-surface-alt);
-				padding: var(--uui-size-space-1) var(--uui-size-space-2);
-				border-radius: calc(var(--uui-border-radius) * 2);
-			}
+				code:not(pre > code) {
+					background-color: var(--uui-color-surface-alt);
+					padding: var(--uui-size-space-1) var(--uui-size-space-2);
+					border-radius: calc(var(--uui-border-radius) * 2);
+				}
 
-			#editor code {
-				font-family: 'Roboto Mono', monospace;
-				background: none;
-				color: inherit;
-				font-size: 0.8rem;
-				padding: 0;
-			}
-			.tiptap {
-				height: 100%;
-				width: 100%;
-				outline: none;
-				white-space: pre-wrap;
-				min-width: 0;
-			}
-			#editor p,
-			#editor h1,
-			#editor h2,
-			#editor h3 {
-				margin-top: 0;
-				margin-bottom: 0.5em;
+				code {
+					font-family: 'Roboto Mono', monospace;
+					background: none;
+					color: inherit;
+					font-size: 0.8rem;
+					padding: 0;
+				}
+
+				h1,
+				h2,
+				h3,
+				p {
+					margin-top: 0;
+					margin-bottom: 0.5em;
+				}
 			}
 		`,
 	];
 }
 
-export default UmbInputTiptapElement;
-
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-tiptap': UmbInputTiptapElement;
+		[elementName]: UmbInputTiptapElement;
 	}
 }

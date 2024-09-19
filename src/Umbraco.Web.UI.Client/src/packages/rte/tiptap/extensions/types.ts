@@ -1,17 +1,20 @@
+import type { ManifestTiptapExtension } from './tiptap-extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
-import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-export abstract class UmbTiptapExtensionApi extends UmbControllerBase implements UmbApi {
+export interface UmbTiptapExtensionApi extends UmbApi {
+	getTiptapExtensions(): Array<Extension | Mark | Node>;
+}
+
+export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implements UmbApi {
+	public manifest?: ManifestTiptapExtension;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	execute(editor?: Editor) {}
 
 	abstract getTiptapExtensions(args?: UmbTiptapExtensionArgs): Array<Extension | Mark | Node>;
 }
@@ -25,9 +28,19 @@ export interface UmbTiptapExtensionArgs {
 	configuration?: UmbPropertyEditorConfigCollection;
 }
 
-export interface UmbTiptapToolbarButton {
-	name: string;
-	icon: string | TemplateResult;
-	isActive: (editor?: Editor) => boolean | undefined;
-	command: (editor?: Editor) => boolean | undefined | void | Promise<boolean> | Promise<undefined> | Promise<void>;
+export interface UmbTiptapToolbarElementApi extends UmbTiptapExtensionApi {
+	execute(editor?: Editor): void;
+	isActive(editor?: Editor): boolean;
+}
+
+export abstract class UmbTiptapToolbarElementApiBase
+	extends UmbTiptapExtensionApiBase
+	implements UmbTiptapToolbarElementApi
+{
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public execute(editor?: Editor) {}
+
+	public isActive(editor?: Editor) {
+		return editor && this.manifest?.meta.alias ? editor?.isActive(this.manifest.meta.alias) : false;
+	}
 }

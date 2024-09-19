@@ -159,6 +159,10 @@ name: "icon-block",
 
 path: () => import("./icons/icon-block.js"),
 },{
+name: "icon-blockquote",
+
+path: () => import("./icons/icon-blockquote.js"),
+},{
 name: "icon-bluetooth",
 
 path: () => import("./icons/icon-bluetooth.js"),
@@ -166,6 +170,10 @@ path: () => import("./icons/icon-bluetooth.js"),
 name: "icon-boat-shipping",
 
 path: () => import("./icons/icon-boat-shipping.js"),
+},{
+name: "icon-bold",
+
+path: () => import("./icons/icon-bold.js"),
 },{
 name: "icon-bones",
 
@@ -627,6 +635,10 @@ name: "icon-edit",
 
 path: () => import("./icons/icon-edit.js"),
 },{
+name: "icon-embed",
+
+path: () => import("./icons/icon-embed.js"),
+},{
 name: "icon-employee",
 legacy: true,
 path: () => import("./icons/icon-employee.js"),
@@ -855,6 +867,18 @@ name: "icon-hard-drive",
 legacy: true,
 path: () => import("./icons/icon-hard-drive.js"),
 },{
+name: "icon-heading-1",
+
+path: () => import("./icons/icon-heading-1.js"),
+},{
+name: "icon-heading-2",
+
+path: () => import("./icons/icon-heading-2.js"),
+},{
+name: "icon-heading-3",
+
+path: () => import("./icons/icon-heading-3.js"),
+},{
 name: "icon-headphones",
 
 path: () => import("./icons/icon-headphones.js"),
@@ -886,6 +910,10 @@ path: () => import("./icons/icon-history.js"),
 name: "icon-home",
 
 path: () => import("./icons/icon-home.js"),
+},{
+name: "icon-horizontal-rule",
+
+path: () => import("./icons/icon-horizontal-rule.js"),
 },{
 name: "icon-hourglass",
 
@@ -926,6 +954,10 @@ path: () => import("./icons/icon-ipad.js"),
 name: "icon-iphone",
 legacy: true,
 path: () => import("./icons/icon-iphone.js"),
+},{
+name: "icon-italic",
+
+path: () => import("./icons/icon-italic.js"),
 },{
 name: "icon-item-arrangement",
 legacy: true,
@@ -1803,6 +1835,10 @@ name: "icon-stream",
 legacy: true,
 path: () => import("./icons/icon-stream.js"),
 },{
+name: "icon-strikethrough",
+
+path: () => import("./icons/icon-strikethrough.js"),
+},{
 name: "icon-sunny",
 
 path: () => import("./icons/icon-sunny.js"),
@@ -1850,6 +1886,22 @@ path: () => import("./icons/icon-temperature.js"),
 name: "icon-terminal",
 
 path: () => import("./icons/icon-terminal.js"),
+},{
+name: "icon-text-align-center",
+
+path: () => import("./icons/icon-text-align-center.js"),
+},{
+name: "icon-text-align-justify",
+
+path: () => import("./icons/icon-text-align-justify.js"),
+},{
+name: "icon-text-align-left",
+
+path: () => import("./icons/icon-text-align-left.js"),
+},{
+name: "icon-text-align-right",
+
+path: () => import("./icons/icon-text-align-right.js"),
 },{
 name: "icon-theater",
 
@@ -1966,6 +2018,10 @@ path: () => import("./icons/icon-umbrella.js"),
 name: "icon-undo",
 
 path: () => import("./icons/icon-undo.js"),
+},{
+name: "icon-underline",
+
+path: () => import("./icons/icon-underline.js"),
 },{
 name: "icon-unlocked",
 
