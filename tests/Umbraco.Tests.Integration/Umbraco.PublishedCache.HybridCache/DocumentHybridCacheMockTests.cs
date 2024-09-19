@@ -160,7 +160,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
         await _mockDocumentCacheService.SeedAsync();
@@ -181,7 +181,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
         await _mockDocumentCacheService.SeedAsync();
@@ -195,7 +195,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     public async Task Content_Is_Not_Seeded_If_Unpblished_By_Id()
     {
 
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
         await _mockDocumentCacheService.SeedAsync();
@@ -209,7 +209,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     public async Task Content_Is_Not_Seeded_If_Unpublished_By_Key()
     {
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         await _mockDocumentCacheService.SeedAsync();
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);

@@ -159,10 +159,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         bool isSeeded = SeedKeys.Contains(content.Key);
 
-        // TODO: We want to remove this however this will not work (currently)
-        // This doesn't work because DeleteItemAsync(int ID) uses idKeyMap to get the key from the id
-        // HOWEVER this doesn't really work here, because at this time the entity has already been removed from the umbracoNode table.
-        _idKeyMap.GetIdForKey(content.Key, UmbracoObjectTypes.Document);
         // Always set draft node
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
@@ -216,15 +212,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     private string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 
-    public async Task DeleteItemAsync(int id)
+    public async Task DeleteItemAsync(IContentBase content)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        await _databaseCacheRepository.DeleteContentItemAsync(id);
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
-        await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, true));
-        await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, false));
-        _idKeyMap.ClearCache(keyAttempt.Result);
-        _idKeyMap.ClearCache(id);
+        await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
+        await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
+        await _hybridCache.RemoveAsync(GetCacheKey(content.Key, false));
+        _idKeyMap.ClearCache(content.Key);
+        _idKeyMap.ClearCache(content.Id);
         scope.Complete();
     }
 
