@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 992,
 	meta: {
 		alias: 'orderedList',
-		icon: 'ordered-list',
+		icon: 'icon-ordered-list',
 		label: 'Ordered List',
 	},
 };

@@ -19,7 +19,8 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 		super.connectedCallback();
 
 		if (this.editor) {
-			this.editor.on('selectionUpdate', this.#onSelectionUpdate);
+			this.editor.on('selectionUpdate', this.#onEditorUpdate);
+			this.editor.on('update', this.#onEditorUpdate);
 		}
 	}
 
@@ -27,11 +28,12 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 		super.disconnectedCallback();
 
 		if (this.editor) {
-			this.editor.off('selectionUpdate', this.#onSelectionUpdate);
+			this.editor.off('selectionUpdate', this.#onEditorUpdate);
+			this.editor.off('update', this.#onEditorUpdate);
 		}
 	}
 
-	#onSelectionUpdate = () => {
+	#onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
 			this._isActive = this.api.isActive(this.editor);
 		}

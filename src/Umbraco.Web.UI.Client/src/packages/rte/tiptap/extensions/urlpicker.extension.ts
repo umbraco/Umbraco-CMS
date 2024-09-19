@@ -11,7 +11,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	api: () => import('./urlpicker.extension.js'),
 	meta: {
 		alias: 'umb-link',
-		icon: 'umbraco',
+		icon: 'icon-link',
 		label: 'URL picker',
 	},
 };

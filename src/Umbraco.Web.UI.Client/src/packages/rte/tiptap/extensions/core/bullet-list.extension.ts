@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 993,
 	meta: {
 		alias: 'bulletList',
-		icon: 'bullet-list',
+		icon: 'icon-bulleted-list',
 		label: 'Bullet List',
 	},
 };

@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 997,
 	meta: {
 		alias: 'underline',
-		icon: 'underline',
+		icon: 'icon-underline',
 		label: 'Underline',
 	},
 };

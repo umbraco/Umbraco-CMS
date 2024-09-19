@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 996,
 	meta: {
 		alias: 'strike',
-		icon: 'strike',
+		icon: 'icon-strikethrough',
 		label: 'Strike',
 	},
 };

@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 917,
 	meta: {
 		alias: 'text-align-right',
-		icon: 'text-align-right',
+		icon: 'icon-text-align-right',
 		label: 'Text Align Right',
 	},
 };

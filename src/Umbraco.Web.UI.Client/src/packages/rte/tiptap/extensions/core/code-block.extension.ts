@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 994,
 	meta: {
 		alias: 'codeBlock',
-		icon: 'code-block',
+		icon: 'icon-code',
 		label: 'Code Block',
 	},
 };

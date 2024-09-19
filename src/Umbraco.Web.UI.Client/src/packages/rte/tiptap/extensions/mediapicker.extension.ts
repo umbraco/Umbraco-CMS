@@ -13,7 +13,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	api: () => import('./mediapicker.extension.js'),
 	meta: {
 		alias: 'umb-media',
-		icon: 'umbraco',
+		icon: 'icon-picture',
 		label: 'Media picker',
 	},
 };

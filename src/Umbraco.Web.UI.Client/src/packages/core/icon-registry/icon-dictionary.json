@@ -234,6 +234,10 @@
 			"file": "ban.svg"
 		},
 		{
+			"name": "icon-blockquote",
+			"file": "text-quote.svg"
+		},
+		{
 			"_name": "icon-blueprint",
 			"____file": "blueprint.svg"
 		},
@@ -244,6 +248,10 @@
 		{
 			"name": "icon-boat-shipping",
 			"file": "ship.svg"
+		},
+		{
+			"name": "icon-bold",
+			"file": "bold.svg"
 		},
 		{
 			"_name": "icon-bomb",
@@ -798,6 +806,10 @@
 			"____file": "eject.svg"
 		},
 		{
+			"name": "icon-embed",
+			"file": "monitor-play.svg"
+		},
+		{
 			"name": "icon-employee",
 			"file": "user.svg",
 			"legacy": true
@@ -1072,6 +1084,18 @@
 			"____file": "hd.svg"
 		},
 		{
+			"name": "icon-heading-1",
+			"file": "heading-1.svg"
+		},
+		{
+			"name": "icon-heading-2",
+			"file": "heading-2.svg"
+		},
+		{
+			"name": "icon-heading-3",
+			"file": "heading-3.svg"
+		},
+		{
 			"name": "icon-headphones",
 			"file": "headphones.svg"
 		},
@@ -1103,6 +1127,10 @@
 		{
 			"name": "icon-home",
 			"file": "house.svg"
+		},
+		{
+			"name": "icon-horizontal-rule",
+			"file": "separator-horizontal.svg"
 		},
 		{
 			"name": "icon-hourglass",
@@ -1152,6 +1180,10 @@
 			"name": "icon-iphone",
 			"file": "smartphone.svg",
 			"legacy": true
+		},
+		{
+			"name": "icon-italic",
+			"file": "italic.svg"
 		},
 		{
 			"name": "icon-item-arrangement",
@@ -2129,6 +2161,10 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-strikethrough",
+			"file": "strikethrough.svg"
+		},
+		{
 			"name": "icon-sunny",
 			"file": "sun.svg"
 		},
@@ -2177,6 +2213,22 @@
 		{
 			"name": "icon-terminal",
 			"file": "square-terminal.svg"
+		},
+		{
+			"name": "icon-text-align-center",
+			"file": "align-center.svg"
+		},
+		{
+			"name": "icon-text-align-justify",
+			"file": "align-justify.svg"
+		},
+		{
+			"name": "icon-text-align-left",
+			"file": "align-left.svg"
+		},
+		{
+			"name": "icon-text-align-right",
+			"file": "align-right.svg"
 		},
 		{
 			"name": "icon-theater",
@@ -2307,6 +2359,10 @@
 		{
 			"name": "icon-undo",
 			"file": "undo-2.svg"
+		},
+		{
+			"name": "icon-underline",
+			"file": "underline.svg"
 		},
 		{
 			"name": "icon-unlocked",

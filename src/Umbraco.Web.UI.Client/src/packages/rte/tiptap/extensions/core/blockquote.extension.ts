@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 995,
 	meta: {
 		alias: 'blockquote',
-		icon: 'blockquote',
+		icon: 'icon-blockquote',
 		label: 'Blockquote',
 	},
 };

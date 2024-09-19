@@ -10,7 +10,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	api: () => import('./embed.extension.js'),
 	meta: {
 		alias: 'umb-embed',
-		icon: 'umbraco',
+		icon: 'icon-embed',
 		label: 'Embed',
 	},
 };

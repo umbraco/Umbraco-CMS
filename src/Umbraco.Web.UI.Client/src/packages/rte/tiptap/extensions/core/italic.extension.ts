@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 998,
 	meta: {
 		alias: 'italic',
-		icon: 'italic',
+		icon: 'icon-italic',
 		label: 'Italic',
 	},
 };

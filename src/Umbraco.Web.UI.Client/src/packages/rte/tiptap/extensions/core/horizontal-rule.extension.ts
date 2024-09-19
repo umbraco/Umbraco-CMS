@@ -12,7 +12,7 @@ export const manifest: ManifestTiptapExtensionButtonKind = {
 	weight: 991,
 	meta: {
 		alias: 'horizontalRule',
-		icon: 'horizontal-rule',
+		icon: 'icon-horizontal-rule',
 		label: 'Horizontal Rule',
 	},
 };

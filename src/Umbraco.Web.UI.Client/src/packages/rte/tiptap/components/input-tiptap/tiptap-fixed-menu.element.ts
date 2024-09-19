@@ -1,5 +1,4 @@
 import type { ManifestTiptapExtension } from '../../extensions/tiptap-extension.js';
-import { UmbTiptapIconRegistry } from './icon.registry.js';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -23,13 +22,6 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 		return this.#editor;
 	}
 	#editor?: Editor;
-
-	#registry = new UmbTiptapIconRegistry();
-
-	constructor() {
-		super();
-		this.#registry.attach(this);
-	}
 
 	override render() {
 		return html`
