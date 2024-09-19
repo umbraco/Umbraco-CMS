@@ -1,1 +1,1 @@
-export * from './section-user-permission.condition.js';
+export type * from './types.js';

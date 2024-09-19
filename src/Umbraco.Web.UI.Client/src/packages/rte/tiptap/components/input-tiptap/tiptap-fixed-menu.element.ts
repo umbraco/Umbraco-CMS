@@ -1,11 +1,15 @@
+import type { UmbTiptapToolbarButton } from '../../extensions/types.js';
+import type { ManifestTiptapExtension } from '../../extensions/tiptap-extension.js';
 import * as icons from './icons.js';
-import type { UmbTiptapExtensionBase, UmbTiptapToolbarButton } from './tiptap-extension.js';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 @customElement('umb-tiptap-fixed-menu')
 export class UmbTiptapFixedMenuElement extends UmbLitElement {
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	actions: Array<UmbTiptapToolbarButton> = [
 		// TODO: I don't think we need a paragraph button. It's the default state.
@@ -151,17 +155,9 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	}
 	#editor?: Editor;
 
-	@property({ attribute: false })
-	extensions: Array<UmbTiptapExtensionBase> = [];
-
 	#onUpdate = () => {
 		this.requestUpdate();
 	};
-
-	protected override firstUpdated() {
-		const buttons = this.extensions.flatMap((ext) => ext.getToolbarButtons());
-		this.actions.push(...buttons);
-	}
 
 	override render() {
 		return html`
@@ -179,10 +175,15 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 					</button>
 				`,
 			)}
+			<umb-extension-with-api-slot
+				type="tiptapExtension"
+				.filter=${(ext: ManifestTiptapExtension) => !!ext.kind || !!ext.element}
+				.elementProps=${{ editor: this.editor }}>
+			</umb-extension-with-api-slot>
 		`;
 	}
 
-	static override styles = css`
+	static override readonly styles = css`
 		:host {
 			border-radius: var(--uui-border-radius);
 			border: 1px solid var(--uui-color-border);
@@ -195,6 +196,11 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			left: 0px;
 			right: 0px;
 			padding: 4px;
+		}
+
+		:host([readonly]) {
+			pointer-events: none;
+			background-color: var(--uui-color-surface-alt);
 		}
 
 		button {

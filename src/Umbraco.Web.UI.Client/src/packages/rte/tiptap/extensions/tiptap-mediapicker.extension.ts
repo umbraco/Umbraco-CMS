@@ -1,23 +1,23 @@
-import { UmbTiptapExtensionBase } from '../components/input-tiptap/tiptap-extension.js';
+import { UmbTiptapExtensionApi } from './types.js';
 import { mergeAttributes, Node } from '@umbraco-cms/backoffice/external/tiptap';
+import { UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
-import { UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 
-export default class UmbTiptapMediaPickerPlugin extends UmbTiptapExtensionBase {
-	getExtensions() {
+export default class UmbTiptapMediaPickerPlugin extends UmbTiptapExtensionApi {
+	getTiptapExtensions() {
 		return [
 			Node.create({
 				name: 'umbMediaPicker',
+				priority: 1000,
 				group: 'block',
 				marks: '',
 				draggable: true,
 				addNodeView() {
 					return () => {
 						//console.log('umb-media.addNodeView');
-						const dom = document.createElement('umb-debug');
-						dom.attributes.setNamedItem(document.createAttribute('visible'));
-						dom.attributes.setNamedItem(document.createAttribute('dialog'));
+						const dom = document.createElement('span');
+						dom.innerText = '🖼️';
 						return { dom };
 					};
 				},
@@ -33,22 +33,15 @@ export default class UmbTiptapMediaPickerPlugin extends UmbTiptapExtensionBase {
 		];
 	}
 
-	getToolbarButtons() {
-		return [
-			{
-				name: 'umb-media',
-				icon: 'icon-picture',
-				isActive: (editor?: Editor) => editor?.isActive('umbMediaPicker'),
-				command: async (editor?: Editor) => {
-					//console.log('umb-media.command', editor);
+	//isActive: (editor?: Editor) => editor?.isActive('umbMediaPicker') || editor?.isActive('image'),
 
-					const selection = await this.#openMediaPicker();
-					if (!selection || !selection.length) return;
+	override async execute(editor?: Editor) {
+		console.log('umb-media.execute', editor);
 
-					editor?.chain().focus().insertContent(`<umb-media>${selection}</umb-media>`).run();
-				},
-			},
-		];
+		const selection = await this.#openMediaPicker();
+		if (!selection || !selection.length) return;
+
+		editor?.chain().focus().insertContent(`<umb-media>${selection}</umb-media>`).run();
 	}
 
 	async #openMediaPicker() {

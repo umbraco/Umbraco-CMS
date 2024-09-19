@@ -1,53 +1,38 @@
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
-import type {
-	ManifestRepository,
-	ManifestTree,
-	ManifestTreeItem,
-	ManifestTreeStore,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_TEMPLATE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Template.Tree';
 export const UMB_TEMPLATE_TREE_STORE_ALIAS = 'Umb.Store.Template.Tree';
 export const UMB_TEMPLATE_TREE_ALIAS = 'Umb.Tree.Template';
 
-const treeRepository: ManifestRepository = {
-	type: 'repository',
-	alias: UMB_TEMPLATE_TREE_REPOSITORY_ALIAS,
-	name: 'Template Tree Repository',
-	api: () => import('./template-tree.repository.js'),
-};
-
-const treeStore: ManifestTreeStore = {
-	type: 'treeStore',
-	alias: UMB_TEMPLATE_TREE_STORE_ALIAS,
-	name: 'Template Tree Store',
-	api: () => import('./template-tree.store.js'),
-};
-
-const tree: ManifestTree = {
-	type: 'tree',
-	kind: 'default',
-	alias: UMB_TEMPLATE_TREE_ALIAS,
-	name: 'Template Tree',
-	meta: {
-		repositoryAlias: UMB_TEMPLATE_TREE_REPOSITORY_ALIAS,
+export const manifests: Array<UmbExtensionManifest> = [
+	{
+		type: 'repository',
+		alias: UMB_TEMPLATE_TREE_REPOSITORY_ALIAS,
+		name: 'Template Tree Repository',
+		api: () => import('./template-tree.repository.js'),
 	},
-};
-
-const treeItem: ManifestTreeItem = {
-	type: 'treeItem',
-	kind: 'default',
-	alias: 'Umb.TreeItem.Template',
-	name: 'Template Tree Item',
-	forEntityTypes: [UMB_TEMPLATE_ROOT_ENTITY_TYPE, UMB_TEMPLATE_ENTITY_TYPE],
-};
-
-export const manifests: Array<ManifestTypes> = [
-	treeRepository,
-	treeStore,
-	tree,
-	treeItem,
+	{
+		type: 'treeStore',
+		alias: UMB_TEMPLATE_TREE_STORE_ALIAS,
+		name: 'Template Tree Store',
+		api: () => import('./template-tree.store.js'),
+	},
+	{
+		type: 'tree',
+		kind: 'default',
+		alias: UMB_TEMPLATE_TREE_ALIAS,
+		name: 'Template Tree',
+		meta: {
+			repositoryAlias: UMB_TEMPLATE_TREE_REPOSITORY_ALIAS,
+		},
+	},
+	{
+		type: 'treeItem',
+		kind: 'default',
+		alias: 'Umb.TreeItem.Template',
+		name: 'Template Tree Item',
+		forEntityTypes: [UMB_TEMPLATE_ROOT_ENTITY_TYPE, UMB_TEMPLATE_ENTITY_TYPE],
+	},
 	...reloadTreeItemChildrenManifest,
 ];

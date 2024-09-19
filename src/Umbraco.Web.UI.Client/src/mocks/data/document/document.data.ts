@@ -843,7 +843,7 @@ export const data: Array<UmbMockDocumentModel> = [
 							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
 						</p>
 						<p>
-							<img width="500" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
 						</p>
 						<p>End of test content</p>
 					`,
@@ -861,7 +861,7 @@ export const data: Array<UmbMockDocumentModel> = [
 						</p>
 						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
 						<p>
-							<img width="500" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
+							<img width="500" height="332" loading="lazy" alt="Jason" src="/umbraco/backoffice/assets/login.jpg" />
 						</p>
 						<p>End of test content</p>
 					`,

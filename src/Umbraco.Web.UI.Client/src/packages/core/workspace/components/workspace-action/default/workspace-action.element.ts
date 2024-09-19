@@ -1,14 +1,14 @@
 import type { UmbWorkspaceAction } from '../workspace-action.interface.js';
+import type {
+	ManifestWorkspaceAction,
+	ManifestWorkspaceActionMenuItem,
+	MetaWorkspaceActionDefaultKind,
+} from '../../../types.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	umbExtensionsRegistry,
-	type ManifestWorkspaceAction,
-	type ManifestWorkspaceActionMenuItem,
-	type MetaWorkspaceActionDefaultKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	type UmbExtensionElementAndApiInitializer,
 	UmbExtensionsElementAndApiInitializer,

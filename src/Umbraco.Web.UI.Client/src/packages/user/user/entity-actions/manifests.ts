@@ -3,9 +3,9 @@ import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 
 import { manifests as createManifests } from './create/manifests.js';
 
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
@@ -96,4 +96,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [...entityActions, ...createManifests];
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [...entityActions, ...createManifests];

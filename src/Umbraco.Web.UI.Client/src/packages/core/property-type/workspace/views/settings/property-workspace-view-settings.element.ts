@@ -6,7 +6,7 @@ import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type {
 	UUIBooleanInputEvent,
 	UUIInputEvent,
@@ -61,6 +61,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	@query('#alias-input')
 	private _aliasInput!: UUIInputLockElement;
 
+	@state()
+	private _entityType?: string;
+
 	constructor() {
 		super();
 
@@ -82,6 +85,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.observe(instance.variesByCulture, (variesByCulture) => (this._contentTypeVariesByCulture = variesByCulture));
 			this.observe(instance.variesBySegment, (variesBySegment) => (this._contentTypeVariesBySegment = variesBySegment));
+			this._entityType = instance.getEntityType();
 		}).passContextAliasMatches();
 	}
 
@@ -140,6 +144,20 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.updateValue({
 			appearance: { ...this._data?.appearance, labelOnTop: true },
 		});
+	}
+
+	#onToggleShowOnMemberProfile(e: UUIBooleanInputEvent) {
+		const memberCanEdit = this._data?.visibility?.memberCanEdit ?? false;
+		this.updateValue({ visibility: { memberCanView: e.target.checked, memberCanEdit } });
+	}
+
+	#onToggleMemberCanEdit(e: UUIBooleanInputEvent) {
+		const memberCanView = this._data?.visibility?.memberCanView ?? false;
+		this.updateValue({ visibility: { memberCanEdit: e.target.checked, memberCanView } });
+	}
+
+	#onToggleIsSensitiveData(e: UUIBooleanInputEvent) {
+		this.updateValue({ isSensitive: e.target.checked });
 	}
 
 	#onToggleAliasLock() {
@@ -255,8 +273,50 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</b>
 					<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
 				</div>
+				${this.#renderMemberTypeOptions()}
 			</uui-box>
 		`;
+	}
+
+	#renderMemberTypeOptions() {
+		if (this._entityType !== 'member-type') return nothing;
+		return html` <hr />
+			<div class="container">
+				<b style="margin-bottom: var(--uui-size-space-3)">
+					<umb-localize key="general_options">Options</umb-localize>
+				</b>
+				<div class="options">
+					<uui-toggle
+						?checked=${this._data?.visibility?.memberCanView}
+						@change=${this.#onToggleShowOnMemberProfile}
+						label=${this.localize.term('contentTypeEditor_showOnMemberProfile')}></uui-toggle>
+					<small>
+						<umb-localize key="contentTypeEditor_showOnMemberProfileDescription">
+							Allow this property value to be displayed on the member profile page
+						</umb-localize>
+					</small>
+
+					<uui-toggle
+						?checked=${this._data?.visibility?.memberCanEdit}
+						@change=${this.#onToggleMemberCanEdit}
+						label=${this.localize.term('contentTypeEditor_memberCanEdit')}></uui-toggle>
+					<small>
+						<umb-localize key="contentTypeEditor_memberCanEditDescription">
+							Allow this property value to be edited by the member on their profile page
+						</umb-localize>
+					</small>
+
+					<uui-toggle
+						?checked=${this._data?.isSensitive}
+						@change=${this.#onToggleIsSensitiveData}
+						label=${this.localize.term('contentTypeEditor_isSensitiveData')}></uui-toggle>
+					<small>
+						<umb-localize key="contentTypeEditor_isSensitiveDataDescription">
+							Hide this property value from content editors that don't have access to view sensitive information
+						</umb-localize>
+					</small>
+				</div>
+			</div>`;
 	}
 
 	#renderAlignLeftIcon() {

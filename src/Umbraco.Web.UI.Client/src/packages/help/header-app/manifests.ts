@@ -1,6 +1,4 @@
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.Help',

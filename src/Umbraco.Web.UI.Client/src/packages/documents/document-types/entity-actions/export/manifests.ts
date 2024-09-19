@@ -1,8 +1,7 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -15,6 +14,5 @@ const entityActions: Array<ManifestTypes> = [
 			label: '#actions_export',
 		},
 	},
+	...repositoryManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...repositoryManifests];

@@ -1,9 +1,8 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_TREE_ALIAS } from '../tree/index.js';
 import { UMB_DICTIONARY_MENU_ALIAS } from './constants.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menu',
 		alias: UMB_DICTIONARY_MENU_ALIAS,

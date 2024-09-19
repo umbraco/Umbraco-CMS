@@ -1,6 +1,4 @@
-import type { ManifestCurrentUserActionDefaultKind, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'currentUserAction',
 		kind: 'default',
@@ -20,4 +18,3 @@ export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 		],
 	},
 ];
-export const manifests: Array<ManifestTypes> = [...userProfileApps];

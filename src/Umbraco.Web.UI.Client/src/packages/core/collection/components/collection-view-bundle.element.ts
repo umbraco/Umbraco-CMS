@@ -1,12 +1,12 @@
 import type { UmbDefaultCollectionContext } from '../default/index.js';
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
+import type { ManifestCollectionView } from '../extensions/index.js';
 import { css, html, customElement, state, nothing, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbCollectionViewLayout {

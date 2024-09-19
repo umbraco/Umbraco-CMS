@@ -1,5 +1,5 @@
-import type { UmbTiptapExtensionBase } from './tiptap-extension.js';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -13,9 +13,9 @@ import {
 	Editor,
 	Gapcursor,
 	HardBreak,
+	Heading,
 	History,
 	HorizontalRule,
-	Image,
 	Italic,
 	Link,
 	ListItem,
@@ -35,12 +35,20 @@ import './tiptap-fixed-menu.element.js';
 import './tiptap-hover-menu.element.js';
 
 @customElement('umb-input-tiptap')
-export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, '') {
+export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
+	#requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
+
 	@state()
-	private _extensions: Array<UmbTiptapExtensionBase> = [];
+	private _extensions: Array<UmbTiptapExtensionApi> = [];
 
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _editor!: Editor;
@@ -53,7 +61,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 		await new Promise<void>((resolve) => {
 			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
 				this._extensions = [];
-
 				for (const manifest of manifests) {
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
@@ -62,9 +69,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 						}
 					}
 				}
-
-				this.requestUpdate('_extensions');
-
 				resolve();
 			});
 		});
@@ -79,27 +83,20 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 		this.setAttribute('style', `max-width: ${maxWidth}px;`);
 		element.setAttribute('style', `max-height: ${maxHeight}px;`);
 
-		const extensions = this._extensions.map((ext) => ext.getExtensions()).flat();
+		const extensions = this._extensions.map((ext) => ext.getTiptapExtensions()).flat();
 
 		this._editor = new Editor({
 			element: element,
+			editable: !this.readonly,
 			extensions: [
-				// REQUIRED EXTENSIONS START
-				Document,
-				Dropcursor,
-				Gapcursor,
-				HardBreak,
-				History,
-				Paragraph,
-				Text,
-				// REQUIRED EXTENSIONS END
+				...this.#requiredExtensions,
 				Blockquote,
 				Bold,
 				BulletList,
 				Code,
 				CodeBlock,
+				Heading,
 				HorizontalRule,
-				Image,
 				Italic,
 				Link.configure({ openOnClick: false }),
 				ListItem, // This is needed for BulletList and OrderedList. When moving to an umbraco-extension, how should we handle shared extensions?
@@ -111,7 +108,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 				Underline,
 				...extensions,
 			],
-			content: this.value.toString(),
+			content: this.value,
 			onUpdate: ({ editor }) => {
 				this.value = editor.getHTML();
 				this.dispatchEvent(new UmbChangeEvent());
@@ -120,18 +117,32 @@ export class UmbInputTiptapElement extends UmbFormControlMixin(UmbLitElement, ''
 	}
 
 	override render() {
-		if (!this._extensions?.length) return html`<uui-loader></uui-loader>`;
 		return html`
-			<umb-tiptap-fixed-menu .editor=${this._editor} .extensions=${this._extensions}></umb-tiptap-fixed-menu>
+			${when(
+				!this._editor && !this._extensions?.length,
+				() => html`<uui-loader></uui-loader>`,
+				() => html`
+					<umb-tiptap-hover-menu .editor=${this._editor}></umb-tiptap-hover-menu>
+					<umb-tiptap-fixed-menu .editor=${this._editor} ?readonly=${this.readonly}></umb-tiptap-fixed-menu>
+				`,
+			)}
 			<div id="editor"></div>
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;
 			}
+			:host([readonly]) {
+				pointer-events: none;
+
+				#editor {
+					background-color: var(--uui-color-surface-alt);
+				}
+			}
+
 			#editor {
 				overflow: auto;
 				border-radius: var(--uui-border-radius);

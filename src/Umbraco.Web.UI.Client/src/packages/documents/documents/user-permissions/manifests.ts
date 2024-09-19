@@ -17,11 +17,10 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
 } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import { manifests as conditionManifests } from './condition/manifests.js';
+import { manifests as conditionManifests } from './conditions/manifests.js';
 import type {
 	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,
-	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const permissions: Array<ManifestEntityUserPermission> = [
@@ -213,7 +212,7 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	...permissions,
 	...granularPermissions,

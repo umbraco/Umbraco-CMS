@@ -1,6 +1,4 @@
-import type { ManifestSectionSidebarApp, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityActions: Array<ManifestSectionSidebarApp> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'sectionSidebarApp',
 		alias: 'Umb.SectionSidebarItem.LanguageSelect',
@@ -18,5 +16,3 @@ const entityActions: Array<ManifestSectionSidebarApp> = [
 		],
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions];

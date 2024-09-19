@@ -1,6 +1,4 @@
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-const modalManifests: Array<ManifestModal> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Sysinfo',
@@ -14,5 +12,3 @@ const modalManifests: Array<ManifestModal> = [
 		js: () => import('./components/new-version.element.js'),
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...modalManifests];

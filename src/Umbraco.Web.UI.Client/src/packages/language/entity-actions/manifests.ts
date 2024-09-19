@@ -1,8 +1,7 @@
 import { UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS, UMB_LANGUAGE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../entity.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
@@ -28,5 +27,3 @@ const entityActions: Array<ManifestTypes> = [
 		},
 	},
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions];

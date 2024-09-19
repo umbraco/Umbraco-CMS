@@ -5,9 +5,8 @@ import { manifests as blockGridEditorManifests } from './block-grid-editor/manif
 import { manifest as blockGridGroupConfiguration } from './block-grid-group-configuration/manifests.js';
 import { manifest as blockGridLayoutStylesheet } from './block-grid-layout-stylesheet/manifests.js';
 import { manifest as blockGridTypeConfiguration } from './block-grid-type-configuration/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	blockGridAreaTypePermission,
 	blockGridAreasConfigEditor,
 	blockGridColumnSpan,

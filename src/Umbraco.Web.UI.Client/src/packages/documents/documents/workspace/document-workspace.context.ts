@@ -26,7 +26,7 @@ import {
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { sortVariants } from '../utils.js';
-import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
+import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -536,11 +536,15 @@ export class UmbDocumentWorkspaceContext
 		const selected = activeVariantIds.concat(changedVariantIds);
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 
+		const readOnlyCultures = this.readOnlyState.getStates().map((s) => s.variantId.culture);
+		const selectedCultures = selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i);
+		const writable = selectedCultures.filter((x) => readOnlyCultures.includes(x) === false);
+
 		const options = await firstValueFrom(this.variantOptions);
 
 		return {
 			options,
-			selected: selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i),
+			selected: writable,
 		};
 	}
 

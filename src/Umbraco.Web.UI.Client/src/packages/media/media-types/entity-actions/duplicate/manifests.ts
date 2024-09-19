@@ -2,9 +2,8 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEDIA_TYPE_TREE_ALIAS, UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
 import { UMB_DUPLICATE_MEDIA_TYPE_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'duplicateTo',
@@ -18,6 +17,5 @@ const entityActions: Array<ManifestTypes> = [
 			foldersOnly: true,
 		},
 	},
+	...repositoryManifests,
 ];
-
-export const manifests: Array<ManifestTypes> = [...entityActions, ...repositoryManifests];

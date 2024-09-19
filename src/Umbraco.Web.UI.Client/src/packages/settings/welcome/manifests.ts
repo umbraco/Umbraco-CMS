@@ -1,7 +1,7 @@
 import { UMB_SETTINGS_SECTION_ALIAS } from '../section/index.js';
-import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.SettingsWelcome',

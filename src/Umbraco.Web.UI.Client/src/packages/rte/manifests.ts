@@ -1,4 +1,4 @@
 import { manifests as tiptapManifests } from './tiptap/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [...tiptapManifests];
+export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...tiptapManifests];

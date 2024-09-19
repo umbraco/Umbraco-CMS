@@ -2,11 +2,11 @@ import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-si
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
-	UmbBackofficeManifestKind,
+	UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifestWithEntityActions: UmbBackofficeManifestKind = {
+const manifestWithEntityActions: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.SectionSidebarAppMenuWithEntityActions',
 	matchKind: 'menuWithEntityActions',

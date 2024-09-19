@@ -550,11 +550,7 @@ export default {
 	},
 	notifications: {
 		editNotifications: 'Rediger dine varsler for %0%',
-		mailBody:
-			"\nHei %0%\n\nDette er en automatisk mail for å informere om at handlingen '%1%'\ner utført på siden '%2%'\nav brukeren '%3%'\n\nGå til http://%4%/Umbraco/default.aspx?section=content&id=%5% for å redigere.\n\nHa en fin dag!\n\nVennlig hilsen Umbraco roboten\n    ",
-		mailBodyHtml:
-			'<p>Hei %0%</p>\n\n\t\t  <p>Dette er en automatisk mail for å informere om at handlingen \'%1%\'\n        er blitt utført på siden <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>\'%2%\'</strong></a>\n        av brukeren <strong>\'%3%\'</strong>\n\t    </p>\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/Umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REDIGER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\t\t  <p>\n\t\t\t  <h3>Rettelser:</h3>\n\t\t\t  <table style="width: 100%;">\n\t\t\t\t\t\t   %6%\n\t\t\t\t</table>\n\t\t\t </p>\n\n\t\t  <div style="margin: 8px 0; padding: 8px; display: block;">\n\t\t\t\t<br />\n\t\t\t\t<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/Umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REDIGER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;\n\t\t\t\t<br />\n\t\t  </div>\n\n\t\t  <p>Ha en fin dag!<br /><br />\n\t\t\t  Vennlig hilsen Umbraco roboten\n\t\t  </p>',
-		mailSubject: '[%0%] Varsling om %1% utført på %2%',
+		notificationsSavedFor: 'Varsler lagret for %0%',
 		notifications: 'Varslinger',
 	},
 	packager: {

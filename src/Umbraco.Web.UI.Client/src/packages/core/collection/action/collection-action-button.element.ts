@@ -4,10 +4,11 @@ import { html, customElement, property, state, ifDefined } from '@umbraco-cms/ba
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbBackofficeManifestKind, ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
-const manifest: UmbBackofficeManifestKind = {
+const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.CollectionAction.Button',
 	matchKind: 'button',
