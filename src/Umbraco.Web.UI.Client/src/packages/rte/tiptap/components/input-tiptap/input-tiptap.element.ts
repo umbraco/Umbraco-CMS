@@ -43,11 +43,18 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@property({ type: String })
 	override set value(value: string) {
-		this._editor?.commands.setContent(value);
+		this.#markup = value;
+
+		// Try to set the value to the editor if it is ready.
+		if (this._editor) {
+			this._editor.commands.setContent(value);
+		}
 	}
 	override get value() {
-		return this._editor?.getHTML() ?? '';
+		return this._editor?.getHTML() ?? this.#markup;
 	}
+
+	#markup = '';
 
 	@property({ attribute: false })
 	configuration!: UmbPropertyEditorConfigCollection;
