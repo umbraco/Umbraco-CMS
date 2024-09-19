@@ -2,19 +2,14 @@ import type { ManifestTiptapExtension } from './tiptap-extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export interface UmbTiptapExtensionApi extends UmbApi {
-	getTiptapExtensions(): Array<Extension | Mark | Node>;
+	getTiptapExtensions(args?: UmbTiptapExtensionArgs): Array<Extension | Mark | Node>;
 }
 
-export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implements UmbApi {
+export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implements UmbTiptapExtensionApi {
 	public manifest?: ManifestTiptapExtension;
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
 
 	abstract getTiptapExtensions(args?: UmbTiptapExtensionArgs): Array<Extension | Mark | Node>;
 }
