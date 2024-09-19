@@ -33,27 +33,19 @@ export class UmbDocumentValidationServerDataSource {
 	 * @param parentUnique
 	 * @returns {*}
 	 */
-	async validateCreate(
-		model: UmbDocumentDetailModel,
-		parentUnique: string | null = null,
-		variantIds: Array<UmbVariantId>,
-	) {
+	async validateCreate(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
-		if (!variantIds) throw new Error('Variant ids are missing');
-
-		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null);
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: ValidateCreateDocumentRequestModel = {
+		const requestBody: CreateDocumentRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
-			cultures,
 		};
 
 		// Maybe use: tryExecuteAndNotify

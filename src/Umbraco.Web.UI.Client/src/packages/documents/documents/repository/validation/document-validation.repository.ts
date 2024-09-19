@@ -19,14 +19,13 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model
 	 * @param {string | null} [parentUnique]
-	 * @param variantIds
 	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async validateCreate(model: DetailModelType, parentUnique: string | null, variantIds: Array<UmbVariantId>) {
+	async validateCreate(model: DetailModelType, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');
 
-		return this.#validationDataSource.validateCreate(model, parentUnique, variantIds);
+		return this.#validationDataSource.validateCreate(model, parentUnique);
 	}
 
 	/**

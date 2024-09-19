@@ -714,7 +714,7 @@ export class UmbDocumentWorkspaceContext
 			if (!parent) throw new Error('Parent is not set');
 			this.#serverValidation.askServerForValidation(
 				saveData,
-				this.#validationRepository.validateCreate(saveData, parent.unique, variantIds),
+				this.#validationRepository.validateCreate(saveData, parent.unique),
 			);
 		} else {
 			this.#serverValidation.askServerForValidation(
