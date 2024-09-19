@@ -1,25 +1,21 @@
-﻿using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services.Navigation;
+﻿using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
 
-public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
+public abstract class BreadthFirstKeyProvider
 {
-    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly CacheSettings _cacheSettings;
+    private readonly INavigationQueryService _navigationQueryService;
+    private readonly int _seedCount;
 
-    public BreadthFirstKeyProvider(
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IOptions<CacheSettings> cacheSettings)
+    public BreadthFirstKeyProvider(INavigationQueryService navigationQueryService, int seedCount)
     {
-        _documentNavigationQueryService = documentNavigationQueryService;
-        _cacheSettings = cacheSettings.Value;
+        _navigationQueryService = navigationQueryService;
+        _seedCount = seedCount;
     }
 
     public ISet<Guid> GetSeedKeys()
     {
-        if (_cacheSettings.BreadthFirstSeedCount == 0)
+        if (_seedCount == 0)
         {
             return new HashSet<Guid>();
         }
@@ -28,7 +24,7 @@ public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
         HashSet<Guid> keys = [];
         int keyCount = 0;
 
-        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+        if (_navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
         {
             return new HashSet<Guid>();
         }
@@ -38,17 +34,17 @@ public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
             keyCount++;
             keys.Add(key);
             keyQueue.Enqueue(key);
-            if (keyCount == _cacheSettings.BreadthFirstSeedCount)
+            if (keyCount == _seedCount)
             {
                 return keys;
             }
         }
 
-        while (keyQueue.Count > 0 && keyCount < _cacheSettings.BreadthFirstSeedCount)
+        while (keyQueue.Count > 0 && keyCount < _seedCount)
         {
             Guid key = keyQueue.Dequeue();
 
-            if (_documentNavigationQueryService.TryGetChildrenKeys(key, out IEnumerable<Guid> childKeys) is false)
+            if (_navigationQueryService.TryGetChildrenKeys(key, out IEnumerable<Guid> childKeys) is false)
             {
                 continue;
             }
@@ -57,7 +53,7 @@ public class BreadthFirstKeyProvider : IDocumentSeedKeyProvider
             {
                 keys.Add(childKey);
                 keyCount++;
-                if (keyCount == _cacheSettings.BreadthFirstSeedCount)
+                if (keyCount == _seedCount)
                 {
                     return keys;
                 }

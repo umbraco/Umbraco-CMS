@@ -11,7 +11,8 @@ using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
-using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Media;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -70,8 +71,10 @@ public static class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddCacheSeeding(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IDocumentSeedKeyProvider, ContentTypeSeedKeyProvider>();
-        builder.Services.AddSingleton<IDocumentSeedKeyProvider, BreadthFirstKeyProvider>();
+        builder.Services.AddSingleton<IDocumentSeedKeyProvider, DocumentBreadthFirstKeyProvider>();
 
+
+        builder.Services.AddSingleton<IMediaSeedKeyProvider, MediaBreadthFirstKeyProvider>();
         return builder;
     }
 }

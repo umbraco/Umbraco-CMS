@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
-using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
+using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -113,7 +113,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders()
     {
         _cacheSettings = new CacheSettings();
-        _cacheSettings.BreadthFirstSeedCount = 0;
+        _cacheSettings.DocumentBreadthFirstSeedCount = 0;
 
         var mock = new Mock<IOptions<CacheSettings>>();
         mock.Setup(m => m.Value).Returns(() => _cacheSettings);
@@ -121,7 +121,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         return new List<IDocumentSeedKeyProvider>
         {
             new ContentTypeSeedKeyProvider(GetRequiredService<ICoreScopeProvider>(), GetRequiredService<IDatabaseCacheRepository>(), mock.Object),
-            new BreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object),
+            new DocumentBreadthFirstKeyProvider(GetRequiredService<IDocumentNavigationQueryService>(), mock.Object),
         };
     }
 
@@ -160,7 +160,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
         await _mockDocumentCacheService.SeedAsync();
@@ -181,7 +181,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
         await _mockDocumentCacheService.SeedAsync();
@@ -195,7 +195,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     public async Task Content_Is_Not_Seeded_If_Unpblished_By_Id()
     {
 
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
         await _mockDocumentCacheService.SeedAsync();
@@ -209,7 +209,7 @@ public class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
     public async Task Content_Is_Not_Seeded_If_Unpublished_By_Key()
     {
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage.Id);
+        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
 
         await _mockDocumentCacheService.SeedAsync();
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);

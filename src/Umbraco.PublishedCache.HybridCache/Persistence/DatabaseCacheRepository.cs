@@ -291,6 +291,25 @@ AND cmsContentNu.nodeId IS NULL
         return CreateMediaNodeKit(dto, serializer);
     }
 
+    public async Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
+    {
+        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+            .Append(SqlWhereNodeKey(SqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+
+        if (dto is null)
+        {
+            return null;
+        }
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+        return CreateMediaNodeKit(dto, serializer);
+    }
+
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
         // use a custom SQL to update row version on each update
