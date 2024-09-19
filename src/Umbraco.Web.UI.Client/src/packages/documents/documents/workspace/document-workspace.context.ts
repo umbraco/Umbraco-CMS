@@ -714,10 +714,13 @@ export class UmbDocumentWorkspaceContext
 			if (!parent) throw new Error('Parent is not set');
 			this.#serverValidation.askServerForValidation(
 				saveData,
-				this.#validationRepository.validateCreate(saveData, parent.unique),
+				this.#validationRepository.validateCreate(saveData, parent.unique, variantIds),
 			);
 		} else {
-			this.#serverValidation.askServerForValidation(saveData, this.#validationRepository.validateSave(saveData));
+			this.#serverValidation.askServerForValidation(
+				saveData,
+				this.#validationRepository.validateSave(saveData, variantIds),
+			);
 		}
 
 		// TODO: Only validate the specified selection.. [NL]
