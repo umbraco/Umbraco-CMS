@@ -22,7 +22,7 @@ public class DocumentUrlServiceInitializer : IHostedLifecycleService
         }
 
         await _documentUrlService.InitAsync(
-            _runtimeState.Level < RuntimeLevel.Install,
+            _runtimeState.Level <= RuntimeLevel.Install,
             cancellationToken);
     }
 

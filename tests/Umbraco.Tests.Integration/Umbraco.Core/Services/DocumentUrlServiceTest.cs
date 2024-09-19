@@ -1,13 +1,23 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
+using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -20,13 +30,15 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        // builder
-        //     .AddNotificationAsyncHandler<ContentPublishedNotification, RoutingNotificationHandler>()
-        //     .AddNotificationAsyncHandler<ContentUnpublishedNotification, RoutingNotificationHandler>()
-        //     .AddNotificationAsyncHandler<ContentDeletedNotification, RoutingNotificationHandler>()
-        //     .AddNotificationAsyncHandler<ContentSavedNotification, RoutingNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+
+        builder.Services.AddHostedService<DocumentUrlServiceInitializer>();
 
     }
+
+
+
     //
     // [Test]
     // [LongRunning]
@@ -57,6 +69,20 @@ public class DocumentUrlServiceTest : UmbracoIntegrationTestWithContent
     }
 
     //TODO test with the urlsegment property value!
+
+    [Test]
+    public async Task Deleted_documents_do_not_have_a_url_segment__Parent_deleted()
+    {
+        ContentService.PublishBranch(Textpage, true, new[] { "*" });
+
+        ContentService.Delete(Textpage);
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var actual = DocumentUrlService.GetUrlSegment(Subpage2.Key, isoCode, false);
+
+        Assert.IsNull(actual);
+    }
 
     [Test]
     public async Task Deleted_documents_do_not_have_a_url_segment()

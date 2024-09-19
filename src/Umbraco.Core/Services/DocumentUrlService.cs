@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -31,7 +32,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IKeyValueService _keyValueService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly IDomainCache _domainCache;
+    private readonly IDomainService _domainService;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
     private bool _isInitialized = false;
@@ -49,7 +50,7 @@ public class DocumentUrlService : IDocumentUrlService
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
         IDocumentNavigationQueryService documentNavigationQueryService,
-        IDomainCache domainCache)
+        IDomainService domainService)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -63,7 +64,7 @@ public class DocumentUrlService : IDocumentUrlService
         _keyValueService = keyValueService;
         _idKeyMap = idKeyMap;
         _documentNavigationQueryService = documentNavigationQueryService;
-        _domainCache = domainCache;
+        _domainService = domainService;
     }
 
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -134,13 +135,26 @@ public class DocumentUrlService : IDocumentUrlService
 
     }
 
-    private void RemoveFromCache(IScopeContext scopeContext, PublishedDocumentUrlSegment publishedDocumentUrlSegment, string isoCode)
+    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode)
     {
-        var cacheKey = CreateCacheKey(publishedDocumentUrlSegment.DocumentKey, isoCode, publishedDocumentUrlSegment.IsDraft);
+        var cacheKeyDraft = CreateCacheKey(documentKey, isoCode, true);
 
-        scopeContext.Enlist("RemoveFromCache_" + cacheKey, () =>
+        scopeContext.Enlist("RemoveFromCache_" + cacheKeyDraft, () =>
         {
-            if (_cache.TryRemove(cacheKey, out _) is false)
+            if (_cache.TryRemove(cacheKeyDraft, out _) is false)
+            {
+                _logger.LogDebug("Could not remove the document url cache. But the important thing is that it is not there.");
+                return false;
+            }
+
+            return true;
+        });
+
+        var cacheKeyPublished = CreateCacheKey(documentKey, isoCode, false);
+
+        scopeContext.Enlist("RemoveFromCache_" + cacheKeyPublished, () =>
+        {
+            if (_cache.TryRemove(cacheKeyPublished, out _) is false)
             {
                 _logger.LogDebug("Could not remove the document url cache. But the important thing is that it is not there.");
                 return false;
@@ -200,6 +214,11 @@ public class DocumentUrlService : IDocumentUrlService
 
     public async Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents)
     {
+        if(documents.Any() is false)
+        {
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         var toSave = new List<PublishedDocumentUrlSegment>();
@@ -260,7 +279,7 @@ public class DocumentUrlService : IDocumentUrlService
             if (document.Trashed)
             {
                 toDelete.Add(model.DocumentKey);
-                RemoveFromCache(scopeContext, model, language.IsoCode);
+                RemoveFromCache(scopeContext, model.DocumentKey, language.IsoCode);
             }
             else
             {
@@ -300,43 +319,19 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    public async Task DeleteUrlsAsync(IEnumerable<IContent> documents)
+    public async Task DeleteUrlsFromCacheAsync(IEnumerable<Guid> documentKeys)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
-        var allCultures = documents.SelectMany(x => x.AvailableCultures ).Distinct();
+        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 
-        var languages = await _languageService.GetMultipleAsync(allCultures);
-        var languageDictionary = languages.ToDictionary(x=>x.IsoCode);
-
-        foreach (IContent document in documents)
+        foreach (ILanguage language in languages)
         {
-            if (document.AvailableCultures.Any())
+            foreach (Guid documentKey in documentKeys)
             {
-                foreach (var culture in document.AvailableCultures)
-                {
-                    var language = languageDictionary[culture];
-
-                    var models = GenerateModels(document, culture, language);
-                    foreach (PublishedDocumentUrlSegment model in models)
-                    {
-                        RemoveFromCache(_coreScopeProvider.Context!, model, culture);
-                    }
-                }
-            }
-            else
-            {
-                var language = await _languageService.GetDefaultLanguageAsync();
-                var models = GenerateModels(document, null, language!);
-
-                foreach (PublishedDocumentUrlSegment model in models)
-                {
-                    RemoveFromCache(_coreScopeProvider.Context!, model, language!.IsoCode);
-                }
+                RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.IsoCode);
             }
         }
-
-        _documentUrlRepository.DeleteByDocumentKey(documents.Select(x=>x.Key));
 
         scope.Complete();
     }
@@ -424,31 +419,31 @@ public class DocumentUrlService : IDocumentUrlService
     {
         // TODO change to not use logic from _documentNavigationQueryService, as this endpoint is a management endpoint it clould also go to another interface
         var result = new List<UrlInfo>();
+
+
         if(_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(contentKey, out var ancestorsOrSelfKeys))
         {
             IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
             IEnumerable<string> cultures = languages.Select(x=>x.IsoCode);
 
-            var ancestorOrSelfKeyToDomains = ancestorsOrSelfKeys.ToDictionary(x => x, ancestorKey =>
+
+            Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeys.ToDictionary(x => x, async ancestorKey =>
             {
-                var ancestorIdAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
-
-
-                return ancestorIdAttempt.Success
-                    ? _domainCache.GetAssigned(ancestorIdAttempt.Result, false).ToDictionary(x=>x.Culture!)
-                    : new Dictionary<string, Domain>();
+                IEnumerable<IDomain> domains = await _domainService.GetAssignedDomainsAsync(ancestorKey, false);
+                return domains.ToDictionary(x => x.LanguageIsoCode!);
             });
 
             var urlSegments = new List<string>();
             foreach (var culture in cultures)
             {
-                Domain? foundDomain = null;
+               IDomain? foundDomain = null;
                 ancestorsOrSelfKeys.Reverse();
                 foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeys)
                 {
-                    if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Dictionary<string, Domain>? domainDictionary))
+                    if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, IDomain>>? domainDictionaryTask))
                     {
-                        if (domainDictionary.TryGetValue(culture, out Domain? domain))
+                        var domainDictionary = await domainDictionaryTask;
+                        if (domainDictionary.TryGetValue(culture, out IDomain? domain))
                         {
                             foundDomain = domain;
                             break;
@@ -474,14 +469,14 @@ public class DocumentUrlService : IDocumentUrlService
         return result;
     }
 
-    private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, Domain? foundDomain)
+    private string GetFullUrl(bool isRootFirstItem, List<string> reversedUrlSegments, IDomain? foundDomain)
     {
         var urlSegments = new List<string>(reversedUrlSegments);
         urlSegments.Reverse();
 
         if (foundDomain is not null)
         {
-            return foundDomain.Name + string.Join('/', urlSegments);
+            return foundDomain.DomainName + string.Join('/', urlSegments);
         }
 
         return '/' + string.Join('/', urlSegments.Skip(_globalSettings.HideTopLevelNodeFromPath && isRootFirstItem ? 1 : 0));
@@ -494,17 +489,6 @@ public class DocumentUrlService : IDocumentUrlService
         IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
 
         await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
-        {
-            item
-        });
-    }
-
-    public async Task DeleteUrlsAndDescendantsAsync(Guid key)
-    {
-        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
-        IContent item = _contentService.GetById(id)!;
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
-        await DeleteUrlsAsync(new List<IContent>(descendants)
         {
             item
         });

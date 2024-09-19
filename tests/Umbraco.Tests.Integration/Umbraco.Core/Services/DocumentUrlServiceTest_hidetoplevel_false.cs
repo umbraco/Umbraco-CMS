@@ -1,14 +1,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -22,8 +25,12 @@ public class DocumentUrlServiceTest_HideTopLevel_False : UmbracoIntegrationTestW
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.Configure<GlobalSettings>(x => x.HideTopLevelNodeFromPath = false);
-    }
 
+        builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+
+        builder.Services.AddHostedService<DocumentUrlServiceInitializer>();
+    }
     [Test]
     [TestCase("/textpage/", "en-US", true, ExpectedResult = TextpageKey)]
     [TestCase("/textpage/text-page-1", "en-US", true, ExpectedResult = SubPageKey)]

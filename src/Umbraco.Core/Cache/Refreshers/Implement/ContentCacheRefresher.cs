@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -17,6 +18,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 {
     private readonly IDomainService _domainService;
     private readonly IDocumentUrlService _documentUrlService;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedSnapshotService _publishedSnapshotService;
 
@@ -37,7 +39,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             domainService,
             eventAggregator,
             factory,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>()
+            )
     {
 
     }
@@ -50,13 +54,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IDomainService domainService,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
-        IDocumentUrlService documentUrlService)
+        IDocumentUrlService documentUrlService,
+        IDocumentNavigationQueryService documentNavigationQueryService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _publishedSnapshotService = publishedSnapshotService;
         _idKeyMap = idKeyMap;
         _domainService = domainService;
         _documentUrlService = documentUrlService;
+        _documentNavigationQueryService = documentNavigationQueryService;
     }
 
     #region Indirect
@@ -103,7 +109,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
 
 
-            _idKeyMap.ClearCache(payload.Id);
 
             // remove those that are in the branch
             if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
@@ -120,6 +125,12 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
 
             HandleRouting(payload);
+
+            _idKeyMap.ClearCache(payload.Id);
+            if (payload.Key.HasValue)
+            {
+                _idKeyMap.ClearCache(payload.Key.Value);
+            }
 
         }
 
@@ -166,7 +177,16 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-            _documentUrlService.DeleteUrlsAndDescendantsAsync(key).GetAwaiter().GetResult();
+
+            //Note the we need to clear the navigation service as the last thing
+            if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out var descendantsOrSelfKeys))
+            {
+                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
+            }else if(_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out var descendantsOrSelfKeysInBin))
+            {
+                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
+            }
+
         }
         if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {

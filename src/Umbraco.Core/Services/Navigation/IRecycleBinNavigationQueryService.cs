@@ -12,6 +12,19 @@ public interface IRecycleBinNavigationQueryService
 
     bool TryGetDescendantsKeysInBin(Guid parentKey, out IEnumerable<Guid> descendantsKeys);
 
+    bool TryGetDescendantsKeysOrSelfKeysInBin(Guid childKey, out IEnumerable<Guid> descendantsOrSelfKeys)
+    {
+        if(TryGetDescendantsKeysInBin(childKey, out var descendantsKeys))
+        {
+            descendantsOrSelfKeys = descendantsKeys.Concat([childKey]);
+            return true;
+        }
+
+        descendantsOrSelfKeys = Array.Empty<Guid>();
+        return false;
+    }
+
+
     bool TryGetAncestorsKeysInBin(Guid childKey, out IEnumerable<Guid> ancestorsKeys);
 
     bool TryGetSiblingsKeysInBin(Guid key, out IEnumerable<Guid> siblingsKeys);

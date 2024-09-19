@@ -13,6 +13,19 @@ public interface INavigationQueryService
 
     bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys);
 
+    bool TryGetDescendantsKeysOrSelfKeys(Guid childKey, out IEnumerable<Guid> descendantsOrSelfKeys)
+    {
+        if(TryGetDescendantsKeys(childKey, out var descendantsKeys))
+        {
+            descendantsOrSelfKeys = descendantsKeys.Concat([childKey]);
+            return true;
+        }
+
+        descendantsOrSelfKeys = Array.Empty<Guid>();
+        return false;
+    }
+
+
     bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys);
 
     bool TryGetAncestorsOrSelfKeys(Guid childKey, out IEnumerable<Guid> ancestorsOrSelfKeys)

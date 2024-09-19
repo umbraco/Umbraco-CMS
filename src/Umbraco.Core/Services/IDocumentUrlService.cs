@@ -26,13 +26,10 @@ public interface IDocumentUrlService
 
     Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents);
 
-
-
-    Task DeleteUrlsAsync(IEnumerable<IContent> documents);
+    Task DeleteUrlsFromCacheAsync(IEnumerable<Guid> documentKeys);
 
     Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft);
     Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey);
     Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key);
-    Task DeleteUrlsAndDescendantsAsync(Guid key);
     Task CreateOrUpdateUrlSegmentsAsync(Guid key);
 }

@@ -1075,7 +1075,14 @@ public class ContentService : RepositoryService, IContentService
             // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
             UpdateInMemoryNavigationStructure(
                 "Umbraco.Cms.Core.Services.ContentService.Save-with-contentSchedule",
-                () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
+                () =>
+                {
+                    _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key);
+                    if (content.Trashed)
+                    {
+                        _documentNavigationManagementService.MoveToBin(content.Key);
+                    }
+                });
 
             if (contentSchedule != null)
             {
@@ -1144,7 +1151,14 @@ public class ContentService : RepositoryService, IContentService
                 // Updates in-memory navigation structure - we only handle new items, other updates are not a concern
                 UpdateInMemoryNavigationStructure(
                     "Umbraco.Cms.Core.Services.ContentService.Save",
-                    () => _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key));
+                    () =>
+                    {
+                        _documentNavigationManagementService.Add(content.Key, GetParent(content)?.Key);
+                        if (content.Trashed)
+                        {
+                            _documentNavigationManagementService.MoveToBin(content.Key);
+                        }
+                    });
             }
 
             scope.Notifications.Publish(
