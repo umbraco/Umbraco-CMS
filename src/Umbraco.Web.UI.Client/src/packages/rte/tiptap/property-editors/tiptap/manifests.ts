@@ -24,59 +24,59 @@ export const manifests: Array<ManifestTypes> = [
 								alias: 'toolbar',
 								value: [
 									// Clipboard Group
-									{ alias: 'undo', label: 'Undo', icon: 'undo', group: 'clipboard' },
-									{ alias: 'redo', label: 'Redo', icon: 'redo', group: 'clipboard' },
-									{ alias: 'cut', label: 'Cut', icon: 'cut', group: 'clipboard' },
-									{ alias: 'copy', label: 'Copy', icon: 'copy', group: 'clipboard' },
-									{ alias: 'paste', label: 'Paste', icon: 'paste', group: 'clipboard' },
+									{ alias: 'undo', label: 'Undo', icon: 'undo', category: 'clipboard' },
+									{ alias: 'redo', label: 'Redo', icon: 'redo', category: 'clipboard' },
+									{ alias: 'cut', label: 'Cut', icon: 'cut', category: 'clipboard' },
+									{ alias: 'copy', label: 'Copy', icon: 'copy', category: 'clipboard' },
+									{ alias: 'paste', label: 'Paste', icon: 'paste', category: 'clipboard' },
 
 									// Formatting Group
-									{ alias: 'bold', label: 'Bold', icon: 'bold', group: 'formatting' },
-									{ alias: 'italic', label: 'Italic', icon: 'italic', group: 'formatting' },
-									{ alias: 'underline', label: 'Underline', icon: 'underline', group: 'formatting' },
-									{ alias: 'strikethrough', label: 'Strikethrough', icon: 'strike-through', group: 'formatting' },
-									{ alias: 'removeformat', label: 'Remove format', icon: 'remove-formatting', group: 'formatting' },
+									{ alias: 'bold', label: 'Bold', icon: 'bold', category: 'formatting' },
+									{ alias: 'italic', label: 'Italic', icon: 'italic', category: 'formatting' },
+									{ alias: 'underline', label: 'Underline', icon: 'underline', category: 'formatting' },
+									{ alias: 'strikethrough', label: 'Strikethrough', icon: 'strike-through', category: 'formatting' },
+									{ alias: 'removeformat', label: 'Remove format', icon: 'remove-formatting', category: 'formatting' },
 
 									// Color Group
-									{ alias: 'forecolor', label: 'Text color', icon: 'text-color', group: 'color' },
-									{ alias: 'backcolor', label: 'Background color', icon: 'highlight-bg-color', group: 'color' },
+									{ alias: 'forecolor', label: 'Text color', icon: 'text-color', category: 'color' },
+									{ alias: 'backcolor', label: 'Background color', icon: 'highlight-bg-color', category: 'color' },
 
 									// Alignment Group
-									{ alias: 'alignleft', label: 'Align left', icon: 'align-left', group: 'alignment' },
-									{ alias: 'aligncenter', label: 'Align center', icon: 'align-center', group: 'alignment' },
-									{ alias: 'alignright', label: 'Align right', icon: 'align-right', group: 'alignment' },
-									{ alias: 'alignjustify', label: 'Justify justify', icon: 'align-justify', group: 'alignment' },
+									{ alias: 'alignleft', label: 'Align left', icon: 'align-left', category: 'alignment' },
+									{ alias: 'aligncenter', label: 'Align center', icon: 'align-center', category: 'alignment' },
+									{ alias: 'alignright', label: 'Align right', icon: 'align-right', category: 'alignment' },
+									{ alias: 'alignjustify', label: 'Justify justify', icon: 'align-justify', category: 'alignment' },
 
 									// List Group
-									{ alias: 'bullist', label: 'Bullet list', icon: 'unordered-list', group: 'list' },
-									{ alias: 'numlist', label: 'Numbered list', icon: 'ordered-list', group: 'list' },
+									{ alias: 'bullist', label: 'Bullet list', icon: 'unordered-list', category: 'list' },
+									{ alias: 'numlist', label: 'Numbered list', icon: 'ordered-list', category: 'list' },
 
 									// Indentation Group
-									{ alias: 'outdent', label: 'Outdent', icon: 'outdent', group: 'indentation' },
-									{ alias: 'indent', label: 'Indent', icon: 'indent', group: 'indentation' },
+									{ alias: 'outdent', label: 'Outdent', icon: 'outdent', category: 'indentation' },
+									{ alias: 'indent', label: 'Indent', icon: 'indent', category: 'indentation' },
 
 									// Insert Elements Group
-									{ alias: 'anchor', label: 'Anchor', icon: 'bookmark', group: 'insert' },
-									{ alias: 'table', label: 'Table', icon: 'table', group: 'insert' },
-									{ alias: 'hr', label: 'Horizontal rule', icon: 'horizontal-rule', group: 'insert' },
-									{ alias: 'charmap', label: 'Character map', icon: 'insert-character', group: 'insert' },
+									{ alias: 'anchor', label: 'Anchor', icon: 'bookmark', category: 'insert' },
+									{ alias: 'table', label: 'Table', icon: 'table', category: 'insert' },
+									{ alias: 'hr', label: 'Horizontal rule', icon: 'horizontal-rule', category: 'insert' },
+									{ alias: 'charmap', label: 'Character map', icon: 'insert-character', category: 'insert' },
 
 									// Direction Group
-									{ alias: 'rtl', label: 'Right to left', icon: 'rtl', group: 'direction' },
-									{ alias: 'ltr', label: 'Left to right', icon: 'ltr', group: 'direction' },
+									{ alias: 'rtl', label: 'Right to left', icon: 'rtl', category: 'direction' },
+									{ alias: 'ltr', label: 'Left to right', icon: 'ltr', category: 'direction' },
 
 									// Text Transformation Group
-									{ alias: 'subscript', label: 'Subscript', icon: 'subscript', group: 'text-transformation' },
-									{ alias: 'superscript', label: 'Superscript', icon: 'superscript', group: 'text-transformation' },
+									{ alias: 'subscript', label: 'Subscript', icon: 'subscript', category: 'text-transformation' },
+									{ alias: 'superscript', label: 'Superscript', icon: 'superscript', category: 'text-transformation' },
 
 									// Styling and Font Group
-									{ alias: 'styles', label: 'Style select', icon: 'permanent-pen', group: 'styling' },
-									{ alias: 'fontname', label: 'Font select', icon: 'text-color', group: 'styling' },
-									{ alias: 'fontsize', label: 'Font size', icon: 'text-color', group: 'styling' },
+									{ alias: 'styles', label: 'Style select', icon: 'permanent-pen', category: 'styling' },
+									{ alias: 'fontname', label: 'Font select', icon: 'text-color', category: 'styling' },
+									{ alias: 'fontsize', label: 'Font size', icon: 'text-color', category: 'styling' },
 
 									// Block Element Group
-									{ alias: 'blockquote', label: 'Blockquote', icon: 'quote', group: 'block-elements' },
-									{ alias: 'formatblock', label: 'Format block', icon: 'format', group: 'block-elements' },
+									{ alias: 'blockquote', label: 'Blockquote', icon: 'quote', category: 'block-elements' },
+									{ alias: 'formatblock', label: 'Format block', icon: 'format', category: 'block-elements' },
 								],
 							},
 						],

@@ -17,7 +17,7 @@ type ToolbarConfig = {
 	label: string;
 	icon?: string;
 	selected: boolean;
-	group: string;
+	category: string;
 };
 
 type ToolbarItems = Array<{
@@ -101,7 +101,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		});
 
 		const grouped = this._toolbarConfig.reduce((acc: any, item) => {
-			const group = item.group || 'miscellaneous'; // Assign to "miscellaneous" if no group
+			const group = item.category || 'miscellaneous'; // Assign to "miscellaneous" if no group
 
 			if (!acc[group]) {
 				acc[group] = [];
