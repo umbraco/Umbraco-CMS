@@ -50,12 +50,6 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		return [
 			UmbImage.extend({
 				name: 'umbMediaUpload',
-				addAttributes() {
-					return {
-						...this.parent?.(),
-						'data-tmpimg': { default: null },
-					};
-				},
 				onCreate() {
 					this.parent?.();
 					const host = this.editor.view.dom;
@@ -165,31 +159,5 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		img.src = url;
 
 		return promise;
-	}
-}
-
-declare module '@tiptap/core' {
-	interface Commands<ReturnType> {
-		umbMediaUpload: {
-			/**
-			 * Add an image
-			 * @param options The image attributes
-			 * @example
-			 * editor
-			 *   .commands
-			 *   .setImage({ src: 'https://tiptap.dev/logo.png', alt: 'tiptap', title: 'tiptap logo' })
-			 */
-			setImage: (options: {
-				src: string;
-				alt?: string;
-				title?: string;
-				width?: string;
-				height?: string;
-				loading?: string;
-				srcset?: string;
-				sizes?: string;
-				'data-tmpimg'?: string;
-			}) => ReturnType;
-		};
 	}
 }
