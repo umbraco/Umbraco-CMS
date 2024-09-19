@@ -4,7 +4,9 @@ import { css, customElement, html, property } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-@customElement('umb-tiptap-fixed-menu')
+const elementName = 'umb-tiptap-fixed-menu';
+
+@customElement(elementName)
 export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
@@ -49,6 +51,8 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 		:host {
 			border-radius: var(--uui-border-radius);
 			border: 1px solid var(--uui-color-border);
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
 			background-color: var(--uui-color-surface);
 			color: var(--color-text);
 			display: grid;
@@ -64,42 +68,11 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			pointer-events: none;
 			background-color: var(--uui-color-surface-alt);
 		}
-
-		button {
-			color: var(--uui-color-interactive);
-			width: 24px;
-			height: 24px;
-			padding: 4px;
-			border: none;
-			background: none;
-			cursor: pointer;
-			margin: 0;
-			border-radius: 4px;
-			box-sizing: border-box;
-		}
-
-		button:hover {
-			color: var(--uui-color-interactive-emphasis);
-			background-color: var(--uui-color-surface-alt);
-		}
-
-		button.active {
-			background-color: var(--uui-color-selected);
-			color: var(--uui-color-selected-contrast);
-		}
-		button.active:hover {
-			background-color: var(--uui-color-selected-emphasis);
-		}
-
-		button img {
-			width: 100%;
-			height: 100%;
-		}
 	`;
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tiptap-fixed-menu': UmbTiptapFixedMenuElement;
+		[elementName]: UmbTiptapFixedMenuElement;
 	}
 }
