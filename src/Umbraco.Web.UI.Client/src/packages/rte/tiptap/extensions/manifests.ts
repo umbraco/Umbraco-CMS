@@ -24,6 +24,14 @@ const extensions: Array<ManifestTiptapExtension> = [
 	},
 	{
 		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.MediaUpload',
+		name: 'Media Upload Tiptap Extension',
+		weight: 900,
+		api: () => import('./tiptap-media-upload.extension.js'),
+		meta: {},
+	},
+	{
+		type: 'tiptapExtension',
 		kind: 'button',
 		alias: 'Umb.Tiptap.MediaPicker',
 		name: 'Media Picker Tiptap Extension',
