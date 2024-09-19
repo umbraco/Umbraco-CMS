@@ -124,16 +124,14 @@ const collectDiskIcons = async (icons) => {
 	iconPaths.forEach((path) => {
 		const rawData = readFileSync(path);
 		const svg = rawData.toString();
-		const pattern = /\/([^/]+)\.svg$/;
+		const parsed = pathModule.parse(path);
 
-		const match = path.match(pattern);
-
-		if (!match) {
-			console.log('No match found.');
+		if (!parsed) {
+			console.log('No match found for: ', path);
 			return;
 		}
 
-		const SVGFileName = match[1];
+		const SVGFileName = parsed.name;
 		const iconFileName = SVGFileName.replace('.svg', '');
 		const iconName = iconFileName;
 

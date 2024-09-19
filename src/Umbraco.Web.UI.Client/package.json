@@ -242,7 +242,7 @@
 		"eslint-plugin-wc": "^2.1.1",
 		"glob": "^11.0.0",
 		"globals": "^15.8.0",
-		"lucide-static": "^0.424.0",
+		"lucide-static": "^0.441.0",
 		"madge": "^8.0.0",
 		"msw": "^1.3.2",
 		"playwright-msw": "^3.0.1",
