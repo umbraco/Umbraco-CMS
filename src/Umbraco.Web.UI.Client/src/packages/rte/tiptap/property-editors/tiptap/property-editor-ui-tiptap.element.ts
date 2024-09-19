@@ -50,7 +50,7 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 		this._value = buildUpValue as UmbRichTextEditorValueType;
 
 		// Only update the actual editor markup if it is not the same as the value.
-		if (this._markup !== buildUpValue.markup) {
+		if (this._latestMarkup !== buildUpValue.markup) {
 			this._markup = buildUpValue.markup;
 		}
 
@@ -81,6 +81,7 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 
 	@state()
 	private _markup = '';
+	private _latestMarkup = '';
 
 	#managerContext = new UmbBlockRteManagerContext(this);
 	#entriesContext = new UmbBlockRteEntriesContext(this);
@@ -117,9 +118,11 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const value = event.target.value as string;
 
+		this._latestMarkup = value;
+
 		this._value = {
 			...this._value,
-			markup: value,
+			markup: this._latestMarkup,
 		};
 
 		// TODO: Validate blocks
