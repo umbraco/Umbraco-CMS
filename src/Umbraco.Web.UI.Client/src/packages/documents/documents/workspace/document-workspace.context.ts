@@ -132,7 +132,7 @@ export class UmbDocumentWorkspaceContext
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
 	#varies?: boolean;
-	// TODO: Maybe wrap this into a Data Type Item Manager.
+
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 
 	readonly splitView = new UmbWorkspaceSplitViewManager();
