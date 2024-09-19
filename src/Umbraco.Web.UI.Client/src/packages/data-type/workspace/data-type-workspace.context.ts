@@ -100,7 +100,7 @@ export class UmbDataTypeWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
 
-		this.addValidationContext(new UmbValidationContext(this).provide());
+		this.addValidationContext(new UmbValidationContext(this));
 
 		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
