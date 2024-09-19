@@ -145,7 +145,7 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 		return html`
 			<umb-input-tiptap
 				.configuration=${this._config}
-				.value=${this._markup}
+				.value=${this._markup as any}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-tiptap>
 		`;
