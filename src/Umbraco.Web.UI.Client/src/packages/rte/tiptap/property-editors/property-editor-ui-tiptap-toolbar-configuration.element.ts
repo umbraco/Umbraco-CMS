@@ -175,7 +175,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#onDragEnter = (event: DragEvent) => {
 		const dropzone = event
 			.composedPath()
-			.find((v) => v instanceof HTMLElement && v.classList.contains('selected-group') && v.hasAttribute('dropzone'));
+			.find((v) => v instanceof HTMLElement && v.classList.contains('toolbar-group') && v.hasAttribute('dropzone'));
 
 		this.#hoveredDropzone = (dropzone as HTMLElement) || null;
 		console.log('hovered dropzone', this.#hoveredDropzone);
@@ -187,7 +187,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		const groupElement = event
 			.composedPath()
 			.find(
-				(v) => v instanceof HTMLElement && v.classList.contains('selected-group') && v.hasAttribute('dropzone'),
+				(v) => v instanceof HTMLElement && v.classList.contains('toolbar-group') && v.hasAttribute('dropzone'),
 			) as HTMLElement;
 
 		if (!groupElement) return;
@@ -215,17 +215,17 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	};
 
 	#renderRow(row: ToolbarConfig[][], rowIndex: number) {
-		return html`<div class="selected-row">
+		return html`<div class="toolbar-row">
 			${row.map((group, index) => {
 				return this.#renderGroup(group, index, rowIndex);
 			})}
-			<uui-button look="secondary" compact @click=${() => this.#addGroup(rowIndex)}>+</uui-button>
+			<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex)}>Add group</uui-button>
 		</div>`;
 	}
 
 	#renderGroup(group: ToolbarConfig[], groupIndex: number, rowIndex: number) {
 		return html`<div
-			class=${`selected-group`}
+			class=${`toolbar-group`}
 			umb-data-group=${groupIndex}
 			umb-data-row=${rowIndex}
 			@dragover=${this.#onDragOver}
@@ -252,37 +252,40 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	override render() {
 		return html`
-			<div class="selected-bar">
+			<div class="toolbar">
 				${repeat(this._selectedValuesNew, (row, index) => this.#renderRow(row, index))}
-				<uui-button look="secondary" compact @click=${() => this.#addRow()}>+</uui-button>
+				<uui-button look="secondary" @click=${() => this.#addRow()}>Add row</uui-button>
 			</div>
 			<div class="extensions">
 				${repeat(
 					this._toolbarItems,
 					(category) => html`
-						<p class="category-name">
-							${category.name}
-							<span style="margin-left: auto; font-size: 0.8em; opacity: 0.5;">Hide in toolbar</span>
-						</p>
-						${repeat(
-							category.items,
-							(item) =>
-								html`<div class="extension-item">
-									<uui-button
-										compact
-										look="outline"
-										class=${item.selected ? 'selected' : ''}
-										label=${item.label}
-										.value=${item.alias}
-										@click=${() => this.#onExtensionSelect(item)}
-										><uui-icon .svg=${tinyIconSet?.icons[item.icon ?? 'alignjustify']}></uui-icon
-									></uui-button>
-									<span>${item.label}</span>
-									<uui-checkbox aria-label="Hide in toolbar"></uui-checkbox>
-								</div>`,
-						)}
+						<div class="category">
+							<p class="category-name">
+								${category.name}
+								<span style="margin-left: auto; font-size: 0.8em; opacity: 0.5;">Hide in toolbar</span>
+							</p>
+							${repeat(
+								category.items,
+								(item) =>
+									html`<div class="extension-item">
+										<uui-button
+											compact
+											look="outline"
+											class=${item.selected ? 'selected' : ''}
+											label=${item.label}
+											.value=${item.alias}
+											@click=${() => this.#onExtensionSelect(item)}
+											><uui-icon .svg=${tinyIconSet?.icons[item.icon ?? 'alignjustify']}></uui-icon
+										></uui-button>
+										<span>${item.label}</span>
+										<uui-checkbox aria-label="Hide in toolbar"></uui-checkbox>
+									</div>`,
+							)}
+						</div>
 					`,
 				)}
+					</div>
 			</div>
 		`;
 	}
@@ -300,38 +303,49 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				--uui-button-border-color: var(--uui-color-selected);
 				--uui-button-border-width: 2px;
 			}
-			.selected-bar {
+			.toolbar {
 				display: flex;
 				flex-direction: column;
 				gap: 12px;
 			}
-			.selected-row {
+			.toolbar-row {
 				display: flex;
 				gap: 18px;
 			}
-			.selected-group {
+			.toolbar-group {
 				padding: 6px;
 				min-width: 12px;
 				background-color: var(--uui-color-surface-alt);
 				border-radius: var(--uui-border-radius);
 				display: flex;
 				gap: 6px;
-				position: relative;
+				min-width: 24px;
 			}
 			.extensions {
-				/* display: grid;
-				grid-template-columns: repeat(auto-fit, 36px);
-				gap: 10px; */
-				max-width: 400px;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 16px;
+				margin-top: 16px;
 			}
 			.extension-item {
 				display: grid;
 				grid-template-columns: 36px 1fr auto;
 				grid-template-rows: 1fr;
+				align-items: center;
+				gap: 9px;
+			}
+			.category {
+				background-color: var(--uui-color-surface-alt);
+				padding: 12px;
+				border-radius: 6px;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				border: 1px solid var(--uui-color-border);
 			}
 			.category-name {
 				grid-column: 1 / -1;
-				margin-bottom: 0;
+				margin: 0;
 				font-weight: bold;
 				display: flex;
 			}
