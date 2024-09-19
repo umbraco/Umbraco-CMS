@@ -120,7 +120,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				Underline,
 				...extensions,
 			],
-			content: this.value,
+			content: this.#markup,
 			onUpdate: () => {
 				this.dispatchEvent(new UmbChangeEvent());
 			},
