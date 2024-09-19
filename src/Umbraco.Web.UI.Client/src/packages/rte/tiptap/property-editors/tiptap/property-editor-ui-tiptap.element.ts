@@ -36,7 +36,7 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	@property({
 		attribute: false,
 		type: Object,
-		hasChanged: (value?: UmbRichTextEditorValueType, oldValue?: UmbRichTextEditorValueType) => {
+		hasChanged(value?: UmbRichTextEditorValueType, oldValue?: UmbRichTextEditorValueType) {
 			return value?.markup !== oldValue?.markup;
 		},
 	})
@@ -48,7 +48,11 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
-		this._markup = buildUpValue.markup;
+
+		// Only update the actual editor markup if it is not the same as the value.
+		if (this._markup !== buildUpValue.markup) {
+			this._markup = buildUpValue.markup;
+		}
 
 		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.blocks.contentData);
@@ -113,6 +117,11 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const value = event.target.value as string;
 
+		this._value = {
+			...this._value,
+			markup: value,
+		};
+
 		// TODO: Validate blocks
 		// Loop through used, to remove the classes on these.
 		/*const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
@@ -128,11 +137,6 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 		unusedBlocks.forEach((blockLayout) => {
 			this.#managerContext.removeOneLayout(blockLayout.contentUdi);
 		});*/
-
-		this._value = {
-			...this._value,
-			markup: value,
-		};
 
 		this.#fireChangeEvent();
 	}
