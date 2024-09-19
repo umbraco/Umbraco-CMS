@@ -80,7 +80,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
         var publishedRouter = CreatePublishedRouter(
             umbracoContextAccessor,
-            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>()) });
+            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
         var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out var uriUtility);
@@ -113,7 +113,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
         var publishedRouter = CreatePublishedRouter(
             umbracoContextAccessor,
-            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>()) });
+            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
         var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out var uriUtility);
@@ -160,7 +160,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
         var publishedRouter = CreatePublishedRouter(
             umbracoContextAccessor,
-            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>()) });
+            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
         var localizationService = GetLangService("en-US", "fr-FR");

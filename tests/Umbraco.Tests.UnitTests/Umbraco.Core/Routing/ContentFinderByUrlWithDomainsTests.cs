@@ -210,7 +210,7 @@ public class ContentFinderByUrlWithDomainsTests : UrlRoutingTestBase
         // must lookup domain else lookup by URL fails
         publishedRouter.FindAndSetDomain(frequest);
 
-        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
+        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
         var result = await lookup.TryFindContent(frequest);
         Assert.IsTrue(result);
         Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
@@ -249,7 +249,7 @@ public class ContentFinderByUrlWithDomainsTests : UrlRoutingTestBase
         publishedRouter.FindAndSetDomain(frequest);
         Assert.AreEqual(expectedCulture, frequest.Culture);
 
-        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
+        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
         var result = await lookup.TryFindContent(frequest);
         Assert.IsTrue(result);
         Assert.AreEqual(expectedId, frequest.PublishedContent.Id);

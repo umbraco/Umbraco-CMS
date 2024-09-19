@@ -66,7 +66,7 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
         Assert.IsTrue(frequest.HasDomain());
 
         // check that it's been routed
-        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
+        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
         var result = await lookup.TryFindContent(frequest);
         Assert.IsTrue(result);
         Assert.AreEqual(100111, frequest.PublishedContent.Id);

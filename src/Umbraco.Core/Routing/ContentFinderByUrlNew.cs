@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -10,16 +13,25 @@ namespace Umbraco.Cms.Core.Routing;
 /// <remarks>
 ///     <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice URL of a document.</para>
 /// </remarks>
-public class ContentFinderByUrl : IContentFinder
+public class ContentFinderByUrlNew : IContentFinder
 {
-    private readonly ILogger<ContentFinderByUrl> _logger;
+    private readonly ILogger<ContentFinderByUrlNew> _logger;
+    private readonly IDocumentUrlService _documentUrlService;
+
+    [Obsolete("Use non-obsoleted constructor. This will be removed in Umbraco 16.")]
+    public ContentFinderByUrlNew(ILogger<ContentFinderByUrlNew> logger, IUmbracoContextAccessor umbracoContextAccessor)
+    : this(logger, umbracoContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+    {
+
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
     /// </summary>
-    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor)
+    public ContentFinderByUrlNew(ILogger<ContentFinderByUrlNew> logger, IUmbracoContextAccessor umbracoContextAccessor, IDocumentUrlService documentUrlService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _documentUrlService = documentUrlService;
         UmbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
     }
@@ -77,8 +89,19 @@ public class ContentFinderByUrl : IContentFinder
             _logger.LogDebug("Test route {Route}", route);
         }
 
-        IPublishedContent? node =
-            umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
+        var documentKey = _documentUrlService.GetDocumentKeyByRoute(
+            docreq.Domain is null ? route : route.Substring(docreq.Domain.ContentId.ToString().Length),
+            docreq.Culture,
+            docreq.Domain?.ContentId,
+            umbracoContext.InPreviewMode
+            );
+
+        IPublishedContent? node = null;
+        if (documentKey.HasValue)
+        {
+            node = umbracoContext.Content?.GetById(umbracoContext.InPreviewMode, documentKey.Value);
+        }
+
         if (node != null)
         {
             docreq.SetPublishedContent(node);

@@ -36,7 +36,7 @@ public static partial class UmbracoBuilderExtensions
         // devs can then modify this list on application startup
         builder.ContentFinders()
             .Append<ContentFinderByPageIdQuery>()
-            .Append<ContentFinderByUrl>()
+            .Append<ContentFinderByUrlNew>()
             .Append<ContentFinderByKeyPath>()
             .Append<ContentFinderByIdPath>()
             /*.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder */

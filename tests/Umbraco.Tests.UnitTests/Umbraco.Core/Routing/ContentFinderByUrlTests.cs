@@ -34,7 +34,7 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
         var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
-        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor, Mock.Of<IDocumentUrlService>());
+        var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
         return (lookup, frequest);
     }
 

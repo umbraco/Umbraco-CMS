@@ -68,8 +68,7 @@ public class ContentFinderByUrlAndTemplateTests : PublishedSnapshotServiceTestBa
             _fileService,
             ContentTypeService,
             umbracoContextAccessor,
-            Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings),
-            Mock.Of<IDocumentUrlService>());
+            Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings));
 
         var result = await lookup.TryFindContent(frequest);
 
