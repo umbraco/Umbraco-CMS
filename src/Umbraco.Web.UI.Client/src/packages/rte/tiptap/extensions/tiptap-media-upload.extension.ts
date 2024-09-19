@@ -55,20 +55,18 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 					const host = this.editor.view.dom;
 
 					host.addEventListener('dragover', (event) => {
+						// Required to allow drop events
 						event.preventDefault();
-						console.log('umb-media-upload.dragover', event);
 					});
 
 					host.addEventListener('drop', (event) => {
 						event.preventDefault();
-						console.log('umb-media-upload.drop', event);
 
 						const files = event.dataTransfer?.files;
 						if (!files) return;
 
 						self.#uploadTemporaryFile(files, this.editor);
 					});
-					console.log('umb-media-upload.onCreate');
 				},
 			}),
 		];
