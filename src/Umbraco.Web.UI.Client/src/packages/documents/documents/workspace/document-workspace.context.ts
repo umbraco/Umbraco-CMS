@@ -441,9 +441,9 @@ export class UmbDocumentWorkspaceContext
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		//const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
-		//const editorAlias = dataType.editorAlias;
-		const editorAlias = (value as any).layout ? 'Umbraco.BlockList' : 'Umbraco.TextBox';
+		const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
+		const editorAlias = dataType.propertyEditorSchemaAlias;
+		//const editorAlias = (value as any).layout ? 'Umbraco.BlockList' : 'Umbraco.TextBox';
 
 		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbDocumentValueModel<ValueType>;
 

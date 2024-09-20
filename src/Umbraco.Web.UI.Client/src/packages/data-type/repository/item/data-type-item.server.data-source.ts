@@ -46,6 +46,7 @@ const mapper = (item: DataTypeItemResponseModel): UmbDataTypeItemModel => {
 		entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 		unique: item.id,
 		name: item.name,
+		propertyEditorSchemaAlias: item.editorAlias,
 		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?
 		icon: manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
 	};

@@ -56,6 +56,7 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 				unique: item.id,
 				name: item.name,
+				propertyEditorSchemaAlias: item.editorAlias,
 				propertyEditorUiAlias: item.editorUiAlias!,
 				icon: this.#manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias!)?.meta.icon,
 			};
