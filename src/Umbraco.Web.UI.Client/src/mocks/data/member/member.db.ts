@@ -11,6 +11,7 @@ import {
 	type CreateMemberRequestModel,
 	type MemberItemResponseModel,
 	type MemberResponseModel,
+	type MemberValueResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
@@ -46,7 +47,7 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 			icon: memberType.icon,
 		},
 		username: request.username,
-		values: request.values,
+		values: request.values as MemberValueResponseModel[],
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,

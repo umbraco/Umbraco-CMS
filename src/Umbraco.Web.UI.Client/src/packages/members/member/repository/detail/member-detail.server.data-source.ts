@@ -100,6 +100,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			groups: data.groups,
 			values: data.values.map((value) => {
 				return {
+					editorAlias: value.editorAlias,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,
