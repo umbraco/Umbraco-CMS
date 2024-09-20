@@ -7,6 +7,7 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 /**
  * A server data source for Document Validation
@@ -30,10 +31,10 @@ export class UmbDocumentValidationServerDataSource {
 	/**
 	 * Validate a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @param parentUnique
+	 * @param parentUnique - Parent Unique
 	 * @returns {*}
 	 */
-	async validateCreate(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
+	async validateCreate(model: UmbDocumentDetailModel, parentUnique: UmbEntityUnique = null) {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
@@ -60,6 +61,7 @@ export class UmbDocumentValidationServerDataSource {
 	/**
 	 * Validate a existing Document
 	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
 	 * @returns {*}
 	 */
 	async validateUpdate(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
