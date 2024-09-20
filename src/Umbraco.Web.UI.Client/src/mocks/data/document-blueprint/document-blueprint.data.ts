@@ -36,6 +36,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 		],
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'prop1',
 				culture: null,
 				segment: null,
