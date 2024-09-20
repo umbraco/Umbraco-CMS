@@ -14,7 +14,7 @@ const kinds: Array<UmbExtensionManifestKind> = [
 	},
 ];
 
-const umbExtensions: Array<ManifestTiptapExtensionButtonKind> = [
+const umbExtensions: Array<ManifestTiptapExtension | ManifestTiptapExtensionButtonKind> = [
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
@@ -50,6 +50,18 @@ const umbExtensions: Array<ManifestTiptapExtensionButtonKind> = [
 			alias: 'umb-media',
 			icon: 'icon-picture',
 			label: 'Media picker',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.MediaUpload',
+		name: 'Media Upload Tiptap Extension',
+		weight: 900,
+		api: () => import('./umb/media-upload.extension.js'),
+		meta: {
+			alias: 'umb-media-upload',
+			icon: 'icon-image-up',
+			label: 'Media upload',
 		},
 	},
 	{

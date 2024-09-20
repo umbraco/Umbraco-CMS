@@ -1,6 +1,7 @@
 import Image from '@tiptap/extension-image';
 
 export const UmbImage = Image.extend({
+	name: 'umbImage',
 	addAttributes() {
 		return {
 			...this.parent?.(),
@@ -19,6 +20,8 @@ export const UmbImage = Image.extend({
 			sizes: {
 				default: null,
 			},
+			'data-tmpimg': { default: null },
+			'data-udi': { default: null },
 		};
 	},
 });
@@ -43,6 +46,7 @@ declare module '@tiptap/core' {
 				loading?: string;
 				srcset?: string;
 				sizes?: string;
+				'data-tmpimg'?: string;
 			}) => ReturnType;
 		};
 	}

@@ -29,6 +29,21 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	private _extensions: Array<UmbTiptapExtensionApi> = [];
 
+	@property({ type: String })
+	override set value(value: string) {
+		this.#markup = value;
+
+		// Try to set the value to the editor if it is ready.
+		if (this._editor) {
+			this._editor.commands.setContent(value);
+		}
+	}
+	override get value() {
+		return this.#markup;
+	}
+
+	#markup = '';
+
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 
@@ -71,15 +86,17 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this.setAttribute('style', `max-width: ${maxWidth}px;`);
 		element.setAttribute('style', `max-height: ${maxHeight}px;`);
 
-		const extensions = this._extensions.map((ext) => ext.getTiptapExtensions()).flat();
+		const extensions = this._extensions
+			.map((ext) => ext.getTiptapExtensions({ configuration: this.configuration }))
+			.flat();
 
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
 			extensions: [...this.#requiredExtensions, ...extensions],
-			content: this.value,
+			content: this.#markup,
 			onUpdate: ({ editor }) => {
-				this.value = editor.getHTML();
+				this.#markup = editor.getHTML();
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});

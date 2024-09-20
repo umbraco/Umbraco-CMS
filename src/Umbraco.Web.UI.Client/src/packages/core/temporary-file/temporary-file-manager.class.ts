@@ -1,6 +1,5 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 ///export type TemporaryFileStatus = 'success' | 'waiting' | 'error';
@@ -20,15 +19,10 @@ export interface UmbTemporaryFileModel {
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
 > extends UmbControllerBase {
-	#temporaryFileRepository;
+	#temporaryFileRepository = new UmbTemporaryFileRepository(this._host);
 
 	#queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
-	}
 
 	async uploadOne(uploadableItem: UploadableItem): Promise<UploadableItem> {
 		this.#queue.setValue([]);

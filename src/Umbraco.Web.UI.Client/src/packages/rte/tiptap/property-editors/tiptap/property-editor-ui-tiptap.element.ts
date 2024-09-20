@@ -30,7 +30,13 @@ export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements U
 		this._config = config;
 	}
 
-	@property({ attribute: false })
+	@property({
+		attribute: false,
+		type: Object,
+		hasChanged(value?: UmbRichTextEditorValueType, oldValue?: UmbRichTextEditorValueType) {
+			return value?.markup !== oldValue?.markup;
+		},
+	})
 	public set value(value: UmbRichTextEditorValueType | undefined) {
 		const buildUpValue: Partial<UmbRichTextEditorValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
@@ -40,6 +46,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements U
 		buildUpValue.blocks.settingsData ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
 
+		// Only update the actual editor markup if it is not the same as the value.
 		if (this._latestMarkup !== this._value.markup) {
 			this._markup = this._value.markup;
 		}
@@ -110,6 +117,11 @@ export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements U
 		const value = event.target.value;
 		this._latestMarkup = value;
 
+		this._value = {
+			...this._value,
+			markup: this._latestMarkup,
+		};
+
 		// TODO: Validate blocks
 		// Loop through used, to remove the classes on these.
 		/*const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
@@ -126,11 +138,6 @@ export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements U
 			this.#managerContext.removeOneLayout(blockLayout.contentUdi);
 		});*/
 
-		this._value = {
-			...this._value,
-			markup: this._latestMarkup,
-		};
-
 		this.#fireChangeEvent();
 	}
 
@@ -138,7 +145,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements U
 		return html`
 			<umb-input-tiptap
 				.configuration=${this._config}
-				.value=${this._markup}
+				.value=${this._markup as any}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-tiptap>
 		`;
