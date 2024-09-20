@@ -16,7 +16,6 @@ export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbP
 export interface UmbContentDetailModel {
 	unique: string;
 	entityType: string;
-	isTrashed: boolean;
 	values: Array<UmbContentValueModel>;
 	variants: Array<UmbVariantModel>;
 }
