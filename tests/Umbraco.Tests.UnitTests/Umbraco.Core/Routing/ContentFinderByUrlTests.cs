@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Tests.Common.Published;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;

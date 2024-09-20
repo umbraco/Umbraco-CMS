@@ -1,5 +1,3 @@
-using Umbraco.Cms.Web.UI;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()

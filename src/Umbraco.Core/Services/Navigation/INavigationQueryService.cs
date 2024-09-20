@@ -1,3 +1,5 @@
+using Umbraco.Extensions;
+
 namespace Umbraco.Cms.Core.Services.Navigation;
 
 /// <summary>
@@ -17,7 +19,7 @@ public interface INavigationQueryService
     {
         if(TryGetDescendantsKeys(childKey, out var descendantsKeys))
         {
-            descendantsOrSelfKeys = descendantsKeys.Concat([childKey]);
+            descendantsOrSelfKeys = childKey.Yield().Concat(descendantsKeys);
             return true;
         }
 

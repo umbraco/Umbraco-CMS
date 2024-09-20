@@ -14,15 +14,6 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public class DocumentUrlFactory : IDocumentUrlFactory
 {
-    private readonly IPublishedRouter _publishedRouter;
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly ILanguageService _languageService;
-    private readonly ILocalizedTextService _localizedTextService;
-    private readonly IContentService _contentService;
-    private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly UriUtility _uriUtility;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IDocumentUrlService _documentUrlService;
 
     [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 16")]
@@ -37,15 +28,6 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         UriUtility uriUtility,
         IPublishedUrlProvider publishedUrlProvider)
     :this(
-        publishedRouter,
-        umbracoContextAccessor,
-        languageService,
-        localizedTextService,
-        contentService,
-        variationContextAccessor,
-        loggerFactory,
-        uriUtility,
-        publishedUrlProvider,
         StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
     {
 
@@ -53,46 +35,15 @@ public class DocumentUrlFactory : IDocumentUrlFactory
 
 
     public DocumentUrlFactory(
-        IPublishedRouter publishedRouter,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILanguageService languageService,
-        ILocalizedTextService localizedTextService,
-        IContentService contentService,
-        IVariationContextAccessor variationContextAccessor,
-        ILoggerFactory loggerFactory,
-        UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider,
         IDocumentUrlService documentUrlService)
     {
-        _publishedRouter = publishedRouter;
-        _umbracoContextAccessor = umbracoContextAccessor;
-        _languageService = languageService;
-        _localizedTextService = localizedTextService;
-        _contentService = contentService;
-        _variationContextAccessor = variationContextAccessor;
-        _loggerFactory = loggerFactory;
-        _uriUtility = uriUtility;
-        _publishedUrlProvider = publishedUrlProvider;
+
         _documentUrlService = documentUrlService;
     }
 
     public async Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content)
     {
-        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-
         IEnumerable<UrlInfo> urlInfos = await _documentUrlService.ListUrlsAsync(content.Key);
-
-        //TODO replace with documentUrlService
-        // IEnumerable<UrlInfo> urlInfos = await content.GetContentUrlsAsync(
-        //     _publishedRouter,
-        //     umbracoContext,
-        //     _languageService,
-        //     _localizedTextService,
-        //     _contentService,
-        //     _variationContextAccessor,
-        //     _loggerFactory.CreateLogger<IContent>(),
-        //     _uriUtility,
-        //     _publishedUrlProvider);
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)

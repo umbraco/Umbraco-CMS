@@ -1,3 +1,5 @@
+using Umbraco.Extensions;
+
 namespace Umbraco.Cms.Core.Services.Navigation;
 
 /// <summary>
@@ -16,7 +18,7 @@ public interface IRecycleBinNavigationQueryService
     {
         if(TryGetDescendantsKeysInBin(childKey, out var descendantsKeys))
         {
-            descendantsOrSelfKeys = descendantsKeys.Concat([childKey]);
+            descendantsOrSelfKeys = childKey.Yield().Concat(descendantsKeys);
             return true;
         }
 
