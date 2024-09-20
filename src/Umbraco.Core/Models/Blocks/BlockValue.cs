@@ -33,6 +33,14 @@ public abstract class BlockValue
     public List<BlockItemData> SettingsData { get; set; } = [];
 
     /// <summary>
+    /// Gets or sets the availability of blocks per variation.
+    /// </summary>
+    /// <remarks>
+    /// Only applicable for block level variance. Empty list is interpreted as "all blocks should be available".
+    /// </remarks>
+    public IList<BlockItemVariation> Expose { get; set; } = new List<BlockItemVariation>();
+
+    /// <summary>
     /// Gets the property editor alias of the current layout.
     /// </summary>
     /// <value>

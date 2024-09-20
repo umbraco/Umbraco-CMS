@@ -14,9 +14,10 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
 
     public RichTextBlockPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
+        IVariationContextAccessor variationContextAccessor,
         IJsonSerializer jsonSerializer,
         RichTextBlockPropertyValueConstructorCache constructorCache)
-        : base(blockEditorConverter)
+        : base(blockEditorConverter, variationContextAccessor)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

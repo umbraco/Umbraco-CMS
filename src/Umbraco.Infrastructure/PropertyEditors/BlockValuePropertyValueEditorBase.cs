@@ -254,8 +254,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
     protected TValue MergeBlockEditorDataForCulture(TValue sourceBlockValue, TValue targetBlockValue, string? culture)
     {
-        // structure is global, and layout follows structure
+        // structure is global, layout and published follows structure
         targetBlockValue.Layout = sourceBlockValue.Layout;
+        targetBlockValue.Expose = sourceBlockValue.Expose;
 
         MergePartialPropertyValueForCulture(sourceBlockValue.ContentData, targetBlockValue.ContentData, culture);
         MergePartialPropertyValueForCulture(sourceBlockValue.SettingsData, targetBlockValue.SettingsData, culture);

@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Blocks;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
@@ -39,13 +41,25 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly ILogger<RteBlockRenderingValueConverter> _logger;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
+    private readonly IVariationContextAccessor _variationContextAccessor;
     private DeliveryApiSettings _deliveryApiSettings;
 
+    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V16")]
     public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
         IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
         IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+        : this(linkParser, urlParser, imageSourceParser, apiRichTextElementParser, apiRichTextMarkupParser, partialViewBlockEngine, blockEditorConverter, jsonSerializer,
+            apiElementBuilder, constructorCache, logger, StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(), deliveryApiSettingsMonitor)
+    {
+    }
+
+    public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
+        IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
+        IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
+        IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
+        IVariationContextAccessor variationContextAccessor, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _linkParser = linkParser;
         _urlParser = urlParser;
@@ -58,6 +72,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _apiElementBuilder = apiElementBuilder;
         _constructorCache = constructorCache;
         _logger = logger;
+        _variationContextAccessor = variationContextAccessor;
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
@@ -189,7 +204,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             return null;
         }
 
-        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _jsonSerializer, _constructorCache);
+        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _jsonSerializer, _constructorCache);
         return creator.CreateBlockModel(owner, referenceCacheLevel, blocks, preview, configuration.Blocks);
     }
 

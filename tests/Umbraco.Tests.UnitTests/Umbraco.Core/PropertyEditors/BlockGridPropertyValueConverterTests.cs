@@ -178,7 +178,8 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
             new SystemTextJsonSerializer(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
-            new BlockGridPropertyValueConstructorCache());
+            new BlockGridPropertyValueConstructorCache(),
+            Mock.Of<IVariationContextAccessor>());
         return editor;
     }
 

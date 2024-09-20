@@ -26,21 +26,22 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly BlockListPropertyValueConstructorCache _constructorCache;
+    private readonly IVariationContextAccessor _variationContextAccessor;
 
-
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(), StaticServiceProvider.Instance.GetRequiredService<BlockListPropertyValueConstructorCache>())
+    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V16")]
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer, BlockListPropertyValueConstructorCache constructorCache)
+        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, jsonSerializer, constructorCache, StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
     {
     }
 
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, BlockListPropertyValueConstructorCache constructorCache)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(), constructorCache)
-    {
-    }
-
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer,  BlockListPropertyValueConstructorCache constructorCache)
+    public BlockListPropertyValueConverter(
+        IProfilingLogger proflog,
+        BlockEditorConverter blockConverter,
+        IContentTypeService contentTypeService,
+        IApiElementBuilder apiElementBuilder,
+        IJsonSerializer jsonSerializer,
+        BlockListPropertyValueConstructorCache constructorCache,
+        IVariationContextAccessor variationContextAccessor)
     {
         _proflog = proflog;
         _blockConverter = blockConverter;
@@ -48,6 +49,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
         _apiElementBuilder = apiElementBuilder;
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
+        _variationContextAccessor = variationContextAccessor;
     }
 
     /// <inheritdoc />
@@ -159,7 +161,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
                 return null;
             }
 
-            var creator = new BlockListPropertyValueCreator(_blockConverter, _jsonSerializer, _constructorCache);
+            var creator = new BlockListPropertyValueCreator(_blockConverter, _variationContextAccessor, _jsonSerializer, _constructorCache);
             return creator.CreateBlockModel(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks);
         }
     }

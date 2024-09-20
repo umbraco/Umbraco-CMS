@@ -11,9 +11,10 @@ internal class BlockListPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
 
     public BlockListPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
+        IVariationContextAccessor variationContextAccessor,
         IJsonSerializer jsonSerializer,
         BlockListPropertyValueConstructorCache constructorCache)
-        : base(blockEditorConverter)
+        : base(blockEditorConverter, variationContextAccessor)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

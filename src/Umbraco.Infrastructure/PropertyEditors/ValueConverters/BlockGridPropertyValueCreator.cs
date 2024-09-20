@@ -10,8 +10,12 @@ internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
     private readonly IJsonSerializer _jsonSerializer;
     private readonly BlockGridPropertyValueConstructorCache _constructorCache;
 
-    public BlockGridPropertyValueCreator(BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer, BlockGridPropertyValueConstructorCache constructorCache)
-        : base(blockEditorConverter)
+    public BlockGridPropertyValueCreator(
+        BlockEditorConverter blockEditorConverter,
+        IVariationContextAccessor variationContextAccessor,
+        IJsonSerializer jsonSerializer,
+        BlockGridPropertyValueConstructorCache constructorCache)
+        : base(blockEditorConverter, variationContextAccessor)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

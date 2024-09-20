@@ -15,6 +15,8 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     where TBlockConfiguration : IBlockConfiguration
     where TBlockValue : BlockValue<TBlockLayoutItem>, new()
 {
+    private readonly IVariationContextAccessor _variationContextAccessor;
+
     /// <summary>
     /// Creates a specific data converter for the block property implementation.
     /// </summary>
@@ -57,7 +59,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     /// <returns></returns>
     protected delegate TBlockItemModel? EnrichBlockItemModelFromConfiguration(TBlockItemModel item, TBlockLayoutItem layoutItem, TBlockConfiguration configuration, CreateBlockItemModelFromLayout blockItemModelCreator);
 
-    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter) => BlockEditorConverter = blockEditorConverter;
+    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor)
+    {
+        BlockEditorConverter = blockEditorConverter;
+        _variationContextAccessor = variationContextAccessor;
+    }
 
     protected BlockEditorConverter BlockEditorConverter { get; }
 
@@ -118,12 +124,20 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         }
 
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
+        VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
+        IList<BlockItemVariation> published = converted.BlockValue.Expose;
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
         foreach (BlockItemData data in converted.BlockValue.ContentData)
         {
             if (!blockConfigMap.ContainsKey(data.ContentTypeKey))
+            {
+                continue;
+            }
+
+            if (published.Any() && published.Any(v =>
+                    v.ContentKey == data.Key && v.Culture == variationContext.Culture && v.Segment == variationContext.Segment.NullOrWhiteSpaceAsNull()) is false)
             {
                 continue;
             }
