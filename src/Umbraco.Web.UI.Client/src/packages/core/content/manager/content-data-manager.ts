@@ -4,12 +4,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObjectState, appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbVariantId, type UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export class UmbContentDataManager<
 	ModelType extends UmbContentDetailModel,
-	ModelVariantType extends UmbVariantModel = ModelType['variants'][0],
+	ModelVariantType extends UmbVariantModel = ModelType extends { variants: UmbVariantModel[] }
+		? ModelType['variants'][0]
+		: never,
 > extends UmbControllerBase {
 	//
 	//#repository;
@@ -22,12 +23,9 @@ export class UmbContentDataManager<
 	//#variesByCulture?: boolean;
 	//#variesBySegment?: boolean;
 
-	constructor(host: UmbControllerHost, repository: UmbDetailRepository<ModelType>) {
+	constructor(host: UmbControllerHost, variantScaffold: ModelVariantType) {
 		super(host);
-		//this.#repository = repository;
-		repository
-			.createScaffold()
-			.then((x) => (this.#variantScaffold = x.data?.variants[0] as ModelVariantType | undefined));
+		this.#variantScaffold = variantScaffold;
 	}
 
 	setData(incomingData: ModelType | undefined) {

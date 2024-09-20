@@ -26,7 +26,7 @@ import {
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { sortVariants } from '../utils.js';
-import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -91,7 +91,7 @@ export class UmbDocumentWorkspaceContext
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
-	readonly #data = new UmbContentDataManager<EntityModel>(this, this.repository);
+	readonly #data = new UmbContentDataManager<EntityModel>(this, UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD);
 
 	#getDataPromise?: Promise<any>;
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
@@ -179,6 +179,9 @@ export class UmbDocumentWorkspaceContext
 		new UmbVariantsValidationPathTranslator(this);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+		this.observe(this.varies, (varies) => {
+			this.#data.setVaries(varies);
+		});
 		this.observe(this.variesByCulture, (varies) => {
 			this.#data.setVariesByCulture(varies);
 			this.#variesByCulture = varies;
