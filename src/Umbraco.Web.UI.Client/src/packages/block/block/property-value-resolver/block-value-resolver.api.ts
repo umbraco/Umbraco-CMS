@@ -5,7 +5,7 @@ import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property'
 export class UmbBlockValueResolver
 	implements UmbPropertyValueResolver<UmbContentValueModel<UmbBlockValueType>, UmbBlockDataValueModel>
 {
-	async process(
+	async processValues(
 		property: UmbContentValueModel<UmbBlockValueType>,
 		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
 	) {

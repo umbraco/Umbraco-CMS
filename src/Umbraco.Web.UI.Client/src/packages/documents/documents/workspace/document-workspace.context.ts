@@ -368,7 +368,7 @@ export class UmbDocumentWorkspaceContext
 
 	setName(name: string, variantId?: UmbVariantId) {
 		// TODO: We should move this type of logic to the act of saving [NL]
-		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+		this.#data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
 	name(variantId?: UmbVariantId) {
@@ -454,7 +454,7 @@ export class UmbDocumentWorkspaceContext
 			this.#data.current.update({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
-			this.#updateVariantData(variantId);
+			this.#data.ensureVariantData(variantId);
 		}
 	}
 
@@ -477,44 +477,12 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	#calculateChangedVariants() {
-		const persisted = this.#data.getPersistedData();
-		const current = this.#data.current.getValue();
-		if (!current) throw new Error('Current data is missing');
-
-		const changedVariants = current?.variants.map((variant) => {
-			const persistedVariant = persisted?.variants.find((x) => UmbVariantId.Create(variant).compare(x));
-			return {
-				culture: variant.culture,
-				segment: variant.segment,
-				equal: persistedVariant ? jsonStringComparison(variant, persistedVariant) : false,
-			};
-		});
-
-		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
-			return {
-				culture: value.culture,
-				segment: value.segment,
-				equal: persistedValues ? jsonStringComparison(value, persistedValues) : false,
-			};
-		});
-
-		// calculate the variantIds of those who either have a change in properties or in variants:
-		return (
-			changedVariants
-				?.concat(changedProperties ?? [])
-				.filter((x) => x.equal === false)
-				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
-		);
-	}
-
 	async #determineVariantOptions() {
 		const activeVariants = this.splitView.getActiveVariants();
 
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
 		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
-		const changedVariantIds = this.#calculateChangedVariants();
+		const changedVariantIds = this.#data.getChangedVariants();
 		const selected = activeVariantIds.concat(changedVariantIds);
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 
@@ -531,14 +499,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async #buildSaveData(selectedVariants: Array<UmbVariantId>): Promise<UmbDocumentDetailModel> {
-		const invariantVariantId = UmbVariantId.CreateInvariant();
-		if (this.#varies === false) {
-			// If we do not vary, we wil just pick the invariant variant id.
-			selectedVariants = [invariantVariantId];
-		} else {
-			selectedVariants = [...selectedVariants, invariantVariantId];
-		}
-
 		return this.#data.constructData(selectedVariants);
 	}
 
