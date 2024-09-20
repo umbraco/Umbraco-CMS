@@ -1,18 +1,13 @@
-import type UmbInputTiptapElement from '../../components/input-tiptap/input-tiptap.element.js';
+import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
-import {
-	UmbBlockRteEntriesContext,
-	UmbBlockRteManagerContext,
-	type UmbBlockRteLayoutModel,
-} from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
 // Look at Tiny for correct types
@@ -23,11 +18,13 @@ export interface UmbRichTextEditorValueType {
 
 const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.RichText';
 
+const elementName = 'umb-property-editor-ui-tiptap';
+
 /**
  * @element umb-property-editor-ui-tiptap
  */
-@customElement('umb-property-editor-ui-tiptap')
-export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement(elementName)
+export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._config = config;
@@ -110,7 +107,7 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
-		const value = event.target.value as string;
+		const value = event.target.value;
 		this._latestMarkup = value;
 
 		// TODO: Validate blocks
@@ -148,10 +145,10 @@ export class UmbPropertyEditorUITiptapElement extends UmbLitElement implements U
 	}
 }
 
-export default UmbPropertyEditorUITiptapElement;
+export { UmbPropertyEditorUiTiptapElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tiptap': UmbPropertyEditorUITiptapElement;
+		[elementName]: UmbPropertyEditorUiTiptapElement;
 	}
 }

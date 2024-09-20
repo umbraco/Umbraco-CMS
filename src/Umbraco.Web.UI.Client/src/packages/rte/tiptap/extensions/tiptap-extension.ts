@@ -8,8 +8,9 @@ export interface ManifestTiptapExtension<MetaType extends MetaTiptapExtension = 
 	meta: MetaType;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface MetaTiptapExtension {}
+export interface MetaTiptapExtension {
+	alias: string;
+}
 
 export interface ManifestTiptapExtensionButtonKind<
 	MetaType extends MetaTiptapExtensionButtonKind = MetaTiptapExtensionButtonKind,
@@ -19,13 +20,12 @@ export interface ManifestTiptapExtensionButtonKind<
 }
 
 export interface MetaTiptapExtensionButtonKind extends MetaTiptapExtension {
-	alias: string;
 	icon: string;
 	label: string;
 }
 
 declare global {
 	interface UmbExtensionManifestMap {
-		tiptapExtension: ManifestTiptapExtension;
+		tiptapExtension: ManifestTiptapExtension | ManifestTiptapExtensionButtonKind;
 	}
 }

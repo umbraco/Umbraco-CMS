@@ -1,4 +1,5 @@
-import type { ManifestTiptapExtension } from './tiptap-extension.js';
+import type { ManifestTiptapExtension, ManifestTiptapExtensionButtonKind } from './tiptap-extension.js';
+import { manifests as core } from './core/manifests.js';
 import type { ManifestTypes, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const kinds: Array<UmbExtensionManifestKind> = [
@@ -8,33 +9,63 @@ const kinds: Array<UmbExtensionManifestKind> = [
 		matchKind: 'button',
 		matchType: 'tiptapExtension',
 		manifest: {
-			element: () => import('./tiptap-toolbar-button.element.js'),
+			element: () => import('../components/toolbar/tiptap-toolbar-button.element.js'),
 		},
 	},
 ];
 
-const extensions: Array<ManifestTiptapExtension> = [
+const umbExtensions: Array<ManifestTiptapExtensionButtonKind> = [
 	{
 		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.Image',
-		name: 'Image Tiptap Extension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.CodeEditor',
+		name: 'Code Editor Tiptap Extension',
+		api: () => import('./umb/code-editor.extension.js'),
 		weight: 1000,
-		api: () => import('./tiptap-image.extension.js'),
-		meta: {},
+		meta: {
+			alias: 'umb-code-editor',
+			icon: 'icon-code',
+			label: '#general_viewSourceCode',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Embed',
+		name: 'Embed Tiptap Extension',
+		api: () => import('./umb/embed.extension.js'),
+		meta: {
+			alias: 'umb-embed',
+			icon: 'icon-embed',
+			label: 'Embed',
+		},
 	},
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
 		alias: 'Umb.Tiptap.MediaPicker',
 		name: 'Media Picker Tiptap Extension',
-		weight: 900,
-		api: () => import('./tiptap-mediapicker.extension.js'),
+		api: () => import('./umb/mediapicker.extension.js'),
 		meta: {
 			alias: 'umb-media',
 			icon: 'icon-picture',
 			label: 'Media picker',
 		},
 	},
+	{
+		type: 'tiptapExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.UrlPicker',
+		name: 'URL Picker Tiptap Extension',
+		api: () => import('./umb/urlpicker.extension.js'),
+		meta: {
+			alias: 'umb-link',
+			icon: 'icon-link',
+			label: 'URL picker',
+		},
+	},
 ];
+
+const extensions: Array<ManifestTiptapExtension> = [...core, ...umbExtensions];
 
 export const manifests: Array<ManifestTypes | UmbExtensionManifestKind> = [...kinds, ...extensions];
