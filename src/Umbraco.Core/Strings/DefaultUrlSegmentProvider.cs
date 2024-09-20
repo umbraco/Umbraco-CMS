@@ -13,7 +13,7 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     public DefaultUrlSegmentProvider(IShortStringHelper shortStringHelper) => _shortStringHelper = shortStringHelper;
 
 
-    public string? GetUrlSegment(IContentBase content, bool published, string? culture = null) =>
+    public virtual string? GetUrlSegment(IContentBase content, bool published, string? culture = null) =>
         GetUrlSegmentSource(content, culture, published)?.ToUrlSegment(_shortStringHelper, culture);
 
     /// <summary>
@@ -22,7 +22,7 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     /// <param name="content">The content.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>The URL segment.</returns>
-    public string? GetUrlSegment(IContentBase content, string? culture = null) =>
+    public virtual string? GetUrlSegment(IContentBase content, string? culture = null) =>
         GetUrlSegmentSource(content, culture, true)?.ToUrlSegment(_shortStringHelper, culture);
 
     private static string? GetUrlSegmentSource(IContentBase content, string? culture, bool published)
