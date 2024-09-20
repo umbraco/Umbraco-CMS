@@ -47,25 +47,29 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			},
 		).asPromise();
 
-		this.observe(this.uniques, (uniques) => {
-			if (uniques.length === 0) {
-				this.#items.setValue([]);
-				return;
-			}
+		this.observe(
+			this.uniques,
+			(uniques) => {
+				if (uniques.length === 0) {
+					this.#items.setValue([]);
+					return;
+				}
 
-			// TODO: This could be optimized so we only load the appended items, but this requires that the response checks that an item is still present in uniques. [NL]
-			// Check if we already have the items, and then just sort them:
-			const items = this.#items.getValue();
-			if (
-				uniques.length === items.length &&
-				uniques.every((unique) => items.find((item) => this.#getUnique(item) === unique))
-			) {
-				this.#items.setValue(this.#sortByUniques(items));
-			} else {
-				// We need to load new items, so ...
-				this.#requestItems();
-			}
-		});
+				// TODO: This could be optimized so we only load the appended items, but this requires that the response checks that an item is still present in uniques. [NL]
+				// Check if we already have the items, and then just sort them:
+				const items = this.#items.getValue();
+				if (
+					uniques.length === items.length &&
+					uniques.every((unique) => items.find((item) => this.#getUnique(item) === unique))
+				) {
+					this.#items.setValue(this.#sortByUniques(items));
+				} else {
+					// We need to load new items, so ...
+					this.#requestItems();
+				}
+			},
+			null,
+		);
 	}
 
 	getUniques(): Array<string> {
@@ -102,7 +106,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		this.#currentRequest = request;
 		const { asObservable } = await request;
 
-		if (this.#currentRequest === request) {
+		if (this.#currentRequest !== request) {
 			// You are not the newest request, so please back out.
 			return;
 		}

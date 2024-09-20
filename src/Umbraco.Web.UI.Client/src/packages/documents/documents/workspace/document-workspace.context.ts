@@ -131,6 +131,7 @@ export class UmbDocumentWorkspaceContext
 	#variesBySegment?: boolean;
 
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
+	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
@@ -193,9 +194,18 @@ export class UmbDocumentWorkspaceContext
 		this.observe(this.varies, (varies) => {
 			this.#varies = varies;
 		});
-		// TODO: observable part which gives data type uniques:
-		this.observe(this.structure.contentTypeProperties, (dataTypeUniques: Array<string>) => {
+
+		this.observe(this.structure.contentTypeDataTypeUniques, (dataTypeUniques: Array<string>) => {
 			this.#dataTypeItemManager.setUniques(dataTypeUniques);
+		});
+
+		this.observe(this.#dataTypeItemManager.items, (dataTypes) => {
+			// Make a map of the data type unique and editorAlias:
+			this.#dataTypeSchemaAliasMap = new Map(
+				dataTypes.map((dataType) => {
+					return [dataType.unique, dataType.propertyEditorSchemaAlias];
+				}),
+			);
 		});
 
 		this.loadLanguages();
@@ -441,9 +451,10 @@ export class UmbDocumentWorkspaceContext
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
-		const editorAlias = dataType.propertyEditorSchemaAlias;
-		//const editorAlias = (value as any).layout ? 'Umbraco.BlockList' : 'Umbraco.TextBox';
+		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		if (!editorAlias) {
+			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
+		}
 
 		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbDocumentValueModel<ValueType>;
 

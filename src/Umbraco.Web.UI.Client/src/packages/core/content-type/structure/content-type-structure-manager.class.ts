@@ -20,6 +20,9 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
+const UmbFilterDuplicateStrings = (value: string, index: number, array: Array<string>) =>
+	array.indexOf(value) === index;
+
 /**
  * Manages a structure of a Content Type and its properties and containers.
  * This loads and merges the structures of the Content Type and its inherited and composed Content Types.
@@ -56,6 +59,12 @@ export class UmbContentTypeStructureManager<
 	readonly contentTypeProperties = this.#contentTypes.asObservablePart((contentTypes) => {
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
 		return contentTypes.flatMap((x) => x.properties ?? []);
+	});
+	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
+		// Notice this may need to use getValue to avoid resetting it self. [NL]
+		return contentTypes
+			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
+			.filter(UmbFilterDuplicateStrings);
 	});
 	readonly contentTypeHasProperties = this.#contentTypes.asObservablePart((contentTypes) => {
 		// Notice this may need to use getValue to avoid resetting it self. [NL]
