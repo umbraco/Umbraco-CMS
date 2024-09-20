@@ -40,7 +40,6 @@ import {
 import {
 	appendToFrozenArray,
 	mergeObservables,
-	jsonStringComparison,
 	UmbArrayState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
