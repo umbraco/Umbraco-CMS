@@ -421,13 +421,14 @@ public class DocumentUrlService : IDocumentUrlService
         var result = new List<UrlInfo>();
 
 
-        if(_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(contentKey, out var ancestorsOrSelfKeys))
+        if(_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(contentKey, out IEnumerable<Guid> ancestorsOrSelfKeys))
         {
             IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
             IEnumerable<string> cultures = languages.Select(x=>x.IsoCode);
 
 
-            Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeys.ToDictionary(x => x, async ancestorKey =>
+            Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
+            Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
             {
                 IEnumerable<IDomain> domains = await _domainService.GetAssignedDomainsAsync(ancestorKey, false);
                 return domains.ToDictionary(x => x.LanguageIsoCode!);
@@ -437,9 +438,9 @@ public class DocumentUrlService : IDocumentUrlService
             foreach (var culture in cultures)
             {
                IDomain? foundDomain = null;
-                ancestorsOrSelfKeys.Reverse();
-                foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeys)
-                {
+
+               foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
+               {
                     if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, IDomain>>? domainDictionaryTask))
                     {
                         var domainDictionary = await domainDictionaryTask;
@@ -456,7 +457,7 @@ public class DocumentUrlService : IDocumentUrlService
                     }
                 }
 
-                var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeys.Last();
+                var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
                 result.Add(new UrlInfo(
                     text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
                     isUrl: true,

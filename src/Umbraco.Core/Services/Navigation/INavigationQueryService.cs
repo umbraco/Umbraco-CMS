@@ -34,7 +34,7 @@ public interface INavigationQueryService
     {
         if(TryGetAncestorsKeys(childKey, out var ancestorsKeys))
         {
-            ancestorsOrSelfKeys = ancestorsKeys.Concat([childKey]);
+            ancestorsOrSelfKeys =  childKey.Yield().Concat(ancestorsKeys);
             return true;
         }
 
