@@ -3,7 +3,7 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -25,9 +25,15 @@ const elementName = 'umb-property-editor-ui-tiptap';
  */
 @customElement(elementName)
 export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
+
 		this._config = config;
+
+		const blocks = config.getValueByAlias<Array<UmbBlockRteTypeModel>>('blocks') ?? [];
+		this.#managerContext.setBlockTypes(blocks);
+
+		this.#managerContext.setEditorConfiguration(config);
 	}
 
 	@property({
