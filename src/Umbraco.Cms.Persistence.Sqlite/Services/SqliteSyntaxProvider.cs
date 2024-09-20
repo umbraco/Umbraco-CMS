@@ -434,7 +434,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override IDictionary<Type, IScalarMapper> ScalarMappers => _scalarMappers;
 
-    private class Constraint
+    private sealed class Constraint
     {
         public string TableName { get; }
 
@@ -452,7 +452,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         public override string ToString() => ConstraintName;
     }
 
-    private class SqliteMaster
+    private sealed class SqliteMaster
     {
         public string Type { get; set; } = null!;
 
@@ -461,7 +461,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         public string Sql { get; set; } = null!;
     }
 
-    private class IndexMeta
+    private sealed class IndexMeta
     {
         public string TableName { get; set; } = null!;
 

@@ -36,7 +36,7 @@ public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProvide
 
     public override string GetQuotedTableName(string? tableName)
     {
-        if (tableName?.Contains(".") == false)
+        if (tableName?.Contains('.') == false)
         {
             return $"[{tableName}]";
         }
