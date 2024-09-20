@@ -1,10 +1,10 @@
-import { imageSize } from '../../utils/index.js';
 import { UmbTiptapExtensionApiBase, type UmbTiptapExtensionArgs } from '../types.js';
 import {
 	TemporaryFileStatus,
 	UmbTemporaryFileManager,
 	type UmbTemporaryFileModel,
 } from '@umbraco-cms/backoffice/temporary-file';
+import { imageSize } from '@umbraco-cms/backoffice/utils';
 import { type Editor, UmbImage } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -85,6 +85,7 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 
 		this.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true, detail: fileModels }));
 
+		// TODO: Image upload folder??
 		const uploads = await this.#manager.upload(fileModels);
 		const maxImageSize = this.maxWidth;
 
