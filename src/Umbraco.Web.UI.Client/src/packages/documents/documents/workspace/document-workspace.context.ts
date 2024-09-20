@@ -502,10 +502,6 @@ export class UmbDocumentWorkspaceContext
 		};
 	}
 
-	async #buildSaveData(selectedVariants: Array<UmbVariantId>): Promise<UmbDocumentDetailModel> {
-		return this.#data.constructData(selectedVariants);
-	}
-
 	async #performSaveOrCreate(saveData: UmbDocumentDetailModel): Promise<void> {
 		if (this.getIsNew()) {
 			// Create:
@@ -565,7 +561,7 @@ export class UmbDocumentWorkspaceContext
 		if (selected.length > 0) {
 			culture = selected[0];
 			const variantId = UmbVariantId.FromString(culture);
-			const saveData = await this.#buildSaveData([variantId]);
+			const saveData = await this.#data.constructData([variantId]);
 			await this.#runMandatoryValidationForSaveData(saveData);
 			await this.#performSaveOrCreate(saveData);
 		}
@@ -610,7 +606,7 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		const saveData = await this.#buildSaveData(variantIds);
+		const saveData = await this.#data.constructData(variantIds);
 		await this.#runMandatoryValidationForSaveData(saveData);
 
 		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
@@ -716,7 +712,7 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		const saveData = await this.#buildSaveData(variantIds);
+		const saveData = await this.#data.constructData(variantIds);
 		await this.#runMandatoryValidationForSaveData(saveData);
 		return await this.#performSaveOrCreate(saveData);
 	}
