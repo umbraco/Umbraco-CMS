@@ -417,54 +417,59 @@ public class DocumentUrlService : IDocumentUrlService
 
     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
     {
-        // TODO change to not use logic from _documentNavigationQueryService, as this endpoint is a management endpoint it clould also go to another interface
         var result = new List<UrlInfo>();
 
+        var documentIdAttempt = _idKeyMap.GetIdForKey(contentKey, UmbracoObjectTypes.Document);
 
-        if(_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(contentKey, out IEnumerable<Guid> ancestorsOrSelfKeys))
+        if(documentIdAttempt.Success is false)
         {
-            IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-            IEnumerable<string> cultures = languages.Select(x=>x.IsoCode);
+            return result;
+        }
+
+        IEnumerable<Guid> ancestorsOrSelfKeys = contentKey.Yield()
+            .Concat(_contentService.GetAncestors(documentIdAttempt.Result).Select(x => x.Key).Reverse());
+
+        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
+        IEnumerable<string> cultures = languages.Select(x=>x.IsoCode);
 
 
-            Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-            Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
-            {
-                IEnumerable<IDomain> domains = await _domainService.GetAssignedDomainsAsync(ancestorKey, false);
-                return domains.ToDictionary(x => x.LanguageIsoCode!);
-            });
+        Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
+        Dictionary<Guid, Task<Dictionary<string, IDomain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
+        {
+            IEnumerable<IDomain> domains = await _domainService.GetAssignedDomainsAsync(ancestorKey, false);
+            return domains.ToDictionary(x => x.LanguageIsoCode!);
+        });
 
-            var urlSegments = new List<string>();
-            foreach (var culture in cultures)
-            {
-               IDomain? foundDomain = null;
+        var urlSegments = new List<string>();
+        foreach (var culture in cultures)
+        {
+           IDomain? foundDomain = null;
 
-               foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
-               {
-                    if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, IDomain>>? domainDictionaryTask))
+           foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
+           {
+                if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out Task<Dictionary<string, IDomain>>? domainDictionaryTask))
+                {
+                    var domainDictionary = await domainDictionaryTask;
+                    if (domainDictionary.TryGetValue(culture, out IDomain? domain))
                     {
-                        var domainDictionary = await domainDictionaryTask;
-                        if (domainDictionary.TryGetValue(culture, out IDomain? domain))
-                        {
-                            foundDomain = domain;
-                            break;
-                        }
-                    }
-
-                    if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, culture, false), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
-                    {
-                        urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+                        foundDomain = domain;
+                        break;
                     }
                 }
 
-                var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
-                result.Add(new UrlInfo(
-                    text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
-                    isUrl: true,
-                    culture: culture
-                ));
-
+                if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, culture, false), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+                {
+                    urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+                }
             }
+
+            var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
+            result.Add(new UrlInfo(
+                text: GetFullUrl(isRootFirstItem, urlSegments, foundDomain),
+                isUrl: true,
+                culture: culture
+            ));
+
         }
 
         return result;
