@@ -5,7 +5,7 @@ import {
 	type UmbTemporaryFileModel,
 } from '@umbraco-cms/backoffice/temporary-file';
 import { imageSize } from '@umbraco-cms/backoffice/utils';
-import { type Editor, UmbImage } from '@umbraco-cms/backoffice/external/tiptap';
+import { type Editor, Extension } from '@umbraco-cms/backoffice/external/tiptap';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -49,7 +49,7 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const self = this;
 		return [
-			UmbImage.extend({
+			Extension.create({
 				name: 'umbMediaUpload',
 				onCreate() {
 					this.parent?.();
