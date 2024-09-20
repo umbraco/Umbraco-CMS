@@ -85,7 +85,6 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 
 		this.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true, detail: fileModels }));
 
-		// TODO: Image upload folder??
 		const uploads = await this.#manager.upload(fileModels);
 		const maxImageSize = this.maxWidth;
 
