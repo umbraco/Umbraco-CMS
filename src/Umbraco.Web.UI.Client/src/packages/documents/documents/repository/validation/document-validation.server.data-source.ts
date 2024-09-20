@@ -67,7 +67,7 @@ export class UmbDocumentValidationServerDataSource {
 	async validateUpdate(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null);
+		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: ValidateUpdateDocumentRequestModel = {
