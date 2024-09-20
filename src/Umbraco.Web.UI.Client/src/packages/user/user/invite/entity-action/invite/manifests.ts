@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-paper-plane',
 			label: '#user_invite',
+			additionalOptions: true,
 		},
 	},
 ];

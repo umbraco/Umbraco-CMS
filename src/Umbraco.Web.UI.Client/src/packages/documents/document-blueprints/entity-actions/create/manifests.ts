@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_createblueprint',
+			additionalOptions: true,
 		},
 	},
 	{

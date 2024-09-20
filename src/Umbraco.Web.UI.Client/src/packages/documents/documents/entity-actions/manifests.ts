@@ -51,6 +51,7 @@ const entityActions: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-globe',
 			label: '#actions_publish',
+			additionalOptions: true,
 		},
 		conditions: [
 			{
@@ -73,6 +74,7 @@ const entityActions: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-globe',
 			label: '#actions_unpublish',
+			additionalOptions: true,
 		},
 		conditions: [
 			{
