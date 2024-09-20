@@ -647,7 +647,7 @@ export class UmbContentTypeStructureManager<
 		return this.#containers.getValue().filter((x) => x.parent === null && x.type === containerType);
 	}
 
-	hasRootContainers(containerType: UmbPropertyContainerTypes) {
+	async hasRootContainers(containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType).length > 0;
 		});

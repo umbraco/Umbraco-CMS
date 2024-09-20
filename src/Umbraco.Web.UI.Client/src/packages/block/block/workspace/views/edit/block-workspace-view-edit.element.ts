@@ -51,7 +51,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			this.#tabsStructureHelper.mergedContainers,
 			(tabs) => {
 				this._tabs = tabs;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			null,
 		);
@@ -64,25 +64,26 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		});
 	}
 
-	#setStructureManager() {
+	async #setStructureManager() {
 		if (!this.#blockWorkspace || !this.#managerName) return;
-		const dataManager = this.#blockWorkspace[this.#managerName];
-		this.#tabsStructureHelper.setStructureManager(dataManager.structure);
+		const blockManager = this.#blockWorkspace[this.#managerName];
+		this.#tabsStructureHelper.setStructureManager(blockManager.structure);
 
 		// Create Data Set & setup Validation Context:
-		dataManager.setup(this);
+		blockManager.setup(this);
 
 		this.observe(
-			this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
+			await this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
-				this._createRoutes();
+				console.log('_hasRootGroups', this._hasRootGroups);
+				this.#createRoutes();
 			},
 			'observeGroups',
 		);
 	}
 
-	private _createRoutes() {
+	#createRoutes() {
 		if (!this._tabs || !this.#blockWorkspace) return;
 		const routes: UmbRoute[] = [];
 
@@ -122,6 +123,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			});
 		}
 
+		console.log('routes', routes, this._hasRootGroups);
 		this._routes = routes;
 	}
 

@@ -57,15 +57,15 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#structureManager = workspaceContext.structure;
 			this._tabsStructureHelper.setStructureManager(workspaceContext.structure);
-			this._observeRootGroups();
+			this.#observeRootGroups();
 		});
 	}
 
-	private _observeRootGroups() {
+	async #observeRootGroups() {
 		if (!this.#structureManager) return;
 
 		this.observe(
-			this.#structureManager.hasRootContainers('Group'),
+			await this.#structureManager.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
