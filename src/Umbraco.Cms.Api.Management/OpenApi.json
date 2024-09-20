@@ -35844,6 +35844,7 @@
       },
       "DataTypeItemResponseModel": {
         "required": [
+          "editorAlias",
           "id",
           "isDeletable",
           "name"
@@ -35860,6 +35861,9 @@
           "editorUiAlias": {
             "type": "string",
             "nullable": true
+          },
+          "editorAlias": {
+            "type": "string"
           },
           "isDeletable": {
             "type": "boolean"
