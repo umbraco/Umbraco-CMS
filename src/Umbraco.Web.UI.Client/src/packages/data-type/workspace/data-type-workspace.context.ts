@@ -13,6 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
+	jsonStringComparison,
 	UmbArrayState,
 	UmbObjectState,
 	UmbStringState,
@@ -29,6 +30,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -100,6 +102,7 @@ export class UmbDataTypeWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
 
+		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.addValidationContext(new UmbValidationContext(this));
 
 		this.#observePropertyEditorSchemaAlias();
@@ -421,6 +424,49 @@ export class UmbDataTypeWorkspaceContext
 		await this.repository.delete(unique);
 	}
 
+	#hasUnpersistedChanges() {
+		const persisted = this.#persistedData.getValue();
+		const current = this.#currentData.getValue();
+		return jsonStringComparison(persisted, current) === false;
+	}
+
+	#resetCurrentData() {
+		this.#currentData.setValue(this.#persistedData.getValue());
+	}
+
+	#willNavigateAway(newUrl: string) {
+		let willNavigateAway = false;
+
+		if (this.getIsNew()) {
+			willNavigateAway = !newUrl.includes(`${this.getEntityType()}/create`);
+		} else {
+			willNavigateAway = !newUrl.includes(this.getUnique()!);
+		}
+
+		return willNavigateAway;
+	}
+
+	#onWillNavigate = async (e: CustomEvent) => {
+		const newUrl = e.detail.url;
+
+		if (this.#willNavigateAway(newUrl) && this.#hasUnpersistedChanges()) {
+			e.preventDefault();
+			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
+
+			try {
+				// navigate to the new url when discarding changes
+				await modal.onSubmit();
+				// Reset the current data so we don't end in a endless loop of asking to discard changes.
+				this.#resetCurrentData();
+				history.pushState({}, '', e.detail.url);
+				return true;
+			} catch {
+				return false;
+			}
+		}
+	};
+
 	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
@@ -428,6 +474,7 @@ export class UmbDataTypeWorkspaceContext
 		this.#propertyEditorUiIcon.destroy();
 		this.#propertyEditorUiName.destroy();
 		this.repository.destroy();
+		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		super.destroy();
 	}
 }

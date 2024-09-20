@@ -929,10 +929,27 @@ export class UmbDocumentWorkspaceContext
 		return jsonStringComparison(persisted, current) === false;
 	}
 
-	#onWillNavigate = async (e: CustomEvent) => {
-		const willNavigateAway = !e.detail.url.includes(this.getUnique());
+	#resetCurrentData() {
+		this.#currentData.setValue(this.#persistedData.getValue());
+	}
 
-		if (willNavigateAway && this.#hasUnpersistedChanges()) {
+	#willNavigateAway(newUrl: string) {
+		let willNavigateAway = false;
+
+		if (this.getIsNew()) {
+			const contentTypeUnique = this.#currentData.getValue()?.documentType.unique;
+			willNavigateAway = !newUrl.includes(`${this.getEntityType()}/create`) || !newUrl.includes(contentTypeUnique!);
+		} else {
+			willNavigateAway = !newUrl.includes(this.getUnique()!);
+		}
+
+		return willNavigateAway;
+	}
+
+	#onWillNavigate = async (e: CustomEvent) => {
+		const newUrl = e.detail.url;
+
+		if (this.#willNavigateAway(newUrl) && this.#hasUnpersistedChanges()) {
 			e.preventDefault();
 			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
@@ -941,7 +958,7 @@ export class UmbDocumentWorkspaceContext
 				// navigate to the new url when discarding changes
 				await modal.onSubmit();
 				// Reset the current data so we don't end in a endless loop of asking to discard changes.
-				this.#currentData.setValue(this.#persistedData.getValue());
+				this.#resetCurrentData();
 				history.pushState({}, '', e.detail.url);
 				return true;
 			} catch {
