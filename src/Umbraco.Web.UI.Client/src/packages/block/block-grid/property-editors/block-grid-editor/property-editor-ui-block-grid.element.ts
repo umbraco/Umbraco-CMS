@@ -20,6 +20,7 @@ import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffi
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import { UmbBlockElementDataValidationPathTranslator } from '@umbraco-cms/backoffice/block';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -99,7 +100,11 @@ export class UmbPropertyEditorUIBlockGridElement
 		// TODO: Prevent initial notification from these observes
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
-				observeMultiple([this.#managerContext.layouts, this.#managerContext.contents, this.#managerContext.settings]),
+				observeMultiple([
+					this.#managerContext.layouts,
+					this.#managerContext.contents,
+					this.#managerContext.settings,
+				]).pipe(debounceTime(20)),
 				([layouts, contents, settings]) => {
 					this._value = {
 						...this._value,
@@ -119,6 +124,7 @@ export class UmbPropertyEditorUIBlockGridElement
 				'observePropertyAlias',
 			);
 		});
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
 		});

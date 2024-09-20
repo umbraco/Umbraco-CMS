@@ -24,6 +24,8 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import '../../components/block-list-entry/index.js';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -179,6 +181,24 @@ export class UmbPropertyEditorUIBlockListElement
 				},
 				'observePropertyAlias',
 			);
+
+			this.observe(
+				observeMultiple([
+					this.#managerContext.layouts,
+					this.#managerContext.contents,
+					this.#managerContext.settings,
+				]).pipe(debounceTime(20)),
+				([layouts, contents, settings]) => {
+					this._value = {
+						...this._value,
+						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts },
+						contentData: contents,
+						settingsData: settings,
+					};
+					context.setValue(this._value);
+				},
+				'motherObserver',
+			);
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
@@ -204,20 +224,6 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#managerContext.setLayouts(layouts);
 		});
 
-		// TODO: Prevent initial notification from these observes:
-		this.observe(this.#managerContext.layouts, (layouts) => {
-			this._value = { ...this._value, layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts } };
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#managerContext.contents, (contents) => {
-			this._value = { ...this._value, contentData: contents };
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#managerContext.settings, (settings) => {
-			this._value = { ...this._value, settingsData: settings };
-			this.#fireChangeEvent();
-		});
-
 		this.observe(this.#managerContext.blockTypes, (blockTypes) => {
 			this._blocks = blockTypes;
 		});
@@ -226,10 +232,6 @@ export class UmbPropertyEditorUIBlockListElement
 			this._catalogueRouteBuilder = routeBuilder;
 		});
 	}
-
-	#fireChangeEvent = () => {
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	};
 
 	protected override getFormElement() {
 		return undefined;

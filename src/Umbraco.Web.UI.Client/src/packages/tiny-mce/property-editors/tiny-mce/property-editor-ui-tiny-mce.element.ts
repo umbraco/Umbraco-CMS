@@ -13,6 +13,8 @@ import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbRichTextEditorValueType {
 	markup: string;
@@ -118,6 +120,26 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 				},
 				'observePropertyAlias',
 			);
+
+			this.observe(
+				observeMultiple([
+					this.#managerContext.layouts,
+					this.#managerContext.contents,
+					this.#managerContext.settings,
+				]).pipe(debounceTime(20)),
+				([layouts, contents, settings]) => {
+					this._value = {
+						...this._value,
+						blocks: {
+							layout: { [UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS]: layouts },
+							contentData: contents,
+							settingsData: settings,
+						},
+					};
+					context.setValue(this._value);
+				},
+				'motherObserver',
+			);
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context.getVariantId());
@@ -127,26 +149,6 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 			// Update manager:
 			this.#managerContext.setLayouts(layouts);
 		});
-
-		this.observe(this.#managerContext.layouts, (layouts) => {
-			this._value = {
-				...this._value,
-				blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS]: layouts } },
-			};
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#managerContext.contents, (contents) => {
-			this._value = { ...this._value, blocks: { ...this._value.blocks, contentData: contents } };
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#managerContext.settings, (settings) => {
-			this._value = { ...this._value, blocks: { ...this._value.blocks, settingsData: settings } };
-			this.#fireChangeEvent();
-		});
-	}
-
-	#fireChangeEvent() {
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChange() {

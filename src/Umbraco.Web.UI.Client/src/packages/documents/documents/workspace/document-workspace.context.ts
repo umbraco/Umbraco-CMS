@@ -433,6 +433,7 @@ export class UmbDocumentWorkspaceContext
 		return undefined;
 	}
 	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
+		this.initiatePropertyValueChange();
 		variantId ??= UmbVariantId.CreateInvariant();
 		const property = await this.structure.getPropertyStructureByAlias(alias);
 
@@ -458,6 +459,7 @@ export class UmbDocumentWorkspaceContext
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#data.ensureVariantData(variantId);
 		}
+		this.finishPropertyValueChange();
 	}
 
 	#updateLock = 0;
