@@ -364,7 +364,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#layout.value;
 		if (currentData) {
-			this.#layout.update({ ...currentData, [alias]: value });
+			this.#layout.update({ ...currentData, [alias]: await value });
 		}
 	}
 
