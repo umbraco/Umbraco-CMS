@@ -76,7 +76,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			await this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
-				console.log('_hasRootGroups', this._hasRootGroups);
 				this.#createRoutes();
 			},
 			'observeGroups',
