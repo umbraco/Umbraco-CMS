@@ -114,7 +114,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
         Guid contentTypeKey,
-        IEnumerable<string>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null)
     {
         TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
         if (contentType is null)
@@ -128,7 +128,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
         TContentType contentType,
-        IEnumerable<string>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null)
     {
         ContentValidationResult result = await _validationService.ValidatePropertiesAsync(contentEditingModelBase, contentType, culturesToValidate);
         return result.ValidationErrors.Any() is false

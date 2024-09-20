@@ -45,7 +45,7 @@ internal sealed class ContentEditingService
     }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
-        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey);
+        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, createModel.Variants.Select(variant => variant.Culture));
 
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
@@ -138,7 +138,7 @@ internal sealed class ContentEditingService
     private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
         Guid contentTypeKey,
-        IEnumerable<string>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null)
         => await ValidateCulturesAsync(contentEditingModelBase) is false
             ? Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult())
             : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);

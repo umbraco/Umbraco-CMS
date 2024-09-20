@@ -13,6 +13,6 @@ internal sealed class MediaValidationService : ContentValidationServiceBase<IMed
     public async Task<ContentValidationResult> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
         IMediaType mediaType,
-        IEnumerable<string>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null)
         => await HandlePropertiesValidationAsync(contentEditingModelBase, mediaType, culturesToValidate);
 }

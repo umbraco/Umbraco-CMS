@@ -13,6 +13,6 @@ internal sealed class ContentValidationService : ContentValidationServiceBase<IC
     public async Task<ContentValidationResult> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
         IContentType contentType,
-        IEnumerable<string>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null)
         => await HandlePropertiesValidationAsync(contentEditingModelBase, contentType, culturesToValidate);
 }

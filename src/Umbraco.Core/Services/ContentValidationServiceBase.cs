@@ -24,7 +24,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
     protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
         ContentEditingModelBase contentEditingModelBase,
         TContentType contentType,
-        IEnumerable<string>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null)
     {
         var validationErrors = new List<PropertyValidationError>();
 
