@@ -1142,6 +1142,10 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-image-up",
+			"file": "image-up.svg"
+		},
+		{
 			"_name": "icon-inactive-line",
 			"____file": "inactive-line.svg"
 		},

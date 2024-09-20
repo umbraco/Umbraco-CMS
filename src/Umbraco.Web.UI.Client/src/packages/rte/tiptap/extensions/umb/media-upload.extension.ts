@@ -1,4 +1,4 @@
-import { UmbTiptapExtensionApiBase, type UmbTiptapExtensionArgs } from './types.js';
+import { UmbTiptapExtensionApiBase, type UmbTiptapExtensionArgs } from '../types.js';
 import {
 	TemporaryFileStatus,
 	UmbTemporaryFileManager,

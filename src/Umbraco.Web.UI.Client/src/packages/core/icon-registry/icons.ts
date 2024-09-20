@@ -923,6 +923,10 @@ name: "icon-imac",
 legacy: true,
 path: () => import("./icons/icon-imac.js"),
 },{
+name: "icon-image-up",
+
+path: () => import("./icons/icon-image-up.js"),
+},{
 name: "icon-inbox-full",
 legacy: true,
 path: () => import("./icons/icon-inbox-full.js"),

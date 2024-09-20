@@ -1,20 +1,6 @@
-import { UmbTiptapToolbarElementApiBase } from './types.js';
-import type { ManifestTiptapExtensionButtonKind } from './tiptap-extension.js';
+import { UmbTiptapToolbarElementApiBase } from '../types.js';
 import { Link } from '@umbraco-cms/backoffice/external/tiptap';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
-
-export const manifest: ManifestTiptapExtensionButtonKind = {
-	type: 'tiptapExtension',
-	kind: 'button',
-	alias: 'Umb.Tiptap.UrlPicker',
-	name: 'URL Picker Tiptap Extension',
-	api: () => import('./urlpicker.extension.js'),
-	meta: {
-		alias: 'umb-link',
-		icon: 'icon-link',
-		label: 'URL picker',
-	},
-};
 
 export default class UmbTiptapUrlPickerExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions() {
