@@ -93,7 +93,7 @@ export class UmbDocumentWorkspaceContext
 	 */
 	readonly #data = new UmbContentDataManager<EntityModel>(this, this.repository);
 
-	#getDataPromise?: Promise<unknown>;
+	#getDataPromise?: Promise<any>;
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
