@@ -123,7 +123,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			});
 		}
 
-		console.log('routes', routes, this._hasRootGroups);
 		this._routes = routes;
 	}
 
