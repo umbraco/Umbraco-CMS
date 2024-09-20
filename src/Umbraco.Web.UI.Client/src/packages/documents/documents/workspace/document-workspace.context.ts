@@ -103,10 +103,6 @@ export class UmbDocumentWorkspaceContext
 	#serverValidation = new UmbServerModelValidatorContext(this);
 	#validationRepository?: UmbDocumentValidationRepository;
 
-	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
-	/*#blueprint = new UmbObjectState<UmbDocumentBlueprintDetailModel | undefined>(undefined);
-	public readonly blueprint = this.#blueprint.asObservable();*/
-
 	public readOnlyState = new UmbReadOnlyVariantStateManager(this);
 
 	public isLoaded() {
@@ -292,7 +288,8 @@ export class UmbDocumentWorkspaceContext
 		this.#parent.setValue(parent);
 
 		if (blueprintUnique) {
-			const { data } = await this.#blueprintRepository.requestByUnique(blueprintUnique);
+			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
+			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
 
 			this.#getDataPromise = this.repository.createScaffold({
 				documentType: data?.documentType,
