@@ -17,8 +17,10 @@ public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCache
         IPublishedSnapshotService publishedSnapshotService,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory)
-        : base(appCaches, serializer, eventAggregator, factory) =>
+        : base(appCaches, serializer, eventAggregator, factory)
+    {
         _publishedSnapshotService = publishedSnapshotService;
+    }
 
     #region Json
 

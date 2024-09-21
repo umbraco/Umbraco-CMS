@@ -337,6 +337,7 @@ AND cmsContentNu.nodeId IS NULL
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect(SqlContentSourcesSelectUmbracoNodeJoin)
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
             .Append(SqlWhereNodeIdX(SqlContext, id))
+            .Append(SqlWhereNodeIdX(SqlContext, id))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
         IContentCacheDataSerializer serializer =

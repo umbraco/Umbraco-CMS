@@ -67,7 +67,7 @@ public class ContentPickerPropertyEditor : DataEditor
         // starting in v14 the passed in value is always a guid, we store it as a document Udi string. Else it's an invalid value
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue) =>
             editorValue.Value is not null
-            && Guid.TryParse(editorValue.Value as string, out Guid guidValue)
+            && Guid.TryParse(editorValue.Value.ToString(), out Guid guidValue)
                 ? GuidUdi.Create(Constants.UdiEntityType.Document, guidValue).ToString()
                 : null;
 

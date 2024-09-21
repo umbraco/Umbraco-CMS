@@ -51,7 +51,6 @@ public class FilePermissionHelper : IFilePermissionHelper
         {
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Bin),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Umbraco),
-            hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoPath),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages),
         };
     }
@@ -94,7 +93,7 @@ public class FilePermissionHelper : IFilePermissionHelper
 
             temp ??= new List<string>();
 
-            temp.Add(dir.TrimStart(_basePath));
+            temp.Add(dir.TrimStartExact(_basePath));
             success = false;
         }
 
@@ -116,7 +115,7 @@ public class FilePermissionHelper : IFilePermissionHelper
 
             temp ??= new List<string>();
 
-            temp.Add(file.TrimStart(_basePath));
+            temp.Add(file.TrimStartExact(_basePath));
             success = false;
         }
 
