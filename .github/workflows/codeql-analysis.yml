@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  dotnetVersion: 8.x
+  dotnetVersion: 9.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
   buildConfiguration: SkipTests
