@@ -9,11 +9,11 @@
     "Plugin",
     "Razor Class Library"
   ],
-  "name": "Umbraco Package RCL",
+  "name": "Umbraco Package",
   "description": "An empty Umbraco package/plugin (Razor Class Library).",
-  "groupIdentity": "Umbraco.Templates.UmbracoPackageRcl",
-  "identity": "Umbraco.Templates.UmbracoPackageRcl.CSharp",
-  "shortName": "umbracopackage-rcl",
+  "groupIdentity": "Umbraco.Templates.UmbracoPackage",
+  "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
+  "shortName": "umbracopackage",
   "tags": {
     "language": "C#",
     "type": "project"

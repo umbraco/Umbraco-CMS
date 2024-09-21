@@ -3,8 +3,8 @@
   "order": 0,
   "icon": "../../icon.png",
   "description": {
-    "id": "UmbracoPackageRcl",
-    "text": "Umbraco Package RCL - An empty Umbraco package/plugin (Razor Class Library)."
+    "id": "UmbracoPackage",
+    "text": "Umbraco Package - An empty Umbraco package/plugin (Razor Class Library)."
   },
   "symbolInfo": [
     {
