@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security;
 using Microsoft.Extensions.Logging;
 
@@ -59,7 +60,7 @@ internal class ReferenceResolver
 
         // Load in each assembly in the directory of the entry assembly to be included in the search
         // for Umbraco dependencies/transitive dependencies
-        foreach (var dir in assemblyLocations)
+        foreach (var dir in CollectionsMarshal.AsSpan(assemblyLocations))
         {
             foreach (var dll in Directory.EnumerateFiles(dir ?? string.Empty, "*.dll"))
             {

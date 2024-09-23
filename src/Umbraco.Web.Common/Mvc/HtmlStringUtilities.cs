@@ -1,4 +1,5 @@
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
@@ -56,7 +57,7 @@ public sealed class HtmlStringUtilities
 
             // we have to reverse the list in order to not override the changes to the nodes later
             targets.Reverse();
-            foreach (HtmlNode target in targets)
+            foreach (HtmlNode target in CollectionsMarshal.AsSpan(targets))
             {
                 HtmlNode content = doc.CreateTextNode(target.InnerHtml);
                 target.ParentNode.ReplaceChild(content, target);
