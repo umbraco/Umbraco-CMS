@@ -1,6 +1,6 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, type UmbDocumentEntityTypeUnion } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type {
 	UmbDocumentVariantPublishModel,
@@ -938,10 +938,20 @@ export class UmbDocumentWorkspaceContext
 		let willNavigateAway = false;
 
 		if (this.getIsNew()) {
-			const contentTypeUnique = this.#currentData.getValue()?.documentType.unique;
-			willNavigateAway = !newUrl.includes(`${this.getEntityType()}/create`) || !newUrl.includes(contentTypeUnique!);
+			const parent = this.#parent.getValue()!;
+			const documentTypeUnique = this.#currentData.getValue()!.documentType.unique;
+
+			const createPath = UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
+				parentEntityType: parent.entityType as UmbDocumentEntityTypeUnion,
+				parentUnique: parent.unique,
+				documentTypeUnique,
+			});
+			willNavigateAway = !newUrl.includes(createPath);
 		} else {
-			willNavigateAway = !newUrl.includes(this.getUnique()!);
+			const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
+				unique: this.getUnique()!,
+			});
+			willNavigateAway = !newUrl.includes(editPath);
 		}
 
 		return willNavigateAway;
