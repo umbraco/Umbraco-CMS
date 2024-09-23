@@ -2,10 +2,9 @@ import '../../../components/body-layout/body-layout.element.js';
 import './icon-picker-modal.element.js';
 
 import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
+import type { UmbIconPickerModalValue } from './icon-picker-modal.token.js';
 import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-
-import type { UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 export default {
 	title: 'API/Modals/Layouts/Icon Picker',

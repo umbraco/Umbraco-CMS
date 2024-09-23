@@ -1,6 +1,7 @@
 import type { UmbTreeStartNode } from '../types.js';
 import { UMB_TREE_PICKER_MODAL_ALIAS } from './constants.js';
-import type { UmbPickerModalData, UmbPickerModalValue, UmbWorkspaceModalData } from '@umbraco-cms/backoffice/modal';
+import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import type { UmbWorkspaceModalData } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbPathPattern, UmbPathPatternParamsType } from '@umbraco-cms/backoffice/router';
 
