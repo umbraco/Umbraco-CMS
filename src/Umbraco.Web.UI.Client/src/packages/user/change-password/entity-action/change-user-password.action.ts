@@ -1,8 +1,9 @@
+import { UMB_CHANGE_PASSWORD_MODAL } from '../modal/index.js';
 import { UmbChangeUserPasswordRepository } from '@umbraco-cms/backoffice/user';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserRepository } from '@umbraco-cms/backoffice/current-user';
 
 export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never> {
