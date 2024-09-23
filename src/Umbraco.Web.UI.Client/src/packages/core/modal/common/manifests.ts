@@ -7,12 +7,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.IconPicker',
-		name: 'Icon Picker Modal',
-		element: () => import('./icon-picker/icon-picker-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.CodeEditor',
 		name: 'Code Editor Modal',
 		element: () => import('./code-editor/code-editor-modal.element.js'),

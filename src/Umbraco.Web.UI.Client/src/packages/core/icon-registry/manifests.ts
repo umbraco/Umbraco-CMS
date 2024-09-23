@@ -1,3 +1,5 @@
+import { manifests as iconPickerModalManifests } from './icon-picker-modal/manifests.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'icons',
@@ -11,4 +13,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Icons Context',
 		api: () => import('./icon-registry.context.js'),
 	},
+	...iconPickerModalManifests,
 ];
