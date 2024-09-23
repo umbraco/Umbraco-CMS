@@ -7,7 +7,7 @@ import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/c
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type {

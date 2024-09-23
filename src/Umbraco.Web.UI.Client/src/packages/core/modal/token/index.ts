@@ -8,4 +8,3 @@ export * from './icon-picker-modal.token.js';
 export * from './item-picker-modal.token.js';
 export * from './modal-token.js';
 export * from './property-editor-ui-picker-modal.token.js';
-export * from './workspace-modal.token.js';
