@@ -1,10 +1,10 @@
+import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
 import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ICON_REGISTRY_CONTEXT, type UmbIconDefinition } from '@umbraco-cms/backoffice/icon';
-import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-icon-picker-modal')

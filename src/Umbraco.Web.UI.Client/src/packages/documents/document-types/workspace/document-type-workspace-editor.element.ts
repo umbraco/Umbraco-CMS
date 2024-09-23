@@ -2,7 +2,8 @@ import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from './document-type-workspace.c
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 

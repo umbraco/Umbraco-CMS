@@ -1,5 +1,5 @@
 import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeModel } from '../types.js';
-import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
+import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockGridTypeWorkspaceData = UmbWorkspaceModalData<UmbBlockGridTypeModel>;
