@@ -1056,6 +1056,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 editor.undoManager.clear();
               }
             }
+
+            angularHelper.safeApply($rootScope, function () {
+              editor.dispatch("Change");
+            });
           });
       });
 
