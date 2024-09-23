@@ -86,8 +86,8 @@ public class AppCaches : IDisposable
         {
             if (disposing)
             {
-                RuntimeCache.DisposeIfDisposable();
-                RequestCache.DisposeIfDisposable();
+                (RuntimeCache as IDisposable)?.Dispose();
+                (RequestCache as IDisposable)?.Dispose();
                 IsolatedCaches.Dispose();
             }
 

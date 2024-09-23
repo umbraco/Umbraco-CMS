@@ -81,9 +81,9 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
         {
             if (disposing)
             {
-                foreach (IAppPolicyCache value in _caches.Values)
+                foreach (IDisposable value in _caches.Values.OfType<IDisposable>())
                 {
-                    value.DisposeIfDisposable();
+                    value.Dispose();
                 }
             }
 

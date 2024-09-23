@@ -26,7 +26,7 @@ public class SerilogLogger : IDisposable
         IConfiguration configuration) =>
         CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, out _);
 
-    public void Dispose() => SerilogLog.DisposeIfDisposable();
+    public void Dispose() => (SerilogLog as IDisposable)?.Dispose();
 
     /// <summary>
     ///     Creates a logger with some pre-defined configuration and remainder from config file
