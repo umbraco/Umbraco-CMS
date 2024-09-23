@@ -307,8 +307,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         Guid[] checkedGroupMembersKeys =
-            EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersKeys ?? Enumerable.Empty<Guid>())
-                .ToArray();
+            EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersKeys ?? []);
         IUser[] usersToAdd = (await _userService.GetAsync(checkedGroupMembersKeys)).ToArray();
 
         // Since this is a brand new creation we don't have to be worried about what users were added and removed
@@ -640,14 +639,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IUser performingUser,
         IEnumerable<Guid> groupMembersUserKeys)
     {
-        var userKeys = groupMembersUserKeys.ToList();
-
         // If the performing user is an admin we don't care, they can access the group later regardless
-        if (performingUser.IsAdmin() is false && userKeys.Contains(performingUser.Key) is false)
+        if (performingUser.IsAdmin() is false && groupMembersUserKeys.Contains(performingUser.Key) is false)
         {
-            userKeys.Add(performingUser.Key);
+            return [..groupMembersUserKeys, performingUser.Key];
         }
 
-        return userKeys;
+        return groupMembersUserKeys;
     }
 }
