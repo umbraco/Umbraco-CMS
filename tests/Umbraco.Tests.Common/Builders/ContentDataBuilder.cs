@@ -1,16 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBuilder
+internal class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBuilder
 {
     private Dictionary<string, CultureVariation> _cultureInfos;
     private string _name;

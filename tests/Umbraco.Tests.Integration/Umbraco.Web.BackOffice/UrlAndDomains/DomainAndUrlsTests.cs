@@ -68,7 +68,6 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     {
         builder.Services.AddUnique<IVariationContextAccessor>(_variationContextAccessor);
         builder.AddUmbracoHybridCache();
-        builder.AddNuCache();
     }
 
     private readonly TestVariationContextAccessor _variationContextAccessor = new();
