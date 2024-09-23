@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Extensions;
@@ -17,6 +18,12 @@ public static class FriendlyPublishedContentExtensions
 {
     private static IVariationContextAccessor VariationContextAccessor { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>();
+
+    private static IPublishedContentCache PublishedContentCache { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
+
+    private static IDocumentNavigationQueryService DocumentNavigationQueryService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
 
     private static IPublishedModelFactory PublishedModelFactory { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>();
@@ -47,19 +54,6 @@ public static class FriendlyPublishedContentExtensions
 
     private static IPublishedValueFallback PublishedValueFallback { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
-
-    private static IPublishedSnapshot? PublishedSnapshot
-    {
-        get
-        {
-            if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
-            {
-                return null;
-            }
-
-            return umbracoContext.PublishedSnapshot;
-        }
-    }
 
     private static IMediaTypeService MediaTypeService { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();
@@ -418,7 +412,7 @@ public static class FriendlyPublishedContentExtensions
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
     public static IEnumerable<IPublishedContent>? Siblings(this IPublishedContent content, string? culture = null)
-        => content.Siblings(PublishedSnapshot, VariationContextAccessor, culture);
+        => content.Siblings(PublishedContentCache, DocumentNavigationQueryService, VariationContextAccessor, culture);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -465,7 +459,7 @@ public static class FriendlyPublishedContentExtensions
     public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
         this IPublishedContent content,
         string? culture = null)
-        => content.SiblingsAndSelf(PublishedSnapshot, VariationContextAccessor, culture);
+        => content.SiblingsAndSelf(PublishedContentCache, DocumentNavigationQueryService, VariationContextAccessor, culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
