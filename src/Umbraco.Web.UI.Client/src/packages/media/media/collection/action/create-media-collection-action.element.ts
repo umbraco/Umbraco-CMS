@@ -5,7 +5,7 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';

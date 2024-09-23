@@ -1,8 +1,8 @@
 import '../confirm/confirm-modal.element.js';
 
+import type { UmbCodeEditorModalData } from './code-editor-modal.token.js';
 import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbCodeEditorModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {
 	title: 'API/Modals/Layouts/Code Editor',

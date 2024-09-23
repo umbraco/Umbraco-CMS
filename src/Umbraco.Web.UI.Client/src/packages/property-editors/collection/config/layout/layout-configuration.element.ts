@@ -14,11 +14,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 
 interface UmbCollectionLayoutConfiguration {
 	icon?: string;
