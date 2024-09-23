@@ -1,5 +1,4 @@
 export * from './change-password-modal.token.js';
-export * from './code-editor-modal.token.js';
 export * from './confirm-modal.token.js';
 export * from './debug-modal.token.js';
 export * from './embedded-media-modal.token.js';
