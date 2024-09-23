@@ -137,12 +137,17 @@ internal class MediaCacheService : IMediaCacheService
         scope.Complete();
     }
 
-    public async Task SeedAsync()
+    public async Task SeedAsync(CancellationToken cancellationToken)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         foreach (Guid key in SeedKeys)
         {
+            if(cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+
             var cacheKey = GetCacheKey(key, false);
 
             ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(

@@ -15,5 +15,5 @@ public interface IMediaCacheService
 
     Task DeleteItemAsync(IContentBase media);
 
-    Task SeedAsync();
+    Task SeedAsync(CancellationToken cancellationToken);
 }

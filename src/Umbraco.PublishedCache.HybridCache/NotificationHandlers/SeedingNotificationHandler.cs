@@ -1,5 +1,7 @@
-﻿using Umbraco.Cms.Core.Events;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
@@ -8,18 +10,27 @@ internal class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApp
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
+    private readonly IRuntimeState _runtimeState;
 
-    public SeedingNotificationHandler(IDocumentCacheService documentCacheService, IMediaCacheService mediaCacheService)
+    public SeedingNotificationHandler(IDocumentCacheService documentCacheService, IMediaCacheService mediaCacheService, IRuntimeState runtimeState)
     {
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
+        _runtimeState = runtimeState;
     }
 
     public async Task HandleAsync(UmbracoApplicationStartedNotification notification,
         CancellationToken cancellationToken)
     {
-        // TODO: Investigate if these can run in parallel
-        await _documentCacheService.SeedAsync();
-        await _mediaCacheService.SeedAsync();
+
+        if (_runtimeState.Level <= RuntimeLevel.Install)
+        {
+            return;
+        }
+
+        await Task.WhenAll(
+            _documentCacheService.SeedAsync(cancellationToken),
+            _mediaCacheService.SeedAsync(cancellationToken)
+        );
     }
 }

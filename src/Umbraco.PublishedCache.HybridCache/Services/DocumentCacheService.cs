@@ -92,12 +92,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
     }
 
-    public async Task SeedAsync()
+    public async Task SeedAsync(CancellationToken cancellationToken)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         foreach (Guid key in SeedKeys)
         {
+            if(cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+
             var cacheKey = GetCacheKey(key, false);
 
             // We'll use GetOrCreateAsync because it may be in the second level cache, in which case we don't have to re-seed.
