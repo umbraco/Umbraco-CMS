@@ -9,8 +9,7 @@ schedules:
   branches:
     include:
     - v14/dev
-   ## Uncomment after merged to v15/dev
-   ## - v15/dev
+    - v15/dev
 
 variables:
   nodeVersion: 20
@@ -109,7 +108,7 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
-        timeoutInMinutes: 120
+        timeoutInMinutes: 180
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
@@ -244,7 +243,7 @@ stages:
       - job:
         displayName: E2E Tests (SQL Server)
         condition: and(succeeded(), ${{ eq(parameters.runSqlServerE2ETests, true) }})
-        timeoutInMinutes: 120
+        timeoutInMinutes: 180
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
