@@ -252,6 +252,11 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             ""contentTypeKey"": """ + ContentKey1 + @""",
             ""key"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
         }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        }
     ]
 }";
         var converted =
@@ -316,8 +321,18 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             ""contentTypeKey"": """ + SettingKey2 + @""",
             ""key"": ""BCF4BA3D-A40C-496C-93EC-58FAC85F18B9""
         }
-    ]
-}";
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        },
+        {
+            ""contentKey"": ""E05A0347-0442-4AB3-A520-E048E6197E79""
+        },
+        {
+            ""contentKey"": ""0A4A416E-547D-464F-ABCC-6F345C17809A""
+        }
+    ]}";
 
         var converted =
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
@@ -401,6 +416,17 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         {
             ""contentTypeKey"": """ + SettingKey2 + @""",
             ""key"": ""BCF4BA3D-A40C-496C-93EC-58FAC85F18B9""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        },
+        {
+            ""contentKey"": ""E05A0347-0442-4AB3-A520-E048E6197E79""
+        },
+        {
+            ""contentKey"": ""0A4A416E-547D-464F-ABCC-6F345C17809A""
         }
     ]
 }";

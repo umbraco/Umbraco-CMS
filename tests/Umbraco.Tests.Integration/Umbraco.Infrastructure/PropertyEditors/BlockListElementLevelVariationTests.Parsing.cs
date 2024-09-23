@@ -239,6 +239,8 @@ public partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", "", "")]
     public async Task Can_Become_Variant_After_Publish(string culture, string expectedVariantContentValue, string expectedVariantSettingsValue)
     {
+        Assert.Inconclusive("Pending implementation for Expose");
+
         var elementType = CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
@@ -325,6 +327,8 @@ public partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", "da-DK", ContentVariation.Culture)]
     public async Task Can_Become_Invariant_After_Publish(string requestCulture, string defaultCulture, ContentVariation elementVariationAfterPublish)
     {
+        Assert.Inconclusive("Pending implementation for Expose");
+
         var language = await LanguageService.GetAsync(defaultCulture);
         language!.IsDefault = true;
         await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);

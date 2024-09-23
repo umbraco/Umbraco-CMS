@@ -198,8 +198,11 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
             richTextBlockLayout.Value.First(),
             richTextBlockLayout.Value.Last()
         ];
+        var contentKey = richTextValue.Blocks.ContentData[1].Key;
         richTextValue.Blocks.ContentData.RemoveAt(1);
         richTextValue.Blocks.SettingsData.RemoveAt(1);
+        richTextValue.Blocks.Expose.RemoveAll(v => v.ContentKey == contentKey);
+        Assert.AreEqual(4, richTextValue.Blocks.Expose.Count);
 
         richTextValue.Blocks.ContentData[0].Values[0].Value = "#1: The second invariant content value";
         richTextValue.Blocks.ContentData[0].Values[1].Value = "#1: The second content value in English";
@@ -460,6 +463,15 @@ public class RichTextElementLevelVariationTests : BlockEditorElementVariationTes
                             new() { Alias = "variantText", Value = "#3: The first settings value in Danish", Culture = "da-DK" }
                         ]
                     },
+                ],
+                Expose =
+                [
+                    new (contentElementKey1, "en-US", null),
+                    new (contentElementKey1, "da-DK", null),
+                    new (contentElementKey2, "en-US", null),
+                    new (contentElementKey2, "da-DK", null),
+                    new (contentElementKey3, "en-US", null),
+                    new (contentElementKey3, "da-DK", null),
                 ]
             }
         };

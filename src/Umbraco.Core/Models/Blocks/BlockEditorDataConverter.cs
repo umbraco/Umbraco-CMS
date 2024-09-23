@@ -64,8 +64,12 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     {
         if (value is not null)
         {
-            ConvertOriginalBlockFormat(value.ContentData);
-            ConvertOriginalBlockFormat(value.SettingsData);
+            var converted = ConvertOriginalBlockFormat(value.ContentData);
+            if (converted)
+            {
+                ConvertOriginalBlockFormat(value.SettingsData);
+                AmendExpose(value);
+            }
         }
 
         TLayout[]? layouts = value?.GetLayouts()?.ToArray();
@@ -81,8 +85,14 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format
-    private void ConvertOriginalBlockFormat(List<BlockItemData> blockItemDatas)
+    private void AmendExpose(TValue value)
+        => value.Expose = value.ContentData.Select(cd => new BlockItemVariation(cd.Key, null, null)).ToList();
+
+    // this method is only meant to have any effect when migrating block editor values
+    // from the original format to the new, variant enabled format
+    private bool ConvertOriginalBlockFormat(List<BlockItemData> blockItemDatas)
     {
+        var converted = false;
         foreach (BlockItemData blockItemData in blockItemDatas)
         {
             // only overwrite the Properties collection if none have been added at this point
@@ -92,6 +102,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
                     .RawPropertyValues
                     .Select(item => new BlockPropertyValue { Alias = item.Key, Value = item.Value })
                     .ToList();
+                converted = true;
             }
 
             // no matter what, clear the RawPropertyValues collection so it is not saved back to the DB
@@ -106,5 +117,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
             // no matter what, clear the UDI value so it's not saved back to the DB
             blockItemData.Udi = null;
         }
+
+        return converted;
     }
 }

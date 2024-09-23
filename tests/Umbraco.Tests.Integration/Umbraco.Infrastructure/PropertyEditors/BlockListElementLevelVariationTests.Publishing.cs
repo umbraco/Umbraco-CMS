@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -1048,24 +1049,18 @@ public partial class BlockListElementLevelVariationTests
             Assert.AreEqual("#2: The second content value in English", blocks[1].Content.Value<string>("variantText"));
         });
 
-        AssertPropertyValues("da-DK", 2, blocks =>
+        AssertPropertyValues("da-DK", 1, blocks =>
         {
             Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
             Assert.AreEqual("#1: The first content value in Danish", blocks[0].Content.Value<string>("variantText"));
-
-            Assert.AreEqual("#2: The second invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual(string.Empty, blocks[1].Content.Value<string>("variantText"));
         });
 
         PublishContent(content, contentType, ["da-DK"]);
 
-        AssertPropertyValues("da-DK", 2, blocks =>
+        AssertPropertyValues("da-DK", 1, blocks =>
         {
             Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
             Assert.AreEqual("#1: The second content value in Danish", blocks[0].Content.Value<string>("variantText"));
-
-            Assert.AreEqual("#2: The second invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual(string.Empty, blocks[1].Content.Value<string>("variantText"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
@@ -1168,6 +1163,209 @@ public partial class BlockListElementLevelVariationTests
 
             Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
             Assert.AreEqual("#2: The content value in Danish", blocks[1].Content.Value<string>("variantText"));
+        });
+
+        void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+
+            validateBlocks(value);
+        }
+    }
+
+    [Test]
+    public async Task Can_Expose_Invariant_Blocks_Across_Cultures()
+    {
+        var elementType = CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The invariant content value" },
+                            new() { Alias = "variantText", Value = "#1: The other invariant content value" }
+                        },
+                        [],
+                        null,
+                        null
+                    )
+                ),
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#2: The invariant content value" },
+                            new() { Alias = "variantText", Value = "#2: The other invariant content value" }
+                        },
+                        [],
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key },
+            new() { ContentKey = blockListValue.ContentData[1].Key },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        foreach (var culture in new[] { "en-US", "da-DK" })
+        {
+            AssertPropertyValues(culture, 2, blocks =>
+            {
+                Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
+                Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+
+                Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
+                Assert.AreEqual("#2: The other invariant content value", blocks[1].Content.Value<string>("variantText"));
+            });
+        }
+
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[1].Key },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        // note how publishing in one language affects both due to the invariance of the block element type
+        PublishContent(content, contentType, ["en-US"]);
+
+        foreach (var culture in new[] { "en-US", "da-DK" })
+        {
+            AssertPropertyValues(culture, 1, blocks =>
+            {
+                Assert.AreEqual("#2: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
+                Assert.AreEqual("#2: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+            });
+        }
+
+        void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+
+            validateBlocks(value);
+        }
+    }
+
+    [Test]
+    public async Task Can_Expose_Both_Variant_And_Invariant_Blocks()
+    {
+        var invariantElementType = CreateElementType(ContentVariation.Nothing);
+        var variantElementType = CreateElementType(ContentVariation.Culture, "myVariantElementType");
+        var blockListDataType = await CreateBlockEditorDataType(
+            Constants.PropertyEditors.Aliases.BlockList,
+            new BlockListConfiguration.BlockConfiguration[]
+            {
+                new() { ContentElementTypeKey = invariantElementType.Key },
+                new() { ContentElementTypeKey = variantElementType.Key }
+            });
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, invariantElementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            invariantElementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue> {
+                            new() { Alias = "invariantText", Value = "#1: The invariant content value" },
+                            new() { Alias = "variantText", Value = "#1: The other invariant content value" }
+                        },
+                        [],
+                        null,
+                        null
+                    )
+                )
+            ]
+        );
+
+        var variantElementKey = Guid.NewGuid();
+        blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList] = blockListValue
+            .Layout[Constants.PropertyEditors.Aliases.BlockList]
+            .Union(new[] { new BlockListLayoutItem(variantElementKey) });
+        blockListValue.ContentData.Add(
+            new BlockItemData(variantElementKey, variantElementType.Key, variantElementType.Alias)
+            {
+                Values = [
+                    new() { Alias = "invariantText", Value = "#2: The invariant content value" },
+                    new() { Alias = "variantText", Value = "#2: The variant content value in English", Culture = "en-US" },
+                    new() { Alias = "variantText", Value = "#2: The variant content value in Danish", Culture = "da-DK" },
+                ]
+            }
+        );
+
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key },
+            new() { ContentKey = blockListValue.ContentData[1].Key, Culture = "en-US" },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        AssertPropertyValues("en-US", 2, blocks =>
+        {
+            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
+            Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+
+            Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
+            Assert.AreEqual("#2: The variant content value in English", blocks[1].Content.Value<string>("variantText"));
+        });
+
+        AssertPropertyValues("da-DK", 1, blocks =>
+        {
+            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
+            Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+        });
+
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key },
+            new() { ContentKey = blockListValue.ContentData[1].Key, Culture = "en-US" },
+            new() { ContentKey = blockListValue.ContentData[1].Key, Culture = "da-DK" },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        PublishContent(content, contentType, ["da-DK"]);
+
+        AssertPropertyValues("da-DK", 2, blocks =>
+        {
+            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
+            Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+
+            Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
+            Assert.AreEqual("#2: The variant content value in Danish", blocks[1].Content.Value<string>("variantText"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)

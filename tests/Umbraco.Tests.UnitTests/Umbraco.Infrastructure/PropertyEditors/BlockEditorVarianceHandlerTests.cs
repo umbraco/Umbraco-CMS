@@ -17,7 +17,7 @@ public class BlockEditorVarianceHandlerTests
     {
         var propertyValue = new BlockPropertyValue { Culture = null };
         var subject = BlockEditorVarianceHandler("da-DK");
-        await subject.AlignPropertyVariance(
+        await subject.AlignPropertyVarianceAsync(
             propertyValue,
             PublishedPropertyType(ContentVariation.Culture),
             PublishedElement(ContentVariation.Culture));
@@ -29,7 +29,7 @@ public class BlockEditorVarianceHandlerTests
     {
         var propertyValue = new BlockPropertyValue { Culture = "da-DK" };
         var subject = BlockEditorVarianceHandler("da-DK");
-        await subject.AlignPropertyVariance(
+        await subject.AlignPropertyVarianceAsync(
             propertyValue,
             PublishedPropertyType(ContentVariation.Nothing),
             PublishedElement(ContentVariation.Nothing));
@@ -41,7 +41,7 @@ public class BlockEditorVarianceHandlerTests
     {
         var propertyValue = new BlockPropertyValue { Culture = "en-US" };
         var subject = BlockEditorVarianceHandler("da-DK");
-        await subject.AlignPropertyVariance(
+        await subject.AlignPropertyVarianceAsync(
             propertyValue,
             PublishedPropertyType(ContentVariation.Nothing),
             PublishedElement(ContentVariation.Nothing));

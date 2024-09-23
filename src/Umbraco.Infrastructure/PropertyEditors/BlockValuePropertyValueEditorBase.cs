@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -174,7 +175,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 // but for local block level properties we don't have that kind of handling, so we to do it manually.
                 // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
                 // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
-                _blockEditorVarianceHandler.AlignPropertyVariance(blockPropertyValue, propertyType, culture, segment).GetAwaiter().GetResult();
+                _blockEditorVarianceHandler.AlignPropertyVarianceAsync(blockPropertyValue, propertyType, culture, segment).GetAwaiter().GetResult();
 
                 if (!valueEditorsByKey.TryGetValue(propertyType.DataTypeKey, out IDataValueEditor? valueEditor))
                 {

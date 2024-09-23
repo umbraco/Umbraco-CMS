@@ -81,10 +81,10 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
         PublishedSnapshotService.Notify(payloads, out _, out _);
     }
 
-    protected IContentType CreateElementType(ContentVariation variation)
+    protected IContentType CreateElementType(ContentVariation variation, string alias = "myElementType")
     {
         var elementType = new ContentTypeBuilder()
-            .WithAlias("myElementType")
+            .WithAlias(alias)
             .WithName("My Element Type")
             .WithIsElement(true)
             .WithContentVariation(variation)

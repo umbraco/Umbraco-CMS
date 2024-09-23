@@ -62,6 +62,11 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             ""contentTypeKey"": """ + SettingKey1 + @""",
             ""key"": ""2D3529ED-B47B-4B10-9F6D-4B802DD5DFE2""
         }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        }
     ]
 }";
         var converted =
@@ -102,6 +107,11 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         {
             ""contentTypeKey"": """ + ContentKey1 + @""",
             ""key"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
         }
     ]
 }";
@@ -152,6 +162,11 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         {
             ""contentTypeKey"": """ + ContentKey1 + @""",
             ""key"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-AC87-4396-84FE-8A399231CB3D""
         }
     ]
 }";

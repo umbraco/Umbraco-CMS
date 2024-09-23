@@ -2,6 +2,17 @@
 
 public class BlockItemVariation
 {
+    public BlockItemVariation()
+    {
+    }
+
+    public BlockItemVariation(Guid contentKey, string? culture, string? segment)
+    {
+        ContentKey = contentKey;
+        Culture = culture;
+        Segment = segment;
+    }
+
     public Guid ContentKey { get; set; }
 
     public string? Culture { get; set; }

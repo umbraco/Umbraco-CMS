@@ -125,7 +125,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
-        IList<BlockItemVariation> published = converted.BlockValue.Expose;
+        IList<BlockItemVariation> exposed = converted.BlockValue.Expose;
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -136,14 +136,19 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            if (published.Any() && published.Any(v =>
-                    v.ContentKey == data.Key && v.Culture == variationContext.Culture && v.Segment == variationContext.Segment.NullOrWhiteSpaceAsNull()) is false)
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
+            if (element == null)
             {
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
-            if (element == null)
+            var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
+                ? variationContext.Culture.NullOrWhiteSpaceAsNull()
+                : null;
+            var expectedBlockVariationSegment = owner.ContentType.VariesBySegment() && element.ContentType.VariesBySegment()
+                ? variationContext.Segment.NullOrWhiteSpaceAsNull()
+                : null;
+            if (exposed.Any(v => v.ContentKey == data.Key && v.Culture == expectedBlockVariationCulture && v.Segment == expectedBlockVariationSegment) is false)
             {
                 continue;
             }

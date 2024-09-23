@@ -120,6 +120,14 @@ public class BlockEditorBackwardsCompatibilityTests : UmbracoIntegrationTest
             Assert.IsFalse(toEditor.SettingsData[0].RawPropertyValues.Any());
             Assert.IsFalse(toEditor.SettingsData[1].RawPropertyValues.Any());
         });
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, toEditor.Expose.Count);
+
+            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Expose[0].ContentKey.ToString("N"));
+            Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.Expose[1].ContentKey.ToString("N"));
+        });
     }
 
     [TestCase]
@@ -257,6 +265,16 @@ public class BlockEditorBackwardsCompatibilityTests : UmbracoIntegrationTest
             Assert.IsFalse(toEditor.SettingsData[0].RawPropertyValues.Any());
             Assert.IsFalse(toEditor.SettingsData[1].RawPropertyValues.Any());
         });
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(4, toEditor.Expose.Count);
+
+            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Expose[0].ContentKey.ToString("N"));
+            Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.Expose[1].ContentKey.ToString("N"));
+            Assert.AreEqual("5fc866c590be4d01a28a979472a1ffee", toEditor.Expose[2].ContentKey.ToString("N"));
+            Assert.AreEqual("264536b65b0f4641aa43d4bfb515831d", toEditor.Expose[3].ContentKey.ToString("N"));
+        });
     }
 
     [TestCase]
@@ -356,6 +374,14 @@ public class BlockEditorBackwardsCompatibilityTests : UmbracoIntegrationTest
 
             Assert.IsFalse(toEditor.Blocks.SettingsData[0].RawPropertyValues.Any());
             Assert.IsFalse(toEditor.Blocks.SettingsData[1].RawPropertyValues.Any());
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, toEditor.Blocks.Expose.Count);
+
+            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Blocks.Expose[0].ContentKey.ToString("N"));
+            Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.Blocks.Expose[1].ContentKey.ToString("N"));
         });
     }
 

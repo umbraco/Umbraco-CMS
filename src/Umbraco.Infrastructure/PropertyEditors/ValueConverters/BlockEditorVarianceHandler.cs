@@ -13,24 +13,25 @@ public sealed class BlockEditorVarianceHandler
     public BlockEditorVarianceHandler(ILanguageService languageService)
         => _languageService = languageService;
 
-    public async Task AlignPropertyVariance(BlockPropertyValue blockPropertyValue, IPropertyType propertyType, string? culture, string? segment)
+    public async Task AlignPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPropertyType propertyType, string? culture, string? segment)
     {
+        culture ??= await _languageService.GetDefaultIsoCodeAsync();
         if (propertyType.VariesByCulture() != VariesByCulture(blockPropertyValue))
         {
             blockPropertyValue.Culture = propertyType.VariesByCulture()
-                ? culture ?? await _languageService.GetDefaultIsoCodeAsync()
+                ? culture
                 : null;
         }
 
         if (propertyType.VariesBySegment() != VariesBySegment(blockPropertyValue))
         {
-            blockPropertyValue.Segment = propertyType.VariesByCulture()
+            blockPropertyValue.Segment = propertyType.VariesBySegment()
                 ? segment
                 : null;
         }
     }
 
-    public async Task AlignPropertyVariance(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
+    public async Task AlignPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
     {
         ContentVariation propertyTypeVariation = owner.ContentType.Variations & propertyType.Variations;
         if (propertyTypeVariation.VariesByCulture() == VariesByCulture(blockPropertyValue))
@@ -39,7 +40,7 @@ public sealed class BlockEditorVarianceHandler
         }
 
         // mismatch in culture variation for published content:
-        // - if the property type varies by culture, assign the current (edited) culture (fallback to the default culture)
+        // - if the property type varies by culture, assign the default culture
         // - if the property type does not vary by culture:
         //   - if the property value culture equals the default culture, assign a null value for it to be rendered as the invariant value
         //   - otherwise leave the value culture as-is - it will be skipped by the rendering

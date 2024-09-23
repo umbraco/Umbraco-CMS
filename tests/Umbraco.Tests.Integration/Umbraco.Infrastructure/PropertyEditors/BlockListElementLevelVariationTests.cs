@@ -63,7 +63,34 @@ public partial class BlockListElementLevelVariationTests : BlockEditorElementVar
         => BlockListPropertyValue(elementType, [(contentElementKey, settingsElementKey, blocksProperty)]);
 
     private BlockListValue BlockListPropertyValue(IContentType elementType, List<(Guid contentElementKey, Guid settingsElementKey, BlockProperty BlocksProperty)> blocks)
-        => new()
+    {
+        var expose = new List<BlockItemVariation>();
+        foreach (var block in blocks)
+        {
+            var cultures = elementType.VariesByCulture()
+                ? new[] { block.BlocksProperty.Culture }
+                    .Union(block.BlocksProperty.BlockContentValues.Select(value => value.Culture))
+                    .WhereNotNull()
+                    .Distinct()
+                    .ToArray()
+                : [null];
+            if (cultures.Any() is false)
+            {
+                cultures = [null];
+            }
+
+            var segments = elementType.VariesBySegment()
+                ? new[] { block.BlocksProperty.Segment }
+                    .Union(block.BlocksProperty.BlockContentValues.Select(value => value.Segment))
+                    .Distinct()
+                    .ToArray()
+                : [null];
+
+            expose.AddRange(cultures.SelectMany(culture => segments.Select(segment =>
+                new BlockItemVariation(block.contentElementKey, culture, segment))));
+        }
+
+        return new BlockListValue
         {
             Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
             {
@@ -71,26 +98,28 @@ public partial class BlockListElementLevelVariationTests : BlockEditorElementVar
                     Constants.PropertyEditors.Aliases.BlockList,
                     blocks.Select(block => new BlockListLayoutItem
                     {
-                        ContentKey = block.contentElementKey,
-                        SettingsKey = block.settingsElementKey
+                        ContentKey = block.contentElementKey, SettingsKey = block.settingsElementKey
                     }).ToArray()
                 }
             },
-            ContentData = blocks.Select(block => new BlockItemData
-            {
-                Key = block.contentElementKey,
-                ContentTypeAlias = elementType.Alias,
-                ContentTypeKey = elementType.Key,
-                Values = block.BlocksProperty.BlockContentValues
-            }).ToList(),
+            ContentData =
+                blocks.Select(block => new BlockItemData
+                {
+                    Key = block.contentElementKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values = block.BlocksProperty.BlockContentValues
+                }).ToList(),
             SettingsData = blocks.Select(block => new BlockItemData
             {
                 Key = block.settingsElementKey,
                 ContentTypeAlias = elementType.Alias,
                 ContentTypeKey = elementType.Key,
                 Values = block.BlocksProperty.BlockSettingsValues
-            }).ToList()
+            }).ToList(),
+            Expose = expose
         };
+    }
 
     private void PublishContent(IContent content, IContentType contentType, string[]? culturesToPublish = null)
     {

@@ -196,8 +196,11 @@ public class BlockGridElementLevelVariationTests : BlockEditorElementVariationTe
         [
             blockGridValue.Layout.First().Value.First(),
         ];
+        var contentKey = blockGridValue.ContentData[2].Key;
         blockGridValue.ContentData.RemoveAt(2);
         blockGridValue.SettingsData.RemoveAt(2);
+        blockGridValue.Expose.RemoveAll(v => v.ContentKey == contentKey);
+        Assert.AreEqual(4, blockGridValue.Expose.Count);
 
         for (var i = 0; i < 2; i++)
         {
@@ -307,8 +310,11 @@ public class BlockGridElementLevelVariationTests : BlockEditorElementVariationTe
 
         // remove block #2 (inside the area of the first block at root level)
         ((BlockGridLayoutItem)blockGridValue.Layout[blockGridValue.Layout.First().Key].First()).Areas = [];
+        var contentKey = blockGridValue.ContentData[1].Key;
         blockGridValue.ContentData.RemoveAt(1);
         blockGridValue.SettingsData.RemoveAt(1);
+        blockGridValue.Expose.RemoveAll(v => v.ContentKey == contentKey);
+        Assert.AreEqual(4, blockGridValue.Expose.Count);
 
         blockGridValue.ContentData[0].Values[0].Value = "#1: The second invariant content value";
         blockGridValue.ContentData[0].Values[1].Value = "#1: The second content value in English";
@@ -496,6 +502,15 @@ public class BlockGridElementLevelVariationTests : BlockEditorElementVariationTe
                         new() { Alias = "variantText", Value = "#3: The first settings value in Danish", Culture = "da-DK" }
                     ]
                 },
+            ],
+            Expose =
+            [
+                new (contentElementKey1, "en-US", null),
+                new (contentElementKey1, "da-DK", null),
+                new (contentElementKey2, "en-US", null),
+                new (contentElementKey2, "da-DK", null),
+                new (contentElementKey3, "en-US", null),
+                new (contentElementKey3, "da-DK", null),
             ]
         };
     }
