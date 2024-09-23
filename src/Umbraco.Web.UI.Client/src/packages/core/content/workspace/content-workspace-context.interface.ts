@@ -17,6 +17,9 @@ export interface UmbContentWorkspaceContext<
 	readonly IS_CONTENT_WORKSPACE_CONTEXT: true;
 	readonly readOnlyState: UmbReadOnlyVariantStateManager;
 
+	// Data:
+	getData(): ContentTypeModel | undefined;
+
 	isLoaded(): Promise<unknown> | undefined;
 	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined>;
 
