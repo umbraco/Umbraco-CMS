@@ -1,4 +1,4 @@
-import { UmbModalToken } from './modal-token.js';
+import { UmbModalToken } from '../../token/index.js';
 
 export type UmbItemPickerModalData = {
 	headline: string;
