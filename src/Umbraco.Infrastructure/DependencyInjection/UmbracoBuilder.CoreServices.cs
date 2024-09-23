@@ -148,9 +148,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
-        // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-        builder.Services.AddSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
-
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
         builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();
 
@@ -195,10 +192,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
         {
             IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-            IUmbracoContext umbracoContext = umbCtx.GetRequiredUmbracoContext();
             return new PublishedContentQuery(
-                umbracoContext.PublishedSnapshot,
-                factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
+                factory.GetRequiredService<IVariationContextAccessor>(),
+                factory.GetRequiredService<IExamineManager>(),
+                factory.GetRequiredService<IPublishedContentCache>(),
+                factory.GetRequiredService<IPublishedMediaCache>());
         });
 
         // register accessors for cultures

@@ -74,7 +74,7 @@ public class AliasUrlProvider : IUrlProvider
 
         // look for domains, walking up the tree
         IPublishedContent? n = node;
-        IEnumerable<DomainAndUri>? domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
+        IEnumerable<DomainAndUri>? domainUris = DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);
 
         // n is null at root
         while (domainUris == null && n != null)
@@ -83,7 +83,7 @@ public class AliasUrlProvider : IUrlProvider
             n = n.Parent;
             domainUris = n == null
                 ? null
-                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
+                : DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);
         }
 
         // determine whether the alias property varies

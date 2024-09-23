@@ -68,7 +68,7 @@ public class DefaultUrlProvider : IUrlProvider
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris =
-            DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
+            DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);
 
         // n is null at root
         while (domainUris == null && n != null)
@@ -76,7 +76,7 @@ public class DefaultUrlProvider : IUrlProvider
             n = n.Parent; // move to parent node
             domainUris = n == null
                 ? null
-                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current);
+                : DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current);
         }
 
         // no domains = exit
@@ -152,7 +152,7 @@ public class DefaultUrlProvider : IUrlProvider
         DomainAndUri? domainUri = pos == 0
             ? null
             : DomainUtilities.DomainForNode(
-                umbracoContext.PublishedSnapshot.Domains,
+                umbracoContext.Domains,
                 _siteDomainMapper,
                 int.Parse(route[..pos], CultureInfo.InvariantCulture),
                 current,

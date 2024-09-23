@@ -33,7 +33,6 @@ public static class UmbracoBuilderExtensions
         // register the NuCache published snapshot service
         // must register default options, required in the service ctor
         builder.Services.TryAddTransient(factory => new PublishedSnapshotServiceOptions());
-        builder.SetPublishedSnapshotService<PublishedSnapshotService>();
 
         // replace this service since we want to improve the content/media
         // mapping lookups if we are using nucache.

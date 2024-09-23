@@ -77,11 +77,10 @@ public class PublishedContentQueryTests : ExamineBaseTest
         var contentCache = new Mock<IPublishedContentCache>();
         contentCache.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int intId) => Mock.Of<IPublishedContent>(x => x.Id == intId));
-        var snapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
         var variationContext = new VariationContext();
         var variationContextAccessor = Mock.Of<IVariationContextAccessor>(x => x.VariationContext == variationContext);
 
-        return new PublishedContentQuery(snapshot, variationContextAccessor, examineManager.Object);
+        return new PublishedContentQuery(variationContextAccessor, examineManager.Object, contentCache.Object, Mock.Of<IPublishedMediaCache>());
     }
 
     [TestCase("fr-fr", ExpectedResult = "1, 3", Description = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]

@@ -21,18 +21,6 @@ public static class CompositionExtensions
     /// <summary>
     ///     Sets the published snapshot service.
     /// </summary>
-    /// <typeparam name="T">The type of the published snapshot service.</typeparam>
-    /// <param name="builder">The builder.</param>
-    public static IUmbracoBuilder SetPublishedSnapshotService<T>(this IUmbracoBuilder builder)
-        where T : class, IPublishedSnapshotService
-    {
-        builder.Services.AddUnique<IPublishedSnapshotService, T>();
-        return builder;
-    }
-
-    /// <summary>
-    ///     Sets the published snapshot service.
-    /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="service">A published snapshot service.</param>
     public static IUmbracoBuilder SetPublishedSnapshotService(
