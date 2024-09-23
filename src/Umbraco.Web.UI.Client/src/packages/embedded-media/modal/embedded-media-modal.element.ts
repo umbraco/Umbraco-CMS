@@ -1,4 +1,4 @@
-import { UmbOEmbedRepository } from './repository/oembed.repository.js';
+import { UmbOEmbedRepository } from '../repository/oembed.repository.js';
 import { css, html, unsafeHTML, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from '@umbraco-cms/backoffice/modal';
