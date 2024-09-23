@@ -128,12 +128,12 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, Dictionary<string, object> attributes)
     {
-        if (attributes.ContainsKey("href") is false || attributes["href"] is not string href)
+        if (attributes.TryGetValue("href", out var hrefAttribute) is false || hrefAttribute is not string href)
         {
             return;
         }
 
-        if (attributes.ContainsKey("type") is false || attributes["type"] is not string type)
+        if (attributes.TryGetValue("type", out var typeAttribute) is false || typeAttribute is not string type)
         {
             type = "unknown";
         }
@@ -154,7 +154,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private void ReplaceLocalImages(IPublishedMediaCache mediaCache, string tag, Dictionary<string, object> attributes)
     {
-        if (tag is not "img" || attributes.ContainsKey("data-udi") is false || attributes["data-udi"] is not string dataUdi)
+        if (tag is not "img" || attributes.TryGetValue("data-udi", out var dataUdiAttribute) is false || dataUdiAttribute is not string dataUdi)
         {
             return;
         }
