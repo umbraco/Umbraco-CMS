@@ -1,9 +1,7 @@
+import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
+import type { UmbCodeEditorModalData, UmbCodeEditorModalValue } from './code-editor-modal.token.js';
 import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import type { UmbCodeEditorModalData, UmbCodeEditorModalValue } from '@umbraco-cms/backoffice/modal';
-
-import '@umbraco-cms/backoffice/code-editor';
 
 const elementName = 'umb-code-editor-modal';
 
