@@ -20,7 +20,9 @@ public partial class DocumentNavigationServiceTests
 
         // Assert
         Assert.AreNotEqual(nodeToCopy, copiedItemKey);
+
         DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
+
         Assert.Multiple(() =>
         {
             if (targetParentKey is null)

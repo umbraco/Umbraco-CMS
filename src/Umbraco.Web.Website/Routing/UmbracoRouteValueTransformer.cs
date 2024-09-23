@@ -100,6 +100,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         }
 
         // Check if there is no existing content and return the no content controller
+        // FIXME: This should be changed to route cache, so instead, if there are any routes, we know there is content.
         if (!umbracoContext.Content?.HasContent() ?? false)
         {
             return new RouteValueDictionary

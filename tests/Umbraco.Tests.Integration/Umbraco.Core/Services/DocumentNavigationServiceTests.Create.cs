@@ -17,6 +17,7 @@ public partial class DocumentNavigationServiceTests
         // Act
         var createAttempt = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Guid createdItemKey = createAttempt.Result.Content!.Key;
+
         // Verify that the structure has updated by checking the siblings list of the Root once again
         DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> updatedSiblingsKeys);
         List<Guid> siblingsList = updatedSiblingsKeys.ToList();

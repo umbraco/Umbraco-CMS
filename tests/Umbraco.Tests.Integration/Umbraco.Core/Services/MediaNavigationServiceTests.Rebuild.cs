@@ -13,6 +13,7 @@ public partial class MediaNavigationServiceTests
     {
         // Arrange
         Guid nodeKey = Album.Key;
+
         // Capture original built state of MediaNavigationService
         MediaNavigationQueryService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
         MediaNavigationQueryService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
@@ -25,6 +26,7 @@ public partial class MediaNavigationServiceTests
 
         // Act
         await newMediaNavigationService.RebuildAsync();
+
         // Capture rebuilt state
         var nodeExists = newMediaNavigationService.TryGetParentKey(nodeKey, out Guid? parentKeyFromRebuild);
         newMediaNavigationService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> childrenKeysFromRebuild);
@@ -36,8 +38,10 @@ public partial class MediaNavigationServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(initialNodeExists);
+
             // Verify that the item is present in the navigation structure after a rebuild
             Assert.IsTrue(nodeExists);
+
             // Verify that we have the same items as in the original built state of MediaNavigationService
             Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
             CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);

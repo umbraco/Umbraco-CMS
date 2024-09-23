@@ -287,14 +287,14 @@ public static class StringExtensions
     /// <param name="value">The value.</param>
     /// <param name="forRemoving">For removing.</param>
     /// <returns></returns>
-    public static string Trim(this string value, string forRemoving)
+    public static string TrimExact(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
             return value;
         }
 
-        return value.TrimEnd(forRemoving).TrimStart(forRemoving);
+        return value.TrimEndExact(forRemoving).TrimStartExact(forRemoving);
     }
 
     public static string EncodeJsString(this string s)
@@ -343,7 +343,7 @@ public static class StringExtensions
         return sb.ToString();
     }
 
-    public static string TrimEnd(this string value, string forRemoving)
+    public static string TrimEndExact(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -363,7 +363,7 @@ public static class StringExtensions
         return value;
     }
 
-    public static string TrimStart(this string value, string forRemoving)
+    public static string TrimStartExact(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -390,7 +390,7 @@ public static class StringExtensions
             return input;
         }
 
-        return toStartWith + input.TrimStart(toStartWith);
+        return toStartWith + input.TrimStartExact(toStartWith);
     }
 
     public static string EnsureStartsWith(this string input, char value) =>

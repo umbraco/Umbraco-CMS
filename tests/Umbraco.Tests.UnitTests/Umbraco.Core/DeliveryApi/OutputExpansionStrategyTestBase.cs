@@ -375,7 +375,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
     internal PublishedElementPropertyBase CreateContentPickerProperty(IPublishedElement parent, Guid pickedContentKey, string propertyTypeAlias, IApiContentBuilder contentBuilder)
     {
-        ContentPickerValueConverter contentPickerValueConverter = new ContentPickerValueConverter(PublishedSnapshotAccessor, contentBuilder);
+        ContentPickerValueConverter contentPickerValueConverter = new ContentPickerValueConverter(PublishedContentCacheMock.Object, contentBuilder);
         var contentPickerPropertyType = SetupPublishedPropertyType(contentPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.ContentPicker);
 
         return new PublishedElementPropertyBase(contentPickerPropertyType, parent, false, PropertyCacheLevel.None, new GuidUdi(Constants.UdiEntityType.Document, pickedContentKey).ToString());

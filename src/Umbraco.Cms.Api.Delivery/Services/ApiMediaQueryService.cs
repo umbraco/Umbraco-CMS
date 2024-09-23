@@ -85,7 +85,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             return null;
         }
 
-        var childrenOf = fetch.TrimStart(childrenOfParameter);
+        var childrenOf = fetch.TrimStartExact(childrenOfParameter);
         if (childrenOf.IsNullOrWhiteSpace())
         {
             // this mirrors the current behavior of the Content Delivery API :-)

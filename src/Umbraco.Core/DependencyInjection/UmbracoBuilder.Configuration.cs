@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
@@ -85,7 +85,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
-            .AddUmbracoOptions<WebhookSettings>();
+            .AddUmbracoOptions<WebhookSettings>()
+            .AddUmbracoOptions<CacheSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

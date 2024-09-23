@@ -13,6 +13,7 @@ public partial class DocumentNavigationServiceTests
     {
         // Arrange
         Guid nodeInRecycleBin = GreatGrandchild1.Key;
+
         // Move nodes to recycle bin
         await ContentEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
         await ContentEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
@@ -34,6 +35,7 @@ public partial class DocumentNavigationServiceTests
         {
             // Verify siblings count has decreased by one
             Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
+
             if (targetParentKey is null)
             {
                 Assert.IsNull(restoredItemParentKey);

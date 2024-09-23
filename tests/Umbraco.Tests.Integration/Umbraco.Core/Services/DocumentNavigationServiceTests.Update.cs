@@ -11,12 +11,14 @@ public partial class DocumentNavigationServiceTests
     {
         // Arrange
         Guid nodeToUpdate = Root.Key;
+
         // Capture initial state
         DocumentNavigationQueryService.TryGetParentKey(nodeToUpdate, out Guid? initialParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeys(nodeToUpdate, out IEnumerable<Guid> initialChildrenKeys);
         DocumentNavigationQueryService.TryGetDescendantsKeys(nodeToUpdate, out IEnumerable<Guid> initialDescendantsKeys);
         DocumentNavigationQueryService.TryGetAncestorsKeys(nodeToUpdate, out IEnumerable<Guid> initialAncestorsKeys);
         DocumentNavigationQueryService.TryGetSiblingsKeys(nodeToUpdate, out IEnumerable<Guid> initialSiblingsKeys);
+
         var updateModel = new ContentUpdateModel
         {
             InvariantName = "Updated Root",
@@ -25,6 +27,7 @@ public partial class DocumentNavigationServiceTests
         // Act
         var updateAttempt = await ContentEditingService.UpdateAsync(nodeToUpdate, updateModel, Constants.Security.SuperUserKey);
         Guid updatedItemKey = updateAttempt.Result.Content!.Key;
+
         // Capture updated state
         var nodeExists = DocumentNavigationQueryService.TryGetParentKey(updatedItemKey, out Guid? updatedParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeys(updatedItemKey, out IEnumerable<Guid> childrenKeysAfterUpdate);
@@ -37,7 +40,9 @@ public partial class DocumentNavigationServiceTests
         {
             // Verify that the item is still present in the navigation structure
             Assert.IsTrue(nodeExists);
+
             Assert.AreEqual(nodeToUpdate, updatedItemKey);
+
             // Verify that nothing's changed
             Assert.AreEqual(initialParentKey, updatedParentKey);
             CollectionAssert.AreEquivalent(initialChildrenKeys, childrenKeysAfterUpdate);

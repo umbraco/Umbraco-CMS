@@ -39,6 +39,11 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     /// </summary>
     string? Avatar { get; set; }
 
+    /// <summary>
+    ///     The type of user.
+    /// </summary>
+    UserKind Kind { get; set; }
+
     void RemoveGroup(string group);
 
     void ClearGroups();

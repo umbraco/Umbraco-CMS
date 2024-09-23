@@ -66,6 +66,21 @@ namespace Umbraco.Extensions
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>
         /// <param name="field">An expression specifying the field.</param>
+        /// <param name="values">The values.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values, string alias)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field, alias);
+            sql.Where(fieldName + " IN (@values)", new { values });
+            return sql;
+        }
+
+        /// <summary>
+        /// Appends a WHERE IN clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the field.</param>
         /// <param name="values">A subquery returning the value.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, Sql<ISqlContext>? values)
@@ -193,7 +208,7 @@ namespace Umbraco.Extensions
 
                 var temp = new Sql<ISqlContext>(sql.SqlContext);
                 temp = predicates[i](temp);
-                wsql.Append(temp.SQL.TrimStart("WHERE "), temp.Arguments);
+                wsql.Append(temp.SQL.TrimStartExact("WHERE "), temp.Arguments);
             }
             wsql.Append(")");
 
@@ -582,7 +597,7 @@ namespace Umbraco.Extensions
         {
             var sql = new Sql<ISqlContext>(sqlJoin.SqlContext);
             sql = on(sql);
-            var text = sql.SQL.Trim().TrimStart("WHERE").Trim();
+            var text = sql.SQL.Trim().TrimStartExact("WHERE").Trim();
             return sqlJoin.On(text, sql.Arguments);
         }
 

@@ -13,6 +13,7 @@ public partial class DocumentNavigationServiceTests
     {
         // Arrange
         Guid nodeKey = Root.Key;
+
         // Capture original built state of DocumentNavigationService
         DocumentNavigationQueryService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
@@ -25,6 +26,7 @@ public partial class DocumentNavigationServiceTests
 
         // Act
         await newDocumentNavigationService.RebuildAsync();
+
         // Capture rebuilt state
         var nodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out Guid? parentKeyFromRebuild);
         newDocumentNavigationService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> childrenKeysFromRebuild);
@@ -36,8 +38,10 @@ public partial class DocumentNavigationServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(initialNodeExists);
+
             // Verify that the item is present in the navigation structure after a rebuild
             Assert.IsTrue(nodeExists);
+
             // Verify that we have the same items as in the original built state of DocumentNavigationService
             Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
             CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);
