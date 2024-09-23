@@ -1,4 +1,4 @@
-import { UmbModalToken } from '../../../../core/modal/token/modal-token.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbEntityUserPermissionSettingsModalData {
 	unique: string;
