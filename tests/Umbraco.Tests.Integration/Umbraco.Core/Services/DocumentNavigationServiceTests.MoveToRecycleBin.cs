@@ -18,7 +18,7 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? originalParentKey);
         DocumentNavigationQueryService.TryGetDescendantsKeys(nodeToMoveToRecycleBin, out IEnumerable<Guid> initialDescendantsKeys);
         var beforeMoveDescendants = initialDescendantsKeys.ToList();
-        DocumentNavigationQueryService.TryGetChildrenKeys((Guid)originalParentKey, out IEnumerable<Guid> initialParentChildrenKeys);
+        DocumentNavigationQueryService.TryGetChildrenKeys(originalParentKey.Value, out IEnumerable<Guid> initialParentChildrenKeys);
         var beforeMoveParentSiblingsCount = initialParentChildrenKeys.Count();
 
         // Act
@@ -33,11 +33,13 @@ public partial class DocumentNavigationServiceTests
         var afterMoveParentSiblingsCount = afterMoveParentChildrenKeys.Count();
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> afterMoveRecycleBinSiblingsKeys);
         var afterMoveRecycleBinSiblingsCount = afterMoveRecycleBinSiblingsKeys.Count();
+
         Assert.Multiple(() =>
         {
             Assert.IsFalse(nodeExists);
             Assert.IsTrue(nodeExistsInRecycleBin);
             Assert.AreNotEqual(originalParentKey, updatedParentKeyInRecycleBin);
+
             Assert.IsNull(updatedParentKeyInRecycleBin); // Verify the node's parent is now located at the root of the recycle bin (null)
             Assert.AreEqual(beforeMoveDescendants, afterMoveDescendants);
             Assert.AreEqual(beforeMoveParentSiblingsCount - 1, afterMoveParentSiblingsCount);

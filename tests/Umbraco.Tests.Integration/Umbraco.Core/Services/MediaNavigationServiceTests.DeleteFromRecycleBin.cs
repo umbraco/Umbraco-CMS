@@ -12,6 +12,7 @@ public partial class MediaNavigationServiceTests
         Guid nodeToDelete = Image1.Key;
         Guid nodeInRecycleBin = Image2.Key;
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeToDelete, out IEnumerable<Guid> initialDescendantsKeys);
+
         // Move nodes to recycle bin
         await MediaEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey);
         await MediaEditingService.MoveToRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
@@ -24,6 +25,7 @@ public partial class MediaNavigationServiceTests
 
         // Assert
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
+
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one

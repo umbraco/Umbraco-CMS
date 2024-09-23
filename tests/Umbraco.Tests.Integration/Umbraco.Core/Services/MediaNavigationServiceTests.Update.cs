@@ -11,12 +11,14 @@ public partial class MediaNavigationServiceTests
     {
         // Arrange
         Guid nodeToUpdate = Album.Key;
+
         // Capture initial state
         MediaNavigationQueryService.TryGetParentKey(nodeToUpdate, out Guid? initialParentKey);
         MediaNavigationQueryService.TryGetChildrenKeys(nodeToUpdate, out IEnumerable<Guid> initialChildrenKeys);
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeToUpdate, out IEnumerable<Guid> initialDescendantsKeys);
         MediaNavigationQueryService.TryGetAncestorsKeys(nodeToUpdate, out IEnumerable<Guid> initialAncestorsKeys);
         MediaNavigationQueryService.TryGetSiblingsKeys(nodeToUpdate, out IEnumerable<Guid> initialSiblingsKeys);
+
         var updateModel = new MediaUpdateModel
         {
             InvariantName = "Updated Album",
@@ -25,6 +27,7 @@ public partial class MediaNavigationServiceTests
         // Act
         var updateAttempt = await MediaEditingService.UpdateAsync(nodeToUpdate, updateModel, Constants.Security.SuperUserKey);
         Guid updatedItemKey = updateAttempt.Result.Content!.Key;
+
         // Capture updated state
         var nodeExists = MediaNavigationQueryService.TryGetParentKey(updatedItemKey, out Guid? updatedParentKey);
         MediaNavigationQueryService.TryGetChildrenKeys(updatedItemKey, out IEnumerable<Guid> childrenKeysAfterUpdate);
@@ -38,6 +41,7 @@ public partial class MediaNavigationServiceTests
             // Verify that the item is still present in the navigation structure
             Assert.IsTrue(nodeExists);
             Assert.AreEqual(nodeToUpdate, updatedItemKey);
+
             // Verify that nothing's changed
             Assert.AreEqual(initialParentKey, updatedParentKey);
             CollectionAssert.AreEquivalent(initialChildrenKeys, childrenKeysAfterUpdate);

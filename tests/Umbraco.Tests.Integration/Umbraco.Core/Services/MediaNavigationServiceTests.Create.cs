@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class MediaNavigationServiceTests
 {
-    // TODO: I am unsure if there are issues with the CreatedMediaCreateModel, when I try to create a ImageMediaType at root, I get validation errors.
     [Test]
     public async Task Structure_Updates_When_Creating_Media_At_Root()
     {
@@ -15,9 +14,9 @@ public partial class MediaNavigationServiceTests
         var createModel = CreateMediaCreateModel("Root Image", Guid.NewGuid(), ImageMediaType.Key);
 
         // Act
-        // UNSURE,the createAttempt has a propertyValidationError, but it is still able to create the media
         var createAttempt = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Guid createdItemKey = createAttempt.Result.Content!.Key;
+
         // Verify that the structure has updated by checking the siblings list of the Root once again
         MediaNavigationQueryService.TryGetSiblingsKeys(Album.Key, out IEnumerable<Guid> updatedSiblingsKeys);
         List<Guid> siblingsList = updatedSiblingsKeys.ToList();
@@ -42,6 +41,7 @@ public partial class MediaNavigationServiceTests
         // Act
         var createAttempt = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Guid createdItemKey = createAttempt.Result.Content!.Key;
+
         // Verify that the structure has updated by checking the children of the Child1 node once again
         MediaNavigationQueryService.TryGetChildrenKeys(Album.Key, out IEnumerable<Guid> updatedChildrenKeys);
         List<Guid> childrenList = updatedChildrenKeys.ToList();

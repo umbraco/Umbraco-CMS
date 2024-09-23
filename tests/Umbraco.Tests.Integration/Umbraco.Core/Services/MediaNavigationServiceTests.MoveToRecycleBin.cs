@@ -18,7 +18,7 @@ public partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? originalParentKey);
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeToMoveToRecycleBin, out IEnumerable<Guid> initialDescendantsKeys);
         var beforeMoveDescendants = initialDescendantsKeys.ToList();
-        MediaNavigationQueryService.TryGetChildrenKeys((Guid)originalParentKey, out IEnumerable<Guid> initialParentChildrenKeys);
+        MediaNavigationQueryService.TryGetChildrenKeys(originalParentKey.Value, out IEnumerable<Guid> initialParentChildrenKeys);
         var beforeMoveParentSiblingsCount = initialParentChildrenKeys.Count();
 
         // Act
@@ -29,10 +29,11 @@ public partial class MediaNavigationServiceTests
         var nodeExistsInRecycleBin = MediaNavigationQueryService.TryGetParentKeyInBin(nodeToMoveToRecycleBin, out Guid? updatedParentKeyInRecycleBin);
         MediaNavigationQueryService.TryGetDescendantsKeysInBin(nodeToMoveToRecycleBin, out IEnumerable<Guid> afterMoveDescendantsKeys);
         var afterMoveDescendants = afterMoveDescendantsKeys.ToList();
-        MediaNavigationQueryService.TryGetChildrenKeys((Guid)originalParentKey, out IEnumerable<Guid> afterMoveParentChildrenKeys);
+        MediaNavigationQueryService.TryGetChildrenKeys(originalParentKey.Value, out IEnumerable<Guid> afterMoveParentChildrenKeys);
         var afterMoveParentSiblingsCount = afterMoveParentChildrenKeys.Count();
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> afterMoveRecycleBinSiblingsKeys);
         var afterMoveRecycleBinSiblingsCount = afterMoveRecycleBinSiblingsKeys.Count();
+
         Assert.Multiple(() =>
         {
             Assert.IsFalse(nodeExists);

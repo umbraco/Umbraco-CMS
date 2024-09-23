@@ -13,6 +13,7 @@ public partial class MediaNavigationServiceTests
     {
         // Arrange
         Guid nodeInRecycleBin = Image3.Key;
+
         // Move nodes to recycle bin
         await MediaEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
         await MediaEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
@@ -30,6 +31,7 @@ public partial class MediaNavigationServiceTests
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
         MediaNavigationQueryService.TryGetDescendantsKeys(restoredItemKey, out IEnumerable<Guid> afterRestoreDescendantsKeys);
         var afterRestoreDescendants = afterRestoreDescendantsKeys.ToList();
+
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one

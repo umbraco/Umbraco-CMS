@@ -22,6 +22,7 @@ public partial class MediaNavigationServiceTests
         // Assert
         var nodeExists = MediaNavigationQueryService.TryGetDescendantsKeys(deletedItemKey, out _);
         var nodeExistsInRecycleBin = MediaNavigationQueryService.TryGetDescendantsKeysInBin(nodeToDelete, out _);
+
         Assert.Multiple(() =>
         {
             Assert.AreEqual(nodeToDelete, deletedItemKey);
