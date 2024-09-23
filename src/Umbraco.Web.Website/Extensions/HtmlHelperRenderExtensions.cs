@@ -254,14 +254,7 @@ public static class HtmlHelperRenderExtensions
         if (!metaData.AreaName.IsNullOrWhiteSpace())
         {
             // set the area to the plugin area
-            if (routeVals.ContainsKey("area"))
-            {
-                routeVals["area"] = metaData.AreaName;
-            }
-            else
-            {
-                routeVals.Add("area", metaData.AreaName);
-            }
+            routeVals["area"] = metaData.AreaName;
         }
 
         return htmlHelper.ActionLink(actionName, metaData.ControllerName, routeVals);

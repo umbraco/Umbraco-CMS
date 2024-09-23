@@ -110,18 +110,13 @@ public static class XmlExtensions
             throw new ArgumentNullException("xml");
         }
 
-        if (xml.HasAttributes == false)
+        XAttribute? xmlAttribute = xml.Attribute(attributeName);
+        if (xmlAttribute == null)
         {
             return default;
         }
 
-        if (xml.Attribute(attributeName) == null)
-        {
-            return default;
-        }
-
-        var val = xml.Attribute(attributeName)?.Value;
-        Attempt<T> result = val.TryConvertTo<T>();
+        Attempt<T> result = xmlAttribute.Value.TryConvertTo<T>();
         if (result.Success)
         {
             return result.Result;
