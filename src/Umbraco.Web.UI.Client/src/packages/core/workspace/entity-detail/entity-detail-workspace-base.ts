@@ -45,6 +45,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
+	#activePathSegment = '';
+
 	#initResolver?: () => void;
 	#initialized = false;
 
@@ -166,6 +168,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		await this._detailRepository!.delete(unique);
 	}
 
+	protected _setActivePathSegment(segment: string) {
+		this.#activePathSegment = segment;
+	}
+
+	protected _getActivePathSegment() {
+		return this.#activePathSegment;
+	}
+
 	/**
 	 * @description method to check if the workspace is about to navigate away.
 	 * @protected
@@ -174,8 +184,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string) {
-		const workspacePathBase = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
-		return !newUrl.includes('/' + workspacePathBase);
+		const workspaceBasePath = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
+		const currentWorkspacePathIdentifier = '/' + workspaceBasePath + '/' + this._getActivePathSegment();
+		return !newUrl.includes(currentWorkspacePathIdentifier);
 	}
 
 	#onWillNavigate = async (e: CustomEvent) => {
