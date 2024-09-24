@@ -635,9 +635,9 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <remarks>
     /// This is to ensure that the user can access the group they themselves created at a later point and modify it.
     /// </remarks>
-    private IEnumerable<Guid> EnsureNonAdminUserIsInSavedUserGroup(
+    private static Guid[] EnsureNonAdminUserIsInSavedUserGroup(
         IUser performingUser,
-        IEnumerable<Guid> groupMembersUserKeys)
+        Guid[] groupMembersUserKeys)
     {
         // If the performing user is an admin we don't care, they can access the group later regardless
         if (performingUser.IsAdmin() is false && groupMembersUserKeys.Contains(performingUser.Key) is false)
