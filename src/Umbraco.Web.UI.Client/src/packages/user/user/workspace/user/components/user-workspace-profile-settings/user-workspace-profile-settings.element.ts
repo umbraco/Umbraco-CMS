@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
@@ -79,6 +80,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 					@change="${this.#onEmailChange}"
 					required
 					required-message=${this.localize.term('user_emailRequired')}
+					${umbBindToValidation(this)}
 					value=${ifDefined(this._user?.email)}></uui-input>
 			</umb-property-layout>
 		`;
