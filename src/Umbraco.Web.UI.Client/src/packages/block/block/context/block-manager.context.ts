@@ -185,12 +185,21 @@ export abstract class UmbBlockManagerContext<
 	setOneSettings(settingsData: UmbBlockDataModel) {
 		this.#settings.appendOne(settingsData);
 	}
+	setOneExpose(contentKey: string, variantId: UmbVariantId) {
+		this.#exposes.appendOne({ contentKey, ...variantId.toObject() });
+	}
 
 	removeOneContent(contentKey: string) {
 		this.#contents.removeOne(contentKey);
 	}
 	removeOneSettings(settingsKey: string) {
 		this.#settings.removeOne(settingsKey);
+	}
+	removeExposesOf(contentKey: string) {
+		this.#exposes.filter((x) => x.contentKey === contentKey);
+	}
+	removeOneExpose(contentKey: string, variantId: UmbVariantId) {
+		this.#exposes.filter((x) => x.contentKey === contentKey && variantId.compare(x));
 	}
 
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
