@@ -32,14 +32,15 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD } from '@umbraco-cms/backoffice/document';
 
-type EntityType = UmbDocumentBlueprintDetailModel;
+type EntityModel = UmbDocumentBlueprintDetailModel;
 
 export class UmbDocumentBlueprintWorkspaceContext
-	extends UmbSubmittableWorkspaceContextBase<EntityType>
-	implements UmbContentWorkspaceContext<EntityType, UmbDocumentTypeDetailModel, UmbDocumentBlueprintVariantModel>
+	extends UmbSubmittableWorkspaceContextBase<EntityModel>
+	implements UmbContentWorkspaceContext<EntityModel, UmbDocumentTypeDetailModel, UmbDocumentBlueprintVariantModel>
 {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 	//
@@ -49,11 +50,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
-	/**
-	 */
-	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
+	readonly #data = new UmbContentWorkspaceDataManager<EntityModel>(this, UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD);
 
-	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	#getDataPromise?: Promise<any>;
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
@@ -66,14 +64,14 @@ export class UmbDocumentBlueprintWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
-	readonly entityType = this.#currentData.asObservablePart((data) => data?.entityType);
+	readonly unique = this.#data.current.asObservablePart((data) => data?.unique);
+	readonly entityType = this.#data.current.asObservablePart((data) => data?.entityType);
 
-	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
+	readonly contentTypeUnique = this.#data.current.asObservablePart((data) => data?.documentType.unique);
 
-	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
+	readonly variants = this.#data.current.asObservablePart((data) => data?.variants || []);
 
-	//readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
+	//readonly urls = this.#data.current.asObservablePart((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
@@ -155,8 +153,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#persistedData.setValue(undefined);
-		this.#currentData.setValue(undefined);
+		this.#data.setPersistedData(undefined);
+		this.#data.setCurrentData(undefined);
 	}
 
 	async loadLanguages() {
@@ -172,8 +170,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.#persistedData.update(data);
-			this.#currentData.update(data);
+			this.#data.setPersistedData(data);
+			this.#data.setCurrentData(data);
 		}
 
 		if (asObservable) {
@@ -181,7 +179,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 		}
 	}
 
-	#onStoreChange(entity: EntityType | undefined) {
+	#onStoreChange(entity: EntityModel | undefined) {
 		if (!entity) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
 			history.pushState(null, '', 'section/document-blueprint');
@@ -199,13 +197,13 @@ export class UmbDocumentBlueprintWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
+		this.#data.setPersistedData(data);
+		this.#data.setCurrentData(data);
 		return data;
 	}
 
 	getData() {
-		return this.#currentData.getValue();
+		return this.#data.current.getValue();
 	}
 
 	getUnique() {
@@ -226,15 +224,15 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	variantById(variantId: UmbVariantId) {
-		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
+		return this.#data.current.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
 
 	getVariant(variantId: UmbVariantId) {
-		return this.#currentData.getValue()?.variants?.find((x) => variantId.compare(x));
+		return this.#data.current.getValue()?.variants?.find((x) => variantId.compare(x));
 	}
 
 	getName(variantId?: UmbVariantId) {
-		const variants = this.#currentData.getValue()?.variants;
+		const variants = this.#data.current.getValue()?.variants;
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
@@ -248,7 +246,9 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	name(variantId?: UmbVariantId) {
-		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
+		return this.#data.current.asObservablePart(
+			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
+		);
 	}
 
 	async propertyStructureById(propertyId: string) {
@@ -262,7 +262,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
-		return this.#currentData.asObservablePart(
+		return this.#data.current.asObservablePart(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
 					?.value as PropertyValueType,
@@ -276,7 +276,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * @returns The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
-		const currentData = this.#currentData.value;
+		const currentData = this.#data.current.value;
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
 				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
@@ -303,14 +303,14 @@ export class UmbDocumentBlueprintWorkspaceContext
 		const editorAlias = 'Umbraco.TextBox';
 
 		const entry = { ...variantId.toObject(), alias, editorAlias, value };
-		const currentData = this.#currentData.value;
+		const currentData = this.#data.current.value;
 		if (currentData) {
 			const values = appendToFrozenArray(
 				currentData.values || [],
 				entry,
 				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
 			);
-			this.#currentData.update({ values });
+			this.#data.current.update({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#updateVariantData(variantId);
@@ -320,7 +320,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	#updateLock = 0;
 	initiatePropertyValueChange() {
 		this.#updateLock++;
-		this.#currentData.mute();
+		this.#data.current.mute();
 		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
 		/*return {
 			[Symbol.dispose]: this.finishPropertyValueChange,
@@ -332,13 +332,13 @@ export class UmbDocumentBlueprintWorkspaceContext
 	};
 	#triggerPropertyValueChanges() {
 		if (this.#updateLock === 0) {
-			this.#currentData.unmute();
+			this.#data.current.unmute();
 		}
 	}
 
 	/* 	#calculateChangedVariants() {
 		const persisted = this.#persistedData.getValue();
-		const current = this.#currentData.getValue();
+		const current = this.#data.current.getValue();
 		if (!current) throw new Error('Current data is missing');
 
 		const changedVariants = current?.variants.map((variant) => {
@@ -387,7 +387,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 				},
 				(x) => variantId.compare(x),
 			);
-			this.#currentData.update({ variants: newVariants });
+			this.#data.current.update({ variants: newVariants });
 		} else if (this.#varies === false) {
 			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
 			const invariantVariantId = UmbVariantId.CreateInvariant();
@@ -403,19 +403,19 @@ export class UmbDocumentBlueprintWorkspaceContext
 					...update,
 				},
 			];
-			this.#currentData.update({ variants: newVariants });
+			this.#data.current.update({ variants: newVariants });
 		} else {
 			throw new Error('Varies by culture is missing');
 		}
 	}
 
 	async #createOrSave() {
-		if (!this.#currentData.value?.unique) throw new Error('Unique is missing');
+		if (!this.#data.current.value?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			const value = this.#currentData.value;
+			const value = this.#data.current.value;
 
 			if ((await this.repository.create(value, parent.unique)).data !== undefined) {
 				this.setIsNew(false);
@@ -429,7 +429,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 				eventContext.dispatchEvent(event);
 			}
 		} else {
-			await this.repository.save(this.#currentData.value);
+			await this.repository.save(this.#data.current.value);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -462,8 +462,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	public override destroy(): void {
-		this.#persistedData.destroy();
-		this.#currentData.destroy();
+		this.#data.destroy();
 		this.structure.destroy();
 		super.destroy();
 	}
