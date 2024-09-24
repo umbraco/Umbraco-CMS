@@ -976,6 +976,8 @@ export class UmbDocumentWorkspaceContext
 				return false;
 			}
 		}
+
+		return true;
 	};
 
 	public override destroy(): void {
