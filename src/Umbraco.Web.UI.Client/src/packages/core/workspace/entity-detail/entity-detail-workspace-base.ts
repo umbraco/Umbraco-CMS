@@ -19,6 +19,10 @@ export interface UmbEntityWorkspaceContextArgs {
 	detailRepositoryAlias: string;
 }
 
+export interface UmbEntityDetailWorkspaceContextCreateArgs {
+	parent: UmbEntityModel;
+}
+
 export abstract class UmbEntityDetailWorkspaceContextBase<
 	EntityModelType extends UmbEntityModel,
 	DetailRepositoryType extends UmbDetailRepository<EntityModelType> = UmbDetailRepository<EntityModelType>,
@@ -138,10 +142,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
-	async create(parent: { entityType: string; unique: string | null }) {
+	async create(args: UmbEntityDetailWorkspaceContextCreateArgs) {
 		await this.#init;
 		this.resetState();
-		this.#parent.setValue(parent);
+		this.#parent.setValue(args.parent);
 		const request = this._detailRepository!.createScaffold();
 		this._getDataPromise = request;
 		let { data } = await request;
