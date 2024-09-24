@@ -3,6 +3,7 @@ import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
 import type {
 	UmbDocumentBlueprintDetailModel,
+	UmbDocumentBlueprintValueModel,
 	UmbDocumentBlueprintVariantModel,
 	UmbDocumentBlueprintVariantOptionModel,
 } from '../types.js';
@@ -35,6 +36,7 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD } from '@umbraco-cms/backoffice/document';
+import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 
 type EntityModel = UmbDocumentBlueprintDetailModel;
 
@@ -80,6 +82,11 @@ export class UmbDocumentBlueprintWorkspaceContext
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
 	#varies?: boolean;
+	#variesByCulture?: boolean;
+	#variesBySegment?: boolean;
+
+	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
+	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
@@ -118,8 +125,29 @@ export class UmbDocumentBlueprintWorkspaceContext
 		super(host, UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+
+		this.observe(this.variesByCulture, (varies) => {
+			this.#data.setVariesByCulture(varies);
+			this.#variesByCulture = varies;
+		});
+		this.observe(this.variesBySegment, (varies) => {
+			this.#data.setVariesBySegment(varies);
+			this.#variesBySegment = varies;
+		});
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
+		this.observe(this.structure.contentTypeDataTypeUniques, (dataTypeUniques: Array<string>) => {
+			this.#dataTypeItemManager.setUniques(dataTypeUniques);
+		});
+
+		this.observe(this.#dataTypeItemManager.items, (dataTypes) => {
+			// Make a map of the data type unique and editorAlias:
+			this.#dataTypeSchemaAliasMap = new Map(
+				dataTypes.map((dataType) => {
+					return [dataType.unique, dataType.propertyEditorSchemaAlias];
+				}),
+			);
+		});
 		this.loadLanguages();
 
 		this.routes.setRoutes([
@@ -218,9 +246,14 @@ export class UmbDocumentBlueprintWorkspaceContext
 		return this.getData()?.documentType.unique;
 	}
 
-	// TODO: Check if this is used:
 	getVaries() {
 		return this.#varies;
+	}
+	getVariesByCulture() {
+		return this.#variesByCulture;
+	}
+	getVariesBySegment() {
+		return this.#variesBySegment;
 	}
 
 	variantById(variantId: UmbVariantId) {
@@ -285,36 +318,35 @@ export class UmbDocumentBlueprintWorkspaceContext
 		}
 		return undefined;
 	}
-	async setPropertyValue<UmbDocumentBlueprintValueModel = unknown>(
-		alias: string,
-		value: UmbDocumentBlueprintValueModel,
-		variantId?: UmbVariantId,
-	) {
-		if (!variantId) throw new Error('VariantId is missing');
-
+	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
+		this.initiatePropertyValueChange();
+		variantId ??= UmbVariantId.CreateInvariant();
 		const property = await this.structure.getPropertyStructureByAlias(alias);
 
 		if (!property) {
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		//const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
-		//const editorAlias = dataType.editorAlias;
-		const editorAlias = 'Umbraco.TextBox';
+		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		if (!editorAlias) {
+			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
+		}
 
-		const entry = { ...variantId.toObject(), alias, editorAlias, value };
-		const currentData = this.#data.current.value;
+		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbDocumentBlueprintValueModel<ValueType>;
+
+		const currentData = this.getData();
 		if (currentData) {
 			const values = appendToFrozenArray(
-				currentData.values || [],
+				currentData.values ?? [],
 				entry,
-				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
+				(x) => x.alias === alias && variantId!.compare(x),
 			);
 			this.#data.current.update({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
-			this.#updateVariantData(variantId);
+			this.#data.ensureVariantData(variantId);
 		}
+		this.finishPropertyValueChange();
 	}
 
 	#updateLock = 0;

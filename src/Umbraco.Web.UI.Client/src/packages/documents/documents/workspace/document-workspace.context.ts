@@ -346,7 +346,6 @@ export class UmbDocumentWorkspaceContext
 		return this.getData()?.documentType.unique;
 	}
 
-	// TODO: Check if this is used:
 	getVaries() {
 		return this.#varies;
 	}

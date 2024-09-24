@@ -2,7 +2,12 @@ import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detai
 import { UmbMediaPropertyDatasetContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
-import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
+import type {
+	UmbMediaDetailModel,
+	UmbMediaValueModel,
+	UmbMediaVariantModel,
+	UmbMediaVariantOptionModel,
+} from '../types.js';
 import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -30,6 +35,7 @@ import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from 
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 
 type EntityModel = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
@@ -76,6 +82,11 @@ export class UmbMediaWorkspaceContext
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
 	#varies?: boolean;
+	#variesByCulture?: boolean;
+	#variesBySegment?: boolean;
+
+	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
+	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
@@ -119,8 +130,29 @@ export class UmbMediaWorkspaceContext
 		super(host, 'Umb.Workspace.Media');
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+
+		this.observe(this.variesByCulture, (varies) => {
+			this.#data.setVariesByCulture(varies);
+			this.#variesByCulture = varies;
+		});
+		this.observe(this.variesBySegment, (varies) => {
+			this.#data.setVariesBySegment(varies);
+			this.#variesBySegment = varies;
+		});
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
+		this.observe(this.structure.contentTypeDataTypeUniques, (dataTypeUniques: Array<string>) => {
+			this.#dataTypeItemManager.setUniques(dataTypeUniques);
+		});
+
+		this.observe(this.#dataTypeItemManager.items, (dataTypes) => {
+			// Make a map of the data type unique and editorAlias:
+			this.#dataTypeSchemaAliasMap = new Map(
+				dataTypes.map((dataType) => {
+					return [dataType.unique, dataType.propertyEditorSchemaAlias];
+				}),
+			);
+		});
 		this.loadLanguages();
 
 		this.routes.setRoutes([
@@ -223,9 +255,14 @@ export class UmbMediaWorkspaceContext
 		return this.getData()?.mediaType.unique;
 	}
 
-	// TODO: Check if this is used:
 	getVaries() {
 		return this.#varies;
+	}
+	getVariesByCulture() {
+		return this.#variesByCulture;
+	}
+	getVariesBySegment() {
+		return this.#variesBySegment;
 	}
 
 	variantById(variantId: UmbVariantId) {
@@ -290,36 +327,36 @@ export class UmbMediaWorkspaceContext
 		}
 		return undefined;
 	}
-	async setPropertyValue<UmbMediaValueModel = unknown>(
-		alias: string,
-		value: UmbMediaValueModel,
-		variantId?: UmbVariantId,
-	) {
-		if (!variantId) throw new Error('VariantId is missing');
 
+	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
+		this.initiatePropertyValueChange();
+		variantId ??= UmbVariantId.CreateInvariant();
 		const property = await this.structure.getPropertyStructureByAlias(alias);
 
 		if (!property) {
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		//const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
-		//const editorAlias = dataType.editorAlias;
-		const editorAlias = 'Umbraco.TextBox';
+		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		if (!editorAlias) {
+			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
+		}
 
-		const entry = { ...variantId.toObject(), alias, editorAlias, value };
-		const currentData = this.#data.current.value;
+		const entry = { ...variantId.toObject(), alias, editorAlias, value } as UmbMediaValueModel<ValueType>;
+
+		const currentData = this.getData();
 		if (currentData) {
 			const values = appendToFrozenArray(
-				currentData.values || [],
+				currentData.values ?? [],
 				entry,
-				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
+				(x) => x.alias === alias && variantId!.compare(x),
 			);
 			this.#data.current.update({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
-			this.#updateVariantData(variantId);
+			this.#data.ensureVariantData(variantId);
 		}
+		this.finishPropertyValueChange();
 	}
 
 	#updateLock = 0;
