@@ -222,7 +222,7 @@ public class CoreRuntime : IRuntime
         }
 
         // Initialize the components
-        _components.Initialize();
+        await _components.InitializeAsync(isRestarting, cancellationToken);
 
         await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
 
@@ -236,7 +236,7 @@ public class CoreRuntime : IRuntime
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
     {
-        _components.Terminate();
+        await _components.TerminateAsync(isRestarting, cancellationToken);
         await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting), cancellationToken);
     }
 
