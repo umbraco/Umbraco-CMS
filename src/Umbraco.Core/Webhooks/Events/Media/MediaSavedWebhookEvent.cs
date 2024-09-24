@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("Media Saved", Constants.WebhookEvents.Types.Media)]
 public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedMediaCache _mediaCache;
     private readonly IApiMediaBuilder _apiMediaBuilder;
 
     public MediaSavedWebhookEvent(
@@ -21,7 +21,7 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedMediaCache mediaCache,
         IApiMediaBuilder apiMediaBuilder)
         : base(
             webhookFiringService,
@@ -29,8 +29,8 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
             webhookSettings,
             serverRoleAccessor)
     {
-        this._publishedSnapshotAccessor = publishedSnapshotAccessor;
-        this._apiMediaBuilder = apiMediaBuilder;
+        _mediaCache = mediaCache;
+        _apiMediaBuilder = apiMediaBuilder;
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
@@ -39,12 +39,7 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
 
     protected override object? ConvertEntityToRequestPayload(IMedia entity)
     {
-        if (this._publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
-        {
-            return null;
-        }
-
-        IPublishedContent? publishedContent = publishedSnapshot.Media?.GetById(entity.Key);
-        return publishedContent is null ? null : this._apiMediaBuilder.Build(publishedContent);
+        IPublishedContent? publishedContent = _mediaCache.GetById(entity.Key);
+        return publishedContent is null ? null : _apiMediaBuilder.Build(publishedContent);
     }
 }

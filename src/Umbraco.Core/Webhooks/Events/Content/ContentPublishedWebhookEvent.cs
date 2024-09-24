@@ -13,24 +13,24 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("Content Published", Constants.WebhookEvents.Types.Content)]
 public class ContentPublishedWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
+    private readonly IPublishedContentCache _publishedContentCache;
 
     public ContentPublishedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IApiContentBuilder apiContentBuilder)
+        IApiContentBuilder apiContentBuilder,
+        IPublishedContentCache publishedContentCache)
         : base(
             webhookFiringService,
             webhookService,
             webhookSettings,
             serverRoleAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiContentBuilder = apiContentBuilder;
+        _publishedContentCache = publishedContentCache;
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentPublish;
@@ -39,12 +39,7 @@ public class ContentPublishedWebhookEvent : WebhookEventContentBase<ContentPubli
 
     protected override object? ConvertEntityToRequestPayload(IContent entity)
     {
-        if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
-        {
-            return null;
-        }
-
-        IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(entity.Key);
+        IPublishedContent? publishedContent = _publishedContentCache.GetById(entity.Key);
         return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
     }
 }

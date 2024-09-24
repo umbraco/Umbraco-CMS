@@ -1,13 +1,10 @@
 ﻿using HtmlAgilityPack;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
@@ -15,7 +12,8 @@ namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
 internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRichTextElementParser
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedContentCache _publishedContentCache;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly ILogger<ApiRichTextElementParser> _logger;
 
@@ -25,12 +23,14 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
     public ApiRichTextElementParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
         IApiMediaUrlProvider mediaUrlProvider,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedContentCache publishedContentCache,
+        IPublishedMediaCache publishedMediaCache,
         IApiElementBuilder apiElementBuilder,
         ILogger<ApiRichTextElementParser> logger)
         : base(apiContentRouteBuilder, mediaUrlProvider)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedContentCache = publishedContentCache;
+        _publishedMediaCache = publishedMediaCache;
         _apiElementBuilder = apiElementBuilder;
         _logger = logger;
     }
@@ -42,10 +42,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
     {
         try
         {
-            IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
-            return ParseRootElement(doc.DocumentNode, publishedSnapshot, richTextBlockModel);
+            return ParseRootElement(doc.DocumentNode, _publishedContentCache, _publishedMediaCache, richTextBlockModel);
         }
         catch (Exception ex)
         {
@@ -54,10 +53,10 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         }
     }
 
-    private IRichTextElement ParseRecursively(HtmlNode current, IPublishedSnapshot publishedSnapshot)
+    private IRichTextElement ParseRecursively(HtmlNode current, IPublishedContentCache contentCache, IPublishedMediaCache mediaCache)
         => current.Name == TextNodeName
                 ? ParseTextElement(current)
-                : ParseGenericElement(current, publishedSnapshot);
+                : ParseGenericElement(current, contentCache, mediaCache);
 
     private RichTextTextElement ParseTextElement(HtmlNode element)
     {
@@ -69,7 +68,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         return new RichTextTextElement(element.InnerText);
     }
 
-    private RichTextRootElement ParseRootElement(HtmlNode element, IPublishedSnapshot publishedSnapshot, RichTextBlockModel? richTextBlockModel)
+    private RichTextRootElement ParseRootElement(HtmlNode element, IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, RichTextBlockModel? richTextBlockModel)
     {
         ApiBlockItem[] blocks = richTextBlockModel is not null
             ? richTextBlockModel.Select(item => item.CreateApiBlockItem(_apiElementBuilder)).ToArray()
@@ -77,11 +76,12 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
         return ParseElement(
             element,
-            publishedSnapshot,
+            contentCache,
+            mediaCache,
             (_, attributes, childElements) => new RichTextRootElement(attributes, childElements, blocks));
     }
 
-    private RichTextGenericElement ParseGenericElement(HtmlNode element, IPublishedSnapshot publishedSnapshot)
+    private RichTextGenericElement ParseGenericElement(HtmlNode element, IPublishedContentCache contentCache, IPublishedMediaCache mediaCache)
     {
         if (element.Name == TextNodeName)
         {
@@ -90,11 +90,12 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
         return ParseElement(
             element,
-            publishedSnapshot,
+            contentCache,
+            mediaCache,
             (tag, attributes, childElements) => new RichTextGenericElement(tag, attributes, childElements));
     }
 
-    private T ParseElement<T>(HtmlNode element, IPublishedSnapshot publishedSnapshot, Func<string, Dictionary<string, object>, IRichTextElement[], T> createElement)
+    private T ParseElement<T>(HtmlNode element, IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, Func<string, Dictionary<string, object>, IRichTextElement[], T> createElement)
         where T : IRichTextElement
     {
         // grab all valid node children:
@@ -108,16 +109,16 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         var tag = TagName(element);
         var attributes = element.Attributes.ToDictionary(a => a.Name, a => a.Value as object);
 
-        ReplaceLocalLinks(publishedSnapshot, attributes);
+        ReplaceLocalLinks(contentCache, mediaCache, attributes);
 
-        ReplaceLocalImages(publishedSnapshot, tag, attributes);
+        ReplaceLocalImages(mediaCache, tag, attributes);
 
         CleanUpBlocks(tag, attributes);
 
         SanitizeAttributes(attributes);
 
         IRichTextElement[] childElements = childNodes.Any()
-            ? childNodes.Select(child => ParseRecursively(child, publishedSnapshot)).ToArray()
+            ? childNodes.Select(child => ParseRecursively(child, contentCache, mediaCache)).ToArray()
             : Array.Empty<IRichTextElement>();
 
         return createElement(tag, attributes, childElements);
@@ -125,7 +126,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
     private string TagName(HtmlNode htmlNode) => htmlNode.Name;
 
-    private void ReplaceLocalLinks(IPublishedSnapshot publishedSnapshot, Dictionary<string, object> attributes)
+    private void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, Dictionary<string, object> attributes)
     {
         if (attributes.ContainsKey("href") is false || attributes["href"] is not string href)
         {
@@ -138,7 +139,8 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         }
 
         ReplaceLocalLinks(
-            publishedSnapshot,
+            contentCache,
+            mediaCache,
             href,
             type,
             route =>
@@ -150,14 +152,14 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             () => attributes.Remove("href"));
     }
 
-    private void ReplaceLocalImages(IPublishedSnapshot publishedSnapshot, string tag, Dictionary<string, object> attributes)
+    private void ReplaceLocalImages(IPublishedMediaCache mediaCache, string tag, Dictionary<string, object> attributes)
     {
         if (tag is not "img" || attributes.ContainsKey("data-udi") is false || attributes["data-udi"] is not string dataUdi)
         {
             return;
         }
 
-        ReplaceLocalImages(publishedSnapshot, dataUdi, mediaUrl =>
+        ReplaceLocalImages(mediaCache, dataUdi, mediaUrl =>
         {
             attributes["src"] = mediaUrl;
             attributes.Remove("data-udi");

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("Content Sorted", Constants.WebhookEvents.Types.Content)]
 public class ContentSortedWebhookEvent : WebhookEventBase<ContentSortedNotification>
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedContentCache _contentCache;
     private readonly IApiContentBuilder _apiContentBuilder;
 
     public ContentSortedWebhookEvent(
@@ -21,7 +21,7 @@ public class ContentSortedWebhookEvent : WebhookEventBase<ContentSortedNotificat
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedContentCache contentCache,
         IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
@@ -29,7 +29,7 @@ public class ContentSortedWebhookEvent : WebhookEventBase<ContentSortedNotificat
             webhookSettings,
             serverRoleAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _contentCache = contentCache;
         _apiContentBuilder = apiContentBuilder;
     }
 
@@ -37,14 +37,10 @@ public class ContentSortedWebhookEvent : WebhookEventBase<ContentSortedNotificat
 
     public override object? ConvertNotificationToRequestPayload(ContentSortedNotification notification)
     {
-        if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
-        {
-            return null;
-        }
         var sortedEntities = new List<object?>();
         foreach (var entity in notification.SortedEntities)
         {
-            IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(entity.Key);
+            IPublishedContent? publishedContent = _contentCache.GetById(entity.Key);
             object? payload = publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
             sortedEntities.Add(payload);
         }

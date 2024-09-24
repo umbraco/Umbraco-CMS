@@ -15,10 +15,10 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
     // so making it configurable.
     private const bool FullCacheWhenPreviewing = true;
     private readonly object _locko = new();
-    private readonly IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
     private readonly object? _sourceValue;
     protected readonly bool IsMember;
     protected readonly bool IsPreviewing;
+    private readonly ICacheManager? _cacheManager;
     private CacheValues? _cacheValues;
 
     private bool _interInitialized;
@@ -30,14 +30,14 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         IPublishedElement element,
         bool previewing,
         PropertyCacheLevel referenceCacheLevel,
-        object? sourceValue = null,
-        IPublishedSnapshotAccessor? publishedSnapshotAccessor = null)
+        ICacheManager? cacheManager,
+        object? sourceValue = null)
         : base(propertyType, referenceCacheLevel)
     {
         _sourceValue = sourceValue;
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         Element = element;
         IsPreviewing = previewing;
+        _cacheManager = cacheManager;
         IsMember = propertyType.ContentType?.ItemType == PublishedItemType.Member;
     }
 
@@ -118,27 +118,6 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
-    private IAppCache? GetSnapshotCache()
-    {
-        // cache within the snapshot cache, unless previewing, then use the snapshot or
-        // elements cache (if we don't want to pollute the elements cache with short-lived
-        // data) depending on settings
-        // for members, always cache in the snapshot cache - never pollute elements cache
-        if (_publishedSnapshotAccessor is null)
-        {
-            return null;
-        }
-
-        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot))
-        {
-            return null;
-        }
-
-        return (IsPreviewing == false || FullCacheWhenPreviewing) && IsMember == false
-            ? publishedSnapshot!.ElementsCache
-            : publishedSnapshot!.SnapshotCache;
-    }
-
     private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
     {
         CacheValues cacheValues;
@@ -153,17 +132,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
                 cacheValues = _cacheValues ??= new CacheValues();
                 break;
             case PropertyCacheLevel.Elements:
-                // cache within the elements  cache, depending...
-                IAppCache? snapshotCache = GetSnapshotCache();
-                cacheValues = (CacheValues?)snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ??
-                              new CacheValues();
-                break;
-            case PropertyCacheLevel.Snapshot:
-                IPublishedSnapshot? publishedSnapshot = _publishedSnapshotAccessor?.GetRequiredPublishedSnapshot();
-
-                // cache within the snapshot cache
-                IAppCache? facadeCache = publishedSnapshot?.SnapshotCache;
-                cacheValues = (CacheValues?)facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ??
+                cacheValues = (CacheValues?)_cacheManager?.ElementsCache.Get(ValuesCacheKey, () => new CacheValues()) ??
                               new CacheValues();
                 break;
             default:

@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("Content Recycle Bin Emptied", Constants.WebhookEvents.Types.Content)]
 public class ContentEmptiedRecycleBinWebhookEvent : WebhookEventContentBase<ContentEmptiedRecycleBinNotification, IContent>
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
 
     public ContentEmptiedRecycleBinWebhookEvent(
@@ -20,7 +19,6 @@ public class ContentEmptiedRecycleBinWebhookEvent : WebhookEventContentBase<Cont
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
@@ -28,7 +26,6 @@ public class ContentEmptiedRecycleBinWebhookEvent : WebhookEventContentBase<Cont
             webhookSettings,
             serverRoleAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiContentBuilder = apiContentBuilder;
     }
 
