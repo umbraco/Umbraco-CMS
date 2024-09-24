@@ -16,6 +16,7 @@ export const manifest: UmbExtensionManifestKind = {
 		meta: {
 			icon: 'icon-trash',
 			label: '#actions_delete',
+			additionalOptions: true,
 			itemRepositoryAlias: '',
 			detailRepositoryAlias: '',
 		},

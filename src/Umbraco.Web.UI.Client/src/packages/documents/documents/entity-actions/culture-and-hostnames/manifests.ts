@@ -14,6 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-home',
 			label: '#actions_assigndomain',
+			additionalOptions: true,
 		},
 		conditions: [
 			{
