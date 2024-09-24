@@ -45,10 +45,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	public set value(value: UmbRichTextEditorValueType | undefined) {
 		const buildUpValue: Partial<UmbRichTextEditorValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
-		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [] };
+		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [], expose: [] };
 		buildUpValue.blocks.layout ??= {};
 		buildUpValue.blocks.contentData ??= [];
 		buildUpValue.blocks.settingsData ??= [];
+		buildUpValue.blocks.expose ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
 
 		if (this._latestMarkup !== this._value.markup) {
@@ -78,7 +79,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	@state()
 	private _value: UmbRichTextEditorValueType = {
 		markup: '',
-		blocks: { layout: {}, contentData: [], settingsData: [] },
+		blocks: { layout: {}, contentData: [], settingsData: [], expose: [] },
 	};
 
 	// Separate state for markup, to avoid re-rendering/re-setting the value of the TinyMCE editor when the value does not really change.
@@ -126,14 +127,16 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 					this.#managerContext.layouts,
 					this.#managerContext.contents,
 					this.#managerContext.settings,
+					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
-				([layouts, contents, settings]) => {
+				([layouts, contents, settings, exposes]) => {
 					this._value = {
 						...this._value,
 						blocks: {
 							layout: { [UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS]: layouts },
 							contentData: contents,
 							settingsData: settings,
+							expose: exposes,
 						},
 					};
 					context.setValue(this._value);

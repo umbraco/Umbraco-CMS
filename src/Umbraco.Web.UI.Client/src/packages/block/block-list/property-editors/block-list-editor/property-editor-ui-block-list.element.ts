@@ -59,6 +59,7 @@ export class UmbPropertyEditorUIBlockListElement
 		layout: {},
 		contentData: [],
 		settingsData: [],
+		expose: [],
 	};
 
 	@property({ attribute: false })
@@ -184,13 +185,15 @@ export class UmbPropertyEditorUIBlockListElement
 					this.#managerContext.layouts,
 					this.#managerContext.contents,
 					this.#managerContext.settings,
+					this.#managerContext.exposes,
 				]).pipe(debounceTime(20)),
-				([layouts, contents, settings]) => {
+				([layouts, contents, settings, exposes]) => {
 					this._value = {
 						...this._value,
 						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
+						expose: exposes,
 					};
 					context.setValue(this._value);
 				},

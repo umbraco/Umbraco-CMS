@@ -39,6 +39,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		layout: {},
 		contentData: [],
 		settingsData: [],
+		expose: [],
 	};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {

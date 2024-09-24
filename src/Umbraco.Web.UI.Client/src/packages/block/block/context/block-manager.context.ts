@@ -61,7 +61,7 @@ export abstract class UmbBlockManagerContext<
 	public readonly settings = this.#settings.asObservable();
 
 	#exposes = new UmbArrayState(<Array<UmbBlockExposeModel>>[], (x) => x.contentKey + '_' + x.culture + '_' + x.segment);
-	public readonly exposes = this.#contents.asObservable();
+	public readonly exposes = this.#exposes.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this._editorConfiguration.setValue(configs);
@@ -88,6 +88,9 @@ export abstract class UmbBlockManagerContext<
 	}
 	setSettings(settings: Array<UmbBlockDataModel>) {
 		this.#settings.setValue(settings);
+	}
+	setExposes(exposes: Array<UmbBlockExposeModel>) {
+		this.#exposes.setValue(exposes);
 	}
 
 	constructor(host: UmbControllerHost) {
@@ -158,6 +161,11 @@ export abstract class UmbBlockManagerContext<
 	}
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
+	}
+	exposeOf(contentKey: string, variantId: UmbVariantId) {
+		return this.#exposes.asObservablePart((source) =>
+			source.filter((x) => x.contentKey === contentKey && variantId.compare(x)),
+		);
 	}
 
 	getBlockTypeOf(contentTypeKey: string) {
