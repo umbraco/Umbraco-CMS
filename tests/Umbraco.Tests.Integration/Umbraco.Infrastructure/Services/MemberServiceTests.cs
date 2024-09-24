@@ -1,24 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.IO;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.PublishedCache;
-using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -31,6 +24,8 @@ public class MemberServiceTests : UmbracoIntegrationTest
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
     private IMemberService MemberService => GetRequiredService<IMemberService>();
+
+    private IPublishedContentFactory PublishedContentFactory => GetRequiredService<IPublishedContentFactory>();
 
     [Test]
     public void Can_Update_Member_Property_Values()
@@ -213,15 +208,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         member = MemberService.GetById(member.Id);
         Assert.AreEqual("xemail", member.Email);
 
-        var contentTypeFactory = new PublishedContentTypeFactory(new NoopPublishedModelFactory(),
-            new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()),
-            GetRequiredService<IDataTypeService>());
-        var pmemberType = new PublishedContentType(memberType, contentTypeFactory);
-
-        var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
-        var variationContextAccessor = new TestVariationContextAccessor();
-        var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor,
-            variationContextAccessor, GetRequiredService<IPublishedModelFactory>());
+        var pmember = PublishedContentFactory.ToPublishedMember(member);
 
         // contains the umbracoMember... properties created when installing, on the member type
         // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
