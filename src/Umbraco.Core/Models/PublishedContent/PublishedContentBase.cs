@@ -1,4 +1,8 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -68,8 +72,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public abstract IPublishedContent? Parent { get; }
 
+        // FIXME
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
+        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }

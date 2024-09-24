@@ -116,25 +116,26 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
             // if not in a domain...
             // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
             // else normal, look for /path/to/node
-            content = hideTopLevelNode.Value
-                ? GetAtRoot(preview)
-                    .SelectMany(x => x.Children(_variationContextAccessor, culture)!) // Do we suppress here?
-                    .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0])
-                : GetAtRoot(preview)
-                    .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
-            content = FollowRoute(content, parts, 1, culture);
+            // content = hideTopLevelNode.Value
+            //     ? GetAtRoot(preview)
+            //         .SelectMany(x => x.Children(_variationContextAccessor, culture)!) // Do we suppress here?
+            //         .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0])
+            //     : GetAtRoot(preview)
+            //         .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
+            // content = FollowRoute(content, parts, 1, culture);
         }
 
         // if hideTopLevelNodePath is true then for URL /foo we looked for /*/foo
         // but maybe that was the URL of a non-default top-level node, so we also
         // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
-        if (content == null && hideTopLevelNode.Value && parts.Length == 1)
-        {
-            content = GetAtRoot(preview)
-                .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
-        }
-
-        return content;
+        // if (content == null && hideTopLevelNode.Value && parts.Length == 1)
+        // {
+        //     content = GetAtRoot(preview)
+        //         .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
+        // }
+        //
+        // return content;
+        return null;
     }
 
     public string? GetRouteById(int contentId, string? culture = null) =>
@@ -221,11 +222,11 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         while (content != null && i < parts.Count)
         {
             var part = parts[i++];
-            content = content.Children(_variationContextAccessor, culture)?.FirstOrDefault(x =>
-            {
-                var urlSegment = x.UrlSegment(_variationContextAccessor, culture);
-                return urlSegment == part;
-            });
+            // content = content.Children(_variationContextAccessor, culture)?.FirstOrDefault(x =>
+            // {
+            //     var urlSegment = x.UrlSegment(_variationContextAccessor, culture);
+            //     return urlSegment == part;
+            // });
         }
 
         return content;
