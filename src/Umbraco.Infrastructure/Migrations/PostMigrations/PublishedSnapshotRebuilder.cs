@@ -10,23 +10,24 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 public class PublishedSnapshotRebuilder : IPublishedSnapshotRebuilder
 {
     private readonly DistributedCache _distributedCache;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
+    private readonly IDatabaseCacheRebuilder _databaseCacheRebuilder;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedSnapshotRebuilder" /> class.
     /// </summary>
     public PublishedSnapshotRebuilder(
         IPublishedSnapshotService publishedSnapshotService,
-        DistributedCache distributedCache)
+        DistributedCache distributedCache,
+        IDatabaseCacheRebuilder databaseCacheRebuilder)
     {
-        _publishedSnapshotService = publishedSnapshotService;
         _distributedCache = distributedCache;
+        _databaseCacheRebuilder = databaseCacheRebuilder;
     }
 
     /// <inheritdoc />
     public void Rebuild()
     {
-        _publishedSnapshotService.RebuildAll();
+        _databaseCacheRebuilder.Rebuild();
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 }

@@ -88,10 +88,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             }
         }
 
-        // refresh the models and cache
-        _publishedModelFactory.WithSafeLiveFactoryReset(() =>
-            _publishedSnapshotService.Notify(payloads));
-
         base.Refresh(payloads);
     }
 

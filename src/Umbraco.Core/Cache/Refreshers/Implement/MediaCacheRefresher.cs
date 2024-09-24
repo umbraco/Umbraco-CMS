@@ -103,12 +103,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             }
         }
 
-        _publishedSnapshotService.Notify(payloads, out var hasPublishedDataChanged);
-        // we only need to clear this if the published cache has changed
-        if (hasPublishedDataChanged)
-        {
-            AppCaches.ClearPartialViewCache();
-        }
+        AppCaches.ClearPartialViewCache();
 
         base.Refresh(payloads);
     }

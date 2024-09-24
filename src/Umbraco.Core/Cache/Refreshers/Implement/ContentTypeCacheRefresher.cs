@@ -115,10 +115,6 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
 
-        // refresh the models and cache
-        _publishedModelFactory.WithSafeLiveFactoryReset(() =>
-            _publishedSnapshotService.Notify(payloads));
-
         // now we can trigger the event
         base.Refresh(payloads);
     }
