@@ -315,7 +315,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getUnique() {
-		return this.getData()?.unique || '';
+		return this._data.getCurrentData()?.unique;
 	}
 
 	getEntityType() {
