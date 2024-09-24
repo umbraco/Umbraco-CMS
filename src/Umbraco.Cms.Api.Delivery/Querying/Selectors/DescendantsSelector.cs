@@ -9,8 +9,8 @@ public sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string DescendantsSpecifier = "descendants:";
 
-    public DescendantsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, requestRoutingService)
+    public DescendantsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
+        : base(publishedContentCache, requestRoutingService)
     {
     }
 

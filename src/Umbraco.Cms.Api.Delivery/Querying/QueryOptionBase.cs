@@ -7,14 +7,15 @@ namespace Umbraco.Cms.Api.Delivery.Querying;
 
 public abstract class QueryOptionBase
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedContentCache _publishedContentCache;
     private readonly IRequestRoutingService _requestRoutingService;
 
+
     public QueryOptionBase(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedContentCache publishedContentCache,
         IRequestRoutingService requestRoutingService)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedContentCache = publishedContentCache;
         _requestRoutingService = requestRoutingService;
     }
 
@@ -30,11 +31,9 @@ public abstract class QueryOptionBase
             return id;
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-
         // Check if the passed value is a path of a content item
         var contentRoute = _requestRoutingService.GetContentRoute(queryStringValue);
-        IPublishedContent? contentItem = publishedSnapshot.Content?.GetByRoute(contentRoute);
+        IPublishedContent? contentItem = _publishedContentCache.GetByRoute(contentRoute);
 
         return contentItem?.Key;
     }

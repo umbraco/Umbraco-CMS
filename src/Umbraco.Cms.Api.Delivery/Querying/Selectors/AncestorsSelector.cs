@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Api.Delivery.Querying.Selectors;
 
 public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 {
+    private readonly IPublishedContentCache _publishedContentCache;
     private const string AncestorsSpecifier = "ancestors:";
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    public AncestorsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, requestRoutingService) =>
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+    public AncestorsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
+        : base(publishedContentCache, requestRoutingService) =>
+        _publishedContentCache = publishedContentCache;
 
     /// <inheritdoc />
     public bool CanHandle(string query)
@@ -37,9 +37,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             };
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-
-        IPublishedContent contentItem = publishedSnapshot.Content?.GetById((Guid)id)
+        IPublishedContent contentItem = _publishedContentCache.GetById((Guid)id)
                                         ?? throw new InvalidOperationException("Could not obtain the content cache");
 
         var ancestorKeys = contentItem.Ancestors().Select(a => a.Key.ToString("D")).ToArray();

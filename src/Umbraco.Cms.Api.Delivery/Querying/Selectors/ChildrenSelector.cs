@@ -9,8 +9,8 @@ public sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
 {
     private const string ChildrenSpecifier = "children:";
 
-    public ChildrenSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, requestRoutingService)
+    public ChildrenSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
+        : base(publishedContentCache, requestRoutingService)
     {
     }
 

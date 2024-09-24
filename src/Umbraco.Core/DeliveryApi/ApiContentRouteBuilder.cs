@@ -19,31 +19,6 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IRequestPreviewService _requestPreviewService;
     private RequestHandlerSettings _requestSettings;
 
-    [Obsolete($"Use the constructor that does not accept {nameof(IPublishedUrlProvider)}. Will be removed in V15.")]
-    public ApiContentRouteBuilder(
-        IPublishedUrlProvider publishedUrlProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings)
-        : this(StaticServiceProvider.Instance.GetRequiredService<IApiContentPathProvider>(), globalSettings, variationContextAccessor, publishedSnapshotAccessor, requestPreviewService, requestSettings)
-    {
-    }
-
-    [Obsolete($"Use the constructor that does not accept {nameof(IPublishedUrlProvider)}. Will be removed in V15.")]
-    public ApiContentRouteBuilder(
-        IPublishedUrlProvider publishedUrlProvider,
-        IApiContentPathProvider apiContentPathProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings)
-        : this(apiContentPathProvider, globalSettings, variationContextAccessor, publishedSnapshotAccessor, requestPreviewService, requestSettings)
-    {
-    }
-
     public ApiContentRouteBuilder(
         IApiContentPathProvider apiContentPathProvider,
         IOptions<GlobalSettings> globalSettings,
