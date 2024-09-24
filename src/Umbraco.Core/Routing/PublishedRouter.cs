@@ -403,21 +403,15 @@ public class PublishedRouter : IPublishedRouter
             _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
         }
 
-        var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
-        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        Domain? domain =
-            DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), nodePath, rootNodeId);
-
-        // always has a contentId and a culture
-        if (domain != null)
+        if (request.Domain is not null)
         {
-            request.SetCulture(domain.Culture);
+            request.SetCulture(request.Domain.Culture);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
                     "{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}",
                     tracePrefix,
-                    domain.ContentId,
+                    request.Domain.ContentId,
                     request.Culture);
             }
         }
