@@ -21,10 +21,10 @@ public class QueryMediaApiController : MediaApiControllerBase
     private readonly IApiMediaQueryService _apiMediaQueryService;
 
     public QueryMediaApiController(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedMediaCache publishedMediaCache,
         IApiMediaWithCropsResponseBuilder apiMediaWithCropsResponseBuilder,
         IApiMediaQueryService apiMediaQueryService)
-        : base(publishedSnapshotAccessor, apiMediaWithCropsResponseBuilder)
+        : base(publishedMediaCache, apiMediaWithCropsResponseBuilder)
         => _apiMediaQueryService = apiMediaQueryService;
 
     [HttpGet]
