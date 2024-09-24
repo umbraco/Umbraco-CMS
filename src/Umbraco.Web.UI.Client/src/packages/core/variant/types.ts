@@ -38,7 +38,11 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 export interface UmbVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
 	extends UmbEntityVariantOptionModel<VariantType> {}
 
-export interface UmbVariantPublishModel {
+export interface UmbEntityVariantPublishModel {
 	variantId: UmbVariantId;
 	schedule?: ScheduleRequestModel | null;
 }
+
+/** @deprecated use `UmbEntityVariantPublishModel` instead */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbVariantPublishModel extends UmbEntityVariantPublishModel {}

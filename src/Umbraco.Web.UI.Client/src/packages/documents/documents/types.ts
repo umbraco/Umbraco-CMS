@@ -2,7 +2,7 @@ import type { UmbDocumentEntityType } from './entity.js';
 import type {
 	UmbEntityVariantModel,
 	UmbEntityVariantOptionModel,
-	UmbVariantPublishModel,
+	UmbEntityVariantPublishModel,
 } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
@@ -40,4 +40,4 @@ export interface UmbDocumentValueModel<ValueType = unknown> extends UmbContentVa
 export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentVariantPublishModel extends UmbVariantPublishModel {}
+export interface UmbDocumentVariantPublishModel extends UmbEntityVariantPublishModel {}
