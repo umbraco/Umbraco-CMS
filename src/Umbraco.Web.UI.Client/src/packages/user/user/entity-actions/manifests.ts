@@ -87,6 +87,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-settings',
 			label: '#user_configureMfa',
+			additionalOptions: true,
 		},
 		conditions: [
 			{
