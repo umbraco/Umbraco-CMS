@@ -51,7 +51,7 @@ internal sealed class CacheRefreshingNotificationHandler :
         foreach (IContent deletedEntity in notification.DeletedEntities)
         {
             await RefreshElementsCacheAsync(deletedEntity);
-            await _documentCacheService.DeleteItemAsync(deletedEntity.Id);
+            await _documentCacheService.DeleteItemAsync(deletedEntity);
         }
     }
 
@@ -66,7 +66,7 @@ internal sealed class CacheRefreshingNotificationHandler :
         foreach (IMedia deletedEntity in notification.DeletedEntities)
         {
             await RefreshElementsCacheAsync(deletedEntity);
-            await _mediaCacheService.DeleteItemAsync(deletedEntity.Id);
+            await _mediaCacheService.DeleteItemAsync(deletedEntity);
         }
     }
 

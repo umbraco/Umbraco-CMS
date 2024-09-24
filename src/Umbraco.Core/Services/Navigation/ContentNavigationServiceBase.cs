@@ -180,17 +180,11 @@ internal abstract class ContentNavigationServiceBase
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(readLock);
 
-        // Build the corresponding navigation structure
-        if (trashed)
-        {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
-            _recycleBinNavigationStructure = NavigationFactory.BuildNavigationDictionary(navigationModels);
-        }
-        else
-        {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
-            _navigationStructure = NavigationFactory.BuildNavigationDictionary(navigationModels);
-        }
+        IEnumerable<INavigationModel> navigationModels = trashed ?
+            _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey) :
+            _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
+
+        NavigationFactory.BuildNavigationDictionary(_navigationStructure, navigationModels);
     }
 
     private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
@@ -216,6 +210,13 @@ internal abstract class ContentNavigationServiceBase
         }
 
         childrenKeys = parentNode.Children.Select(child => child.Key);
+        return true;
+    }
+
+    private bool TryGetRootKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, out IEnumerable<Guid> childrenKeys)
+    {
+        // TODO can we make this more efficient?
+        childrenKeys = structure.Values.Where(x=>x.Parent is null).Select(x=>x.Key);
         return true;
     }
 
