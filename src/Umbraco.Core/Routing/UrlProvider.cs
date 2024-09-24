@@ -1,6 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,20 +25,51 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="urlProviders">The list of URL providers.</param>
         /// <param name="mediaUrlProviders">The list of media URL providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
-        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptions<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        /// <param name="contentCache">The content cache.</param>
+        /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+        public UrlProvider(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IOptions<WebRoutingSettings> routingSettings,
+            UrlProviderCollection urlProviders,
+            MediaUrlProviderCollection mediaUrlProviders,
+            IVariationContextAccessor variationContextAccessor,
+            IPublishedContentCache contentCache,
+            IDocumentNavigationQueryService navigationQueryService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _urlProviders = urlProviders;
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+            _contentCache = contentCache;
+            _navigationQueryService = navigationQueryService;
             Mode = routingSettings.Value.UrlProviderMode;
 
+        }
+
+        [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17")]
+        public UrlProvider(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IOptions<WebRoutingSettings> routingSettings,
+            UrlProviderCollection urlProviders,
+            MediaUrlProviderCollection mediaUrlProviders,
+            IVariationContextAccessor variationContextAccessor)
+            : this(
+                umbracoContextAccessor,
+                routingSettings,
+                urlProviders,
+                mediaUrlProviders,
+                variationContextAccessor,
+                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+                StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+        {
         }
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IEnumerable<IUrlProvider> _urlProviders;
         private readonly IEnumerable<IMediaUrlProvider> _mediaUrlProviders;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IPublishedContentCache _contentCache;
+        private readonly IDocumentNavigationQueryService _navigationQueryService;
 
         /// <summary>
         /// Gets or sets the provider URL mode.
@@ -113,7 +148,7 @@ namespace Umbraco.Cms.Core.Routing
             // be nice with tests, assume things can be null, ultimately fall back to invariant
             // (but only for variant content of course)
             // We need to check all ancestors because urls are variant even for invariant content, if an ancestor is variant.
-            if (culture == null && content.AncestorsOrSelf().Any(x => x.ContentType.VariesByCulture()))
+            if (culture == null && content.AncestorsOrSelf(_contentCache, _navigationQueryService).Any(x => x.ContentType.VariesByCulture()))
             {
                 culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
             }

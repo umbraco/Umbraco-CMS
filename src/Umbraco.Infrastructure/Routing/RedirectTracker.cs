@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Routing
             }
 
             // Get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
-            var defaultCultures = new Lazy<string[]>(() => entityContent.AncestorsOrSelf().FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? Array.Empty<string>());
+            var defaultCultures = new Lazy<string[]>(() => entityContent.AncestorsOrSelf(_contentCache, _navigationQueryService).FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? Array.Empty<string>());
 
             // Get all language ISO codes (in case we're dealing with invariant content with variant ancestors)
             var languageIsoCodes = new Lazy<string[]>(() => _localizationService.GetAllLanguages().Select(x => x.IsoCode).ToArray());
