@@ -47,20 +47,12 @@ export class UmbUserWorkspaceContext
 			{
 				path: 'edit/:id',
 				component: UmbUserWorkspaceEditorElement,
-				setup: (component, info) => {
+				setup: (_component, info) => {
 					const id = info.match.params.id;
 					this.load(id);
 				},
 			},
 		]);
-	}
-
-	protected override _checkWillNavigateAway(newUrl: string): boolean {
-		if (this.getIsNew()) {
-			return !newUrl.includes(`/create`) || super._checkWillNavigateAway(newUrl);
-		} else {
-			return !newUrl.includes(`/edit/${this.getUnique()}`) || super._checkWillNavigateAway(newUrl);
-		}
 	}
 
 	override async load(unique: string) {

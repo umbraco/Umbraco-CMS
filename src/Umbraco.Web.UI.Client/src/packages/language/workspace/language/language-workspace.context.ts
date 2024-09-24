@@ -54,14 +54,6 @@ export class UmbLanguageWorkspaceContext
 		]);
 	}
 
-	protected override _checkWillNavigateAway(newUrl: string): boolean {
-		if (this.getIsNew()) {
-			return !newUrl.includes(`/create`) || super._checkWillNavigateAway(newUrl);
-		} else {
-			return !newUrl.includes(`/edit/${this.getUnique()}`) || super._checkWillNavigateAway(newUrl);
-		}
-	}
-
 	setName(name: string) {
 		this._data.updateCurrentData({ name });
 	}

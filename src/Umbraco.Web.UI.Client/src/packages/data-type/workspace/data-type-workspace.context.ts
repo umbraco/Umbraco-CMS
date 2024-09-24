@@ -112,14 +112,6 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
-	protected override _checkWillNavigateAway(newUrl: string): boolean {
-		if (this.getIsNew()) {
-			return !newUrl.includes(`/create`) || super._checkWillNavigateAway(newUrl);
-		} else {
-			return !newUrl.includes(`/edit/${this.getUnique()}`) || super._checkWillNavigateAway(newUrl);
-		}
-	}
-
 	override async load(unique: string) {
 		const response = await super.load(unique);
 		this.observe(response.asObservable?.(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');

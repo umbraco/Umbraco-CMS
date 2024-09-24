@@ -174,8 +174,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string) {
-		const workspacePathBase = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
-		return !newUrl.includes('/' + workspacePathBase);
+		const workspaceBasePath = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
+		const currentWorkspacePathIdentifier = '/' + workspaceBasePath + '/' + this.routes.getActiveLocalPath();
+		return !newUrl.includes(currentWorkspacePathIdentifier);
 	}
 
 	#onWillNavigate = async (e: CustomEvent) => {
