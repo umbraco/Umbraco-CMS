@@ -44,7 +44,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly ILoggerFactory _loggerFactory;
     private readonly IMigrationBuilder _migrationBuilder;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
+    private readonly IDatabaseCacheRebuilder _databaseCacheRebuilder;
     private readonly IKeyValueService _keyValueService;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DistributedCache _distributedCache;
@@ -59,7 +59,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         ILoggerFactory loggerFactory,
         IMigrationBuilder migrationBuilder,
         IUmbracoDatabaseFactory databaseFactory,
-        IPublishedSnapshotService publishedSnapshotService,
+        IDatabaseCacheRebuilder databaseCacheRebuilder,
         DistributedCache distributedCache,
         IKeyValueService keyValueService,
         IServiceScopeFactory serviceScopeFactory)
@@ -69,52 +69,11 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _loggerFactory = loggerFactory;
         _migrationBuilder = migrationBuilder;
         _databaseFactory = databaseFactory;
-        _publishedSnapshotService = publishedSnapshotService;
+        _databaseCacheRebuilder = databaseCacheRebuilder;
         _keyValueService = keyValueService;
         _serviceScopeFactory = serviceScopeFactory;
         _distributedCache = distributedCache;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
-    }
-
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
-    public MigrationPlanExecutor(
-        ICoreScopeProvider scopeProvider,
-        IScopeAccessor scopeAccessor,
-        ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder,
-        IUmbracoDatabaseFactory databaseFactory,
-        IPublishedSnapshotService publishedSnapshotService,
-        DistributedCache distributedCache)
-        : this(
-            scopeProvider,
-            scopeAccessor,
-            loggerFactory,
-            migrationBuilder,
-            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
-            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IServiceScopeFactory>())
-    {
-    }
-
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
-    public MigrationPlanExecutor(
-        ICoreScopeProvider scopeProvider,
-        IScopeAccessor scopeAccessor,
-        ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder)
-        : this(
-            scopeProvider,
-            scopeAccessor,
-            loggerFactory,
-            migrationBuilder,
-            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
-            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IServiceScopeFactory>())
-    {
     }
 
     public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
@@ -344,7 +303,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
     private void RebuildCache()
     {
-        _publishedSnapshotService.RebuildAll();
+        _databaseCacheRebuilder.Rebuild();
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 

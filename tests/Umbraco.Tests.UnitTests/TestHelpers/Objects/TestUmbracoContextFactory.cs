@@ -57,9 +57,7 @@ public class TestUmbracoContextFactory
         var snapshot = new Mock<IPublishedSnapshot>();
         snapshot.Setup(x => x.Content).Returns(contentCache.Object);
         snapshot.Setup(x => x.Media).Returns(mediaCache.Object);
-        var snapshotService = new Mock<IPublishedSnapshotService>();
         var cacheManager = new Mock<ICacheManager>();
-        snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
 
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
 

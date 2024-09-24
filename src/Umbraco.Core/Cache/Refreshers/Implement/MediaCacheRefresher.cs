@@ -13,18 +13,15 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public MediaCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
         IIdKeyMap idKeyMap,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
         _idKeyMap = idKeyMap;
     }
 
@@ -103,12 +100,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             }
         }
 
-        _publishedSnapshotService.Notify(payloads, out var hasPublishedDataChanged);
-        // we only need to clear this if the published cache has changed
-        if (hasPublishedDataChanged)
-        {
-            AppCaches.ClearPartialViewCache();
-        }
+        AppCaches.ClearPartialViewCache();
 
         base.Refresh(payloads);
     }

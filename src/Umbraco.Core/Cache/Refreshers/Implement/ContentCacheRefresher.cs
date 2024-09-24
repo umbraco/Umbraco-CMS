@@ -14,22 +14,22 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     ContentCacheRefresher.JsonPayload>
 {
     private readonly IDomainService _domainService;
+    private readonly IDomainCacheService _domainCacheService;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
         IIdKeyMap idKeyMap,
         IDomainService domainService,
         IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+        ICacheRefresherNotificationFactory factory,
+        IDomainCacheService domainCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
         _idKeyMap = idKeyMap;
         _domainService = domainService;
+        _domainCacheService = domainCacheService;
     }
 
     #region Indirect
@@ -107,23 +107,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 // content and when the PublishedCachesService is notified of changes it does not see
                 // the new content...
                 // notify
-                _publishedSnapshotService.Notify(assignedDomains
+                _domainCacheService.Refresh(assignedDomains
                     .Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)).ToArray());
             }
-        }
-
-        // note: must do what's above FIRST else the repositories still have the old cached
-        // content and when the PublishedCachesService is notified of changes it does not see
-        // the new content...
-
-        // TODO: what about this?
-        // should rename it, and then, this is only for Deploy, and then, ???
-        // if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
-        //   ...
-        if (payloads.Any(x => x.Blueprint is false))
-        {
-            // Only notify if the payload contains actual (non-blueprint) contents
-            NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, payloads);
         }
 
         base.Refresh(payloads);
@@ -142,24 +128,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     #endregion
 
     #region Json
-
-    /// <summary>
-    ///     Refreshes the publish snapshot service and if there are published changes ensures that partial view caches are
-    ///     refreshed too
-    /// </summary>
-    /// <param name="service"></param>
-    /// <param name="appCaches"></param>
-    /// <param name="payloads"></param>
-    internal static void NotifyPublishedSnapshotService(IPublishedSnapshotService service, AppCaches appCaches, JsonPayload[] payloads)
-    {
-        service.Notify(payloads, out _, out var publishedChanged);
-
-        if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
-        {
-            // when a public version changes
-            appCaches.ClearPartialViewCache();
-        }
-    }
 
     // TODO (V14): Change into a record
     public class JsonPayload
