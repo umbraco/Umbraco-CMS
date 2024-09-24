@@ -27,7 +27,7 @@ import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
-	implements UmbContentWorkspaceContext<UmbMemberTypeDetailModel, UmbMemberVariantModel>
+	implements UmbContentWorkspaceContext<EntityType, UmbMemberTypeDetailModel, UmbMemberVariantModel>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 

@@ -34,7 +34,7 @@ type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements
-		UmbContentWorkspaceContext<UmbMediaTypeDetailModel, UmbMediaVariantModel>,
+		UmbContentWorkspaceContext<EntityType, UmbMediaTypeDetailModel, UmbMediaVariantModel>,
 		UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;

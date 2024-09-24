@@ -75,7 +75,7 @@ type EntityTypeModel = UmbDocumentTypeDetailModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityModel>
 	implements
-		UmbContentWorkspaceContext<EntityTypeModel, UmbDocumentVariantModel>,
+		UmbContentWorkspaceContext<EntityModel, EntityTypeModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext,
 		UmbCollectionWorkspaceContext<EntityTypeModel>
 {

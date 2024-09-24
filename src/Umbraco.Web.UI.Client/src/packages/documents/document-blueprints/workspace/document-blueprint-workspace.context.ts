@@ -39,7 +39,7 @@ type EntityType = UmbDocumentBlueprintDetailModel;
 
 export class UmbDocumentBlueprintWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
-	implements UmbContentWorkspaceContext<UmbDocumentTypeDetailModel, UmbDocumentBlueprintVariantModel>
+	implements UmbContentWorkspaceContext<EntityType, UmbDocumentTypeDetailModel, UmbDocumentBlueprintVariantModel>
 {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 	//
