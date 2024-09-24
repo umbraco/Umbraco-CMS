@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 
@@ -16,21 +17,20 @@ namespace Umbraco.Cms.Core.Routing;
 public class ContentFinderByUrlNew : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrlNew> _logger;
+    private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentUrlService _documentUrlService;
-
-    [Obsolete("Use non-obsoleted constructor. This will be removed in Umbraco 16.")]
-    public ContentFinderByUrlNew(ILogger<ContentFinderByUrlNew> logger, IUmbracoContextAccessor umbracoContextAccessor)
-    : this(logger, umbracoContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    {
-
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
     /// </summary>
-    public ContentFinderByUrlNew(ILogger<ContentFinderByUrlNew> logger, IUmbracoContextAccessor umbracoContextAccessor, IDocumentUrlService documentUrlService)
+    public ContentFinderByUrlNew(
+        ILogger<ContentFinderByUrlNew> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentUrlService documentUrlService,
+        IPublishedContentCache publishedContentCache)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _publishedContentCache = publishedContentCache;
         _documentUrlService = documentUrlService;
         UmbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -99,7 +99,8 @@ public class ContentFinderByUrlNew : IContentFinder
         IPublishedContent? node = null;
         if (documentKey.HasValue)
         {
-            node = umbracoContext.Content?.GetById(umbracoContext.InPreviewMode, documentKey.Value);
+            node = _publishedContentCache.GetById(umbracoContext.InPreviewMode, documentKey.Value);
+            //node = umbracoContext.Content?.GetById(umbracoContext.InPreviewMode, documentKey.Value);
         }
 
         if (node != null)
