@@ -1,7 +1,6 @@
 import { UmbWorkspaceRouteManager } from '../controllers/workspace-route-manager.controller.js';
 import { UMB_WORKSPACE_CONTEXT } from '../contexts/tokens/workspace.context-token.js';
 import type { UmbSubmittableWorkspaceContext } from '../contexts/tokens/submittable-workspace-context.interface.js';
-import { UmbEntityWorkspaceDataManager } from './submittable-workspace-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,14 +8,11 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType extends UmbEntityModel>
+export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
 	implements UmbSubmittableWorkspaceContext
 {
-	protected readonly _data = new UmbEntityWorkspaceDataManager<WorkspaceDataModelType>(this);
-
 	public readonly workspaceAlias: string;
 
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)

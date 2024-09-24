@@ -7,9 +7,9 @@ import type {
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
+	UmbEntityWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -51,7 +51,7 @@ type EntityType = UmbDataTypeDetailModel;
  * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
  */
 export class UmbDataTypeWorkspaceContext
-	extends UmbSubmittableWorkspaceContextBase<EntityType>
+	extends UmbEntityWorkspaceContextBase<EntityType>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//

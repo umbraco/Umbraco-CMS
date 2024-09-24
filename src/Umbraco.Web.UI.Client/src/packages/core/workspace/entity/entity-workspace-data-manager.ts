@@ -17,14 +17,8 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 		super(host);
 	}
 
-	/**
-	 * Creates an observable part
-	 * @template ReturnType
-	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction
-	 * @memberof UmbSubmittableWorkspaceDataManager
-	 */
 	createObservablePart<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
-		this.#current.asObservablePart(mappingFunction);
+		return this.#current.asObservablePart(mappingFunction);
 	}
 
 	/**
