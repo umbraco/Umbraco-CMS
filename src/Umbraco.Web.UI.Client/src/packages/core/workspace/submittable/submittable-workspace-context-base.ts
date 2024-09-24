@@ -1,7 +1,7 @@
 import { UmbWorkspaceRouteManager } from '../controllers/workspace-route-manager.controller.js';
 import { UMB_WORKSPACE_CONTEXT } from '../contexts/tokens/workspace.context-token.js';
 import type { UmbSubmittableWorkspaceContext } from '../contexts/tokens/submittable-workspace-context.interface.js';
-import { UmbSubmittableWorkspaceDataManager } from './submittable-workspace-data-manager.js';
+import { UmbEntityWorkspaceDataManager } from './submittable-workspace-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -15,7 +15,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType 
 	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
 	implements UmbSubmittableWorkspaceContext
 {
-	protected readonly _data = new UmbSubmittableWorkspaceDataManager<WorkspaceDataModelType>(this);
+	protected readonly _data = new UmbEntityWorkspaceDataManager<WorkspaceDataModelType>(this);
 
 	public readonly workspaceAlias: string;
 

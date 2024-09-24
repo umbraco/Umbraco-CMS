@@ -4,7 +4,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSubmittableWorkspaceDataManager<ModelType extends UmbEntityModel>
+export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	extends UmbControllerBase
 	implements UmbWorkspaceDataManager<ModelType>
 {
