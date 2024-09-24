@@ -397,6 +397,8 @@ export class UmbDataTypeWorkspaceContext
 				throw error?.message ?? 'Repository did not return data after create.';
 			}
 
+			this._data.setPersistedData(data);
+
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
@@ -410,6 +412,8 @@ export class UmbDataTypeWorkspaceContext
 			if (error || !data) {
 				throw error?.message ?? 'Repository did not return data after create.';
 			}
+
+			this._data.setPersistedData(data);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
