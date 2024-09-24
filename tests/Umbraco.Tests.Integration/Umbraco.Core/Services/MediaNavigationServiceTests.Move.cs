@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class MediaNavigationServiceTests
 {
- [Test]
+    [Test]
     [TestCase("62BCE72F-8C18-420E-BCAC-112B5ECC95FD", "139DC977-E50F-4382-9728-B278C4B7AC6A")] // Image 4 to Sub-album 1
     [TestCase("E0B23D56-9A0E-4FC4-BD42-834B73B4C7AB", "1CD97C02-8534-4B72-AE9E-AE52EC94CF31")] // Sub-sub-album 1 to Album
     public async Task Structure_Updates_When_Moving_Media(Guid nodeToMove, Guid targetParentKey)

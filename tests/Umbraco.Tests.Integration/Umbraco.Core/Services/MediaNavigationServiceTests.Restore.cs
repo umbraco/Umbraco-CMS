@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class MediaNavigationServiceTests
 {
- [Test]
+    [Test]
     [TestCase("62BCE72F-8C18-420E-BCAC-112B5ECC95FD", "139DC977-E50F-4382-9728-B278C4B7AC6A")] // Image 4 to Sub-album 1
     [TestCase("DBCAFF2F-BFA4-4744-A948-C290C432D564", "1CD97C02-8534-4B72-AE9E-AE52EC94CF31")] // Sub-album 2 to Album
     [TestCase("3E489C32-9315-42DA-95CE-823D154B09C8", null)] // Image 2 to media root
@@ -15,8 +15,8 @@ public partial class MediaNavigationServiceTests
         Guid nodeInRecycleBin = Image3.Key;
 
         // Move nodes to recycle bin
-        await MediaEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey); // Make sure we have an item already in the recycle bin to act as a sibling
-        await MediaEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
+        await MediaEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey);
+        await MediaEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey);
         MediaNavigationQueryService.TryGetParentKeyInBin(nodeToRestore, out Guid? initialParentKey);
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
         MediaNavigationQueryService.TryGetDescendantsKeysInBin(nodeToRestore, out IEnumerable<Guid> initialDescendantsKeys);

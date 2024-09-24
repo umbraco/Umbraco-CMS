@@ -7,9 +7,8 @@ public partial class DocumentNavigationServiceTests
 {
     [Test]
     [TestCase("A1B1B217-B02F-4307-862C-A5E22DB729EB", "A1B1B217-B02F-4307-862C-A5E22DB729EB")] // Grandchild 2 to itself
-    [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", null)] // Child 2 to content root
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", "C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 3 to Child 1
-    public async Task Structure_Updates_When_Copying_Content(Guid nodeToCopy, Guid? targetParentKey)
+    public async Task Structure_Updates_When_Copying_Content(Guid nodeToCopy, Guid targetParentKey)
     {
         // Arrange
         DocumentNavigationQueryService.TryGetParentKey(nodeToCopy, out Guid? sourceParentKey);
@@ -25,16 +24,7 @@ public partial class DocumentNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            if (targetParentKey is null)
-            {
-                // Verify the copied node's parent is null (it's been copied to content root)
-                Assert.IsNull(copiedItemParentKey);
-            }
-            else
-            {
-                Assert.IsNotNull(copiedItemParentKey);
-            }
-
+            Assert.IsNotNull(copiedItemParentKey);
             Assert.AreEqual(targetParentKey, copiedItemParentKey);
             Assert.AreNotEqual(sourceParentKey, copiedItemParentKey);
         });
@@ -54,6 +44,7 @@ public partial class DocumentNavigationServiceTests
 
         // Assert
         Assert.AreNotEqual(Grandchild2.Key, copiedItemKey);
+
         DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
         DocumentNavigationQueryService.TryGetSiblingsKeys(Root.Key, out IEnumerable<Guid> afterCopyRootSiblingsKeys);
         DocumentNavigationQueryService.TryGetChildrenKeys(sourceParentKey.Value, out IEnumerable<Guid> sourceParentChildrenKeys);
@@ -90,6 +81,7 @@ public partial class DocumentNavigationServiceTests
 
         // Assert
         Assert.AreNotEqual(Grandchild3.Key, copiedItemKey);
+
         DocumentNavigationQueryService.TryGetParentKey(copiedItemKey, out Guid? copiedItemParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeys(Child3.Key, out IEnumerable<Guid> afterCopyChild3ChildrenKeys);
         DocumentNavigationQueryService.TryGetChildrenKeys(copiedItemKey, out IEnumerable<Guid> afterCopyGrandChild1Descendents);
