@@ -16,6 +16,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_create',
+			additionalOptions: true,
 		},
 	},
 	...modalManifests,

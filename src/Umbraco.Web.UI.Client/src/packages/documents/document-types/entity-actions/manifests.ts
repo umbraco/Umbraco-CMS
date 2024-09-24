@@ -19,6 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+			additionalOptions: true,
 		},
 	},
 	...createManifests,

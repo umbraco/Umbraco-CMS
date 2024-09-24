@@ -13,7 +13,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: '#dictionary_createNew',
+			label: '#general_create',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -27,6 +28,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-download-alt',
 			label: '#actions_export',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -40,6 +42,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-page-up',
 			label: '#actions_import',
+			additionalOptions: true,
 		},
 	},
 	{

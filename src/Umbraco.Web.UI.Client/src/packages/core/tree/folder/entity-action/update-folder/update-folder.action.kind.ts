@@ -17,6 +17,7 @@ export const manifest: UmbExtensionManifestKind = {
 		meta: {
 			icon: 'icon-edit',
 			label: '#actions_folderRename',
+			additionalOptions: true,
 		},
 	},
 };
