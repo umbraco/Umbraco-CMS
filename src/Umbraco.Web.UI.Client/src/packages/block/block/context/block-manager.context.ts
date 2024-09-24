@@ -167,6 +167,11 @@ export abstract class UmbBlockManagerContext<
 			source.filter((x) => x.contentKey === contentKey && variantId.compare(x)),
 		);
 	}
+	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
+		return this.#exposes.asObservablePart((source) =>
+			source.some((x) => x.contentKey === contentKey && variantId.compare(x)),
+		);
+	}
 
 	getBlockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);

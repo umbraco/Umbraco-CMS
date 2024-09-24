@@ -5,6 +5,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
+	UmbBooleanState,
 	UmbClassState,
 	UmbNumberState,
 	UmbObjectState,
@@ -45,6 +46,9 @@ export abstract class UmbBlockEntryContext<
 	#contentKey?: string;
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected _variantId = this.#variantId.asObservable();
+
+	#hasExpose = new UmbBooleanState(undefined);
+	hasExpose = this.#hasExpose.asObservable();
 
 	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).
 	getEntityType() {
@@ -232,26 +236,6 @@ export abstract class UmbBlockEntryContext<
 
 	abstract readonly showContentEdit: Observable<boolean>;
 
-	/**
-	 * Set the contentKey of this entry.
-	 * @function setContentKey
-	 * @param {string} contentKey the entry content key.
-	 * @returns {void}
-	 */
-	setContentKey(contentKey: string) {
-		this.#contentKey = contentKey;
-		this.#observeLayout();
-	}
-
-	/**
-	 * Get the current value of this Blocks label.
-	 * @function getLabel
-	 * @returns {string} - the value of the label.
-	 */
-	getLabel() {
-		return this.#label.value;
-	}
-
 	constructor(
 		host: UmbControllerHost,
 		blockManagerContextToken: BlockManagerContextTokenType,
@@ -357,6 +341,26 @@ export abstract class UmbBlockEntryContext<
 
 	getContentKey() {
 		return this._layout.value?.contentKey;
+	}
+
+	/**
+	 * Set the contentKey of this entry.
+	 * @function setContentKey
+	 * @param {string} contentKey the entry content key.
+	 * @returns {void}
+	 */
+	setContentKey(contentKey: string) {
+		this.#contentKey = contentKey;
+		this.#observeLayout();
+	}
+
+	/**
+	 * Get the current value of this Blocks label.
+	 * @function getLabel
+	 * @returns {string} - the value of the label.
+	 */
+	getLabel() {
+		return this.#label.value;
 	}
 
 	#updateCreatePaths() {
@@ -540,8 +544,16 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#gotVariantId() {
-		if (!this.#variantId) return;
+		const variantId = this.#variantId.getValue();
+		if (!variantId || !this.#contentKey) return;
 		// TODO: Handle variantId changes
+		this.observe(
+			this._manager?.hasExposeOf(this.#contentKey, variantId),
+			(hasExpose) => {
+				this.#hasExpose.setValue(hasExpose);
+			},
+			'observeExpose',
+		);
 	}
 
 	// Public methods:
@@ -571,6 +583,12 @@ export abstract class UmbBlockEntryContext<
 		const contentKey = this._layout.value?.contentKey;
 		if (!contentKey) return;
 		this._entries.delete(contentKey);
+	}
+
+	public expose() {
+		const variantId = this.#variantId.getValue();
+		if (!this.#contentKey || !variantId) return;
+		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
 	//copy
