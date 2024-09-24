@@ -153,7 +153,7 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Handle_Variance_Change()
+    public async Task Can_Handle_Culture_Variance_Addition()
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
@@ -190,6 +190,10 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
                         }
                     ]
                 }
+            ],
+            Expose =
+            [
+                new (contentElementKey, null, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -218,6 +222,98 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
             Assert.AreEqual("singleLineText", property.Alias);
             Assert.AreEqual("The single line text", property.Value);
             Assert.AreEqual("en-US", property.Culture);
+        });
+
+        Assert.AreEqual(1, toEditorValue.Expose.Count);
+        Assert.Multiple(() =>
+        {
+            var itemVariation = toEditorValue.Expose[0];
+            Assert.AreEqual(contentElementKey, itemVariation.ContentKey);
+            Assert.AreEqual("en-US", itemVariation.Culture);
+        });
+    }
+
+    [Test]
+    public async Task Can_Handle_Culture_Variance_Removal()
+    {
+        var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
+        elementType.IsElement = true;
+        elementType.Variations = ContentVariation.Culture;
+        elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Culture;
+        ContentTypeService.Save(elementType);
+
+        var blockListContentType = await CreateBlockListContentType(elementType);
+
+        var contentElementKey = Guid.NewGuid();
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[]
+                    {
+                        new BlockListLayoutItem { ContentKey = contentElementKey }
+                    }
+                }
+            },
+            ContentData =
+            [
+                new()
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values =
+                    [
+                        new ()
+                        {
+                            Alias = "singleLineText",
+                            Value = "The single line text",
+                            Culture = "en-US"
+                        }
+                    ]
+                }
+            ],
+            Expose =
+            [
+                new (contentElementKey, "en-US", null)
+            ]
+        };
+        var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
+
+        var content = new ContentBuilder()
+            .WithContentType(blockListContentType)
+            .WithName("My Blocks")
+            .WithPropertyValues(new { blocks = blocksPropertyValue })
+            .Build();
+        ContentService.Save(content);
+
+        elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Nothing;
+        elementType.Variations = ContentVariation.Nothing;
+        ContentTypeService.Save(elementType);
+
+        var valueEditor = await GetValueEditor(blockListContentType);
+        var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(toEditorValue);
+        Assert.AreEqual(1, toEditorValue.ContentData.Count);
+
+        var properties = toEditorValue.ContentData.First().Values;
+        Assert.AreEqual(1, properties.Count);
+        Assert.Multiple(() =>
+        {
+            var property = properties.First();
+            Assert.AreEqual("singleLineText", property.Alias);
+            Assert.AreEqual("The single line text", property.Value);
+            Assert.AreEqual(null, property.Culture);
+        });
+
+        Assert.AreEqual(1, toEditorValue.Expose.Count);
+        Assert.Multiple(() =>
+        {
+            var itemVariation = toEditorValue.Expose[0];
+            Assert.AreEqual(contentElementKey, itemVariation.ContentKey);
+            Assert.AreEqual(null, itemVariation.Culture);
         });
     }
 

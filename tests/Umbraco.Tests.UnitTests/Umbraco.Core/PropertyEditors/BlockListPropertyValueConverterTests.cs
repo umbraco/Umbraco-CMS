@@ -32,7 +32,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new SystemTextJsonSerializer(),
             new BlockListPropertyValueConstructorCache(),
-            Mock.Of<IVariationContextAccessor>());
+            Mock.Of<IVariationContextAccessor>(),
+            blockVarianceHandler);
         return editor;
     }
 
@@ -125,7 +126,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         string json = null;
         var converted =
@@ -148,7 +149,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = "{}";
         var converted =
@@ -176,7 +177,12 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             }
         ]
     },
-    ""contentData"": []
+    ""contentData"": [],
+    ""expose"": [
+        {
+            ""contentKey"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
+        }
+    ]
 }";
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
@@ -197,6 +203,11 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     ""contentData"": [
         {
             ""key"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
+        }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""e7dba547-615b-4e9a-b4ab-2a7674845bc9""
         }
     ]
 }";
@@ -221,6 +232,11 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             ""contentTypeKey"": """ + ContentKey1 + @""",
             ""key"": ""1304E1DD-0000-4396-84FE-8A399231CB3D""
         }
+    ],
+    ""expose"": [
+        {
+            ""contentKey"": ""1304E1DD-0000-4396-84FE-8A399231CB3D""
+        }
     ]
 }";
 
@@ -236,7 +252,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
@@ -278,7 +294,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
@@ -374,7 +390,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         };
 
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {

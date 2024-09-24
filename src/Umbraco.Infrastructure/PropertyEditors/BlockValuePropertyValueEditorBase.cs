@@ -138,6 +138,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     {
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
+        _blockEditorVarianceHandler.AlignExposeVariance(blockValue);
     }
 
     protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)
@@ -175,7 +176,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 // but for local block level properties we don't have that kind of handling, so we to do it manually.
                 // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
                 // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
-                _blockEditorVarianceHandler.AlignPropertyVarianceAsync(blockPropertyValue, propertyType, culture, segment).GetAwaiter().GetResult();
+                _blockEditorVarianceHandler.AlignPropertyVarianceAsync(blockPropertyValue, propertyType, culture).GetAwaiter().GetResult();
 
                 if (!valueEditorsByKey.TryGetValue(propertyType.DataTypeKey, out IDataValueEditor? valueEditor))
                 {

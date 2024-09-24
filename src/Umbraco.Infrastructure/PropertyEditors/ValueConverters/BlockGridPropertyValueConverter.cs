@@ -23,6 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly IApiElementBuilder _apiElementBuilder;
         private readonly BlockGridPropertyValueConstructorCache _constructorCache;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
         [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V16")]
         public BlockGridPropertyValueConverter(
@@ -31,7 +32,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             IJsonSerializer jsonSerializer,
             IApiElementBuilder apiElementBuilder,
             BlockGridPropertyValueConstructorCache constructorCache)
-            : this(proflog, blockConverter, jsonSerializer, apiElementBuilder, constructorCache, StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
+            : this(proflog, blockConverter, jsonSerializer, apiElementBuilder, constructorCache,
+                StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
+                StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>())
         {
         }
 
@@ -41,7 +44,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             IJsonSerializer jsonSerializer,
             IApiElementBuilder apiElementBuilder,
             BlockGridPropertyValueConstructorCache constructorCache,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor,
+            BlockEditorVarianceHandler blockEditorVarianceHandler)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
@@ -49,6 +53,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             _apiElementBuilder = apiElementBuilder;
             _constructorCache = constructorCache;
             _variationContextAccessor = variationContextAccessor;
+            _blockEditorVarianceHandler = blockEditorVarianceHandler;
         }
 
         /// <inheritdoc />
@@ -136,7 +141,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     return null;
                 }
 
-                var creator = new BlockGridPropertyValueCreator(_blockConverter, _variationContextAccessor, _jsonSerializer, _constructorCache);
+                var creator = new BlockGridPropertyValueCreator(_blockConverter, _variationContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache);
                 return creator.CreateBlockModel(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns);
             }
         }

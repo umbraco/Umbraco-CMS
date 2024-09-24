@@ -36,7 +36,7 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForSingle(SettingKey1);
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
@@ -89,7 +89,7 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForSingle();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
@@ -134,7 +134,7 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForSingle();
         var propertyType = GetPropertyType(config);
-        var publishedElement = Mock.Of<IPublishedElement>();
+        var publishedElement = GetPublishedElement();
 
         var json = @"
 {
@@ -194,7 +194,8 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             new SystemTextJsonSerializer(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new BlockGridPropertyValueConstructorCache(),
-            Mock.Of<IVariationContextAccessor>());
+            Mock.Of<IVariationContextAccessor>(),
+            blockVarianceHandler);
         return editor;
     }
 

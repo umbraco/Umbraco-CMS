@@ -42,6 +42,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private DeliveryApiSettings _deliveryApiSettings;
 
     [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V16")]
@@ -51,7 +52,8 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
         : this(linkParser, urlParser, imageSourceParser, apiRichTextElementParser, apiRichTextMarkupParser, partialViewBlockEngine, blockEditorConverter, jsonSerializer,
-            apiElementBuilder, constructorCache, logger, StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(), deliveryApiSettingsMonitor)
+            apiElementBuilder, constructorCache, logger, StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
+            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(), deliveryApiSettingsMonitor)
     {
     }
 
@@ -59,7 +61,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
         IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
         IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
-        IVariationContextAccessor variationContextAccessor, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+        IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _linkParser = linkParser;
         _urlParser = urlParser;
@@ -73,6 +75,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _constructorCache = constructorCache;
         _logger = logger;
         _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
@@ -204,7 +207,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             return null;
         }
 
-        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _jsonSerializer, _constructorCache);
+        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache);
         return creator.CreateBlockModel(owner, referenceCacheLevel, blocks, preview, configuration.Blocks);
     }
 

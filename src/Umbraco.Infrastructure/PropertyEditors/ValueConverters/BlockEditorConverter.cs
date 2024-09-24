@@ -61,15 +61,15 @@ public sealed class BlockEditorConverter
             // things are handled when a content type is saved (copies of property values are created in the DB).
             _blockEditorVarianceHandler.AlignPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
 
-            var culture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
+            var expectedCulture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
                 ? variationContext.Culture
                 : null;
-            var segment = owner.ContentType.VariesBySegment() && publishedContentType.VariesBySegment() && propertyType.VariesBySegment()
+            var expectedSegment = owner.ContentType.VariesBySegment() && publishedContentType.VariesBySegment() && propertyType.VariesBySegment()
                 ? variationContext.Segment
                 : null;
 
-            if (property.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(culture.NullOrWhiteSpaceAsNull())
-                && property.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(segment.NullOrWhiteSpaceAsNull()))
+            if (property.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
+                && property.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
             {
                 propertyValues[property.Alias] = property.Value;
             }

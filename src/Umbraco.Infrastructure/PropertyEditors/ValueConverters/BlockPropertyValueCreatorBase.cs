@@ -16,6 +16,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     where TBlockValue : BlockValue<TBlockLayoutItem>, new()
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
     /// <summary>
     /// Creates a specific data converter for the block property implementation.
@@ -59,10 +60,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     /// <returns></returns>
     protected delegate TBlockItemModel? EnrichBlockItemModelFromConfiguration(TBlockItemModel item, TBlockLayoutItem layoutItem, TBlockConfiguration configuration, CreateBlockItemModelFromLayout blockItemModelCreator);
 
-    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor)
+    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler)
     {
         BlockEditorConverter = blockEditorConverter;
         _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
     }
 
     protected BlockEditorConverter BlockEditorConverter { get; }
@@ -125,7 +127,6 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
-        IList<BlockItemVariation> exposed = converted.BlockValue.Expose;
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -142,13 +143,16 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
+            IEnumerable<BlockItemVariation> expose = _blockEditorVarianceHandler.AlignExposeVarianceForElementAsync(converted.BlockValue, owner, element).GetAwaiter().GetResult();
             var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
                 ? variationContext.Culture.NullOrWhiteSpaceAsNull()
                 : null;
             var expectedBlockVariationSegment = owner.ContentType.VariesBySegment() && element.ContentType.VariesBySegment()
                 ? variationContext.Segment.NullOrWhiteSpaceAsNull()
                 : null;
-            if (exposed.Any(v => v.ContentKey == data.Key && v.Culture == expectedBlockVariationCulture && v.Segment == expectedBlockVariationSegment) is false)
+            if (expose.Any(v =>
+                    v.ContentKey == element.Key && v.Culture == expectedBlockVariationCulture &&
+                    v.Segment == expectedBlockVariationSegment) is false)
             {
                 continue;
             }

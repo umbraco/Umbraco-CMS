@@ -9,6 +9,18 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
+/*
+If the content type varies, then:
+
+1. Variant element types ALWAYS adds variation to the block property Expose, as well as to any variant element properties.
+2. Invariant element types NEVER adds variation to the block property Expose, nor to any variant element properties (because there are none).
+
+If the content type does NOT vary, then variation is NEVER added to Expose, nor to any variant properties - regardless of the element type variation.
+
+This means that an invariant element cannot be "turned off" for a single variation - it's all or nothing.
+
+It also means that in a variant setting, the parent property variance has no effect for the variance notation for any nested blocks.
+*/
 public partial class BlockListElementLevelVariationTests
 {
     [Test]

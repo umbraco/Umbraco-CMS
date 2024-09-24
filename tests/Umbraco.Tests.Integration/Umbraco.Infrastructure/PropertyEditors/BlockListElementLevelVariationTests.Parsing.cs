@@ -235,12 +235,10 @@ public partial class BlockListElementLevelVariationTests
         });
     }
 
-    [TestCase("en-US", "Another invariant content value", "Another invariant settings value")]
-    [TestCase("da-DK", "", "")]
-    public async Task Can_Become_Variant_After_Publish(string culture, string expectedVariantContentValue, string expectedVariantSettingsValue)
+    [TestCase("en-US", true)]
+    [TestCase("da-DK", false)]
+    public async Task Can_Become_Variant_After_Publish(string culture, bool expectExposedBlocks)
     {
-        Assert.Inconclusive("Pending implementation for Expose");
-
         var elementType = CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
@@ -283,38 +281,41 @@ public partial class BlockListElementLevelVariationTests
 
         // the "blocks" property is invariant (at content level), and the block data currently stored is also invariant.
         // however, the content and element types both vary by culture at this point, so the blocks should be parsed
-        // accordingly. this means that the "variantText" property should now perform a fallback for the default language
-        // (which is en-US) and be empty for other languages.
+        // accordingly. this means that the block is exposed only in the default culture, and the "variantText" property
+        // should perform a fallback to the default language (which is en-US).
         var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
         Assert.IsNotNull(value);
-        Assert.AreEqual(1, value.Count);
+        Assert.AreEqual(expectExposedBlocks ? 1 : 0, value.Count);
 
-        var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
-        Assert.Multiple(() =>
+        if (expectExposedBlocks)
         {
-            var invariantProperty = blockListItem.Content.Properties.First();
-            Assert.IsFalse(invariantProperty.PropertyType.VariesByCulture());
-            Assert.AreEqual("invariantText", invariantProperty.Alias);
-            Assert.AreEqual("The invariant content value", invariantProperty.GetValue());
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                var invariantProperty = blockListItem.Content.Properties.First();
+                Assert.IsFalse(invariantProperty.PropertyType.VariesByCulture());
+                Assert.AreEqual("invariantText", invariantProperty.Alias);
+                Assert.AreEqual("The invariant content value", invariantProperty.GetValue());
 
-            var variantProperty = blockListItem.Content.Properties.Last();
-            Assert.IsTrue(variantProperty.PropertyType.VariesByCulture());
-            Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual(expectedVariantContentValue, variantProperty.GetValue());
-        });
+                var variantProperty = blockListItem.Content.Properties.Last();
+                Assert.IsTrue(variantProperty.PropertyType.VariesByCulture());
+                Assert.AreEqual("variantText", variantProperty.Alias);
+                Assert.AreEqual("Another invariant content value", variantProperty.GetValue());
+            });
 
-        Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
-        Assert.Multiple(() =>
-        {
-            var invariantProperty = blockListItem.Settings.Properties.First();
-            Assert.AreEqual("invariantText", invariantProperty.Alias);
-            Assert.AreEqual("The invariant settings value", invariantProperty.GetValue());
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                var invariantProperty = blockListItem.Settings.Properties.First();
+                Assert.AreEqual("invariantText", invariantProperty.Alias);
+                Assert.AreEqual("The invariant settings value", invariantProperty.GetValue());
 
-            var variantProperty = blockListItem.Settings.Properties.Last();
-            Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual(expectedVariantSettingsValue, variantProperty.GetValue());
-        });
+                var variantProperty = blockListItem.Settings.Properties.Last();
+                Assert.AreEqual("variantText", variantProperty.Alias);
+                Assert.AreEqual("Another invariant settings value", variantProperty.GetValue());
+            });
+        }
     }
 
     [TestCase("en-US", "en-US", ContentVariation.Nothing)]
@@ -327,8 +328,6 @@ public partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", "da-DK", ContentVariation.Culture)]
     public async Task Can_Become_Invariant_After_Publish(string requestCulture, string defaultCulture, ContentVariation elementVariationAfterPublish)
     {
-        Assert.Inconclusive("Pending implementation for Expose");
-
         var language = await LanguageService.GetAsync(defaultCulture);
         language!.IsDefault = true;
         await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);
