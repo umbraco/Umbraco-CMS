@@ -14,19 +14,18 @@ import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 const tinyIconSet = tinymce.IconManager.get('default');
 
-type EditorExtension = {
+type UmbEditorExtensionConfig = {
 	alias: string;
 	label: string;
 	icon?: string;
 	hideInToolbar: boolean;
-	row: number;
-	group: [number, number];
+	position?: [number, number];
 };
 
 type EditorExtensionValue = {
 	alias: string;
 	hideInToolbar: boolean;
-	position: [number, number];
+	position?: [number, number];
 };
 
 type ExtensionConfig = {
@@ -67,7 +66,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	private _extensionCategories: ExtensionCategory = [];
 
 	@state()
-	private _extensionsConfig: Array<ExtensionConfig> = [];
+	private _internalValue: Array<UmbEditorExtensionConfig> = [];
 
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
@@ -106,10 +105,21 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		item.selected = !item.selected;
 
 		if (item.selected) {
-			this.value = [...this.value, { alias: item.alias, hideInToolbar: false, position: [0, 0] }];
+			this._internalValue = [
+				...this._internalValue,
+				{ alias: item.alias, label: item.label, icon: item.icon, hideInToolbar: false },
+			];
 		} else {
-			this.value = this.value.filter((x) => x.alias !== item.alias);
+			this._internalValue = this._internalValue.filter((x) => x.alias !== item.alias);
 		}
+	}
+
+	#onChange() {
+		this.value = this._internalValue.map((x) => ({
+			alias: x.alias,
+			hideInToolbar: x.hideInToolbar,
+			position: x.position,
+		}));
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
@@ -138,7 +148,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	override render() {
 		return html`
 		<button @click=${this.#test}>Test</button>
-		<umb-tiptap-toolbar-groups-configuration></umb-tiptap-toolbar-groups-configuration>
+		<umb-tiptap-toolbar-groups-configuration .value=${this._internalValue}></umb-tiptap-toolbar-groups-configuration>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,

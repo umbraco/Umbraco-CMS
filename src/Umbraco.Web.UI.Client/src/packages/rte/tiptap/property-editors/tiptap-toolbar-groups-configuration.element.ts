@@ -1,130 +1,71 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, property, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
-type ToolbarButton = {
+type ToolbarLayout = Array<Array<string>>;
+
+type Extension = {
 	alias: string;
 	label: string;
-	icon: string;
+	icon?: string;
 };
-
-type ToolbarGroup = {
-	groupId: string;
-	buttons: ToolbarButton[];
-};
-
-type ToolbarRow = {
-	rowId: string;
-	groups: ToolbarGroup[];
-};
-
-type ToolbarConfig = ToolbarRow[];
 
 @customElement('umb-tiptap-toolbar-groups-configuration')
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
-	set value(value: ToolbarConfig) {
+	set value(value: Array<ToolbarLayout>) {
 		// TODO: if value is null or does not have at least one row with one group, default to a single row with a single empty group
-		this.#value = value;
-
-		this.requestUpdate('#value');
+		// this.#value = value;
+		// this.requestUpdate('#value');
 	}
-	get value(): ToolbarConfig {
+	get value(): Array<ToolbarLayout> {
 		return this.#value;
 	}
 
-	#value: ToolbarConfig = [
+	#value: Array<ToolbarLayout> = [
+		[['bold', 'italic'], []],
+		[[], ['underline'], ['strikethrough']],
+	];
+
+	@property({ attribute: false })
+	extensions: Array<Extension> = [
 		{
-			rowId: 'asdasgasgasd',
-			groups: [
-				{
-					groupId: 'asdasldjh12h123',
-					buttons: [
-						{ alias: 'bold', label: 'Bold', icon: 'bold-icon' },
-						{ alias: 'italic', label: 'Italic', icon: 'italic-icon' },
-					],
-				},
-				{
-					groupId: 'askdjljk123ljkh12kj3h',
-					buttons: [{ alias: 'underline', label: 'Underline', icon: 'underline-icon' }],
-				},
-			],
+			alias: 'bold',
+			label: 'Bold',
 		},
 		{
-			rowId: '1l2j3ljk123l21j3',
-			groups: [
-				{
-					groupId: 'asdashd9ashd0as87hdoasudh',
-					buttons: [{ alias: 'align-left', label: 'Align Left', icon: 'align-left-icon' }],
-				},
-			],
+			alias: 'italic',
+			label: 'Italic',
+		},
+		{
+			alias: 'underline',
+			label: 'Underline',
+		},
+		{
+			alias: 'strikethrough',
+			label: 'Strikethrough',
 		},
 	];
 
-	#addGroup = (rowId: string) => {
-		const row = this.#value.find((row) => row.rowId === rowId);
-		if (!row) return;
+	private moveItem(from: [number, number, number], to: [number, number, number]) {
+		const [fromRow, fromGroup, fromItem] = from;
+		const [toRow, toGroup, toItem] = to;
 
-		row.groups.push({
-			groupId: UmbId.new(),
-			buttons: [],
-		});
+		// Get the item to move from the 'from' position
+		const itemToMove = this.#value[fromRow][fromGroup][fromItem];
 
-		this.requestUpdate();
-	};
+		// Remove the item from the original position
+		this.#value[fromRow][fromGroup].splice(fromItem, 1);
 
-	#removeGroup(groupId: string) {
-		const row = this.#value.find((row) => row.groups.some((group) => group.groupId === groupId));
-		if (!row) return;
+		// Insert the item into the new position
+		this.#value[toRow][toGroup].splice(toItem, 0, itemToMove);
 
-		row.groups = row.groups.filter((group) => group.groupId !== groupId);
-
-		this.requestUpdate();
+		// Trigger an update to re-render the UI
+		this.requestUpdate('value');
 	}
 
-	#addRow = () => {
-		this.#value.push({
-			rowId: UmbId.new(),
-			groups: [
-				{
-					groupId: UmbId.new(),
-					buttons: [],
-				},
-			],
-		});
-
-		this.requestUpdate();
-	};
-
-	#removeRow(rowId: string) {
-		this.#value = this.#value.filter((row) => row.rowId !== rowId);
-
-		this.requestUpdate();
-	}
-
-	#moveButton(alias: string, targetGroupId: string) {
-		const sourceGroup = this.#value
-			.flatMap((row) => row.groups)
-			.find((group) => group.buttons.some((button) => button.alias === alias));
-
-		if (!sourceGroup) return;
-
-		// remove button from source group
-		const buttonIndex = sourceGroup.buttons.findIndex((button) => button.alias === alias);
-		const button = sourceGroup.buttons.splice(buttonIndex, 1)[0];
-
-		// add button to target group
-		const targetGroup = this.#value.flatMap((row) => row.groups).find((group) => group.groupId === targetGroupId);
-		if (!targetGroup) return;
-
-		targetGroup.buttons.push(button);
-
-		this.requestUpdate();
-	}
-
-	#onDragStart = (event: DragEvent, alias: string) => {
-		event.dataTransfer!.setData('text/plain', alias);
+	#onDragStart = (event: DragEvent, pos: [number, number, number]) => {
+		event.dataTransfer!.setData('application/json', JSON.stringify(pos));
 		event.dataTransfer!.dropEffect = 'move';
 	};
 
@@ -132,47 +73,49 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		event.preventDefault();
 	};
 
-	#onDrop = (event: DragEvent, groupId: string) => {
+	#onDrop = (event: DragEvent, toPos: [number, number, number]) => {
 		event.preventDefault();
 
-		const alias = event.dataTransfer!.getData('text/plain');
-		if (!alias) return;
-
-		this.#moveButton(alias, groupId);
+		const fromPos: [number, number, number] = JSON.parse(event.dataTransfer!.getData('application/json') ?? '[0,0,0]');
+		this.moveItem(fromPos, toPos);
 	};
 
-	#renderButton = (button: ToolbarButton) => {
-		return html`<button @dragstart=${(e: DragEvent) => this.#onDragStart(e, button.alias)} draggable="true">
-			${button.label}
-		</button>`;
-	};
+	private renderItem(alias: string, rowIndex: number, groupIndex: number, itemIndex: number) {
+		const extension = this.extensions.find((ext) => ext.alias === alias);
+		if (!extension) return nothing;
 
-	#renderGroup = (group: ToolbarGroup) => {
 		return html`<div
-			class="group"
-			dropzone="move"
-			@dragover=${this.#onDragOver}
-			@drop=${(e: DragEvent) => this.#onDrop(e, group.groupId)}>
-			${repeat(group.buttons, (button) => button.alias, this.#renderButton)}
-			<button class="remove-group-button" @click=${() => this.#removeGroup(group.groupId)}>X</button>
+			class="item"
+			draggable="true"
+			@dragstart=${(e: DragEvent) => this.#onDragStart(e, [rowIndex, groupIndex, itemIndex])}>
+			${extension.label}
 		</div>`;
-	};
+	}
 
-	#renderRow = (row: ToolbarRow) => {
-		return html`<div class="row">
-			${repeat(row.groups, (group) => group.groupId, this.#renderGroup)}<button
-				@click=${() => this.#addGroup(row.rowId)}>
-				Add group
-			</button>
-			<button class="remove-row-button" @click=${() => this.#removeRow(row.rowId)}>X</button>
-		</div>`;
-	};
+	private renderGroup(group: string[], rowIndex: number, groupIndex: number) {
+		return html`
+			<div
+				class="group"
+				dropzone="move"
+				@dragover=${this.#onDragOver}
+				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, 0])}>
+				${group.map((alias, itemIndex) => this.renderItem(alias, rowIndex, groupIndex, itemIndex))}
+				<!-- <div class="remove-group-button">X</div> -->
+			</div>
+		`;
+	}
+
+	private renderRow(row: string[][], rowIndex: number) {
+		return html`
+			<div class="row">
+				${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}
+				<!-- <div class="remove-row-button">Remove row</div> -->
+			</div>
+		`;
+	}
 
 	override render() {
-		return html`<button @click=${this.#addGroup}>Add Group</button>
-			<button @click=${this.#addRow}>Add Row</button>
-
-			${repeat(this.#value, (row) => row.rowId, this.#renderRow)}`;
+		return html`${repeat(this.#value, (row, rowIndex) => this.renderRow(row, rowIndex))}`;
 	}
 
 	static override styles = [
@@ -196,6 +139,12 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				padding: 6px;
 				min-height: 24px;
 				min-width: 24px;
+			}
+			.item {
+				padding: 3px;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+				background-color: #f9f9f9;
 			}
 
 			.remove-group-button {
