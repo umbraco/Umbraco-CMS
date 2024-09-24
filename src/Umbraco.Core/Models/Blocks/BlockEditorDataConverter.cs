@@ -112,6 +112,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
             if (blockItemData.Key == Guid.Empty && blockItemData.Udi is GuidUdi guidUdi)
             {
                 blockItemData.Key = guidUdi.Guid;
+                converted = true;
             }
 
             // no matter what, clear the UDI value so it's not saved back to the DB
