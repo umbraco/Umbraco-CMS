@@ -1,7 +1,7 @@
-import { UmbOEmbedRepository } from './repository/oembed.repository.js';
+import { UmbOEmbedRepository } from '../repository/oembed.repository.js';
+import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from './embedded-media-modal.token.js';
 import { css, html, unsafeHTML, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
