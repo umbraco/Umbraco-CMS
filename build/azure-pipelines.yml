@@ -5,10 +5,6 @@ parameters:
     displayName: Run SQL Server Integration Tests
     type: boolean
     default: false
-#  - name: sqlServerAcceptanceTests
-#    displayName: Run SQL Server Acceptance Tests
-#    type: boolean
-#    default: false
   - name: myGetDeploy
     displayName: Deploy to MyGet
     type: boolean
@@ -553,8 +549,6 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}}) # Outcommented due to timeouts
-#        condition: eq(${{parameters.sqlServerAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
@@ -709,7 +703,7 @@ stages:
     dependsOn:
       - Unit
       - Integration
-#      - E2E
+    #      - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:

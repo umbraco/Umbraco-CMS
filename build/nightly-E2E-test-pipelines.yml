@@ -4,12 +4,12 @@ pr: none
 trigger: none
 
 schedules:
-- cron: '0 0 * * *'
-  displayName: Daily midnight build
-  branches:
-    include:
-    - v14/dev
-    - v15/dev
+  - cron: '0 0 * * *'
+    displayName: Daily midnight build
+    branches:
+      include:
+        - v14/dev
+        - v15/dev
 
 variables:
   nodeVersion: 20
@@ -24,7 +24,7 @@ variables:
   NODE_OPTIONS: --max_old_space_size=16384
 
 parameters:
-  - name : runSmokeTests
+  - name: runSmokeTests
     displayName: Run the smoke tests
     type: boolean
     default: false
