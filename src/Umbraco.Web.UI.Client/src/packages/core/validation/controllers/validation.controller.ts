@@ -219,7 +219,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Validate this context, all the validators of this context will be validated.
 	 * Notice its a recursive check meaning sub validation contexts also validates their validators.
-	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
+	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
 	 */
 	async validate(): Promise<void> {
 		// TODO: clear server messages here?, well maybe only if we know we will get new server messages? Do the server messages hook into the system like another validator?

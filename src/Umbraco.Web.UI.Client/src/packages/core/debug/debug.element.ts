@@ -1,7 +1,8 @@
+import { UMB_CONTEXT_DEBUGGER_MODAL } from './debug-modal/index.js';
 import { css, customElement, html, map, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { contextData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDebugContextData, UmbDebugContextItemData } from '@umbraco-cms/backoffice/context-api';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 

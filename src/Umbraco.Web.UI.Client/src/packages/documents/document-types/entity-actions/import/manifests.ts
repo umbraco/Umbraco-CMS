@@ -13,6 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-page-up',
 			label: '#actions_import',
+			additionalOptions: true,
 		},
 	},
 	...repositoryManifests,
