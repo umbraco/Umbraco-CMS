@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 /// <inheritdoc />
 internal sealed class ApiMediaQueryService : IApiMediaQueryService
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiMediaQueryService> _logger;
 
-    public ApiMediaQueryService(IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger<ApiMediaQueryService> logger)
+    public ApiMediaQueryService(IPublishedMediaCache publishedMediaCache, ILogger<ApiMediaQueryService> logger)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedMediaCache = publishedMediaCache;
         _logger = logger;
     }
 
@@ -52,8 +52,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
         => TryGetByPath(path, GetRequiredPublishedMediaCache());
 
     private IPublishedMediaCache GetRequiredPublishedMediaCache()
-        => _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Media
-           ?? throw new InvalidOperationException("Could not obtain the published media cache");
+        => _publishedMediaCache;
 
     private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
     {
