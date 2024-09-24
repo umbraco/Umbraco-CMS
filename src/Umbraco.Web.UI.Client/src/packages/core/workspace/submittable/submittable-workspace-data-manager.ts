@@ -1,5 +1,5 @@
 import type { UmbWorkspaceDataManager } from '../data-manager/workspace-data-manager.interface.js';
-import { jsonStringComparison, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, UmbObjectState, type MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -15,6 +15,16 @@ export class UmbSubmittableWorkspaceDataManager<ModelType extends UmbEntityModel
 
 	constructor(host: UmbControllerHost) {
 		super(host);
+	}
+
+	/**
+	 * Creates an observable part
+	 * @template ReturnType
+	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction
+	 * @memberof UmbSubmittableWorkspaceDataManager
+	 */
+	createObservablePart<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
+		this.#current.asObservablePart(mappingFunction);
 	}
 
 	/**

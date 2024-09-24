@@ -67,12 +67,12 @@ export class UmbDataTypeWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	readonly name = this._data.current.asObservablePart((data) => data?.name);
-	readonly unique = this._data.current.asObservablePart((data) => data?.unique);
-	readonly entityType = this._data.current.asObservablePart((data) => data?.entityType);
+	readonly name = this._data.createObservablePart((data) => data?.name);
+	readonly unique = this._data.createObservablePart((data) => data?.unique);
+	readonly entityType = this._data.createObservablePart((data) => data?.entityType);
 
-	readonly propertyEditorUiAlias = this._data.current.asObservablePart((data) => data?.editorUiAlias);
-	readonly propertyEditorSchemaAlias = this._data.current.asObservablePart((data) => data?.editorAlias);
+	readonly propertyEditorUiAlias = this._data.createObservablePart((data) => data?.editorUiAlias);
+	readonly propertyEditorSchemaAlias = this._data.createObservablePart((data) => data?.editorAlias);
 
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias).sortBy(
 		(a, b) => (a.weight || 0) - (b.weight || 0),
@@ -354,7 +354,7 @@ export class UmbDataTypeWorkspaceContext
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
-		return this.#currentData.asObservablePart(
+		return this._data.createObservablePart(
 			(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
 		);
 	}
