@@ -7,7 +7,7 @@ import { UmbUserConfigRepository } from '../../repository/config/index.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UMB_WORKSPACE_PATH_PATTERN, UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
