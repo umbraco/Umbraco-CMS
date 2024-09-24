@@ -1,5 +1,5 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
-import type { UmbDataTypeDetailRepository, UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { type UmbDataTypeDetailRepository, UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
