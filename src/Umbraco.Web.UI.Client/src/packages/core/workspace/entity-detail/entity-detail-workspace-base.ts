@@ -45,7 +45,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
-	#activePathSegment = '';
+	#routerActiveLocalPath = '';
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -169,11 +169,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	protected _setActivePathSegment(segment: string) {
-		this.#activePathSegment = segment;
+		this.#routerActiveLocalPath = segment;
 	}
 
 	protected _getActivePathSegment() {
-		return this.#activePathSegment;
+		return this.#routerActiveLocalPath;
 	}
 
 	/**
