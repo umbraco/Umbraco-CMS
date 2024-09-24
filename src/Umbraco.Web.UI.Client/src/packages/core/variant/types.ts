@@ -10,7 +10,7 @@ export interface UmbVariantDataModel {
 
 export interface UmbVariantPropertyValueModel extends UmbVariantDataModel, UmbPropertyValueData {}
 
-export interface UmbVariantModel {
+export interface UmbEntityVariantModel {
 	name: string;
 	culture: string | null;
 	segment: string | null;
@@ -18,7 +18,11 @@ export interface UmbVariantModel {
 	updateDate: string | null;
 }
 
-export interface UmbVariantOptionModel<VariantType extends UmbVariantModel = UmbVariantModel> {
+/** @deprecated use `UmbEntityVariantModel` instead */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbVariantModel extends UmbEntityVariantModel {}
+
+export interface UmbVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel> {
 	variant?: VariantType;
 	language: UmbLanguageDetailModel;
 	/**

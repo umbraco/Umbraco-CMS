@@ -1,5 +1,9 @@
 import type { UmbDocumentEntityType } from './entity.js';
-import type { UmbVariantModel, UmbVariantOptionModel, UmbVariantPublishModel } from '@umbraco-cms/backoffice/variant';
+import type {
+	UmbEntityVariantModel,
+	UmbVariantOptionModel,
+	UmbVariantPublishModel,
+} from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
@@ -19,7 +23,7 @@ export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	variants: Array<UmbDocumentVariantModel>;
 }
 
-export interface UmbDocumentVariantModel extends UmbVariantModel {
+export interface UmbDocumentVariantModel extends UmbEntityVariantModel {
 	state: UmbDocumentVariantState | null;
 	publishDate: string | null;
 }

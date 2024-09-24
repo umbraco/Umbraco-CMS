@@ -2,7 +2,7 @@ import { UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT } from './language-access.workspa
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import type { UmbVariantOptionModel, UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantOptionModel, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
@@ -10,7 +10,7 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
-	#variantOptions?: UmbVariantOptionModel<UmbVariantModel>[];
+	#variantOptions?: UmbVariantOptionModel<UmbEntityVariantModel>[];
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT);

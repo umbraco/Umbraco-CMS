@@ -4,12 +4,12 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObjectState, appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId, type UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbContentWorkspaceDataManager<
 		ModelType extends UmbContentDetailModel,
-		ModelVariantType extends UmbVariantModel = ModelType extends { variants: UmbVariantModel[] }
+		ModelVariantType extends UmbEntityVariantModel = ModelType extends { variants: UmbEntityVariantModel[] }
 			? ModelType['variants'][0]
 			: never,
 	>
@@ -240,8 +240,8 @@ export class UmbContentWorkspaceDataManager<
 	}
 
 	#buildSaveVariants(
-		persistedVariants: Array<UmbVariantModel> | undefined,
-		draftVariants: Array<UmbVariantModel>,
+		persistedVariants: Array<UmbEntityVariantModel> | undefined,
+		draftVariants: Array<UmbEntityVariantModel>,
 		selectedVariants: Array<UmbVariantId>,
 	) {
 		return draftVariants
@@ -254,7 +254,7 @@ export class UmbContentWorkspaceDataManager<
 					return persistedVariants?.find((x) => x.culture === variant.culture && x.segment === variant.segment);
 				}
 			})
-			.filter((x) => x !== undefined) as Array<UmbVariantModel>;
+			.filter((x) => x !== undefined) as Array<UmbEntityVariantModel>;
 	}
 
 	getChangedVariants() {

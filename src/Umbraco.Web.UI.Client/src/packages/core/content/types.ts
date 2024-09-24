@@ -1,5 +1,5 @@
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbContentValueModel<ValueType = unknown> extends UmbPropertyValueData<ValueType> {
 	editorAlias: string;
@@ -17,5 +17,5 @@ export interface UmbContentDetailModel {
 	unique: string;
 	entityType: string;
 	values: Array<UmbContentValueModel>;
-	variants: Array<UmbVariantModel>;
+	variants: Array<UmbEntityVariantModel>;
 }

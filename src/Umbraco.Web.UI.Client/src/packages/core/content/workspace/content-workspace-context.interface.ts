@@ -2,7 +2,7 @@ import type { UmbContentDetailModel } from '@umbraco-cms/backoffice/content';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
-import type { UmbVariantId, UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import type {
 	UmbPropertyStructureWorkspaceContext,
 	UmbRoutableWorkspaceContext,
@@ -12,7 +12,7 @@ import type {
 export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
-	VariantModelType extends UmbVariantModel = UmbVariantModel,
+	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
 > extends UmbRoutableWorkspaceContext,
 		UmbVariantDatasetWorkspaceContext<VariantModelType>,
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {

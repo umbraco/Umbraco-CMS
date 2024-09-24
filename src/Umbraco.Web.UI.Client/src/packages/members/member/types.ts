@@ -1,6 +1,6 @@
 import type { UmbMemberEntityType } from './entity.js';
 import type { UmbMemberKindType } from './utils/index.js';
-import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 
 export interface UmbMemberDetailModel extends UmbContentDetailModel {
@@ -21,11 +21,11 @@ export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	unique: string;
 	username: string;
 	values: Array<UmbMemberValueModel>;
-	variants: Array<UmbVariantModel>;
+	variants: Array<UmbEntityVariantModel>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbMemberVariantModel extends UmbVariantModel {}
+export interface UmbMemberVariantModel extends UmbEntityVariantModel {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMemberValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}

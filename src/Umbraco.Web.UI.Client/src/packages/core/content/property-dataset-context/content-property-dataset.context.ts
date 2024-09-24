@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { type Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceUniqueType } from '@umbraco-cms/backoffice/workspace';
@@ -14,7 +14,7 @@ import type { UmbWorkspaceUniqueType } from '@umbraco-cms/backoffice/workspace';
 export class UmbContentPropertyDatasetContext<
 		ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
 		ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
-		VariantModelType extends UmbVariantModel = UmbVariantModel,
+		VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
 	>
 	extends UmbContextBase<UmbPropertyDatasetContext>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
@@ -25,7 +25,7 @@ export class UmbContentPropertyDatasetContext<
 		return this.#variantId;
 	}
 
-	#currentVariant = new UmbObjectState<UmbVariantModel | undefined>(undefined);
+	#currentVariant = new UmbObjectState<UmbEntityVariantModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
 	name = this.#currentVariant.asObservablePart((x) => x?.name);
