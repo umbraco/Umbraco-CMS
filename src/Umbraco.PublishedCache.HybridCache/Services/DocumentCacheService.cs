@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -21,6 +22,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly IPublishedContentFactory _publishedContentFactory;
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
+    private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly CacheSettings _cacheSettings;
 
     private HashSet<Guid>? _seedKeys;
@@ -52,7 +54,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         IPublishedContentFactory publishedContentFactory,
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
-        IOptions<CacheSettings> cacheSettings)
+        IOptions<CacheSettings> cacheSettings,
+        IPublishedModelFactory publishedModelFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -61,6 +64,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _publishedContentFactory = publishedContentFactory;
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
+        _publishedModelFactory = publishedModelFactory;
         _cacheSettings = cacheSettings.Value;
     }
 
@@ -73,7 +77,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             async cancel => await _databaseCacheRepository.GetContentSourceAsync(key, preview));
 
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
     }
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool preview = false)
@@ -89,7 +93,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             GetCacheKey(keyAttempt.Result, preview), // Unique key to the cache entry
             async cancel => await _databaseCacheRepository.GetContentSourceAsync(id, preview));
         scope.Complete();
-        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview);
+        return contentCacheNode is null ? null : _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);;
     }
 
     public async Task SeedAsync(CancellationToken cancellationToken)
