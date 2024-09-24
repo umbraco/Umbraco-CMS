@@ -56,14 +56,10 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	protected override _checkWillNavigateAway(newUrl: string): boolean {
-		super._checkWillNavigateAway(newUrl);
-
-		const workspacePathBase = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
-
 		if (this.getIsNew()) {
-			return !newUrl.includes(`${workspacePathBase}/create`);
+			return !newUrl.includes(`/create`) || super._checkWillNavigateAway(newUrl);
 		} else {
-			return !newUrl.includes(`${workspacePathBase}/edit/${this.getUnique()}`);
+			return !newUrl.includes(`/edit/${this.getUnique()}`) || super._checkWillNavigateAway(newUrl);
 		}
 	}
 
