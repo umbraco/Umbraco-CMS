@@ -1,6 +1,6 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, type UmbDocumentEntityTypeUnion } from '../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type {
 	UmbDocumentVariantPublishModel,
@@ -52,7 +52,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -171,7 +171,6 @@ export class UmbDocumentWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
-		window.addEventListener('willchangestate', this.#onWillNavigate);
 		this.addValidationContext(new UmbValidationContext(this));
 
 		new UmbVariantValuesValidationPathTranslator(this);
@@ -924,68 +923,11 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	#hasUnpersistedChanges() {
-		const persisted = this.#persistedData.getValue();
-		const current = this.#currentData.getValue();
-		return jsonStringComparison(persisted, current) === false;
-	}
-
-	#resetCurrentData() {
-		this.#currentData.setValue(this.#persistedData.getValue());
-	}
-
-	#willNavigateAway(newUrl: string) {
-		let willNavigateAway = false;
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue()!;
-			const documentTypeUnique = this.#currentData.getValue()!.documentType.unique;
-
-			const createPath = UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
-				parentEntityType: parent.entityType as UmbDocumentEntityTypeUnion,
-				parentUnique: parent.unique,
-				documentTypeUnique,
-			});
-			willNavigateAway = !newUrl.includes(createPath);
-		} else {
-			const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
-				unique: this.getUnique()!,
-			});
-			willNavigateAway = !newUrl.includes(editPath);
-		}
-
-		return willNavigateAway;
-	}
-
-	#onWillNavigate = async (e: CustomEvent) => {
-		const newUrl = e.detail.url;
-
-		if (this.#willNavigateAway(newUrl) && this.#hasUnpersistedChanges()) {
-			e.preventDefault();
-			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
-
-			try {
-				// navigate to the new url when discarding changes
-				await modal.onSubmit();
-				// Reset the current data so we don't end in a endless loop of asking to discard changes.
-				this.#resetCurrentData();
-				history.pushState({}, '', e.detail.url);
-				return true;
-			} catch {
-				return false;
-			}
-		}
-
-		return true;
-	};
-
 	public override destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.structure.destroy();
 		this.#languageRepository.destroy();
-		window.removeEventListener('willchangestate', this.#onWillNavigate);
 		super.destroy();
 	}
 }
