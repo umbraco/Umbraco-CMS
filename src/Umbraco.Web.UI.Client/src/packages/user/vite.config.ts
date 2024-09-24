@@ -13,7 +13,7 @@ export default defineConfig({
 		entry: {
 			'current-user/index': 'current-user/index.ts',
 			'umbraco-package': 'umbraco-package.ts',
-			'user-change-password/index': 'user-change-password/index.ts',
+			'change-password/index': 'change-password/index.ts',
 			'user-group/index': 'user-group/index.ts',
 			'user-permission/index': 'user-permission/index.ts',
 			'user/index': 'user/index.ts',
