@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -303,7 +304,7 @@ public static class UserExtensions
             usn.Add(sn);
         }
 
-        foreach (var sn in usn)
+        foreach (var sn in CollectionsMarshal.AsSpan(usn))
         {
             var snp = paths[sn]; // has to be here now
             lsn.RemoveAll(x =>

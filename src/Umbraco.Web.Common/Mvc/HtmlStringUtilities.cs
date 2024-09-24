@@ -163,7 +163,9 @@ public sealed class HtmlStringUtilities
                                         if (isTagClose && tagStack.Count > 0)
                                         {
                                             var thisTag = tagStack.Pop();
-                                            outputtw.Write("</" + thisTag + ">");
+                                            outputtw.Write("</");
+                                            outputtw.Write(thisTag);
+                                            outputtw.Write('>');
                                             if (treatTagsAsContent)
                                             {
                                                 currentTextLength++;
@@ -175,7 +177,8 @@ public sealed class HtmlStringUtilities
                                             if (!lengthReached)
                                             {
                                                 tagStack.Push(currentTag);
-                                                outputtw.Write("<" + currentTag);
+                                                outputtw.Write('<');
+                                                outputtw.Write(currentTag);
                                                 if (treatTagsAsContent)
                                                 {
                                                     currentTextLength++;
@@ -183,7 +186,7 @@ public sealed class HtmlStringUtilities
 
                                                 if (!string.IsNullOrEmpty(tagContents))
                                                 {
-                                                    if (tagContents.EndsWith("/"))
+                                                    if (tagContents.EndsWith('/'))
                                                     {
                                                         // No end tag e.g. <br />.
                                                         tagStack.Pop();
