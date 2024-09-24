@@ -1,7 +1,5 @@
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-const UMB_DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
-
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspace',

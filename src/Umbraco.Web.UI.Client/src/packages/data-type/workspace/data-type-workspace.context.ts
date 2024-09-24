@@ -1,7 +1,9 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
+import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
@@ -12,23 +14,13 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbEntityWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import {
-	appendToFrozenArray,
-	UmbArrayState,
-	UmbObjectState,
-	UmbStringState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
@@ -51,22 +43,9 @@ type EntityType = UmbDataTypeDetailModel;
  * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
  */
 export class UmbDataTypeWorkspaceContext
-	extends UmbEntityWorkspaceContextBase<EntityType>
+	extends UmbEntityWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	//
-	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
-
-	#getDataPromise?: Promise<any>;
-
-	public isLoaded() {
-		return this.#getDataPromise;
-	}
-
 	readonly name = this._data.createObservablePart((data) => data?.name);
 	readonly unique = this._data.createObservablePart((data) => data?.unique);
 	readonly entityType = this._data.createObservablePart((data) => data?.entityType);
@@ -96,7 +75,11 @@ export class UmbDataTypeWorkspaceContext
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.DataType');
+		super(host, {
+			workspaceAlias: UMB_DATA_TYPE_WORKSPACE_ALIAS,
+			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.addValidationContext(new UmbValidationContext(this));
 
@@ -130,15 +113,28 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
+	async load(unique: string) {
+		const { asObservable } = await super.load(unique);
+
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
+		}
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/data-type-root');
+		}
+	}
+
 	override resetState() {
 		super.resetState();
-		this._data.clearData();
 		this.#propertyEditorSchemaSettingsProperties = [];
 		this.#propertyEditorUISettingsProperties = [];
 		this.#propertyEditorSchemaSettingsDefaultData = [];
 		this.#propertyEditorUISettingsDefaultData = [];
 		this.#settingsDefaultData = undefined;
-
 		this.#mergeConfigProperties();
 	}
 
@@ -267,60 +263,6 @@ export class UmbDataTypeWorkspaceContext
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
 	}
 
-	async load(unique: string) {
-		this.resetState();
-		this.#getDataPromise = this.repository.requestByUnique(unique);
-		type GetDataType = Awaited<ReturnType<UmbDataTypeDetailRepository['requestByUnique']>>;
-		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
-		if (!data) return undefined;
-
-		if (data) {
-			this.setIsNew(false);
-			this._data.setPersistedData(data);
-			this._data.setCurrentData(data);
-		}
-
-		if (asObservable) {
-			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
-		}
-	}
-
-	#onStoreChange(entity: EntityType | undefined) {
-		if (!entity) {
-			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/settings/workspace/data-type-root');
-		}
-	}
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent.setValue(parent);
-		const request = this.repository.createScaffold();
-		this.#getDataPromise = request;
-		let { data } = await request;
-		if (!data) return undefined;
-
-		if (this.modalContext) {
-			data = { ...data, ...this.modalContext.data.preset };
-		}
-		this.setIsNew(true);
-		this._data.setPersistedData(data);
-		this._data.setCurrentData(data);
-		return data;
-	}
-
-	getData() {
-		return this._data.getCurrentData();
-	}
-
-	getUnique() {
-		return this._data.getCurrentData()?.unique;
-	}
-
-	getEntityType() {
-		return UMB_DATA_TYPE_ENTITY_TYPE;
-	}
-
 	getName() {
 		return this._data.getCurrentData()?.name;
 	}
@@ -352,7 +294,7 @@ export class UmbDataTypeWorkspaceContext
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		await this.#getDataPromise;
+		await this._getDataPromise;
 		return this._data.createObservablePart(
 			(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
 		);
@@ -367,7 +309,7 @@ export class UmbDataTypeWorkspaceContext
 
 	// TODO: its not called a property in the model, but we do consider this way in our front-end
 	async setPropertyValue(alias: string, value: unknown) {
-		await this.#getDataPromise;
+		await this._getDataPromise;
 		const entry = { alias: alias, value: value };
 
 		const currentData = this._data.getCurrentData();
@@ -378,61 +320,10 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async submit() {
-		const currentData = this._data.getCurrentData();
-
-		if (!currentData) {
-			throw new Error('Data is not set');
-		}
-		if (!currentData.unique) {
-			throw new Error('Unique is not set');
-		}
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			const { error, data } = await this.repository.create(currentData, parent.unique);
-			if (error || !data) {
-				throw error?.message ?? 'Repository did not return data after create.';
-			}
-
-			this._data.setPersistedData(data);
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-			this.setIsNew(false);
-		} else {
-			const { error, data } = await this.repository.save(currentData);
-			if (error || !data) {
-				throw error?.message ?? 'Repository did not return data after create.';
-			}
-
-			this._data.setPersistedData(data);
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-	}
-
-	async delete(unique: string) {
-		await this.repository.delete(unique);
-	}
-
 	public override destroy(): void {
 		this.#properties.destroy();
 		this.#propertyEditorUiIcon.destroy();
 		this.#propertyEditorUiName.destroy();
-		this.repository.destroy();
 		super.destroy();
 	}
 }
