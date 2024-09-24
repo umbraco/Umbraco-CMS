@@ -86,6 +86,9 @@ export abstract class UmbBlockManagerContext<
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
+	getLayouts() {
+		return this._layouts.getValue();
+	}
 	setContents(contents: Array<UmbBlockDataType>) {
 		this.#contents.setValue(contents);
 	}
@@ -276,21 +279,21 @@ export abstract class UmbBlockManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		// TODO: [v15]: ignoring unused var here here to prevent a breaking change
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		originData: BlockOriginDataType,
 	) {
 		// Create content entry:
 		if (layoutEntry.contentUdi) {
 			this.#contents.appendOne(content);
 		} else {
 			throw new Error('Cannot create block, missing contentUdi');
-			return false;
 		}
 
 		//Create settings entry:
 		if (settings && layoutEntry.settingsUdi) {
 			this.#settings.appendOne(settings);
 		}
+	}
+
+	protected removeBlockUdi(contentUdi: string) {
+		this.#contents.removeOne(contentUdi);
 	}
 }

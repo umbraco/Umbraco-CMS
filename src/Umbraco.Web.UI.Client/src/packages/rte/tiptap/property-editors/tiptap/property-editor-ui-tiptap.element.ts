@@ -10,13 +10,12 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import '../../components/input-tiptap/input-tiptap.element.js';
 import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
-// Look at Tiny for correct types
 export interface UmbRichTextEditorValueType {
 	markup: string;
 	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }
 
-const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.RichText';
+const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.TinyMCE';
 
 const elementName = 'umb-property-editor-ui-tiptap';
 
@@ -128,21 +127,24 @@ export class UmbPropertyEditorUiTiptapElement extends UmbLitElement implements U
 			markup: this._latestMarkup,
 		};
 
-		// TODO: Validate blocks
-		// Loop through used, to remove the classes on these.
-		/*const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
-		blockEls.forEach((blockEl) => {
-			blockEl.removeAttribute('contenteditable');
-			blockEl.removeAttribute('class');
-		});
-
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-		//const blockElements = editor.dom.select(`umb-rte-block, umb-rte-block-inline`);
-		const usedContentUdis = Array.from(blockEls).map((blockElement) => blockElement.getAttribute('data-content-udi'));
+		const usedContentUdis: string[] = [];
+
+		// Regex matching all block elements in the markup, and extracting the content UDI. It's the same as the one used on the backend.
+		const regex = new RegExp(
+			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-udi="(?<udi>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
+		);
+		let blockElement: RegExpExecArray | null;
+		while ((blockElement = regex.exec(this._latestMarkup)) !== null) {
+			if (blockElement.groups?.udi) {
+				usedContentUdis.push(blockElement.groups.udi);
+			}
+		}
+
 		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentUdis.indexOf(x.contentUdi) === -1);
 		unusedBlocks.forEach((blockLayout) => {
 			this.#managerContext.removeOneLayout(blockLayout.contentUdi);
-		});*/
+		});
 
 		this.#fireChangeEvent();
 	}

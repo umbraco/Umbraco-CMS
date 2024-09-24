@@ -1,10 +1,14 @@
-import type { UmbBlockRteLayoutModel } from '../../types.js';
+import { UMB_BLOCK_RTE, type UmbBlockRteLayoutModel } from '../../types.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbBlockEditorCustomViewProperties } from '@umbraco-cms/backoffice/block-custom-view';
+import type {
+	ManifestBlockEditorCustomView,
+	UmbBlockEditorCustomViewProperties,
+} from '@umbraco-cms/backoffice/block-custom-view';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 import '../ref-rte-block/index.js';
 
@@ -13,22 +17,22 @@ import '../ref-rte-block/index.js';
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
 	@property({ type: String, attribute: 'data-content-udi', reflect: true })
 	public get contentUdi(): string | undefined {
-		return this._contentUdi;
+		return this.#contentUdi;
 	}
 	public set contentUdi(value: string | undefined) {
 		if (!value) return;
-		this._contentUdi = value;
+		this.#contentUdi = value;
 		this.#context.setContentUdi(value);
 	}
-	private _contentUdi?: string | undefined;
+	#contentUdi?: string;
 
 	#context = new UmbBlockRteEntryContext(this);
 
 	@state()
 	_showContentEdit = false;
+
 	@state()
 	_hasSettings = false;
 
@@ -43,6 +47,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	_workspaceEditSettingsPath?: string;
+
+	@state()
+	_contentElementTypeAlias?: string;
 
 	@state()
 	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
@@ -68,6 +75,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(this.#context.settingsElementTypeKey, (key) => {
 			this._hasSettings = !!key;
 			this.#updateBlockViewProps({ config: { ...this._blockViewProps.config, showSettingsEdit: !!key } });
+		});
+		this.observe(this.#context.contentElementTypeAlias, (alias) => {
+			this._contentElementTypeAlias = alias;
 		});
 		this.observe(
 			this.#context.blockType,
@@ -142,16 +152,26 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return html`<umb-ref-rte-block .label=${this._label} .icon=${this._icon}></umb-ref-rte-block>`;
 	}
 
+	#filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
+		const elementTypeAlias = this._contentElementTypeAlias ?? '';
+		const isForBlockEditor =
+			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);
+		const isForContentTypeAlias =
+			!manifest.forContentTypeAlias || stringOrStringArrayContains(manifest.forContentTypeAlias, elementTypeAlias);
+		return isForBlockEditor && isForContentTypeAlias;
+	};
+
 	#renderBlock() {
 		return html`
 			<div class="uui-text uui-font">
 				<umb-extension-slot
 					type="blockEditorCustomView"
-					default-element=${'umb-ref-rte-block'}
+					default-element="umb-ref-rte-block"
 					.props=${this._blockViewProps}
-					single
-					>${this.#renderRefBlock()}</umb-extension-slot
-				>
+					.filter=${this.#filterBlockCustomViews}
+					single>
+					${this.#renderRefBlock()}
+				</umb-extension-slot>
 				<uui-action-bar>
 					${this._showContentEdit && this._workspaceEditContentPath
 						? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
@@ -163,9 +183,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 								<uui-icon name="icon-settings"></uui-icon>
 							</uui-button>`
 						: ''}
-					<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
-						<uui-icon name="icon-remove"></uui-icon>
-					</uui-button>
 				</uui-action-bar>
 			</div>
 		`;
@@ -175,7 +192,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return this.#renderBlock();
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -183,6 +200,13 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				display: block;
 				user-select: none;
 				user-drag: auto;
+				white-space: nowrap;
+			}
+			:host(.ProseMirror-selectednode) {
+				umb-ref-rte-block {
+					cursor: not-allowed;
+					outline: 3px solid #b4d7ff;
+				}
 			}
 			uui-action-bar {
 				position: absolute;

@@ -1,3 +1,4 @@
+import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -115,13 +116,12 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onChange() {
-		const editor = this.#managerContext.getTinyMceEditor();
-		if (!editor) return;
+	#onChange(event: CustomEvent & { target: UmbInputTinyMceElement }) {
+		const value = event.target.value;
 
 		// Clone the DOM, to remove the classes and attributes on the original:
 		const div = document.createElement('div');
-		div.innerHTML = editor.getContent();
+		div.innerHTML = value.toString();
 
 		// Loop through used, to remove the classes on these.
 		const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);

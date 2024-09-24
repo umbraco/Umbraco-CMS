@@ -32,13 +32,16 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this._workspaceEditPath ?? '#'}
-			><uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon
-		></uui-ref-node>`;
+		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this._workspaceEditPath ?? '#'}>
+			<uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon>
+		</uui-ref-node>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
+			:host {
+				display: block;
+			}
 			uui-ref-node {
 				min-height: var(--uui-size-16);
 			}
