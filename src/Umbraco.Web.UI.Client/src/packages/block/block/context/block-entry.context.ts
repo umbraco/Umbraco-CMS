@@ -274,29 +274,45 @@ export abstract class UmbBlockEntryContext<
 		});
 
 		// Observe key:
-		this.observe(this.unique, (contentKey) => {
-			if (!contentKey) return;
-			this.#observeContentData();
-		});
+		this.observe(
+			this.unique,
+			(contentKey) => {
+				if (!contentKey) return;
+				this.#observeContentData();
+			},
+			null,
+		);
 
 		// Observe contentElementTypeKey:
-		this.observe(this.contentTypeKey, (contentElementTypeKey) => {
-			if (!contentElementTypeKey) return;
+		this.observe(
+			this.contentTypeKey,
+			(contentElementTypeKey) => {
+				if (!contentElementTypeKey) return;
 
-			this.#getContentStructure();
-			this.#observeBlockType();
-		});
-		this.observe(this.settingsDataContentTypeKey, (settingsElementTypeKey) => {
-			if (!settingsElementTypeKey) return;
+				this.#getContentStructure();
+				this.#observeBlockType();
+			},
+			null,
+		);
+		this.observe(
+			this.settingsDataContentTypeKey,
+			(settingsElementTypeKey) => {
+				if (!settingsElementTypeKey) return;
 
-			this.#getSettingsStructure(settingsElementTypeKey);
-		});
+				this.#getSettingsStructure(settingsElementTypeKey);
+			},
+			null,
+		);
 
 		// Observe blockType:
-		this.observe(this.blockType, (blockType) => {
-			if (!blockType) return;
-			this.#observeBlockTypeLabel();
-		});
+		this.observe(
+			this.blockType,
+			(blockType) => {
+				if (!blockType) return;
+				this.#observeBlockTypeLabel();
+			},
+			null,
+		);
 
 		// Correct settings data, accordingly to configuration of the BlockType: [NL]
 		this.observe(
@@ -317,21 +333,26 @@ export abstract class UmbBlockEntryContext<
 					// We do not need to remove the settings if configuration is gone, cause another observation handles this. [NL]
 				}
 			},
+			null,
 		);
 
-		this.observe(observeMultiple([this.layout, this.blockType]), ([layout, blockType]) => {
-			if (!this.#contentKey || !layout || !blockType) return;
-			if (layout.settingsKey == null && blockType.settingsElementTypeKey) {
-				// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
-				const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
-				this._manager?.setOneSettings(settingsData);
-				this._layout.update({ settingsKey: settingsData.key } as Partial<BlockLayoutType>);
-			} else if (layout.settingsKey && blockType.settingsElementTypeKey === undefined) {
-				// We no longer have settings ElementType in config. So we remove the settingsData and settings key from the layout. [NL]
-				this._manager?.removeOneSettings(layout.settingsKey);
-				this._layout.update({ settingsKey: undefined } as Partial<BlockLayoutType>);
-			}
-		});
+		this.observe(
+			observeMultiple([this.layout, this.blockType]),
+			([layout, blockType]) => {
+				if (!this.#contentKey || !layout || !blockType) return;
+				if (layout.settingsKey == null && blockType.settingsElementTypeKey) {
+					// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
+					const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
+					this._manager?.setOneSettings(settingsData);
+					this._layout.update({ settingsKey: settingsData.key } as Partial<BlockLayoutType>);
+				} else if (layout.settingsKey && blockType.settingsElementTypeKey === undefined) {
+					// We no longer have settings ElementType in config. So we remove the settingsData and settings key from the layout. [NL]
+					this._manager?.removeOneSettings(layout.settingsKey);
+					this._layout.update({ settingsKey: undefined } as Partial<BlockLayoutType>);
+				}
+			},
+			null,
+		);
 	}
 
 	getContentKey() {
