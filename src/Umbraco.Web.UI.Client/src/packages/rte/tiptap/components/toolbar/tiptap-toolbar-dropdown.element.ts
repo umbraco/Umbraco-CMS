@@ -1,5 +1,5 @@
 import { css, customElement, html, nothing, repeat, type TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { PopoverContainerPlacement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const elementName = 'umb-tiptap-toolbar-dropdown';
@@ -86,8 +86,12 @@ export class UmbTiptapToolbarDropdownElement extends UmbLitElement {
 		`;
 	}
 
-	#renderItems(label: string, items: Array<DropdownItem>) {
-		return html` <uui-popover-container placement="right-start" id=${this.#makeAlias(label)}>
+	#renderItems(
+		label: string,
+		items: Array<DropdownItem>,
+		placement: PopoverContainerPlacement = 'right-start',
+	): TemplateResult {
+		return html` <uui-popover-container placement=${placement} id=${this.#makeAlias(label)}>
 			<div class="popover-content">
 				${repeat(
 					items,
@@ -101,7 +105,7 @@ export class UmbTiptapToolbarDropdownElement extends UmbLitElement {
 	override render() {
 		return html`
 			<button class="label selected-value" aria-label="Text styles" popovertarget="text-styles">Text styles</button>
-			${this.#renderItems('Text styles', this.#testDropdownItems)}
+			${this.#renderItems('Text styles', this.#testDropdownItems, 'bottom-start')}
 		`;
 	}
 
@@ -122,6 +126,11 @@ export class UmbTiptapToolbarDropdownElement extends UmbLitElement {
 			align-items: center;
 			cursor: pointer;
 			color: var(--uui-color-text);
+		}
+
+		.label:hover {
+			background: var(--uui-color-surface-alt);
+			color: var(--uui-color-interactive-emphasis);
 		}
 
 		.selected-value {
