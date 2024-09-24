@@ -8,6 +8,8 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 
+import './tiptap-toolbar-groups-configuration.element.js';
+
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 const tinyIconSet = tinymce.IconManager.get('default');
@@ -230,6 +232,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	override render() {
+		return html`<umb-tiptap-toolbar-groups-configuration></umb-tiptap-toolbar-groups-configuration>`;
 		return html`
 			<div class="toolbar">
 				${repeat(this._selectedValuesNew, (row, index) => this.#renderRow(row, index))}
