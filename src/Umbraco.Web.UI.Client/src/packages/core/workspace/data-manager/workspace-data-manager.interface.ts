@@ -4,4 +4,6 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 export interface UmbWorkspaceDataManager<ModelType extends UmbEntityModel> extends UmbController {
 	getPersistedData(): ModelType | undefined;
 	getCurrentData(): ModelType | undefined;
+	setPersistedData(data: ModelType | undefined): void;
+	setCurrentData(data: ModelType | undefined): void;
 }

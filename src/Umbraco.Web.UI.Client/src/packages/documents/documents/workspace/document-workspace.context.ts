@@ -88,9 +88,6 @@ export class UmbDocumentWorkspaceContext
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
-	/**
-	 * The document is the current state/draft version of the document.
-	 */
 	readonly #data = new UmbContentWorkspaceDataManager<EntityModel>(this, UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD);
 
 	#getDataPromise?: Promise<any>;

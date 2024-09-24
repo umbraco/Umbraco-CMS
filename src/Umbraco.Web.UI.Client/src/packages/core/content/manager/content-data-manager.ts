@@ -49,6 +49,13 @@ export class UmbContentWorkspaceDataManager<
 		this.#varies = vary;
 	}
 
+	setPersistedData(data: ModelType | undefined) {
+		this.#persisted.setValue(data);
+	}
+	setCurrentData(data: ModelType | undefined) {
+		this.current.setValue(data);
+	}
+
 	getPersistedData() {
 		return this.#persisted.getValue();
 	}
