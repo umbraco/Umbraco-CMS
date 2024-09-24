@@ -24,10 +24,6 @@ variables:
   NODE_OPTIONS: --max_old_space_size=16384
 
 parameters:
-  - name: runSqlServerE2ETests
-    displayName: Run the SQL Server E2E Tests
-    type: boolean
-    default: false
   - name : runSmokeTests
     displayName: Run the smoke tests
     type: boolean
