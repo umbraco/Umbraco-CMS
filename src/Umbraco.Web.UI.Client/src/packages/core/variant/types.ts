@@ -22,7 +22,7 @@ export interface UmbEntityVariantModel {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbVariantModel extends UmbEntityVariantModel {}
 
-export interface UmbVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel> {
+export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel> {
 	variant?: VariantType;
 	language: UmbLanguageDetailModel;
 	/**
@@ -32,6 +32,11 @@ export interface UmbVariantOptionModel<VariantType extends UmbEntityVariantModel
 	culture: string | null;
 	segment: string | null;
 }
+
+/** @deprecated use `UmbEntityVariantOptionModel` instead */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
+	extends UmbEntityVariantOptionModel<VariantType> {}
 
 export interface UmbVariantPublishModel {
 	variantId: UmbVariantId;
