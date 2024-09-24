@@ -16,11 +16,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache;
 internal class Property : PublishedPropertyBase
 {
     private readonly PublishedContent _content;
+    private readonly ICacheManager _cacheManager;
     private readonly Guid _contentUid;
     private readonly bool _isMember;
     private readonly bool _isPreviewing;
-
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
     // the invariant-neutral source and inter values
     private readonly object? _sourceValue;
@@ -42,9 +41,9 @@ internal class Property : PublishedPropertyBase
     public Property(
         IPublishedPropertyType propertyType,
         PublishedContent content,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        ICacheManager cacheManager,
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
-        : this(propertyType, content, null, publishedSnapshotAccessor, referenceCacheLevel)
+        : this(propertyType, content, null, cacheManager, referenceCacheLevel)
     {
     }
 
@@ -53,7 +52,7 @@ internal class Property : PublishedPropertyBase
         IPublishedPropertyType propertyType,
         PublishedContent content,
         PropertyData[]? sourceValues,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        ICacheManager cacheManager,
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
         : base(propertyType, referenceCacheLevel)
     {
@@ -82,9 +81,9 @@ internal class Property : PublishedPropertyBase
 
         _contentUid = content.Key;
         _content = content;
+        _cacheManager = cacheManager;
         _isPreviewing = content.IsPreviewing;
         _isMember = content.ContentType.ItemType == PublishedItemType.Member;
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
         _variations = propertyType.Variations | content.ContentType.Variations;
@@ -102,7 +101,7 @@ internal class Property : PublishedPropertyBase
         _content = content;
         _isPreviewing = true;
         _isMember = origin._isMember;
-        _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+        _cacheManager = origin._cacheManager;
         _variations = origin._variations;
         _sourceVariations = origin._sourceVariations;
     }
@@ -188,23 +187,8 @@ internal class Property : PublishedPropertyBase
                 cacheValues = _cacheValues ??= new CacheValues();
                 break;
             case PropertyCacheLevel.Elements:
-                // cache within the elements cache, unless previewing, then use the snapshot or
-                // elements cache (if we don't want to pollute the elements cache with short-lived
-                // data) depending on settings
-                // for members, always cache in the snapshot cache - never pollute elements cache
-                publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-                cache = publishedSnapshot == null
-                    ? null
-                    : (_isPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && _isMember == false
-                        ? publishedSnapshot.ElementsCache
-                        : publishedSnapshot.SnapshotCache;
-                cacheValues = GetCacheValues(cache);
-                break;
-            case PropertyCacheLevel.Snapshot:
-                // cache within the snapshot cache
-                publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-                cache = publishedSnapshot?.SnapshotCache;
-                cacheValues = GetCacheValues(cache);
+                // TODO: Is this right?
+                cacheValues = GetCacheValues(_cacheManager.ElementsCache);
                 break;
             default:
                 throw new InvalidOperationException("Invalid cache level.");
