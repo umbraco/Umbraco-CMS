@@ -9,6 +9,7 @@ import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/wor
 import { UmbSubmittableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbUserDetailModel;
 
@@ -39,6 +40,8 @@ export class UmbUserWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
+
+		this.addValidationContext(new UmbValidationContext(this));
 
 		this.routes.setRoutes([
 			{

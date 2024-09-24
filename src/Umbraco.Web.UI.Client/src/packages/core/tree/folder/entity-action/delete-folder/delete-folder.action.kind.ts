@@ -17,6 +17,7 @@ export const manifest: UmbExtensionManifestKind = {
 		meta: {
 			icon: 'icon-trash',
 			label: '#actions_folderDelete',
+			additionalOptions: true,
 		},
 	},
 };
