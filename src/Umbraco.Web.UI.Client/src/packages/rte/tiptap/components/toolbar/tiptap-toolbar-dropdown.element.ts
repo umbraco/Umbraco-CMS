@@ -79,7 +79,7 @@ export class UmbTiptapToolbarDropdownElement extends UmbLitElement {
 				@mouseenter=${() => this.#onMouseEnter(item.label)}
 				@mouseleave=${() => this.#onMouseLeave(item.label)}>
 				<button class="label" aria-label=${item.label} popovertarget=${this.#makeAlias(item.label)}>
-					${item.label}
+					${item.label}${item.nested ? html`<uui-symbol-expand></uui-symbol-expand>` : nothing}
 				</button>
 				${item.nested ? this.#renderItems(item.label, item.nested) : nothing}
 			</div>
@@ -104,7 +104,9 @@ export class UmbTiptapToolbarDropdownElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<button class="label selected-value" aria-label="Text styles" popovertarget="text-styles">Text styles</button>
+			<button class="label selected-value" aria-label="Text styles" popovertarget="text-styles">
+				Text styles<uui-symbol-expand style="top: 4px;" ?open=${true}></uui-symbol-expand>
+			</button>
 			${this.#renderItems('Text styles', this.#testDropdownItems, 'bottom-start')}
 		`;
 	}
@@ -117,15 +119,23 @@ export class UmbTiptapToolbarDropdownElement extends UmbLitElement {
 			text-align: unset;
 		}
 
+		uui-symbol-expand {
+			position: absolute;
+			right: 5px;
+			top: 5px;
+		}
+
 		.label {
 			border-radius: var(--uui-border-radius);
 			width: 100%;
 			box-sizing: border-box;
 			align-content: center;
 			padding: var(--uui-size-space-1) var(--uui-size-space-3);
+			padding-right: 21px;
 			align-items: center;
 			cursor: pointer;
 			color: var(--uui-color-text);
+			position: relative;
 		}
 
 		.label:hover {
