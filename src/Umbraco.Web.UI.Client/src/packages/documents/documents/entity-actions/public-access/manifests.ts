@@ -14,6 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-lock',
 			label: '#actions_protect',
+			additionalOptions: true,
 		},
 		conditions: [
 			{

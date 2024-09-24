@@ -1,7 +1,7 @@
+import type { UmbContextDebuggerModalData } from './debug-modal.token.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbContextDebuggerModalData } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-context-debugger-modal')
 export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<UmbContextDebuggerModalData> {

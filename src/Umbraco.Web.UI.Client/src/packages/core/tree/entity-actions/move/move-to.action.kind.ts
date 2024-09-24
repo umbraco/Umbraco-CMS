@@ -16,6 +16,7 @@ export const manifest: UmbExtensionManifestKind = {
 		meta: {
 			icon: 'icon-enter',
 			label: '#actions_move',
+			additionalOptions: true,
 			treeRepositoryAlias: '',
 			moveRepositoryAlias: '',
 			treeAlias: '',
