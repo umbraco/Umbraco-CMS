@@ -112,12 +112,12 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
-	async load(unique: string) {
-		const { asObservable } = await super.load(unique);
+	override async load(unique: string) {
+		const response = await super.load(unique);
 
-		if (asObservable) {
-			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
-		}
+		this.observe(response.asObservable?.(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
+
+		return response;
 	}
 
 	#onStoreChange(entity: EntityType | undefined) {

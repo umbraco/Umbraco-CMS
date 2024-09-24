@@ -53,9 +53,9 @@ export class UmbUserWorkspaceContext
 	}
 
 	override async load(unique: string) {
-		const { asObservable } = await super.load(unique);
+		const response = await super.load(unique);
 
-		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
+		this.observe(response.asObservable?.(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
 
 		if (!this._detailRepository) {
 			throw new Error('Detail repository is missing');
@@ -64,6 +64,8 @@ export class UmbUserWorkspaceContext
 		// Get the calculated start nodes
 		const { data: calculatedStartNodes } = await this._detailRepository.requestCalculateStartNodes(unique);
 		this.#calculatedStartNodes.setValue(calculatedStartNodes);
+
+		return response;
 	}
 
 	/* TODO: some properties are allowed to update without saving.
