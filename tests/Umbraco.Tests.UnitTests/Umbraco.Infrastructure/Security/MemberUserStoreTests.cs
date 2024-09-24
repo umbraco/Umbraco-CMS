@@ -36,9 +36,9 @@ public class MemberUserStoreTests
             new UmbracoMapper(new MapDefinitionCollection(() => new List<IMapDefinition>()), mockScopeProvider, NullLogger<UmbracoMapper>.Instance),
             mockScopeProvider,
             new IdentityErrorDescriber(),
-            Mock.Of<IPublishedSnapshotAccessor>(),
             Mock.Of<IExternalLoginWithKeyService>(),
-            Mock.Of<ITwoFactorLoginService>());
+            Mock.Of<ITwoFactorLoginService>(),
+            Mock.Of<IPublishedMemberCache>());
     }
 
     [Test]

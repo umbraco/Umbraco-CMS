@@ -129,15 +129,9 @@ public class PropertyCacheLevelTests
         var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
         var elementsCache = new FastDictionaryAppCache();
-        var snapshotCache = new FastDictionaryAppCache();
 
-        var publishedSnapshot = new Mock<IPublishedSnapshot>();
-        publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);
-        publishedSnapshot.Setup(x => x.ElementsCache).Returns(elementsCache);
-
-        var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
-        var localPublishedSnapshot = publishedSnapshot.Object;
-        publishedSnapshotAccessor.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
+        var cacheManager = new Mock<ICacheManager>();
+        cacheManager.Setup(x => x.ElementsCache).Returns(elementsCache);
 
         // pretend we're creating this set as a value for a property
         // referenceCacheLevel is the cache level for this fictious property
@@ -151,33 +145,23 @@ public class PropertyCacheLevelTests
             },
             false,
             referenceCacheLevel,
-            publishedSnapshotAccessor.Object);
+            cacheManager.Object);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
         Assert.AreEqual(1, converter.InterConverts);
 
         Assert.AreEqual(elementsCount1, elementsCache.Count);
-        Assert.AreEqual(snapshotCount1, snapshotCache.Count);
-
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
         Assert.AreEqual(interConverts, converter.InterConverts);
 
         Assert.AreEqual(elementsCount2, elementsCache.Count);
-        Assert.AreEqual(snapshotCount2, snapshotCache.Count);
-
-        var oldSnapshotCache = snapshotCache;
-        snapshotCache.Clear();
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
 
         Assert.AreEqual(elementsCount2, elementsCache.Count);
-        Assert.AreEqual(snapshotCount2, snapshotCache.Count);
-        Assert.AreEqual(snapshotCount2, oldSnapshotCache.Count);
-
-        Assert.AreEqual((interConverts == 1 ? 1 : 3) + snapshotCache.Count, converter.InterConverts);
 
         var oldElementsCache = elementsCache;
         elementsCache.Clear();
@@ -187,9 +171,6 @@ public class PropertyCacheLevelTests
 
         Assert.AreEqual(elementsCount2, elementsCache.Count);
         Assert.AreEqual(elementsCount2, oldElementsCache.Count);
-        Assert.AreEqual(snapshotCount2, snapshotCache.Count);
-
-        Assert.AreEqual((interConverts == 1 ? 1 : 4) + snapshotCache.Count + elementsCache.Count, converter.InterConverts);
     }
 
     [Test]
