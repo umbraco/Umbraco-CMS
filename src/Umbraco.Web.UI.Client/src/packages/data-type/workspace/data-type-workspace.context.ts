@@ -11,7 +11,7 @@ import type {
 import {
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
-	UmbEntityWorkspaceContextBase,
+	UmbEntityDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -42,7 +42,7 @@ type EntityType = UmbDataTypeDetailModel;
  * - a new property editor ui is picked for a data-type, uses the data-type configuration to set the schema, if such is configured for the Property Editor UI. (The user picks the UI via the UI, the schema comes from the UI that the user picked, we store both on the data-type)
  */
 export class UmbDataTypeWorkspaceContext
-	extends UmbEntityWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
+	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	readonly name = this._data.createObservablePart((data) => data?.name);

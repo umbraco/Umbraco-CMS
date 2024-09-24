@@ -1,5 +1,5 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
-import { UmbEntityWorkspaceDataManager } from './entity-workspace-data-manager.js';
+import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -19,7 +19,7 @@ export interface UmbEntityWorkspaceContextArgs {
 	detailRepositoryAlias: string;
 }
 
-export abstract class UmbEntityWorkspaceContextBase<
+export abstract class UmbEntityDetailWorkspaceContextBase<
 	EntityModelType extends UmbEntityModel,
 	DetailRepositoryType extends UmbDetailRepository<EntityModelType> = UmbDetailRepository<EntityModelType>,
 > extends UmbSubmittableWorkspaceContextBase<EntityModelType> {
