@@ -21,7 +21,7 @@ type ToolbarRow = {
 
 type ToolbarConfig = ToolbarRow[];
 
-const toolbarConfig: ToolbarConfig = [
+let toolbarConfig: ToolbarConfig = [
 	{
 		rowId: 'asdasgasgasd',
 		groups: [
@@ -63,8 +63,11 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 
 	#value = '';
 
-	#addGroup = (rowId) => {
-		toolbarConfig[toolbarConfig.length - 1].groups.push({
+	#addGroup = (rowId: string) => {
+		const row = toolbarConfig.find((row) => row.rowId === rowId);
+		if (!row) return;
+
+		row.groups.push({
 			groupId: UmbId.new(),
 			buttons: [],
 		});
@@ -73,10 +76,10 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	};
 
 	#removeGroup(groupId: string) {
-		const groupIndex = toolbarConfig.findIndex((row) => row.groups.some((group) => group.groupId === groupId));
-		if (groupIndex === -1) return;
+		const row = toolbarConfig.find((row) => row.groups.some((group) => group.groupId === groupId));
+		if (!row) return;
 
-		toolbarConfig.splice(groupIndex, 1);
+		row.groups = row.groups.filter((group) => group.groupId !== groupId);
 
 		this.requestUpdate();
 	}
@@ -95,11 +98,8 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		this.requestUpdate();
 	};
 
-	#removeRow(rowId: number) {
-		const rowIndex = toolbarConfig.findIndex((row) => row.rowId === rowId);
-		if (rowIndex === -1) return;
-
-		toolbarConfig.splice(rowIndex, 1);
+	#removeRow(rowId: string) {
+		toolbarConfig = toolbarConfig.filter((row) => row.rowId !== rowId);
 
 		this.requestUpdate();
 	}
@@ -155,11 +155,18 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 			@dragover=${this.#onDragOver}
 			@drop=${(e: DragEvent) => this.#onDrop(e, group.groupId)}>
 			${repeat(group.buttons, (button) => button.alias, this.#renderButton)}
+			<button class="remove-group-button" @click=${() => this.#removeGroup(group.groupId)}>X</button>
 		</div>`;
 	};
 
 	#renderRow = (row: ToolbarRow) => {
-		return html`<div class="row">${repeat(row.groups, (group) => group.groupId, this.#renderGroup)}</div>`;
+		return html`<div class="row">
+			${repeat(row.groups, (group) => group.groupId, this.#renderGroup)}<button
+				@click=${() => this.#addGroup(row.rowId)}>
+				Add group
+			</button>
+			<button class="remove-row-button" @click=${() => this.#removeRow(row.rowId)}>X</button>
+		</div>`;
 	};
 
 	override render() {
@@ -178,16 +185,38 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				gap: 6px;
 			}
 			.row {
+				position: relative;
 				display: flex;
 				gap: 12px;
 			}
 			.group {
+				position: relative;
 				display: flex;
 				gap: 3px;
 				border: 1px solid #ccc;
 				padding: 6px;
 				min-height: 24px;
 				min-width: 24px;
+			}
+
+			.remove-group-button {
+				position: absolute;
+				top: -4px;
+				right: -4px;
+				display: none;
+			}
+			.group:hover .remove-group-button {
+				display: block;
+			}
+
+			.remove-row-button {
+				position: absolute;
+				left: -25px;
+				top: 8px;
+				display: none;
+			}
+			.row:hover .remove-row-button {
+				display: block;
 			}
 		`,
 	];
