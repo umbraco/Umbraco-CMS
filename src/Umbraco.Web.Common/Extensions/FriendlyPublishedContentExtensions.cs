@@ -195,6 +195,108 @@ public static class FriendlyPublishedContentExtensions
         => content.Value(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
 
     /// <summary>
+    ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" />.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <returns>
+    ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" />.
+    /// </returns>
+    /// <remarks>
+    ///     This is the same as calling
+    ///     <see cref="AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c>
+    ///     set to 1.
+    /// </remarks>
+    public static IPublishedContent Root(this IPublishedContent content)
+        => content.Root(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
+    ///     specified content type <typeparamref name="T" />.
+    /// </summary>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <param name="content">The content.</param>
+    /// <returns>
+    ///     The root content (ancestor or self at level 1) for the specified <paramref name="content" /> of content type
+    ///     <typeparamref name="T" />.
+    /// </returns>
+    /// <remarks>
+    ///     This is the same as calling
+    ///     <see cref="AncestorOrSelf{T}(IPublishedContent, int)" /> with
+    ///     <c>maxLevel</c> set to 1.
+    /// </remarks>
+    public static T? Root<T>(this IPublishedContent content)
+        where T : class, IPublishedContent
+        => content.Root<T>(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the parent of the content item.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <returns>The parent of content of the specified content type or <c>null</c>.</returns>
+    public static T? Parent<T>(this IPublishedContent content)
+        where T : class, IPublishedContent
+        => content.Parent<T>(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the ancestors of the content.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <returns>The ancestors of the content, in down-top order.</returns>
+    /// <remarks>Does not consider the content itself.</remarks>
+    public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content)
+        => content.Ancestors(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the content and its ancestors.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <returns>The content and its ancestors, in down-top order.</returns>
+    public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content)
+        => content.AncestorsOrSelf(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the content and its ancestors, of a specified content type.
+    /// </summary>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <param name="content">The content.</param>
+    /// <returns>The content and its ancestors, of the specified content type, in down-top order.</returns>
+    /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
+    public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content)
+        where T : class, IPublishedContent
+        => content.AncestorsOrSelf<T>(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the ancestor of the content, i.e. its parent.
+    /// </summary>
+    /// <param name="content">The content.</param>
+    /// <returns>The ancestor of the content.</returns>
+    public static IPublishedContent? Ancestor(this IPublishedContent content)
+        => content.Ancestor(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the nearest ancestor of the content, of a specified content type.
+    /// </summary>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <param name="content">The content.</param>
+    /// <returns>The nearest (in down-top order) ancestor of the content, of the specified content type.</returns>
+    /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
+    public static T? Ancestor<T>(this IPublishedContent content)
+        where T : class, IPublishedContent
+        => content.Ancestor<T>(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
+    ///     Gets the content or its nearest ancestor, of a specified content type.
+    /// </summary>
+    /// <typeparam name="T">The content type.</typeparam>
+    /// <param name="content">The content.</param>
+    /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
+    /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
+    public static T? AncestorOrSelf<T>(this IPublishedContent content)
+        where T : class, IPublishedContent
+        => content.AncestorOrSelf<T>(PublishedContentCache, DocumentNavigationQueryService);
+
+    /// <summary>
     ///     Returns all DescendantsOrSelf of all content referenced
     /// </summary>
     /// <param name="parentNodes"></param>
