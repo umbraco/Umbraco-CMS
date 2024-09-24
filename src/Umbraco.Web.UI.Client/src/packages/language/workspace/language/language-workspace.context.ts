@@ -8,6 +8,7 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 	UmbEntityDetailWorkspaceContextBase,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -52,6 +53,18 @@ export class UmbLanguageWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _checkWillNavigateAway(newUrl: string): boolean {
+		super._checkWillNavigateAway(newUrl);
+
+		const workspacePathBase = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
+
+		if (this.getIsNew()) {
+			return !newUrl.includes(`${workspacePathBase}/create`);
+		} else {
+			return !newUrl.includes(`${workspacePathBase}/edit/${this.getUnique()}`);
+		}
 	}
 
 	setName(name: string) {

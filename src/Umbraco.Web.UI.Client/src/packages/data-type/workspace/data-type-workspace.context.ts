@@ -12,6 +12,7 @@ import {
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbEntityDetailWorkspaceContextBase,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -92,7 +93,7 @@ export class UmbDataTypeWorkspaceContext
 				setup: (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
+					this.create({ parent: { entityType: parentEntityType, unique: parentUnique } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -112,11 +113,21 @@ export class UmbDataTypeWorkspaceContext
 		]);
 	}
 
+	protected override _checkWillNavigateAway(newUrl: string): boolean {
+		super._checkWillNavigateAway(newUrl);
+
+		const workspacePathBase = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
+
+		if (this.getIsNew()) {
+			return !newUrl.includes(`${workspacePathBase}/create`);
+		} else {
+			return !newUrl.includes(`${workspacePathBase}/edit/${this.getUnique()}`);
+		}
+	}
+
 	override async load(unique: string) {
 		const response = await super.load(unique);
-
 		this.observe(response.asObservable?.(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
-
 		return response;
 	}
 

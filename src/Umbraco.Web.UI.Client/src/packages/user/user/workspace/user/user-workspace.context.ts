@@ -7,7 +7,7 @@ import { UmbUserConfigRepository } from '../../repository/config/index.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_PATH_PATTERN, UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -50,6 +50,18 @@ export class UmbUserWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _checkWillNavigateAway(newUrl: string): boolean {
+		super._checkWillNavigateAway(newUrl);
+
+		const workspacePathBase = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
+
+		if (this.getIsNew()) {
+			return !newUrl.includes(`${workspacePathBase}/create`);
+		} else {
+			return !newUrl.includes(`${workspacePathBase}/edit/${this.getUnique()}`);
+		}
 	}
 
 	override async load(unique: string) {
