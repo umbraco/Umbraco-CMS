@@ -10,6 +10,7 @@ import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/wor
 import { UMB_WORKSPACE_PATH_PATTERN, UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbUserDetailModel;
 
@@ -39,6 +40,8 @@ export class UmbUserWorkspaceContext
 			entityType: UMB_USER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
 		});
+
+		this.addValidationContext(new UmbValidationContext(this));
 
 		this.routes.setRoutes([
 			{
