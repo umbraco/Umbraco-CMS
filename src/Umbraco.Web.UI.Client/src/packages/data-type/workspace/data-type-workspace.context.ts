@@ -1,5 +1,6 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../types.js';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
@@ -29,7 +30,6 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
-import { UMB_DISCARD_CHANGES_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -318,7 +318,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getEntityType() {
-		return 'data-type';
+		return UMB_DATA_TYPE_ENTITY_TYPE;
 	}
 
 	getName() {
