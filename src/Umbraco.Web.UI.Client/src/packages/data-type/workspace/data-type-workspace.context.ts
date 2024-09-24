@@ -13,7 +13,6 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
-	jsonStringComparison,
 	UmbArrayState,
 	UmbObjectState,
 	UmbStringState,
