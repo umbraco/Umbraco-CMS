@@ -63,7 +63,7 @@ import {
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UmbContentDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
@@ -91,7 +91,7 @@ export class UmbDocumentWorkspaceContext
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
-	readonly #data = new UmbContentDataManager<EntityModel>(this, UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD);
+	readonly #data = new UmbContentWorkspaceDataManager<EntityModel>(this, UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD);
 
 	#getDataPromise?: Promise<any>;
 	// TODo: Optimize this so it uses either a App Language Context? [NL]

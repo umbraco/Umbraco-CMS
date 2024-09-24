@@ -59,6 +59,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		return this.#variantId.getValue() ?? UmbVariantId.CreateInvariant();
 	}
 
+	// TODO: rename to currentData:
 	setData(data: UmbBlockDataModel | undefined) {
 		this.#data.setValue(data);
 		this.#getDataResolver();

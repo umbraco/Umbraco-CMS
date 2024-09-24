@@ -6,7 +6,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbObjectState, appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, type UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
-export class UmbContentDataManager<
+export class UmbContentWorkspaceDataManager<
 	ModelType extends UmbContentDetailModel,
 	ModelVariantType extends UmbVariantModel = ModelType extends { variants: UmbVariantModel[] }
 		? ModelType['variants'][0]
