@@ -10,7 +10,7 @@ import { manifests as extensionManifests } from './extension-registry/manifests.
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
-import { manifests as modalManifests } from './modal/common/manifests.js';
+import { manifests as modalManifests } from './modal/manifests.js';
 import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyManifests } from './property/manifests.js';
