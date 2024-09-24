@@ -5,13 +5,17 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObjectState, appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, type UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbContentWorkspaceDataManager<
-	ModelType extends UmbContentDetailModel,
-	ModelVariantType extends UmbVariantModel = ModelType extends { variants: UmbVariantModel[] }
-		? ModelType['variants'][0]
-		: never,
-> extends UmbControllerBase {
+		ModelType extends UmbContentDetailModel,
+		ModelVariantType extends UmbVariantModel = ModelType extends { variants: UmbVariantModel[] }
+			? ModelType['variants'][0]
+			: never,
+	>
+	extends UmbControllerBase
+	implements UmbWorkspaceDataManager<ModelType>
+{
 	//
 	//#repository;
 	#variantScaffold?: ModelVariantType;
