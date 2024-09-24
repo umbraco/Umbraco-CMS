@@ -13,18 +13,15 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public MediaCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
         IIdKeyMap idKeyMap,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
         _idKeyMap = idKeyMap;
     }
 

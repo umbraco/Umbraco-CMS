@@ -16,7 +16,6 @@ public class PublishedSnapshotRebuilder : IPublishedSnapshotRebuilder
     ///     Initializes a new instance of the <see cref="PublishedSnapshotRebuilder" /> class.
     /// </summary>
     public PublishedSnapshotRebuilder(
-        IPublishedSnapshotService publishedSnapshotService,
         DistributedCache distributedCache,
         IDatabaseCacheRebuilder databaseCacheRebuilder)
     {

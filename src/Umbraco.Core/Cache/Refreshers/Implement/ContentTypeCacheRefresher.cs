@@ -1,13 +1,10 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -15,22 +12,16 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 {
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public ContentTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
-        IPublishedModelFactory publishedModelFactory,
         IIdKeyMap idKeyMap,
         IContentTypeCommonRepository contentTypeCommonRepository,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
-        _publishedSnapshotService = publishedSnapshotService;
-        _publishedModelFactory = publishedModelFactory;
         _idKeyMap = idKeyMap;
         _contentTypeCommonRepository = contentTypeCommonRepository;
     }
