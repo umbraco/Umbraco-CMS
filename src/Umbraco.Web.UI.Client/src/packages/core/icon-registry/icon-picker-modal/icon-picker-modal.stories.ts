@@ -1,4 +1,3 @@
-import '../../../components/body-layout/body-layout.element.js';
 import './icon-picker-modal.element.js';
 
 import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';

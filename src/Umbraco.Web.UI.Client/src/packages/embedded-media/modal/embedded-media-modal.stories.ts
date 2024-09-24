@@ -1,4 +1,3 @@
-import '../../../components/body-layout/body-layout.element.js';
 import './embedded-media-modal.element.js';
 
 import type { UmbEmbeddedMediaModalData } from './embedded-media-modal.token.js';
