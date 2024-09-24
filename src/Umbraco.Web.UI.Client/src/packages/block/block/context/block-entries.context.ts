@@ -112,7 +112,7 @@ export abstract class UmbBlockEntriesContext<
 			this._manager!.removeOneSettings(layout.settingsKey);
 		}
 		this._manager!.removeOneContent(contentKey);
-		this._manager!.removeExposes(contentKey);
+		this._manager!.removeExposesOf(contentKey);
 
 		this._layoutEntries.removeOne(contentKey);
 	}
