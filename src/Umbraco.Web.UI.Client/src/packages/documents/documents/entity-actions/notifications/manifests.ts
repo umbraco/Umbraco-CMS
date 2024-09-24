@@ -17,6 +17,7 @@ const actionManifests: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-megaphone',
 			label: '#actions_notify',
+			additionalOptions: true,
 		},
 		conditions: [
 			{

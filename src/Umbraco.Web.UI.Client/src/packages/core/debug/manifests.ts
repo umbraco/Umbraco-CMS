@@ -1,8 +1,3 @@
-export const manifests: Array<UmbExtensionManifest> = [
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.ContextDebugger',
-		name: 'Context Debugger Modal',
-		element: () => import('./modals/debug/debug-modal.element.js'),
-	},
-];
+import { manifests as debugModalManifests } from './debug-modal/manifests.js';
+
+export const manifests: Array<UmbExtensionManifest> = [...debugModalManifests];

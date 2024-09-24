@@ -1,4 +1,4 @@
-import type { UmbIconPickerModalElement } from '../../core/modal/common/icon-picker/icon-picker-modal.element.js';
+import type { UmbIconPickerModalElement } from '@umbraco-cms/backoffice/icon';
 import type { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

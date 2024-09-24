@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-download-alt',
 			label: '#actions_export',
+			additionalOptions: true,
 		},
 	},
 	...repositoryManifests,

@@ -2,7 +2,8 @@ import type { UmbMediaTypeWorkspaceContext } from './media-type-workspace.contex
 import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from './media-type-workspace.context-token.js';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 

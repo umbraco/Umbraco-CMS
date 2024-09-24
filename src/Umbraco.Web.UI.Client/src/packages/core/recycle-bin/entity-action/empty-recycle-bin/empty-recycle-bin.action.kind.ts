@@ -15,7 +15,8 @@ export const manifest: UmbExtensionManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
-			label: 'Empty Recycle Bin...',
+			label: 'Empty Recycle Bin',
+			additionalOptions: true,
 		},
 	},
 };

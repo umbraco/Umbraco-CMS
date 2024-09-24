@@ -15,8 +15,9 @@ export const manifest: UmbExtensionManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-undo',
-			label: 'Restore...',
+			label: 'Restore',
 			pickerModal: '',
+			additionalOptions: true,
 		},
 	},
 };
