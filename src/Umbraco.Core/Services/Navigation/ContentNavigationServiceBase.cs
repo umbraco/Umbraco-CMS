@@ -183,11 +183,17 @@ internal abstract class ContentNavigationServiceBase
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(readLock);
 
-        IEnumerable<INavigationModel> navigationModels = trashed ?
-            _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey) :
-            _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
-
-        NavigationFactory.BuildNavigationDictionary(_navigationStructure, navigationModels);
+        // Build the corresponding navigation structure
+        if (trashed)
+        {
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
+            NavigationFactory.BuildNavigationDictionary(_recycleBinNavigationStructure, navigationModels);
+        }
+        else
+        {
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
+            NavigationFactory.BuildNavigationDictionary(_navigationStructure, navigationModels);
+        }
     }
 
     private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
