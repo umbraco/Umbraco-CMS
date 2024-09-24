@@ -90,7 +90,6 @@ export class UmbDataTypeWorkspaceContext
 				path: 'create/parent/:entityType/:parentUnique',
 				component: UmbDataTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this._setActivePathSegment(info.match.fragments.consumed);
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					this.create({ parent: { entityType: parentEntityType, unique: parentUnique } });
@@ -106,7 +105,6 @@ export class UmbDataTypeWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbDataTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this._setActivePathSegment(info.match.fragments.consumed);
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},

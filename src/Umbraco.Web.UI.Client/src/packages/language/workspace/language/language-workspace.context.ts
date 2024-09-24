@@ -33,8 +33,7 @@ export class UmbLanguageWorkspaceContext
 			{
 				path: 'create',
 				component: UmbLanguageWorkspaceEditorElement,
-				setup: async (_component, info) => {
-					this._setActivePathSegment(info.match.fragments.consumed);
+				setup: async () => {
 					this.create({ parent: { entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
@@ -50,7 +49,6 @@ export class UmbLanguageWorkspaceContext
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias('isNewRedirectController');
 					this.load(info.match.params.unique);
-					this._setActivePathSegment(info.match.fragments.consumed);
 				},
 			},
 		]);

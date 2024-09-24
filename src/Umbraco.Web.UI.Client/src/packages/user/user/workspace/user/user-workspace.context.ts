@@ -47,8 +47,7 @@ export class UmbUserWorkspaceContext
 			{
 				path: 'edit/:id',
 				component: UmbUserWorkspaceEditorElement,
-				setup: (component, info) => {
-					this._setActivePathSegment(info.match.fragments.consumed);
+				setup: (_component, info) => {
 					const id = info.match.params.id;
 					this.load(id);
 				},
