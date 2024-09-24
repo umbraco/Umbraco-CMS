@@ -1,4 +1,4 @@
-import { UmbModalToken } from './modal-token.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbPropertyEditorUIPickerModalData {
 	/** @deprecated This property will be removed in Umbraco 15. */
