@@ -1,19 +1,6 @@
-import type { ManifestTiptapExtensionButtonKind } from '../../extensions/tiptap-extension.js';
-import type { UmbTiptapToolbarElementApi } from '../../extensions/types.js';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	repeat,
-	state,
-	when,
-	type TemplateResult,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, type TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIPopoverContainerElement } from '@umbraco-ui/uui';
 
 const elementName = 'umb-tiptap-toolbar-dropdown';
 
@@ -91,47 +78,61 @@ export class UmbTiptapToolbarDropdownElement extends UmbLitElement {
 				class="dropdown-item"
 				@mouseenter=${() => this.#onMouseEnter(item.label)}
 				@mouseleave=${() => this.#onMouseLeave(item.label)}>
-				<uui-button label=${item.label} popovertarget=${this.#makeAlias(item.label)}></uui-button>
-				<uui-popover-container placement="right-start" id=${this.#makeAlias(item.label)}>
-					${item.nested ? this.#renderItems(item.nested) : nothing}
-				</uui-popover-container>
+				<button class="label" aria-label=${item.label} popovertarget=${this.#makeAlias(item.label)}>
+					${item.label}
+				</button>
+				${item.nested ? this.#renderItems(item.label, item.nested) : nothing}
 			</div>
 		`;
 	}
 
-	#renderItems(items: Array<DropdownItem>) {
-		return html` ${repeat(
-			items,
-			(item) => item.label,
-			(item) => html`${this.#renderItem(item)}`,
-		)}`;
+	#renderItems(label: string, items: Array<DropdownItem>) {
+		return html` <uui-popover-container placement="right-start" id=${this.#makeAlias(label)}>
+			<div class="popover-content">
+				${repeat(
+					items,
+					(item) => item.label,
+					(item) => html`${this.#renderItem(item)}`,
+				)}
+			</div>
+		</uui-popover-container>`;
 	}
 
 	override render() {
 		return html`
-			<uui-button popovertarget="text-styles">Text styles</uui-button>
-			<uui-popover-container id="text-styles"
-				><div class="dropdown-item">${this.#renderItems(this.#testDropdownItems)}</div></uui-popover-container
-			>
+			<button class="label selected-value" aria-label="Text styles" popovertarget="text-styles">Text styles</button>
+			${this.#renderItems('Text styles', this.#testDropdownItems)}
 		`;
 	}
 
 	static override readonly styles = css`
-		:host {
-			position: absolute;
-			top: -67px;
-			--uui-button-content-align: left;
+		button {
+			border: unset;
+			background-color: unset;
+			font: unset;
+			text-align: unset;
 		}
 
-		uui-popover-container {
+		.label {
+			border-radius: var(--uui-border-radius);
+			width: 100%;
+			box-sizing: border-box;
+			align-content: center;
+			padding: var(--uui-size-space-1) var(--uui-size-space-3);
+			align-items: center;
+			cursor: pointer;
+			color: var(--uui-color-text);
+		}
+
+		.selected-value {
+			background: var(--uui-color-surface-alt);
+		}
+
+		.popover-content {
+			background: var(--uui-color-surface);
+			border-radius: var(--uui-border-radius);
 			box-shadow: var(--uui-shadow-depth-3);
-		}
-
-		.dropdown-item {
-			background-color: var(--uui-color-surface);
-			display: flex;
-			flex-direction: column;
-			text-wrap: nowrap;
+			padding: var(--uui-size-space-1);
 		}
 	`;
 }

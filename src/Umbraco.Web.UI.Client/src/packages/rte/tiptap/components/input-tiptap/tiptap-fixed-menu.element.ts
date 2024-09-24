@@ -27,12 +27,12 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 
 	override render() {
 		return html`
+			<umb-tiptap-toolbar-dropdown style="grid-column: span 4;"></umb-tiptap-toolbar-dropdown>
 			<umb-extension-with-api-slot
 				type="tiptapExtension"
 				.filter=${(ext: ManifestTiptapExtension) => !!ext.kind || !!ext.element}
 				.elementProps=${{ editor: this.editor }}>
 			</umb-extension-with-api-slot>
-			<umb-tiptap-toolbar-dropdown></umb-tiptap-toolbar-dropdown>
 		`;
 	}
 
@@ -46,12 +46,13 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			color: var(--color-text);
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
-			gap: 4px;
+			gap: var(--uui-size-space-1);
 			position: sticky;
 			top: -25px;
 			left: 0px;
 			right: 0px;
-			padding: 4px;
+			padding: var(--uui-size-space-3);
+			align-items: center;
 		}
 
 		:host([readonly]) {
