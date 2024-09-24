@@ -24,28 +24,48 @@ public sealed class BlockEditorVarianceHandler
         }
     }
 
-    public async Task AlignPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
+    public async Task<BlockPropertyValue?> AlignedPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
     {
         ContentVariation propertyTypeVariation = owner.ContentType.Variations & propertyType.Variations;
         if (propertyTypeVariation.VariesByCulture() == VariesByCulture(blockPropertyValue))
         {
-            return;
+            return blockPropertyValue;
         }
 
         // mismatch in culture variation for published content:
         // - if the property type varies by culture, assign the default culture
         // - if the property type does not vary by culture:
         //   - if the property value culture equals the default culture, assign a null value for it to be rendered as the invariant value
-        //   - otherwise leave the value culture as-is - it will be skipped by the rendering
+        //   - otherwise return null (not applicable for rendering)
         var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
-        blockPropertyValue.Culture = propertyTypeVariation.VariesByCulture()
-            ? defaultCulture
-            : defaultCulture.Equals(blockPropertyValue.Culture)
-                ? null
-                : blockPropertyValue.Culture;
+        if (propertyTypeVariation.VariesByCulture())
+        {
+            return new BlockPropertyValue
+            {
+                Alias = blockPropertyValue.Alias,
+                Culture = defaultCulture,
+                Segment = blockPropertyValue.Segment,
+                Value = blockPropertyValue.Value,
+                PropertyType = blockPropertyValue.PropertyType
+            };
+        }
+
+        if (defaultCulture.Equals(blockPropertyValue.Culture))
+        {
+            return new BlockPropertyValue
+            {
+                Alias = blockPropertyValue.Alias,
+                Culture = null,
+                Segment = blockPropertyValue.Segment,
+                Value = blockPropertyValue.Value,
+                PropertyType = blockPropertyValue.PropertyType
+            };
+        }
+
+        return null;
     }
 
-    public async Task<IEnumerable<BlockItemVariation>> AlignExposeVarianceForElementAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element)
+    public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element)
     {
         BlockItemVariation[] blockVariations = blockValue.Expose.Where(v => v.ContentKey == element.Key).ToArray();
         if (blockVariations.Any() is false)
@@ -114,7 +134,4 @@ public sealed class BlockEditorVarianceHandler
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)
         => blockPropertyValue.Culture.IsNullOrWhiteSpace() is false;
-
-    private static bool VariesBySegment(BlockPropertyValue blockPropertyValue)
-        => blockPropertyValue.Segment.IsNullOrWhiteSpace() is false;
 }

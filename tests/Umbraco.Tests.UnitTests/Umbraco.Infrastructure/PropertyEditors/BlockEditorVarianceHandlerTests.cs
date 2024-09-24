@@ -17,11 +17,12 @@ public class BlockEditorVarianceHandlerTests
     {
         var propertyValue = new BlockPropertyValue { Culture = null };
         var subject = BlockEditorVarianceHandler("da-DK");
-        await subject.AlignPropertyVarianceAsync(
+        var result = await subject.AlignedPropertyVarianceAsync(
             propertyValue,
             PublishedPropertyType(ContentVariation.Culture),
             PublishedElement(ContentVariation.Culture));
-        Assert.AreEqual("da-DK", propertyValue.Culture);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("da-DK", result.Culture);
     }
 
     [Test]
@@ -29,11 +30,12 @@ public class BlockEditorVarianceHandlerTests
     {
         var propertyValue = new BlockPropertyValue { Culture = "da-DK" };
         var subject = BlockEditorVarianceHandler("da-DK");
-        await subject.AlignPropertyVarianceAsync(
+        var result = await subject.AlignedPropertyVarianceAsync(
             propertyValue,
             PublishedPropertyType(ContentVariation.Nothing),
             PublishedElement(ContentVariation.Nothing));
-        Assert.AreEqual(null, propertyValue.Culture);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(null, result.Culture);
     }
 
     [Test]
@@ -41,11 +43,11 @@ public class BlockEditorVarianceHandlerTests
     {
         var propertyValue = new BlockPropertyValue { Culture = "en-US" };
         var subject = BlockEditorVarianceHandler("da-DK");
-        await subject.AlignPropertyVarianceAsync(
+        var result = await subject.AlignedPropertyVarianceAsync(
             propertyValue,
             PublishedPropertyType(ContentVariation.Nothing),
             PublishedElement(ContentVariation.Nothing));
-        Assert.AreEqual("en-US", propertyValue.Culture);
+        Assert.IsNull(result);
     }
 
     private static IPublishedPropertyType PublishedPropertyType(ContentVariation variation)

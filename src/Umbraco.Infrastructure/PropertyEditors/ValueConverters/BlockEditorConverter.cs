@@ -56,10 +56,14 @@ public sealed class BlockEditorConverter
                 continue;
             }
 
-            // if case changes have been made to the element type variation since the parent content was published,
-            // we need to contextualize those changes manually here - unlike for root level properties, where these
-            // things are handled when a content type is saved (copies of property values are created in the DB).
-            _blockEditorVarianceHandler.AlignPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
+            // if case changes have been made to the content or element type variation since the parent content was published,
+            // we need to align those changes for the block properties - unlike for root level properties, where these
+            // things are handled when a content type is saved.
+            BlockPropertyValue? alignedProperty = _blockEditorVarianceHandler.AlignedPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
+            if (alignedProperty is null)
+            {
+                continue;
+            }
 
             var expectedCulture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
                 ? variationContext.Culture
@@ -68,10 +72,10 @@ public sealed class BlockEditorConverter
                 ? variationContext.Segment
                 : null;
 
-            if (property.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
-                && property.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
+            if (alignedProperty.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
+                && alignedProperty.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
             {
-                propertyValues[property.Alias] = property.Value;
+                propertyValues[alignedProperty.Alias] = alignedProperty.Value;
             }
         }
 

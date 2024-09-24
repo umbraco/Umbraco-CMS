@@ -143,7 +143,9 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IEnumerable<BlockItemVariation> expose = _blockEditorVarianceHandler.AlignExposeVarianceForElementAsync(converted.BlockValue, owner, element).GetAwaiter().GetResult();
+            // if case changes have been made to the content or element type variation since the content was published,
+            // we need to align those changes for the exposed blocks.
+            IEnumerable<BlockItemVariation> expose = _blockEditorVarianceHandler.AlignedExposeVarianceAsync(converted.BlockValue, owner, element).GetAwaiter().GetResult();
             var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
                 ? variationContext.Culture.NullOrWhiteSpaceAsNull()
                 : null;
