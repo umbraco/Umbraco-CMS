@@ -971,9 +971,9 @@ public static class PublishedContentExtensions
 
     public static IPublishedContent? Descendant(
         this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
         IPublishedContentCache contentCache,
         IDocumentNavigationQueryService navigationQueryService,
-        IVariationContextAccessor variationContextAccessor,
         string? culture = null) =>
         content.Children(variationContextAccessor, contentCache, navigationQueryService, culture)?.FirstOrDefault();
 
@@ -1214,9 +1214,11 @@ public static class PublishedContentExtensions
     /// <returns>The children of the content, of any of the specified types.</returns>
     public static IEnumerable<IPublishedContent> ChildrenOfType(
         this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
         IPublishedContentCache publishedContentCache,
         IDocumentNavigationQueryService navigationQueryService,
-        IVariationContextAccessor variationContextAccessor, string? contentTypeAlias, string? culture = null) =>
+        string? contentTypeAlias,
+        string? culture = null) =>
         content.Children(variationContextAccessor, publishedContentCache, navigationQueryService, x => x.ContentType.Alias.InvariantEquals(contentTypeAlias),
             culture);
 
@@ -1261,7 +1263,7 @@ public static class PublishedContentExtensions
         IDocumentNavigationQueryService navigationQueryService,
         string contentTypeAlias,
         string? culture = null) =>
-        content.ChildrenOfType(publishedContentCache, navigationQueryService, variationContextAccessor, contentTypeAlias, culture)?.FirstOrDefault();
+        content.ChildrenOfType(variationContextAccessor, publishedContentCache, navigationQueryService, contentTypeAlias, culture)?.FirstOrDefault();
 
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
@@ -1345,11 +1347,12 @@ public static class PublishedContentExtensions
     /// </remarks>
     public static IEnumerable<IPublishedContent> SiblingsOfType(
         this IPublishedContent content,
-        IPublishedSnapshot? publishedSnapshot,
         IVariationContextAccessor variationContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
         string contentTypeAlias,
         string? culture = null) =>
-        SiblingsAndSelfOfType(content, publishedSnapshot, variationContextAccessor, contentTypeAlias, culture)
+        SiblingsAndSelfOfType(content, variationContextAccessor, contentCache, navigationQueryService, contentTypeAlias, culture)
             ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<IPublishedContent>();
 
     /// <summary>
@@ -1367,9 +1370,14 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<T> Siblings<T>(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
+    public static IEnumerable<T> Siblings<T>(
+        this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        string? culture = null)
         where T : class, IPublishedContent =>
-        SiblingsAndSelf<T>(content, publishedSnapshot, variationContextAccessor, culture)
+        SiblingsAndSelf<T>(content, variationContextAccessor, contentCache, documentNavigationQueryService, culture)
             ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<T>();
 
     /// <summary>
@@ -1425,16 +1433,18 @@ public static class PublishedContentExtensions
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
     public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
         this IPublishedContent content,
+        IVariationContextAccessor variationContextAccessor,
         IPublishedContentCache publishedContentCache,
         IDocumentNavigationQueryService navigationQueryService,
-        IVariationContextAccessor variationContextAccessor,
         string contentTypeAlias,
         string? culture = null)
     {
 
         var parentSuccess = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
 
-        if (parentSuccess is false || parentKey is null)
+        IPublishedContent? parent = parentKey is null ? null : publishedContentCache.GetById(parentKey.Value);
+
+        if (parentSuccess is false || parent is null)
         {
             if (navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> childrenKeys) is false)
             {
@@ -1448,13 +1458,7 @@ public static class PublishedContentExtensions
                 .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
-
-
-        return (content.Parent != null
-                   ? content.Parent.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture)
-                   : publishedSnapshot?.Content?.GetAtRoot(culture).OfTypes(contentTypeAlias)
-                       .WhereIsInvariantOrHasCulture(variationContextAccessor, culture))
-               ?? Enumerable.Empty<IPublishedContent>();
+        return parent.ChildrenOfType(variationContextAccessor, publishedContentCache, navigationQueryService, contentTypeAlias, culture);
     }
 
     /// <summary>
@@ -1471,15 +1475,32 @@ public static class PublishedContentExtensions
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
     public static IEnumerable<T> SiblingsAndSelf<T>(
         this IPublishedContent content,
-        IPublishedSnapshot? publishedSnapshot,
         IVariationContextAccessor variationContextAccessor,
+        IPublishedContentCache publishedContentCache,
+        IDocumentNavigationQueryService navigationQueryService,
         string? culture = null)
-        where T : class, IPublishedContent =>
-        (content.Parent != null
-            ? content.Parent.Children<T>(variationContextAccessor, culture)
-            : publishedSnapshot?.Content?.GetAtRoot(culture).OfType<T>()
-                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture))
-        ?? Enumerable.Empty<T>();
+        where T : class, IPublishedContent
+    {
+        var parentSuccess = navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey);
+        IPublishedContent? parent = parentKey is null ? null : publishedContentCache.GetById(parentKey.Value);
+
+        if (parentSuccess is false || parent is null)
+        {
+            var rootSuccess = navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+            if (rootSuccess is false)
+            {
+                return [];
+            }
+
+            return rootKeys
+                .Select(publishedContentCache.GetById)
+                .WhereNotNull()
+                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture)
+                .OfType<T>();
+        }
+
+        return parent.Children<T>(variationContextAccessor, publishedContentCache, navigationQueryService, culture);
+    }
 
     #endregion
 
@@ -1556,13 +1577,15 @@ public static class PublishedContentExtensions
     public static DataTable ChildrenAsTable(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
         IMemberTypeService memberTypeService,
         IPublishedUrlProvider publishedUrlProvider,
         string contentTypeAliasFilter = "",
         string? culture = null)
-        => GenerateDataTable(content, variationContextAccessor, contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
+        => GenerateDataTable(content, variationContextAccessor, contentCache, documentNavigationQueryService, contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
 
     /// <summary>
     ///     Gets the children of the content in a DataTable.
@@ -1582,6 +1605,8 @@ public static class PublishedContentExtensions
     private static DataTable GenerateDataTable(
         IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService,
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
         IMemberTypeService memberTypeService,
@@ -1590,10 +1615,10 @@ public static class PublishedContentExtensions
         string? culture = null)
     {
         IPublishedContent? firstNode = contentTypeAliasFilter.IsNullOrWhiteSpace()
-            ? content.Children(variationContextAccessor, culture)?.Any() ?? false
-                ? content.Children(variationContextAccessor, culture)?.ElementAt(0)
+            ? content.Children(variationContextAccessor, contentCache, documentNavigationQueryService, culture)?.Any() ?? false
+                ? content.Children(variationContextAccessor, contentCache, documentNavigationQueryService, culture)?.ElementAt(0)
                 : null
-            : content.Children(variationContextAccessor, culture)
+            : content.Children(variationContextAccessor, contentCache, documentNavigationQueryService, culture)
                 ?.FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAliasFilter));
         if (firstNode == null)
         {
@@ -1616,7 +1641,7 @@ public static class PublishedContentExtensions
                 List<Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>>
                     tableData = DataTableExtensions.CreateTableData();
                 IOrderedEnumerable<IPublishedContent>? children =
-                    content.Children(variationContextAccessor)?.OrderBy(x => x.SortOrder);
+                    content.Children(variationContextAccessor, contentCache, documentNavigationQueryService)?.OrderBy(x => x.SortOrder);
                 if (children is not null)
                 {
                     // loop through each child and create row data for it
