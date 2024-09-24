@@ -1,9 +1,8 @@
-import '../../../components/body-layout/body-layout.element.js';
 import './embedded-media-modal.element.js';
 
+import type { UmbEmbeddedMediaModalData } from './embedded-media-modal.token.js';
 import type { Meta } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbEmbeddedMediaModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {
 	title: 'API/Modals/Layouts/Embedded Media',

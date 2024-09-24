@@ -1,4 +1,4 @@
-export const UMB_OEMBED_REPOSITORY_ALIAS = 'Umb.Repository.OEmbed';
+import { UMB_OEMBED_REPOSITORY_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

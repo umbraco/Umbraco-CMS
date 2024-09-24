@@ -1,9 +1,9 @@
+import type { UmbChangePasswordModalData, UmbChangePasswordModalValue } from './change-password-modal.token.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbChangePasswordModalData, UmbChangePasswordModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-change-password-modal')
