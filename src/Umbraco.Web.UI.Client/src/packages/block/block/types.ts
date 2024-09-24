@@ -20,8 +20,15 @@ export interface UmbBlockDataType {
 	[key: string]: unknown;
 }
 
+export interface UmbBlockExposeModel {
+	contentKey: string;
+	culture: string | null;
+	segment: string | null;
+}
+
 export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel> {
 	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 	contentData: Array<UmbBlockDataModel>;
 	settingsData: Array<UmbBlockDataModel>;
+	expose: Array<UmbBlockExposeModel>;
 }
