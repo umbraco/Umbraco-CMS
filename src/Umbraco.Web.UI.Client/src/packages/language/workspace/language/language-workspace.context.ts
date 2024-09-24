@@ -33,7 +33,8 @@ export class UmbLanguageWorkspaceContext
 			{
 				path: 'create',
 				component: UmbLanguageWorkspaceEditorElement,
-				setup: async () => {
+				setup: async (_component, info) => {
+					this._setActivePathSegment(info.match.fragments.consumed);
 					this.create({ parent: { entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
@@ -49,17 +50,10 @@ export class UmbLanguageWorkspaceContext
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias('isNewRedirectController');
 					this.load(info.match.params.unique);
+					this._setActivePathSegment(info.match.fragments.consumed);
 				},
 			},
 		]);
-	}
-
-	protected override _checkWillNavigateAway(newUrl: string): boolean {
-		if (this.getIsNew()) {
-			return !newUrl.includes(`/create`) || super._checkWillNavigateAway(newUrl);
-		} else {
-			return !newUrl.includes(`/edit/${this.getUnique()}`) || super._checkWillNavigateAway(newUrl);
-		}
 	}
 
 	setName(name: string) {
