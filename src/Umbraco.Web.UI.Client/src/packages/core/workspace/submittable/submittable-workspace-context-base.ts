@@ -141,7 +141,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	};
 
 	//abstract getIsDirty(): Promise<boolean>;
-	abstract getUnique(): string | undefined;
+	abstract getUnique(): string | null | undefined;
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
 	protected abstract submit(): Promise<void>;
