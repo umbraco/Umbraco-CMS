@@ -21,50 +21,49 @@ type ToolbarRow = {
 
 type ToolbarConfig = ToolbarRow[];
 
-let toolbarConfig: ToolbarConfig = [
-	{
-		rowId: 'asdasgasgasd',
-		groups: [
-			{
-				groupId: 'asdasldjh12h123',
-				buttons: [
-					{ alias: 'bold', label: 'Bold', icon: 'bold-icon' },
-					{ alias: 'italic', label: 'Italic', icon: 'italic-icon' },
-				],
-			},
-			{
-				groupId: 'askdjljk123ljkh12kj3h',
-				buttons: [{ alias: 'underline', label: 'Underline', icon: 'underline-icon' }],
-			},
-		],
-	},
-	{
-		rowId: '1l2j3ljk123l21j3',
-		groups: [
-			{
-				groupId: 'asdashd9ashd0as87hdoasudh',
-				buttons: [{ alias: 'align-left', label: 'Align Left', icon: 'align-left-icon' }],
-			},
-		],
-	},
-];
-
 @customElement('umb-tiptap-toolbar-groups-configuration')
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
-	set value(value: string) {
-		this.#value = value as string;
+	set value(value: ToolbarConfig) {
+		// TODO: if value is null or does not have at least one row with one group, default to a single row with a single empty group
+		this.#value = value;
 
-		this.requestUpdate('#selectedValuesNew');
+		this.requestUpdate('#value');
 	}
-	get value(): string {
+	get value(): ToolbarConfig {
 		return this.#value;
 	}
 
-	#value = '';
+	#value: ToolbarConfig = [
+		{
+			rowId: 'asdasgasgasd',
+			groups: [
+				{
+					groupId: 'asdasldjh12h123',
+					buttons: [
+						{ alias: 'bold', label: 'Bold', icon: 'bold-icon' },
+						{ alias: 'italic', label: 'Italic', icon: 'italic-icon' },
+					],
+				},
+				{
+					groupId: 'askdjljk123ljkh12kj3h',
+					buttons: [{ alias: 'underline', label: 'Underline', icon: 'underline-icon' }],
+				},
+			],
+		},
+		{
+			rowId: '1l2j3ljk123l21j3',
+			groups: [
+				{
+					groupId: 'asdashd9ashd0as87hdoasudh',
+					buttons: [{ alias: 'align-left', label: 'Align Left', icon: 'align-left-icon' }],
+				},
+			],
+		},
+	];
 
 	#addGroup = (rowId: string) => {
-		const row = toolbarConfig.find((row) => row.rowId === rowId);
+		const row = this.#value.find((row) => row.rowId === rowId);
 		if (!row) return;
 
 		row.groups.push({
@@ -76,7 +75,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	};
 
 	#removeGroup(groupId: string) {
-		const row = toolbarConfig.find((row) => row.groups.some((group) => group.groupId === groupId));
+		const row = this.#value.find((row) => row.groups.some((group) => group.groupId === groupId));
 		if (!row) return;
 
 		row.groups = row.groups.filter((group) => group.groupId !== groupId);
@@ -85,7 +84,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	}
 
 	#addRow = () => {
-		toolbarConfig.push({
+		this.#value.push({
 			rowId: UmbId.new(),
 			groups: [
 				{
@@ -99,13 +98,13 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	};
 
 	#removeRow(rowId: string) {
-		toolbarConfig = toolbarConfig.filter((row) => row.rowId !== rowId);
+		this.#value = this.#value.filter((row) => row.rowId !== rowId);
 
 		this.requestUpdate();
 	}
 
 	#moveButton(alias: string, targetGroupId: string) {
-		const sourceGroup = toolbarConfig
+		const sourceGroup = this.#value
 			.flatMap((row) => row.groups)
 			.find((group) => group.buttons.some((button) => button.alias === alias));
 
@@ -116,7 +115,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		const button = sourceGroup.buttons.splice(buttonIndex, 1)[0];
 
 		// add button to target group
-		const targetGroup = toolbarConfig.flatMap((row) => row.groups).find((group) => group.groupId === targetGroupId);
+		const targetGroup = this.#value.flatMap((row) => row.groups).find((group) => group.groupId === targetGroupId);
 		if (!targetGroup) return;
 
 		targetGroup.buttons.push(button);
@@ -173,7 +172,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		return html`<button @click=${this.#addGroup}>Add Group</button>
 			<button @click=${this.#addRow}>Add Row</button>
 
-			${repeat(toolbarConfig, (row) => row.rowId, this.#renderRow)}`;
+			${repeat(this.#value, (row) => row.rowId, this.#renderRow)}`;
 	}
 
 	static override styles = [
