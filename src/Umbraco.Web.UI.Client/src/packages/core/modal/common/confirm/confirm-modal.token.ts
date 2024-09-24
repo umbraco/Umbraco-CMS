@@ -1,4 +1,4 @@
-import { UmbModalToken } from './modal-token.js';
+import { UmbModalToken } from '../../token/index.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 
 export interface UmbConfirmModalData {

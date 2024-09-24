@@ -1,12 +1,6 @@
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.PropertyEditorUiPicker',
-		name: 'Property Editor UI Picker Modal',
-		element: () => import('./property-editor-ui-picker/property-editor-ui-picker-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.DataTypePickerFlow',
 		name: 'Data Type Picker Flow Modal',
 		element: () => import('./data-type-picker-flow/data-type-picker-flow-modal.element.js'),
