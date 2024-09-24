@@ -78,8 +78,6 @@ export abstract class UmbEntityWorkspaceContextBase<
 		const response = (await this._getDataPromise) as GetDataType;
 		const data = response.data;
 
-		if (!data) return undefined;
-
 		if (data) {
 			this.setIsNew(false);
 			this._data.setPersistedData(data);
