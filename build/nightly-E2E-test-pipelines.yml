@@ -249,7 +249,6 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        condition: and(succeeded(), ${{ eq(parameters.runSqlServerE2ETests, true) }})
         timeoutInMinutes: 180
         variables:
           # Connection string
