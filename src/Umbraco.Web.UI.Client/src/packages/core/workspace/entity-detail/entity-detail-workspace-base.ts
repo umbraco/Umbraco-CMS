@@ -1,5 +1,6 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
+import { UMB_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -175,10 +176,12 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	protected _checkWillNavigateAway(newUrl: string) {
 		let willNavigateAway = false;
 
+		const workspacePathBase = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
+
 		if (this.getIsNew()) {
-			willNavigateAway = !newUrl.includes(`${this.getEntityType()}/create`);
+			willNavigateAway = !newUrl.includes(`${workspacePathBase}/create`);
 		} else {
-			willNavigateAway = !newUrl.includes(this.getUnique()!);
+			willNavigateAway = !newUrl.includes(`${workspacePathBase}/edit/${this.getUnique()}`);
 		}
 
 		return willNavigateAway;
