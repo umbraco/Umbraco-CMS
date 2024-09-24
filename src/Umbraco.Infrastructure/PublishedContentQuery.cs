@@ -25,8 +25,10 @@ public class PublishedContentQuery : IPublishedContentQuery
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
     /// </summary>
-    public PublishedContentQuery(IPublishedSnapshot publishedSnapshot,
-        IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
+    public PublishedContentQuery(
+        IPublishedSnapshot publishedSnapshot,
+        IVariationContextAccessor variationContextAccessor,
+        IExamineManager examineManager)
     {
         _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
         _variationContextAccessor = variationContextAccessor ??
@@ -331,8 +333,10 @@ public class PublishedContentQuery : IPublishedContentQuery
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IEnumerable<PublishedSearchResult> _wrapped;
 
-        public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped,
-            IVariationContextAccessor variationContextAccessor, string culture)
+        public CultureContextualSearchResults(
+            IEnumerable<PublishedSearchResult> wrapped,
+            IVariationContextAccessor variationContextAccessor,
+            string culture)
         {
             _wrapped = wrapped;
             _variationContextAccessor = variationContextAccessor;

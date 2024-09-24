@@ -300,8 +300,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     /// <summary>
     ///     Gets paged member results.
     /// </summary>
-    public override IEnumerable<IMember> GetPage(IQuery<IMember>? query,
-        long pageIndex, int pageSize, out long totalRecords,
+    public override IEnumerable<IMember> GetPage(
+        IQuery<IMember>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
         IQuery<IMember>? filter,
         Ordering? ordering)
     {

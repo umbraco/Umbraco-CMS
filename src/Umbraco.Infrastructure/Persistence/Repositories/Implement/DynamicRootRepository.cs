@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-public class DynamicRootRepository: IDynamicRootRepository
+public class DynamicRootRepository : IDynamicRootRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
@@ -35,7 +35,8 @@ public class DynamicRootRepository: IDynamicRootRepository
         return await Database.SingleOrDefaultAsync<Guid?>(query);
     }
 
-    public async Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep filter) {
+    public async Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
+    {
         Sql<ISqlContext> query = Database.SqlContext.SqlSyntax.SelectTop(
             GetAncestorOrSelfBaseQuery(origins, filter)
                 .Append($"ORDER BY n.level ASC"),
@@ -46,7 +47,7 @@ public class DynamicRootRepository: IDynamicRootRepository
 
     private Sql<ISqlContext> GetAncestorOrSelfBaseQuery(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
     {
-        var query = Database.SqlContext.Sql()
+        Sql<ISqlContext> query = Database.SqlContext.Sql()
             .Select<NodeDto>("n", n => n.UniqueId)
             .From<NodeDto>("norigin")
             .Append( // hack because npoco do not support this
@@ -103,7 +104,7 @@ internal static class HelperExtensions
 {
     internal static Sql<ISqlContext> DescendantOrSelfBaseQuery(this Sql<ISqlContext> sql, IEnumerable<Guid> origins, DynamicRootQueryStep filter)
     {
-        var query =  sql
+        Sql<ISqlContext> query = sql
             .From<NodeDto>("norigin")
             .Append(// hack because npoco do not support this
                 $"INNER JOIN {sql.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {sql.SqlContext.SqlSyntax.Substring}(N.path, 1, {sql.SqlContext.SqlSyntax.Length}(norigin.path)) = norigin.path")

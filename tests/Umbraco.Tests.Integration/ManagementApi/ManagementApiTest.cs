@@ -67,7 +67,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             }
             else
             {
-                user = (await userService.CreateAsync(Constants.Security.SuperUserKey,
+                user = (await userService.CreateAsync(
+                    Constants.Security.SuperUserKey,
                     new UserCreateModel()
                     {
                         Email = username,

@@ -6,8 +6,10 @@
     <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <!-- TODO: Fix all warnings and remove this override -->
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!--  TODO: Fix SA1117 params all on same line, [SA1401] make fields private, [SA1134] own line
+          attributes, [SA1649] file name match type, [CS0618] obsolete, [SA1111] closing parenthesis,
+          and remove these overrides -->
+    <WarningsNotAsErrors>SA1117,SA1401,SA1134,SA1649,CS0618,SA1111</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Umbraco.CSharpTest.Net.Collections" />

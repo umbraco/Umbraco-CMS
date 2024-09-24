@@ -160,11 +160,8 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     /// </remarks>
     public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
     {
-        TUser? user = await FindByIdAsync(userId);
-        if (user is null)
-        {
-            throw new InvalidOperationException("Could not find user");
-        }
+        TUser? user = await FindByIdAsync(userId)
+            ?? throw new InvalidOperationException("Could not find user");
 
         IdentityResult result = await ResetPasswordAsync(user, token, newPassword);
         return result;
@@ -265,7 +262,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
                                             typeof(IUserPasswordStore<>));
         }
 
-        var result = await VerifyPasswordAsync(userPasswordStore, user, password);
+        PasswordVerificationResult result = await VerifyPasswordAsync(userPasswordStore, user, password);
 
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }

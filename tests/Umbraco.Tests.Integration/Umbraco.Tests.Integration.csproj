@@ -10,8 +10,14 @@
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <!-- TODO: Fix all warnings and remove this override -->
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!--  TODO: Fix [CS0108] hidden inherited members, fix [SYSLIB0012] and [CS0618] obsolete references,
+          [CS1998] async, [SA1116] and [SA1117] parameter formatting, [CS0162] unreachable code, [CS0169]
+          unused fields, [SA1134] attribute on each line of code, [SA1405] Debug.Assert provide message text,
+          [CS4014]/[CS1998] await call, [CS0649] field not assigned to, [CS0168] unused variable,
+          and remove overrides -->
+    <WarningsNotAsErrors>
+      SYSLIB0012,SA1117,SA1116,CS0162,CS0169,SA1134,SA1405,CS0108,CS0618,CS4014,CS1998,CS0649,CS0168
+    </WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" />

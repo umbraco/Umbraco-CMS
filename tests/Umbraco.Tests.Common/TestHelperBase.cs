@@ -183,10 +183,7 @@ public abstract class TestHelperBase
     {
         get
         {
-            if (_uriUtility == null)
-            {
-                _uriUtility = new UriUtility(GetHostingEnvironment());
-            }
+            _uriUtility ??= new UriUtility(GetHostingEnvironment());
 
             return _uriUtility;
         }

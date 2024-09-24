@@ -250,13 +250,13 @@ AND umbracoNode.nodeObjectType = @objectType",
         if (allowedContentTypes.Any())
         {
             // Insert collection of allowed content types
-            foreach ((TEntity Entity, int SortOrder) allowedContentType in allowedContentTypes)
+            foreach ((TEntity entity1, int sortOrder1) in allowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
                 {
                     Id = entity.Id,
-                    AllowedId = allowedContentType.Entity.Id,
-                    SortOrder = allowedContentType.SortOrder,
+                    AllowedId = entity1.Id,
+                    SortOrder = sortOrder1,
                 });
             }
         }
@@ -406,13 +406,13 @@ AND umbracoNode.id <> @id",
         (TEntity Entity, int SortOrder)[] allowedContentTypes = GetAllowedContentTypes(entity);
         if (allowedContentTypes.Any())
         {
-            foreach ((TEntity Entity, int SortOrder) allowedContentType in allowedContentTypes)
+            foreach ((TEntity entity1, int sortOrder) in allowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
                 {
                     Id = entity.Id,
-                    AllowedId = allowedContentType.Entity.Id,
-                    SortOrder = allowedContentType.SortOrder,
+                    AllowedId = entity1.Id,
+                    SortOrder = sortOrder,
                 });
             }
         }
@@ -539,11 +539,7 @@ AND umbracoNode.id <> @id",
             if (propertyType.IsPropertyDirty("Variations"))
             {
                 // allocate the list only when needed
-                if (propertyTypeVariationDirty == null)
-                {
-                    propertyTypeVariationDirty = new List<IPropertyType>();
-                }
-
+                propertyTypeVariationDirty ??= new List<IPropertyType>();
                 propertyTypeVariationDirty.Add(propertyType);
             }
         }
@@ -797,11 +793,7 @@ AND umbracoNode.id <> @id",
             }
 
             // allocate the dictionary only when needed
-            if (changes == null)
-            {
-                changes = new Dictionary<int, (ContentVariation, ContentVariation)>();
-            }
-
+            changes ??= new Dictionary<int, (ContentVariation, ContentVariation)>();
             changes[propertyType.Id] = (oldVariation, newVariation);
         }
 
@@ -864,10 +856,10 @@ AND umbracoNode.id <> @id",
                  propertyTypeChanges.GroupBy(x => x.Value))
         {
             var propertyTypeIds = grouping.Select(x => x.Key).ToList();
-            (ContentVariation FromVariation, ContentVariation ToVariation) = grouping.Key;
+            (ContentVariation fromVariation, ContentVariation toVariation) = grouping.Key;
 
-            var fromCultureEnabled = FromVariation.HasFlag(ContentVariation.Culture);
-            var toCultureEnabled = ToVariation.HasFlag(ContentVariation.Culture);
+            var fromCultureEnabled = fromVariation.HasFlag(ContentVariation.Culture);
+            var toCultureEnabled = toVariation.HasFlag(ContentVariation.Culture);
 
             if (!fromCultureEnabled && toCultureEnabled)
             {
@@ -889,7 +881,9 @@ AND umbracoNode.id <> @id",
     /// <summary>
     ///     Moves variant data for a content type variation change.
     /// </summary>
-    private void MoveContentTypeVariantData(IContentTypeComposition contentType, ContentVariation fromVariation,
+    private void MoveContentTypeVariantData(
+        IContentTypeComposition contentType,
+        ContentVariation fromVariation,
         ContentVariation toVariation)
     {
         var defaultLanguageId = GetDefaultLanguageId();
@@ -1510,7 +1504,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         var sql = new Sql(
             $@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
-WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.listView IS NULL", new { ids});
+WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.listView IS NULL", new { ids });
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 

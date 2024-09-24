@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Globalization;
@@ -25,7 +25,7 @@ internal static class ChecksumValidator
         //
         // Other files (view imports) may or may not have existed at the time of compilation,
         // so we may not have checksums for them.
-        var checksums = item.GetChecksumMetadata();
+        IReadOnlyList<IRazorSourceChecksumMetadata> checksums = item.GetChecksumMetadata();
         return checksums.Any(c => string.Equals(item.Identifier, c.Identifier, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -43,7 +43,7 @@ internal static class ChecksumValidator
             throw new ArgumentNullException(nameof(item));
         }
 
-        var checksums = item.GetChecksumMetadata();
+        IReadOnlyList<IRazorSourceChecksumMetadata> checksums = item.GetChecksumMetadata();
 
         // The checksum that matches 'Item.Identity' in this list is significant. That represents the main file.
         //
@@ -53,7 +53,7 @@ internal static class ChecksumValidator
         //
         // The presence of the main file with the same content is a very strong signal that you're in a
         // development scenario.
-        var primaryChecksum = checksums
+        IRazorSourceChecksumMetadata? primaryChecksum = checksums
             .FirstOrDefault(c => string.Equals(item.Identifier, c.Identifier, StringComparison.OrdinalIgnoreCase));
         if (primaryChecksum == null)
         {
@@ -61,7 +61,7 @@ internal static class ChecksumValidator
             return true;
         }
 
-        var projectItem = fileSystem.GetItem(primaryChecksum.Identifier, fileKind: null);
+        RazorProjectItem projectItem = fileSystem.GetItem(primaryChecksum.Identifier, fileKind: null);
         if (!projectItem.Exists)
         {
             // Main file doesn't exist - assume valid.
@@ -78,14 +78,14 @@ internal static class ChecksumValidator
 
         for (var i = 0; i < checksums.Count; i++)
         {
-            var checksum = checksums[i];
+            IRazorSourceChecksumMetadata checksum = checksums[i];
             if (string.Equals(item.Identifier, checksum.Identifier, StringComparison.OrdinalIgnoreCase))
             {
                 // Ignore primary checksum on this pass.
                 continue;
             }
 
-            var importItem = fileSystem.GetItem(checksum.Identifier, fileKind: null);
+            RazorProjectItem importItem = fileSystem.GetItem(checksum.Identifier, fileKind: null);
             if (!importItem.Exists)
             {
                 // Import file doesn't exist - assume invalid.
@@ -114,7 +114,7 @@ internal static class ChecksumValidator
         for (var i = 0; i < bytes.Length; i++)
         {
             var text = bytes[i].ToString("x2", CultureInfo.InvariantCulture);
-            if (checksum[i * 2] != text[0] || checksum[i * 2 + 1] != text[1])
+            if (checksum[i * 2] != text[0] || checksum[(i * 2) + 1] != text[1])
             {
                 return false;
             }

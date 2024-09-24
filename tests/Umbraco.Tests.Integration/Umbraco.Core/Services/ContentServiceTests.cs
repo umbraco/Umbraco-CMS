@@ -640,7 +640,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // and proper values
         // first, the current (edited) version, with edited and published versions
         Assert.AreEqual("John Farr", versions[0].GetValue("author")); // current version has the edited value
-        Assert.AreEqual("Bob Hope",
+        Assert.AreEqual(
+            "Bob Hope",
             versions[0].GetValue("author", published: true)); // and the published published value
 
         // then, the current (published) version, with edited == published

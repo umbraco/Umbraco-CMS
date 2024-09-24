@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -14,10 +14,10 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
 
     private const string LogfileName = "UmbracoTraceLog.INTEGRATIONTEST.20230707.json";
 
-    private string _newLogfilePath;
-    private string _newLogfileDirPath;
-    private DateTime _startDate = new(2023, 7, 7);
-    private DateTime _endDate = new(2023, 7, 8);
+    private readonly string _newLogfilePath;
+    private readonly string _newLogfileDirPath;
+    private readonly DateTime _startDate = new(2023, 7, 7);
+    private readonly DateTime _endDate = new(2023, 7, 8);
 
     [OneTimeSetUp]
     public void Setup()
@@ -83,7 +83,11 @@ public class LogViewerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_Logs_By_Filter_Expression()
     {
-        var attempt = await LogViewerService.GetPagedLogsAsync(_startDate, _endDate, 0, int.MaxValue,
+        var attempt = await LogViewerService.GetPagedLogsAsync(
+            _startDate,
+            _endDate,
+            0,
+            int.MaxValue,
             filterExpression: "@Level='Error'");
 
         Assert.Multiple(() =>

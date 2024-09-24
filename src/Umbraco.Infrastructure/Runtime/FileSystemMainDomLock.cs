@@ -71,7 +71,8 @@ internal class FileSystemMainDomLock : IMainDomLock
                 _lockFileStream?.Close();
                 return Task.FromResult(false);
             }
-        } while (stopwatch.ElapsedMilliseconds < millisecondsTimeout);
+        }
+        while (stopwatch.ElapsedMilliseconds < millisecondsTimeout);
 
         return Task.FromResult(false);
     }
