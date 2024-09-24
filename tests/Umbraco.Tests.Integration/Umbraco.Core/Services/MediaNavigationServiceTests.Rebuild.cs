@@ -14,7 +14,7 @@ public partial class MediaNavigationServiceTests
         // Arrange
         Guid nodeKey = Album.Key;
 
-        // Capture original built state of MediaNavigationService
+        // Capture original built state of MediaNavigationQueryService
         MediaNavigationQueryService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
         MediaNavigationQueryService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
@@ -59,7 +59,7 @@ public partial class MediaNavigationServiceTests
         Guid nodeKey = Album.Key;
         await MediaEditingService.MoveToRecycleBinAsync(nodeKey, Constants.Security.SuperUserKey);
 
-        // Capture original built state of MediaNavigationService
+        // Capture original built state of MediaNavigationQueryService
         MediaNavigationQueryService.TryGetParentKeyInBin(nodeKey, out Guid? originalParentKey);
         MediaNavigationQueryService.TryGetChildrenKeysInBin(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
         MediaNavigationQueryService.TryGetDescendantsKeysInBin(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);

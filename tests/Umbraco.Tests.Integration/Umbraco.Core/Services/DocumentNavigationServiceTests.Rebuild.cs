@@ -14,7 +14,7 @@ public partial class DocumentNavigationServiceTests
         // Arrange
         Guid nodeKey = Root.Key;
 
-        // Capture original built state of DocumentNavigationService
+        // Capture original built state of DocumentNavigationQueryService
         DocumentNavigationQueryService.TryGetParentKey(nodeKey, out Guid? originalParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeys(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
         DocumentNavigationQueryService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
@@ -59,7 +59,7 @@ public partial class DocumentNavigationServiceTests
         Guid nodeKey = Root.Key;
         await ContentEditingService.MoveToRecycleBinAsync(nodeKey, Constants.Security.SuperUserKey);
 
-        // Capture original built state of DocumentNavigationService
+        // Capture original built state of DocumentNavigationQueryService
         DocumentNavigationQueryService.TryGetParentKeyInBin(nodeKey, out Guid? originalParentKey);
         DocumentNavigationQueryService.TryGetChildrenKeysInBin(nodeKey, out IEnumerable<Guid> originalChildrenKeys);
         DocumentNavigationQueryService.TryGetDescendantsKeysInBin(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
