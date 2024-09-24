@@ -1,6 +1,5 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -124,7 +123,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         return createElement(tag, attributes, childElements);
     }
 
-    private string TagName(HtmlNode htmlNode) => htmlNode.Name;
+    private static string TagName(HtmlNode htmlNode) => htmlNode.Name;
 
     private void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, Dictionary<string, object> attributes)
     {
@@ -166,9 +165,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         });
     }
 
-    private void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
+    private static void CleanUpBlocks(string tag, Dictionary<string, object> attributes)
     {
-        if (tag.StartsWith("umb-rte-block") is false || attributes.ContainsKey(BlockContentKeyAttribute) is false || attributes[BlockContentKeyAttribute] is not string dataKey)
+        if (tag.StartsWith("umb-rte-block") is false || attributes.TryGetValue(BlockContentKeyAttribute, out object? blockContentKeyAttribute) is false || blockContentKeyAttribute is not string dataKey)
         {
             return;
         }
