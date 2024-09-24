@@ -64,14 +64,6 @@ export class UmbUserGroupWorkspaceContext
 		]);
 	}
 
-	protected override _checkWillNavigateAway(newUrl: string): boolean {
-		if (this.getIsNew()) {
-			return !newUrl.includes(`/create`) || super._checkWillNavigateAway(newUrl);
-		} else {
-			return !newUrl.includes(`/edit/${this.getUnique()}`) || super._checkWillNavigateAway(newUrl);
-		}
-	}
-
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
 		this._data.updateCurrentData({ [alias]: value });
 	}
