@@ -147,7 +147,7 @@ stages:
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)
+              URL=$(ASPNETCORE_URLS)" | Out-File .env
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
