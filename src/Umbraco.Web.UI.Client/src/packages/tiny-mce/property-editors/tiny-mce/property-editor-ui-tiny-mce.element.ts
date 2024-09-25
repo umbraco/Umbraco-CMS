@@ -59,6 +59,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.blocks.contentData);
 		this.#managerContext.setSettings(buildUpValue.blocks.settingsData);
+		this.#managerContext.setExposes(buildUpValue.blocks.expose);
 	}
 	public get value(): UmbRichTextEditorValueType {
 		return this._value;

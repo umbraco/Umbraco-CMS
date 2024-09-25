@@ -225,7 +225,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.#data.setPersistedData(data);
+		this.#data.setPersistedData(undefined);
 		this.#data.setCurrentData(data);
 		return data;
 	}

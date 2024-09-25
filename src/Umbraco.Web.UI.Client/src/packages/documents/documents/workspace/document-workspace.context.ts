@@ -321,8 +321,8 @@ export class UmbDocumentWorkspaceContext
 		this.#entityContext.setUnique(data.unique);
 		this.#isTrashedContext.setIsTrashed(data.isTrashed);
 		this.setIsNew(true);
-		this.#data.setData(undefined);
-		this.#data.current.setValue(data);
+		this.#data.setPersistedData(undefined);
+		this.#data.setCurrentData(data);
 		return data;
 	}
 
@@ -522,8 +522,9 @@ export class UmbDocumentWorkspaceContext
 			}
 
 			this.setIsNew(false);
-			// TODO: Only update the variants that we asked to save.
-			this.#data.setData(data);
+			this.#data.setPersistedData(data);
+			// TODO: Only update the variants that was chosen to be saved:
+			this.#data.setCurrentData(data);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
@@ -539,8 +540,9 @@ export class UmbDocumentWorkspaceContext
 				throw new Error('Error saving document');
 			}
 
-			// TODO: Only update the variants that we asked to save.
-			this.#data.setData(data);
+			this.#data.setPersistedData(data);
+			// TODO: Only update the variants that was chosen to be saved:
+			this.#data.setCurrentData(data);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({

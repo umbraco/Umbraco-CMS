@@ -371,7 +371,8 @@ export class UmbMemberWorkspaceContext
 
 		if (newData) {
 			this.#data.setPersistedData(newData);
-			this.#data.setCurrentData(newData);
+			// TODO: Only update the variants that was chosen to be saved:
+			//this.#data.setCurrentData(newData);
 		}
 	}
 

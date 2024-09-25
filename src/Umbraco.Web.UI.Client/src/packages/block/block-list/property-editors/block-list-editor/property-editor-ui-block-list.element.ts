@@ -68,11 +68,13 @@ export class UmbPropertyEditorUIBlockListElement
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
+		buildUpValue.expose ??= [];
 		this._value = buildUpValue as UmbBlockListValueModel;
 
 		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] ?? []);
-		this.#managerContext.setContents(buildUpValue.contentData);
-		this.#managerContext.setSettings(buildUpValue.settingsData);
+		this.#managerContext.setContents(this._value.contentData);
+		this.#managerContext.setSettings(this._value.settingsData);
+		this.#managerContext.setExposes(this._value.expose);
 	}
 	public override get value(): UmbBlockListValueModel | undefined {
 		return this._value;
