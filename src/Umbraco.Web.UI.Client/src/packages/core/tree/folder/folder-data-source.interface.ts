@@ -7,6 +7,7 @@ export interface UmbFolderDataSourceConstructor {
 }
 
 export interface UmbFolderDataSource {
+	createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>>;
 	create(args: UmbCreateFolderModel): Promise<UmbDataSourceResponse<UmbFolderModel>>;
 	read(unique: string): Promise<UmbDataSourceResponse<UmbFolderModel>>;
 	update(args: UmbUpdateFolderModel): Promise<UmbDataSourceResponse<UmbFolderModel>>;

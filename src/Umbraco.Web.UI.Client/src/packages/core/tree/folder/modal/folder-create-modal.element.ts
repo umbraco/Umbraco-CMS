@@ -37,7 +37,7 @@ export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
 
 		const createFolderModel: UmbCreateFolderModel = {
 			...this._folderScaffold,
-			parentUnique: this.data.parent.unique,
+			parent: this.data.parent,
 			name,
 		};
 

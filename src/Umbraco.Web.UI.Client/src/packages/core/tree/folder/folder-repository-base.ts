@@ -1,9 +1,8 @@
 import { UmbRepositoryBase } from '../../repository/repository-base.js';
 import type { UmbFolderRepository } from './folder-repository.interface.js';
 import type { UmbFolderDataSource, UmbFolderDataSourceConstructor } from './folder-data-source.interface.js';
-import type { UmbCreateFolderModel, UmbUpdateFolderModel } from './types.js';
+import type { UmbFolderModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
@@ -24,17 +23,13 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 	}
 
 	/**
-	 * Creates a scaffold for a folder
+	 * Creates a scaffold
+	 * @param {Partial<UmbFolderModel>} [preset]
 	 * @returns {*}
 	 * @memberof UmbFolderRepositoryBase
 	 */
-	async createScaffold() {
-		const scaffold = {
-			unique: UmbId.new(),
-			name: '',
-		};
-
-		return { data: scaffold };
+	async createScaffold(preset?: Partial<UmbFolderModel>) {
+		return this.#folderDataSource.createScaffold(preset);
 	}
 
 	/**
@@ -44,7 +39,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 	 * @memberof UmbFolderRepositoryBase
 	 */
 	async create(args: UmbCreateFolderModel) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+		if (args.parent === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 		await this._init;
 

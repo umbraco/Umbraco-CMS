@@ -1,10 +1,11 @@
+import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbCreateFolderModel, UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderDataSource, UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../../entity';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * A data source for Stylesheet folders that fetches data from the server
@@ -22,6 +23,17 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
+	}
+
+	async createScaffold(preset?: Partial<UmbFolderModel>) {
+		const scaffold: UmbFolderModel = {
+			entityType: UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
+			unique: UmbId.new(),
+			name: '',
+			...preset,
+		};
+
+		return { data: scaffold };
 	}
 
 	/**
@@ -59,19 +71,21 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 	/**
 	 * Creates a Stylesheet folder on the server
-	 * @param {UmbCreateFolderModel} args
+	 * @param {UmbCreateFolderModel} model
 	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
-	async create(args: UmbCreateFolderModel) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
-		if (!args.name) throw new Error('Name is missing');
+	async create(model: UmbFolderModel, parentUnique: string | null) {
+		if (!model) throw new Error('Data is missing');
 
-		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
+		if (model.parent === undefined) throw new Error('Parent unique is missing');
+		if (!model.name) throw new Error('Name is missing');
+
+		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(model.parent?.unique || null);
 
 		const requestBody: CreateStylesheetFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
-			name: args.name,
+			name: model.name,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(

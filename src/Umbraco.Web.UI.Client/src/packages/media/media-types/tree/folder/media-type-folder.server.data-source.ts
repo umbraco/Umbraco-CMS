@@ -1,8 +1,14 @@
 import { UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbCreateFolderModel,
+	UmbFolderDataSource,
+	UmbFolderModel,
+	UmbUpdateFolderModel,
+} from '@umbraco-cms/backoffice/tree';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * A data source for a Media Type folder that fetches data from the server
@@ -19,6 +25,23 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
+	}
+
+	/**
+	 * Creates a scaffold for a Media Type folder
+	 * @param {Partial<UmbFolderModel>} [preset]
+	 * @return {*}
+	 * @memberof UmbMediaTypeFolderServerDataSource
+	 */
+	async createScaffold(preset?: Partial<UmbFolderModel>) {
+		const scaffold: UmbFolderModel = {
+			entityType: UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
+			unique: UmbId.new(),
+			name: '',
+			...preset,
+		};
+
+		return { data: scaffold };
 	}
 
 	/**
@@ -57,12 +80,12 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+		if (args.parent === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 
 		const requestBody = {
 			id: args.unique,
-			parent: args.parentUnique ? { id: args.parentUnique } : null,
+			parent: args.parent ? { id: args.parent.unique } : null,
 			name: args.name,
 		};
 

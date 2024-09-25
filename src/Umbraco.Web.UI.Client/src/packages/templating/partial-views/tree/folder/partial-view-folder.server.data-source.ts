@@ -1,10 +1,11 @@
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbCreateFolderModel, UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
+import type { UmbCreateFolderModel, UmbFolderDataSource, UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreatePartialViewFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * A data source for Partial View folders that fetches data from the server
@@ -22,6 +23,23 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
+	}
+
+	/**
+	 * Creates a scaffold for a Partial View folder
+	 * @param {Partial<UmbFolderModel>} [preset]
+	 * @returns {*}
+	 * @memberof UmbPartialViewFolderServerDataSource
+	 */
+	async createScaffold(preset?: Partial<UmbFolderModel>) {
+		const scaffold: UmbFolderModel = {
+			entityType: UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+			unique: UmbId.new(),
+			name: '',
+			...preset,
+		};
+
+		return { data: scaffold };
 	}
 
 	/**
@@ -64,10 +82,10 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+		if (args.parent === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 
-		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
+		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent?.unique || null);
 
 		const requestBody: CreatePartialViewFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
