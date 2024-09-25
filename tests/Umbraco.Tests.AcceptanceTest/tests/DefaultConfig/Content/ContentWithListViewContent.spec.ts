@@ -155,10 +155,13 @@ test('child is removed from list after child content is deleted', async ({umbrac
   await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoApi.document.ensureNameNotExists(childContentName);
 
   // Act
+  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.clickActionsMenuForContent(childContentName);
+  await umbracoUi.content.clickTrashButton();
+  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.doesListViewHaveNoItemsInList();
 
   // Assert
@@ -345,4 +348,46 @@ test('can trash child content in list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.doesListViewContainCount(0);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
   await umbracoUi.content.isItemVisibleInRecycleBin(childContentName);
+});
+
+test('can search for child content in list', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondChildName = 'SecondChildDocument';
+  await umbracoApi.document.ensureNameNotExists(secondChildName);
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(secondChildName, childDocumentTypeId, documentId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.doesListViewContainCount(2);
+
+  // Act
+  await umbracoUi.content.searchByKeywordInCollection(childContentName);
+
+  // Assert
+  await umbracoUi.content.doesListViewContainCount(1);
+  await umbracoUi.content.doesFirstItemInListViewHaveName(childContentName);
+});
+
+test('can swap from list view to grid view in list', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAPropertyEditorAndAnAllowedChildNode(documentTypeName, dataTypeName, dataTypeData.id, childDocumentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, documentId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.isDocumentListViewVisible();
+
+  // Act
+  await umbracoUi.content.changeToGridView();
+
+  // Assert
+  await umbracoUi.content.isDocumentGridViewVisible();
 });
