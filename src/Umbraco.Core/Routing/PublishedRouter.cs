@@ -24,6 +24,7 @@ public class PublishedRouter : IPublishedRouter
     private readonly IContentLastChanceFinder _contentLastChanceFinder;
     private readonly IContentTypeService _contentTypeService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IDomainCache _domainCache;
     private readonly IFileService _fileService;
     private readonly ILogger<PublishedRouter> _logger;
     private readonly IProfilingLogger _profilingLogger;
@@ -50,7 +51,8 @@ public class PublishedRouter : IPublishedRouter
         IFileService fileService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IDomainCache domainCache)
     {
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
@@ -68,6 +70,7 @@ public class PublishedRouter : IPublishedRouter
         _contentTypeService = contentTypeService;
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
+        _domainCache = domainCache;
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
@@ -403,15 +406,20 @@ public class PublishedRouter : IPublishedRouter
             _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
         }
 
-        if (request.Domain is not null)
+        var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
+        Domain? domain =
+            DomainUtilities.FindWildcardDomainInPath(_domainCache.GetAll(true), nodePath, rootNodeId);
+
+
+        if (domain != null)
         {
-            request.SetCulture(request.Domain.Culture);
+            request.SetCulture(domain.Culture);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
                     "{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}",
                     tracePrefix,
-                    request.Domain.ContentId,
+                    domain.ContentId,
                     request.Culture);
             }
         }

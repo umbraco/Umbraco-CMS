@@ -12,32 +12,35 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 public sealed class ApiPublishedContentCache : IApiPublishedContentCache
 {
     private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IRequestCultureService _requestCultureService;
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IPublishedContentCache _publishedContentCache;
     private DeliveryApiSettings _deliveryApiSettings;
+    //
+    // [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
+    // public ApiPublishedContentCache(
+    //     IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    //     IRequestPreviewService requestPreviewService,
+    //     IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
+    // :this(
+    //     requestPreviewService,
+    //     deliveryApiSettings,
+    //     StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+    //     StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>()
+    //     )
+    // {
+    //
+    // }
 
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
     public ApiPublishedContentCache(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
-    :this(
-        requestPreviewService,
-        deliveryApiSettings,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>()
-        )
-    {
-
-    }
-
-    public ApiPublishedContentCache(
-        IRequestPreviewService requestPreviewService,
+        IRequestCultureService requestCultureService,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
         IDocumentUrlService documentUrlService,
         IPublishedContentCache publishedContentCache)
     {
         _requestPreviewService = requestPreviewService;
+        _requestCultureService = requestCultureService;
         _documentUrlService = documentUrlService;
         _publishedContentCache = publishedContentCache;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
@@ -49,10 +52,24 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
 
+
+        // Handle the nasty logic with domain document ids in front of paths.
+        int? documentStartNodeId = null;
+        if (route.StartsWith("/") is false)
+        {
+            var index = route.IndexOf('/');
+
+            if (index > -1 && int.TryParse(route.Substring(0, index), out var nodeId))
+            {
+                documentStartNodeId = nodeId;
+                route = route.Substring(index);
+            }
+        }
+
         Guid? documentKey = _documentUrlService.GetDocumentKeyByRoute(
             route,
-            null,
-            null,
+            _requestCultureService.GetRequestedCulture(),
+            documentStartNodeId,
             _requestPreviewService.IsPreview()
         );
         IPublishedContent? content = documentKey.HasValue

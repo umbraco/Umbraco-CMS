@@ -47,7 +47,7 @@ public static partial class UmbracoBuilderExtensions
         builder.HealthCheckNotificationMethods().Add(() => builder.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
         builder.UrlProviders()
             .Append<AliasUrlProvider>()
-            .Append<DefaultUrlProvider>();
+            .Append<NewDefaultUrlProvider>();
         builder.MediaUrlProviders()
             .Append<DefaultMediaUrlProvider>();
 

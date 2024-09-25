@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -35,7 +36,9 @@ public class PublishedRouterTests
             Mock.Of<IFileService>(),
             Mock.Of<IContentTypeService>(),
             umbracoContextAccessor,
-            Mock.Of<IEventAggregator>());
+            Mock.Of<IEventAggregator>(),
+            Mock.Of<IDomainCache>()
+            );
 
     private IUmbracoContextAccessor GetUmbracoContextAccessor()
     {

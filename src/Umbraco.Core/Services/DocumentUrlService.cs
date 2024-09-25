@@ -415,6 +415,67 @@ public class DocumentUrlService : IDocumentUrlService
         return runnerKey;
     }
 
+    public string GetLegacdyRouteFormat(Guid docuemntKey, string? culture, bool isDraft)
+    {
+        var documentIdAttempt = _idKeyMap.GetIdForKey(docuemntKey, UmbracoObjectTypes.Document);
+
+        if(documentIdAttempt.Success is false)
+        {
+            return "#";
+        }
+
+        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(docuemntKey,
+                out IEnumerable<Guid> ancestorsOrSelfKeys) is false)
+        {
+            return "#";
+        }
+
+        var cultureOrDefault = culture ?? _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+
+        Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
+        IDictionary<Guid, IDomain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, ancestorKey =>
+        {
+            IEnumerable<IDomain> domains = _domainService.GetAssignedDomainsAsync(ancestorKey, false).GetAwaiter().GetResult();
+            return domains.FirstOrDefault(x=>x.LanguageIsoCode == cultureOrDefault);
+        });
+
+        var urlSegments = new List<string>();
+
+        IDomain? foundDomain = null;
+
+        foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
+        {
+            if (ancestorOrSelfKeyToDomains.TryGetValue(ancestorOrSelfKey, out IDomain? domain))
+            {
+                if (domain is not null)
+                {
+                    foundDomain = domain;
+                    break;
+                }
+            }
+
+            if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, cultureOrDefault, isDraft), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+            {
+                urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+            }
+
+            if (foundDomain is not null)
+            {
+                break;
+            }
+        }
+
+        if (foundDomain is not null)
+        {
+            //we found a domain, and not to construct the route in the funny legacy way
+            return foundDomain.Id + "/" + string.Join("/", urlSegments);
+        }
+
+        var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();
+        return GetFullUrl(isRootFirstItem, urlSegments, null);
+    }
+
+
     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
     {
         var result = new List<UrlInfo>();
@@ -509,6 +570,7 @@ public class DocumentUrlService : IDocumentUrlService
             await CreateOrUpdateUrlSegmentsAsync(content.Yield());
         }
     }
+
 
     //TODO test cases:
     // - Find the root, when a domain is set
