@@ -29,7 +29,7 @@ public sealed class BlockEditorConverter
     public IPublishedElement? ConvertToElement(BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
-        IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Element, data.ContentTypeKey);
+        IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Content, data.ContentTypeKey);
         if (publishedContentType == null || publishedContentType.IsElement == false)
         {
             return null;
@@ -57,7 +57,7 @@ public sealed class BlockEditorConverter
 
     public Type GetModelType(Guid contentTypeKey)
     {
-        IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Element, contentTypeKey);
+        IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentTypeKey);
         if (publishedContentType is not null && publishedContentType.IsElement)
         {
             return _publishedModelFactory.GetModelType(publishedContentType.Alias);
