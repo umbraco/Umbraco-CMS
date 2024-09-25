@@ -1,46 +1,44 @@
 import type { UmbTemplateDetailModel } from '../types.js';
-import type { UmbTemplateItemModel } from '../repository/index.js';
-import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repository/index.js';
+import type { UmbTemplateItemModel, UmbTemplateDetailRepository } from '../repository/index.js';
+import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS, UmbTemplateItemRepository } from '../repository/index.js';
+import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
 import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSubmittableWorkspaceContextBase,
+	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbSubmittableWorkspaceContextBase<UmbTemplateDetailModel>
+	extends UmbEntityDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly detailRepository = new UmbTemplateDetailRepository(this);
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
-	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
-	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
-	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
+	data = this._data.current;
 
-	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-	alias = this.#data.asObservablePart((data) => data?.alias);
-	content = this.#data.asObservablePart((data) => data?.content);
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	readonly entityType = this.#data.asObservablePart((data) => data?.entityType);
-	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
+
+	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	public readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias);
+	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
+	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
+	public readonly masterTemplateUnique = this._data.createObservablePartOfCurrent(
+		(data) => data?.masterTemplate?.unique,
+	);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_TEMPLATE_WORKSPACE_ALIAS);
+		super(host, {
+			workspaceAlias: UMB_TEMPLATE_WORKSPACE_ALIAS,
+			entityType: UMB_TEMPLATE_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
@@ -49,7 +47,7 @@ export class UmbTemplateWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
+					this.create({ parent: { entityType: parentEntityType, unique: parentUnique } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -69,33 +67,16 @@ export class UmbTemplateWorkspaceContext
 		]);
 	}
 
-	protected override resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	getEntityType(): string {
-		return 'template';
-	}
-
-	getUnique() {
-		return this.getData()?.unique;
-	}
-
-	getData() {
-		return this.#data.getValue();
-	}
-
 	setName(value: string) {
-		this.#data.update({ name: value });
+		this._data.updateCurrent({ name: value });
 	}
 
 	setAlias(value: string) {
-		this.#data.update({ alias: value });
+		this._data.updateCurrent({ alias: value });
 	}
 
 	setContent(value: string) {
-		this.#data.update({ content: value });
+		this._data.updateCurrent({ content: value });
 	}
 
 	getLayoutBlockRegexPattern() {
@@ -104,16 +85,6 @@ export class UmbTemplateWorkspaceContext
 
 	getHasLayoutBlock() {
 		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
-	}
-
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.detailRepository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.setMasterTemplate(data.masterTemplate?.unique ?? null);
-			this.#data.setValue(data);
-		}
 	}
 
 	async setMasterTemplate(id: string | null) {
@@ -133,7 +104,7 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	#updateMasterTemplateLayoutBlock = () => {
-		const currentContent = this.#data.getValue()?.content;
+		const currentContent = this._data.getCurrent()?.content;
 		const newMasterTemplateAlias = this.#masterTemplate?.getValue()?.alias;
 		const hasLayoutBlock = this.getHasLayoutBlock();
 
@@ -160,55 +131,6 @@ export class UmbTemplateWorkspaceContext
 ${currentContent}`;
 		this.setContent(string);
 	};
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent.setValue(parent);
-		const { data } = await this.detailRepository.createScaffold();
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.setValue(data);
-
-		if (!parent) return;
-		await this.setMasterTemplate(parent.unique);
-	}
-
-	async submit() {
-		if (!this.#data.value) throw new Error('Data is missing');
-
-		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			const { error, data } = await this.detailRepository.create(this.#data.value, parent.unique);
-			if (error) throw new Error(error.message);
-			this.#data.setValue(data);
-			this.setIsNew(false);
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-		} else {
-			const { error, data } = await this.detailRepository.save(this.#data.value);
-			if (error) throw new Error(error.message);
-			this.#data.setValue(data);
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
-		}
-	}
-
-	public override destroy() {
-		this.#data.destroy();
-		super.destroy();
-	}
 }
+
 export { UmbTemplateWorkspaceContext as api };
