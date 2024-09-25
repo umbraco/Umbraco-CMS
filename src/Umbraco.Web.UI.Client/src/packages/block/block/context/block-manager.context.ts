@@ -201,10 +201,10 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.removeOne(settingsKey);
 	}
 	removeExposesOf(contentKey: string) {
-		this.#exposes.filter((x) => x.contentKey === contentKey);
+		this.#exposes.filter((x) => x.contentKey !== contentKey);
 	}
 	removeOneExpose(contentKey: string, variantId: UmbVariantId) {
-		this.#exposes.filter((x) => x.contentKey === contentKey && variantId.compare(x));
+		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
 	}
 
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
