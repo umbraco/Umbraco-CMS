@@ -17,6 +17,9 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
+
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
@@ -51,6 +54,9 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);
+			}
+			:host([unpublished]) uui-ref-node {
+				opacity: 0.6;
 			}
 		`,
 	];

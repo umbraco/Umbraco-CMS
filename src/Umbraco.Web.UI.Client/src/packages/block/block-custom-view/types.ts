@@ -27,6 +27,7 @@ export interface UmbBlockEditorCustomViewProperties<
 	settings?: UmbBlockDataType;
 	contentInvalid?: boolean;
 	settingsInvalid?: boolean;
+	unpublished?: boolean;
 }
 
 export interface UmbBlockEditorCustomViewElement<

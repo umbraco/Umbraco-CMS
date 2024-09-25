@@ -85,6 +85,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -170,6 +173,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			(icon) => {
 				this.#updateBlockViewProps({ icon });
 				this._icon = icon;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
 			},
 			null,
 		);
@@ -376,6 +387,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			class="umb-block-grid__block--view"
 			.label=${this._label}
 			.icon=${this._icon}
+			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
 	}
@@ -385,6 +397,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			class="umb-block-grid__block--view"
 			.label=${this._label}
 			.icon=${this._icon}
+			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
 	}

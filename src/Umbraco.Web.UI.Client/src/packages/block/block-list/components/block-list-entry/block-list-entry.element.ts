@@ -74,6 +74,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_icon?: string;
 
 	@state()
+	_exposed?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -145,9 +148,17 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
+			},
+			null,
+		);
+		this.observe(
 			this.#context.inlineEditingMode,
-			(inlineEditingMode) => {
-				this._inlineEditingMode = inlineEditingMode;
+			(mode) => {
+				this._inlineEditingMode = mode;
 			},
 			null,
 		);
@@ -256,6 +267,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-ref-list-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-ref-list-block>`;
 	}
@@ -264,6 +276,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-inline-list-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}></umb-inline-list-block>`;
 	}

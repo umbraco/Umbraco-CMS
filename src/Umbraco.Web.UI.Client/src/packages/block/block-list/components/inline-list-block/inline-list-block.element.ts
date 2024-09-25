@@ -1,12 +1,16 @@
-import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../index.js';
-import type { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../../block/index.js';
-import { UMB_BLOCK_WORKSPACE_ALIAS } from '../../../block/index.js';
+import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/index.js';
+import {
+	UMB_BLOCK_WORKSPACE_ALIAS,
+	type UmbBlockDataType,
+	type UMB_BLOCK_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/block';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+
+import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 /**
  * @element umb-inline-list-block
@@ -22,6 +26,12 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	@property({ type: String, reflect: false })
 	icon?: string;
+
+	@property({ type: Boolean, reflect: true })
+	unpublished?: boolean;
+
+	@property({ attribute: false })
+	content?: UmbBlockDataType;
 
 	@state()
 	_isOpen = false;
@@ -67,7 +77,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		return html`
 			<div id="host">
 				<button
-					slot="header"
 					id="open-part"
 					tabindex="0"
 					@keydown=${(e: KeyboardEvent) => {
@@ -98,7 +107,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<div id="name">${this.label}</div>
+					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 				</div>
 			</span>
 		`;
@@ -136,6 +145,10 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			}
 			:host([disabled]) #host {
 				border-color: var(--uui-color-disabled-standalone);
+			}
+
+			:host([unpublished]) #open-part {
+				opacity: 0.6;
 			}
 
 			slot[name='tag'] {
