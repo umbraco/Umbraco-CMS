@@ -1,5 +1,6 @@
-import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS, UmbMemberGroupDetailRepository } from '../../repository/index.js';
+import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMemberGroupDetailModel } from '../../types.js';
+import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
@@ -9,8 +10,6 @@ import {
 	UmbEntityDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '@umbraco-cms/backoffice/user-group';
 
 export class UmbMemberGroupWorkspaceContext
