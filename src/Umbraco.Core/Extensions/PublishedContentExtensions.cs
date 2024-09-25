@@ -134,6 +134,24 @@ public static class PublishedContentExtensions
         return content.GetParent(contentCache, navigationQueryService) as T;
     }
 
+    private static IPublishedContent? GetParent(
+        this IPublishedContent content,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
+    {
+        IPublishedContent? parent;
+        if (navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey))
+        {
+            parent = parentKey.HasValue ? contentCache.GetById(parentKey.Value) : null;
+        }
+        else
+        {
+            throw new KeyNotFoundException($"Content with key '{content.Key}' was not found in the in-memory navigation structure.");
+        }
+
+        return parent;
+    }
+
     #endregion
 
     #region Url
@@ -1881,22 +1899,4 @@ public static class PublishedContentExtensions
         contentType?.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name) ?? new Dictionary<string, string>();
 
     #endregion
-
-    private static IPublishedContent? GetParent(
-        this IPublishedContent content,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
-    {
-        IPublishedContent? parent;
-        if (navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey))
-        {
-            parent = parentKey.HasValue ? contentCache.GetById(parentKey.Value) : null;
-        }
-        else
-        {
-            throw new KeyNotFoundException($"Content with key '{content.Key}' was not found in the in-memory navigation structure.");
-        }
-
-        return parent;
-    }
 }
