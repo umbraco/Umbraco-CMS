@@ -99,13 +99,7 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 				return;
 			}
 
-			let { width, height } = await imageSize(URL.createObjectURL(upload.file));
-
-			if (maxImageSize > 0 && width > maxImageSize) {
-				const ratio = maxImageSize / width;
-				width = maxImageSize;
-				height = Math.round(height * ratio);
-			}
+			const { width, height } = await imageSize(URL.createObjectURL(upload.file), { maxWidth: maxImageSize });
 
 			editor
 				.chain()
