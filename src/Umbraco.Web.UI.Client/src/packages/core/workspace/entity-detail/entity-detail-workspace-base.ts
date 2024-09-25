@@ -68,11 +68,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	getData() {
-		return this._data.getCurrentData();
+		return this._data.getCurrent();
 	}
 
 	getUnique() {
-		return this._data.getCurrentData()?.unique;
+		return this._data.getCurrent()?.unique;
 	}
 
 	async load(unique: string) {
@@ -85,8 +85,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		if (data) {
 			this.setIsNew(false);
-			this._data.setPersistedData(data);
-			this._data.setCurrentData(data);
+			this._data.setPersisted(data);
+			this._data.setCurrent(data);
 		}
 
 		return response;
@@ -98,7 +98,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	async submit() {
 		await this.#init;
-		const currentData = this._data.getCurrentData();
+		const currentData = this._data.getCurrent();
 
 		if (!currentData) {
 			throw new Error('Data is not set');
@@ -115,7 +115,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				throw error?.message ?? 'Repository did not return data after create.';
 			}
 
-			this._data.setPersistedData(data);
+			this._data.setPersisted(data);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -131,7 +131,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				throw error?.message ?? 'Repository did not return data after create.';
 			}
 
-			this._data.setPersistedData(data);
+			this._data.setPersisted(data);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -156,8 +156,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			data = { ...data, ...this.modalContext.data.preset };
 		}
 		this.setIsNew(true);
-		this._data.setPersistedData(data);
-		this._data.setCurrentData(data);
+		this._data.setPersisted(data);
+		this._data.setCurrent(data);
 		return data;
 	}
 
@@ -182,7 +182,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#onWillNavigate = async (e: CustomEvent) => {
 		const newUrl = e.detail.url;
 
-		if (this._checkWillNavigateAway(newUrl) && this._data.hasUnpersistedChanges()) {
+		if (this._checkWillNavigateAway(newUrl) && this._data.getHasUnpersistedChanges()) {
 			e.preventDefault();
 			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const modal = modalManager.open(this, UMB_DISCARD_CHANGES_MODAL);
@@ -191,7 +191,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				// navigate to the new url when discarding changes
 				await modal.onSubmit();
 				// Reset the current data so we don't end in a endless loop of asking to discard changes.
-				this._data.resetCurrentData();
+				this._data.resetCurrent();
 				history.pushState({}, '', e.detail.url);
 				return true;
 			} catch {
@@ -204,7 +204,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
-		this._data.clearData();
+		this._data.clear();
 	}
 
 	#checkIfInitialized() {

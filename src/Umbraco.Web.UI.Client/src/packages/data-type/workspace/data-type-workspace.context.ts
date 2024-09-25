@@ -45,12 +45,12 @@ export class UmbDataTypeWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbDataTypeDetailRepository>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePart((data) => data?.name);
-	readonly unique = this._data.createObservablePart((data) => data?.unique);
-	readonly entityType = this._data.createObservablePart((data) => data?.entityType);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
 
-	readonly propertyEditorUiAlias = this._data.createObservablePart((data) => data?.editorUiAlias);
-	readonly propertyEditorSchemaAlias = this._data.createObservablePart((data) => data?.editorAlias);
+	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
+	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias).sortBy(
 		(a, b) => (a.weight || 0) - (b.weight || 0),
@@ -239,7 +239,7 @@ export class UmbDataTypeWorkspaceContext
 	#transferConfigDefaultData() {
 		if (!this.#propertyEditorSchemaSettingsDefaultData || !this.#propertyEditorUISettingsDefaultData) return;
 
-		const data = this._data.getCurrentData();
+		const data = this._data.getCurrent();
 		if (!data) return;
 
 		this.#settingsDefaultData = [
@@ -248,8 +248,8 @@ export class UmbDataTypeWorkspaceContext
 		] satisfies Array<UmbDataTypePropertyModel>;
 		// We check for satisfied type, because we will be directly transferring them to become value. Future note, if they are not satisfied, we need to transfer alias and value. [NL]
 
-		this._data.updatePersistedData({ values: this.#settingsDefaultData });
-		this._data.updateCurrentData({ values: this.#settingsDefaultData });
+		this._data.updatePersisted({ values: this.#settingsDefaultData });
+		this._data.updateCurrent({ values: this.#settingsDefaultData });
 	}
 
 	public getPropertyDefaultValue(alias: string) {
@@ -261,27 +261,27 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getName() {
-		return this._data.getCurrentData()?.name;
+		return this._data.getCurrent()?.name;
 	}
 
 	setName(name: string | undefined) {
-		this._data.updateCurrentData({ name });
+		this._data.updateCurrent({ name });
 	}
 
 	getPropertyEditorSchemaAlias() {
-		return this._data.getCurrentData()?.editorAlias;
+		return this._data.getCurrent()?.editorAlias;
 	}
 
 	setPropertyEditorSchemaAlias(alias?: string) {
-		this._data.updateCurrentData({ editorAlias: alias });
+		this._data.updateCurrent({ editorAlias: alias });
 	}
 
 	getPropertyEditorUiAlias() {
-		return this._data.getCurrentData()?.editorUiAlias;
+		return this._data.getCurrent()?.editorUiAlias;
 	}
 
 	setPropertyEditorUiAlias(alias?: string) {
-		this._data.updateCurrentData({ editorUiAlias: alias });
+		this._data.updateCurrent({ editorUiAlias: alias });
 	}
 
 	/**
@@ -292,14 +292,14 @@ export class UmbDataTypeWorkspaceContext
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this._getDataPromise;
-		return this._data.createObservablePart(
+		return this._data.createObservablePartOfCurrent(
 			(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
 		);
 	}
 
 	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
 		return (
-			(this._data.getCurrentData()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType) ??
+			(this._data.getCurrent()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType) ??
 			(this.getPropertyDefaultValue(propertyAlias) as ReturnType)
 		);
 	}
@@ -309,11 +309,11 @@ export class UmbDataTypeWorkspaceContext
 		await this._getDataPromise;
 		const entry = { alias: alias, value: value };
 
-		const currentData = this._data.getCurrentData();
+		const currentData = this._data.getCurrent();
 		if (currentData) {
 			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
 			const newDataSet = appendToFrozenArray(currentData.values || [], entry, (x) => x.alias);
-			this._data.updateCurrentData({ values: newDataSet });
+			this._data.updateCurrent({ values: newDataSet });
 		}
 	}
 

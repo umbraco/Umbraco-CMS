@@ -19,8 +19,8 @@ export class UmbLanguageWorkspaceContext
 
 	readonly data = this._data.current;
 
-	readonly unique = this._data.createObservablePart((data) => data?.unique);
-	readonly name = this._data.createObservablePart((data) => data?.name);
+	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -55,23 +55,23 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	setName(name: string) {
-		this._data.updateCurrentData({ name });
+		this._data.updateCurrent({ name });
 	}
 
 	setCulture(unique: string) {
-		this._data.updateCurrentData({ unique });
+		this._data.updateCurrent({ unique });
 	}
 
 	setMandatory(isMandatory: boolean) {
-		this._data.updateCurrentData({ isMandatory });
+		this._data.updateCurrent({ isMandatory });
 	}
 
 	setDefault(isDefault: boolean) {
-		this._data.updateCurrentData({ isDefault });
+		this._data.updateCurrent({ isDefault });
 	}
 
 	setFallbackCulture(unique: string) {
-		this._data.updateCurrentData({ fallbackIsoCode: unique });
+		this._data.updateCurrent({ fallbackIsoCode: unique });
 	}
 }
 
