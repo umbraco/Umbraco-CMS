@@ -1,4 +1,4 @@
-import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
+import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbContentDetailModel } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -29,11 +29,6 @@ export class UmbContentWorkspaceDataManager<
 	constructor(host: UmbControllerHost, variantScaffold: ModelVariantType) {
 		super(host);
 		this.#variantScaffold = variantScaffold;
-	}
-
-	setData(incomingData: ModelType | undefined) {
-		this.#persisted.setValue(incomingData);
-		this.current.setValue(incomingData);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

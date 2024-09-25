@@ -63,7 +63,11 @@ import {
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import {
+	UmbContentWorkspaceDataManager,
+	UmbMergeContentVariantDataController,
+	type UmbContentWorkspaceContext,
+} from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
@@ -255,7 +259,8 @@ export class UmbDocumentWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setData(undefined);
+		this.#data.setPersistedData(undefined);
+		this.#data.setCurrentData(undefined);
 	}
 
 	async loadLanguages() {
@@ -275,7 +280,8 @@ export class UmbDocumentWorkspaceContext
 			this.#entityContext.setUnique(unique);
 			this.#isTrashedContext.setIsTrashed(data.isTrashed);
 			this.setIsNew(false);
-			this.#data.setData(data);
+			this.#data.setPersistedData(data);
+			this.#data.setCurrentData(data);
 		}
 
 		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDocumentStoreObserver');
@@ -509,7 +515,7 @@ export class UmbDocumentWorkspaceContext
 		};
 	}
 
-	async #performSaveOrCreate(saveData: UmbDocumentDetailModel): Promise<void> {
+	async #performSaveOrCreate(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		if (this.getIsNew()) {
 			// Create:
 			const parent = this.#parent.getValue();
@@ -524,7 +530,17 @@ export class UmbDocumentWorkspaceContext
 			this.setIsNew(false);
 			this.#data.setPersistedData(data);
 			// TODO: Only update the variants that was chosen to be saved:
-			this.#data.setCurrentData(data);
+			const currentData = this.#data.getCurrentData();
+
+			const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
+
+			const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
+				currentData,
+				data,
+				variantIds,
+				variantIdsIncludingInvariant,
+			);
+			this.#data.setCurrentData(newCurrentData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
@@ -542,7 +558,17 @@ export class UmbDocumentWorkspaceContext
 
 			this.#data.setPersistedData(data);
 			// TODO: Only update the variants that was chosen to be saved:
-			this.#data.setCurrentData(data);
+			const currentData = this.#data.getCurrentData();
+
+			const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
+
+			const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
+				currentData,
+				data,
+				variantIds,
+				variantIdsIncludingInvariant,
+			);
+			this.#data.setCurrentData(newCurrentData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -569,10 +595,10 @@ export class UmbDocumentWorkspaceContext
 		const { selected } = await this.#determineVariantOptions();
 		if (selected.length > 0) {
 			culture = selected[0];
-			const variantId = UmbVariantId.FromString(culture);
-			const saveData = await this.#data.constructData([variantId]);
+			const variantIds = [UmbVariantId.FromString(culture)];
+			const saveData = await this.#data.constructData(variantIds);
 			await this.#runMandatoryValidationForSaveData(saveData);
-			await this.#performSaveOrCreate(saveData);
+			await this.#performSaveOrCreate(variantIds, saveData);
 		}
 
 		// Tell the server that we're entering preview mode.
@@ -640,7 +666,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			async () => {
 				// If data of the selection is not valid Then just save:
-				await this.#performSaveOrCreate(saveData);
+				await this.#performSaveOrCreate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				// TODO: Get rid of the save notification.
@@ -675,7 +701,7 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		await this.#performSaveOrCreate(saveData);
+		await this.#performSaveOrCreate(variantIds, saveData);
 
 		await this.publishingRepository.publish(
 			unique,
@@ -723,7 +749,7 @@ export class UmbDocumentWorkspaceContext
 
 		const saveData = await this.#data.constructData(variantIds);
 		await this.#runMandatoryValidationForSaveData(saveData);
-		return await this.#performSaveOrCreate(saveData);
+		return await this.#performSaveOrCreate(variantIds, saveData);
 	}
 
 	public override requestSubmit() {
