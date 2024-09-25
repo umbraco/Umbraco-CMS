@@ -96,17 +96,11 @@ public class ConvertersTests
         var cacheContent = new Dictionary<int, IPublishedContent>();
         cacheMock.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns<int>(id => cacheContent.TryGetValue(id, out var content) ? content : null);
-        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
-        publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
-        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        var localPublishedSnapshot = publishedSnapshotMock.Object;
-        publishedSnapshotAccessorMock.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
-        var publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
 
-        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
-        {
-            new SimpleConverter2(publishedSnapshotAccessor),
-        });
+        var converters = new PropertyValueConverterCollection(() =>
+        [
+            new SimpleConverter2(cacheMock.Object)
+        ]);
 
         var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
@@ -136,12 +130,12 @@ public class ConvertersTests
 
     private class SimpleConverter2 : IPropertyValueConverter
     {
+        private readonly IPublishedContentCache _contentCache;
         private readonly PropertyCacheLevel _cacheLevel;
-        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public SimpleConverter2(IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
+        public SimpleConverter2(IPublishedContentCache contentCache, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
         {
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _contentCache = contentCache;
             _cacheLevel = cacheLevel;
         }
 
@@ -172,8 +166,7 @@ public class ConvertersTests
             object inter,
             bool preview)
         {
-            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-            return publishedSnapshot.Content.GetById((int)inter);
+            return _contentCache.GetById((int)inter)!;
         }
 
         public object ConvertIntermediateToXPath(
