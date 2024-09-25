@@ -71,43 +71,31 @@ public class PropertyCacheLevelTests
 
     // property is not cached, converted cached at Content, exept
     //  /None = not cached at all
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
+    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.None, 2, 0, 0)]
+    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Element, 1, 0, 0)]
+    [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Elements, 1, 0, 0)]
 
     // property is cached at element level, converted cached at
     //  /None = not at all
     //  /Element = in element
     //  /Snapshot = in snapshot
     //  /Elements = in elements
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Elements, 1, 1, 0, 1, 0)]
-    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Snapshot, 1, 0, 1, 0, 1)]
+    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.None, 2, 0, 0)]
+    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Element, 1, 0, 0)]
+    [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Elements, 1, 1, 1)]
 
     // property is cached at elements level, converted cached at Element, exept
     //  /None = not cached at all
     //  /Snapshot = cached in snapshot
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Snapshot, 1, 0, 1, 0, 1)]
-
-    // property is cached at snapshot level, converted cached at Element, exept
-    //  /None = not cached at all
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
-    [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
+    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.None, 2, 0, 0)]
+    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Element, 1, 0, 0)]
+    [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Elements, 1, 0, 0)]
     public void CachePublishedSnapshotTest(
         PropertyCacheLevel referenceCacheLevel,
         PropertyCacheLevel converterCacheLevel,
         int interConverts,
         int elementsCount1,
-        int snapshotCount1,
-        int elementsCount2,
-        int snapshotCount2)
+        int elementsCount2)
     {
         var converter = new CacheConverter1(converterCacheLevel);
 
