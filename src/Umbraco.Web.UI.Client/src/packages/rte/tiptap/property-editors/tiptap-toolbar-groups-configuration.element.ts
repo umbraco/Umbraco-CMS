@@ -1,13 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	customElement,
-	css,
-	html,
-	property,
-	repeat,
-	nothing,
-	type PropertyValues,
-} from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -27,17 +19,14 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		if (!value || value.length === 0 || value[0].length === 0) {
 			value = [[[]]];
 		}
-		this.#value = value;
+		this._value = value;
 		this.requestUpdate();
 	}
 	get value(): Array<ToolbarLayout> {
-		return this.#value;
+		return this._value;
 	}
 
-	#value: Array<ToolbarLayout> = [
-		[['bold', 'italic'], []],
-		[[], ['underline'], ['strikethrough']],
-	];
+	_value: Array<ToolbarLayout> = [[[]]];
 
 	@property({ attribute: false })
 	extensions: Array<Extension> = [];
@@ -46,33 +35,40 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		const [fromRow, fromGroup, fromItem] = from;
 		const [toRow, toGroup, toItem] = to;
 
-		// Deep clone the entire value array (shallow copy of nested arrays)
-		const clonedValue = this.#value.map((row) => row.map((group) => [...group]));
-
-		const fromGroupArray = clonedValue[fromRow]?.[fromGroup];
-		const toGroupArray = clonedValue[toRow]?.[toGroup];
-
-		if (!fromGroupArray || !toGroupArray) {
-			console.error('Invalid group or row indexes.');
-			return;
-		}
-
-		const itemToMove = fromGroupArray[fromItem];
-		if (typeof itemToMove === 'undefined') {
-			console.error('Invalid item index:', fromItem);
-			return;
-		}
+		// Get the item to move from the 'from' position
+		const itemToMove = this.value[fromRow][fromGroup][fromItem];
 
 		// Remove the item from the original position
-		fromGroupArray.splice(fromItem, 1);
+		this.value[fromRow][fromGroup].splice(fromItem, 1);
 
 		// Insert the item into the new position
-		toGroupArray.splice(toItem, 0, itemToMove);
-
-		// Replace the whole value with the modified cloned structure
-		this.#value = clonedValue;
+		this.value[toRow][toGroup].splice(toItem, 0, itemToMove);
 
 		// Trigger a re-render
+		this.requestUpdate('value');
+		this.dispatchEvent(new UmbChangeEvent());
+	};
+
+	#addGroup = (rowIndex: number, groupIndex: number) => {
+		this.value[rowIndex].splice(groupIndex, 0, []);
+		this.requestUpdate('value');
+		this.dispatchEvent(new UmbChangeEvent());
+	};
+
+	#removeGroup = (rowIndex: number, groupIndex: number) => {
+		this.value[rowIndex].splice(groupIndex, 1);
+		this.requestUpdate('value');
+		this.dispatchEvent(new UmbChangeEvent());
+	};
+
+	#addRow = (rowIndex: number) => {
+		this.value.splice(rowIndex, 0, [[]]);
+		this.requestUpdate('value');
+		this.dispatchEvent(new UmbChangeEvent());
+	};
+
+	#removeRow = (rowIndex: number) => {
+		this.value.splice(rowIndex, 1);
 		this.requestUpdate('value');
 		this.dispatchEvent(new UmbChangeEvent());
 	};
@@ -113,7 +109,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				@dragover=${this.#onDragOver}
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, 0])}>
 				${group.map((alias, itemIndex) => this.renderItem(alias, rowIndex, groupIndex, itemIndex))}
-				<!-- <div class="remove-group-button">X</div> -->
+				<button class="remove-group-button" @click=${() => this.#removeGroup(rowIndex, groupIndex)}>X</button>
 			</div>
 		`;
 	}
@@ -122,13 +118,15 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		return html`
 			<div class="row">
 				${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}
-				<!-- <div class="remove-row-button">Remove row</div> -->
+				<button @click=${() => this.#addGroup(rowIndex, row.length)}>+</button>
+				<button class="remove-row-button" @click=${() => this.#removeRow(rowIndex)}>X</button>
 			</div>
 		`;
 	}
 
 	override render() {
-		return html`${repeat(this.#value, (row, rowIndex) => this.renderRow(row, rowIndex))}`;
+		return html`${repeat(this._value, (row, rowIndex) => this.renderRow(row, rowIndex))}
+			<button @click=${() => this.#addRow(this._value.length)}>+</button>`;
 	}
 
 	static override styles = [

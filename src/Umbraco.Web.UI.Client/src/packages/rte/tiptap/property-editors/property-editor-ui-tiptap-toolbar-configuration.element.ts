@@ -45,11 +45,15 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	set value(value: NewestValue) {
 		if (!value) value = { extensions: [], toolbarLayout: [] };
 
-		this.#value = value;
+		this.#value = this.#deepClone(value) as NewestValue;
 		this.requestUpdate('#value');
 	}
 	get value(): NewestValue {
-		return this.#value;
+		return this.#deepClone(this.#value) as NewestValue;
+	}
+
+	#deepClone(value: unknown): unknown {
+		return JSON.parse(JSON.stringify(value));
 	}
 
 	#value: NewestValue = { extensions: [], toolbarLayout: [] };
