@@ -341,7 +341,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
     private IApiContentPathProvider SetupApiContentPathProvider(bool hideTopLevelNodeFromPath)
         => new ApiContentPathProvider(SetupPublishedUrlProvider(hideTopLevelNodeFromPath));
 
-    private ApiContentRouteBuilder CreateApiContentRouteBuilder(bool hideTopLevelNodeFromPath, bool addTrailingSlash = false, bool isPreview = false, IPublishedSnapshotAccessor? publishedSnapshotAccessor = null, IApiContentPathProvider? apiContentPathProvider = null)
+    private ApiContentRouteBuilder CreateApiContentRouteBuilder(bool hideTopLevelNodeFromPath, bool addTrailingSlash = false, bool isPreview = false, IPublishedContentCache? contentCache = null, IApiContentPathProvider? apiContentPathProvider = null)
     {
         var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = addTrailingSlash };
         var requestHandlerSettingsMonitorMock = new Mock<IOptionsMonitor<RequestHandlerSettings>>();
@@ -350,7 +350,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var requestPreviewServiceMock = new Mock<IRequestPreviewService>();
         requestPreviewServiceMock.Setup(m => m.IsPreview()).Returns(isPreview);
 
-        publishedSnapshotAccessor ??= CreatePublishedSnapshotAccessorForRoute("#");
+        contentCache ??= CreatePublishedContentCache("#");
         apiContentPathProvider ??= SetupApiContentPathProvider(hideTopLevelNodeFromPath);
 
         return CreateContentRouteBuilder(
@@ -358,7 +358,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             CreateGlobalSettings(hideTopLevelNodeFromPath),
             requestHandlerSettingsMonitor: requestHandlerSettingsMonitorMock.Object,
             requestPreviewService: requestPreviewServiceMock.Object,
-            publishedSnapshotAccessor: publishedSnapshotAccessor);
+            contentCache: contentCache);
     }
 
     private IApiContentRoute? GetUnRoutableRoute(string publishedUrl, string routeById)
@@ -369,35 +369,24 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             .Returns(publishedUrl);
         var contentPathProvider = new ApiContentPathProvider(publishedUrlProviderMock.Object);
 
-        var publishedSnapshotAccessor = CreatePublishedSnapshotAccessorForRoute(routeById);
+        var contentCache = CreatePublishedContentCache(routeById);
         var content = SetupVariantPublishedContent("The Content", Guid.NewGuid());
 
         var builder = CreateContentRouteBuilder(
             contentPathProvider,
             CreateGlobalSettings(),
-            publishedSnapshotAccessor: publishedSnapshotAccessor);
+            contentCache: contentCache);
 
         return builder.Build(content);
     }
 
-    private IPublishedSnapshotAccessor CreatePublishedSnapshotAccessorForRoute(string routeById)
+    private IPublishedContentCache CreatePublishedContentCache(string routeById)
     {
         var publishedContentCacheMock = new Mock<IPublishedContentCache>();
         publishedContentCacheMock
             .Setup(c => c.GetRouteById(It.IsAny<int>(), It.IsAny<string?>()))
             .Returns(routeById);
 
-        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
-        publishedSnapshotMock
-            .SetupGet(s => s.Content)
-            .Returns(publishedContentCacheMock.Object);
-        var publishedSnapshot = publishedSnapshotMock.Object;
-
-        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        publishedSnapshotAccessorMock
-            .Setup(a => a.TryGetPublishedSnapshot(out publishedSnapshot))
-            .Returns(true);
-
-        return publishedSnapshotAccessorMock.Object;
+        return publishedContentCacheMock.Object;
     }
 }
