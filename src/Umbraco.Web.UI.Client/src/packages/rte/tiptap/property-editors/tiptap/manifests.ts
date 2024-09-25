@@ -70,7 +70,6 @@ export const manifests: Array<ManifestTypes> = [
 									{ alias: 'superscript', label: 'Superscript', icon: 'superscript', category: 'text-transformation' },
 
 									// Styling and Font Group
-									{ alias: 'styles', label: 'Style select', icon: 'permanent-pen', category: 'styling' },
 									{ alias: 'fontname', label: 'Font select', icon: 'text-color', category: 'styling' },
 									{ alias: 'fontsize', label: 'Font size', icon: 'text-color', category: 'styling' },
 
