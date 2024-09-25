@@ -17,7 +17,7 @@ internal class CacheNodeFactory : ICacheNodeFactory
 
     public ContentCacheNode ToContentCacheNode(IContent content, bool preview)
     {
-        ContentData contentData = GetContentData(content, !preview, preview ? content.PublishTemplateId : content.TemplateId);
+        ContentData contentData = GetContentData(content, !preview, preview ? content.TemplateId : content.PublishTemplateId);
         return new ContentCacheNode
         {
             Id = content.Id,

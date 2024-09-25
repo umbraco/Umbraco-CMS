@@ -13,5 +13,7 @@ public interface IMediaCacheService
 
     Task RefreshMediaAsync(IMedia media);
 
-    Task DeleteItemAsync(int id);
+    Task DeleteItemAsync(IContentBase media);
+
+    Task SeedAsync(CancellationToken cancellationToken);
 }

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -25,23 +26,25 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
-    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
-    private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
+    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
+    private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
 
     [Test]
     public async Task Can_Get_Value_From_ContentPicker()
     {
+        // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
-        var textPage = await CreateTextPageDocument(template.Id);
-        var contentPickerDocument = await CreateContentPickerDocument(template.Id, textPage.Key);
+        var textPage = await CreateTextPageDocument(template.Key);
+        var contentPickerDocument = await CreateContentPickerDocument(template.Key, textPage.Key);
 
+        // Act
         var contentPickerPage = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
 
+        // Assert
         IPublishedContent contentPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
         Assert.AreEqual(textPage.Key, contentPickerValue.Key);
         Assert.AreEqual(textPage.Id, contentPickerValue.Id);
@@ -52,10 +55,11 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
     [Test]
     public async Task Can_Get_Value_From_Updated_ContentPicker()
     {
+        // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
-        var textPage = await CreateTextPageDocument(template.Id);
-        var contentPickerDocument = await CreateContentPickerDocument(template.Id, textPage.Key);
+        var textPage = await CreateTextPageDocument(template.Key);
+        var contentPickerDocument = await CreateContentPickerDocument(template.Key, textPage.Key);
 
         // Get for caching
         var notUpdatedContent = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
@@ -88,46 +92,42 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 
         Assert.IsTrue(publishResult);
 
+        // Act
         var contentPickerPage = await CacheManager.Content.GetByIdAsync(contentPickerDocument.Id);
+
+        // Assert
         IPublishedContent updatedPickerValue = (IPublishedContent)contentPickerPage.Value("contentPicker");
-
-
         Assert.AreEqual(textPage.Key, updatedPickerValue.Key);
         Assert.AreEqual(textPage.Id, updatedPickerValue.Id);
         Assert.AreEqual(textPage.Name, updatedPickerValue.Name);
         Assert.AreEqual("Updated title", updatedPickerValue.Properties.First(x => x.Alias == "title").GetValue());
     }
 
-    private async Task<IContent> CreateContentPickerDocument(int templateId, Guid textPageKey)
+    private async Task<IContent> CreateContentPickerDocument(Guid templateKey, Guid textPageKey)
     {
-        var builder = new ContentTypeBuilder();
-        var pickerContentType = (ContentType)builder
+        var builder = new ContentTypeEditingBuilder();
+        var pickerContentType = builder
             .WithAlias("test")
             .WithName("TestName")
-            .AddAllowedTemplate()
-            .WithId(templateId)
-            .Done()
+            .WithAllowAtRoot(true)
+            .AddAllowedTemplateKeys([templateKey])
             .AddPropertyGroup()
-            .WithName("Content")
-            .WithSupportsPublishing(true)
+                .WithName("Content")
+                .Done()
             .AddPropertyType()
-            .WithAlias("contentPicker")
-            .WithName("Content Picker")
-            .WithDataTypeId(1046)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
-            .WithValueStorageType(ValueStorageType.Integer)
-            .WithSortOrder(16)
-            .Done()
-            .Done()
+                .WithAlias("contentPicker")
+                .WithName("Content Picker")
+                .WithDataTypeKey(Constants.DataTypes.Guids.ContentPickerGuid)
+                .WithSortOrder(16)
+                .Done()
             .Build();
 
-        pickerContentType.AllowedAsRoot = true;
-        ContentTypeService.Save(pickerContentType);
+        await ContentTypeEditingService.CreateAsync(pickerContentType, Constants.Security.SuperUserKey);
 
 
         var createOtherModel = new ContentCreateModel
         {
-            ContentTypeKey = pickerContentType.Key,
+            ContentTypeKey = pickerContentType.Key.Value,
             ParentKey = Constants.System.RootKey,
             InvariantName = "Test Create",
             InvariantProperties = new[] { new PropertyValueModel { Alias = "contentPicker", Value = textPageKey }, },
@@ -149,15 +149,14 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         return result.Result.Content;
     }
 
-    private async Task<IContent> CreateTextPageDocument(int templateId)
+    private async Task<IContent> CreateTextPageDocument(Guid templateKey)
     {
-        var textContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: templateId);
-        textContentType.AllowedAsRoot = true;
-        ContentTypeService.Save(textContentType);
+        var textContentType = ContentTypeEditingBuilder.CreateTextPageContentType(defaultTemplateKey: templateKey);
+        await ContentTypeEditingService.CreateAsync(textContentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
-            ContentTypeKey = textContentType.Key,
+            ContentTypeKey = textContentType.Key.Value,
             ParentKey = Constants.System.RootKey,
             InvariantName = "Root Create",
             InvariantProperties = new[]

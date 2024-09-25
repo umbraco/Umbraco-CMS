@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
@@ -17,10 +16,10 @@ public class ContentEditingBuilder
         IWithKeyBuilder,
         IWithContentTypeKeyBuilder,
         IWithParentKeyBuilder,
-        IWithTemplateKeyBuilder
+        IWithTemplateKeyBuilder,
+        IBuildContentTypes
 {
-    private IContentType _contentType;
-    private ContentTypeBuilder _contentTypeBuilder;
+    private ContentTypeEditingBuilder _contentTypeEditingBuilder;
     private IEnumerable<PropertyValueModel> _invariantProperties = [];
     private IEnumerable<VariantModel> _variants = [];
     private Guid _contentTypeKey;
@@ -84,8 +83,7 @@ public class ContentEditingBuilder
         return this;
     }
 
-    public ContentEditingBuilder AddVariant(string culture, string segment, string name,
-        IEnumerable<PropertyValueModel> properties)
+    public ContentEditingBuilder AddVariant(string culture, string segment, string name, IEnumerable<PropertyValueModel> properties)
     {
         var variant = new VariantModel { Culture = culture, Segment = segment, Name = name, Properties = properties };
         _variants = _variants.Concat(new[] { variant });
@@ -104,13 +102,6 @@ public class ContentEditingBuilder
         return this;
     }
 
-    public ContentEditingBuilder WithContentType(IContentType contentType)
-    {
-        _contentTypeBuilder = null;
-        _contentType = contentType;
-        return this;
-    }
-
     public override ContentCreateModel Build()
     {
         var key = _key ?? Guid.NewGuid();
@@ -120,15 +111,7 @@ public class ContentEditingBuilder
         var invariantProperties = _invariantProperties;
         var variants = _variants;
 
-        if (_contentTypeBuilder is null && _contentType is null)
-        {
-            throw new InvalidOperationException(
-                "A content item cannot be constructed without providing a content type. Use AddContentType() or WithContentType().");
-        }
-
-        var contentType = _contentType ?? _contentTypeBuilder.Build();
         var content = new ContentCreateModel();
-
         content.InvariantName = invariantName;
         if (parentKey is not null)
         {
@@ -140,7 +123,7 @@ public class ContentEditingBuilder
             content.TemplateKey = templateKey;
         }
 
-        content.ContentTypeKey = contentType.Key;
+        content.ContentTypeKey = _contentTypeKey;
         content.Key = key;
         content.InvariantProperties = invariantProperties;
         content.Variants = variants;
@@ -148,25 +131,39 @@ public class ContentEditingBuilder
         return content;
     }
 
-    public static ContentCreateModel CreateBasicContent(IContentType contentType, Guid? key) =>
+    public static ContentCreateModel CreateBasicContent(Guid contentTypeKey, Guid? key) =>
         new ContentEditingBuilder()
             .WithKey(key)
-            .WithContentType(contentType)
+            .WithContentTypeKey(contentTypeKey)
             .WithInvariantName("Home")
             .Build();
 
-    public static ContentCreateModel CreateSimpleContent(IContentType contentType) =>
+    public static ContentCreateModel CreateSimpleContent(Guid contentTypeKey) =>
         new ContentEditingBuilder()
-            .WithContentType(contentType)
+            .WithContentTypeKey(contentTypeKey)
             .WithInvariantName("Home")
             .WithInvariantProperty("title", "Welcome to our Home page")
             .Build();
 
-    public static ContentCreateModel CreateSimpleContent(IContentType contentType, string name, Guid? parentKey) =>
+    public static ContentCreateModel CreateSimpleContent(Guid contentTypeKey, string name, Guid? parentKey) =>
         new ContentEditingBuilder()
-            .WithContentType(contentType)
+            .WithContentTypeKey(contentTypeKey)
             .WithInvariantName(name)
             .WithParentKey(parentKey)
             .WithInvariantProperty("title", "Welcome to our Home page")
+            .Build();
+
+    public static ContentCreateModel CreateSimpleContent(Guid contentTypeKey, string name) =>
+        new ContentEditingBuilder()
+            .WithContentTypeKey(contentTypeKey)
+            .WithInvariantName(name)
+            .WithInvariantProperty("title", "Welcome to our Home page")
+            .Build();
+
+    public static ContentCreateModel CreateContentWithTwoVariantProperties(Guid contentTypeKey, string firstCulture, string secondCulture, string propertyAlias, string propertyName) =>
+        new ContentEditingBuilder()
+            .WithContentTypeKey(contentTypeKey)
+            .AddVariant(firstCulture, null, firstCulture, new[] { new PropertyValueModel { Alias = propertyAlias, Value = propertyName } })
+            .AddVariant(secondCulture, null, secondCulture, new[] { new PropertyValueModel { Alias = propertyAlias, Value = propertyName } })
             .Build();
 }
