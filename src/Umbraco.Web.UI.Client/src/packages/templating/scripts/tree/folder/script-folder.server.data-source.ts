@@ -1,18 +1,19 @@
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbCreateFolderModel, UmbFolderDataSource, UmbFolderModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreateScriptFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Script folders that fetches data from the server
  * @class UmbScriptFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
+export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
 	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
@@ -77,19 +78,19 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates a Script folder on the server
-	 * @param {UmbCreateFolderModel} args
+	 * @param {UmbFolderModel} model
 	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
-	async create(args: UmbCreateFolderModel) {
-		if (args.parent === undefined) throw new Error('Parent unique is missing');
-		if (!args.name) throw new Error('Name is missing');
+	async create(model: UmbFolderModel, parentUnique: string | null) {
+		if (!model) throw new Error('Data is missing');
+		if (!model.name) throw new Error('Name is missing');
 
-		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent?.unique || null);
+		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
 		const requestBody: CreateScriptFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
-			name: args.name,
+			name: model.name,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(

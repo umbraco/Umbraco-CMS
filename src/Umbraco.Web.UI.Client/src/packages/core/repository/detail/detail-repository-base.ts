@@ -7,9 +7,10 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbDetailRepositoryBase<
-		DetailModelType extends { unique: string; entityType: string },
+		DetailModelType extends UmbEntityModel,
 		UmbDetailDataSourceType extends UmbDetailDataSource<DetailModelType> = UmbDetailDataSource<DetailModelType>,
 	>
 	extends UmbRepositoryBase

@@ -1,21 +1,17 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type {
-	UmbCreateFolderModel,
-	UmbFolderDataSource,
-	UmbFolderModel,
-	UmbUpdateFolderModel,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for a Document Type folder that fetches data from the server
  * @class UmbDocumentTypeFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSource {
+export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -75,18 +71,19 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 
 	/**
 	 * Creates a Document Type folder on the server
-	 * @param {UmbCreateFolderModel} args
+	 * @param {UmbCreateFolderModel} model
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
-	async create(args: UmbCreateFolderModel) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
-		if (!args.name) throw new Error('Name is missing');
+	async create(model: UmbFolderModel, parentUnique: string | null) {
+		if (!model) throw new Error('Model is missing');
+		if (!model.unique) throw new Error('Unique is missing');
+		if (!model.name) throw new Error('Name is missing');
 
 		const requestBody = {
-			id: args.unique,
-			parent: args.parentUnique ? { id: args.parentUnique } : null,
-			name: args.name,
+			id: model.unique,
+			parent: parentUnique ? { id: parentUnique } : null,
+			name: model.name,
 		};
 
 		const { error } = await tryExecuteAndNotify(
@@ -97,7 +94,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 		);
 
 		if (!error) {
-			return this.read(args.unique);
+			return this.read(model.unique);
 		}
 
 		return { error };
@@ -105,24 +102,24 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 
 	/**
 	 * Updates a Document Type folder on the server
-	 * @param {UmbUpdateFolderModel} args
+	 * @param {UmbFolderModel} model
 	 * @returns {*}
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
-	async update(args: UmbUpdateFolderModel) {
-		if (!args.unique) throw new Error('Unique is missing');
-		if (!args.name) throw new Error('Folder name is missing');
+	async update(model: UmbFolderModel) {
+		if (!model.unique) throw new Error('Unique is missing');
+		if (!model.name) throw new Error('Folder name is missing');
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeService.putDocumentTypeFolderById({
-				id: args.unique,
-				requestBody: { name: args.name },
+				id: model.unique,
+				requestBody: { name: model.name },
 			}),
 		);
 
 		if (!error) {
-			return this.read(args.unique);
+			return this.read(model.unique);
 		}
 
 		return { error };

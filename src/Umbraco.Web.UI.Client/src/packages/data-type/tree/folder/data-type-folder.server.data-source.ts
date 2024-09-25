@@ -1,21 +1,17 @@
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type {
-	UmbCreateFolderModel,
-	UmbFolderDataSource,
-	UmbFolderModel,
-	UmbUpdateFolderModel,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for a Data Type folder that fetches data from the server
  * @class UmbDataTypeFolderServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
+export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -75,18 +71,19 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates a Data Type folder on the server
-	 * @param {UmbCreateFolderModel} args
+	 * @param {UmbFolderModel} model
 	 * @returns {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async create(args: UmbCreateFolderModel) {
-		if (args.parent === undefined) throw new Error('Parent unique is missing');
-		if (!args.name) throw new Error('Name is missing');
+	async create(model: UmbFolderModel, parentUnique: string | null) {
+		if (!model) throw new Error('Data is missing');
+		if (!model.unique) throw new Error('Unique is missing');
+		if (!model.name) throw new Error('Name is missing');
 
 		const requestBody = {
-			id: args.unique,
-			parent: args.parent ? { id: args.parent.unique } : null,
-			name: args.name,
+			id: model.unique,
+			parent: parentUnique ? { id: parentUnique } : null,
+			name: model.name,
 		};
 
 		const { error } = await tryExecuteAndNotify(
@@ -97,7 +94,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		);
 
 		if (!error) {
-			return this.read(args.unique);
+			return this.read(model.unique);
 		}
 
 		return { error };
@@ -105,24 +102,25 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Updates a Data Type folder on the server
-	 * @param {UmbUpdateFolderModel} args
+	 * @param {UmbFolderModel} model
 	 * @returns {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async update(args: UmbUpdateFolderModel) {
-		if (!args.unique) throw new Error('Unique is missing');
-		if (!args.name) throw new Error('Folder name is missing');
+	async update(model: UmbFolderModel) {
+		if (!model) throw new Error('Data is missing');
+		if (!model.unique) throw new Error('Unique is missing');
+		if (!model.name) throw new Error('Folder name is missing');
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeService.putDataTypeFolderById({
-				id: args.unique,
-				requestBody: { name: args.name },
+				id: model.unique,
+				requestBody: { name: model.name },
 			}),
 		);
 
 		if (!error) {
-			return this.read(args.unique);
+			return this.read(model.unique);
 		}
 
 		return { error };

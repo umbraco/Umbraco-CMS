@@ -1,8 +1,12 @@
 import { UmbDataTypeFolderServerDataSource } from './data-type-folder.server.data-source.js';
+import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
-export class UmbDataTypeFolderRepository extends UmbFolderRepositoryBase {
+export class UmbDataTypeFolderRepository extends UmbDetailRepositoryBase<
+	UmbFolderModel,
+	UmbDataTypeFolderServerDataSource
+> {
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDataTypeFolderServerDataSource);
 	}
