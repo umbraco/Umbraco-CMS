@@ -2,6 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, property, repeat, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Observable, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type Extension = {
 	alias: string;
@@ -9,44 +10,62 @@ type Extension = {
 	icon?: string;
 };
 
-type TestServerValue = [
-	{
-		alias: string;
-		position: [number, number, number];
-	},
-];
+type TestServerValue = Array<{
+	alias: string;
+	position: [number, number, number];
+}>;
 
 @customElement('umb-tiptap-toolbar-groups-configuration2')
 export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	#testData: TestServerValue = [
 		{
-			alias: 'bold',
+			alias: 'asdasd',
 			position: [0, 0, 0],
 		},
 		{
-			alias: 'italic',
+			alias: 'itafsdgsdglic',
 			position: [0, 0, 1],
 		},
 		{
-			alias: 'undo',
+			alias: 'sdgsdg',
 			position: [0, 1, 0],
 		},
 		{
-			alias: 'redo',
+			alias: 'asdasd',
 			position: [0, 1, 1],
 		},
 		{
-			alias: 'copy',
+			alias: 'afasf',
 			position: [1, 0, 0],
 		},
 		{
-			alias: 'paste',
+			alias: 'sdgsdg',
 			position: [1, 2, 0],
 		},
 	];
 
-	toStructuredData = (data: any): string[][][] => {
+	@property({ attribute: false })
+	set value(value: TestServerValue) {
+		if (this.#originalFormat === value) return;
+		this.#originalFormat = value;
+		this._structuredData = this.toStructuredData(value);
+	}
+
+	get value(): TestServerValue {
+		console.log('get value groups');
+		return this.#originalFormat;
+	}
+
+	@state()
+	_structuredData: string[][][] = [[[]]];
+
+	#originalFormat: TestServerValue = [];
+
+	toStructuredData = (data: TestServerValue) => {
+		console.log('toStructuredData');
 		const structuredData: string[][][] = [];
+
+		if (!data.length) return [[[]]];
 
 		data.forEach(({ alias, position }) => {
 			const [rowIndex, groupIndex, aliasIndex] = position;
@@ -70,6 +89,7 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	};
 
 	toOriginalFormat = (structuredData: string[][][]) => {
+		console.log('toOriginalFormat');
 		const originalData: any = [];
 
 		structuredData.forEach((row, rowIndex) => {
@@ -87,9 +107,20 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 
 		return originalData;
 	};
+	private renderItem(alias: string) {
+		return html`<div class="item" draggable="true">${alias}</div>`;
+	}
+
+	private renderGroup(group: string[]) {
+		return html` <div class="group" dropzone="move">${group.map((alias) => this.renderItem(alias))}</div> `;
+	}
+
+	private renderRow(row: string[][]) {
+		return html` <div class="row">${repeat(row, (group) => this.renderGroup(group))}</div> `;
+	}
 
 	override render() {
-		return html``;
+		return html`${repeat(this._structuredData, (row) => this.renderRow(row))}`;
 	}
 
 	static override styles = [
@@ -109,16 +140,16 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				position: relative;
 				display: flex;
 				gap: 3px;
-				border: 1px solid #ccc;
+				border: 1px solid var(--uui-color-border);
 				padding: 6px;
 				min-height: 24px;
 				min-width: 24px;
 			}
 			.item {
 				padding: 3px;
-				border: 1px solid #ccc;
+				border: 1px solid var(--uui-color-border);
 				border-radius: 3px;
-				background-color: #f9f9f9;
+				background-color: var(--uui-color-surface);
 			}
 
 			.remove-group-button {
