@@ -12,7 +12,6 @@ public class UmbracoPremigrationPlan : MigrationPlan
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoPlan" /> class.
     /// </summary>
-    /// <param name="umbracoVersion">The Umbraco version.</param>
     public UmbracoPremigrationPlan()
         : base(Constants.Conventions.Migrations.UmbracoUpgradePlanPremigrationsName)
         => DefinePlan();
