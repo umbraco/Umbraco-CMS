@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const nameOfTheUser = 'TestUser';
@@ -16,10 +16,11 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickCreateButton();
+  await umbracoUi.user.clickUserButton();
   await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
   await umbracoUi.user.enterUserEmail(userEmail);
   await umbracoUi.user.clickChooseButton();
@@ -38,7 +39,7 @@ test('can rename a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.user.ensureNameNotExists(wrongName);
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(wrongName, wrongName + userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(wrongName);
@@ -54,10 +55,11 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickDeleteButton();
   await umbracoUi.user.clickConfirmToDeleteButton();
 
@@ -65,7 +67,7 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.isSuccessNotificationVisible();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
   // Checks if the user is deleted from the list
-  await umbracoUi.user.clickUsersTabButton();
+  await umbracoUi.user.clickUsersMenu();
   await umbracoUi.user.isUserVisible(nameOfTheUser, false);
 });
 
@@ -75,7 +77,7 @@ test('can add multiple user groups to a user', async ({umbracoApi, umbracoUi}) =
   const userGroupWriters = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userGroupTranslators = await umbracoApi.userGroup.getByName(secondUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroupWriters.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -86,7 +88,7 @@ test('can add multiple user groups to a user', async ({umbracoApi, umbracoUi}) =
 
   // Assert
   await umbracoUi.user.isSuccessNotificationVisible();
-  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  await umbracoApi.user.getByName(nameOfTheUser);
   expect(await umbracoApi.user.doesUserContainUserGroupIds(nameOfTheUser, [userGroupWriters.id, userGroupTranslators.id])).toBeTruthy();
 });
 
@@ -94,7 +96,7 @@ test('can remove a user group from a user', {tag: '@smoke'}, async ({umbracoApi,
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -113,11 +115,11 @@ test('can update culture for a user', async ({umbracoApi, umbracoUi}) => {
   const danishIsoCode = 'da-dk';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.selectUserLanguage('Dansk');
+  await umbracoUi.user.selectUserLanguage('Dansk (Danmark)');
   await umbracoUi.user.clickSaveButton();
 
   // Assert
@@ -136,7 +138,7 @@ test('can add a content start node to a user', {tag: '@smoke'}, async ({umbracoA
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -171,7 +173,7 @@ test('can add multiple content start nodes for a user', async ({umbracoApi, umbr
   userData.documentStartNodeIds.push({id: documentId});
   await umbracoApi.user.update(userId, userData);
   const secondDocumentId = await umbracoApi.document.createDefaultDocument(secondDocumentName, documentTypeId);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -205,7 +207,7 @@ test('can remove a content start node from a user', {tag: '@smoke'}, async ({umb
   userData.documentStartNodeIds.push({id: documentId});
   await umbracoApi.user.update(userId, userData);
   expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -229,7 +231,7 @@ test('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   await umbracoApi.media.ensureNameNotExists(mediaName);
   const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -261,7 +263,7 @@ test('can add multiple media start nodes for a user', async ({umbracoApi, umbrac
   userData.mediaStartNodeIds.push({id: firstMediaId});
   await umbracoApi.user.update(userId, userData);
   expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [firstMediaId])).toBeTruthy();
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -291,7 +293,7 @@ test('can remove a media start node from a user', async ({umbracoApi, umbracoUi}
   userData.mediaStartNodeIds.push({id: mediaId});
   await umbracoApi.user.update(userId, userData);
   expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -311,7 +313,7 @@ test('can allow access to all documents for a user', async ({umbracoApi, umbraco
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -328,7 +330,7 @@ test('can allow access to all media for a user', async ({umbracoApi, umbracoUi})
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -356,7 +358,7 @@ test('can see if the user has the correct access based on content start nodes', 
   userData.documentStartNodeIds.push({id: documentId});
   await umbracoApi.user.update(userId, userData);
   expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -381,7 +383,7 @@ test('can see if the user has the correct access based on media start nodes', as
   userData.mediaStartNodeIds.push({id: mediaId});
   await umbracoApi.user.update(userId, userData);
   expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -398,10 +400,11 @@ test('can change password for a user', {tag: '@smoke'}, async ({umbracoApi, umbr
   const userPassword = 'TestPassword';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickChangePasswordButton();
   await umbracoUi.user.updatePassword(userPassword);
 
@@ -414,10 +417,11 @@ test('can disable a user', async ({umbracoApi, umbracoUi}) => {
   const disabledStatus = 'Disabled';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickDisableButton();
   await umbracoUi.user.clickConfirmDisableButton();
 
@@ -434,10 +438,11 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   await umbracoApi.user.disable([userId]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickEnableButton();
   await umbracoUi.user.clickConfirmEnableButton();
 
@@ -454,7 +459,7 @@ test('can add an avatar to a user', {tag: '@smoke'}, async ({umbracoApi, umbraco
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   const filePath = './fixtures/mediaLibrary/Umbraco.png';
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -471,7 +476,7 @@ test('can remove an avatar from a user', async ({umbracoApi, umbracoUi}) => {
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   await umbracoApi.user.addDefaultAvatarImageToUser(userId);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
@@ -487,7 +492,7 @@ test('can see if the inactive label is removed from the admin user', async ({umb
   // Arrange
   const userLabel = 'Active';
   const currentUser = await umbracoApi.user.getCurrentUser();
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(currentUser.name);
@@ -502,7 +507,7 @@ test('can search for a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.doesUserSectionContainUserAmount(2);
@@ -520,7 +525,7 @@ test('can filter by status', async ({umbracoApi, umbracoUi}) => {
   const inactiveStatus = 'Inactive';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.doesUserSectionContainUserAmount(2);
@@ -538,7 +543,7 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.doesUserSectionContainUserAmount(2);
@@ -555,7 +560,7 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+  await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.doesUserSectionContainUserAmount(2);
