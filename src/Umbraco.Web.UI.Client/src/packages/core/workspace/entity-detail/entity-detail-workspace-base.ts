@@ -117,11 +117,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return data;
 	}
 
-	async delete(unique: string) {
-		await this.#init;
-		await this._detailRepository!.delete(unique);
-	}
-
 	async submit() {
 		await this.#init;
 		const currentData = this._data.getCurrent();
@@ -167,6 +162,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 			actionEventContext.dispatchEvent(event);
 		}
+	}
+
+	async delete(unique: string) {
+		await this.#init;
+		await this._detailRepository!.delete(unique);
 	}
 
 	/**
