@@ -4,6 +4,7 @@ import type { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice
 import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../../entity';
 
 /**
  * A data source for Stylesheet folders that fetches data from the server
@@ -44,6 +45,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		if (data) {
 			const mappedData = {
+				entityType: UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
 				unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
 				parentUnique: data.parent ? this.#serverFilePathUniqueSerializer.toUnique(data.parent.path) : null,
 				name: data.name,

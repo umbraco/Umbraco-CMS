@@ -1,3 +1,4 @@
+import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbCreateFolderModel, UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
 import type { CreatePartialViewFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -44,6 +45,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 
 		if (data) {
 			const mappedData = {
+				entityType: UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
 				unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
 				parentUnique: data.parent ? this.#serverFilePathUniqueSerializer.toUnique(data.parent.path) : null,
 				name: data.name,

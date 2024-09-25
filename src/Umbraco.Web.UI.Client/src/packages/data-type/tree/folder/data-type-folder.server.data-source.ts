@@ -1,3 +1,4 @@
+import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -38,6 +39,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		if (data) {
 			const mappedData = {
+				entityType: UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
 				unique: data.id,
 				name: data.name,
 			};

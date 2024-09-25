@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -38,6 +39,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbFolderData
 
 		if (data) {
 			const mappedData = {
+				entityType: UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 				unique: data.id,
 				name: data.name,
 			};
