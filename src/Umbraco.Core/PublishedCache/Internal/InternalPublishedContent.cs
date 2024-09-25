@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache.Internal;
@@ -8,10 +9,18 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public sealed class InternalPublishedContent : IPublishedContent
 {
+    private readonly IPublishedContentCache _contentCache;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
     private Dictionary<string, PublishedCultureInfo>? _cultures;
 
-    public InternalPublishedContent(IPublishedContentType contentType)
+    public InternalPublishedContent(
+        IPublishedContentType contentType,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
     {
+        _contentCache = contentCache;
+        _navigationQueryService = navigationQueryService;
+
         // initialize boring stuff
         TemplateId = 0;
         WriterId = CreatorId = 0;
@@ -94,7 +103,7 @@ public sealed class InternalPublishedContent : IPublishedContent
         IPublishedContent? content = this;
         while (content != null && (property == null || property.HasValue() == false))
         {
-            content = content.Parent;
+            content = GetParent(content);
             property = content?.GetProperty(alias);
         }
 
@@ -105,4 +114,19 @@ public sealed class InternalPublishedContent : IPublishedContent
     {
         { string.Empty, new PublishedCultureInfo(string.Empty, Name, UrlSegment, UpdateDate) },
     };
+
+    private IPublishedContent? GetParent(IPublishedContent content)
+    {
+        IPublishedContent? parent;
+        if (_navigationQueryService.TryGetParentKey(content.Key, out Guid? parentKey))
+        {
+            parent = parentKey.HasValue ? _contentCache.GetById(parentKey.Value) : null;
+        }
+        else
+        {
+            throw new KeyNotFoundException($"Content with key '{content.Key}' was not found in the in-memory navigation structure.");
+        }
+
+        return parent;
+    }
 }
