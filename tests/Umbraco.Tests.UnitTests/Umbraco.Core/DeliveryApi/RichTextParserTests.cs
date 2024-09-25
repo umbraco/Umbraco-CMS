@@ -457,7 +457,8 @@ public class RichTextParserTests : PropertyValueConverterTests
         return new ApiRichTextElementParser(
             routeBuilder,
             urlProvider,
-            snapshotAccessor,
+            CacheManager.Content,
+            CacheManager.Media,
             new ApiElementBuilder(CreateOutputExpansionStrategyAccessor()),
             Mock.Of<ILogger<ApiRichTextElementParser>>());
     }
@@ -469,7 +470,8 @@ public class RichTextParserTests : PropertyValueConverterTests
         return new ApiRichTextMarkupParser(
             routeBuilder,
             urlProvider,
-            snapshotAccessor,
+            CacheManager.Content,
+            CacheManager.Media,
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 
@@ -522,7 +524,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         element.SetupGet(c => c.ContentType).Returns(elementType.Object);
 
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), "number", Constants.PropertyEditors.Aliases.Label);
-        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, propertyValue);
+        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, CacheManager, propertyValue);
 
         element.SetupGet(c => c.Properties).Returns(new[] { property });
         return element.Object;
