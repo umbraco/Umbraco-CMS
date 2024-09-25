@@ -36,7 +36,7 @@ public abstract class BlockValue
     /// Gets or sets the availability of blocks per variation.
     /// </summary>
     /// <remarks>
-    /// Only applicable for block level variance. Empty list is interpreted as "all blocks should be available".
+    /// Only applicable for block level variance.
     /// </remarks>
     public IList<BlockItemVariation> Expose { get; set; } = new List<BlockItemVariation>();
 

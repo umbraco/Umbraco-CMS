@@ -102,10 +102,9 @@ public class BlockEditorValues<TValue, TLayout>
             if (!propertyTypes.TryGetValue(property.Alias, out IPropertyType? propertyType))
             {
                 _logger.LogWarning(
-                    "The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
+                    "The property {PropertyAlias} for block {BlockKey} was removed because the property type was not found on {ContentTypeAlias}",
                     property.Alias,
                     block.Key,
-                    property.Alias,
                     contentType.Alias);
                 continue;
             }
