@@ -1,5 +1,5 @@
-import type { UmbEntityVariantModel } from '../../variant/types.js';
 import type { UmbPropertyValueData } from '../types/index.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './property-value-resolver.extension.js';
@@ -7,10 +7,9 @@ export type * from './property-value-resolver.extension.js';
 export interface UmbPropertyValueResolver<
 	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
 	InnerPropertyValueType extends UmbPropertyValueData = PropertyValueType,
-	InnerVariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
 > extends UmbApi {
 	processValues?: UmbPropertyValueResolverValueProcessor<PropertyValueType, InnerPropertyValueType>;
-	processVariants?: UmbPropertyValueResolverVariantProcessor<PropertyValueType, InnerVariantModelType>;
+	ensureVariants?: UmbPropertyValueResolverEnsureVariants<PropertyValueType>;
 }
 
 export type UmbPropertyValueResolverValueProcessor<
@@ -21,10 +20,13 @@ export type UmbPropertyValueResolverValueProcessor<
 	valuesProcessor: (values: Array<InnerPropertyValueType>) => Promise<Array<InnerPropertyValueType> | undefined>,
 ) => PromiseLike<PropertyValueType | undefined>;
 
-export type UmbPropertyValueResolverVariantProcessor<
+export type UmbPropertyValueResolverEnsureVariants<
 	PropertyValueType extends UmbPropertyValueData = UmbPropertyValueData,
-	VariantType extends UmbEntityVariantModel = UmbEntityVariantModel,
 > = (
 	value: PropertyValueType,
-	variantsProcessor: (variants: Array<VariantType>) => Promise<Array<VariantType> | undefined>,
+	args: UmbPropertyValueResolverEnsureVariantArgs,
 ) => PromiseLike<PropertyValueType | undefined>;
+
+export type UmbPropertyValueResolverEnsureVariantArgs = {
+	selectedVariants: Array<UmbVariantId>;
+};

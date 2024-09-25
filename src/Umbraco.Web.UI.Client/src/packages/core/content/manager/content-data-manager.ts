@@ -112,11 +112,12 @@ export class UmbContentWorkspaceDataManager<
 		// Lets correct the selected variants, so invariant is included, or the only one if invariant.
 		// TODO: VDIVD: Could a document be set to invariant but hold variant data inside it?
 		const invariantVariantId = UmbVariantId.CreateInvariant();
+		let variantsToStore = [invariantVariantId];
 		if (this.#varies === false) {
 			// If we do not vary, we wil just pick the invariant variant id.
 			selectedVariants = [invariantVariantId];
 		} else {
-			selectedVariants = [...selectedVariants, invariantVariantId];
+			variantsToStore = [...selectedVariants, invariantVariantId];
 		}
 
 		const data = this.current.getValue();
@@ -134,6 +135,7 @@ export class UmbContentWorkspaceDataManager<
 				persistedData?.values,
 				data.values,
 				selectedVariants,
+				variantsToStore,
 			),
 			variants: this.#buildSaveVariants(persistedData?.variants, data.variants, selectedVariants),
 		};
@@ -145,57 +147,52 @@ export class UmbContentWorkspaceDataManager<
 		persistedValues: Array<T> | undefined,
 		draftValues: Array<T> | undefined,
 		selectedVariants: Array<UmbVariantId>,
+		variantsToStore: Array<UmbVariantId>,
 	): Promise<Array<T>> {
-		// Make array of unique values, based on persistedValues and draftValues. unique values are based upon alias culture and segment
-		const uniqueValues = [
-			...new Set(
-				[...(persistedValues ?? []), ...(draftValues ?? [])].map((x) => ({
-					alias: x.alias,
-					culture: x.culture,
-					segment: x.segment,
-				})),
-			),
-		];
+		// Make array of unique values, based on persistedValues and draftValues. Both alias, culture and segment has to be taken into account. [NL]
+
+		const uniqueValues = [...(persistedValues ?? []), ...(draftValues ?? [])].filter(
+			(n, i, self) =>
+				i === self.findIndex((v) => v.alias === n.alias && v.culture === n.culture && v.segment === n.segment),
+		);
 
 		// Map unique values to their respective draft values.
-		return await Promise.all(
-			uniqueValues
-				.map((value) => {
+		return (
+			await Promise.all(
+				uniqueValues.map((value) => {
 					const persistedValue = persistedValues?.find(
 						(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
 					);
+
 					// Should this value be saved?
-					if (selectedVariants.some((x) => x.equal(UmbVariantId.CreateFromPartial(value)))) {
+					if (variantsToStore.some((x) => x.equal(UmbVariantId.CreateFromPartial(value)))) {
 						const draftValue = draftValues?.find(
 							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
 						);
 
-						return this.#buildSaveValue(persistedValue, draftValue, selectedVariants);
+						return this.#buildSaveValue(persistedValue, draftValue, selectedVariants, variantsToStore);
 					} else {
 						// TODO: Check if this promise is needed: [NL]
 						return Promise.resolve(persistedValue);
 					}
-				})
-				.filter((x) => x !== undefined) as Array<Promise<T>>,
-		);
+				}),
+			)
+		).filter((x) => x !== undefined) as Array<T>;
 	}
 
 	async #buildSaveValue(
 		persistedValue: UmbPotentialContentValueModel | undefined,
 		draftValue: UmbPotentialContentValueModel | undefined,
 		selectedVariants: Array<UmbVariantId>,
+		variantsToStore: Array<UmbVariantId>,
 	): Promise<UmbPotentialContentValueModel | undefined> {
 		const editorAlias = draftValue?.editorAlias ?? persistedValue?.editorAlias;
 		if (!editorAlias) {
 			console.error(`Editor alias not found for ${editorAlias}`);
 			return draftValue;
 		}
-		if (!persistedValue) {
-			// If the persisted value does not exists then no need to combine.
-			return draftValue;
-		}
 		if (!draftValue) {
-			// If the draft value does not exists then no need to combine.
+			// If the draft value does not exists then no need to process.
 			return undefined;
 		}
 
@@ -216,27 +213,41 @@ export class UmbContentWorkspaceDataManager<
 			return draftValue;
 		}
 
+		let newValue = draftValue;
+
 		if (api.processValues) {
 			// The a property values resolver resolves one value, we need to gather the persisted inner values first, and store them here:
 			const persistedValuesHolder: Array<Array<UmbPotentialContentValueModel>> = [];
 
-			await api.processValues(persistedValue, async (values) => {
-				persistedValuesHolder.push(values as unknown as Array<UmbPotentialContentValueModel>);
-				return undefined;
-			});
+			if (persistedValue) {
+				await api.processValues(persistedValue, async (values) => {
+					persistedValuesHolder.push(values as unknown as Array<UmbPotentialContentValueModel>);
+					return undefined;
+				});
+			}
 
 			let valuesIndex = 0;
-			return await api.processValues(draftValue, async (values) => {
+			newValue = await api.processValues(newValue, async (values) => {
 				// got some values (content and/or settings):
 				// but how to get the persisted and the draft of this.....
 				const persistedValues = persistedValuesHolder[valuesIndex++];
 
-				return await this.#buildSaveValues(persistedValues, values, selectedVariants);
+				return await this.#buildSaveValues(persistedValues, values, selectedVariants, variantsToStore);
 			});
 		}
 
+		if (api.ensureVariants) {
+			// The a property values resolver resolves one value, we need to gather the persisted inner values first, and store them here:
+			//const persistedVariants = newValue ? ((await api.readVariants(newValue)) ?? []) : [];
+
+			const args = {
+				selectedVariants,
+			};
+			newValue = await api.ensureVariants(newValue, args);
+		}
+
 		// the api did not provide a value processor, so we will return the draftValue:
-		return draftValue;
+		return newValue;
 	}
 
 	#buildSaveVariants(
