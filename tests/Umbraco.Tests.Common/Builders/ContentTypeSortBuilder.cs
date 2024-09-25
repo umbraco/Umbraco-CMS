@@ -8,8 +8,8 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentTypeSortBuilder
-    : ChildBuilderBase<ContentTypeBuilder, ContentTypeSort>,
+public class ContentTypeSortBuilder<TBuilder>
+    : ChildBuilderBase<TBuilder, ContentTypeSort>,
         IWithKeyBuilder,
         IWithAliasBuilder,
         IWithSortOrderBuilder
@@ -18,20 +18,11 @@ public class ContentTypeSortBuilder
     private string _alias;
     private int? _sortOrder;
 
-    public ContentTypeSortBuilder()
-        : base(null)
-    {
-    }
-
-    public ContentTypeSortBuilder(ContentTypeBuilder parentBuilder)
+    public ContentTypeSortBuilder(TBuilder parentBuilder)
         : base(parentBuilder)
     {
     }
 
-    public ContentTypeSortBuilder(ContentTypeEditingBuilder parentBuilder)
-        : base(null)
-    {
-    }
 
     string IWithAliasBuilder.Alias
     {

@@ -7,7 +7,7 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class ContentTypeEditingBuilder
-    : ContentTypeBaseBuilder<ContentEditingBuilder, ContentTypeCreateModel>,
+    : ContentTypeEditingBuilderBase<ContentTypeEditingBuilder, ContentTypeCreateModel, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>,
         IBuildPropertyTypes
 {
     private Guid? _key;
@@ -19,19 +19,15 @@ public class ContentTypeEditingBuilder
     private bool? _isElement;
     private bool? _variesByCulture;
     private bool? _variesBySegment;
-    private readonly List<PropertyTypeEditingBuilder> _propertyTypeBuilders = [];
+    private readonly List<PropertyTypeEditingBuilder<ContentTypeEditingBuilder>> _propertyTypeBuilders = [];
     private readonly List<PropertyTypeContainerBuilder<ContentTypeEditingBuilder>> _propertyTypeContainerBuilders = [];
-    private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = [];
+    private readonly List<ContentTypeSortBuilder<ContentTypeEditingBuilder>> _allowedContentTypeBuilders = [];
 
     public ContentTypeEditingBuilder()
         : base(null)
     {
     }
 
-    public ContentTypeEditingBuilder(ContentEditingBuilder parentBuilder)
-        : base(parentBuilder)
-    {
-    }
 
     public ContentTypeEditingBuilder WithDefaultTemplateKey(Guid templateKey)
     {
@@ -43,28 +39,6 @@ public class ContentTypeEditingBuilder
     {
         _isElement = isElement;
         return this;
-    }
-
-    public PropertyTypeContainerBuilder<ContentTypeEditingBuilder> AddPropertyGroup()
-    {
-        var builder = new PropertyTypeContainerBuilder<ContentTypeEditingBuilder>(this);
-        _propertyTypeContainerBuilders.Add(builder);
-        return builder;
-    }
-
-    public PropertyTypeEditingBuilder AddPropertyType()
-    {
-        var builder = new PropertyTypeEditingBuilder(this);
-        _propertyTypeBuilders.Add(builder);
-        return builder;
-    }
-
-
-    public ContentTypeSortBuilder AddAllowedContentType()
-    {
-        var builder = new ContentTypeSortBuilder(this);
-        _allowedContentTypeBuilders.Add(builder);
-        return builder;
     }
 
     public ContentTypeEditingBuilder AddAllowedTemplateKeys(IEnumerable<Guid> templateKeys)
@@ -105,10 +79,6 @@ public class ContentTypeEditingBuilder
         contentType.VariesByCulture = _variesByCulture ?? false;
         contentType.VariesBySegment = _variesBySegment ?? false;
         contentType.AllowedAsRoot = _allowAtRoot ?? false;
-        contentType.Properties = _propertyTypeBuilders.Select(x => x.Build());
-        contentType.Containers = _propertyTypeContainerBuilders.Select(x => x.Build());
-        contentType.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build());
-
         return contentType;
     }
 

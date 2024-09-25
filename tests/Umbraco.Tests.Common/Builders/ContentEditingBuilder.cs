@@ -9,15 +9,14 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces.ContentCreateModel;
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class ContentEditingBuilder
-    : BuilderBase<ContentCreateModel>,
+    : ContentEditingBaseBuilder<ContentCreateModel>,
         IWithInvariantNameBuilder,
         IWithInvariantPropertiesBuilder,
         IWithVariantsBuilder,
         IWithKeyBuilder,
         IWithContentTypeKeyBuilder,
         IWithParentKeyBuilder,
-        IWithTemplateKeyBuilder,
-        IBuildContentTypes
+        IWithTemplateKeyBuilder
 {
     private ContentTypeEditingBuilder _contentTypeEditingBuilder;
     private IEnumerable<PropertyValueModel> _invariantProperties = [];
@@ -110,9 +109,9 @@ public class ContentEditingBuilder
         var invariantName = _invariantName ?? Guid.NewGuid().ToString();
         var invariantProperties = _invariantProperties;
         var variants = _variants;
+        var contentTypeKey = _contentTypeKey;
 
         var content = new ContentCreateModel();
-        content.InvariantName = invariantName;
         if (parentKey is not null)
         {
             content.ParentKey = parentKey;
@@ -123,7 +122,8 @@ public class ContentEditingBuilder
             content.TemplateKey = templateKey;
         }
 
-        content.ContentTypeKey = _contentTypeKey;
+        content.InvariantName = invariantName;
+        content.ContentTypeKey = contentTypeKey;
         content.Key = key;
         content.InvariantProperties = invariantProperties;
         content.Variants = variants;

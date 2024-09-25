@@ -4,8 +4,8 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeEditingBuilder
-    : ChildBuilderBase<ContentTypeEditingBuilder, ContentTypePropertyTypeModel>, IBuildPropertyTypes, IWithKeyBuilder,
+public class PropertyTypeEditingBuilder<TParent>
+    : ChildBuilderBase<TParent, ContentTypePropertyTypeModel>, IBuildPropertyTypes, IWithKeyBuilder,
         IWIthContainerKeyBuilder,
         IWithSortOrderBuilder, IWithAliasBuilder, IWithNameBuilder, IWithDescriptionBuilder, IWithDataTypeKeyBuilder,
         IWithVariesByCultureBuilder, IWithVariesBySegmentBuilder
@@ -19,14 +19,15 @@ public class PropertyTypeEditingBuilder
     private Guid? _dataTypeKey;
     private bool _variesByCulture;
     private bool _variesBySegment;
-    private PropertyTypeValidationEditingBuilder _validationBuilder;
-    private PropertyTypeAppearanceBuilder _appearanceBuilder;
+    private PropertyTypeValidationEditingBuilder<TParent> _validationBuilder;
+    private PropertyTypeAppearanceBuilder<TParent> _appearanceBuilder;
 
-    public PropertyTypeEditingBuilder(ContentTypeEditingBuilder parentBuilder) : base(parentBuilder)
+    public PropertyTypeEditingBuilder(TParent parentBuilder) : base(parentBuilder)
     {
-        _validationBuilder = new PropertyTypeValidationEditingBuilder(this);
-        _appearanceBuilder = new PropertyTypeAppearanceBuilder(this);
+        _validationBuilder = new PropertyTypeValidationEditingBuilder<TParent>(this);
+        _appearanceBuilder = new PropertyTypeAppearanceBuilder<TParent>(this);
     }
+
 
     Guid? IWithKeyBuilder.Key
     {
@@ -82,63 +83,63 @@ public class PropertyTypeEditingBuilder
         set => _variesBySegment = value;
     }
 
-    public PropertyTypeValidationEditingBuilder AddValidation()
+    public PropertyTypeValidationEditingBuilder<TParent> AddValidation()
     {
-        var builder = new PropertyTypeValidationEditingBuilder(this);
+        var builder = new PropertyTypeValidationEditingBuilder<TParent>(this);
         _validationBuilder = builder;
         return builder;
     }
 
-    public PropertyTypeAppearanceBuilder AddAppearance()
+    public PropertyTypeAppearanceBuilder<TParent> AddAppearance()
     {
-        var builder = new PropertyTypeAppearanceBuilder(this);
+        var builder = new PropertyTypeAppearanceBuilder<TParent>(this);
         _appearanceBuilder = builder;
         return builder;
     }
 
-    public PropertyTypeEditingBuilder WithContainerKey(Guid? containerKey)
+    public PropertyTypeEditingBuilder<TParent> WithContainerKey(Guid? containerKey)
     {
         _containerKey = containerKey;
         return this;
     }
 
-    public PropertyTypeEditingBuilder WithSortOrder(int sortOrder)
+    public PropertyTypeEditingBuilder<TParent> WithSortOrder(int sortOrder)
     {
         _sortOrder = sortOrder;
         return this;
     }
 
-    public PropertyTypeEditingBuilder WithAlias(string alias)
+    public PropertyTypeEditingBuilder<TParent> WithAlias(string alias)
     {
         _alias = alias;
         return this;
     }
 
-    public PropertyTypeEditingBuilder WithName(string name)
+    public PropertyTypeEditingBuilder<TParent> WithName(string name)
     {
         _name = name;
         return this;
     }
 
-    public PropertyTypeEditingBuilder WithDescription(string description)
+    public PropertyTypeEditingBuilder<TParent> WithDescription(string description)
     {
         _description = description;
         return this;
     }
 
-    public PropertyTypeEditingBuilder WithDataTypeKey(Guid dataTypeKey)
+    public PropertyTypeEditingBuilder<TParent> WithDataTypeKey(Guid dataTypeKey)
     {
         _dataTypeKey = dataTypeKey;
         return this;
     }
 
-    public PropertyTypeEditingBuilder WithVariesByCulture(bool variesByCulture)
+    public PropertyTypeEditingBuilder<TParent> WithVariesByCulture(bool variesByCulture)
     {
         _variesByCulture = variesByCulture;
         return this;
     }
 
-    public PropertyTypeEditingBuilder WithVariesBySegment(bool variesBySegment)
+    public PropertyTypeEditingBuilder<TParent> WithVariesBySegment(bool variesBySegment)
     {
         _variesBySegment = variesBySegment;
         return this;

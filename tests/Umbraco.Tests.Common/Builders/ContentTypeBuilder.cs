@@ -16,7 +16,7 @@ public class ContentTypeBuilder
         IWithPropertyTypeIdsIncrementingFrom,
         IBuildPropertyTypes
 {
-    private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new();
+    private readonly List<ContentTypeSortBuilder<ContentTypeBuilder>> _allowedContentTypeBuilders = new();
     private readonly List<PropertyTypeBuilder<ContentTypeBuilder>> _noGroupPropertyTypeBuilders = new();
     private readonly List<PropertyGroupBuilder<ContentTypeBuilder>> _propertyGroupBuilders = new();
     private readonly List<TemplateBuilder> _templateBuilders = new();
@@ -88,9 +88,9 @@ public class ContentTypeBuilder
         return builder;
     }
 
-    public ContentTypeSortBuilder AddAllowedContentType()
+    public ContentTypeSortBuilder<ContentTypeBuilder> AddAllowedContentType()
     {
-        var builder = new ContentTypeSortBuilder(this);
+        var builder = new ContentTypeSortBuilder<ContentTypeBuilder>(this);
         _allowedContentTypeBuilders.Add(builder);
         return builder;
     }
