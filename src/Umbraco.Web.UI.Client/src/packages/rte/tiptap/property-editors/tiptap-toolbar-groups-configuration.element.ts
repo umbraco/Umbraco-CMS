@@ -1,9 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, property, repeat, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-type ToolbarLayout = Array<Array<string>>;
+import type { Observable, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 type Extension = {
 	alias: string;
@@ -14,63 +12,62 @@ type Extension = {
 @customElement('umb-tiptap-toolbar-groups-configuration')
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
-	set value(value: Array<ToolbarLayout>) {
-		//If value is null or does not have at least one row with one group, default to a single row with a single empty group
-		if (!value || value.length === 0 || value[0].length === 0) {
-			value = [[[]]];
-		}
-		this._value = value;
-		this.requestUpdate();
-	}
-	get value(): Array<ToolbarLayout> {
-		return this._value;
-	}
-
-	_value: Array<ToolbarLayout> = [[[]]];
-
-	@property({ attribute: false })
 	extensions: Array<Extension> = [];
+
+	@state()
+	private _toolbar: string[][][] = [[[]]];
+
+	#toolbarLayout: UmbArrayState<string[][]> | undefined;
+
+	constructor() {
+		super();
+
+		this.consumeContext(
+			'umb-tiptap-toolbar-context',
+			(instance: { state: UmbArrayState<string[][]>; observable: Observable<string[][][]> }) => {
+				this.#toolbarLayout = instance.state;
+
+				this.observe(instance.observable, (value) => {
+					this._toolbar = value.map((rows) => rows.map((groups) => [...groups]));
+				});
+			},
+		);
+	}
 
 	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
 		const [fromRow, fromGroup, fromItem] = from;
 		const [toRow, toGroup, toItem] = to;
 
 		// Get the item to move from the 'from' position
-		const itemToMove = this.value[fromRow][fromGroup][fromItem];
+		const itemToMove = this._toolbar[fromRow][fromGroup][fromItem];
 
 		// Remove the item from the original position
-		this.value[fromRow][fromGroup].splice(fromItem, 1);
+		this._toolbar[fromRow][fromGroup].splice(fromItem, 1);
 
 		// Insert the item into the new position
-		this.value[toRow][toGroup].splice(toItem, 0, itemToMove);
+		this._toolbar[toRow][toGroup].splice(toItem, 0, itemToMove);
 
-		// Trigger a re-render
-		this.requestUpdate('value');
-		this.dispatchEvent(new UmbChangeEvent());
+		this.#toolbarLayout?.setValue(this._toolbar);
 	};
 
 	#addGroup = (rowIndex: number, groupIndex: number) => {
-		this.value[rowIndex].splice(groupIndex, 0, []);
-		this.requestUpdate('value');
-		this.dispatchEvent(new UmbChangeEvent());
+		this._toolbar[rowIndex].splice(groupIndex, 0, []);
+		this.#toolbarLayout?.setValue(this._toolbar);
 	};
 
 	#removeGroup = (rowIndex: number, groupIndex: number) => {
-		this.value[rowIndex].splice(groupIndex, 1);
-		this.requestUpdate('value');
-		this.dispatchEvent(new UmbChangeEvent());
+		this._toolbar[rowIndex].splice(groupIndex, 1);
+		this.#toolbarLayout?.setValue(this._toolbar);
 	};
 
 	#addRow = (rowIndex: number) => {
-		this.value.splice(rowIndex, 0, [[]]);
-		this.requestUpdate('value');
-		this.dispatchEvent(new UmbChangeEvent());
+		this._toolbar.splice(rowIndex, 0, [[]]);
+		this.#toolbarLayout?.setValue(this._toolbar);
 	};
 
 	#removeRow = (rowIndex: number) => {
-		this.value.splice(rowIndex, 1);
-		this.requestUpdate('value');
-		this.dispatchEvent(new UmbChangeEvent());
+		this._toolbar.splice(rowIndex, 1);
+		this.#toolbarLayout?.setValue(this._toolbar);
 	};
 
 	#onDragStart = (event: DragEvent, pos: [number, number, number]) => {
@@ -125,8 +122,8 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`${repeat(this._value, (row, rowIndex) => this.renderRow(row, rowIndex))}
-			<button @click=${() => this.#addRow(this._value.length)}>+</button>`;
+		return html`${repeat(this._toolbar, (row, rowIndex) => this.renderRow(row, rowIndex))}
+			<button @click=${() => this.#addRow(this._toolbar.length)}>+</button>`;
 	}
 
 	static override styles = [

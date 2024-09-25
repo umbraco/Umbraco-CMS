@@ -12,6 +12,7 @@ import './tiptap-toolbar-groups-configuration.element.js';
 
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import type UmbTiptapToolbarGroupsConfigurationElement from './tiptap-toolbar-groups-configuration.element.js';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 const tinyIconSet = tinymce.IconManager.get('default');
 
@@ -61,16 +62,29 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _selectedExtensions: string[] = [];
-
-	@state()
 	private _extensionCategories: ExtensionCategory[] = [];
 
 	@state()
 	private _availableExtensions: ExtensionConfig[] = [];
 
+	#toolbarLayout = new UmbArrayState<string[][]>([[[]]], (x) => x);
+	toolbarLayout = this.#toolbarLayout.asObservable();
+
+	constructor() {
+		super();
+		this.provideContext('umb-tiptap-toolbar-context', { state: this.#toolbarLayout, observable: this.toolbarLayout });
+
+		this.toolbarLayout.subscribe((value) => {
+			this.#value.toolbarLayout = value;
+
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		});
+	}
+
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
+
+		this.#toolbarLayout.setValue(this.#value.toolbarLayout);
 
 		const toolbarConfig = this.config?.getValueByAlias<ExtensionConfig[]>('toolbar');
 		if (!toolbarConfig) return;
@@ -125,29 +139,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onChange = (event: CustomEvent) => {
-		const value = (event.target as UmbTiptapToolbarGroupsConfigurationElement).value;
-
-		// If any groups or rows have been removed from the toolbar layout, remove the corresponding extensions
-		const extensions = value.flat(2);
-		// only keep the extensions that are in the new toolbar layout
-		const test = this.#value.extensions.filter((alias) => extensions.includes(alias));
-
-		this.#value = {
-			toolbarLayout: value,
-			extensions: test,
-		};
-
-		console.log('value', this.#value);
-
-		// Remove the removed extensions from the available extensions
-
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	};
-
 	override render() {
 		return html`
-		<umb-tiptap-toolbar-groups-configuration @change=${this.#onChange} .extensions=${this._availableExtensions} .value=${this.#value.toolbarLayout}></umb-tiptap-toolbar-groups-configuration>
+		<umb-tiptap-toolbar-groups-configuration .extensions=${this._availableExtensions}></umb-tiptap-toolbar-groups-configuration>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,
