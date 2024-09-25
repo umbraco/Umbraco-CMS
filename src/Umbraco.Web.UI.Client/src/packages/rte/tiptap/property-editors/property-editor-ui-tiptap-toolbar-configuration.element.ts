@@ -46,7 +46,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		if (!value) value = { extensions: [], toolbarLayout: [] };
 
 		this.#value = this.#deepClone(value) as NewestValue;
-		this.requestUpdate('#value');
 	}
 	get value(): NewestValue {
 		return this.#deepClone(this.#value) as NewestValue;
@@ -62,7 +61,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _toolbarLayout: ToolbarLayout = [[[]]];
+	private _selectedExtensions: string[] = [];
 
 	@state()
 	private _extensionCategories: ExtensionCategory[] = [];
@@ -77,16 +76,14 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		if (!toolbarConfig) return;
 		this._availableExtensions = toolbarConfig;
 
-		const extensions: Array<ExtensionConfig> = [];
-
-		this._availableExtensions.forEach((v) => {
-			extensions.push({
+		this._availableExtensions = this._availableExtensions.map((v) => {
+			return {
 				...v,
-				selected: this.value.extensions.includes(v.alias),
-			});
+				selected: this.#value.extensions.includes(v.alias),
+			};
 		});
 
-		const grouped = extensions.reduce((acc: any, item) => {
+		const grouped = this._availableExtensions.reduce((acc: any, item) => {
 			const group = item.category || 'miscellaneous'; // Assign to "miscellaneous" if no group
 
 			if (!acc[group]) {
@@ -109,30 +106,48 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		item.selected = !item.selected;
 
 		if (item.selected) {
-			const lastRow = this._toolbarLayout[this._toolbarLayout.length - 1]; // Last row
+			const lastRow = this.#value.toolbarLayout[this.#value.toolbarLayout.length - 1]; // Last row
 			const lastGroup = lastRow[lastRow.length - 1]; // Last group in the last row
 			lastGroup.push(item.alias);
 		} else {
-			this._toolbarLayout = this._toolbarLayout.map((row) =>
+			this.#value.toolbarLayout = this.#value.toolbarLayout.map((row) =>
 				row.map((group) => group.filter((alias) => alias !== item.alias)),
 			);
 		}
 
-		this.requestUpdate();
+		this.#value = {
+			...this.#value,
+			extensions: item.selected
+				? [...this.#value.extensions, item.alias]
+				: this.#value.extensions.filter((alias) => alias !== item.alias),
+		};
+
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChange = (event: CustomEvent) => {
 		const value = (event.target as UmbTiptapToolbarGroupsConfigurationElement).value;
-		this.value = {
-			...this.value,
+
+		// If any groups or rows have been removed from the toolbar layout, remove the corresponding extensions
+		const extensions = value.flat(2);
+		// only keep the extensions that are in the new toolbar layout
+		const test = this.#value.extensions.filter((alias) => extensions.includes(alias));
+
+		this.#value = {
 			toolbarLayout: value,
+			extensions: test,
 		};
+
+		console.log('value', this.#value);
+
+		// Remove the removed extensions from the available extensions
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	};
 
 	override render() {
 		return html`
-		<umb-tiptap-toolbar-groups-configuration @change=${this.#onChange} .extensions=${this._availableExtensions} .value=${this._toolbarLayout}></umb-tiptap-toolbar-groups-configuration>
+		<umb-tiptap-toolbar-groups-configuration @change=${this.#onChange} .extensions=${this._availableExtensions} .value=${this.#value.toolbarLayout}></umb-tiptap-toolbar-groups-configuration>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,
