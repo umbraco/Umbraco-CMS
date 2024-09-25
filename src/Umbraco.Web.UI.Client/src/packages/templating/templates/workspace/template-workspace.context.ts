@@ -47,7 +47,7 @@ export class UmbTemplateWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ parent: { entityType: parentEntityType, unique: parentUnique } });
+					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

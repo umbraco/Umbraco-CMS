@@ -57,7 +57,7 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 	}
 
 	#onCreate = async (parent: { entityType: string; unique: string | null }, snippetId?: string) => {
-		await this.#workspaceContext.create(parent, snippetId);
+		await this.#workspaceContext.createScaffold(parent, snippetId);
 
 		new UmbWorkspaceIsNewRedirectController(
 			this,

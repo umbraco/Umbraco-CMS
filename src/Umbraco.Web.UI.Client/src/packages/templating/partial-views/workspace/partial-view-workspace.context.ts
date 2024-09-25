@@ -82,7 +82,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	#onCreate = async (args: UmbPartialViewWorkspaceContextCreateArgs) => {
-		await this.create(args);
+		await this.createScaffold(args);
 
 		new UmbWorkspaceIsNewRedirectController(
 			this,
@@ -113,7 +113,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	override async create(args: UmbPartialViewWorkspaceContextCreateArgs) {
+	override async createScaffold(args: UmbPartialViewWorkspaceContextCreateArgs) {
 		let snippetContent = '';
 
 		if (args.snippet?.unique) {
@@ -123,7 +123,7 @@ export class UmbPartialViewWorkspaceContext
 
 		const argsWithPreset = { ...args, preset: { content: snippetContent } };
 
-		return super.create(argsWithPreset);
+		return super.createScaffold(argsWithPreset);
 	}
 
 	#getSnippet(unique: string) {

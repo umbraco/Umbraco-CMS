@@ -146,7 +146,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
-	async create(args: CreateArgsType) {
+	async createScaffold(args: CreateArgsType) {
 		await this.#init;
 		this.resetState();
 		this.#parent.setValue(args.parent);

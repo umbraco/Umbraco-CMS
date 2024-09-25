@@ -46,7 +46,7 @@ export class UmbUserGroupWorkspaceContext
 				path: 'create',
 				component: UmbUserGroupWorkspaceEditorElement,
 				setup: () => {
-					this.create({ parent: { entityType: UMB_USER_GROUP_ROOT_ENTITY_TYPE, unique: null } });
+					this.createScaffold({ parent: { entityType: UMB_USER_GROUP_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
