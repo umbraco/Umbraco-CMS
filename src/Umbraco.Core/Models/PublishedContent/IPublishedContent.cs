@@ -142,9 +142,4 @@ public interface IPublishedContent : IPublishedElement
     ///     Gets the children of the content item that are available for the current culture.
     /// </summary>
     IEnumerable<IPublishedContent> Children { get; }
-
-    /// <summary>
-    ///     Gets all the children of the content item, regardless of whether they are available for the current culture.
-    /// </summary>
-    IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 }

@@ -77,8 +77,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
-        /// <inheritdoc />
-        public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
         /// <inheritdoc cref="IPublishedElement.Properties"/>
         public abstract IEnumerable<IPublishedProperty> Properties { get; }

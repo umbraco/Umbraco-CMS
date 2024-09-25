@@ -110,8 +110,6 @@ internal class PublishedContent : PublishedContentBase
         }
     }
 
-    public override IEnumerable<IPublishedContent> ChildrenForAllCultures { get; } = Enumerable.Empty<IPublishedContent>();
-
     public override IPublishedContent? Parent { get; } = null!;
 
 
