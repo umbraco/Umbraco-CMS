@@ -1,6 +1,15 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	customElement,
+	css,
+	html,
+	property,
+	repeat,
+	nothing,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type ToolbarLayout = Array<Array<string>>;
 
@@ -14,9 +23,12 @@ type Extension = {
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
 	set value(value: Array<ToolbarLayout>) {
-		// TODO: if value is null or does not have at least one row with one group, default to a single row with a single empty group
-		// this.#value = value;
-		// this.requestUpdate('#value');
+		//If value is null or does not have at least one row with one group, default to a single row with a single empty group
+		if (!value || value.length === 0 || value[0].length === 0) {
+			value = [[[]]];
+		}
+		this.#value = value;
+		this.requestUpdate();
 	}
 	get value(): Array<ToolbarLayout> {
 		return this.#value;
@@ -28,41 +40,42 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	];
 
 	@property({ attribute: false })
-	extensions: Array<Extension> = [
-		{
-			alias: 'bold',
-			label: 'Bold',
-		},
-		{
-			alias: 'italic',
-			label: 'Italic',
-		},
-		{
-			alias: 'underline',
-			label: 'Underline',
-		},
-		{
-			alias: 'strikethrough',
-			label: 'Strikethrough',
-		},
-	];
+	extensions: Array<Extension> = [];
 
-	private moveItem(from: [number, number, number], to: [number, number, number]) {
+	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
 		const [fromRow, fromGroup, fromItem] = from;
 		const [toRow, toGroup, toItem] = to;
 
-		// Get the item to move from the 'from' position
-		const itemToMove = this.#value[fromRow][fromGroup][fromItem];
+		// Deep clone the entire value array (shallow copy of nested arrays)
+		const clonedValue = this.#value.map((row) => row.map((group) => [...group]));
+
+		const fromGroupArray = clonedValue[fromRow]?.[fromGroup];
+		const toGroupArray = clonedValue[toRow]?.[toGroup];
+
+		if (!fromGroupArray || !toGroupArray) {
+			console.error('Invalid group or row indexes.');
+			return;
+		}
+
+		const itemToMove = fromGroupArray[fromItem];
+		if (typeof itemToMove === 'undefined') {
+			console.error('Invalid item index:', fromItem);
+			return;
+		}
 
 		// Remove the item from the original position
-		this.#value[fromRow][fromGroup].splice(fromItem, 1);
+		fromGroupArray.splice(fromItem, 1);
 
 		// Insert the item into the new position
-		this.#value[toRow][toGroup].splice(toItem, 0, itemToMove);
+		toGroupArray.splice(toItem, 0, itemToMove);
 
-		// Trigger an update to re-render the UI
+		// Replace the whole value with the modified cloned structure
+		this.#value = clonedValue;
+
+		// Trigger a re-render
 		this.requestUpdate('value');
-	}
+		this.dispatchEvent(new UmbChangeEvent());
+	};
 
 	#onDragStart = (event: DragEvent, pos: [number, number, number]) => {
 		event.dataTransfer!.setData('application/json', JSON.stringify(pos));
