@@ -27,7 +27,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
                 CreateOutputExpansionStrategyAccessor()),
             publishedValueFallback);
         return new MediaPickerWithCropsValueConverter(
-            PublishedSnapshotAccessor,
+            CacheManager.Media,
             PublishedUrlProvider,
             publishedValueFallback,
             serializer,
