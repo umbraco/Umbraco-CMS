@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const memberGroupName = 'Test Member Group';
@@ -6,7 +6,7 @@ const memberGroupName = 'Test Member Group';
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
   await umbracoUi.goToBackOffice();
-  await umbracoUi.memberGroup.goToSection(ConstantHelper.sections.members);
+  await umbracoUi.memberGroup.goToMemberGroups();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -15,7 +15,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create a member group', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.memberGroup.clickMemberGroupsTab();
   await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
   await umbracoUi.memberGroup.clickSaveButton();
@@ -29,7 +28,6 @@ test('can create a member group', {tag: '@smoke'}, async ({page, umbracoApi, umb
 
 test('cannot create member group with empty name', async ({umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.memberGroup.clickMemberGroupsTab();
   await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.clickSaveButton();
 
@@ -45,7 +43,6 @@ test.skip('cannot create member group with duplicate name', async ({umbracoApi, 
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 
   // Act
-  await umbracoUi.memberGroup.clickMemberGroupsTab();
   await umbracoUi.memberGroup.clickCreateButton(true);
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
   await umbracoUi.memberGroup.clickSaveButton();
@@ -54,14 +51,12 @@ test.skip('cannot create member group with duplicate name', async ({umbracoApi, 
   await umbracoUi.memberGroup.isErrorNotificationVisible();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is impossible to delete a member group.
-test.skip('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.memberGroup.create(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 
   // Act
-  await umbracoUi.memberGroup.clickMemberGroupsTab();
   await umbracoUi.memberGroup.clickMemberGroupLinkByName(memberGroupName);
   await umbracoUi.memberGroup.clickActionsButton();
   await umbracoUi.memberGroup.clickDeleteButton();
