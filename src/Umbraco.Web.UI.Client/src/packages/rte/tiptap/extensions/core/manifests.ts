@@ -243,4 +243,18 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 			label: 'Underline',
 		},
 	},
+	{
+		type: 'tiptapExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Unlink',
+		name: 'Unlink Tiptap Extension',
+		api: () => import('./unlink.extension.js'),
+		element: () => import('../../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
+		weight: 101,
+		meta: {
+			alias: 'unlink',
+			icon: 'icon-unlink',
+			label: 'Unlink',
+		},
+	},
 ];

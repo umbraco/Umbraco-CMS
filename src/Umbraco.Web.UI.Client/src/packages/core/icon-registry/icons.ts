@@ -2035,6 +2035,10 @@ name: "icon-underline",
 
 path: () => import("./icons/icon-underline.js"),
 },{
+name: "icon-unlink",
+
+path: () => import("./icons/icon-unlink.js"),
+},{
 name: "icon-unlocked",
 
 path: () => import("./icons/icon-unlocked.js"),

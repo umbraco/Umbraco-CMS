@@ -7,6 +7,7 @@ export const manifests: ManifestTiptapExtensionButtonKind[] = [
 		alias: 'Umb.TiptapExtension.BlockPicker',
 		name: 'Block Picker Tiptap Extension Button',
 		api: () => import('./block-picker.extension.js'),
+		weight: 90,
 		meta: {
 			alias: 'umbblockpicker',
 			icon: 'icon-plugin',

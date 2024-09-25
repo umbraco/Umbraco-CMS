@@ -20,7 +20,7 @@ export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implem
 	/**
 	 * The manifest for the extension.
 	 */
-	protected _manifest?: ManifestTiptapExtension;
+	protected manifest?: ManifestTiptapExtension;
 
 	/**
 	 * The editor instance.
@@ -74,7 +74,7 @@ export abstract class UmbTiptapToolbarElementApiBase
 	 * Informs the toolbar element if it is active or not. It uses the manifest meta alias to check if the toolbar element is active.
 	 * @see {ManifestTiptapExtension}
 	 */
-	public isActive(editor?: Editor) {
-		return editor && this._manifest?.meta.alias ? editor?.isActive(this._manifest.meta.alias) : false;
+	public isActive(editor: Editor) {
+		return editor && this.manifest?.meta.alias ? editor?.isActive(this.manifest.meta.alias) : false;
 	}
 }

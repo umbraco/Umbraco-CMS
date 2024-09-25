@@ -14,7 +14,6 @@ const kinds: Array<UmbExtensionManifestKind> = [
 	},
 ];
 
-// TODO: [LK] Move each of these to their corresponding packages, e.g. "code-editor", "embedded-media", "media", "multi-url-picker"
 const umbExtensions: Array<ManifestTiptapExtension | ManifestTiptapExtensionButtonKind> = [
 	{
 		type: 'tiptapExtension',
@@ -31,14 +30,27 @@ const umbExtensions: Array<ManifestTiptapExtension | ManifestTiptapExtensionButt
 	},
 	{
 		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Embed',
-		name: 'Embed Tiptap Extension',
-		api: () => import('./umb/embedded-media.extension.js'),
+		alias: 'Umb.Tiptap.MediaUpload',
+		name: 'Media Upload Tiptap Extension',
+		api: () => import('./umb/media-upload.extension.js'),
+		weight: 900,
 		meta: {
-			alias: 'umb-embedded-media',
-			icon: 'icon-embed',
-			label: '#general_embed',
+			alias: 'umbMediaUpload',
+			icon: 'icon-image-up',
+			label: 'Media upload',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Link',
+		name: 'Link Tiptap Extension',
+		api: () => import('./umb/link.extension.js'),
+		weight: 102,
+		meta: {
+			alias: 'umbLink',
+			icon: 'icon-link',
+			label: '#defaultdialogs_urlLinkPicker',
 		},
 	},
 	{
@@ -47,34 +59,24 @@ const umbExtensions: Array<ManifestTiptapExtension | ManifestTiptapExtensionButt
 		alias: 'Umb.Tiptap.MediaPicker',
 		name: 'Media Picker Tiptap Extension',
 		api: () => import('./umb/mediapicker.extension.js'),
+		weight: 80,
 		meta: {
-			alias: 'umb-media',
+			alias: 'umbMedia',
 			icon: 'icon-picture',
 			label: 'Media picker',
 		},
 	},
 	{
 		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.MediaUpload',
-		name: 'Media Upload Tiptap Extension',
-		weight: 900,
-		api: () => import('./umb/media-upload.extension.js'),
-		meta: {
-			alias: 'umb-media-upload',
-			icon: 'icon-image-up',
-			label: 'Media upload',
-		},
-	},
-	{
-		type: 'tiptapExtension',
 		kind: 'button',
-		alias: 'Umb.Tiptap.UrlPicker',
-		name: 'URL Picker Tiptap Extension',
-		api: () => import('./umb/urlpicker.extension.js'),
+		alias: 'Umb.Tiptap.Embed',
+		name: 'Embed Tiptap Extension',
+		api: () => import('./umb/embedded-media.extension.js'),
+		weight: 70,
 		meta: {
-			alias: 'umb-link',
-			icon: 'icon-link',
-			label: 'URL picker',
+			alias: 'umbEmbeddedMedia',
+			icon: 'icon-embed',
+			label: '#general_embed',
 		},
 	},
 ];
