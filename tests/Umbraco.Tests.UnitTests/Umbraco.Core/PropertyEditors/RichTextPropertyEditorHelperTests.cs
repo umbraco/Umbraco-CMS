@@ -222,23 +222,23 @@ public class RichTextPropertyEditorHelperTests
     {
         const string input = """
                              {
-                              "markup": "<p>this is <umb-rte-block-inline data-content-udi=\"umb://element/36cc710ad8a645d0a07f7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-udi=\"umb://element/36cc710ad8a645d0a07f7bbd8742cf02\"></umb-rte-block>",
+                              "markup": "<p>this is <umb-rte-block-inline data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>",
                               "blocks": {
                                   "layout": {
                                       "Umbraco.TinyMCE": [{
-                                              "contentUdi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02"
+                                              "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02"
                                           }, {
-                                              "contentUdi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf03"
+                                              "contentKey": "36cc710a-d8a6-45d0-a07f-7bbd8742cf03"
                                           }
                                       ]
                                   },
                                   "contentData": [{
                                           "contentTypeKey": "b2f0806c-d231-4c78-88b2-3c97d26e1123",
-                                          "udi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02",
+                                          "key": "36cc710a-d8a6-45d0-a07f-7bbd8742cf02",
                                           "contentPropertyAlias": "A content property value"
                                         }, {
                                           "contentTypeKey": "b2f0806c-d231-4c78-88b2-3c97d26e1124",
-                                          "udi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf03",
+                                          "key": "36cc710a-d8a6-45d0-a07f-7bbd8742cf03",
                                           "contentPropertyAlias": "A content property value"
                                         }
                                     ],
@@ -250,7 +250,7 @@ public class RichTextPropertyEditorHelperTests
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
         Assert.IsTrue(result);
         Assert.IsNotNull(value);
-        Assert.AreEqual("<p>this is <umb-rte-block-inline data-content-udi=\"umb://element/36cc710ad8a645d0a07f7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-udi=\"umb://element/36cc710ad8a645d0a07f7bbd8742cf02\"></umb-rte-block>", value.Markup);
+        Assert.AreEqual("<p>this is <umb-rte-block-inline data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>", value.Markup);
 
         Assert.IsNotNull(value.Blocks);
 
@@ -261,7 +261,6 @@ public class RichTextPropertyEditorHelperTests
         for (var i = 0; i < value.Blocks.ContentData.Count; i++) {
             var item = value.Blocks.ContentData[i];
             Assert.AreEqual(contentTypeGuids[i], item.ContentTypeKey);
-            Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Element, itemGuids[i]), item.Udi);
             Assert.AreEqual(itemGuids[i], item.Key);
         }
 
