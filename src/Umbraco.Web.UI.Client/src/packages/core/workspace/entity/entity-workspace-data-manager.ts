@@ -11,22 +11,24 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	#persisted = new UmbObjectState<ModelType | undefined>(undefined);
 	#current = new UmbObjectState<ModelType | undefined>(undefined);
 
+	/**
+	 * Observable of the persisted data
+	 * @memberof UmbEntityWorkspaceDataManager
+	 */
+	public readonly persisted = this.#persisted.asObservable();
+
+	/**
+	 * Observable of the current data
+	 * @memberof UmbEntityWorkspaceDataManager
+	 */
 	public readonly current = this.#current.asObservable();
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-
-	createObservablePart<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
-		return this.#current.asObservablePart(mappingFunction);
-	}
 
 	/**
 	 * Gets persisted data
 	 * @returns {(ModelType | undefined)}
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	getPersistedData() {
+	getPersisted() {
 		return this.#persisted.getValue();
 	}
 
@@ -35,7 +37,7 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * @param {(ModelType | undefined)} data
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	setPersistedData(data: ModelType | undefined) {
+	setPersisted(data: ModelType | undefined) {
 		this.#persisted.setValue(data);
 	}
 
@@ -44,8 +46,19 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * @param {Partial<ModelType>} partialData
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	updatePersistedData(partialData: Partial<ModelType>) {
+	updatePersisted(partialData: Partial<ModelType>) {
 		this.#persisted.update(partialData);
+	}
+
+	/**
+	 * Creates an observable part of the persisted data
+	 * @template ReturnType
+	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction
+	 * @returns {*}
+	 * @memberof UmbEntityWorkspaceDataManager
+	 */
+	createObservablePartOfPersisted<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
+		return this.#persisted.asObservablePart(mappingFunction);
 	}
 
 	/**
@@ -53,7 +66,7 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * @returns {(ModelType | undefined)}
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	getCurrentData() {
+	getCurrent() {
 		return this.#current.getValue();
 	}
 
@@ -62,7 +75,7 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * @param {(ModelType | undefined)} data
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	setCurrentData(data: ModelType | undefined) {
+	setCurrent(data: ModelType | undefined) {
 		this.#current.setValue(data);
 	}
 
@@ -71,8 +84,19 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * @param {Partial<ModelType>} partialData
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	updateCurrentData(partialData: Partial<ModelType>) {
+	updateCurrent(partialData: Partial<ModelType>) {
 		this.#current.update(partialData);
+	}
+
+	/**
+	 * Creates an observable part of the current data
+	 * @template ReturnType
+	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction
+	 * @returns {*}
+	 * @memberof UmbEntityWorkspaceDataManager
+	 */
+	createObservablePartOfCurrent<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
+		return this.#current.asObservablePart(mappingFunction);
 	}
 
 	/**
@@ -80,7 +104,7 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * @returns {*}
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	hasUnpersistedChanges() {
+	getHasUnpersistedChanges() {
 		const persisted = this.#persisted.getValue();
 		const current = this.#current.getValue();
 		return jsonStringComparison(persisted, current) === false;
@@ -90,7 +114,7 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * Resets the current data to the persisted data
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	resetCurrentData() {
+	resetCurrent() {
 		this.#current.setValue(this.#persisted.getValue());
 	}
 
@@ -98,7 +122,7 @@ export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	 * Clears the data
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
-	clearData() {
+	clear() {
 		this.#persisted.setValue(undefined);
 		this.#current.setValue(undefined);
 	}

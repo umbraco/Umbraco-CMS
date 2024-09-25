@@ -22,14 +22,20 @@ export class UmbUserWorkspaceContext
 	public readonly configRepository = new UmbUserConfigRepository(this);
 
 	readonly data = this._data.current;
-	readonly state = this._data.createObservablePart((x) => x?.state);
-	readonly unique = this._data.createObservablePart((x) => x?.unique);
-	readonly kind = this._data.createObservablePart((x) => x?.kind);
-	readonly userGroupUniques = this._data.createObservablePart((x) => x?.userGroupUniques || []);
-	readonly documentStartNodeUniques = this._data.createObservablePart((data) => data?.documentStartNodeUniques || []);
-	readonly hasDocumentRootAccess = this._data.createObservablePart((data) => data?.hasDocumentRootAccess || false);
-	readonly mediaStartNodeUniques = this._data.createObservablePart((data) => data?.mediaStartNodeUniques || []);
-	readonly hasMediaRootAccess = this._data.createObservablePart((data) => data?.hasMediaRootAccess || false);
+	readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
+	readonly unique = this._data.createObservablePartOfCurrent((x) => x?.unique);
+	readonly kind = this._data.createObservablePartOfCurrent((x) => x?.kind);
+	readonly userGroupUniques = this._data.createObservablePartOfCurrent((x) => x?.userGroupUniques || []);
+	readonly documentStartNodeUniques = this._data.createObservablePartOfCurrent(
+		(data) => data?.documentStartNodeUniques || [],
+	);
+	readonly hasDocumentRootAccess = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasDocumentRootAccess || false,
+	);
+	readonly mediaStartNodeUniques = this._data.createObservablePartOfCurrent(
+		(data) => data?.mediaStartNodeUniques || [],
+	);
+	readonly hasMediaRootAccess = this._data.createObservablePartOfCurrent((data) => data?.hasMediaRootAccess || false);
 
 	#calculatedStartNodes = new UmbObjectState<UmbUserStartNodesModel | undefined>(undefined);
 	readonly calculatedStartNodes = this.#calculatedStartNodes.asObservable();
@@ -82,15 +88,15 @@ export class UmbUserWorkspaceContext
 			history.pushState(null, '', 'section/user-management');
 			return;
 		}
-		this._data.updateCurrentData({ state: user.state, avatarUrls: user.avatarUrls });
+		this._data.updateCurrent({ state: user.state, avatarUrls: user.avatarUrls });
 	}
 
 	getState(): UmbUserStateEnum | null | undefined {
-		return this._data.getCurrentData()?.state;
+		return this._data.getCurrent()?.state;
 	}
 
 	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
-		this._data.updateCurrentData({ [propertyName]: value });
+		this._data.updateCurrent({ [propertyName]: value });
 	}
 
 	// TODO: implement upload progress
