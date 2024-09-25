@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract int SortOrder { get; }
 
         /// <inheritdoc />
+        [Obsolete("Not supported for members, scheduled for removal in v17")]
         public abstract int Level { get; }
 
         /// <inheritdoc />
@@ -76,8 +77,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
 
-        /// <inheritdoc />
-        public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
         /// <inheritdoc cref="IPublishedElement.Properties"/>
         public abstract IEnumerable<IPublishedProperty> Properties { get; }

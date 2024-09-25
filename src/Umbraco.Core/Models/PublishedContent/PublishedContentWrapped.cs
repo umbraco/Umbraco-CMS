@@ -101,9 +101,6 @@ public abstract class PublishedContentWrapped : IPublishedContent
     /// <inheritdoc />
     public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
-    /// <inheritdoc />
-    public virtual IEnumerable<IPublishedContent> ChildrenForAllCultures => _content.ChildrenForAllCultures;
-
     /// <inheritdoc cref="IPublishedElement.Properties" />
     public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
 

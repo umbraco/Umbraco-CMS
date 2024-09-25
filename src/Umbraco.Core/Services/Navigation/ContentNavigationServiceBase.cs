@@ -63,6 +63,28 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetSiblingsKeysInBin(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_recycleBinNavigationStructure, key, out siblingsKeys);
 
+    public bool TryGetLevel(Guid contentKey, out int level)
+    {
+        level = 1;
+        Guid? parentKey;
+        if (TryGetParentKey(contentKey, out parentKey) is false)
+        {
+            return false;
+        }
+
+        while (parentKey is not null)
+        {
+            if (TryGetParentKey(parentKey.Value, out parentKey) is false)
+            {
+                return false;
+            }
+
+            level++;
+        }
+
+        return true;
+    }
+
     public bool MoveToBin(Guid key)
     {
         if (TryRemoveNodeFromParentInStructure(_navigationStructure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
