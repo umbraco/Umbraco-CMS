@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -116,9 +117,10 @@ public class DeliveryApiTests
         IApiContentPathProvider contentPathProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor? variationContextAccessor = null,
-        IPublishedSnapshotAccessor? publishedSnapshotAccessor = null,
         IRequestPreviewService? requestPreviewService = null,
-        IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null)
+        IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
+        IPublishedContentCache? contentCache = null,
+        IDocumentNavigationQueryService? navigationQueryService = null)
     {
         if (requestHandlerSettingsMonitor == null)
         {
@@ -131,8 +133,9 @@ public class DeliveryApiTests
             contentPathProvider,
             globalSettings,
             variationContextAccessor ?? Mock.Of<IVariationContextAccessor>(),
-            publishedSnapshotAccessor ?? Mock.Of<IPublishedSnapshotAccessor>(),
             requestPreviewService ?? Mock.Of<IRequestPreviewService>(),
-        requestHandlerSettingsMonitor);
+            requestHandlerSettingsMonitor,
+            contentCache ?? Mock.Of<IPublishedContentCache>(),
+            navigationQueryService ?? Mock.Of<IDocumentNavigationQueryService>());
     }
 }
