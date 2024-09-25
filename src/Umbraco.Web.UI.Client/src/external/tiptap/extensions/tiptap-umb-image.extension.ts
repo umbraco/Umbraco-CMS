@@ -22,6 +22,7 @@ export const UmbImage = Image.extend({
 			},
 			'data-tmpimg': { default: null },
 			'data-udi': { default: null },
+			'data-caption': { default: null },
 		};
 	},
 });
@@ -47,6 +48,8 @@ declare module '@tiptap/core' {
 				srcset?: string;
 				sizes?: string;
 				'data-tmpimg'?: string;
+				'data-udi'?: string;
+				'data-caption'?: string;
 			}) => ReturnType;
 		};
 	}
