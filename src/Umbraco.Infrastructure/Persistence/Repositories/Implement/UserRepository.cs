@@ -411,8 +411,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         List<int> userIds = dtos.Count == 1 ? new List<int> {dtos[0].Id} : dtos.Select(x => x.Id).ToList();
         Dictionary<int, UserDto>? xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
 
-        List<int> groupIds = new List<int>();
-        List<Guid> groupKeys = new List<Guid>();
+        var groupIds = new List<int>();
+        var groupKeys = new List<Guid>();
         Sql<ISqlContext> sql;
         try
         {
@@ -595,9 +595,9 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // map languages
 
-        foreach (var group in groups.Values)
+        foreach (UserGroupDto group in groups.Values)
         {
-            if (groups2languages.TryGetValue(group.Id, out var list))
+            if (groups2languages.TryGetValue(group.Id, out IGrouping<int, UserGroup2LanguageDto>? list))
             {
                 group.UserGroup2LanguageDtos = list.ToList(); // groups2apps is distinct
             }

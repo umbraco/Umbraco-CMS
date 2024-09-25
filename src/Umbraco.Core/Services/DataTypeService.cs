@@ -330,7 +330,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             return Task.FromResult(dataTypes);
         }
-        
+
         /// <inheritdoc />
         public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
         {
@@ -555,7 +555,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.DuplicateKey, dataType);
             }
 
-            var result = await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
+            Attempt<IDataType, DataTypeOperationStatus> result = await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
 
             scope.Complete();
 
