@@ -100,6 +100,7 @@ public interface IPublishedContent : IPublishedElement
     ///     Gets the parent of the content item.
     /// </summary>
     /// <remarks>The parent of root content is <c>null</c>.</remarks>
+    [Obsolete("Please use IDocumentNavigationQueryService.TryGetParentKey() instead. Scheduled for removal in V16.")]
     IPublishedContent? Parent { get; }
 
     /// <summary>
