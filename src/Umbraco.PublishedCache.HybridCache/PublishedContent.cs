@@ -1,5 +1,8 @@
-﻿using Umbraco.Cms.Core.Exceptions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -84,7 +87,28 @@ internal class PublishedContent : PublishedContentBase
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
 
-    public override int Level { get; } = 0;
+    [Obsolete("Use the INavigationQueryService instead, scheduled for removal in v17")]
+    public override int Level
+    {
+        get
+        {
+            INavigationQueryService? navigationQueryService = null;
+            switch (_contentNode.ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                    break;
+                case PublishedItemType.Media:
+                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                    break;
+                default:
+                    throw new NotImplementedException("Level is not implemented for " + _contentNode.ContentType.ItemType);
+            }
+
+            navigationQueryService.TryGetLevel(Key, out int level);
+            return level;
+        }
+    }
 
     public override IEnumerable<IPublishedContent> ChildrenForAllCultures { get; } = Enumerable.Empty<IPublishedContent>();
 
