@@ -29,6 +29,9 @@ export abstract class UmbDetailRepositoryBase<
 	) {
 		super(host);
 
+		if (!detailSource) throw new Error('Detail source is missing');
+		if (!detailStoreContextAlias) throw new Error('Detail store context alias is missing');
+
 		this.detailDataSource = new detailSource(host) as UmbDetailDataSourceType;
 
 		this.#init = Promise.all([
