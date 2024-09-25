@@ -2,7 +2,6 @@ import type { UmbWorkspaceDataManager } from '../data-manager/workspace-data-man
 import { jsonStringComparison, UmbObjectState, type MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	extends UmbControllerBase
