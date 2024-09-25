@@ -63,6 +63,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
         var cacheMock = new Mock<ICacheManager>();
         cacheMock.SetupGet(cache => cache.Content).Returns(PublishedContentCacheMock.Object);
         cacheMock.SetupGet(cache => cache.Media).Returns(PublishedMediaCacheMock.Object);
+        CacheManager = cacheMock.Object;
 
         PublishedUrlProviderMock = new Mock<IPublishedUrlProvider>();
         PublishedUrlProviderMock
