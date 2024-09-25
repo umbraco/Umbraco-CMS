@@ -138,6 +138,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			}
 
 			this._data.setPersisted(data);
+			this._data.setCurrent(data);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
@@ -153,6 +154,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			}
 
 			this._data.setPersisted(data);
+			this._data.setCurrent(data);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
