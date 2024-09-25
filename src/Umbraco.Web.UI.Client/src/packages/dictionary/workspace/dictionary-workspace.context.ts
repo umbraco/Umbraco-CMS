@@ -17,11 +17,11 @@ export class UmbDictionaryWorkspaceContext
 {
 	readonly data = this._data.current;
 
-	readonly unique = this._data.createObservablePart((data) => data?.unique);
-	readonly entityType = this._data.createObservablePart((data) => data?.entityType);
+	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
 
-	readonly name = this._data.createObservablePart((data) => data?.name);
-	readonly dictionary = this._data.createObservablePart((data) => data);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	readonly dictionary = this._data.createObservablePartOfCurrent((data) => data);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -58,11 +58,11 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	setName(name: string) {
-		this._data.updateCurrentData({ name });
+		this._data.updateCurrent({ name });
 	}
 
 	setPropertyValue(isoCode: string, translation: string) {
-		const currentData = this._data.getCurrentData();
+		const currentData = this._data.getCurrent();
 		if (!currentData) return;
 
 		// TODO: This can use some of our own methods, to make it simpler. see appendToFrozenArray()
@@ -80,7 +80,7 @@ export class UmbDictionaryWorkspaceContext
 			updatedValue?.push({ isoCode, translation });
 		}
 
-		this._data.setCurrentData({ ...currentData, translations: updatedValue });
+		this._data.setCurrent({ ...currentData, translations: updatedValue });
 	}
 }
 

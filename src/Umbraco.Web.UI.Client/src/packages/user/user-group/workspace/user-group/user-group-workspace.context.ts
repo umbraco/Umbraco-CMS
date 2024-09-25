@@ -17,20 +17,22 @@ export class UmbUserGroupWorkspaceContext
 {
 	data = this._data.current;
 
-	readonly unique = this._data.createObservablePart((data) => data?.unique);
-	readonly name = this._data.createObservablePart((data) => data?.name || '');
-	readonly alias = this._data.createObservablePart((data) => data?.alias || '');
-	readonly aliasCanBeChanged = this._data.createObservablePart((data) => data?.aliasCanBeChanged);
-	readonly icon = this._data.createObservablePart((data) => data?.icon || null);
-	readonly sections = this._data.createObservablePart((data) => data?.sections || []);
-	readonly languages = this._data.createObservablePart((data) => data?.languages || []);
-	readonly hasAccessToAllLanguages = this._data.createObservablePart((data) => data?.hasAccessToAllLanguages || false);
-	readonly documentStartNode = this._data.createObservablePart((data) => data?.documentStartNode || null);
-	readonly documentRootAccess = this._data.createObservablePart((data) => data?.documentRootAccess || false);
-	readonly mediaStartNode = this._data.createObservablePart((data) => data?.mediaStartNode || null);
-	readonly mediaRootAccess = this._data.createObservablePart((data) => data?.mediaRootAccess || false);
-	readonly fallbackPermissions = this._data.createObservablePart((data) => data?.fallbackPermissions || []);
-	readonly permissions = this._data.createObservablePart((data) => data?.permissions || []);
+	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name || '');
+	readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias || '');
+	readonly aliasCanBeChanged = this._data.createObservablePartOfCurrent((data) => data?.aliasCanBeChanged);
+	readonly icon = this._data.createObservablePartOfCurrent((data) => data?.icon || null);
+	readonly sections = this._data.createObservablePartOfCurrent((data) => data?.sections || []);
+	readonly languages = this._data.createObservablePartOfCurrent((data) => data?.languages || []);
+	readonly hasAccessToAllLanguages = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasAccessToAllLanguages || false,
+	);
+	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
+	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);
+	readonly mediaStartNode = this._data.createObservablePartOfCurrent((data) => data?.mediaStartNode || null);
+	readonly mediaRootAccess = this._data.createObservablePartOfCurrent((data) => data?.mediaRootAccess || false);
+	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
+	readonly permissions = this._data.createObservablePartOfCurrent((data) => data?.permissions || []);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -65,7 +67,7 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
-		this._data.updateCurrentData({ [alias]: value });
+		this._data.updateCurrent({ [alias]: value });
 	}
 
 	/**
@@ -73,7 +75,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getPermissions() {
-		return this._data.getCurrentData()?.permissions ?? [];
+		return this._data.getCurrent()?.permissions ?? [];
 	}
 
 	/**
@@ -82,7 +84,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setPermissions(permissions: Array<UmbUserPermissionModel>) {
-		this._data.updateCurrentData({ permissions: permissions });
+		this._data.updateCurrent({ permissions: permissions });
 	}
 
 	/**
@@ -90,7 +92,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getFallbackPermissions() {
-		return this._data.getCurrentData()?.fallbackPermissions ?? [];
+		return this._data.getCurrent()?.fallbackPermissions ?? [];
 	}
 
 	/**
@@ -99,7 +101,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setFallbackPermissions(fallbackPermissions: Array<string>) {
-		this._data.updateCurrentData({ fallbackPermissions });
+		this._data.updateCurrent({ fallbackPermissions });
 	}
 }
 
