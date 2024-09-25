@@ -99,6 +99,29 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this._getDataPromise;
 	}
 
+	async createScaffold(args: CreateArgsType) {
+		await this.#init;
+		this.resetState();
+		this.#parent.setValue(args.parent);
+		const request = this._detailRepository!.createScaffold(args.preset);
+		this._getDataPromise = request;
+		let { data } = await request;
+		if (!data) return undefined;
+
+		if (this.modalContext) {
+			data = { ...data, ...this.modalContext.data.preset };
+		}
+		this.setIsNew(true);
+		this._data.setPersisted(data);
+		this._data.setCurrent(data);
+		return data;
+	}
+
+	async delete(unique: string) {
+		await this.#init;
+		await this._detailRepository!.delete(unique);
+	}
+
 	async submit() {
 		await this.#init;
 		const currentData = this._data.getCurrent();
@@ -144,29 +167,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 			actionEventContext.dispatchEvent(event);
 		}
-	}
-
-	async createScaffold(args: CreateArgsType) {
-		await this.#init;
-		this.resetState();
-		this.#parent.setValue(args.parent);
-		const request = this._detailRepository!.createScaffold(args.preset);
-		this._getDataPromise = request;
-		let { data } = await request;
-		if (!data) return undefined;
-
-		if (this.modalContext) {
-			data = { ...data, ...this.modalContext.data.preset };
-		}
-		this.setIsNew(true);
-		this._data.setPersisted(data);
-		this._data.setCurrent(data);
-		return data;
-	}
-
-	async delete(unique: string) {
-		await this.#init;
-		await this._detailRepository!.delete(unique);
 	}
 
 	/**
