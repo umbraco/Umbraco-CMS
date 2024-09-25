@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
 
 export const UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType.Folder';
 
@@ -29,4 +30,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			folderRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
+	...workspaceManifests,
 ];
