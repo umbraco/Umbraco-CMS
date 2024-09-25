@@ -20,20 +20,23 @@ export interface UmbEntityWorkspaceContextArgs {
 	detailRepositoryAlias: string;
 }
 
-export interface UmbEntityDetailWorkspaceContextCreateArgs {
+export interface UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> {
 	parent: UmbEntityModel;
+	preset?: Partial<DetailModelType>;
 }
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
-	EntityModelType extends UmbEntityModel,
-	DetailRepositoryType extends UmbDetailRepository<EntityModelType> = UmbDetailRepository<EntityModelType>,
-> extends UmbSubmittableWorkspaceContextBase<EntityModelType> {
+	DetailModelType extends UmbEntityModel,
+	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+	CreateArgsType extends
+		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+> extends UmbSubmittableWorkspaceContextBase<DetailModelType> {
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected readonly _data = new UmbEntityWorkspaceDataManager<EntityModelType>(this);
+	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
 	protected _getDataPromise?: Promise<any>;
 
@@ -79,7 +82,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		await this.#init;
 		this.resetState();
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
-		type GetDataType = Awaited<ReturnType<UmbDetailRepository<EntityModelType>['requestByUnique']>>;
+		type GetDataType = Awaited<ReturnType<UmbDetailRepository<DetailModelType>['requestByUnique']>>;
 		const response = (await this._getDataPromise) as GetDataType;
 		const data = response.data;
 
@@ -143,11 +146,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	}
 
-	async create(args: UmbEntityDetailWorkspaceContextCreateArgs) {
+	async create(args: CreateArgsType) {
 		await this.#init;
 		this.resetState();
 		this.#parent.setValue(args.parent);
-		const request = this._detailRepository!.createScaffold();
+		const request = this._detailRepository!.createScaffold(args.preset);
 		this._getDataPromise = request;
 		let { data } = await request;
 		if (!data) return undefined;
