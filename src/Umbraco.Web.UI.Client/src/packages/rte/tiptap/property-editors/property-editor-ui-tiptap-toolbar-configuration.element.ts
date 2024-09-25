@@ -15,6 +15,13 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 const tinyIconSet = tinymce.IconManager.get('default');
 
+type TestServerValue = [
+	{
+		alias: string;
+		position: [number, number, number];
+	},
+];
+
 // If an extension exists in the extensions array but not in the toolbarLayout, it means that the extension is hidden in the toolbar
 type ServerValue = {
 	extensions: Array<string>;
@@ -146,6 +153,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	override render() {
 		return html`
 		<umb-tiptap-toolbar-groups-configuration .availableExtensions=${this._availableExtensions}></umb-tiptap-toolbar-groups-configuration>
+		<!-- <umb-tiptap-toolbar-groups-configuration2></umb-tiptap-toolbar-groups-configuration2> -->
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,

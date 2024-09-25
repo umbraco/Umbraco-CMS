@@ -19,6 +19,60 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 
 	#toolbarLayout: UmbArrayState<string[][]> | undefined;
 
+	#testData: TestServerValue = [
+		{
+			alias: 'bold',
+			position: [0, 0, 0],
+		},
+		{
+			alias: 'italic',
+			position: [0, 0, 1],
+		},
+		{
+			alias: 'undo',
+			position: [0, 1, 0],
+		},
+		{
+			alias: 'redo',
+			position: [0, 1, 1],
+		},
+		{
+			alias: 'copy',
+			position: [1, 0, 0],
+		},
+		{
+			alias: 'paste',
+			position: [1, 2, 0],
+		},
+	];
+
+	toStructuredData = (data: any): string[][][] => {
+		const structuredData: string[][][] = [];
+
+		data.forEach(({ alias, position }) => {
+			const [rowIndex, groupIndex, aliasIndex] = position;
+
+			// Ensure the row exists up to rowIndex
+			while (structuredData.length <= rowIndex) {
+				structuredData.push([]);
+			}
+
+			const currentRow = structuredData[rowIndex];
+
+			// Ensure the group exists up to groupIndex within the row
+			while (currentRow.length <= groupIndex) {
+				currentRow.push([]);
+			}
+
+			const currentGroup = currentRow[groupIndex];
+
+			// Ensure the alias is placed at the correct position in the group
+			currentGroup[aliasIndex] = alias;
+		});
+
+		return structuredData;
+	};
+
 	constructor() {
 		super();
 
@@ -32,6 +86,10 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				});
 			},
 		);
+
+		setTimeout(() => {
+			this._toolbar = this.toStructuredData(this.#testData);
+		}, 2000);
 	}
 
 	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
@@ -99,6 +157,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	}
 
 	private renderGroup(group: string[], rowIndex: number, groupIndex: number) {
+		console.log('group', group);
 		return html`
 			<div
 				class="group"
