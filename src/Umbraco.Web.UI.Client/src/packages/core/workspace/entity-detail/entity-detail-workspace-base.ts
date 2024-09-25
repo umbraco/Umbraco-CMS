@@ -130,39 +130,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		if (this.getIsNew()) {
-			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
-			const { error, data } = await this._detailRepository!.create(currentData, parent.unique);
-			if (error || !data) {
-				throw error?.message ?? 'Repository did not return data after create.';
-			}
-
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
-
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadChildrenOfEntityEvent({
-				entityType: parent.entityType,
-				unique: parent.unique,
-			});
-			eventContext.dispatchEvent(event);
-			this.setIsNew(false);
+			this.#create(currentData);
 		} else {
-			const { error, data } = await this._detailRepository!.save(currentData);
-			if (error || !data) {
-				throw error?.message ?? 'Repository did not return data after create.';
-			}
-
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
-
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
-			});
-
-			actionEventContext.dispatchEvent(event);
+			this.#update(currentData);
 		}
 	}
 
@@ -182,6 +152,44 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const workspaceBasePath = UMB_WORKSPACE_PATH_PATTERN.generateLocal({ entityType: this.getEntityType() });
 		const currentWorkspacePathIdentifier = '/' + workspaceBasePath + '/' + this.routes.getActiveLocalPath();
 		return !newUrl.includes(currentWorkspacePathIdentifier);
+	}
+
+	async #create(currentData: DetailModelType) {
+		const parent = this.#parent.getValue();
+		if (!parent) throw new Error('Parent is not set');
+		const { error, data } = await this._detailRepository!.create(currentData, parent.unique);
+		if (error || !data) {
+			throw error?.message ?? 'Repository did not return data after create.';
+		}
+
+		this._data.setPersisted(data);
+		this._data.setCurrent(data);
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: parent.entityType,
+			unique: parent.unique,
+		});
+		eventContext.dispatchEvent(event);
+		this.setIsNew(false);
+	}
+
+	async #update(currentData: DetailModelType) {
+		const { error, data } = await this._detailRepository!.save(currentData);
+		if (error || !data) {
+			throw error?.message ?? 'Repository did not return data after create.';
+		}
+
+		this._data.setPersisted(data);
+		this._data.setCurrent(data);
+
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.getUnique()!,
+			entityType: this.getEntityType(),
+		});
+
+		actionEventContext.dispatchEvent(event);
 	}
 
 	#onWillNavigate = async (e: CustomEvent) => {
