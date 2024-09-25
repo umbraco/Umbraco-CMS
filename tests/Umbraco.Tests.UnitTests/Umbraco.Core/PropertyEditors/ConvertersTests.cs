@@ -104,7 +104,7 @@ public class ConvertersTests
             Guid.NewGuid(),
             new Dictionary<string, object> { { "prop2", "1003" } },
             false);
-        var cnt1 = new InternalPublishedContent(contentType1, cacheMock.Object, Mock.Of<IDocumentNavigationQueryService>())
+        var cnt1 = new InternalPublishedContent(contentType1)
         {
             Id = 1003,
             Properties = new[]
@@ -112,7 +112,7 @@ public class ConvertersTests
                 new InternalPublishedProperty { Alias = "prop1", SolidHasValue = true, SolidValue = "val1" },
             },
         };
-        var cnt2 = new InternalPublishedContent(contentType1, cacheMock.Object, Mock.Of<IDocumentNavigationQueryService>())
+        var cnt2 = new InternalPublishedContent(contentType1)
         {
             Id = 1004,
             Properties = new[]
