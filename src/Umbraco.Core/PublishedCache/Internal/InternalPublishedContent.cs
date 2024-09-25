@@ -13,8 +13,7 @@ public sealed class InternalPublishedContent : IPublishedContent
 {
     private Dictionary<string, PublishedCultureInfo>? _cultures;
 
-    public InternalPublishedContent(
-        IPublishedContentType contentType)
+    public InternalPublishedContent(IPublishedContentType contentType)
     {
         // initialize boring stuff
         TemplateId = 0;

@@ -25,7 +25,6 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         _navigationQueryService = navigationQueryService;
     }
 
-
     [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
     public AncestorsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
         : this(publishedContentCache, requestRoutingService, StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())

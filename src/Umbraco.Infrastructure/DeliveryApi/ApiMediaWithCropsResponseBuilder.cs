@@ -11,7 +11,11 @@ internal sealed class ApiMediaWithCropsResponseBuilder : ApiMediaWithCropsBuilde
     private readonly IPublishedMediaCache _mediaCache;
     private readonly IMediaNavigationQueryService _navigationQueryService;
 
-    public ApiMediaWithCropsResponseBuilder(IApiMediaBuilder apiMediaBuilder, IPublishedValueFallback publishedValueFallback, IPublishedMediaCache mediaCache, IMediaNavigationQueryService navigationQueryService)
+    public ApiMediaWithCropsResponseBuilder(
+        IApiMediaBuilder apiMediaBuilder,
+        IPublishedValueFallback publishedValueFallback,
+        IPublishedMediaCache mediaCache,
+        IMediaNavigationQueryService navigationQueryService)
         : base(apiMediaBuilder, publishedValueFallback)
     {
         _mediaCache = mediaCache;
