@@ -17,33 +17,6 @@ type TestServerValue = Array<{
 
 @customElement('umb-tiptap-toolbar-groups-configuration2')
 export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
-	#testData: TestServerValue = [
-		{
-			alias: 'asdasd',
-			position: [0, 0, 0],
-		},
-		{
-			alias: 'itafsdgsdglic',
-			position: [0, 0, 1],
-		},
-		{
-			alias: 'sdgsdg',
-			position: [0, 1, 0],
-		},
-		{
-			alias: 'asdasd',
-			position: [0, 1, 1],
-		},
-		{
-			alias: 'afasf',
-			position: [1, 0, 0],
-		},
-		{
-			alias: 'sdgsdg',
-			position: [1, 2, 0],
-		},
-	];
-
 	@property({ attribute: false })
 	set value(value: TestServerValue) {
 		if (this.#originalFormat === value) return;
@@ -60,6 +33,71 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	_structuredData: string[][][] = [[[]]];
 
 	#originalFormat: TestServerValue = [];
+
+	#currentDragAlias?: string;
+
+	#onDragStart = (event: DragEvent, alias: string) => {
+		this.#currentDragAlias = alias;
+		event.dataTransfer!.dropEffect = 'move';
+	};
+
+	#onDragOver = (event: DragEvent) => {
+		event.preventDefault();
+	};
+
+	#onDrop = (event: DragEvent, toPos: [number, number, number]) => {
+		event.preventDefault();
+		const fromPos = this.#originalFormat.find((item) => item.alias === this.#currentDragAlias)?.position;
+		if (!fromPos) return;
+
+		this.moveItem(fromPos, toPos);
+	};
+
+	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
+		const [fromRow, fromGroup, fromItem] = from;
+		const [toRow, toGroup, toItem] = to;
+
+		// Get the item to move from the 'from' position
+		const itemToMove = this._structuredData[fromRow][fromGroup][fromItem];
+
+		// Remove the item from the original position
+		this._structuredData[fromRow][fromGroup].splice(fromItem, 1);
+
+		// Insert the item into the new position
+		this._structuredData[toRow][toGroup].splice(toItem, 0, itemToMove);
+
+		this.requestUpdate('_structuredData');
+
+		this.dispatchEvent(new UmbChangeEvent());
+	};
+
+	private renderItem(alias: string) {
+		return html`<div class="item" draggable="true" @dragstart=${(e: DragEvent) => this.#onDragStart(e, alias)}>
+			${alias}
+		</div>`;
+	}
+
+	private renderGroup(group: string[], rowIndex: number, groupIndex: number) {
+		return html`
+			<div
+				class="group"
+				dropzone="move"
+				@dragover=${this.#onDragOver}
+				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.length])}>
+				${group.map((alias) => this.renderItem(alias))}
+			</div>
+		`;
+	}
+
+	private renderRow(row: string[][], rowIndex: number) {
+		return html`
+			<div class="row">${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}</div>
+		`;
+	}
+
+	override render() {
+		return html`${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}`;
+	}
 
 	toStructuredData = (data: TestServerValue) => {
 		console.log('toStructuredData');
@@ -107,21 +145,6 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 
 		return originalData;
 	};
-	private renderItem(alias: string) {
-		return html`<div class="item" draggable="true">${alias}</div>`;
-	}
-
-	private renderGroup(group: string[]) {
-		return html` <div class="group" dropzone="move">${group.map((alias) => this.renderItem(alias))}</div> `;
-	}
-
-	private renderRow(row: string[][]) {
-		return html` <div class="row">${repeat(row, (group) => this.renderGroup(group))}</div> `;
-	}
-
-	override render() {
-		return html`${repeat(this._structuredData, (row) => this.renderRow(row))}`;
-	}
 
 	static override styles = [
 		UmbTextStyles,

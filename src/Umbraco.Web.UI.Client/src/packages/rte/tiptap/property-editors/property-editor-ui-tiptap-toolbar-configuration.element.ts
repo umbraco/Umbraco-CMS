@@ -16,16 +16,11 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 const tinyIconSet = tinymce.IconManager.get('default');
 
+// If an extension does not have a position, it is considered hidden in the toolbar
 type TestServerValue = Array<{
 	alias: string;
 	position: [number, number, number]; //TODO: This should be optional to allow for hiding extensions
 }>;
-
-// If an extension exists in the extensions array but not in the toolbarLayout, it means that the extension is hidden in the toolbar
-type ServerValue = {
-	extensions: Array<string>;
-	toolbarLayout: string[][][];
-};
 
 type ExtensionConfig = {
 	alias: string;
