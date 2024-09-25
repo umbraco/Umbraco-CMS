@@ -48,7 +48,7 @@ public class UmbLoginController : SurfaceController
         _navigationQueryService = navigationQueryService;
     }
 
-    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17")]
+    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
     public UmbLoginController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,

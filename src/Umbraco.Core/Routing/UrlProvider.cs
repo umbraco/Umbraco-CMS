@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Routing
 
         }
 
-        [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17")]
+        [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
         public UrlProvider(
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<WebRoutingSettings> routingSettings,

@@ -26,7 +26,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     }
 
 
-    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17")]
+    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
     public AncestorsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
         : this(publishedContentCache, requestRoutingService, StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
     {
