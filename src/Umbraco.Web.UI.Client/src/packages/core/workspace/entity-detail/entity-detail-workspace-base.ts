@@ -103,7 +103,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		if (!currentData) {
 			throw new Error('Data is not set');
 		}
-		if (!currentData.unique) {
+
+		if (currentData.unique === undefined) {
 			throw new Error('Unique is not set');
 		}
 
