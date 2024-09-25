@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Published;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
@@ -103,7 +104,7 @@ public class ConvertersTests
             Guid.NewGuid(),
             new Dictionary<string, object> { { "prop2", "1003" } },
             false);
-        var cnt1 = new InternalPublishedContent(contentType1)
+        var cnt1 = new InternalPublishedContent(contentType1, cacheMock.Object, Mock.Of<IDocumentNavigationQueryService>())
         {
             Id = 1003,
             Properties = new[]
@@ -111,7 +112,7 @@ public class ConvertersTests
                 new InternalPublishedProperty { Alias = "prop1", SolidHasValue = true, SolidValue = "val1" },
             },
         };
-        var cnt2 = new InternalPublishedContent(contentType1)
+        var cnt2 = new InternalPublishedContent(contentType1, cacheMock.Object, Mock.Of<IDocumentNavigationQueryService>())
         {
             Id = 1004,
             Properties = new[]
