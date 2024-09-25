@@ -12,7 +12,7 @@ type Extension = {
 @customElement('umb-tiptap-toolbar-groups-configuration')
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
-	extensions: Array<Extension> = [];
+	availableExtensions: Array<Extension> = [];
 
 	@state()
 	private _toolbar: string[][][] = [[[]]];
@@ -87,7 +87,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	};
 
 	private renderItem(alias: string, rowIndex: number, groupIndex: number, itemIndex: number) {
-		const extension = this.extensions.find((ext) => ext.alias === alias);
+		const extension = this.availableExtensions.find((ext) => ext.alias === alias);
 		if (!extension) return nothing;
 
 		return html`<div
