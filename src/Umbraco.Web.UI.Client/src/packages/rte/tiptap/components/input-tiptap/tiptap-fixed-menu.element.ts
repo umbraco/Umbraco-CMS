@@ -3,7 +3,7 @@ import { css, customElement, html, property } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-import '../toolbar/tiptap-toolbar-dropdown.element.js';
+import '../toolbar/tiptap-toolbar-dropdown-base.element.js';
 
 const elementName = 'umb-tiptap-fixed-menu';
 
@@ -27,7 +27,6 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-tiptap-toolbar-dropdown style="grid-column: span 4;"></umb-tiptap-toolbar-dropdown>
 			<umb-extension-with-api-slot
 				type="tiptapExtension"
 				.filter=${(ext: ManifestTiptapExtension) => !!ext.kind || !!ext.element}
