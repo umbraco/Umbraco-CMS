@@ -3,6 +3,13 @@ import { jsonStringComparison, UmbObjectState, type MappingFunction } from '@umb
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
+/**
+ * Manages the workspace data for an entity.
+ * @class UmbEntityWorkspaceDataManager
+ * @augments {UmbControllerBase}
+ * @implements {UmbWorkspaceDataManager<ModelType>}
+ * @template ModelType
+ */
 export class UmbEntityWorkspaceDataManager<ModelType extends UmbEntityModel>
 	extends UmbControllerBase
 	implements UmbWorkspaceDataManager<ModelType>
