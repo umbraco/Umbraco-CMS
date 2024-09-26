@@ -4,9 +4,9 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-folder-workspace-editor';
+const elementName = 'umb-document-type-folder-workspace-editor';
 @customElement(elementName)
-export class UmbFolderWorkspaceEditorElement extends UmbLitElement {
+export class UmbDocumentTypeFolderWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name = '';
 
@@ -38,10 +38,10 @@ export class UmbFolderWorkspaceEditorElement extends UmbLitElement {
 	static override styles = [UmbTextStyles, css``];
 }
 
-export { UmbFolderWorkspaceEditorElement as element };
+export { UmbDocumentTypeFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbFolderWorkspaceEditorElement;
+		[elementName]: UmbDocumentTypeFolderWorkspaceEditorElement;
 	}
 }

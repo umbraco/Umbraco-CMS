@@ -4,7 +4,7 @@ import {
 	type UmbDocumentTypeFolderRepository,
 } from '../repository/index.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
-import { UmbFolderWorkspaceEditorElement } from './folder-editor.element.js';
+import { UmbDocumentTypeFolderWorkspaceEditorElement } from './document-type-folder-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbEntityDetailWorkspaceContextBase,
@@ -33,7 +33,7 @@ export class UmbDocumentTypeFolderWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'edit/:unique',
-				component: UmbFolderWorkspaceEditorElement,
+				component: UmbDocumentTypeFolderWorkspaceEditorElement,
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
