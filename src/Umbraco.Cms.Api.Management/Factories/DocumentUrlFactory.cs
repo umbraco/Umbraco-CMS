@@ -15,24 +15,6 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class DocumentUrlFactory : IDocumentUrlFactory
 {
     private readonly IDocumentUrlService _documentUrlService;
-    //
-    // [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 16")]
-    // public DocumentUrlFactory(
-    //     IPublishedRouter publishedRouter,
-    //     IUmbracoContextAccessor umbracoContextAccessor,
-    //     ILanguageService languageService,
-    //     ILocalizedTextService localizedTextService,
-    //     IContentService contentService,
-    //     IVariationContextAccessor variationContextAccessor,
-    //     ILoggerFactory loggerFactory,
-    //     UriUtility uriUtility,
-    //     IPublishedUrlProvider publishedUrlProvider)
-    // :this(
-    //     StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    // {
-    //
-    // }
-
 
     public DocumentUrlFactory(
         IDocumentUrlService documentUrlService)

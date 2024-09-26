@@ -415,7 +415,7 @@ public class DocumentUrlService : IDocumentUrlService
         return runnerKey;
     }
 
-    public string GetLegacdyRouteFormat(Guid docuemntKey, string? culture, bool isDraft)
+    public string GetLegacyRouteFormat(Guid docuemntKey, string? culture, bool isDraft)
     {
         var documentIdAttempt = _idKeyMap.GetIdForKey(docuemntKey, UmbracoObjectTypes.Document);
 
@@ -468,7 +468,7 @@ public class DocumentUrlService : IDocumentUrlService
         if (foundDomain is not null)
         {
             //we found a domain, and not to construct the route in the funny legacy way
-            return foundDomain.Id + "/" + string.Join("/", urlSegments);
+            return foundDomain.RootContentId + "/" + string.Join("/", urlSegments);
         }
 
         var isRootFirstItem = GetTopMostRootKey() == ancestorsOrSelfKeysArray.Last();

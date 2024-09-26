@@ -16,21 +16,6 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IPublishedContentCache _publishedContentCache;
     private DeliveryApiSettings _deliveryApiSettings;
-    //
-    // [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
-    // public ApiPublishedContentCache(
-    //     IPublishedSnapshotAccessor publishedSnapshotAccessor,
-    //     IRequestPreviewService requestPreviewService,
-    //     IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
-    // :this(
-    //     requestPreviewService,
-    //     deliveryApiSettings,
-    //     StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-    //     StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>()
-    //     )
-    // {
-    //
-    // }
 
     public ApiPublishedContentCache(
         IRequestPreviewService requestPreviewService,

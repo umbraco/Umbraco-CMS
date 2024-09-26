@@ -32,5 +32,5 @@ public interface IDocumentUrlService
     Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey);
     Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key);
     Task CreateOrUpdateUrlSegmentsAsync(Guid key);
-    string GetLegacdyRouteFormat(Guid key, string? culture, bool isDraft);
+    string GetLegacyRouteFormat(Guid key, string? culture, bool isDraft);
 }

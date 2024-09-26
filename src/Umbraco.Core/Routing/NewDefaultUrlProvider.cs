@@ -142,7 +142,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     private string GetLegacyRouteFormatById(Guid key, string? culture)
     {
 
-        return _documentUrlService.GetLegacdyRouteFormat(key, culture, _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode);
+        return _documentUrlService.GetLegacyRouteFormat(key, culture, _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode);
 
 
     }
