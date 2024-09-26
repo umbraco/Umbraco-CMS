@@ -56,14 +56,25 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	private _editor!: Editor;
 
+	@state()
+	private _toolbarConfig: Array<{
+		alias: string;
+		position?: [number, number, number];
+	}> = [];
+
 	protected override async firstUpdated() {
+		// TODO: we need some types here
+		this._toolbarConfig = (this.configuration?.getValueByAlias<string>('toolbar') as any) ?? [];
 		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
 	}
 
 	async #loadExtensions() {
 		await new Promise<void>((resolve) => {
 			this.observe(umbExtensionsRegistry.byType('tiptapExtension'), async (manifests) => {
-				this._extensions = [];
+				manifests = manifests.filter((ext) => {
+					return !!this._toolbarConfig.find((x) => x.alias === ext.alias);
+				});
+
 				for (const manifest of manifests) {
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
@@ -108,7 +119,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				!this._editor && !this._extensions?.length,
 				() => html`<uui-loader></uui-loader>`,
 				() => html`
-					<umb-tiptap-fixed-menu .editor=${this._editor} ?readonly=${this.readonly}></umb-tiptap-fixed-menu>
+					<umb-tiptap-fixed-menu
+						.editor=${this._editor}
+						.toolbarConfig=${this._toolbarConfig}
+						?readonly=${this.readonly}></umb-tiptap-fixed-menu>
 				`,
 			)}
 			<div id="editor"></div>

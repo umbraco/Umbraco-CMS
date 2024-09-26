@@ -2,36 +2,43 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 
 import './tiptap-toolbar-groups-configuration.element.js';
+import './tiptap-toolbar-groups-configuration2.element.js';
 
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 const tinyIconSet = tinymce.IconManager.get('default');
 
-// If an extension exists in the extensions array but not in the toolbarLayout, it means that the extension is hidden in the toolbar
-type ServerValue = {
-	extensions: Array<string>;
-	toolbarLayout: string[][][];
-};
+// If an extension does not have a position, it is considered hidden in the toolbar
+type TestServerValue = Array<{
+	alias: string;
+	position?: [number, number, number];
+}>;
 
 type ExtensionConfig = {
 	alias: string;
 	label: string;
 	icon?: string;
-	selected: boolean;
 	category: string;
+};
+
+type Extension = {
+	alias: string;
+	label: string;
+	icon?: string;
+	selected: boolean;
 };
 
 type ExtensionCategory = {
 	category: string;
-	extensions: ExtensionConfig[];
+	extensions: Extension[];
 };
 
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
@@ -40,16 +47,15 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	set value(value: ServerValue) {
-		if (!value) value = { extensions: [], toolbarLayout: [] };
-
+	set value(value: TestServerValue) {
+		if (!value) value = [];
 		this.#value = value;
 	}
-	get value(): ServerValue {
+	get value(): TestServerValue {
 		return this.#value;
 	}
 
-	#value: ServerValue = { extensions: [], toolbarLayout: [] };
+	#value: TestServerValue = [];
 
 	@property({ attribute: false })
 	config?: UmbPropertyEditorConfigCollection;
@@ -58,103 +64,94 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	private _extensionCategories: ExtensionCategory[] = [];
 
 	@state()
-	private _availableExtensions: ExtensionConfig[] = [];
+	private _extensionConfigs: ExtensionConfig[] = [];
 
-	#toolbarLayout = new UmbArrayState<string[][]>([[[]]], (x) => x);
-	toolbarLayout = this.#toolbarLayout.asObservable();
-
-	constructor() {
-		super();
-		this.provideContext('umb-tiptap-toolbar-context', {
-			state: this.#toolbarLayout,
-			observable: this.toolbarLayout,
-		});
-
-		this.toolbarLayout.subscribe((value) => {
-			this.#value = { ...this.#value, toolbarLayout: value };
-
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
-		});
-	}
+	@state()
+	private _extensions: ExtensionConfig[] = [];
 
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
-		this.#toolbarLayout.setValue(this.#value.toolbarLayout);
+		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
+			console.log('extensions', extensions);
+			this._extensions = extensions.map((ext) => {
+				return {
+					alias: ext.alias,
+					label: ext.meta.label,
+					icon: ext.meta.icon,
+					category: '',
+				};
+			});
+			this.#setupExtensionCategories();
+		});
+	}
 
-		const toolbarConfigValue = this.config?.getValueByAlias<ExtensionConfig[]>('toolbar');
-		if (!toolbarConfigValue) return;
-
-		this._availableExtensions = toolbarConfigValue.map((v) => {
+	#setupExtensionCategories() {
+		// console.log('exensions', this._extensions);
+		// const toolbarConfigValue = this.config?.getValueByAlias<ExtensionConfig[]>('toolbar');
+		// if (!toolbarConfigValue) return;
+		const withSelected = this._extensions.map((v) => {
 			return {
 				...v,
-				selected: this.#value.extensions.includes(v.alias),
+				selected: this.value?.some((item) => item.alias === v.alias),
 			};
 		});
 
-		const grouped = this._availableExtensions.reduce((acc: any, item) => {
+		const grouped = withSelected.reduce((acc: any, item) => {
 			const group = item.category || 'miscellaneous'; // Assign to "miscellaneous" if no group
-
 			if (!acc[group]) {
 				acc[group] = [];
 			}
 			acc[group].push(item);
 			return acc;
 		}, {});
-
 		this._extensionCategories = Object.keys(grouped).map((group) => ({
 			category: group.charAt(0).toUpperCase() + group.slice(1).replace(/-/g, ' '),
 			extensions: grouped[group],
 		}));
-
-		this.requestUpdate('_toolbarConfig');
-		this.requestUpdate('_availableExtensions');
 	}
 
-	#onExtensionSelect(item: ExtensionConfig) {
+	#onExtensionSelect(item: Extension) {
 		item.selected = !item.selected;
 
-		// Clone the toolbarLayout for immutability before making changes
-		const updatedLayout = this.#value.toolbarLayout.map((row) => row.map((group) => [...group]));
-
-		// Add or remove the alias from toolbarLayout
 		if (item.selected) {
-			const lastRow = updatedLayout.at(-1);
-			const lastGroup = lastRow?.at(-1);
-			lastGroup?.push(item.alias);
+			this.value = [
+				...this.value,
+				{
+					alias: item.alias,
+				},
+			];
 		} else {
-			updatedLayout.forEach((row) =>
-				row.forEach((group, groupIndex) => {
-					row[groupIndex] = group.filter((alias) => alias !== item.alias);
-				}),
-			);
+			this.value = this.value.filter((v) => v.alias !== item.alias);
 		}
 
-		// Update extensions based on the selection state
-		const updatedExtensions = item.selected
-			? [...this.#value.extensions, item.alias]
-			: this.#value.extensions.filter((alias) => alias !== item.alias);
-
-		this.#value = {
-			...this.#value,
-			extensions: updatedExtensions,
-		};
-		this.#toolbarLayout.setValue(updatedLayout);
 		this.requestUpdate('_extensionCategories');
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	#onChange(event: CustomEvent) {
+		this.value = event.target.value;
+
+		// update the selected state of the extensions
+		// TODO this should be done in a more efficient way
+		this._extensionCategories.forEach((category) => {
+			category.extensions.forEach((item) => {
+				item.selected = this.value.some((v) => v.alias === item.alias);
+			});
+		});
+
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	override render() {
 		return html`
-		<umb-tiptap-toolbar-groups-configuration .availableExtensions=${this._availableExtensions}></umb-tiptap-toolbar-groups-configuration>
+		<umb-tiptap-toolbar-groups-configuration2 @change=${this.#onChange} .value=${this.value}></umb-tiptap-toolbar-groups-configuration2>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,
 					(category) => html`
 						<div class="category">
-							<p class="category-name">
-								${category.category}
-								<span style="margin-left: auto; font-size: 0.8em; opacity: 0.5;">Hide in toolbar</span>
-							</p>
+							<p class="category-name">${category.category}</p>
 							${repeat(
 								category.extensions,
 								(item) =>
@@ -166,10 +163,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 											label=${item.label}
 											.value=${item.alias}
 											@click=${() => this.#onExtensionSelect(item)}
-											><uui-icon .svg=${tinyIconSet?.icons[item.icon ?? 'alignjustify']}></uui-icon
+											><uui-icon name=${item.icon ?? ''}></uui-icon
 										></uui-button>
 										<span>${item.label}</span>
-										<uui-checkbox aria-label="Hide in toolbar"></uui-checkbox>
 									</div>`,
 							)}
 						</div>
@@ -194,19 +190,20 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				--uui-button-border-width: 2px;
 			}
 			.extensions {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				display: flex;
+				flex-wrap: wrap;
 				gap: 16px;
 				margin-top: 16px;
 			}
 			.extension-item {
 				display: grid;
-				grid-template-columns: 36px 1fr auto;
+				grid-template-columns: 36px 1fr;
 				grid-template-rows: 1fr;
 				align-items: center;
 				gap: 9px;
 			}
 			.category {
+				flex: 1;
 				background-color: var(--uui-color-surface-alt);
 				padding: 12px;
 				border-radius: 6px;

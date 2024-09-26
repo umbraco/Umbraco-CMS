@@ -11,6 +11,12 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 	readonly = false;
 
 	@property({ attribute: false })
+	toolbarConfig: Array<{
+		alias: string;
+		position?: [number, number, number];
+	}> = [];
+
+	@property({ attribute: false })
 	set editor(value) {
 		const oldValue = this.#editor;
 		if (value === oldValue) {
@@ -27,7 +33,9 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 		return html`
 			<umb-extension-with-api-slot
 				type="tiptapExtension"
-				.filter=${(ext: ManifestTiptapExtension) => !!ext.kind || !!ext.element}
+				.filter=${(ext: ManifestTiptapExtension) => {
+					return !!this.toolbarConfig.find((x) => x.alias === ext.alias) && (!!ext.kind || !!ext.element);
+				}}
 				.elementProps=${{ editor: this.editor }}>
 			</umb-extension-with-api-slot>
 		`;
