@@ -4,12 +4,12 @@ pr: none
 trigger: none
 
 schedules:
-- cron: '0 0 * * *'
-  displayName: Daily midnight build
-  branches:
-    include:
-    - v14/dev
-    - v15/dev
+  - cron: '0 0 * * *'
+    displayName: Daily midnight build
+    branches:
+      include:
+        - v14/dev
+        - v15/dev
 
 variables:
   nodeVersion: 20
@@ -24,8 +24,8 @@ variables:
   NODE_OPTIONS: --max_old_space_size=16384
 
 parameters:
-  - name: runSqlServerE2ETests
-    displayName: Run the SQL Server E2E Tests
+  - name: runSmokeTests
+    displayName: Run the smoke tests
     type: boolean
     default: false
 
@@ -206,7 +206,10 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run test --ignore-certificate-errors
+          - ${{ if eq(parameters.runSmokeTests, true) }}:
+              pwsh: npm run smokeTest --ignore-certificate-errors
+            ${{ else }}:
+              pwsh: npm run test --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -242,7 +245,6 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        condition: and(succeeded(), ${{ eq(parameters.runSqlServerE2ETests, true) }})
         timeoutInMinutes: 180
         variables:
           # Connection string
@@ -279,7 +281,8 @@ stages:
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)" | Out-File .env
+              URL=$(ASPNETCORE_URLS)
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -350,7 +353,10 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run test --ignore-certificate-errors
+          - ${{ if eq(parameters.runSmokeTests, true) }}:
+              pwsh: npm run smokeTest --ignore-certificate-errors
+            ${{ else }}:
+              pwsh: npm run test --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
