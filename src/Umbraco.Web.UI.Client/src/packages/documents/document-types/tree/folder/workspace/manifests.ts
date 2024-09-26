@@ -12,21 +12,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 			entityType: UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 		},
 	},
-	{
-		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.DocumentType.FolderCollection',
-		name: 'Document Type Folder Collection Workspace View',
-		element: () => import('./folder-collection-workspace-view.element.js'),
-		meta: {
-			pathname: 'folder',
-			label: 'Folder',
-			icon: 'folder',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
-			},
-		],
-	},
 ];

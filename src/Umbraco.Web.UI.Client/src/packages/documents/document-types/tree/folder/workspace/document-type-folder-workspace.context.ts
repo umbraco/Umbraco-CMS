@@ -1,5 +1,8 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
-import type { UmbDocumentTypeFolderRepository } from '../repository/index.js';
+import {
+	UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
+	type UmbDocumentTypeFolderRepository,
+} from '../repository/index.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbFolderWorkspaceEditorElement } from './folder-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -7,12 +10,11 @@ import {
 	UmbEntityDetailWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	type UmbSubmittableWorkspaceContext,
-	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
-export class UmbScriptWorkspaceContext
+export class UmbDocumentTypeFolderWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbFolderModel, UmbDocumentTypeFolderRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
@@ -25,25 +27,10 @@ export class UmbScriptWorkspaceContext
 		super(host, {
 			workspaceAlias: UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
 			entityType: UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-			detailRepositoryAlias: 'Umb.Repository.DocumentType.Folder',
+			detailRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
 		});
 
 		this.routes.setRoutes([
-			{
-				path: 'create/parent/:entityType/:parentUnique',
-				component: UmbFolderWorkspaceEditorElement,
-				setup: async (component: PageComponent, info: IRoutingInfo) => {
-					const parentEntityType = info.match.params.entityType;
-					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
-
-					new UmbWorkspaceIsNewRedirectController(
-						this,
-						this,
-						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
-					);
-				},
-			},
 			{
 				path: 'edit/:unique',
 				component: UmbFolderWorkspaceEditorElement,
@@ -65,4 +52,4 @@ export class UmbScriptWorkspaceContext
 	}
 }
 
-export { UmbScriptWorkspaceContext as api };
+export { UmbDocumentTypeFolderWorkspaceContext as api };

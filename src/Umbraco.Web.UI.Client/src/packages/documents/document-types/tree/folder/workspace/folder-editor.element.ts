@@ -1,15 +1,37 @@
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_CONTEXT } from './document-type-folder.workspace.context-token.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 const elementName = 'umb-folder-workspace-editor';
 @customElement(elementName)
 export class UmbFolderWorkspaceEditorElement extends UmbLitElement {
+	@state()
+	private _name = '';
+
+	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext;
+			this.#observeName();
+		});
+	}
+
+	#observeName() {
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.name, (name) => {
+			if (name !== this._name) {
+				this._name = name ?? '';
+			}
+		});
+	}
+
 	override render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.DocumentType.Folder">
-			<div id="header" slot="header">
-				<uui-input label="Folder name" value="" ${umbFocus()}></uui-input>
-			</div>
+		return html`<umb-workspace-editor headline=${this._name} alias=${UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS}>
 		</umb-workspace-editor>`;
 	}
 
