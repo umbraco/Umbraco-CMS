@@ -9,7 +9,7 @@ public class SubTypesHandler : ISubTypesHandler
     public SubTypesHandler(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver)
         => _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
 
-    public virtual bool CanHandle(Type type)
+    protected virtual bool CanHandle(Type type)
         => type.Namespace?.StartsWith("Umbraco.Cms") is true;
 
     public virtual bool CanHandle(Type type, string documentName)
