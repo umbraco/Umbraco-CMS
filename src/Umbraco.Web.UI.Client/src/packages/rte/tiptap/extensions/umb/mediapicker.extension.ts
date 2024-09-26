@@ -59,7 +59,7 @@ export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapToolbarEl
 		}
 
 		const selection = await this.#openMediaPicker(currentMediaUdi);
-		if (!selection || !selection.length) return;
+		if (!selection?.length) return;
 
 		const mediaGuid = selection[0];
 		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption);

@@ -17,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceView',
-		kind: 'collection',
+		kind: 'contentCollection',
 		alias: 'Umb.WorkspaceView.Media.Collection',
 		name: 'Media Workspace Collection View',
 		meta: {

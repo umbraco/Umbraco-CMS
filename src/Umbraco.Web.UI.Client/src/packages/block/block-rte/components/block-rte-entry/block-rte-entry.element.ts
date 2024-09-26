@@ -152,7 +152,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return html`<umb-ref-rte-block .label=${this._label} .icon=${this._icon}></umb-ref-rte-block>`;
 	}
 
-	#filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
+	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
 		const elementTypeAlias = this._contentElementTypeAlias ?? '';
 		const isForBlockEditor =
 			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);

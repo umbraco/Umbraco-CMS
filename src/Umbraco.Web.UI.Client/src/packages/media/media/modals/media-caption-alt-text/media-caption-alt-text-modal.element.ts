@@ -14,7 +14,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 	UmbMediaCaptionAltTextModalValue
 > {
 	#mediaUnique?: string;
-	#mediaDetailRepository = new UmbMediaDetailRepository(this);
+	readonly #mediaDetailRepository = new UmbMediaDetailRepository(this);
 
 	override connectedCallback() {
 		super.connectedCallback();

@@ -168,6 +168,19 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
+		alias: 'Umb.Tiptap.Table',
+		name: 'Table Tiptap Extension',
+		api: () => import('./table.extension.js'),
+		weight: 909,
+		meta: {
+			alias: 'table',
+			icon: 'icon-table',
+			label: 'Table',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		kind: 'button',
 		alias: 'Umb.Tiptap.TextAlignCenter',
 		name: 'Text Align Center Tiptap Extension',
 		api: () => import('./text-align-center.extension.js'),

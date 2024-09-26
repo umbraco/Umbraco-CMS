@@ -19,9 +19,9 @@ export interface UmbTemporaryFileModel {
 export class UmbTemporaryFileManager<
 	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
 > extends UmbControllerBase {
-	#temporaryFileRepository = new UmbTemporaryFileRepository(this._host);
+	readonly #temporaryFileRepository = new UmbTemporaryFileRepository(this._host);
 
-	#queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
+	readonly #queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
 
 	async uploadOne(uploadableItem: UploadableItem): Promise<UploadableItem> {

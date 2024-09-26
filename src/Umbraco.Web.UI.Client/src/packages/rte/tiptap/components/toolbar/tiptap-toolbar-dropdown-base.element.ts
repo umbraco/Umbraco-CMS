@@ -15,13 +15,13 @@ export abstract class UmbTiptapToolbarDropdownBaseElement extends UmbLitElement 
 	protected abstract get items(): TiptapDropdownItem[];
 	protected abstract get label(): string;
 
-	#onMouseEnter = (popoverId: string) => {
+	readonly #onMouseEnter = (popoverId: string) => {
 		const popover = this.shadowRoot?.querySelector(`#${this.makeAlias(popoverId)}`) as UUIPopoverContainerElement;
 		if (!popover) return;
 		popover.showPopover();
 	};
 
-	#onMouseLeave = (popoverId: string) => {
+	readonly #onMouseLeave = (popoverId: string) => {
 		popoverId = popoverId.replace(/\s/g, '-').toLowerCase();
 		const popover = this.shadowRoot?.querySelector(`#${this.makeAlias(popoverId)}`) as UUIPopoverContainerElement;
 		if (!popover) return;

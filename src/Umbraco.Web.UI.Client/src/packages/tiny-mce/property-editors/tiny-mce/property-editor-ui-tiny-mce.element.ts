@@ -84,8 +84,8 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	private _markup = '';
 	private _latestMarkup = ''; // The latest value gotten from the TinyMCE editor.
 
-	#managerContext = new UmbBlockRteManagerContext(this);
-	#entriesContext = new UmbBlockRteEntriesContext(this);
+	readonly #managerContext = new UmbBlockRteManagerContext(this);
+	readonly #entriesContext = new UmbBlockRteEntriesContext(this);
 
 	constructor() {
 		super();

@@ -6,7 +6,6 @@ import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionMo
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	type UmbCollectionWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceSplitViewManager,
@@ -25,7 +24,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
-import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import type { UmbContentCollectionWorkspaceContext, UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
@@ -35,7 +34,7 @@ export class UmbMediaWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements
 		UmbContentWorkspaceContext<UmbMediaTypeDetailModel, UmbMediaVariantModel>,
-		UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
+		UmbContentCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 

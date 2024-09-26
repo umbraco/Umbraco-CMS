@@ -24,7 +24,7 @@ const elementName = 'umb-input-tiptap';
 
 @customElement(elementName)
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
-	#requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
+	readonly #requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
 
 	@state()
 	private _extensions: Array<UmbTiptapExtensionApi> = [];
@@ -198,6 +198,91 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					&.ProseMirror-selectednode {
 						outline: 3px solid #b4d7ff;
 					}
+				}
+
+				.umb-embed-holder {
+					display: inline-block;
+					position: relative;
+				}
+
+				.umb-embed-holder > * {
+					user-select: none;
+					pointer-events: none;
+				}
+
+				.umb-embed-holder.ProseMirror-selectednode {
+					outline: 2px solid var(--uui-palette-spanish-pink-light);
+				}
+
+				.umb-embed-holder::before {
+					z-index: 1000;
+					width: 100%;
+					height: 100%;
+					position: absolute;
+					content: ' ';
+				}
+
+				.umb-embed-holder.ProseMirror-selectednode::before {
+					background: rgba(0, 0, 0, 0.025);
+				/* Table-specific styling */
+				.tableWrapper {
+					margin: 1.5rem 0;
+					overflow-x: auto;
+
+					table {
+						border-collapse: collapse;
+						margin: 0;
+						overflow: hidden;
+						table-layout: fixed;
+						width: 100%;
+
+						td,
+						th {
+							border: 1px solid var(--uui-color-border);
+							box-sizing: border-box;
+							min-width: 1em;
+							padding: 6px 8px;
+							position: relative;
+							vertical-align: top;
+
+							> * {
+								margin-bottom: 0;
+							}
+						}
+
+						th {
+							background-color: var(--uui-color-background);
+							font-weight: bold;
+							text-align: left;
+						}
+
+						.selectedCell:after {
+							background: var(--uui-color-surface-emphasis);
+							content: '';
+							left: 0;
+							right: 0;
+							top: 0;
+							bottom: 0;
+							pointer-events: none;
+							position: absolute;
+							z-index: 2;
+						}
+
+						.column-resize-handle {
+							background-color: var(--uui-color-default);
+							bottom: -2px;
+							pointer-events: none;
+							position: absolute;
+							right: -2px;
+							top: 0;
+							width: 3px;
+						}
+					}
+				}
+
+				.resize-cursor {
+					cursor: ew-resize;
+					cursor: col-resize;
 				}
 			}
 		`,

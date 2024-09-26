@@ -32,8 +32,8 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		);
 	}
 
-	#manager = new UmbTemporaryFileManager(this);
-	#localize = new UmbLocalizationController(this);
+	readonly #manager = new UmbTemporaryFileManager(this);
+	readonly #localize = new UmbLocalizationController(this);
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
