@@ -257,7 +257,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 			});
 		});
 
-		// add items from this.#originalFormat only if they are not already in the structured data. and if they have a position property set, unset it.
+		// Add the hidden extensions so they are not lost
 		this.#originalFormat.forEach((item) => {
 			if (!originalData.some((i) => i.alias === item.alias)) {
 				originalData.push({

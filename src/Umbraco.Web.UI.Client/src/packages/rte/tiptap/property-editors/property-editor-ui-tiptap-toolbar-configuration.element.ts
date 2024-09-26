@@ -24,7 +24,7 @@ type ExtensionConfig = {
 	category: string;
 };
 
-type Extension = {
+type ExtensionCategoryItem = {
 	alias: string;
 	label: string;
 	icon?: string;
@@ -33,7 +33,7 @@ type Extension = {
 
 type ExtensionCategory = {
 	category: string;
-	extensions: Extension[];
+	extensions: ExtensionCategoryItem[];
 };
 
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
@@ -78,14 +78,14 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	#setupExtensionCategories() {
-		const withSelected = this._extensionConfigs.map((v) => {
+		const withSelectedProperty = this._extensionConfigs.map((v) => {
 			return {
 				...v,
 				selected: this.value?.some((item) => item.alias === v.alias),
 			};
 		});
 
-		const grouped = withSelected.reduce((acc: any, item) => {
+		const grouped = withSelectedProperty.reduce((acc: any, item) => {
 			const group = item.category || 'miscellaneous'; // Assign to "miscellaneous" if no group
 			if (!acc[group]) {
 				acc[group] = [];
@@ -99,7 +99,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		}));
 	}
 
-	#onExtensionSelect(item: Extension) {
+	#onExtensionSelect(item: ExtensionCategoryItem) {
 		item.selected = !item.selected;
 
 		if (item.selected) {
