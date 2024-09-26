@@ -122,10 +122,7 @@ export default class UmbTiptapBlockPickerExtension extends UmbTiptapToolbarEleme
 	}
 
 	override isActive(editor: Editor) {
-		return (
-			editor.isActive(`umb-rte-block[${UMB_DATA_CONTENT_UDI}]`) ||
-			editor.isActive(`umb-rte-block-inline[${UMB_DATA_CONTENT_UDI}]`)
-		);
+		return editor.isActive('umbRteBlock') || editor.isActive('umbRteBlockInline');
 	}
 
 	override async execute() {
