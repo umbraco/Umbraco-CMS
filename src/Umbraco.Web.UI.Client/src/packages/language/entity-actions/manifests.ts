@@ -24,6 +24,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_create',
+			additionalOptions: true,
 		},
 	},
 ];

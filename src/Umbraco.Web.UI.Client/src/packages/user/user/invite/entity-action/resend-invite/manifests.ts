@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-message',
 			label: '#actions_resendInvite',
+			additionalOptions: true,
 		},
 		conditions: [
 			{

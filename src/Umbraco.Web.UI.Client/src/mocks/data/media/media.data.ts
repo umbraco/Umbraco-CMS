@@ -19,6 +19,7 @@ export const data: Array<UmbMockMediaModel> = [
 		},
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'myMediaHeadline',
 				value: 'The daily life at Umbraco HQ',
 			},
@@ -47,6 +48,7 @@ export const data: Array<UmbMockMediaModel> = [
 		},
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
@@ -123,6 +125,7 @@ export const data: Array<UmbMockMediaModel> = [
 		},
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
@@ -151,6 +154,7 @@ export const data: Array<UmbMockMediaModel> = [
 		},
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
@@ -179,6 +183,7 @@ export const data: Array<UmbMockMediaModel> = [
 		},
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
@@ -207,6 +212,7 @@ export const data: Array<UmbMockMediaModel> = [
 		},
 		values: [
 			{
+				editorAlias: 'Umbraco.TextBox',
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},

@@ -14,6 +14,7 @@ import type {
 	MediaItemResponseModel,
 	MediaResponseModel,
 	MediaTreeItemResponseModel,
+	MediaValueResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
@@ -64,7 +65,8 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 		isTrashed: false,
 		noAccess: false,
 		parent: request.parent,
-		values: request.values,
+		// We trust blindly that we send of the editorAlias to the create end point.
+		values: request.values as MediaValueResponseModel[],
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,

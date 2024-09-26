@@ -147,6 +147,10 @@ name: "icon-binarycode",
 
 path: () => import("./icons/icon-binarycode.js"),
 },{
+name: "icon-binoculars",
+legacy: true,
+path: () => import("./icons/icon-binoculars.js"),
+},{
 name: "icon-bird",
 
 path: () => import("./icons/icon-bird.js"),
@@ -2203,10 +2207,6 @@ name: "icon-twitter-x",
 
 path: () => import("./icons/icon-twitter-x.js"),
 },{
-name: "icon-umbraco",
-
-path: () => import("./icons/icon-umbraco.js"),
-},{
 name: "icon-art-easel",
 legacy: true,
 path: () => import("./icons/icon-art-easel.js"),
@@ -2219,14 +2219,6 @@ name: "icon-auction-hammer",
 legacy: true,
 path: () => import("./icons/icon-auction-hammer.js"),
 },{
-name: "icon-azure",
-legacy: true,
-path: () => import("./icons/icon-azure.js"),
-},{
-name: "icon-baby-stroller",
-legacy: true,
-path: () => import("./icons/icon-baby-stroller.js"),
-},{
 name: "icon-badge-count",
 legacy: true,
 path: () => import("./icons/icon-badge-count.js"),
@@ -2234,6 +2226,10 @@ path: () => import("./icons/icon-badge-count.js"),
 name: "icon-band-aid",
 legacy: true,
 path: () => import("./icons/icon-band-aid.js"),
+},{
+name: "icon-baby-stroller",
+legacy: true,
+path: () => import("./icons/icon-baby-stroller.js"),
 },{
 name: "icon-bill-dollar",
 legacy: true,
@@ -2278,10 +2274,6 @@ path: () => import("./icons/icon-bills-yen.js"),
 name: "icon-bills",
 legacy: true,
 path: () => import("./icons/icon-bills.js"),
-},{
-name: "icon-binoculars",
-legacy: true,
-path: () => import("./icons/icon-binoculars.js"),
 },{
 name: "icon-blueprint",
 legacy: true,
@@ -2419,10 +2411,6 @@ name: "icon-male-symbol",
 legacy: true,
 path: () => import("./icons/icon-male-symbol.js"),
 },{
-name: "icon-microsoft",
-legacy: true,
-path: () => import("./icons/icon-microsoft.js"),
-},{
 name: "icon-molecular-network",
 legacy: true,
 path: () => import("./icons/icon-molecular-network.js"),
@@ -2430,6 +2418,18 @@ path: () => import("./icons/icon-molecular-network.js"),
 name: "icon-molecular",
 legacy: true,
 path: () => import("./icons/icon-molecular.js"),
+},{
+name: "icon-umbraco",
+
+path: () => import("./icons/icon-umbraco.js"),
+},{
+name: "icon-azure",
+legacy: true,
+path: () => import("./icons/icon-azure.js"),
+},{
+name: "icon-microsoft",
+legacy: true,
+path: () => import("./icons/icon-microsoft.js"),
 },{
 name: "icon-os-x",
 legacy: true,

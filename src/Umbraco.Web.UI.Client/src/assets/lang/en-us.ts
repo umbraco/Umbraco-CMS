@@ -447,8 +447,7 @@ export default {
 		stay: 'Stay',
 		discardChanges: 'Discard changes',
 		unsavedChanges: 'You have unsaved changes',
-		unsavedChangesWarning:
-			'Are you sure you want to navigate away from this page? - you have unsaved\n      changes\n    ',
+		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
 		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
 		confirmListViewUnpublish:
 			'Unpublishing will remove the selected items and all their descendants from the\n      site.\n    ',

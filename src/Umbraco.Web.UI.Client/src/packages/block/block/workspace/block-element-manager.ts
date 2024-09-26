@@ -7,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockElementManager extends UmbControllerBase {
 	//
@@ -29,7 +29,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 		new UmbDocumentTypeDetailRepository(this),
 	);
 
-	readonly validation = new UmbValidationContext(this);
+	readonly validation = new UmbValidationController(this);
 
 	constructor(host: UmbControllerHost, dataPathPropertyName: string) {
 		super(host);

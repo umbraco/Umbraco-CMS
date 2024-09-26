@@ -612,7 +612,7 @@ export type DocumentBlueprintItemResponseModel = {
 };
 
 export type DocumentBlueprintResponseModel = {
-    values: Array<(DocumentValueModel)>;
+    values: Array<(DocumentValueResponseModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
     documentType: (DocumentTypeReferenceResponseModel);
@@ -628,7 +628,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
 };
 
 export type DocumentCollectionResponseModel = {
-    values: Array<(DocumentValueModel)>;
+    values: Array<(DocumentValueResponseModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
     creator?: (string) | null;
@@ -684,7 +684,7 @@ export type DocumentReferenceResponseModel = {
 };
 
 export type DocumentResponseModel = {
-    values: Array<(DocumentValueModel)>;
+    values: Array<(DocumentValueResponseModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
     documentType: (DocumentTypeReferenceResponseModel);
@@ -834,6 +834,14 @@ export type DocumentValueModel = {
     value?: unknown;
 };
 
+export type DocumentValueResponseModel = {
+    culture?: (string) | null;
+    segment?: (string) | null;
+    alias: string;
+    value?: unknown;
+    editorAlias: string;
+};
+
 export type DocumentVariantItemResponseModel = {
     name: string;
     culture?: (string) | null;
@@ -875,7 +883,7 @@ export type DocumentVersionItemResponseModel = {
 };
 
 export type DocumentVersionResponseModel = {
-    values: Array<(DocumentValueModel)>;
+    values: Array<(DocumentValueResponseModel)>;
     variants: Array<(DocumentVariantResponseModel)>;
     id: string;
     documentType: (DocumentTypeReferenceResponseModel);
@@ -1156,7 +1164,7 @@ export type ManifestResponseModel = {
 };
 
 export type MediaCollectionResponseModel = {
-    values: Array<(MediaValueModel)>;
+    values: Array<(MediaValueResponseModel)>;
     variants: Array<(MediaVariantResponseModel)>;
     id: string;
     creator?: (string) | null;
@@ -1195,7 +1203,7 @@ export type MediaReferenceResponseModel = {
 };
 
 export type MediaResponseModel = {
-    values: Array<(MediaValueModel)>;
+    values: Array<(MediaValueResponseModel)>;
     variants: Array<(MediaVariantResponseModel)>;
     id: string;
     urls: Array<(MediaUrlInfoModel)>;
@@ -1325,6 +1333,14 @@ export type MediaValueModel = {
     value?: unknown;
 };
 
+export type MediaValueResponseModel = {
+    culture?: (string) | null;
+    segment?: (string) | null;
+    alias: string;
+    value?: unknown;
+    editorAlias: string;
+};
+
 export type MediaVariantRequestModel = {
     culture?: (string) | null;
     segment?: (string) | null;
@@ -1369,7 +1385,7 @@ export enum MemberKindModel {
 }
 
 export type MemberResponseModel = {
-    values: Array<(MemberValueModel)>;
+    values: Array<(MemberValueResponseModel)>;
     variants: Array<(MemberVariantResponseModel)>;
     id: string;
     email: string;
@@ -1477,6 +1493,14 @@ export type MemberValueModel = {
     segment?: (string) | null;
     alias: string;
     value?: unknown;
+};
+
+export type MemberValueResponseModel = {
+    culture?: (string) | null;
+    segment?: (string) | null;
+    alias: string;
+    value?: unknown;
+    editorAlias: string;
 };
 
 export type MemberVariantRequestModel = {

@@ -269,7 +269,17 @@ export class UmbMemberWorkspaceContext
 	) {
 		variantId ??= UmbVariantId.CreateInvariant();
 
-		const entry = { ...variantId.toObject(), alias, value };
+		const property = await this.structure.getPropertyStructureByAlias(alias);
+
+		if (!property) {
+			throw new Error(`Property alias "${alias}" not found.`);
+		}
+
+		//const dataType = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
+		//const editorAlias = dataType.editorAlias;
+		const editorAlias = 'Umbraco.TextBox';
+
+		const entry = { ...variantId.toObject(), alias, editorAlias, value };
 		const currentData = this.getData();
 		if (currentData) {
 			const values = appendToFrozenArray(

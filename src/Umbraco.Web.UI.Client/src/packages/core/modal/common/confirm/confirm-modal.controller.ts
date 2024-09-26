@@ -1,5 +1,5 @@
-import { UMB_CONFIRM_MODAL, type UmbConfirmModalData } from '../../token/confirm-modal.token.js';
-import { UMB_MODAL_MANAGER_CONTEXT } from '../../context/modal-manager.context.js';
+import { UMB_MODAL_MANAGER_CONTEXT } from '../../context/index.js';
+import { UMB_CONFIRM_MODAL, type UmbConfirmModalData } from './confirm-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

@@ -16,6 +16,7 @@ export const manifest: UmbExtensionManifestKind = {
 		meta: {
 			icon: 'icon-height',
 			label: '#actions_sort',
+			additionalOptions: true,
 			itemRepositoryAlias: '',
 			sortRepositoryAlias: '',
 		},

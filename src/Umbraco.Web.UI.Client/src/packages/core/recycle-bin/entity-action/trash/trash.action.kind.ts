@@ -18,6 +18,7 @@ export const manifest: UmbExtensionManifestKind = {
 			label: '#actions_trash',
 			itemRepositoryAlias: '',
 			recycleBinRepositoryAlias: '',
+			additionalOptions: true,
 		},
 	},
 };
