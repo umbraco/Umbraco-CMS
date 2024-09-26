@@ -37,14 +37,12 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	set value(value: string | string[] | null) {
 		if (!value) {
 			this.#selectedValues = [];
+		} else if (typeof value === 'string') {
+			this.#selectedValues = value.split(',').filter((x) => x.length > 0);
+		} else if (Array.isArray(value)) {
+			this.#selectedValues = value;
 		} else {
-			if (typeof value === 'string') {
-				this.#selectedValues = value.split(',').filter((x) => x.length > 0);
-			} else if (Array.isArray(value)) {
-				this.#selectedValues = value;
-			} else {
-				this.#selectedValues = [];
-			}
+			this.#selectedValues = [];
 		}
 
 		this.requestUpdate('#selectedValuesNew');
@@ -60,7 +58,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	private _toolbarItems: ToolbarItems = [];
 
 	@state()
-	private _toolbarConfig: Array<ToolbarConfig> = [];
+	private readonly _toolbarConfig: Array<ToolbarConfig> = [];
 
 	@state()
 	_selectedValuesNew: ToolbarConfig[][][] = [[[]]];
@@ -123,7 +121,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.requestUpdate('_selectedValuesNew');
 	}
 
-	#onChange = (item: ToolbarConfig) => {
+	readonly #onChange = (item: ToolbarConfig) => {
 		const value = this._toolbarItems
 			.flatMap((group) =>
 				group.items.map((i) => {
@@ -141,17 +139,17 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	};
 
-	#onDragStart = (event: DragEvent, alias: string) => {
+	readonly #onDragStart = (event: DragEvent, alias: string) => {
 		event.dataTransfer!.setData('text/plain', alias);
 		event.dataTransfer!.dropEffect = 'move';
 		event.dataTransfer!.effectAllowed = 'move';
 	};
 
-	#onDragOver = (event: DragEvent) => {
+	readonly #onDragOver = (event: DragEvent) => {
 		event.preventDefault();
 	};
 
-	#onDragEnter = (event: DragEvent) => {
+	readonly #onDragEnter = (event: DragEvent) => {
 		const dropzone = event
 			.composedPath()
 			.find((v) => v instanceof HTMLElement && v.classList.contains('toolbar-group') && v.hasAttribute('dropzone'));
@@ -160,7 +158,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		console.log('hovered dropzone', this.#hoveredDropzone);
 	};
 
-	#onDrop = (event: DragEvent) => {
+	readonly #onDrop = (event: DragEvent) => {
 		event.preventDefault();
 
 		const groupElement = event
@@ -269,7 +267,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-icon {

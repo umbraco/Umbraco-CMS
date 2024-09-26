@@ -41,7 +41,7 @@ export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapToolbarEl
 		console.log('umb-media.execute', editor);
 
 		const selection = await this.#openMediaPicker();
-		if (!selection || !selection.length) return;
+		if (!selection?.length) return;
 
 		editor?.chain().focus().insertContent(`<umb-media>${selection}</umb-media>`).run();
 	}

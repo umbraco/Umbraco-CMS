@@ -8,8 +8,8 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
 export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase {
-	#localize = new UmbLocalizationController(this._host);
-	#editor: Editor;
+	readonly #localize = new UmbLocalizationController(this._host);
+	readonly #editor: Editor;
 	#blocks?: Array<UmbBlockTypeBaseModel>;
 	#entriesContext?: typeof UMB_BLOCK_RTE_ENTRIES_CONTEXT.TYPE;
 

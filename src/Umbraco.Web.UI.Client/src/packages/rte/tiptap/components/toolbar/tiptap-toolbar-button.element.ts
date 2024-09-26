@@ -33,7 +33,7 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 		}
 	}
 
-	#onEditorUpdate = () => {
+	readonly #onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
 			this._isActive = this.api.isActive(this.editor);
 		}

@@ -23,7 +23,7 @@ export class UmbTiptapHoverMenuElement extends LitElement {
 		this.setAttribute('popover', '');
 	}
 
-	#onUpdate = () => {
+	readonly #onUpdate = () => {
 		if (this.editor?.isActive('link')) {
 			// show the popover
 			this.showPopover();

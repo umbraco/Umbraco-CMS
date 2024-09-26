@@ -24,7 +24,7 @@ const elementName = 'umb-input-tiptap';
 
 @customElement(elementName)
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
-	#requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
+	readonly #requiredExtensions = [Document, Dropcursor, Gapcursor, HardBreak, History, Paragraph, Text];
 
 	@state()
 	private _extensions: Array<UmbTiptapExtensionApi> = [];
