@@ -133,7 +133,7 @@ export abstract class UmbBlockManagerContext<
 		const structure = this.#structures.find((x) => x.getOwnerContentTypeUnique() === contentTypeKey);
 		if (!structure) return undefined;
 
-		return structure.ownerContentTypePart((x) => x?.name);
+		return structure.ownerContentTypeObservablePart((x) => x?.name);
 	}
 	getContentTypeNameOf(contentTypeKey: string) {
 		const structure = this.#structures.find((x) => x.getOwnerContentTypeUnique() === contentTypeKey);

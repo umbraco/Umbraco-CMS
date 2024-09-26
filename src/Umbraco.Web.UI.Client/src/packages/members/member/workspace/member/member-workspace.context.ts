@@ -57,9 +57,9 @@ export class UmbMemberWorkspaceContext
 	readonly kind = this.#data.createObservablePartOfCurrent((data) => data?.kind);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMemberTypeDetailRepository(this));
-	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
-	readonly varies = this.structure.ownerContentTypePart((x) =>
+	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
+	readonly variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
+	readonly varies = this.structure.ownerContentTypeObservablePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
 	#varies?: boolean;

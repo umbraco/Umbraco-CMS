@@ -232,7 +232,7 @@ export class UmbContentTypeStructureManager<
 
 	/** Public methods for consuming structure: */
 
-	ownerContentTypePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
+	ownerContentTypeObservablePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
 		return createObservablePart(this.ownerContentType, mappingFunction);
 	}
 
@@ -611,12 +611,6 @@ export class UmbContentTypeStructureManager<
 		return undefined;
 	}
 
-	ownerContentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
-		return this.#contentTypes.asObservablePart((docTypes) => {
-			const docType = docTypes.find((x) => x.unique === this.#ownerContentTypeUnique);
-			return docType ? mappingFunction(docType) : undefined;
-		});
-	}
 
 	hasPropertyStructuresOf(containerId: string | null) {
 		return this.#contentTypes.asObservablePart((docTypes) => {

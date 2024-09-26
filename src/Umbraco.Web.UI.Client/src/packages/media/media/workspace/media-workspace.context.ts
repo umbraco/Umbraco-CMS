@@ -80,9 +80,9 @@ export class UmbMediaWorkspaceContext
 	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMediaTypeDetailRepository(this));
-	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
-	readonly varies = this.structure.ownerContentTypePart((x) =>
+	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
+	readonly variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
+	readonly varies = this.structure.ownerContentTypeObservablePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
 	#varies?: boolean;

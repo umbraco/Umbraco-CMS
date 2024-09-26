@@ -125,9 +125,9 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this.#data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
-	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
-	readonly varies = this.structure.ownerContentTypePart((x) =>
+	readonly variesByCulture = this.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture);
+	readonly variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
+	readonly varies = this.structure.ownerContentTypeObservablePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
 	#varies?: boolean;
