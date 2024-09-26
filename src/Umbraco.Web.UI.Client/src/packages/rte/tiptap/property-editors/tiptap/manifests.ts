@@ -1,4 +1,4 @@
-import { umbExtensionsRegistry, type ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	{
