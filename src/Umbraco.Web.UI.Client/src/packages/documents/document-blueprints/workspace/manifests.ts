@@ -28,15 +28,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.DocumentBlueprint.Folder',
-		name: 'Document Blueprint Folder Workspace',
-		element: () => import('./document-blueprint-root-workspace.element.js'),
-		meta: {
-			entityType: UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
-		},
-	},
-	{
 		type: 'workspaceView',
 		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.DocumentBlueprint.Edit',
