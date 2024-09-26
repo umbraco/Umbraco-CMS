@@ -29,6 +29,9 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 		return this.#originalFormat;
 	}
 
+	@property({ attribute: false })
+	extensionConfigs: Extension[] = [];
+
 	//TODO: Use the context again so that we can remove items from the extensions list from here.
 
 	@state()
@@ -118,8 +121,10 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	}
 
 	private renderItem(alias: string) {
+		const extension = this.extensionConfigs.find((ext) => ext.alias === alias);
+		if (!extension) return nothing;
 		return html`<div class="item" draggable="true" @dragstart=${(e: DragEvent) => this.#onDragStart(e, alias)}>
-			${alias}
+			<umb-icon name=${extension.icon ?? ''}></umb-icon>
 		</div>`;
 	}
 
@@ -140,7 +145,7 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 		return html`
 			<div class="row">
 				${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}
-				<button @click=${() => this.#addGroup(rowIndex, row.length)}>+</button>
+				<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex, row.length)}>+</uui-button>
 				<button class="remove-row-button" @click=${() => this.#removeRow(rowIndex)}>X</button>
 			</div>
 		`;
@@ -149,7 +154,7 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	override render() {
 		return html`
 			${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
-			<button @click=${() => this.#addRow(this._structuredData.length)}>+</button>
+			<uui-button look="secondary" @click=${() => this.#addRow(this._structuredData.length)}>+</uui-button>
 
 			<p class="hidden-extensions-header">Extensions hidden from the toolbar</p>
 			<div class="hidden-extensions">
@@ -247,16 +252,20 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				position: relative;
 				display: flex;
 				gap: 3px;
-				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
 				padding: 6px;
-				min-height: 24px;
-				min-width: 24px;
+				min-height: 30px;
+				min-width: 30px;
 			}
 			.item {
-				padding: 3px;
+				padding: var(--uui-size-space-2);
 				border: 1px solid var(--uui-color-border);
-				border-radius: 3px;
+				border-radius: var(--uui-border-radius);
 				background-color: var(--uui-color-surface);
+				cursor: move;
+				display: flex;
+				align-items: baseline;
 			}
 			.remove-group-button {
 				position: absolute;

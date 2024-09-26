@@ -1,3 +1,4 @@
+import type UmbTiptapToolbarGroupsConfiguration2Element from './tiptap-toolbar-groups-configuration2.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -8,13 +9,7 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-toolbar-groups-configuration.element.js';
 import './tiptap-toolbar-groups-configuration2.element.js';
-
-import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-
-const tinyIconSet = tinymce.IconManager.get('default');
 
 // If an extension does not have a position, it is considered hidden in the toolbar
 type TestServerValue = Array<{
@@ -66,15 +61,12 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	@state()
 	private _extensionConfigs: ExtensionConfig[] = [];
 
-	@state()
-	private _extensions: ExtensionConfig[] = [];
-
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
 		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
 			console.log('extensions', extensions);
-			this._extensions = extensions.map((ext) => {
+			this._extensionConfigs = extensions.map((ext) => {
 				return {
 					alias: ext.alias,
 					label: ext.meta.label,
@@ -87,10 +79,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	#setupExtensionCategories() {
-		// console.log('exensions', this._extensions);
-		// const toolbarConfigValue = this.config?.getValueByAlias<ExtensionConfig[]>('toolbar');
-		// if (!toolbarConfigValue) return;
-		const withSelected = this._extensions.map((v) => {
+		const withSelected = this._extensionConfigs.map((v) => {
 			return {
 				...v,
 				selected: this.value?.some((item) => item.alias === v.alias),
@@ -130,7 +119,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	#onChange(event: CustomEvent) {
-		this.value = event.target.value;
+		this.value = (event.target as UmbTiptapToolbarGroupsConfiguration2Element).value;
 
 		// update the selected state of the extensions
 		// TODO this should be done in a more efficient way
@@ -145,7 +134,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	override render() {
 		return html`
-		<umb-tiptap-toolbar-groups-configuration2 @change=${this.#onChange} .value=${this.value}></umb-tiptap-toolbar-groups-configuration2>
+		<umb-tiptap-toolbar-groups-configuration2 .extensionConfigs=${this._extensionConfigs} @change=${this.#onChange} .value=${this.value}></umb-tiptap-toolbar-groups-configuration2>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,
@@ -163,7 +152,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 											label=${item.label}
 											.value=${item.alias}
 											@click=${() => this.#onExtensionSelect(item)}
-											><uui-icon name=${item.icon ?? ''}></uui-icon
+											><umb-icon name=${item.icon ?? ''}></umb-icon
 										></uui-button>
 										<span>${item.label}</span>
 									</div>`,
