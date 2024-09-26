@@ -1,5 +1,7 @@
-import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/manifests.js';
-import { UmbDocumentBlueprintFolderRepository } from '../../../tree/index.js';
+import {
+	UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
+	UmbDocumentBlueprintFolderRepository,
+} from '../../../tree/index.js';
 import type {
 	UmbDocumentBlueprintOptionsCreateModalData,
 	UmbDocumentBlueprintOptionsCreateModalValue,
