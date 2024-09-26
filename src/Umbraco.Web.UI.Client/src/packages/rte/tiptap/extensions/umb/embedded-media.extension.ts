@@ -33,6 +33,12 @@ export default class UmbTiptapEmbedExtensionApi extends UmbTiptapToolbarElementA
 		const result = await modalHandler.onSubmit().catch(() => undefined);
 		if (!result) return;
 
-		editor?.commands.setEmbeddedMedia(result);
+		editor?.commands.setEmbeddedMedia({
+			markup: result.markup,
+			url: result.url,
+			constrain: result.constrain,
+			height: result.height?.toString(),
+			width: result.width?.toString(),
+		});
 	}
 }
