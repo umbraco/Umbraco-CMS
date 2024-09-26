@@ -1,49 +1,52 @@
-import { UmbUserGroupDetailRepository } from '../../repository/detail/index.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
+import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS, type UmbUserGroupDetailRepository } from '../../repository/index.js';
+import { UMB_USER_GROUP_ENTITY_TYPE, UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
+import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSubmittableWorkspaceContextBase,
+	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbSubmittableWorkspaceContextBase<UmbUserGroupDetailModel>
+	extends UmbEntityDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	//
-	public readonly repository: UmbUserGroupDetailRepository = new UmbUserGroupDetailRepository(this);
+	data = this._data.current;
 
-	#data = new UmbObjectState<UmbUserGroupDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
-
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	readonly name = this.#data.asObservablePart((data) => data?.name || '');
-	readonly alias = this.#data.asObservablePart((data) => data?.alias || '');
-	readonly aliasCanBeChanged = this.#data.asObservablePart((data) => data?.aliasCanBeChanged);
-	readonly icon = this.#data.asObservablePart((data) => data?.icon || null);
-	readonly sections = this.#data.asObservablePart((data) => data?.sections || []);
-	readonly languages = this.#data.asObservablePart((data) => data?.languages || []);
-	readonly hasAccessToAllLanguages = this.#data.asObservablePart((data) => data?.hasAccessToAllLanguages || false);
-	readonly documentStartNode = this.#data.asObservablePart((data) => data?.documentStartNode || null);
-	readonly documentRootAccess = this.#data.asObservablePart((data) => data?.documentRootAccess || false);
-	readonly mediaStartNode = this.#data.asObservablePart((data) => data?.mediaStartNode || null);
-	readonly mediaRootAccess = this.#data.asObservablePart((data) => data?.mediaRootAccess || false);
-	readonly fallbackPermissions = this.#data.asObservablePart((data) => data?.fallbackPermissions || []);
-	readonly permissions = this.#data.asObservablePart((data) => data?.permissions || []);
+	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name || '');
+	readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias || '');
+	readonly aliasCanBeChanged = this._data.createObservablePartOfCurrent((data) => data?.aliasCanBeChanged);
+	readonly icon = this._data.createObservablePartOfCurrent((data) => data?.icon || null);
+	readonly sections = this._data.createObservablePartOfCurrent((data) => data?.sections || []);
+	readonly languages = this._data.createObservablePartOfCurrent((data) => data?.languages || []);
+	readonly hasAccessToAllLanguages = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasAccessToAllLanguages || false,
+	);
+	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
+	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);
+	readonly mediaStartNode = this._data.createObservablePartOfCurrent((data) => data?.mediaStartNode || null);
+	readonly mediaRootAccess = this._data.createObservablePartOfCurrent((data) => data?.mediaRootAccess || false);
+	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
+	readonly permissions = this._data.createObservablePartOfCurrent((data) => data?.permissions || []);
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.UserGroup');
+		super(host, {
+			workspaceAlias: UMB_USER_GROUP_WORKSPACE_ALIAS,
+			entityType: UMB_USER_GROUP_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
 				path: 'create',
 				component: UmbUserGroupWorkspaceEditorElement,
 				setup: () => {
-					this.create();
+					this.createScaffold({ parent: { entityType: UMB_USER_GROUP_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -63,70 +66,8 @@ export class UmbUserGroupWorkspaceContext
 		]);
 	}
 
-	protected override resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	async create() {
-		this.resetState();
-		const { data } = await this.repository.createScaffold();
-		this.setIsNew(true);
-		this.#data.setValue(data);
-		return { data };
-	}
-
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.#data.setValue(data);
-		}
-	}
-
-	getUnique() {
-		return this.getData()?.unique;
-	}
-
-	getEntityType(): string {
-		return 'user-group';
-	}
-
-	getData() {
-		return this.#data.getValue();
-	}
-
-	async submit() {
-		if (!this.#data.value) throw new Error('Data is missing');
-
-		if (this.getIsNew()) {
-			const { error, data } = await this.repository.create(this.#data.value);
-			if (data) {
-				this.#data.setValue(data);
-				this.setIsNew(false);
-			}
-			if (error) throw new Error(error.message);
-		} else if (this.#data.value.unique) {
-			const { error, data } = await this.repository.save(this.#data.value);
-			if (data) {
-				this.#data.setValue(data);
-			}
-			if (error) throw new Error(error.message);
-		}
-	}
-
-	override destroy(): void {
-		this.#data.destroy();
-		super.destroy();
-	}
-
-	async delete(id: string) {
-		await this.repository.delete(id);
-	}
-
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
-		this.#data.update({ [alias]: value });
+		this._data.updateCurrent({ [alias]: value });
 	}
 
 	/**
@@ -134,7 +75,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getPermissions() {
-		return this.#data.getValue()?.permissions ?? [];
+		return this._data.getCurrent()?.permissions ?? [];
 	}
 
 	/**
@@ -143,7 +84,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setPermissions(permissions: Array<UmbUserPermissionModel>) {
-		this.#data.update({ permissions: permissions });
+		this._data.updateCurrent({ permissions: permissions });
 	}
 
 	/**
@@ -151,7 +92,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getFallbackPermissions() {
-		return this.#data.getValue()?.fallbackPermissions ?? [];
+		return this._data.getCurrent()?.fallbackPermissions ?? [];
 	}
 
 	/**
@@ -160,7 +101,7 @@ export class UmbUserGroupWorkspaceContext
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setFallbackPermissions(fallbackPermissions: Array<string>) {
-		this.#data.update({ fallbackPermissions });
+		this._data.updateCurrent({ fallbackPermissions });
 	}
 }
 
