@@ -15,9 +15,6 @@ export class UmbDictionaryWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbDictionaryDetailModel, UmbDictionaryDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
-	readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
-
 	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	readonly dictionary = this._data.createObservablePartOfCurrent((data) => data);
 

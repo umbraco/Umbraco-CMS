@@ -17,7 +17,6 @@ export class UmbLanguageWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 
-	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 
 	constructor(host: UmbControllerHost) {

@@ -25,8 +25,6 @@ export class UmbTemplateWorkspaceContext
 	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 	public readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias);
 	public readonly content = this._data.createObservablePartOfCurrent((data) => data?.content);
-	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
-	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
 	public readonly masterTemplateUnique = this._data.createObservablePartOfCurrent(
 		(data) => data?.masterTemplate?.unique,
 	);

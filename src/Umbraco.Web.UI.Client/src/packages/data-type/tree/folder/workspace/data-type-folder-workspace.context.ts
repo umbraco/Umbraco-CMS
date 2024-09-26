@@ -15,8 +15,6 @@ export class UmbDataTypeFolderWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbFolderModel, UmbDataTypeFolderRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
-	public readonly entityType = this._data.createObservablePartOfCurrent((data) => data?.entityType);
 	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 
 	constructor(host: UmbControllerHost) {

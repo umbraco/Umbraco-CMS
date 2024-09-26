@@ -22,7 +22,6 @@ export class UmbUserWorkspaceContext
 	public readonly configRepository = new UmbUserConfigRepository(this);
 
 	readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
-	readonly unique = this._data.createObservablePartOfCurrent((x) => x?.unique);
 	readonly kind = this._data.createObservablePartOfCurrent((x) => x?.kind);
 	readonly userGroupUniques = this._data.createObservablePartOfCurrent((x) => x?.userGroupUniques || []);
 	readonly documentStartNodeUniques = this._data.createObservablePartOfCurrent(
