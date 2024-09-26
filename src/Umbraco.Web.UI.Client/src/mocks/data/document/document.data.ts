@@ -892,6 +892,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		values: [
 			{
 				alias: 'tiptap',
+				editorAlias: 'Umb.PropertyEditorUi.Tiptap',
 				culture: null,
 				segment: null,
 				value: {
@@ -909,6 +910,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 			{
 				alias: 'tinymce',
+				editorAlias: 'Umb.PropertyEditorUi.TinyMCE',
 				culture: null,
 				segment: null,
 				value: {
