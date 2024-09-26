@@ -12,7 +12,6 @@ public class UmbracoPremigrationPlan : MigrationPlan
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoPlan" /> class.
     /// </summary>
-    /// <param name="umbracoVersion">The Umbraco version.</param>
     public UmbracoPremigrationPlan()
         : base(Constants.Conventions.Migrations.UmbracoUpgradePlanPremigrationsName)
         => DefinePlan();
@@ -54,6 +53,10 @@ public class UmbracoPremigrationPlan : MigrationPlan
 
         // To 14.0.0
         To<V_14_0_0.UpdateToOpenIddictV5>("{76FBF80E-37E6-462E-ADC1-25668F56151D}");
+        To<V_14_0_0.AddGuidsToUserGroups>("{37CF4AC3-8489-44BC-A7E8-64908FEEC656}");
+        To<V_14_0_0.AddUserGroup2PermisionTable>("{7BCB5352-B2ED-4D4B-B27D-ECDED930B50A}");
+        To<V_14_0_0.AddGuidsToUsers>("{3E69BF9B-BEAB-41B1-BB11-15383CCA1C7F}");
+        To<V_14_0_0.MigrateCharPermissionsToStrings>("{F12C609B-86B9-4386-AFA4-78E02857247C}");
 
         // To 15.0.0
         To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");

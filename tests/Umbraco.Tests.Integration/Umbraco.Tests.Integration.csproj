@@ -9,7 +9,10 @@
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />

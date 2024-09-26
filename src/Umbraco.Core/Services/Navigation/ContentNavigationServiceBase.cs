@@ -33,11 +33,11 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetParentKey(Guid childKey, out Guid? parentKey)
         => TryGetParentKeyFromStructure(_navigationStructure, childKey, out parentKey);
 
+    public bool TryGetRootKeys(out IEnumerable<Guid> rootKeys)
+        => TryGetRootKeysFromStructure(_navigationStructure, out rootKeys);
+
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys);
-
-    public bool TryGetRootKeys(out IEnumerable<Guid> childrenKeys)
-        => TryGetRootKeysFromStructure(_navigationStructure, out childrenKeys);
 
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
         => TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys);
@@ -165,7 +165,6 @@ internal abstract class ContentNavigationServiceBase
                _recycleBinNavigationStructure.TryRemove(key, out _);
     }
 
-
     /// <summary>
     ///     Rebuilds the navigation structure based on the specified object type key and whether the items are trashed.
     ///     Only relevant for items in the content and media trees (which have readLock values of -333 or -334).
@@ -184,11 +183,17 @@ internal abstract class ContentNavigationServiceBase
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(readLock);
 
-        IEnumerable<INavigationModel> navigationModels = trashed ?
-            _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey) :
-            _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
-
-        NavigationFactory.BuildNavigationDictionary(_navigationStructure, navigationModels);
+        // Build the corresponding navigation structure
+        if (trashed)
+        {
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
+            NavigationFactory.BuildNavigationDictionary(_recycleBinNavigationStructure, navigationModels);
+        }
+        else
+        {
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
+            NavigationFactory.BuildNavigationDictionary(_navigationStructure, navigationModels);
+        }
     }
 
     private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
@@ -204,6 +209,13 @@ internal abstract class ContentNavigationServiceBase
         return false;
     }
 
+    private bool TryGetRootKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, out IEnumerable<Guid> rootKeys)
+    {
+        // TODO can we make this more efficient?
+        rootKeys = structure.Values.Where(x => x.Parent is null).Select(x => x.Key);
+        return true;
+    }
+
     private bool TryGetChildrenKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid parentKey, out IEnumerable<Guid> childrenKeys)
     {
         if (structure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
@@ -214,13 +226,6 @@ internal abstract class ContentNavigationServiceBase
         }
 
         childrenKeys = parentNode.Children.Select(child => child.Key);
-        return true;
-    }
-
-    private bool TryGetRootKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, out IEnumerable<Guid> childrenKeys)
-    {
-        // TODO can we make this more efficient?
-        childrenKeys = structure.Values.Where(x=>x.Parent is null).Select(x=>x.Key);
         return true;
     }
 

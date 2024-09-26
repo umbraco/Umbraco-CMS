@@ -11,7 +11,7 @@ public class EnumeratorBenchmarks
     {
         foreach (var t in EnumerateOneWithArray(1))
         {
-            ;
+
         }
     }
 
@@ -20,7 +20,7 @@ public class EnumeratorBenchmarks
     {
         foreach (var t in EnumerateOneWithYield(1))
         {
-            ;
+
         }
     }
 

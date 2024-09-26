@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-// TODO: test that descendants are also restored in the right place
 public partial class DocumentNavigationServiceTests
 {
     [Test]
@@ -20,6 +19,8 @@ public partial class DocumentNavigationServiceTests
         await ContentEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey); // Make sure the item is in the recycle bin
         DocumentNavigationQueryService.TryGetParentKeyInBin(nodeToRestore, out Guid? initialParentKey);
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
+        DocumentNavigationQueryService.TryGetDescendantsKeysInBin(nodeToRestore, out IEnumerable<Guid> initialDescendantsKeys);
+        var beforeRestoreDescendants = initialDescendantsKeys.ToList();
 
         // Act
         var restoreAttempt = await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey);
@@ -28,7 +29,8 @@ public partial class DocumentNavigationServiceTests
         // Assert
         DocumentNavigationQueryService.TryGetParentKey(restoredItemKey, out Guid? restoredItemParentKey);
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> updatedSiblingsKeys);
-
+        DocumentNavigationQueryService.TryGetDescendantsKeys(restoredItemKey, out IEnumerable<Guid> afterRestoreDescendantsKeys);
+        var afterRestoreDescendants = afterRestoreDescendantsKeys.ToList();
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one
@@ -44,6 +46,7 @@ public partial class DocumentNavigationServiceTests
                 Assert.AreNotEqual(initialParentKey, restoredItemParentKey);
             }
 
+            Assert.AreEqual(beforeRestoreDescendants, afterRestoreDescendants);
             Assert.AreEqual(targetParentKey, restoredItemParentKey);
         });
     }
