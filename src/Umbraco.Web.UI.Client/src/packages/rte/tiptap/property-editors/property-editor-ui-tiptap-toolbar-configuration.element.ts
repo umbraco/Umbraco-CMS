@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
@@ -47,7 +47,15 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	value: TestServerValue = [];
+	set value(value: TestServerValue) {
+		if (!value) value = [];
+		this.#value = value;
+	}
+	get value(): TestServerValue {
+		return this.#value;
+	}
+
+	#value: TestServerValue = [];
 
 	@property({ attribute: false })
 	config?: UmbPropertyEditorConfigCollection;
@@ -58,19 +66,34 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	@state()
 	private _extensionConfigs: ExtensionConfig[] = [];
 
+	@state()
+	private _extensions: ExtensionConfig[] = [];
+
 	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
-		this.#setupExtensionCategories();
+		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
+			console.log('extensions', extensions);
+			this._extensions = extensions.map((ext) => {
+				return {
+					alias: ext.alias,
+					label: ext.meta.label,
+					icon: ext.meta.icon,
+					category: '',
+				};
+			});
+			this.#setupExtensionCategories();
+		});
 	}
 
 	#setupExtensionCategories() {
-		const toolbarConfigValue = this.config?.getValueByAlias<ExtensionConfig[]>('toolbar');
-		if (!toolbarConfigValue) return;
-		const withSelected = toolbarConfigValue.map((v) => {
+		// console.log('exensions', this._extensions);
+		// const toolbarConfigValue = this.config?.getValueByAlias<ExtensionConfig[]>('toolbar');
+		// if (!toolbarConfigValue) return;
+		const withSelected = this._extensions.map((v) => {
 			return {
 				...v,
-				selected: this.value.some((item) => item.alias === v.alias),
+				selected: this.value?.some((item) => item.alias === v.alias),
 			};
 		});
 
@@ -140,7 +163,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 											label=${item.label}
 											.value=${item.alias}
 											@click=${() => this.#onExtensionSelect(item)}
-											><uui-icon .svg=${tinyIconSet?.icons[item.icon ?? 'alignjustify']}></uui-icon
+											><uui-icon name=${item.icon ?? ''}></uui-icon
 										></uui-button>
 										<span>${item.label}</span>
 									</div>`,

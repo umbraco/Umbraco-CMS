@@ -153,13 +153,13 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 
 			<p class="hidden-extensions-header">Extensions hidden from the toolbar</p>
 			<div class="hidden-extensions">
-				${this.#originalFormat.filter((item) => !item.position).map((item) => this.renderItem(item.alias))}
+				${this.#originalFormat?.filter((item) => !item.position).map((item) => this.renderItem(item.alias))}
 			</div>
 		`;
 	}
 
 	toStructuredData = (data: TestServerValue) => {
-		if (!data.length) return [[[]]];
+		if (!data?.length) return [[[]]];
 
 		const structuredData: string[][][] = [[[]]];
 		data.forEach(({ alias, position }) => {

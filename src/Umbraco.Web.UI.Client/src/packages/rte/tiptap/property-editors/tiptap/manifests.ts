@@ -1,4 +1,4 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry, type ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	{
@@ -19,67 +19,67 @@ export const manifests: Array<ManifestTypes> = [
 						description: 'Pick the toolbar options that should be available when editing',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
 						weight: 10,
-						config: [
-							{
-								alias: 'toolbar',
-								value: [
-									// Clipboard Group
-									{ alias: 'undo', label: 'Undo', icon: 'undo', category: 'clipboard' },
-									{ alias: 'redo', label: 'Redo', icon: 'redo', category: 'clipboard' },
-									{ alias: 'cut', label: 'Cut', icon: 'cut', category: 'clipboard' },
-									{ alias: 'copy', label: 'Copy', icon: 'copy', category: 'clipboard' },
-									{ alias: 'paste', label: 'Paste', icon: 'paste', category: 'clipboard' },
+						// config: [
+						// 	{
+						// 		alias: 'toolbar',
+						// 		value: [
+						// 			// Clipboard Group
+						// 			{ alias: 'undo', label: 'Undo', icon: 'undo', category: 'clipboard' },
+						// 			{ alias: 'redo', label: 'Redo', icon: 'redo', category: 'clipboard' },
+						// 			{ alias: 'cut', label: 'Cut', icon: 'cut', category: 'clipboard' },
+						// 			{ alias: 'copy', label: 'Copy', icon: 'copy', category: 'clipboard' },
+						// 			{ alias: 'paste', label: 'Paste', icon: 'paste', category: 'clipboard' },
 
-									// Formatting Group
-									{ alias: 'bold', label: 'Bold', icon: 'bold', category: 'formatting' },
-									{ alias: 'italic', label: 'Italic', icon: 'italic', category: 'formatting' },
-									{ alias: 'underline', label: 'Underline', icon: 'underline', category: 'formatting' },
-									{ alias: 'strikethrough', label: 'Strikethrough', icon: 'strike-through', category: 'formatting' },
-									{ alias: 'removeformat', label: 'Remove format', icon: 'remove-formatting', category: 'formatting' },
+						// 			// Formatting Group
+						// 			{ alias: 'bold', label: 'Bold', icon: 'bold', category: 'formatting' },
+						// 			{ alias: 'italic', label: 'Italic', icon: 'italic', category: 'formatting' },
+						// 			{ alias: 'underline', label: 'Underline', icon: 'underline', category: 'formatting' },
+						// 			{ alias: 'strikethrough', label: 'Strikethrough', icon: 'strike-through', category: 'formatting' },
+						// 			{ alias: 'removeformat', label: 'Remove format', icon: 'remove-formatting', category: 'formatting' },
 
-									// Color Group
-									{ alias: 'forecolor', label: 'Text color', icon: 'text-color', category: 'color' },
-									{ alias: 'backcolor', label: 'Background color', icon: 'highlight-bg-color', category: 'color' },
+						// 			// Color Group
+						// 			{ alias: 'forecolor', label: 'Text color', icon: 'text-color', category: 'color' },
+						// 			{ alias: 'backcolor', label: 'Background color', icon: 'highlight-bg-color', category: 'color' },
 
-									// Alignment Group
-									{ alias: 'alignleft', label: 'Align left', icon: 'align-left', category: 'alignment' },
-									{ alias: 'aligncenter', label: 'Align center', icon: 'align-center', category: 'alignment' },
-									{ alias: 'alignright', label: 'Align right', icon: 'align-right', category: 'alignment' },
-									{ alias: 'alignjustify', label: 'Justify justify', icon: 'align-justify', category: 'alignment' },
+						// 			// Alignment Group
+						// 			{ alias: 'alignleft', label: 'Align left', icon: 'align-left', category: 'alignment' },
+						// 			{ alias: 'aligncenter', label: 'Align center', icon: 'align-center', category: 'alignment' },
+						// 			{ alias: 'alignright', label: 'Align right', icon: 'align-right', category: 'alignment' },
+						// 			{ alias: 'alignjustify', label: 'Justify justify', icon: 'align-justify', category: 'alignment' },
 
-									// List Group
-									{ alias: 'bullist', label: 'Bullet list', icon: 'unordered-list', category: 'list' },
-									{ alias: 'numlist', label: 'Numbered list', icon: 'ordered-list', category: 'list' },
+						// 			// List Group
+						// 			{ alias: 'bullist', label: 'Bullet list', icon: 'unordered-list', category: 'list' },
+						// 			{ alias: 'numlist', label: 'Numbered list', icon: 'ordered-list', category: 'list' },
 
-									// Indentation Group
-									{ alias: 'outdent', label: 'Outdent', icon: 'outdent', category: 'indentation' },
-									{ alias: 'indent', label: 'Indent', icon: 'indent', category: 'indentation' },
+						// 			// Indentation Group
+						// 			{ alias: 'outdent', label: 'Outdent', icon: 'outdent', category: 'indentation' },
+						// 			{ alias: 'indent', label: 'Indent', icon: 'indent', category: 'indentation' },
 
-									// Insert Elements Group
-									{ alias: 'anchor', label: 'Anchor', icon: 'bookmark', category: 'insert' },
-									{ alias: 'table', label: 'Table', icon: 'table', category: 'insert' },
-									{ alias: 'hr', label: 'Horizontal rule', icon: 'horizontal-rule', category: 'insert' },
-									{ alias: 'charmap', label: 'Character map', icon: 'insert-character', category: 'insert' },
+						// 			// Insert Elements Group
+						// 			{ alias: 'anchor', label: 'Anchor', icon: 'bookmark', category: 'insert' },
+						// 			{ alias: 'table', label: 'Table', icon: 'table', category: 'insert' },
+						// 			{ alias: 'hr', label: 'Horizontal rule', icon: 'horizontal-rule', category: 'insert' },
+						// 			{ alias: 'charmap', label: 'Character map', icon: 'insert-character', category: 'insert' },
 
-									// Direction Group
-									{ alias: 'rtl', label: 'Right to left', icon: 'rtl', category: 'direction' },
-									{ alias: 'ltr', label: 'Left to right', icon: 'ltr', category: 'direction' },
+						// 			// Direction Group
+						// 			{ alias: 'rtl', label: 'Right to left', icon: 'rtl', category: 'direction' },
+						// 			{ alias: 'ltr', label: 'Left to right', icon: 'ltr', category: 'direction' },
 
-									// Text Transformation Group
-									{ alias: 'subscript', label: 'Subscript', icon: 'subscript', category: 'text-transformation' },
-									{ alias: 'superscript', label: 'Superscript', icon: 'superscript', category: 'text-transformation' },
+						// 			// Text Transformation Group
+						// 			{ alias: 'subscript', label: 'Subscript', icon: 'subscript', category: 'text-transformation' },
+						// 			{ alias: 'superscript', label: 'Superscript', icon: 'superscript', category: 'text-transformation' },
 
-									// Styling and Font Group
-									{ alias: 'styles', label: 'Style select', icon: 'permanent-pen', category: 'styling' },
-									{ alias: 'fontname', label: 'Font select', icon: 'text-color', category: 'styling' },
-									{ alias: 'fontsize', label: 'Font size', icon: 'text-color', category: 'styling' },
+						// 			// Styling and Font Group
+						// 			{ alias: 'styles', label: 'Style select', icon: 'permanent-pen', category: 'styling' },
+						// 			{ alias: 'fontname', label: 'Font select', icon: 'text-color', category: 'styling' },
+						// 			{ alias: 'fontsize', label: 'Font size', icon: 'text-color', category: 'styling' },
 
-									// Block Element Group
-									{ alias: 'blockquote', label: 'Blockquote', icon: 'quote', category: 'block-elements' },
-									{ alias: 'formatblock', label: 'Format block', icon: 'format', category: 'block-elements' },
-								],
-							},
-						],
+						// 			// Block Element Group
+						// 			{ alias: 'blockquote', label: 'Blockquote', icon: 'quote', category: 'block-elements' },
+						// 			{ alias: 'formatblock', label: 'Format block', icon: 'format', category: 'block-elements' },
+						// 		],
+						// 	},
+						// ],
 					},
 					{
 						alias: 'maxWidth',
