@@ -23,6 +23,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         // If the new column already exists we'll do nothing.
         if (ColumnExists(Constants.DatabaseSchema.Tables.UserGroup, NewColumnName))
         {
+            Context.Complete();
             return;
         }
 
@@ -31,10 +32,12 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateSqlServer();
+            Context.Complete();
             return;
         }
 
         MigrateSqlite();
+        Context.Complete();
     }
 
     private void MigrateSqlServer()
