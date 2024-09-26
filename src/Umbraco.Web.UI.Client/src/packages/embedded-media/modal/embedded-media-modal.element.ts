@@ -44,8 +44,8 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 		const { data } = await this.#oEmbedRepository.requestOEmbed({
 			url: this._url,
-			maxWidth: this._width,
-			maxHeight: this._height,
+			maxWidth: this._width > 0 ? this._width : undefined,
+			maxHeight: this._height > 0 ? this._height : undefined,
 		});
 
 		if (data) {
@@ -64,11 +64,13 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 	#onWidthChange(e: UUIInputEvent) {
 		this._width = parseInt(e.target.value as string, 10);
+		this.value = { ...this.value, width: this._width };
 		this.#getPreview();
 	}
 
 	#onHeightChange(e: UUIInputEvent) {
 		this._height = parseInt(e.target.value as string, 10);
+		this.value = { ...this.value, height: this._height };
 		this.#getPreview();
 	}
 
