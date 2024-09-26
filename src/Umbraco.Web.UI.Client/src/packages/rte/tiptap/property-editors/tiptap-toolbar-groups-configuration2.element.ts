@@ -151,8 +151,8 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 			${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
 			<button @click=${() => this.#addRow(this._structuredData.length)}>+</button>
 
-			<div>
-				<p>Extensions hidden from the toolbar</p>
+			<p class="hidden-extensions-header">Extensions hidden from the toolbar</p>
+			<div class="hidden-extensions">
 				${this.#originalFormat.filter((item) => !item.position).map((item) => this.renderItem(item.alias))}
 			</div>
 		`;
@@ -231,6 +231,13 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				flex-direction: column;
 				gap: 6px;
 			}
+			.hidden-extensions {
+				display: flex;
+				gap: 6px;
+			}
+			.hidden-extensions-header {
+				margin-bottom: 3px;
+			}
 			.row {
 				position: relative;
 				display: flex;
@@ -251,7 +258,6 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				border-radius: 3px;
 				background-color: var(--uui-color-surface);
 			}
-
 			.remove-group-button {
 				position: absolute;
 				top: -4px;
