@@ -1,5 +1,5 @@
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../../entity.js';
-import type { UmbScriptFolderWorkspaceContext } from './script-type-folder-workspace.context.js';
+import type { UmbScriptFolderWorkspaceContext } from './script-folder-workspace.context.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 

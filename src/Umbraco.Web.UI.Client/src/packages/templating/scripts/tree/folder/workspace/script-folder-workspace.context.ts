@@ -1,7 +1,7 @@
 import { UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS, type UmbScriptFolderRepository } from '../repository/index.js';
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_SCRIPT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
-import { UmbScriptFolderWorkspaceEditorElement } from './script-type-folder-editor.element.js';
+import { UmbScriptFolderWorkspaceEditorElement } from './script-folder-workspace-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbEntityDetailWorkspaceContextBase,

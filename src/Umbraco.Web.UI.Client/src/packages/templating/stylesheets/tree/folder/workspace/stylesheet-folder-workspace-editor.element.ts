@@ -1,21 +1,21 @@
-import { UMB_SCRIPT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT } from './script-type-folder.workspace.context-token.js';
+import { UMB_STYLESHEET_FOLDER_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_STYLESHEET_FOLDER_WORKSPACE_CONTEXT } from './stylesheet-folder-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-script-folder-workspace-editor';
+const elementName = 'umb-stylesheet-folder-workspace-editor';
 @customElement(elementName)
-export class UmbScriptFolderWorkspaceEditorElement extends UmbLitElement {
+export class UmbStylesheetFolderWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name = '';
 
-	#workspaceContext?: typeof UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_STYLESHEET_FOLDER_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_STYLESHEET_FOLDER_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#observeName();
 		});
@@ -31,17 +31,17 @@ export class UmbScriptFolderWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-workspace-editor headline=${this._name} alias=${UMB_SCRIPT_FOLDER_WORKSPACE_ALIAS}>
+		return html`<umb-workspace-editor headline=${this._name} alias=${UMB_STYLESHEET_FOLDER_WORKSPACE_ALIAS}>
 		</umb-workspace-editor>`;
 	}
 
 	static override styles = [UmbTextStyles, css``];
 }
 
-export { UmbScriptFolderWorkspaceEditorElement as element };
+export { UmbStylesheetFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbScriptFolderWorkspaceEditorElement;
+		[elementName]: UmbStylesheetFolderWorkspaceEditorElement;
 	}
 }

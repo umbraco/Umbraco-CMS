@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'routable',
 		alias: UMB_SCRIPT_FOLDER_WORKSPACE_ALIAS,
 		name: 'Script Folder Workspace',
-		api: () => import('./script-type-folder-workspace.context.js'),
+		api: () => import('./script-folder-workspace.context.js'),
 		meta: {
 			entityType: UMB_SCRIPT_FOLDER_ENTITY_TYPE,
 		},
