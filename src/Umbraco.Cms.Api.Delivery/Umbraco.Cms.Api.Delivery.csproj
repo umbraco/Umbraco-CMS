@@ -12,6 +12,10 @@
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>

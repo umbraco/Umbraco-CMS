@@ -8,12 +8,17 @@
           and remove this override -->
     <WarningsNotAsErrors>IDE0270,CS0108,CS1998</WarningsNotAsErrors>
   </PropertyGroup>
-  <ItemGroup> 
-    <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="Azure.Identity" />
+  <ItemGroup>
+
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
+
+    <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
+    <PackageReference Include="Azure.Identity" />
+
+    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
+    <PackageReference Include="System.Text.Encodings.Web"/>
   </ItemGroup>
 
   <ItemGroup>

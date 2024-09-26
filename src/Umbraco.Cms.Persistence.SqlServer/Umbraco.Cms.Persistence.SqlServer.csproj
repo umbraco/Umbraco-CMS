@@ -16,6 +16,12 @@
 
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
+
+    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
+    <PackageReference Include="System.Text.Encodings.Web"/>
+
+    <!-- NPoco.SqlServer bring in vulnerable version of Microsoft.Data.SqlClient  -->
+    <PackageReference Include="Microsoft.Data.SqlClient" />
   </ItemGroup>
 
   <ItemGroup>
