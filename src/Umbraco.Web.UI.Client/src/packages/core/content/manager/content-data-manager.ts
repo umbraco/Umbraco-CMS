@@ -1,7 +1,7 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentDetailModel } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState, appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
@@ -18,9 +18,6 @@ export class UmbContentWorkspaceDataManager<
 	//#repository;
 	#variantScaffold?: ModelVariantType;
 
-	#persisted = new UmbObjectState<ModelType | undefined>(undefined);
-	#current = new UmbObjectState<ModelType | undefined>(undefined);
-
 	#varies?: boolean;
 	//#variesByCulture?: boolean;
 	//#variesBySegment?: boolean;
@@ -33,7 +30,7 @@ export class UmbContentWorkspaceDataManager<
 	#updateLock = 0;
 	initiatePropertyValueChange() {
 		this.#updateLock++;
-		this.#current.mute();
+		this._current.mute();
 		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
 		/*return {
 			[Symbol.dispose]: this.finishPropertyValueChange,
@@ -45,7 +42,7 @@ export class UmbContentWorkspaceDataManager<
 	};
 	#triggerPropertyValueChanges() {
 		if (this.#updateLock === 0) {
-			this.#current.unmute();
+			this._current.unmute();
 		}
 	}
 
@@ -66,7 +63,7 @@ export class UmbContentWorkspaceDataManager<
 	}
 
 	updateVariantData(variantId: UmbVariantId, update?: Partial<ModelVariantType>) {
-		const currentData = this.#current.getValue();
+		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
 		if (!this.#variantScaffold) throw new Error('Variant scaffold data is missing');
 		if (this.#varies === true) {
@@ -84,7 +81,7 @@ export class UmbContentWorkspaceDataManager<
 				(x) => variantId.compare(x),
 			) as Array<ModelVariantType>;
 			// TODO: I have some trouble with TypeScript here, I does not look like me, but i had to give up. [NL]
-			this.#current.update({ variants: newVariants } as any);
+			this._current.update({ variants: newVariants } as any);
 		} else if (this.#varies === false) {
 			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
 			const invariantVariantId = UmbVariantId.CreateInvariant();
@@ -99,7 +96,7 @@ export class UmbContentWorkspaceDataManager<
 				} as ModelVariantType,
 			];
 			// TODO: I have some trouble with TypeScript here, I does not look like me, but i had to give up. [NL]
-			this.#current.update({ variants: newVariants } as any);
+			this._current.update({ variants: newVariants } as any);
 		} else {
 			throw new Error('Varies by culture is missing');
 		}
@@ -117,7 +114,7 @@ export class UmbContentWorkspaceDataManager<
 			variantsToStore = [...selectedVariants, invariantVariantId];
 		}
 
-		const data = this.#current.getValue();
+		const data = this._current.getValue();
 		if (!data) throw new Error('Current data is missing');
 		if (!data.unique) throw new Error('Unique of current data is missing');
 
@@ -132,8 +129,8 @@ export class UmbContentWorkspaceDataManager<
 	}
 
 	getChangedVariants() {
-		const persisted = this.#persisted.getValue();
-		const current = this.#current.getValue();
+		const persisted = this.getPersisted();
+		const current = this.getCurrent();
 		if (!current) throw new Error('Current data is missing');
 
 		const changedVariants = current?.variants.map((variant) => {
