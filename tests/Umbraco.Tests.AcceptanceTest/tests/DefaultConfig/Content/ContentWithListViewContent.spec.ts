@@ -373,7 +373,7 @@ test('can search for child content in list', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.doesFirstItemInListViewHaveName(childContentName);
 });
 
-test('can swap from list view to grid view in list', async ({umbracoApi, umbracoUi}) => {
+test('can change from list view to grid view in list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
