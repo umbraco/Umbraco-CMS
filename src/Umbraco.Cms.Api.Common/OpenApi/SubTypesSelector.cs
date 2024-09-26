@@ -32,7 +32,7 @@ public class SubTypesSelector : ISubTypesSelector
     public IEnumerable<Type> SubTypes(Type type)
     {
         var backOfficePath =  _settings.Value.GetBackOfficePath(_hostingEnvironment);
-        if (_httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments($"{backOfficePath}/swagger/") ?? false)
+        if (_httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments($"{backOfficePath}/swagger") ?? false)
         {
             // Split the path into segments
             var segments = _httpContextAccessor.HttpContext.Request.Path.Value!.TrimStart($"{backOfficePath}/swagger/").Split('/');
