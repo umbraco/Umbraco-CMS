@@ -5,6 +5,10 @@ parameters:
     displayName: Run SQL Server Integration Tests
     type: boolean
     default: false
+  - name: sqlServerAcceptanceTests
+    displayName: Run SQL Server Acceptance Tests
+    type: boolean
+    default: false
   - name: myGetDeploy
     displayName: Deploy to MyGet
     type: boolean
@@ -549,6 +553,7 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
+        condition: eq(${{parameters.sqlServerAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
