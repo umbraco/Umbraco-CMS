@@ -38,7 +38,13 @@ export const umbEmbeddedMedia = Node.create({
 			setEmbeddedMedia:
 				(options) =>
 				({ commands }) => {
-					const attrs = { markup: options.markup, 'data-embed-url': options.url };
+					const attrs = {
+						markup: options.markup,
+						'data-embed-url': options.url,
+						'data-embed-width': options.width,
+						'data-embed-height': options.height,
+						'data-embed-constrain': options.constrain,
+					};
 					return commands.insertContent({ type: this.name, attrs });
 				},
 		};
@@ -48,7 +54,13 @@ export const umbEmbeddedMedia = Node.create({
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		umbEmbeddedMedia: {
-			setEmbeddedMedia: (options: { markup: string; url: string }) => ReturnType;
+			setEmbeddedMedia: (options: {
+				markup: string;
+				url: string;
+				width?: string;
+				height?: string;
+				constrain?: boolean;
+			}) => ReturnType;
 		};
 	}
 }
