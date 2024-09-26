@@ -1,63 +1,143 @@
-import { UmbTiptapToolbarElementApiBase } from '../types.js';
-import { mergeAttributes, Node } from '@umbraco-cms/backoffice/external/tiptap';
-import { UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
+import { UmbTiptapToolbarElementApiBase, type UmbTiptapExtensionArgs } from '../types.js';
+import {
+	UMB_MEDIA_CAPTION_ALT_TEXT_MODAL,
+	UMB_MEDIA_PICKER_MODAL,
+	type UmbMediaCaptionAltTextModalValue,
+} from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapToolbarElementApiBase {
-	getTiptapExtensions() {
-		return [
-			Node.create({
-				name: 'umb-media',
-				priority: 1000,
-				group: 'block',
-				marks: '',
-				draggable: true,
-				addNodeView() {
-					return () => {
-						//console.log('umb-media.addNodeView');
-						const dom = document.createElement('span');
-						dom.innerText = '🖼️';
-						return { dom };
-					};
-				},
-				parseHTML() {
-					//console.log('umb-media.parseHTML');
-					return [{ tag: 'umb-media' }];
-				},
-				renderHTML({ HTMLAttributes }) {
-					//console.log('umb-media.renderHTML');
-					return ['umb-media', mergeAttributes(HTMLAttributes)];
-				},
-			}),
-		];
+	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	#configuration?: UmbPropertyEditorConfigCollection;
+
+	/**
+	 * @returns {number} The maximum width of uploaded images
+	 */
+	get maxWidth(): number {
+		const maxImageSize = parseInt(this.#configuration?.getValueByAlias('maxImageSize') ?? '', 10);
+		return isNaN(maxImageSize) ? 500 : maxImageSize;
+	}
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
+			this.#modalManager = instance;
+		});
+	}
+
+	getTiptapExtensions(args: UmbTiptapExtensionArgs) {
+		this.#configuration = args?.configuration;
+		return [];
 	}
 
 	override isActive(editor?: Editor) {
-		return editor?.isActive('umb-media') === true || editor?.isActive('image') === true;
+		return editor?.isActive('image') === true || editor?.isActive('figure') === true;
 	}
 
-	override async execute(editor?: Editor) {
-		console.log('umb-media.execute', editor);
+	override async execute(editor: Editor) {
+		const currentTarget = editor.getAttributes('image');
+		const figure = editor.getAttributes('figure');
 
-		const selection = await this.#openMediaPicker();
+		let currentMediaUdi: string | undefined = undefined;
+		if (currentTarget?.['data-udi']) {
+			currentMediaUdi = getGuidFromUdi(currentTarget['data-udi']);
+		}
+
+		let currentAltText: string | undefined = undefined;
+		if (currentTarget?.alt) {
+			currentAltText = currentTarget.alt;
+		}
+
+		let currentCaption: string | undefined = undefined;
+		if (figure?.figcaption) {
+			currentCaption = figure.figcaption;
+		}
+
+		const selection = await this.#openMediaPicker(currentMediaUdi);
 		if (!selection || !selection.length) return;
 
-		editor?.chain().focus().insertContent(`<umb-media>${selection}</umb-media>`).run();
+		const mediaGuid = selection[0];
+		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption);
+		if (!media) return;
+
+		this.#insertInEditor(editor, mediaGuid, media);
 	}
 
-	async #openMediaPicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
-			data: { multiple: false },
-			value: { selection: [] },
+	async #openMediaPicker(currentMediaUdi?: string) {
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
+			data: {
+				multiple: false,
+				//startNodeIsVirtual,
+			},
+			value: {
+				selection: currentMediaUdi ? [currentMediaUdi] : [],
+			},
 		});
 
 		if (!modalHandler) return;
 
 		const { selection } = await modalHandler.onSubmit().catch(() => ({ selection: undefined }));
 
-		//console.log('umb-media.selection', selection);
 		return selection;
+	}
+
+	async #showMediaCaptionAltText(mediaUnique: string, altText?: string, caption?: string) {
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, {
+			data: { mediaUnique },
+			value: {
+				url: '',
+				altText,
+				caption,
+			},
+		});
+		const mediaData = await modalHandler?.onSubmit().catch(() => null);
+		return mediaData;
+	}
+
+	async #insertInEditor(editor: Editor, mediaUnique: string, media: UmbMediaCaptionAltTextModalValue) {
+		if (!media?.url) return;
+
+		const { width, height } = await imageSize(media.url, { maxWidth: this.maxWidth });
+
+		const img = {
+			alt: media.altText,
+			src: media.url ? media.url : 'nothing.jpg',
+			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
+			width: width.toString(),
+			height: height.toString(),
+		};
+
+		if (media.caption) {
+			return editor.commands.insertContent({
+				type: 'figure',
+				content: [
+					{
+						type: 'paragraph',
+						content: [
+							{
+								type: 'image',
+								attrs: img,
+							},
+						],
+					},
+					{
+						type: 'figcaption',
+						content: [
+							{
+								type: 'text',
+								text: media.caption,
+							},
+						],
+					},
+				],
+			});
+		}
+
+		return editor.commands.setImage(img);
 	}
 }
