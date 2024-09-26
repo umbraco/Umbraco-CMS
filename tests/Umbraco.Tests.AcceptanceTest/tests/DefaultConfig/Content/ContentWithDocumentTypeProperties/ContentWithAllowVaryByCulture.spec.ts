@@ -41,7 +41,7 @@ test('can create a language version with a different name of an empty content', 
   // Arrange
   const danishContentName = 'Test indhold';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowVaryByCulture(documentTypeName);
-  await umbracoApi.document.createDefaultEnglishDocument(contentName, documentTypeId);
+  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -70,7 +70,7 @@ test('can create a language version with a different name and same content of an
   const dataTypeName = 'Textstring';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false);
-  await umbracoApi.document.createEnglishDocumentWithTextContent(contentName, documentTypeId, textContent, dataTypeName);
+  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, textContent, dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -102,7 +102,7 @@ test('can create a language version with a different name and different content 
   const dataTypeName = 'Textstring';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', true);
-  await umbracoApi.document.createEnglishDocumentWithTextContent(contentName, documentTypeId, textContent, dataTypeName, true);
+  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, textContent, dataTypeName, true);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
