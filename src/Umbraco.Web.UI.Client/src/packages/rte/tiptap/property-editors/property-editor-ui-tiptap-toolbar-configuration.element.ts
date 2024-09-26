@@ -103,20 +103,23 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		}
 
 		this.requestUpdate('_extensionCategories');
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	#onChange(event: CustomEvent) {
+		this.value = event.target.value;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	override render() {
 		return html`
-		<umb-tiptap-toolbar-groups-configuration2 .value=${this.value}></umb-tiptap-toolbar-groups-configuration2>
+		<umb-tiptap-toolbar-groups-configuration2 @change=${this.#onChange} .value=${this.value}></umb-tiptap-toolbar-groups-configuration2>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,
 					(category) => html`
 						<div class="category">
-							<p class="category-name">
-								${category.category}
-								<span style="margin-left: auto; font-size: 0.8em; opacity: 0.5;">Hide in toolbar</span>
-							</p>
+							<p class="category-name">${category.category}</p>
 							${repeat(
 								category.extensions,
 								(item) =>
@@ -131,7 +134,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 											><uui-icon .svg=${tinyIconSet?.icons[item.icon ?? 'alignjustify']}></uui-icon
 										></uui-button>
 										<span>${item.label}</span>
-										<uui-checkbox aria-label="Hide in toolbar"></uui-checkbox>
 									</div>`,
 							)}
 						</div>
@@ -156,19 +158,20 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				--uui-button-border-width: 2px;
 			}
 			.extensions {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				display: flex;
+				flex-wrap: wrap;
 				gap: 16px;
 				margin-top: 16px;
 			}
 			.extension-item {
 				display: grid;
-				grid-template-columns: 36px 1fr auto;
+				grid-template-columns: 36px 1fr;
 				grid-template-rows: 1fr;
 				align-items: center;
 				gap: 9px;
 			}
 			.category {
+				flex: 1;
 				background-color: var(--uui-color-surface-alt);
 				padding: 12px;
 				border-radius: 6px;
