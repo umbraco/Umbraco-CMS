@@ -85,7 +85,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				'observeLiveEditingMode',
 			);
 			this.observe(context.variantId, (variantId) => {
-				console.log('workspace variantID:', variantId);
 				this.#variantId.setValue(variantId);
 			});
 		}).asPromise();
@@ -212,6 +211,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		// TODO: We should investigate if it makes sense to gather
 
+		const unique = blockCreated.layout.contentKey;
+
 		if (!this.#liveEditingMode) {
 			this.#layout.setValue(blockCreated.layout as LayoutDataType);
 			this.content.setData(blockCreated.content);
@@ -229,8 +230,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			if (!blockInserted) {
 				throw new Error('Block Entries could not insert block');
 			}
-
-			const unique = blockCreated.layout.contentKey;
 
 			this.#observeBlockData(unique);
 			this.establishLiveSync();
@@ -402,7 +401,17 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
+		this.#expose(layoutData.contentKey);
 		this.setIsNew(false);
+	}
+
+	#expose(unique: string) {
+		const variantId = this.#variantId.getValue();
+		if (!variantId) {
+			throw new Error('Block could not bre exposed cause we where missing a variant ID.');
+		}
+		// expose
+		this.#blockManager?.setOneExpose(unique, variantId);
 	}
 
 	#modalRejected = () => {
