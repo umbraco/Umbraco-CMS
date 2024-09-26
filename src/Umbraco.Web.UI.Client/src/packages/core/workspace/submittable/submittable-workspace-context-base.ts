@@ -1,5 +1,5 @@
 import { UmbWorkspaceRouteManager } from '../controllers/workspace-route-manager.controller.js';
-import { UMB_WORKSPACE_CONTEXT } from '../contexts/tokens/workspace.context-token.js';
+import { UMB_WORKSPACE_CONTEXT } from '../workspace.context-token.js';
 import type { UmbSubmittableWorkspaceContext } from '../contexts/tokens/submittable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
