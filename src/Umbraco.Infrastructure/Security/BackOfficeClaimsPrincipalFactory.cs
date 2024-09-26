@@ -17,6 +17,7 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
     /// </summary>
     /// <param name="userManager">The user manager</param>
     /// <param name="optionsAccessor">The <see cref="BackOfficeIdentityOptions" /></param>
+    /// <param name="backOfficeAuthenticationTypeSettings"></param>
     public BackOfficeClaimsPrincipalFactory(
         UserManager<BackOfficeIdentityUser> userManager,
         IOptions<BackOfficeIdentityOptions> optionsAccessor,

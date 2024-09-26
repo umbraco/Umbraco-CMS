@@ -5,6 +5,10 @@
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!--  TODO: [SA1119] Correct unnecessary parenthesis and remove this override -->
+    <WarningsNotAsErrors>SA1119</WarningsNotAsErrors>
+  </PropertyGroup>
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>

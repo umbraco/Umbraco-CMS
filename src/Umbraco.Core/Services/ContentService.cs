@@ -620,10 +620,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -651,10 +648,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -811,10 +805,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        if (ordering == null)
-        {
-            ordering = Ordering.By("sortOrder");
-        }
+        ordering ??= Ordering.By("sortOrder");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -828,10 +819,7 @@ public class ContentService : RepositoryService, IContentService
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
     {
-        if (ordering == null)
-        {
-            ordering = Ordering.By("Path");
-        }
+        ordering ??= Ordering.By("Path");
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -969,10 +957,7 @@ public class ContentService : RepositoryService, IContentService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            if (ordering == null)
-            {
-                ordering = Ordering.By("Path");
-            }
+            ordering ??= Ordering.By("Path");
 
             scope.ReadLock(Constants.Locks.ContentTree);
             IQuery<IContent>? query = Query<IContent>()?
@@ -1409,6 +1394,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="scope"></param>
     /// <param name="content"></param>
     /// <param name="allLangs"></param>
+    /// <param name="notificationState"></param>
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
@@ -1879,7 +1865,7 @@ public class ContentService : RepositoryService, IContentService
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
                         var tryPublish = d.PublishCulture(impact) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1961,7 +1947,7 @@ public class ContentService : RepositoryService, IContentService
         {
             return culturesToPublish.All(culture =>
             {
-                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
                 return content.PublishCulture(impact) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
@@ -1977,10 +1963,7 @@ public class ContentService : RepositoryService, IContentService
         // if published, republish
         if (published)
         {
-            if (cultures == null)
-            {
-                cultures = new HashSet<string>(); // empty means 'already published'
-            }
+            cultures ??= new HashSet<string>(); // empty means 'already published'
 
             if (edited)
             {
@@ -1996,10 +1979,7 @@ public class ContentService : RepositoryService, IContentService
             return cultures; // null means 'nothing to do'
         }
 
-        if (cultures == null)
-        {
-            cultures = new HashSet<string>();
-        }
+        cultures ??= new HashSet<string>();
 
         cultures.Add(c); // <culture> means 'publish this culture'
         return cultures;
@@ -2751,7 +2731,6 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <param name="content">The <see cref="IContent" /> to copy</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
-    /// <param name="parentKey">Key of the Content's new Parent</param>
     /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
@@ -3420,6 +3399,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="scope"></param>
     /// <param name="content"></param>
     /// <param name="evtMsgs"></param>
+    /// <param name="notificationState"></param>
     /// <returns></returns>
     private PublishResult StrategyCanUnpublish(
         ICoreScope scope,
@@ -3428,7 +3408,7 @@ public class ContentService : RepositoryService, IContentService
         IDictionary<string, object?>? notificationState)
     {
         // raise Unpublishing notification
-        var notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
+        ContentUnpublishingNotification notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
         var notificationResult = scope.Notifications.PublishCancelable(notification);
 
         if (notificationResult)
