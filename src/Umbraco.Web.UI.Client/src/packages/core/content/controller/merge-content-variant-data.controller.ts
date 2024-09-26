@@ -151,6 +151,8 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			// The a property values resolver resolves one value, we need to gather the persisted inner values first, and store them here:
 			//const persistedVariants = newValue ? ((await api.readVariants(newValue)) ?? []) : [];
 
+			// TODO: An expose for a Block should be invariant if the Block Content Element Type is not vary by culture.
+			// TODO: And expose determination should look for invariant expose in this case.
 			const args = {
 				selectedVariants,
 			};
