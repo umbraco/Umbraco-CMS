@@ -24,4 +24,6 @@ export { TextAlign } from '@tiptap/extension-text-align';
 export { Underline } from '@tiptap/extension-underline';
 export { Image } from '@tiptap/extension-image';
 // CUSTOM EXTENSIONS
+export * from './extensions/tiptap-figcaption.extension.js';
+export * from './extensions/tiptap-figure.extension.js';
 export * from './extensions/tiptap-umb-image.extension.js';
