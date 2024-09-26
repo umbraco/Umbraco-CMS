@@ -2,8 +2,13 @@ using Umbraco.Cms.Api.Common.Serialization;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public class SubTypesHandler(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver) : ISubTypesHandler
+public class SubTypesHandler : ISubTypesHandler
 {
+    private readonly IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
+
+    public SubTypesHandler(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver)
+        => _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
+
     public virtual bool CanHandle(Type type)
         => type.Namespace?.StartsWith("Umbraco.Cms") is true;
 
@@ -11,5 +16,5 @@ public class SubTypesHandler(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoRes
         => CanHandle(type);
 
     public virtual IEnumerable<Type> Handle(Type type)
-        => umbracoJsonTypeInfoResolver.FindSubTypes(type);
+        => _umbracoJsonTypeInfoResolver.FindSubTypes(type);
 }
