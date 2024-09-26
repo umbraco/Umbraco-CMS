@@ -43,7 +43,6 @@ namespace Umbraco.Cms.Core.Routing
             _contentCache = contentCache;
             _navigationQueryService = navigationQueryService;
             Mode = routingSettings.Value.UrlProviderMode;
-
         }
 
         [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
