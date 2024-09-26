@@ -1,4 +1,4 @@
-import type UmbTiptapToolbarGroupsConfiguration2Element from './tiptap-toolbar-groups-configuration2.element.js';
+import type UmbTiptapToolbarGroupsConfigurationElement from './tiptap-toolbar-groups-configuration.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -9,7 +9,7 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-toolbar-groups-configuration2.element.js';
+import './tiptap-toolbar-groups-configuration.element.js';
 
 // If an extension does not have a position, it is considered hidden in the toolbar
 type TestServerValue = Array<{
@@ -119,7 +119,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	#onChange(event: CustomEvent) {
-		this.value = (event.target as UmbTiptapToolbarGroupsConfiguration2Element).value;
+		this.value = (event.target as UmbTiptapToolbarGroupsConfigurationElement).value;
 
 		// update the selected state of the extensions
 		// TODO this should be done in a more efficient way
@@ -134,7 +134,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	override render() {
 		return html`
-		<umb-tiptap-toolbar-groups-configuration2 .extensionConfigs=${this._extensionConfigs} @change=${this.#onChange} .value=${this.value}></umb-tiptap-toolbar-groups-configuration2>
+		<umb-tiptap-toolbar-groups-configuration .extensionConfigs=${this._extensionConfigs} @change=${this.#onChange} .value=${this.value}></umb-tiptap-toolbar-groups-configuration>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,

@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, property, repeat, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { Observable, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type Extension = {
 	alias: string;
@@ -9,163 +9,165 @@ type Extension = {
 	icon?: string;
 };
 
+type TestServerValue = Array<{
+	alias: string;
+	position?: [number, number, number];
+}>;
+
 @customElement('umb-tiptap-toolbar-groups-configuration')
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
-	availableExtensions: Array<Extension> = [];
-
-	@state()
-	private _toolbar: string[][][] = [[[]]];
-
-	#toolbarLayout: UmbArrayState<string[][]> | undefined;
-
-	#testData: TestServerValue = [
-		{
-			alias: 'bold',
-			position: [0, 0, 0],
-		},
-		{
-			alias: 'italic',
-			position: [0, 0, 1],
-		},
-		{
-			alias: 'undo',
-			position: [0, 1, 0],
-		},
-		{
-			alias: 'redo',
-			position: [0, 1, 1],
-		},
-		{
-			alias: 'copy',
-			position: [1, 0, 0],
-		},
-		{
-			alias: 'paste',
-			position: [1, 2, 0],
-		},
-	];
-
-	toStructuredData = (data: any): string[][][] => {
-		const structuredData: string[][][] = [];
-
-		data.forEach(({ alias, position }) => {
-			const [rowIndex, groupIndex, aliasIndex] = position;
-
-			// Ensure the row exists up to rowIndex
-			while (structuredData.length <= rowIndex) {
-				structuredData.push([]);
-			}
-
-			const currentRow = structuredData[rowIndex];
-
-			// Ensure the group exists up to groupIndex within the row
-			while (currentRow.length <= groupIndex) {
-				currentRow.push([]);
-			}
-
-			const currentGroup = currentRow[groupIndex];
-
-			// Ensure the alias is placed at the correct position in the group
-			currentGroup[aliasIndex] = alias;
-		});
-
-		return structuredData;
-	};
-
-	constructor() {
-		super();
-
-		this.consumeContext(
-			'umb-tiptap-toolbar-context',
-			(instance: { state: UmbArrayState<string[][]>; observable: Observable<string[][][]> }) => {
-				this.#toolbarLayout = instance.state;
-
-				this.observe(instance.observable, (value) => {
-					this._toolbar = value.map((rows) => rows.map((groups) => [...groups]));
-				});
-			},
-		);
-
-		setTimeout(() => {
-			this._toolbar = this.toStructuredData(this.#testData);
-		}, 2000);
+	set value(value: TestServerValue) {
+		// if (this.#originalFormat === value) return;
+		// TODO: also check if the added values have positions, if not, there's no need to update the structured data.
+		this.#originalFormat = value;
+		this._structuredData = this.toStructuredData(value);
 	}
 
-	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
-		const [fromRow, fromGroup, fromItem] = from;
-		const [toRow, toGroup, toItem] = to;
+	get value(): TestServerValue {
+		return this.#originalFormat;
+	}
 
-		// Get the item to move from the 'from' position
-		const itemToMove = this._toolbar[fromRow][fromGroup][fromItem];
+	@property({ attribute: false })
+	extensionConfigs: Extension[] = [];
 
-		// Remove the item from the original position
-		this._toolbar[fromRow][fromGroup].splice(fromItem, 1);
+	//TODO: Use the context again so that we can remove items from the extensions list from here.
 
-		// Insert the item into the new position
-		this._toolbar[toRow][toGroup].splice(toItem, 0, itemToMove);
+	@state()
+	_structuredData: string[][][] = [[[]]];
 
-		this.#toolbarLayout?.setValue(this._toolbar);
-	};
+	#originalFormat: TestServerValue = [];
 
-	#addGroup = (rowIndex: number, groupIndex: number) => {
-		this._toolbar[rowIndex].splice(groupIndex, 0, []);
-		this.#toolbarLayout?.setValue(this._toolbar);
-	};
+	#currentDragAlias?: string;
 
-	#removeGroup = (rowIndex: number, groupIndex: number) => {
-		this._toolbar[rowIndex].splice(groupIndex, 1);
-		this.#toolbarLayout?.setValue(this._toolbar);
-	};
-
-	#addRow = (rowIndex: number) => {
-		this._toolbar.splice(rowIndex, 0, [[]]);
-		this.#toolbarLayout?.setValue(this._toolbar);
-	};
-
-	#removeRow = (rowIndex: number) => {
-		this._toolbar.splice(rowIndex, 1);
-		this.#toolbarLayout?.setValue(this._toolbar);
-	};
-
-	#onDragStart = (event: DragEvent, pos: [number, number, number]) => {
-		event.dataTransfer!.setData('application/json', JSON.stringify(pos));
-		event.dataTransfer!.dropEffect = 'move';
+	#onDragStart = (event: DragEvent, alias: string) => {
+		this.#currentDragAlias = alias;
+		event.dataTransfer!.effectAllowed = 'move';
 	};
 
 	#onDragOver = (event: DragEvent) => {
 		event.preventDefault();
+		event.dataTransfer!.dropEffect = 'move';
+	};
+
+	#onDragEnd = (event: DragEvent) => {
+		event.preventDefault();
+		if (event.dataTransfer?.dropEffect === 'none') {
+			const fromPos = this.#originalFormat.find((item) => item.alias === this.#currentDragAlias)?.position;
+			if (!fromPos) return;
+
+			this.removeItem(fromPos);
+		}
 	};
 
 	#onDrop = (event: DragEvent, toPos: [number, number, number]) => {
 		event.preventDefault();
+		const fromPos = this.#originalFormat.find((item) => item.alias === this.#currentDragAlias)?.position;
 
-		const fromPos: [number, number, number] = JSON.parse(event.dataTransfer!.getData('application/json') ?? '[0,0,0]');
-		this.moveItem(fromPos, toPos);
+		if (fromPos) {
+			this.moveItem(fromPos, toPos);
+		} else if (this.#currentDragAlias) {
+			this.insertItem(this.#currentDragAlias, toPos);
+		}
 	};
 
-	private renderItem(alias: string, rowIndex: number, groupIndex: number, itemIndex: number) {
-		const extension = this.availableExtensions.find((ext) => ext.alias === alias);
-		if (!extension) return nothing;
+	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
+		const [rowIndex, groupIndex, itemIndex] = from;
 
+		// Get the item to move from the 'from' position
+		const itemToMove = this._structuredData[rowIndex][groupIndex][itemIndex];
+
+		// Remove the item from the original position
+		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 1);
+
+		this.insertItem(itemToMove, to);
+	};
+
+	private insertItem = (alias: string, toPos: [number, number, number]) => {
+		const [rowIndex, groupIndex, itemIndex] = toPos;
+		// Insert the item into the new position
+		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 0, alias);
+		this.#updateOriginalFormat();
+
+		this.requestUpdate('_structuredData');
+		this.dispatchEvent(new UmbChangeEvent());
+	};
+
+	private removeItem(from: [number, number, number]) {
+		const [rowIndex, groupIndex, itemIndex] = from;
+		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 1);
+
+		this.#updateOriginalFormat();
+
+		this.requestUpdate('_structuredData');
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#addGroup = (rowIndex: number, groupIndex: number) => {
+		this._structuredData[rowIndex].splice(groupIndex, 0, []);
+		this.requestUpdate('_structuredData');
+	};
+
+	#removeGroup = (rowIndex: number, groupIndex: number) => {
+		if (rowIndex === 0 && groupIndex === 0) {
+			// Prevent removing the last group
+			this._structuredData[rowIndex][groupIndex] = [];
+		} else {
+			this._structuredData[rowIndex].splice(groupIndex, 1);
+		}
+		this.requestUpdate('_structuredData');
+		this.#updateOriginalFormat();
+	};
+
+	#addRow = (rowIndex: number) => {
+		this._structuredData.splice(rowIndex, 0, [[]]);
+		this.requestUpdate('_structuredData');
+	};
+
+	#removeRow = (rowIndex: number) => {
+		if (rowIndex === 0) {
+			// Prevent removing the last row
+			this._structuredData[rowIndex] = [[]];
+		} else {
+			this._structuredData.splice(rowIndex, 1);
+		}
+		this.requestUpdate('_structuredData');
+		this.#updateOriginalFormat();
+	};
+
+	#updateOriginalFormat() {
+		this.#originalFormat = this.toOriginalFormat(this._structuredData);
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	private renderItem(alias: string) {
+		const extension = this.extensionConfigs.find((ext) => ext.alias === alias);
+		if (!extension) return nothing;
 		return html`<div
 			class="item"
 			draggable="true"
-			@dragstart=${(e: DragEvent) => this.#onDragStart(e, [rowIndex, groupIndex, itemIndex])}>
-			${extension.label}
+			@dragend=${this.#onDragEnd}
+			@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias)}>
+			<umb-icon name=${extension.icon ?? ''}></umb-icon>
 		</div>`;
 	}
 
 	private renderGroup(group: string[], rowIndex: number, groupIndex: number) {
-		console.log('group', group);
 		return html`
 			<div
 				class="group"
 				dropzone="move"
 				@dragover=${this.#onDragOver}
-				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, 0])}>
-				${group.map((alias, itemIndex) => this.renderItem(alias, rowIndex, groupIndex, itemIndex))}
-				<button class="remove-group-button" @click=${() => this.#removeGroup(rowIndex, groupIndex)}>X</button>
+				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.length])}>
+				${group.map((alias) => this.renderItem(alias))}
+				<uui-button
+					look="primary"
+					color="danger"
+					compact
+					class="remove-group-button ${rowIndex === 0 && groupIndex === 0 && group.length === 0 ? 'hidden' : undefined}"
+					@click=${() => this.#removeGroup(rowIndex, groupIndex)}>
+					<umb-icon name="icon-trash"></umb-icon>
+				</uui-button>
 			</div>
 		`;
 	}
@@ -174,16 +176,100 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		return html`
 			<div class="row">
 				${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}
-				<button @click=${() => this.#addGroup(rowIndex, row.length)}>+</button>
-				<button class="remove-row-button" @click=${() => this.#removeRow(rowIndex)}>X</button>
+				<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex, row.length)}>+</uui-button>
+				<uui-button
+					look="primary"
+					color="danger"
+					compact
+					class="remove-row-button ${rowIndex === 0 && row[rowIndex].length === 0 ? 'hidden' : undefined}"
+					@click=${() => this.#removeRow(rowIndex)}>
+					<umb-icon name="icon-trash"></umb-icon>
+				</uui-button>
 			</div>
 		`;
 	}
 
 	override render() {
-		return html`${repeat(this._toolbar, (row, rowIndex) => this.renderRow(row, rowIndex))}
-			<button @click=${() => this.#addRow(this._toolbar.length)}>+</button>`;
+		return html`
+			<p style="margin-top: 0">
+				<uui-tag color="warning">WIP Feature</uui-tag> Rows, groups, and item order have no effect yet. <br />
+				However, adding and removing items from the toolbar is functional. Additionally, hiding items from the toolbar
+				while retaining their functionality by excluding them from the toolbar layout is also functional.
+			</p>
+			${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
+			<uui-button look="secondary" @click=${() => this.#addRow(this._structuredData.length)}>+</uui-button>
+
+			<p class="hidden-extensions-header">Extensions hidden from the toolbar</p>
+			<div class="hidden-extensions">
+				${this.#originalFormat?.filter((item) => !item.position).map((item) => this.renderItem(item.alias))}
+			</div>
+		`;
 	}
+
+	toStructuredData = (data: TestServerValue) => {
+		if (!data?.length) return [[[]]];
+
+		const structuredData: string[][][] = [[[]]];
+		data.forEach(({ alias, position }) => {
+			if (!position) return;
+
+			const [rowIndex, groupIndex, aliasIndex] = position;
+
+			while (structuredData.length <= rowIndex) {
+				structuredData.push([]);
+			}
+
+			const currentRow = structuredData[rowIndex];
+
+			while (currentRow.length <= groupIndex) {
+				currentRow.push([]);
+			}
+
+			const currentGroup = currentRow[groupIndex];
+
+			currentGroup[aliasIndex] = alias;
+		});
+
+		return structuredData;
+	};
+
+	toOriginalFormat = (structuredData: string[][][]) => {
+		const originalData: TestServerValue = [];
+
+		structuredData.forEach((row, rowIndex) => {
+			row.forEach((group, groupIndex) => {
+				group.forEach((alias, aliasIndex) => {
+					if (alias) {
+						originalData.push({
+							alias,
+							position: [rowIndex, groupIndex, aliasIndex],
+						});
+					}
+				});
+			});
+		});
+
+		// add items from this.#originalFormat only if they are not already in the structured data. and if they have a position property set, unset it.
+		this.#originalFormat.forEach((item) => {
+			if (!originalData.some((i) => i.alias === item.alias)) {
+				originalData.push({
+					alias: item.alias,
+				});
+			}
+		});
+
+		// TODO: this code removes the items completely, while the one above just puts them back into the hidden extensions list. Which one do we prefer?
+		// this.#originalFormat.forEach((item) => {
+		// 	if (!item.position) {
+		// 		const exists = originalData.find((i) => i.alias === item.alias);
+		// 		if (!exists) {
+		// 			originalData.push(item);
+		// 		}
+		// 	}
+		// });
+
+		return originalData;
+	};
 
 	static override styles = [
 		UmbTextStyles,
@@ -192,6 +278,13 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				gap: 6px;
+			}
+			.hidden-extensions {
+				display: flex;
+				gap: 6px;
+			}
+			.hidden-extensions-header {
+				margin-bottom: 3px;
 			}
 			.row {
 				position: relative;
@@ -202,36 +295,37 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				position: relative;
 				display: flex;
 				gap: 3px;
-				border: 1px solid #ccc;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
 				padding: 6px;
-				min-height: 24px;
-				min-width: 24px;
+				min-height: 30px;
+				min-width: 30px;
 			}
 			.item {
-				padding: 3px;
-				border: 1px solid #ccc;
-				border-radius: 3px;
-				background-color: #f9f9f9;
+				padding: var(--uui-size-space-2);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface);
+				cursor: move;
+				display: flex;
+				align-items: baseline;
 			}
 
+			.remove-row-button,
+			.remove-group-button {
+				display: none;
+			}
 			.remove-group-button {
 				position: absolute;
-				top: -4px;
-				right: -4px;
-				display: none;
-			}
-			.group:hover .remove-group-button {
-				display: block;
+				top: -26px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 1;
 			}
 
-			.remove-row-button {
-				position: absolute;
-				left: -25px;
-				top: 8px;
-				display: none;
-			}
-			.row:hover .remove-row-button {
-				display: block;
+			.row:hover .remove-row-button:not(.hidden),
+			.group:hover .remove-group-button:not(.hidden) {
+				display: flex;
 			}
 		`,
 	];
