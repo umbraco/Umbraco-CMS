@@ -180,6 +180,25 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					margin-top: 0;
 					margin-bottom: 0.5em;
 				}
+
+				figure {
+					> p,
+					img {
+						pointer-events: none;
+						margin: 0;
+						padding: 0;
+					}
+
+					&.ProseMirror-selectednode {
+						outline: 3px solid #b4d7ff;
+					}
+				}
+
+				img {
+					&.ProseMirror-selectednode {
+						outline: 3px solid #b4d7ff;
+					}
+				}
 			}
 		`,
 	];
