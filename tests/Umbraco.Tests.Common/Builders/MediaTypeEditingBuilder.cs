@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
@@ -33,6 +34,17 @@ public class MediaTypeEditingBuilder : ContentTypeEditingBaseBuilder<MediaTypeEd
         return (MediaTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
+            .WithAllowAtRoot(true)
+            .Build();
+    }
+
+    public static MediaTypeCreateModel CreateBasicFolderMediaType(string alias = "basicFolder", string name = "BasicFolder")
+    {
+        var builder = new MediaTypeEditingBuilder();
+        return (MediaTypeCreateModel)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithIcon("icon-folder")
             .WithAllowAtRoot(true)
             .Build();
     }
