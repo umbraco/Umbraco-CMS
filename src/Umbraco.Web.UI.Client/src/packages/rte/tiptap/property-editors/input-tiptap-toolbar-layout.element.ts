@@ -14,7 +14,7 @@ type TestServerValue = Array<{
 	position?: [number, number, number];
 }>;
 
-@customElement('umb-tiptap-toolbar-groups-configuration')
+@customElement('umb-input-tiptap-toolbar-layout')
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
 	set value(value: TestServerValue) {
@@ -198,11 +198,21 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 			</p>
 			${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
 			<uui-button look="secondary" @click=${() => this.#addRow(this._structuredData.length)}>+</uui-button>
+			${this.#renderHiddenExtensions()}
+		`;
+	}
 
-			<p class="hidden-extensions-header">Extensions hidden from the toolbar</p>
-			<div class="hidden-extensions">
-				${this.#originalFormat?.filter((item) => !item.position).map((item) => this.renderItem(item.alias))}
-			</div>
+	#renderHiddenExtensions() {
+		const hiddenExtensions = this.#originalFormat?.filter((item) => !item.position);
+
+		if (!hiddenExtensions?.length) return nothing;
+
+		return html`
+			<p class="hidden-extensions-header">
+				Extensions hidden from the toolbar<br />Drag and drop buttons into the toolbar to add them
+			</p>
+
+			<div class="hidden-extensions">${hiddenExtensions.map((item) => this.renderItem(item.alias))}</div>
 		`;
 	}
 
@@ -335,6 +345,6 @@ export default UmbTiptapToolbarGroupsConfigurationElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tiptap-toolbar-groups-configuration': UmbTiptapToolbarGroupsConfigurationElement;
+		'umb-input-tiptap-toolbar-layout': UmbTiptapToolbarGroupsConfigurationElement;
 	}
 }

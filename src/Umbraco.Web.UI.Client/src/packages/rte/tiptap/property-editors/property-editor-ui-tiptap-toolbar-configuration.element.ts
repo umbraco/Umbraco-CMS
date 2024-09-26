@@ -1,4 +1,4 @@
-import type UmbTiptapToolbarGroupsConfigurationElement from './tiptap-toolbar-groups-configuration.element.js';
+import type UmbTiptapToolbarGroupsConfigurationElement from './input-tiptap-toolbar-layout.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -9,7 +9,7 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-toolbar-groups-configuration.element.js';
+import './input-tiptap-toolbar-layout.element.js';
 
 // If an extension does not have a position, it is considered hidden in the toolbar
 type TestServerValue = Array<{
@@ -65,7 +65,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		super.firstUpdated(_changedProperties);
 
 		this.observe(umbExtensionsRegistry.byType('tiptapExtension'), (extensions) => {
-			console.log('extensions', extensions);
 			this._extensionConfigs = extensions.map((ext) => {
 				return {
 					alias: ext.alias,
@@ -134,7 +133,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	override render() {
 		return html`
-		<umb-tiptap-toolbar-groups-configuration .extensionConfigs=${this._extensionConfigs} @change=${this.#onChange} .value=${this.value}></umb-tiptap-toolbar-groups-configuration>
+		<umb-input-tiptap-toolbar-layout .extensionConfigs=${this._extensionConfigs} @change=${this.#onChange} .value=${this.value}></umb-input-tiptap-toolbar-layout>
 			<div class="extensions">
 				${repeat(
 					this._extensionCategories,
