@@ -1,2 +1,2 @@
-export { UmbDocumentTypeFolderRepository } from './document-type-folder.repository.js';
-export * from './constants.js';
+export * from './repository/index.js';
+export * from './workspace/index.js';

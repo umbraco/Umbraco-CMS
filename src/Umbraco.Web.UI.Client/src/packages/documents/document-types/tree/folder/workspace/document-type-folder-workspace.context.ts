@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
-import type { UmbDocumentTypeFolderRepository } from '../document-type-folder.repository.js';
+import type { UmbDocumentTypeFolderRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbFolderWorkspaceEditorElement } from './folder-editor.element.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
