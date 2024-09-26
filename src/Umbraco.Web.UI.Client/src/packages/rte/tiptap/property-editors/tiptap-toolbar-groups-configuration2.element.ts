@@ -201,18 +201,24 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 			});
 		});
 
-		//TODO Should the extensions removed from the toolbar be removed from the original data as well?
-		// or just put into the hidden extensions list? (just remove the position property)
-
-		// add items from this.#originalFormat only if they are not already in the structured data and they have no position
+		// add items from this.#originalFormat only if they are not already in the structured data. and if they have a position property set, unset it.
 		this.#originalFormat.forEach((item) => {
-			if (!item.position) {
-				const exists = originalData.find((i) => i.alias === item.alias);
-				if (!exists) {
-					originalData.push(item);
-				}
+			if (!originalData.some((i) => i.alias === item.alias)) {
+				originalData.push({
+					alias: item.alias,
+				});
 			}
 		});
+
+		// TODO: this code removes the items completely, while the one above just puts them back into the hidden extensions list. Which one do we prefer?
+		// this.#originalFormat.forEach((item) => {
+		// 	if (!item.position) {
+		// 		const exists = originalData.find((i) => i.alias === item.alias);
+		// 		if (!exists) {
+		// 			originalData.push(item);
+		// 		}
+		// 	}
+		// });
 
 		return originalData;
 	};
