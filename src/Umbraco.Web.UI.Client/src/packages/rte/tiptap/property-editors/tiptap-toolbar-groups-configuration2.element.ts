@@ -1,7 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, property, repeat, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { Observable, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type Extension = {
@@ -165,7 +164,7 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 					look="primary"
 					color="danger"
 					compact
-					class="remove-group-button"
+					class="remove-group-button ${rowIndex === 0 && groupIndex === 0 && group.length === 0 ? 'hidden' : undefined}"
 					@click=${() => this.#removeGroup(rowIndex, groupIndex)}>
 					<umb-icon name="icon-trash"></umb-icon>
 				</uui-button>
@@ -182,7 +181,7 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 					look="primary"
 					color="danger"
 					compact
-					class="remove-row-button"
+					class="remove-row-button ${rowIndex === 0 && row[rowIndex].length === 0 ? 'hidden' : undefined}"
 					@click=${() => this.#removeRow(rowIndex)}>
 					<umb-icon name="icon-trash"></umb-icon>
 				</uui-button>
@@ -323,8 +322,9 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				transform: translateX(-50%);
 				z-index: 1;
 			}
-			.row:hover .remove-row-button,
-			.group:hover .remove-group-button {
+
+			.row:hover .remove-row-button:not(.hidden),
+			.group:hover .remove-group-button:not(.hidden) {
 				display: flex;
 			}
 		`,
