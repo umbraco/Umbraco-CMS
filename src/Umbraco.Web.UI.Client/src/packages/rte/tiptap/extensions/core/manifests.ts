@@ -55,6 +55,18 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 	},
 	{
 		type: 'tiptapExtension',
+		alias: 'Umb.Tiptap.Figure',
+		name: 'Figure Tiptap Extension',
+		api: () => import('./figure.extension.js'),
+		weight: 955,
+		meta: {
+			alias: 'figure',
+			icon: 'icon-frame',
+			label: 'Figure',
+		},
+	},
+	{
+		type: 'tiptapExtension',
 		kind: 'button',
 		alias: 'Umb.Tiptap.Heading1',
 		name: 'Heading 1 Tiptap Extension',
@@ -151,6 +163,19 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapExtensionB
 			alias: 'strike',
 			icon: 'icon-strikethrough',
 			label: 'Strike',
+		},
+	},
+	{
+		type: 'tiptapExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Table',
+		name: 'Table Tiptap Extension',
+		api: () => import('./table.extension.js'),
+		weight: 909,
+		meta: {
+			alias: 'table',
+			icon: 'icon-table',
+			label: 'Table',
 		},
 	},
 	{

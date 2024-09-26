@@ -1867,6 +1867,10 @@ name: "icon-tab-key",
 
 path: () => import("./icons/icon-tab-key.js"),
 },{
+name: "icon-table",
+
+path: () => import("./icons/icon-table.js"),
+},{
 name: "icon-tag",
 
 path: () => import("./icons/icon-tag.js"),

@@ -1983,6 +1983,10 @@
 			"file": "arrow-right-to-line.svg"
 		},
 		{
+			"name": "icon-table",
+			"file": "table.svg"
+		},
+		{
 			"name": "icon-tag",
 			"file": "tag.svg"
 		},

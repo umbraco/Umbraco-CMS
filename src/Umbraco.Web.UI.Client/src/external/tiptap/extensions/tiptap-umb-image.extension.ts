@@ -1,7 +1,19 @@
 import Image from '@tiptap/extension-image';
 
+export interface UmbImageAttributes {
+	src: string;
+	alt?: string;
+	title?: string;
+	width?: string;
+	height?: string;
+	loading?: string;
+	srcset?: string;
+	sizes?: string;
+	'data-tmpimg'?: string;
+	'data-udi'?: string;
+}
+
 export const UmbImage = Image.extend({
-	name: 'umbImage',
 	addAttributes() {
 		return {
 			...this.parent?.(),
@@ -22,7 +34,6 @@ export const UmbImage = Image.extend({
 			},
 			'data-tmpimg': { default: null },
 			'data-udi': { default: null },
-			'data-caption': { default: null },
 		};
 	},
 });
@@ -38,19 +49,7 @@ declare module '@tiptap/core' {
 			 *   .commands
 			 *   .setImage({ src: 'https://tiptap.dev/logo.png', alt: 'tiptap', title: 'tiptap logo' })
 			 */
-			setImage: (options: {
-				src: string;
-				alt?: string;
-				title?: string;
-				width?: string;
-				height?: string;
-				loading?: string;
-				srcset?: string;
-				sizes?: string;
-				'data-tmpimg'?: string;
-				'data-udi'?: string;
-				'data-caption'?: string;
-			}) => ReturnType;
+			setImage: (options: UmbImageAttributes) => ReturnType;
 		};
 	}
 }
