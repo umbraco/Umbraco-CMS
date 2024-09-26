@@ -17,15 +17,6 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
     private readonly ISchemaIdSelector _schemaIdSelector;
     private readonly ISubTypesSelector _subTypesSelector;
 
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
-    public ConfigureUmbracoSwaggerGenOptions(
-        IOptions<ApiVersioningOptions> apiVersioningOptions,
-        IOperationIdSelector operationIdSelector,
-        ISchemaIdSelector schemaIdSelector)
-        : this(operationIdSelector, schemaIdSelector)
-    {
-    }
-
     [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 16.")]
     public ConfigureUmbracoSwaggerGenOptions(
         IOperationIdSelector operationIdSelector,
