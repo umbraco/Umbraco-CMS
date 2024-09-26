@@ -1,12 +1,10 @@
 import type { UmbBlockDataValueModel, UmbBlockExposeModel, UmbBlockValueType } from '../types.js';
 import type { UmbContentValueModel } from '@umbraco-cms/backoffice/content';
-import type {
-	UmbPropertyValueResolver,
-	UmbPropertyValueResolverEnsureVariantArgs,
-} from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockValueResolver
-	implements UmbPropertyValueResolver<UmbContentValueModel<UmbBlockValueType>, UmbBlockDataValueModel>
+	implements
+		UmbPropertyValueResolver<UmbContentValueModel<UmbBlockValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
 {
 	async processValues(
 		property: UmbContentValueModel<UmbBlockValueType>,
@@ -38,6 +36,29 @@ export class UmbBlockValueResolver
 		return property;
 	}
 
+	async processVariants(
+		property: UmbContentValueModel<UmbBlockValueType>,
+		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
+	) {
+		if (property.value) {
+			const expose = (await variantsCallback(property.value.expose)) ?? [];
+
+			return {
+				...property,
+				value: {
+					...property.value,
+					expose,
+				},
+			};
+		}
+		return property;
+	}
+
+	compareVariants(a: UmbBlockExposeModel, b: UmbBlockExposeModel) {
+		return a.contentKey === b.contentKey && a.culture === b.culture && a.segment === b.segment;
+	}
+
+	/*
 	async ensureVariants(
 		property: UmbContentValueModel<UmbBlockValueType>,
 		args: UmbPropertyValueResolverEnsureVariantArgs,
@@ -75,6 +96,7 @@ export class UmbBlockValueResolver
 		}
 		return property;
 	}
+		*/
 
 	destroy(): void {}
 }
