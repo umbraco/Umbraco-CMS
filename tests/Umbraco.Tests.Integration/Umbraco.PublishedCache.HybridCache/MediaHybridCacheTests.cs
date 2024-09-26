@@ -52,7 +52,7 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
 
         // Act
-        var media = await PublishedMediaHybridCache.GetByKeyAsync(result.Result.Content.Key);
+        var media = await PublishedMediaHybridCache.GetByIdAsync(result.Result.Content.Key);
 
         // Assert
         Assert.IsNotNull(media);
@@ -95,7 +95,7 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
     public async Task Cannot_Get_Non_Existing_Media_By_Key()
     {
         // Act
-        var media = await PublishedMediaHybridCache.GetByKeyAsync(Guid.NewGuid());
+        var media = await PublishedMediaHybridCache.GetByIdAsync(Guid.NewGuid());
 
         // Assert
         Assert.IsNull(media);
@@ -118,7 +118,7 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
         var media = await CreateMedia();
 
         // Act
-        var publishedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
+        var publishedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Key);
 
         UmbracoContextFactory.EnsureUmbracoContext();
 
@@ -135,7 +135,7 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
         var media = await CreateMedia();
 
         // Act
-        var publishedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
+        var publishedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Key);
 
         UmbracoContextFactory.EnsureUmbracoContext();
 
@@ -199,13 +199,13 @@ public class MediaHybridCacheTests : UmbracoIntegrationTest
     {
         // Arrange
         var media = await CreateMedia();
-        var publishedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
+        var publishedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Key);
         Assert.IsNotNull(publishedMedia);
 
         await MediaEditingService.DeleteAsync(media.Key, Constants.Security.SuperUserKey);
 
         // Act
-        var deletedMedia = await PublishedMediaHybridCache.GetByKeyAsync(media.Key);
+        var deletedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Key);
 
         // Assert
         Assert.IsNull(deletedMedia);
