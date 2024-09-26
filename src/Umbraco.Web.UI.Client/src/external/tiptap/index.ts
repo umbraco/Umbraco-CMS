@@ -30,6 +30,7 @@ export { TextAlign } from '@tiptap/extension-text-align';
 export { Underline } from '@tiptap/extension-underline';
 
 // CUSTOM EXTENSIONS
+export * from './extensions/tiptap-umb-embedded-media.extension.js';
 export * from './extensions/tiptap-figcaption.extension.js';
 export * from './extensions/tiptap-figure.extension.js';
 export * from './extensions/tiptap-umb-image.extension.js';

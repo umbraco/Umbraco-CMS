@@ -1,8 +1,9 @@
 import { UmbOEmbedRepository } from '../repository/oembed.repository.js';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from './embedded-media-modal.token.js';
 import { css, html, unsafeHTML, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-embedded-media-modal')
@@ -27,6 +28,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 	override connectedCallback() {
 		super.connectedCallback();
+
 		if (this.data?.width) this._width = this.data.width;
 		if (this.data?.height) this._height = this.data.height;
 		if (this.data?.constrain) this.value = { ...this.value, constrain: this.data.constrain };
@@ -42,8 +44,8 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 		const { data } = await this.#oEmbedRepository.requestOEmbed({
 			url: this._url,
-			maxWidth: this._width,
-			maxHeight: this._height,
+			maxWidth: this._width > 0 ? this._width : undefined,
+			maxHeight: this._height > 0 ? this._height : undefined,
 		});
 
 		if (data) {
@@ -62,11 +64,13 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 	#onWidthChange(e: UUIInputEvent) {
 		this._width = parseInt(e.target.value as string, 10);
+		this.value = { ...this.value, width: this._width };
 		this.#getPreview();
 	}
 
 	#onHeightChange(e: UUIInputEvent) {
 		this._height = parseInt(e.target.value as string, 10);
+		this.value = { ...this.value, height: this._height };
 		this.#getPreview();
 	}
 
@@ -81,7 +85,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 				<uui-box>
 					<umb-property-layout label=${this.localize.term('general_url')} orientation="vertical">
 						<div slot="editor">
-							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true">
+							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true" ${umbFocus()}>
 								<uui-button
 									slot="append"
 									look="primary"

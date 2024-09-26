@@ -14,6 +14,7 @@ const kinds: Array<UmbExtensionManifestKind> = [
 	},
 ];
 
+// TODO: [LK] Move each of these to their corresponding packages, e.g. "code-editor", "embedded-media", "media", "multi-url-picker"
 const umbExtensions: Array<ManifestTiptapExtension | ManifestTiptapExtensionButtonKind> = [
 	{
 		type: 'tiptapExtension',
@@ -33,11 +34,11 @@ const umbExtensions: Array<ManifestTiptapExtension | ManifestTiptapExtensionButt
 		kind: 'button',
 		alias: 'Umb.Tiptap.Embed',
 		name: 'Embed Tiptap Extension',
-		api: () => import('./umb/embed.extension.js'),
+		api: () => import('./umb/embedded-media.extension.js'),
 		meta: {
-			alias: 'umb-embed',
+			alias: 'umb-embedded-media',
 			icon: 'icon-embed',
-			label: 'Embed',
+			label: '#general_embed',
 		},
 	},
 	{
