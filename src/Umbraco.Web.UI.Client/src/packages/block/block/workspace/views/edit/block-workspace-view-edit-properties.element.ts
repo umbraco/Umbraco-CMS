@@ -35,11 +35,15 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	@state()
 	_dataPaths?: Array<string>;
 
+	@state()
+	private _ownerEntityType?: string;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#blockWorkspace = workspaceContext;
+			this._ownerEntityType = this.#blockWorkspace.getEntityType();
 			this.#setStructureManager();
 		});
 	}
@@ -70,6 +74,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 				html`<umb-property-type-based-property
 					class="property"
 					data-path=${this._dataPaths![index]}
+					.ownerEntityType=${this._ownerEntityType}
 					.property=${property}
 					${umbDestroyOnDisconnect()}></umb-property-type-based-property>`,
 		);
