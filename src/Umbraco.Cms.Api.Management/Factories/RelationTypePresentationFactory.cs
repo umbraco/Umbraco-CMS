@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -15,7 +15,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         _umbracoMapper = umbracoMapper;
     }
 
-    public async Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(IEnumerable<RelationItemModel> relationItemModels)
+    public Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(IEnumerable<RelationItemModel> relationItemModels)
     {
         IReferenceResponseModel[] result = relationItemModels.Select(relationItemModel => relationItemModel.NodeType switch
         {
@@ -24,6 +24,6 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel) as IReferenceResponseModel,
         }).WhereNotNull().ToArray();
 
-        return await Task.FromResult(result);
+        return Task.FromResult<IEnumerable<IReferenceResponseModel>>(result);
     }
 }

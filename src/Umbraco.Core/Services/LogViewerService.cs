@@ -31,7 +31,7 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<PagedModel<ILogEntry>?, LogViewerOperationStatus>> GetPagedLogsAsync(
+    public Task<Attempt<PagedModel<ILogEntry>?, LogViewerOperationStatus>> GetPagedLogsAsync(
         DateTimeOffset? startDate,
         DateTimeOffset? endDate,
         int skip,
@@ -45,33 +45,33 @@ public class LogViewerService : ILogViewerService
         // We will need to stop the request if trying to do this on a 1GB file
         if (CanViewLogs(logTimePeriod) == false)
         {
-            return Attempt.FailWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
                 LogViewerOperationStatus.CancelledByLogsSizeValidation,
-                null);
+                null));
         }
 
 
         PagedModel<ILogEntry> filteredLogs = GetFilteredLogs(logTimePeriod, filterExpression, logLevels, orderDirection, skip, take);
 
-        return Attempt.SucceedWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
+        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
-            filteredLogs);
+            filteredLogs));
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<ILogViewerQuery>> GetSavedLogQueriesAsync(int skip, int take)
+    public Task<PagedModel<ILogViewerQuery>> GetSavedLogQueriesAsync(int skip, int take)
     {
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
         ILogViewerQuery[] savedLogQueries = _logViewerQueryRepository.GetMany().ToArray();
         var pagedModel = new PagedModel<ILogViewerQuery>(savedLogQueries.Length, savedLogQueries.Skip(skip).Take(take));
-        return await Task.FromResult(pagedModel);
+        return Task.FromResult(pagedModel);
     }
 
     /// <inheritdoc/>
-    public async Task<ILogViewerQuery?> GetSavedLogQueryByNameAsync(string name)
+    public Task<ILogViewerQuery?> GetSavedLogQueryByNameAsync(string name)
     {
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
-        return await Task.FromResult(_logViewerQueryRepository.GetByName(name));
+        return Task.FromResult(_logViewerQueryRepository.GetByName(name));
     }
 
     /// <inheritdoc/>
@@ -109,57 +109,57 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate)
+    public Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
         bool isAllowed = CanViewLogs(logTimePeriod);
 
         if (isAllowed == false)
         {
-            return Attempt.FailWithStatus(LogViewerOperationStatus.CancelledByLogsSizeValidation, isAllowed);
+            return Task.FromResult(Attempt.FailWithStatus(LogViewerOperationStatus.CancelledByLogsSizeValidation, isAllowed));
         }
 
-        return Attempt.SucceedWithStatus(LogViewerOperationStatus.Success, isAllowed);
+        return Task.FromResult(Attempt.SucceedWithStatus(LogViewerOperationStatus.Success, isAllowed));
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate)
+    public Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTimeOffset? startDate, DateTimeOffset? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (CanViewLogs(logTimePeriod) == false)
         {
-            return Attempt.FailWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
+            return Task.FromResult(Attempt.FailWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
                 LogViewerOperationStatus.CancelledByLogsSizeValidation,
-                null);
+                null));
         }
 
         LogLevelCounts counter = _logViewerRepository.GetLogCount(logTimePeriod);
 
-        return Attempt.SucceedWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
+        return Task.FromResult(Attempt.SucceedWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
-            counter);
+            counter));
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTimeOffset? startDate, DateTimeOffset? endDate, int skip, int take)
+    public Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTimeOffset? startDate, DateTimeOffset? endDate, int skip, int take)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (CanViewLogs(logTimePeriod) == false)
         {
-            return Attempt.FailWithStatus<PagedModel<LogTemplate>, LogViewerOperationStatus>(
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<LogTemplate>, LogViewerOperationStatus>(
                 LogViewerOperationStatus.CancelledByLogsSizeValidation,
-                null!);
+                null!));
         }
 
         LogTemplate[] messageTemplates = _logViewerRepository.GetMessageTemplates(logTimePeriod);
 
-        return Attempt.SucceedWithStatus(
+        return Task.FromResult(Attempt.SucceedWithStatus(
             LogViewerOperationStatus.Success,
-            new PagedModel<LogTemplate>(messageTemplates.Length, messageTemplates.Skip(skip).Take(take)));
+            new PagedModel<LogTemplate>(messageTemplates.Length, messageTemplates.Skip(skip).Take(take))));
     }
 
     /// <inheritdoc/>

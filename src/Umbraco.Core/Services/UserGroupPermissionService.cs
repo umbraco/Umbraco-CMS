@@ -27,24 +27,24 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> userGroupKeys)
+    public Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> userGroupKeys)
     {
         if (user.IsAdmin())
         {
-            return UserGroupAuthorizationStatus.Success;
+            return Task.FromResult(UserGroupAuthorizationStatus.Success);
         }
 
         var allowedUserGroupsKeys = user.Groups.Select(x => x.Key).ToArray();
         var missingAccess = userGroupKeys.Except(allowedUserGroupsKeys).ToArray();
 
-        return missingAccess.Length == 0
+        return Task.FromResult(missingAccess.Length == 0
             ? UserGroupAuthorizationStatus.Success
-            : UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess;
+            : UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess);
     }
 
     /// <inheritdoc/>
-    public async Task<UserGroupAuthorizationStatus> AuthorizeCreateAsync(IUser user, IUserGroup userGroup)
-        => ValidateAccess(user, userGroup);
+    public Task<UserGroupAuthorizationStatus> AuthorizeCreateAsync(IUser user, IUserGroup userGroup)
+        => Task.FromResult(ValidateAccess(user, userGroup));
 
 
     /// <inheritdoc/>

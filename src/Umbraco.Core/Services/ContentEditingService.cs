@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -30,10 +30,10 @@ internal sealed class ContentEditingService
         _logger = logger;
     }
 
-    public async Task<IContent?> GetAsync(Guid key)
+    public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
-        return await Task.FromResult(content);
+        return Task.FromResult(content);
     }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ContentUpdateModel updateModel)

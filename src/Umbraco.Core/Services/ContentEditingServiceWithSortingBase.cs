@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -56,7 +56,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
 
         if (contentId.HasValue is false)
         {
-            return await Task.FromResult(ContentEditingOperationStatus.NotFound);
+            return ContentEditingOperationStatus.NotFound;
         }
 
         const int pageSize = 500;

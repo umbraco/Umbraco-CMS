@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -24,7 +24,7 @@ public class SearchMemberItemController : MemberItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MemberItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Member, query, skip, take);
         var result = new PagedModel<MemberItemResponseModel>
@@ -33,6 +33,6 @@ public class SearchMemberItemController : MemberItemControllerBase
             Total = searchResult.Total
         };
 
-        return await Task.FromResult(Ok(result));
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

@@ -31,11 +31,12 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {
     [SetUp]
-    public async Task Setup()
+    public Task Setup()
     {
         Client.DefaultRequestHeaders
             .Accept
             .Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
+        return Task.CompletedTask;
     }
 
     protected override void CustomTestAuthSetup(IServiceCollection services)

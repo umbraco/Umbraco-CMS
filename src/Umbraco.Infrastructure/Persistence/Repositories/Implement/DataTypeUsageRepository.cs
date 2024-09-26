@@ -38,7 +38,7 @@ public class DataTypeUsageRepository : IDataTypeUsageRepository
         return database.ExecuteScalar<bool>(hasValueQuery);
     }
 
-    public async Task<bool> HasSavedValuesAsync(Guid dataTypeKey)
+    public Task<bool> HasSavedValuesAsync(Guid dataTypeKey)
     {
         IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
 
@@ -59,6 +59,6 @@ public class DataTypeUsageRepository : IDataTypeUsageRepository
         Sql<ISqlContext> hasValueQuery = database.SqlContext.Sql()
             .SelectAnyIfExists(selectQuery);
 
-        return await Task.FromResult(database.ExecuteScalar<bool>(hasValueQuery));
+        return Task.FromResult(database.ExecuteScalar<bool>(hasValueQuery));
     }
 }
