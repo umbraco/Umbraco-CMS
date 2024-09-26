@@ -43,11 +43,22 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 
 	#onDragStart = (event: DragEvent, alias: string) => {
 		this.#currentDragAlias = alias;
-		event.dataTransfer!.dropEffect = 'move';
+		event.dataTransfer!.effectAllowed = 'move';
 	};
 
 	#onDragOver = (event: DragEvent) => {
 		event.preventDefault();
+		event.dataTransfer!.dropEffect = 'move';
+	};
+
+	#onDragEnd = (event: DragEvent) => {
+		event.preventDefault();
+		if (event.dataTransfer?.dropEffect === 'none') {
+			const fromPos = this.#originalFormat.find((item) => item.alias === this.#currentDragAlias)?.position;
+			if (!fromPos) return;
+
+			this.removeItem(fromPos);
+		}
 	};
 
 	#onDrop = (event: DragEvent, toPos: [number, number, number]) => {
@@ -82,6 +93,16 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 		this.requestUpdate('_structuredData');
 		this.dispatchEvent(new UmbChangeEvent());
 	};
+
+	private removeItem(from: [number, number, number]) {
+		const [rowIndex, groupIndex, itemIndex] = from;
+		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 1);
+
+		this.#updateOriginalFormat();
+
+		this.requestUpdate('_structuredData');
+		this.dispatchEvent(new UmbChangeEvent());
+	}
 
 	#addGroup = (rowIndex: number, groupIndex: number) => {
 		this._structuredData[rowIndex].splice(groupIndex, 0, []);
@@ -123,7 +144,11 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	private renderItem(alias: string) {
 		const extension = this.extensionConfigs.find((ext) => ext.alias === alias);
 		if (!extension) return nothing;
-		return html`<div class="item" draggable="true" @dragstart=${(e: DragEvent) => this.#onDragStart(e, alias)}>
+		return html`<div
+			class="item"
+			draggable="true"
+			@dragend=${this.#onDragEnd}
+			@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias)}>
 			<umb-icon name=${extension.icon ?? ''}></umb-icon>
 		</div>`;
 	}
@@ -136,7 +161,14 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				@dragover=${this.#onDragOver}
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.length])}>
 				${group.map((alias) => this.renderItem(alias))}
-				<button class="remove-group-button" @click=${() => this.#removeGroup(rowIndex, groupIndex)}>X</button>
+				<uui-button
+					look="primary"
+					color="danger"
+					compact
+					class="remove-group-button"
+					@click=${() => this.#removeGroup(rowIndex, groupIndex)}>
+					<umb-icon name="icon-trash"></umb-icon>
+				</uui-button>
 			</div>
 		`;
 	}
@@ -146,7 +178,14 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 			<div class="row">
 				${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}
 				<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex, row.length)}>+</uui-button>
-				<button class="remove-row-button" @click=${() => this.#removeRow(rowIndex)}>X</button>
+				<uui-button
+					look="primary"
+					color="danger"
+					compact
+					class="remove-row-button"
+					@click=${() => this.#removeRow(rowIndex)}>
+					<umb-icon name="icon-trash"></umb-icon>
+				</uui-button>
 			</div>
 		`;
 	}
@@ -272,24 +311,21 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				display: flex;
 				align-items: baseline;
 			}
+
+			.remove-row-button,
+			.remove-group-button {
+				display: none;
+			}
 			.remove-group-button {
 				position: absolute;
-				top: -4px;
-				right: -4px;
-				display: none;
+				top: -26px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 1;
 			}
+			.row:hover .remove-row-button,
 			.group:hover .remove-group-button {
-				display: block;
-			}
-
-			.remove-row-button {
-				position: absolute;
-				left: -25px;
-				top: 8px;
-				display: none;
-			}
-			.row:hover .remove-row-button {
-				display: block;
+				display: flex;
 			}
 		`,
 	];
