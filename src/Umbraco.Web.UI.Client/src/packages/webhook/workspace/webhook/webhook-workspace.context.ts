@@ -1,35 +1,36 @@
 import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
-import { UmbWebhookDetailRepository } from '../../repository/index.js';
+import type { UmbWebhookDetailRepository } from '../../repository/index.js';
+import { UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_ROOT_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
 import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 import {
 	type UmbSubmittableWorkspaceContext,
-	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
+	UmbEntityDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbWebhookWorkspaceContext
-	extends UmbSubmittableWorkspaceContextBase<UmbWebhookDetailModel>
+	extends UmbEntityDetailWorkspaceContextBase<UmbWebhookDetailModel, UmbWebhookDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	public readonly repository: UmbWebhookDetailRepository = new UmbWebhookDetailRepository(this);
-
-	#data = new UmbObjectState<UmbWebhookDetailModel | undefined>(undefined);
-	readonly data = this.#data.asObservable();
-
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
+	readonly data = this._data.current;
+	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.Webhook');
+		super(host, {
+			workspaceAlias: UMB_WEBHOOK_WORKSPACE_ALIAS,
+			entityType: UMB_WEBHOOK_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
 				path: 'create',
 				component: UmbWebhookWorkspaceEditorElement,
 				setup: async () => {
-					this.create();
+					this.createScaffold({ parent: { entityType: UMB_WEBHOOK_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -49,84 +50,24 @@ export class UmbWebhookWorkspaceContext
 		]);
 	}
 
-	protected override resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.#data.update(data);
-		}
-	}
-
-	async create() {
-		this.resetState();
-		const { data } = await this.repository.createScaffold();
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.update(data);
-		return { data };
-	}
-
-	getData() {
-		return this.#data.getValue();
-	}
-
-	getEntityType() {
-		return 'webhook';
-	}
-
-	getUnique() {
-		return this.#data.getValue()?.unique;
-	}
-
 	setEvents(events: Array<UmbWebhookEventModel>) {
-		this.#data.update({ events });
+		this._data.updateCurrent({ events });
 	}
 
 	setHeaders(headers: { [key: string]: string }) {
-		this.#data.update({ headers });
+		this._data.updateCurrent({ headers });
 	}
 
 	setTypes(types: string[]) {
-		this.#data.update({ contentTypes: types });
+		this._data.updateCurrent({ contentTypes: types });
 	}
 
 	setUrl(url: string) {
-		this.#data.update({ url });
+		this._data.updateCurrent({ url });
 	}
 
 	setEnabled(enabled: boolean) {
-		this.#data.update({ enabled });
-	}
-
-	async submit() {
-		const newData = this.getData();
-		if (!newData) {
-			throw new Error('No data to submit');
-		}
-
-		if (this.getIsNew()) {
-			const { error } = await this.repository.create(newData);
-			if (error) {
-				throw new Error(error.message);
-			}
-			this.setIsNew(false);
-		} else {
-			const { error } = await this.repository.save(newData);
-			if (error) {
-				throw new Error(error.message);
-			}
-		}
-	}
-
-	override destroy(): void {
-		this.#data.destroy();
-		super.destroy();
+		this._data.updateCurrent({ enabled });
 	}
 }
 

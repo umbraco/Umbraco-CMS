@@ -12,7 +12,6 @@ import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	type UmbCollectionWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceSplitViewManager,
@@ -31,18 +30,23 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
-import { UmbContentWorkspaceDataManager, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import {
+	UmbContentWorkspaceDataManager,
+	type UmbContentCollectionWorkspaceContext,
+	type UmbContentWorkspaceContext,
+} from '@umbraco-cms/backoffice/content';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 
-type EntityModel = UmbMediaDetailModel;
+type ContentModel = UmbMediaDetailModel;
+type ContentTypeModel = UmbMediaTypeDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbSubmittableWorkspaceContextBase<EntityModel>
+	extends UmbSubmittableWorkspaceContextBase<ContentModel>
 	implements
-		UmbContentWorkspaceContext<EntityModel, UmbMediaTypeDetailModel, UmbMediaVariantModel>,
-		UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
+		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMediaVariantModel>,
+		UmbContentCollectionWorkspaceContext<ContentTypeModel>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -52,7 +56,7 @@ export class UmbMediaWorkspaceContext
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
-	readonly #data = new UmbContentWorkspaceDataManager<EntityModel>(this, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD);
+	readonly #data = new UmbContentWorkspaceDataManager<ContentModel>(this, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD);
 
 	#getDataPromise?: Promise<any>;
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
@@ -185,8 +189,8 @@ export class UmbMediaWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(undefined);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(undefined);
 	}
 
 	async loadLanguages() {
@@ -206,14 +210,14 @@ export class UmbMediaWorkspaceContext
 			this.#entityContext.setUnique(unique);
 			this.#isTrashedContext.setIsTrashed(data.isTrashed);
 			this.setIsNew(false);
-			this.#data.setPersistedData(data);
-			this.#data.setCurrentData(data);
+			this.#data.setPersisted(data);
+			this.#data.setCurrent(data);
 		}
 
 		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMediaStoreObserver');
 	}
 
-	#onStoreChange(entity: EntityModel | undefined) {
+	#onStoreChange(entity: ContentModel | undefined) {
 		if (!entity) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
 			history.pushState(null, '', 'section/media');
@@ -230,8 +234,8 @@ export class UmbMediaWorkspaceContext
 		this.#entityContext.setEntityType(UMB_MEDIA_ENTITY_TYPE);
 		this.#entityContext.setUnique(data.unique);
 		this.setIsNew(true);
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(data);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(data);
 		return data;
 	}
 
@@ -452,7 +456,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async #createOrSave() {
-		const data = this.#data.getCurrentData();
+		const data = this.#data.getCurrent();
 		if (!data?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {

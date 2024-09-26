@@ -43,18 +43,18 @@ export class UmbContentWorkspaceDataManager<
 		this.#varies = vary;
 	}
 
-	setPersistedData(data: ModelType | undefined) {
+	setPersisted(data: ModelType | undefined) {
 		this.#persisted.setValue(data);
 	}
-	setCurrentData(data: ModelType | undefined) {
+	setCurrent(data: ModelType | undefined) {
 		this.current.setValue(data);
 	}
 
-	getPersistedData() {
+	getPersisted() {
 		return this.#persisted.getValue();
 	}
 
-	getCurrentData() {
+	getCurrent() {
 		return this.current.getValue();
 	}
 
@@ -118,7 +118,7 @@ export class UmbContentWorkspaceDataManager<
 		if (!data) throw new Error('Current data is missing');
 		if (!data.unique) throw new Error('Unique of current data is missing');
 
-		const persistedData = this.getPersistedData();
+		const persistedData = this.getPersisted();
 
 		return await new UmbMergeContentVariantDataController(this).process(
 			persistedData,

@@ -161,8 +161,8 @@ export class UmbMemberWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(undefined);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(undefined);
 	}
 
 	async loadLanguages() {
@@ -179,8 +179,8 @@ export class UmbMemberWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.#data.setPersistedData(data);
-			this.#data.setCurrentData(data);
+			this.#data.setPersisted(data);
+			this.#data.setCurrent(data);
 		}
 
 		this.observe(asObservable(), (member) => this.#onMemberStoreChange(member), 'umbMemberStoreObserver');
@@ -204,8 +204,8 @@ export class UmbMemberWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(data);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(data);
 		return data;
 	}
 
@@ -370,7 +370,7 @@ export class UmbMemberWorkspaceContext
 		}
 
 		if (newData) {
-			this.#data.setPersistedData(newData);
+			this.#data.setPersisted(newData);
 			// TODO: Only update the variants that was chosen to be saved:
 			//this.#data.setCurrentData(newData);
 		}

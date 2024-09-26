@@ -1,4 +1,4 @@
-import type { UmbSubmittableWorkspaceContextBase } from '../contexts/index.js';
+import type { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';

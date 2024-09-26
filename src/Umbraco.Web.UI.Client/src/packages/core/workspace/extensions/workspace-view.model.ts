@@ -18,11 +18,6 @@ export interface ManifestWorkspaceView<MetaType extends MetaWorkspaceView = Meta
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaWorkspaceView extends MetaManifestWithView {}
 
-export interface ManifestWorkspaceViewCollectionKind extends ManifestWorkspaceView<MetaWorkspaceView> {
-	type: 'workspaceView';
-	kind: 'collection';
-}
-
 export interface ManifestWorkspaceViewContentTypeDesignEditorKind extends ManifestWorkspaceView {
 	type: 'workspaceView';
 	kind: 'contentTypeDesignEditor';
@@ -36,7 +31,6 @@ export interface MetaWorkspaceViewContentTypeDesignEditorKind extends MetaWorksp
 declare global {
 	interface UmbExtensionManifestMap {
 		ManifestWorkspaceView: ManifestWorkspaceView;
-		ManifestWorkspaceViewCollectionKind: ManifestWorkspaceViewCollectionKind;
 		ManifestWorkspaceViewContentTypeDesignEditorKind: ManifestWorkspaceViewContentTypeDesignEditorKind;
 	}
 }

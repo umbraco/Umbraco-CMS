@@ -1,4 +1,5 @@
-import { UMB_WORKSPACE_CONTEXT, type UmbWorkspaceContext } from '../contexts/index.js';
+import { UMB_WORKSPACE_CONTEXT } from '../workspace.context-token.js';
+import type { UmbWorkspaceContext } from '../workspace-context.interface.js';
 import type { WorkspaceAliasConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {

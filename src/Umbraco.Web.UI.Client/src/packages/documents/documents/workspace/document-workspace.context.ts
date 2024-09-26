@@ -31,7 +31,6 @@ import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	type UmbCollectionWorkspaceContext,
 	type UmbPublishableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
@@ -66,6 +65,7 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import {
 	UmbContentWorkspaceDataManager,
 	UmbMergeContentVariantDataController,
+	type UmbContentCollectionWorkspaceContext,
 	type UmbContentWorkspaceContext,
 } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
@@ -81,7 +81,7 @@ export class UmbDocumentWorkspaceContext
 	implements
 		UmbContentWorkspaceContext<EntityModel, EntityTypeModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext,
-		UmbCollectionWorkspaceContext<EntityTypeModel>
+		UmbContentCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -259,8 +259,8 @@ export class UmbDocumentWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(undefined);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(undefined);
 	}
 
 	async loadLanguages() {
@@ -280,8 +280,8 @@ export class UmbDocumentWorkspaceContext
 			this.#entityContext.setUnique(unique);
 			this.#isTrashedContext.setIsTrashed(data.isTrashed);
 			this.setIsNew(false);
-			this.#data.setPersistedData(data);
-			this.#data.setCurrentData(data);
+			this.#data.setPersisted(data);
+			this.#data.setCurrent(data);
 		}
 
 		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDocumentStoreObserver');
@@ -327,8 +327,8 @@ export class UmbDocumentWorkspaceContext
 		this.#entityContext.setUnique(data.unique);
 		this.#isTrashedContext.setIsTrashed(data.isTrashed);
 		this.setIsNew(true);
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(data);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(data);
 		return data;
 	}
 
@@ -337,7 +337,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getData() {
-		return this.#data.getCurrentData();
+		return this.#data.getCurrent();
 	}
 
 	getUnique() {
@@ -528,9 +528,9 @@ export class UmbDocumentWorkspaceContext
 			}
 
 			this.setIsNew(false);
-			this.#data.setPersistedData(data);
+			this.#data.setPersisted(data);
 			// TODO: Only update the variants that was chosen to be saved:
-			const currentData = this.#data.getCurrentData();
+			const currentData = this.#data.getCurrent();
 
 			const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
@@ -540,7 +540,7 @@ export class UmbDocumentWorkspaceContext
 				variantIds,
 				variantIdsIncludingInvariant,
 			);
-			this.#data.setCurrentData(newCurrentData);
+			this.#data.setCurrent(newCurrentData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadChildrenOfEntityEvent({
@@ -556,9 +556,9 @@ export class UmbDocumentWorkspaceContext
 				throw new Error('Error saving document');
 			}
 
-			this.#data.setPersistedData(data);
+			this.#data.setPersisted(data);
 			// TODO: Only update the variants that was chosen to be saved:
-			const currentData = this.#data.getCurrentData();
+			const currentData = this.#data.getCurrent();
 
 			const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
@@ -568,7 +568,7 @@ export class UmbDocumentWorkspaceContext
 				variantIds,
 				variantIdsIncludingInvariant,
 			);
-			this.#data.setCurrentData(newCurrentData);
+			this.#data.setCurrent(newCurrentData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({

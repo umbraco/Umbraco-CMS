@@ -181,8 +181,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(undefined);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(undefined);
 	}
 
 	async loadLanguages() {
@@ -198,8 +198,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.#data.setPersistedData(data);
-			this.#data.setCurrentData(data);
+			this.#data.setPersisted(data);
+			this.#data.setCurrent(data);
 		}
 
 		if (asObservable) {
@@ -225,8 +225,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.#data.setPersistedData(undefined);
-		this.#data.setCurrentData(data);
+		this.#data.setPersisted(undefined);
+		this.#data.setCurrent(data);
 		return data;
 	}
 
