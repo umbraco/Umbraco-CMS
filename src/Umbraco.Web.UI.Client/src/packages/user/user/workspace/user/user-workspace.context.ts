@@ -21,7 +21,6 @@ export class UmbUserWorkspaceContext
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
 	public readonly configRepository = new UmbUserConfigRepository(this);
 
-	readonly data = this._data.current;
 	readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
 	readonly unique = this._data.createObservablePartOfCurrent((x) => x?.unique);
 	readonly kind = this._data.createObservablePartOfCurrent((x) => x?.kind);

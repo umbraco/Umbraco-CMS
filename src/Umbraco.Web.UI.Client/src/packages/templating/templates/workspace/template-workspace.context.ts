@@ -19,8 +19,6 @@ export class UmbTemplateWorkspaceContext
 {
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
-	data = this._data.current;
-
 	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
 

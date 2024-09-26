@@ -37,6 +37,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
+	public readonly data = this._data.current;
 
 	protected _getDataPromise?: Promise<any>;
 

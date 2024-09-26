@@ -15,8 +15,6 @@ export class UmbUserGroupWorkspaceContext
 	extends UmbEntityDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	data = this._data.current;
-
 	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
 	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name || '');
 	readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias || '');
