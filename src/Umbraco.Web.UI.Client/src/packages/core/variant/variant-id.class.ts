@@ -83,6 +83,13 @@ export class UmbVariantId {
 		return { culture: this.culture, segment: this.segment };
 	}
 
+	public toSegmentInvariant(): UmbVariantId {
+		return Object.freeze(new UmbVariantId(this.culture, null));
+	}
+	public toCultureInvariant(): UmbVariantId {
+		return Object.freeze(new UmbVariantId(null, this.culture));
+	}
+
 	// TODO: needs localization option:
 	// TODO: Consider if this should be handled else where, it does not seem like the responsibility of this class, since it contains wordings:
 	public toDifferencesString(
