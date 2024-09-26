@@ -19,7 +19,7 @@ const tinyIconSet = tinymce.IconManager.get('default');
 // If an extension does not have a position, it is considered hidden in the toolbar
 type TestServerValue = Array<{
 	alias: string;
-	position: [number, number, number]; //TODO: This should be optional to allow for hiding extensions
+	position?: [number, number, number];
 }>;
 
 type ExtensionConfig = {
@@ -96,7 +96,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				...this.value,
 				{
 					alias: item.alias,
-					position: [0, 5, 0], //TODO remove when hiding extensions is implemented
 				},
 			];
 		} else {

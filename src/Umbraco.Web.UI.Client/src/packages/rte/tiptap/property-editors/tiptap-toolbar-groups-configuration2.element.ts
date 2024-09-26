@@ -12,20 +12,20 @@ type Extension = {
 
 type TestServerValue = Array<{
 	alias: string;
-	position: [number, number, number];
+	position?: [number, number, number];
 }>;
 
 @customElement('umb-tiptap-toolbar-groups-configuration2')
 export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	@property({ attribute: false })
 	set value(value: TestServerValue) {
-		if (this.#originalFormat === value) return;
+		// if (this.#originalFormat === value) return;
+		// TODO: also check if the added values have positions, if not, there's no need to update the structured data.
 		this.#originalFormat = value;
 		this._structuredData = this.toStructuredData(value);
 	}
 
 	get value(): TestServerValue {
-		console.log('get value groups');
 		return this.#originalFormat;
 	}
 
@@ -48,26 +48,33 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	#onDrop = (event: DragEvent, toPos: [number, number, number]) => {
 		event.preventDefault();
 		const fromPos = this.#originalFormat.find((item) => item.alias === this.#currentDragAlias)?.position;
-		if (!fromPos) return;
 
-		this.moveItem(fromPos, toPos);
+		if (fromPos) {
+			this.moveItem(fromPos, toPos);
+		} else if (this.#currentDragAlias) {
+			this.insertItem(this.#currentDragAlias, toPos);
+		}
 	};
 
 	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
-		const [fromRow, fromGroup, fromItem] = from;
-		const [toRow, toGroup, toItem] = to;
+		const [rowIndex, groupIndex, itemIndex] = from;
 
 		// Get the item to move from the 'from' position
-		const itemToMove = this._structuredData[fromRow][fromGroup][fromItem];
+		const itemToMove = this._structuredData[rowIndex][groupIndex][itemIndex];
 
 		// Remove the item from the original position
-		this._structuredData[fromRow][fromGroup].splice(fromItem, 1);
+		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 1);
 
+		this.insertItem(itemToMove, to);
+	};
+
+	private insertItem = (alias: string, toPos: [number, number, number]) => {
+		const [rowIndex, groupIndex, itemIndex] = toPos;
 		// Insert the item into the new position
-		this._structuredData[toRow][toGroup].splice(toItem, 0, itemToMove);
+		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 0, alias);
+		this.#originalFormat = this.toOriginalFormat(this._structuredData);
 
 		this.requestUpdate('_structuredData');
-
 		this.dispatchEvent(new UmbChangeEvent());
 	};
 
@@ -96,16 +103,22 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	}
 
 	override render() {
-		return html`${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}`;
+		return html`${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
+
+			<div>
+				<p>Extensions hidden from the toolbar</p>
+				${this.#originalFormat.filter((item) => !item.position).map((item) => this.renderItem(item.alias))}
+			</div> `;
 	}
 
 	toStructuredData = (data: TestServerValue) => {
-		console.log('toStructuredData');
 		const structuredData: string[][][] = [];
 
 		if (!data.length) return [[[]]];
 
 		data.forEach(({ alias, position }) => {
+			if (!position) return;
+
 			const [rowIndex, groupIndex, aliasIndex] = position;
 
 			while (structuredData.length <= rowIndex) {
@@ -127,8 +140,7 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	};
 
 	toOriginalFormat = (structuredData: string[][][]) => {
-		console.log('toOriginalFormat');
-		const originalData: any = [];
+		const originalData: TestServerValue = [];
 
 		structuredData.forEach((row, rowIndex) => {
 			row.forEach((group, groupIndex) => {
@@ -141,6 +153,14 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 					}
 				});
 			});
+		});
+
+		// Add the items that are not in any group and does not already exist in the original data
+		const itemsNotInGroups = this.#originalFormat.filter((item) => !item.position);
+		itemsNotInGroups.forEach((item) => {
+			if (!originalData.some((i) => i.alias === item.alias)) {
+				originalData.push(item);
+			}
 		});
 
 		return originalData;
