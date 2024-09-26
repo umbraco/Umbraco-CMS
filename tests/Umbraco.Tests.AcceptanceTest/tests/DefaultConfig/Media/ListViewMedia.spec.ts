@@ -32,6 +32,7 @@ test('can change the the default sort order for the list in the media section', 
   await umbracoApi.dataType.updateListViewMediaDataType('orderBy', sortOrder);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.changeToListView();
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
   await umbracoUi.media.isMediaListViewVisible();
@@ -114,8 +115,8 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(firstMediaFileName);
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(secondMediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(firstMediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName);
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();

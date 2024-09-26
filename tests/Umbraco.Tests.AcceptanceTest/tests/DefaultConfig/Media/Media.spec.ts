@@ -192,7 +192,7 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeTruthy();
 
@@ -212,7 +212,7 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
   await umbracoUi.media.restoreMediaItem(mediaFileName);
 
   // Assert
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
   await umbracoUi.media.isTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
@@ -229,11 +229,11 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   await umbracoUi.media.deleteMediaItem(mediaFileName);
 
   // Assert
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });
@@ -246,12 +246,12 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   await umbracoUi.media.clickEmptyRecycleBinButton();
   await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  await umbracoUi.media.isMediaItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });
