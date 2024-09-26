@@ -109,17 +109,20 @@ export class UmbDocumentWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	readonly unique = this.#data.current.asObservablePart((data) => data?.unique);
-	readonly entityType = this.#data.current.asObservablePart((data) => data?.entityType);
-	readonly isTrashed = this.#data.current.asObservablePart((data) => data?.isTrashed);
+	readonly data = this.#data.current;
+	readonly unique = this.#data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly entityType = this.#data.createObservablePartOfCurrent((data) => data?.entityType);
+	readonly isTrashed = this.#data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
-	readonly contentTypeUnique = this.#data.current.asObservablePart((data) => data?.documentType.unique);
-	readonly contentTypeHasCollection = this.#data.current.asObservablePart((data) => !!data?.documentType.collection);
+	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.documentType.unique);
+	readonly contentTypeHasCollection = this.#data.createObservablePartOfCurrent(
+		(data) => !!data?.documentType.collection,
+	);
 
-	readonly variants = this.#data.current.asObservablePart((data) => data?.variants ?? []);
+	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
-	readonly urls = this.#data.current.asObservablePart((data) => data?.urls || []);
-	readonly templateId = this.#data.current.asObservablePart((data) => data?.template?.unique || null);
+	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
+	readonly templateId = this.#data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
@@ -363,15 +366,15 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	variantById(variantId: UmbVariantId) {
-		return this.#data.current.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
+		return this.#data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
 
 	getVariant(variantId: UmbVariantId) {
-		return this.#data.current.getValue()?.variants?.find((x) => variantId.compare(x));
+		return this.#data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
 	getName(variantId?: UmbVariantId) {
-		const variants = this.#data.current.getValue()?.variants;
+		const variants = this.#data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
@@ -386,13 +389,13 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	name(variantId?: UmbVariantId) {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
 		);
 	}
 
 	setTemplate(templateUnique: string) {
-		this.#data.current.update({ template: { unique: templateUnique } });
+		this.#data.updateCurrent({ template: { unique: templateUnique } });
 	}
 
 	async propertyStructureById(propertyId: string) {
@@ -410,7 +413,7 @@ export class UmbDocumentWorkspaceContext
 		propertyAlias: string,
 		variantId?: UmbVariantId,
 	): Promise<Observable<PropertyValueType | undefined> | undefined> {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
 					?.value as PropertyValueType,
@@ -467,7 +470,7 @@ export class UmbDocumentWorkspaceContext
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),
 			);
-			this.#data.current.update({ values });
+			this.#data.updateCurrent({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#data.ensureVariantData(variantId);
@@ -475,24 +478,12 @@ export class UmbDocumentWorkspaceContext
 		this.finishPropertyValueChange();
 	}
 
-	#updateLock = 0;
 	initiatePropertyValueChange() {
-		this.#updateLock++;
-		this.#data.current.mute();
-		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
-		/*return {
-			[Symbol.dispose]: this.finishPropertyValueChange,
-		};*/
+		this.#data.initiatePropertyValueChange();
 	}
 	finishPropertyValueChange = () => {
-		this.#updateLock--;
-		this.#triggerPropertyValueChanges();
+		this.#data.finishPropertyValueChange();
 	};
-	#triggerPropertyValueChanges() {
-		if (this.#updateLock === 0) {
-			this.#data.current.unmute();
-		}
-	}
 
 	async #determineVariantOptions() {
 		const activeVariants = this.splitView.getActiveVariants();

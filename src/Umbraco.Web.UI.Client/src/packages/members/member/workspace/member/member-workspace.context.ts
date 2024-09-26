@@ -49,12 +49,12 @@ export class UmbMemberWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	readonly data = this.#data.current.asObservable();
-	readonly unique = this.#data.current.asObservablePart((data) => data?.unique);
-	readonly createDate = this.#data.current.asObservablePart((data) => data?.variants[0].createDate);
-	readonly updateDate = this.#data.current.asObservablePart((data) => data?.variants[0].updateDate);
-	readonly contentTypeUnique = this.#data.current.asObservablePart((data) => data?.memberType.unique);
-	readonly kind = this.#data.current.asObservablePart((data) => data?.kind);
+	readonly data = this.#data.current;
+	readonly unique = this.#data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly createDate = this.#data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
+	readonly updateDate = this.#data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
+	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.memberType.unique);
+	readonly kind = this.#data.createObservablePartOfCurrent((data) => data?.kind);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMemberTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
@@ -66,7 +66,7 @@ export class UmbMemberWorkspaceContext
 	#variesByCulture?: boolean;
 	#variesBySegment?: boolean;
 
-	readonly variants = this.#data.current.asObservablePart((data) => data?.variants ?? []);
+	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
 	#dataTypeSchemaAliasMap = new Map<string, string>();
@@ -210,7 +210,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	getData() {
-		return this.#data.current.getValue();
+		return this.#data.getCurrent();
 	}
 
 	getUnique() {
@@ -236,15 +236,15 @@ export class UmbMemberWorkspaceContext
 	}
 
 	variantById(variantId: UmbVariantId) {
-		return this.#data.current.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
+		return this.#data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
 
 	getVariant(variantId: UmbVariantId) {
-		return this.#data.current.getValue()?.variants?.find((x) => variantId.compare(x));
+		return this.#data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
 	getName(variantId?: UmbVariantId) {
-		const variants = this.#data.current.getValue()?.variants;
+		const variants = this.#data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
@@ -258,7 +258,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	name(variantId?: UmbVariantId) {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
 		);
 	}
@@ -275,7 +275,7 @@ export class UmbMemberWorkspaceContext
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
 					?.value as PropertyValueType,
@@ -321,7 +321,7 @@ export class UmbMemberWorkspaceContext
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),
 			);
-			this.#data.current.update({ values });
+			this.#data.updateCurrent({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#data.ensureVariantData(variantId);
@@ -329,40 +329,29 @@ export class UmbMemberWorkspaceContext
 		this.finishPropertyValueChange();
 	}
 
-	#updateLock = 0;
 	initiatePropertyValueChange() {
-		this.#updateLock++;
-		this.#data.current.mute();
-		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
-		/*return {
-			[Symbol.dispose]: this.finishPropertyValueChange,
-		};*/
+		this.#data.initiatePropertyValueChange();
 	}
 	finishPropertyValueChange = () => {
-		this.#updateLock--;
-		this.#triggerPropertyValueChanges();
+		this.#data.finishPropertyValueChange();
 	};
-	#triggerPropertyValueChanges() {
-		if (this.#updateLock === 0) {
-			this.#data.current.unmute();
-		}
-	}
 
 	async submit() {
-		if (!this.#data.current.value) throw new Error('Data is missing');
-		if (!this.#data.current.value.unique) throw new Error('Unique is missing');
+		const current = this.#data.getCurrent();
+		if (!current) throw new Error('Data is missing');
+		if (!current.unique) throw new Error('Unique is missing');
 
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.current.value);
+			const { data } = await this.repository.create(current);
 			if (!data) {
 				throw new Error('Could not create member.');
 			}
 			newData = data;
 			this.setIsNew(false);
 		} else {
-			const { data } = await this.repository.save(this.#data.current.value);
+			const { data } = await this.repository.save(current);
 			if (!data) {
 				throw new Error('Could not create member.');
 			}
@@ -399,14 +388,14 @@ export class UmbMemberWorkspaceContext
 		propertyName: PropertyName,
 		value: UmbMemberDetailModel[PropertyName],
 	) {
-		this.#data.current.update({ [propertyName]: value });
+		this.#data.updateCurrent({ [propertyName]: value });
 	}
 
 	// Only for CRUD demonstration purposes
 	updateData(data: Partial<EntityModel>) {
-		const currentData = this.#data.current.getValue();
+		const currentData = this.#data.getCurrent();
 		if (!currentData) throw new Error('No data to update');
-		this.#data.current.setValue({ ...currentData, ...data });
+		this.#data.setCurrent({ ...currentData, ...data });
 	}
 
 	get email(): string {
@@ -450,7 +439,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	#get<PropertyName extends keyof UmbMemberDetailModel>(propertyName: PropertyName) {
-		return this.#data.current.getValue()?.[propertyName];
+		return this.#data.getCurrent()?.[propertyName];
 	}
 }
 

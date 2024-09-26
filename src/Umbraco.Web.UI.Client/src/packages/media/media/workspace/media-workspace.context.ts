@@ -70,14 +70,14 @@ export class UmbMediaWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	readonly unique = this.#data.current.asObservablePart((data) => data?.unique);
-	readonly entityType = this.#data.current.asObservablePart((data) => data?.entityType);
-	readonly contentTypeUnique = this.#data.current.asObservablePart((data) => data?.mediaType.unique);
-	readonly contentTypeHasCollection = this.#data.current.asObservablePart((data) => !!data?.mediaType.collection);
+	readonly unique = this.#data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly entityType = this.#data.createObservablePartOfCurrent((data) => data?.entityType);
+	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
+	readonly contentTypeHasCollection = this.#data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
 
-	readonly variants = this.#data.current.asObservablePart((data) => data?.variants || []);
+	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants || []);
 
-	readonly urls = this.#data.current.asObservablePart((data) => data?.urls || []);
+	readonly urls = this.#data.createObservablePartOfCurrent((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMediaTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
@@ -244,7 +244,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	getData() {
-		return this.#data.current.getValue();
+		return this.#data.getCurrent();
 	}
 
 	getUnique() {
@@ -270,15 +270,15 @@ export class UmbMediaWorkspaceContext
 	}
 
 	variantById(variantId: UmbVariantId) {
-		return this.#data.current.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
+		return this.#data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
 
 	getVariant(variantId: UmbVariantId) {
-		return this.#data.current.getValue()?.variants?.find((x) => variantId.compare(x));
+		return this.#data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
 	getName(variantId?: UmbVariantId) {
-		const variants = this.#data.current.getValue()?.variants;
+		const variants = this.#data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
@@ -292,7 +292,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	name(variantId?: UmbVariantId) {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
 		);
 	}
@@ -308,7 +308,7 @@ export class UmbMediaWorkspaceContext
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
 					?.value as PropertyValueType,
@@ -322,7 +322,7 @@ export class UmbMediaWorkspaceContext
 	 * @returns The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
-		const currentData = this.#data.current.value;
+		const currentData = this.#data.getCurrent();
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
 				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
@@ -355,7 +355,7 @@ export class UmbMediaWorkspaceContext
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),
 			);
-			this.#data.current.update({ values });
+			this.#data.updateCurrent({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#data.ensureVariantData(variantId);
@@ -363,24 +363,12 @@ export class UmbMediaWorkspaceContext
 		this.finishPropertyValueChange();
 	}
 
-	#updateLock = 0;
 	initiatePropertyValueChange() {
-		this.#updateLock++;
-		this.#data.current.mute();
-		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
-		/*return {
-			[Symbol.dispose]: this.finishPropertyValueChange,
-		};*/
+		this.#data.initiatePropertyValueChange();
 	}
 	finishPropertyValueChange = () => {
-		this.#updateLock--;
-		this.#triggerPropertyValueChanges();
+		this.#data.finishPropertyValueChange();
 	};
-	#triggerPropertyValueChanges() {
-		if (this.#updateLock === 0) {
-			this.#data.current.unmute();
-		}
-	}
 
 	/* 	#calculateChangedVariants() {
 		const persisted = this.#persistedData.getValue();
@@ -433,7 +421,7 @@ export class UmbMediaWorkspaceContext
 				},
 				(x) => variantId.compare(x),
 			);
-			this.#data.current.update({ variants: newVariants });
+			this.#data.updateCurrent({ variants: newVariants });
 		} else if (this.#varies === false) {
 			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
 			const invariantVariantId = UmbVariantId.CreateInvariant();
@@ -449,7 +437,7 @@ export class UmbMediaWorkspaceContext
 					...update,
 				},
 			];
-			this.#data.current.update({ variants: newVariants });
+			this.#data.updateCurrent({ variants: newVariants });
 		} else {
 			throw new Error('Varies by culture is missing');
 		}

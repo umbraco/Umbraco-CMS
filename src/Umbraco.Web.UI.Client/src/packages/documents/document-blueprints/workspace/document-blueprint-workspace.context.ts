@@ -66,12 +66,12 @@ export class UmbDocumentBlueprintWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	readonly unique = this.#data.current.asObservablePart((data) => data?.unique);
-	readonly entityType = this.#data.current.asObservablePart((data) => data?.entityType);
+	readonly unique = this.#data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly entityType = this.#data.createObservablePartOfCurrent((data) => data?.entityType);
 
-	readonly contentTypeUnique = this.#data.current.asObservablePart((data) => data?.documentType.unique);
+	readonly contentTypeUnique = this.#data.createObservablePartOfCurrent((data) => data?.documentType.unique);
 
-	readonly variants = this.#data.current.asObservablePart((data) => data?.variants || []);
+	readonly variants = this.#data.createObservablePartOfCurrent((data) => data?.variants || []);
 
 	//readonly urls = this.#data.current.asObservablePart((data) => data?.urls || []);
 
@@ -231,7 +231,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	getData() {
-		return this.#data.current.getValue();
+		return this.#data.getCurrent();
 	}
 
 	getUnique() {
@@ -257,15 +257,15 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	variantById(variantId: UmbVariantId) {
-		return this.#data.current.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
+		return this.#data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
 
 	getVariant(variantId: UmbVariantId) {
-		return this.#data.current.getValue()?.variants?.find((x) => variantId.compare(x));
+		return this.#data.getCurrent()?.variants?.find((x) => variantId.compare(x));
 	}
 
 	getName(variantId?: UmbVariantId) {
-		const variants = this.#data.current.getValue()?.variants;
+		const variants = this.#data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
@@ -275,11 +275,11 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+		this.#data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
 	name(variantId?: UmbVariantId) {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
 		);
 	}
@@ -295,7 +295,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
-		return this.#data.current.asObservablePart(
+		return this.#data.createObservablePartOfCurrent(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
 					?.value as PropertyValueType,
@@ -309,7 +309,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * @returns The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
-		const currentData = this.#data.current.value;
+		const currentData = this.#data.getCurrent();
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
 				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
@@ -341,7 +341,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),
 			);
-			this.#data.current.update({ values });
+			this.#data.updateCurrent({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#data.ensureVariantData(variantId);
@@ -349,107 +349,22 @@ export class UmbDocumentBlueprintWorkspaceContext
 		this.finishPropertyValueChange();
 	}
 
-	#updateLock = 0;
 	initiatePropertyValueChange() {
-		this.#updateLock++;
-		this.#data.current.mute();
-		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
-		/*return {
-			[Symbol.dispose]: this.finishPropertyValueChange,
-		};*/
+		this.#data.initiatePropertyValueChange();
 	}
 	finishPropertyValueChange = () => {
-		this.#updateLock--;
-		this.#triggerPropertyValueChanges();
+		this.#data.finishPropertyValueChange();
 	};
-	#triggerPropertyValueChanges() {
-		if (this.#updateLock === 0) {
-			this.#data.current.unmute();
-		}
-	}
-
-	/* 	#calculateChangedVariants() {
-		const persisted = this.#persistedData.getValue();
-		const current = this.#data.current.getValue();
-		if (!current) throw new Error('Current data is missing');
-
-		const changedVariants = current?.variants.map((variant) => {
-			const persistedVariant = persisted?.variants.find((x) => UmbVariantId.Create(variant).compare(x));
-			return {
-				culture: variant.culture,
-				segment: variant.segment,
-				equal: persistedVariant ? jsonStringComparison(variant, persistedVariant) : false,
-			};
-		});
-
-		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
-			return {
-				culture: value.culture,
-				segment: value.segment,
-				equal: persistedValues ? jsonStringComparison(value, persistedValues) : false,
-			};
-		});
-
-		// calculate the variantIds of those who either have a change in properties or in variants:
-		return (
-			changedVariants
-				?.concat(changedProperties ?? [])
-				.filter((x) => x.equal === false)
-				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
-		);
-	} */
-
-	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbDocumentBlueprintVariantModel>) {
-		const currentData = this.getData();
-		if (!currentData) throw new Error('Data is missing');
-		if (this.#varies === true) {
-			// If variant Id is invariant, we don't to have the variant appended to our data.
-			if (variantId.isInvariant()) return;
-			const variant = currentData.variants.find((x) => variantId.compare(x));
-			const newVariants = appendToFrozenArray(
-				currentData.variants,
-				{
-					name: '',
-					createDate: null,
-					updateDate: null,
-					...variantId.toObject(),
-					...variant,
-					...update,
-				},
-				(x) => variantId.compare(x),
-			);
-			this.#data.current.update({ variants: newVariants });
-		} else if (this.#varies === false) {
-			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
-			const invariantVariantId = UmbVariantId.CreateInvariant();
-			const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
-			// Cause we are invariant, we will just overwrite all variants with this one:
-			const newVariants = [
-				{
-					name: '',
-					createDate: null,
-					updateDate: null,
-					...invariantVariantId.toObject(),
-					...variant,
-					...update,
-				},
-			];
-			this.#data.current.update({ variants: newVariants });
-		} else {
-			throw new Error('Varies by culture is missing');
-		}
-	}
 
 	async #createOrSave() {
-		if (!this.#data.current.value?.unique) throw new Error('Unique is missing');
+		const current = this.#data.getCurrent();
+		if (!current?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			const value = this.#data.current.value;
 
-			if ((await this.repository.create(value, parent.unique)).data !== undefined) {
+			if ((await this.repository.create(current, parent.unique)).data !== undefined) {
 				this.setIsNew(false);
 
 				// TODO: this might not be the right place to alert the tree, but it works for now
@@ -461,7 +376,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 				eventContext.dispatchEvent(event);
 			}
 		} else {
-			await this.repository.save(this.#data.current.value);
+			await this.repository.save(current);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
