@@ -1,15 +1,10 @@
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from './repository/index.js';
+import { manifests as repositoryManifests } from './repository/manifests.js';
 
-export const UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Folder';
 export const UMB_DELETE_PARTIAL_VIEW_FOLDER_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.PartialView.Folder.Delete';
 
 export const manifests: Array<UmbExtensionManifest> = [
-	{
-		type: 'repository',
-		alias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
-		name: 'Partial View Folder Repository',
-		api: () => import('./partial-view-folder.repository.js'),
-	},
 	{
 		type: 'entityAction',
 		kind: 'folderDelete',
@@ -20,4 +15,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			folderRepositoryAlias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
+	...repositoryManifests,
 ];

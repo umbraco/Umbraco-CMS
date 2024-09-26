@@ -1,4 +1,4 @@
-import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreatePartialViewFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
