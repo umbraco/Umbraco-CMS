@@ -132,24 +132,39 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		`;
 	}
 
+	#renderNoDocumentTypes() {
+		if (this.data?.documentType?.unique) {
+			return html`
+				<umb-localize key="create_noDocumentTypes">
+					There are no allowed Document Types available for creating content here. You must enable these in
+					<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
+					<strong>Allowed child node types</strong> under <strong>Structure</strong>.
+				</umb-localize>
+				<br />
+				<uui-button
+					id="edit-permissions"
+					look="secondary"
+					href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
+					label=${this.localize.term('create_noDocumentTypesEditPermissions')}
+					@click=${() => this._rejectModal()}></uui-button>
+			`;
+		} else {
+			return html`
+				<umb-localize key="create_noDocumentTypesAllowedAtRoot">
+					There are no allowed Document Types available for creating content here. You must enable these in
+					<strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the
+					<strong>Allow as root</strong> option under <strong>Structure</strong>.
+				</umb-localize>
+			`;
+		}
+	}
+
 	#renderDocumentTypes() {
 		return html`
 			<uui-box .headline=${this._headline}>
 				${when(
 					this._allowedDocumentTypes.length === 0,
-					() => html`
-						<umb-localize key="create_noDocumentTypes">
-							There are no allowed Document Types available for creating content here. You must enable these in
-							<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
-							<strong>Allowed child node types</strong> under <strong>Permissions</strong>.<br />
-						</umb-localize>
-						<uui-button
-							id="edit-permissions"
-							look="secondary"
-							href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
-							label=${this.localize.term('create_noDocumentTypesEditPermissions')}
-							@click=${() => this._rejectModal()}></uui-button>
-					`,
+					() => this.#renderNoDocumentTypes(),
 					() =>
 						repeat(
 							this._allowedDocumentTypes,
