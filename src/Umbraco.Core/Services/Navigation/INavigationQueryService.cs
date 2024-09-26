@@ -8,9 +8,9 @@ public interface INavigationQueryService
 {
     bool TryGetParentKey(Guid childKey, out Guid? parentKey);
 
-    bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
+    bool TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
-    bool TryGetRootKeys(out IEnumerable<Guid> childrenKeys);
+    bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
 
     bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys);
 

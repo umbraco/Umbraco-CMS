@@ -41,6 +41,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract int Level { get; }
 
         /// <inheritdoc />
+        [Obsolete("Not supported for members, scheduled for removal in v17")]
         public abstract string Path { get; }
 
         /// <inheritdoc />

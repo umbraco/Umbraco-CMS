@@ -51,12 +51,7 @@ public class ConvertersTests
         var cacheContent = new Dictionary<int, IPublishedContent>();
         cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id =>
             cacheContent.TryGetValue(id, out var content) ? content : null);
-        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
-        publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
-        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        var localPublishedSnapshot = publishedSnapshotMock.Object;
-        publishedSnapshotAccessorMock.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
-        register.AddTransient(f => publishedSnapshotAccessorMock.Object);
+        register.AddSingleton(f => cacheMock.Object);
 
         var registerFactory = composition.CreateServiceProvider();
         var converters =
@@ -175,10 +170,12 @@ public class ConvertersTests
 
     public class SimpleConverter3B : PropertyValueConverterBase
     {
-        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IPublishedContentCache _publishedContentCache;
 
-        public SimpleConverter3B(IPublishedSnapshotAccessor publishedSnapshotAccessor) =>
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        public SimpleConverter3B(IPublishedContentCache publishedContentCache)
+        {
+            _publishedContentCache = publishedContentCache;
+        }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias == "Umbraco.Void.2";
@@ -206,9 +203,8 @@ public class ConvertersTests
             object inter,
             bool preview)
         {
-            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             return ((int[])inter).Select(x =>
-                (PublishedSnapshotTestObjects.TestContentModel1)publishedSnapshot.Content
+                (PublishedSnapshotTestObjects.TestContentModel1)_publishedContentCache
                     .GetById(x)).ToArray();
         }
     }
