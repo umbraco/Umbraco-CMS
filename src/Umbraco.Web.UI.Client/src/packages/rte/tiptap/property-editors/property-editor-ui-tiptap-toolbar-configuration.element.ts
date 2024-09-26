@@ -108,6 +108,15 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 
 	#onChange(event: CustomEvent) {
 		this.value = event.target.value;
+
+		// update the selected state of the extensions
+		// TODO this should be done in a more efficient way
+		this._extensionCategories.forEach((category) => {
+			category.extensions.forEach((item) => {
+				item.selected = this.value.some((v) => v.alias === item.alias);
+			});
+		});
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 

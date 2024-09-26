@@ -29,6 +29,8 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 		return this.#originalFormat;
 	}
 
+	//TODO: Use the context again so that we can remove items from the extensions list from here.
+
 	@state()
 	_structuredData: string[][][] = [[[]]];
 
@@ -72,11 +74,48 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 		const [rowIndex, groupIndex, itemIndex] = toPos;
 		// Insert the item into the new position
 		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 0, alias);
-		this.#originalFormat = this.toOriginalFormat(this._structuredData);
+		this.#updateOriginalFormat();
 
 		this.requestUpdate('_structuredData');
 		this.dispatchEvent(new UmbChangeEvent());
 	};
+
+	#addGroup = (rowIndex: number, groupIndex: number) => {
+		this._structuredData[rowIndex].splice(groupIndex, 0, []);
+		this.requestUpdate('_structuredData');
+	};
+
+	#removeGroup = (rowIndex: number, groupIndex: number) => {
+		if (rowIndex === 0 && groupIndex === 0) {
+			// Prevent removing the last group
+			this._structuredData[rowIndex][groupIndex] = [];
+		} else {
+			this._structuredData[rowIndex].splice(groupIndex, 1);
+		}
+		this.requestUpdate('_structuredData');
+		this.#updateOriginalFormat();
+	};
+
+	#addRow = (rowIndex: number) => {
+		this._structuredData.splice(rowIndex, 0, [[]]);
+		this.requestUpdate('_structuredData');
+	};
+
+	#removeRow = (rowIndex: number) => {
+		if (rowIndex === 0) {
+			// Prevent removing the last row
+			this._structuredData[rowIndex] = [[]];
+		} else {
+			this._structuredData.splice(rowIndex, 1);
+		}
+		this.requestUpdate('_structuredData');
+		this.#updateOriginalFormat();
+	};
+
+	#updateOriginalFormat() {
+		this.#originalFormat = this.toOriginalFormat(this._structuredData);
+		this.dispatchEvent(new UmbChangeEvent());
+	}
 
 	private renderItem(alias: string) {
 		return html`<div class="item" draggable="true" @dragstart=${(e: DragEvent) => this.#onDragStart(e, alias)}>
@@ -92,23 +131,31 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 				@dragover=${this.#onDragOver}
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.length])}>
 				${group.map((alias) => this.renderItem(alias))}
+				<button class="remove-group-button" @click=${() => this.#removeGroup(rowIndex, groupIndex)}>X</button>
 			</div>
 		`;
 	}
 
 	private renderRow(row: string[][], rowIndex: number) {
 		return html`
-			<div class="row">${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}</div>
+			<div class="row">
+				${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}
+				<button @click=${() => this.#addGroup(rowIndex, row.length)}>+</button>
+				<button class="remove-row-button" @click=${() => this.#removeRow(rowIndex)}>X</button>
+			</div>
 		`;
 	}
 
 	override render() {
-		return html`${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
+		return html`
+			${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
+			<button @click=${() => this.#addRow(this._structuredData.length)}>+</button>
 
 			<div>
 				<p>Extensions hidden from the toolbar</p>
 				${this.#originalFormat.filter((item) => !item.position).map((item) => this.renderItem(item.alias))}
-			</div> `;
+			</div>
+		`;
 	}
 
 	toStructuredData = (data: TestServerValue) => {
@@ -154,11 +201,16 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 			});
 		});
 
-		// Add the items that are not in any group and does not already exist in the original data
-		const itemsNotInGroups = this.#originalFormat.filter((item) => !item.position);
-		itemsNotInGroups.forEach((item) => {
-			if (!originalData.some((i) => i.alias === item.alias)) {
-				originalData.push(item);
+		//TODO Should the extensions removed from the toolbar be removed from the original data as well?
+		// or just put into the hidden extensions list? (just remove the position property)
+
+		// add items from this.#originalFormat only if they are not already in the structured data and they have no position
+		this.#originalFormat.forEach((item) => {
+			if (!item.position) {
+				const exists = originalData.find((i) => i.alias === item.alias);
+				if (!exists) {
+					originalData.push(item);
+				}
 			}
 		});
 
