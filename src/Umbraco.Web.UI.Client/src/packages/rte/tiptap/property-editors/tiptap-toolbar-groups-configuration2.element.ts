@@ -112,10 +112,9 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 	}
 
 	toStructuredData = (data: TestServerValue) => {
-		const structuredData: string[][][] = [];
-
 		if (!data.length) return [[[]]];
 
+		const structuredData: string[][][] = [[[]]];
 		data.forEach(({ alias, position }) => {
 			if (!position) return;
 
