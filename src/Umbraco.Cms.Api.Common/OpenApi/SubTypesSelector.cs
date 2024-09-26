@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Serialization;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
@@ -35,7 +36,7 @@ public class SubTypesSelector : ISubTypesSelector
         if (_httpContextAccessor.HttpContext?.Request.Path.StartsWithSegments($"{backOfficePath}/swagger") ?? false)
         {
             // Split the path into segments
-            var segments = _httpContextAccessor.HttpContext.Request.Path.Value!.TrimStart($"{backOfficePath}/swagger/").Split('/');
+            var segments = _httpContextAccessor.HttpContext.Request.Path.Value!.TrimStart($"{backOfficePath}/swagger/").Split(Constants.CharArrays.ForwardSlash);
 
             // Extract the document name from the path
             var documentName = segments[0];
