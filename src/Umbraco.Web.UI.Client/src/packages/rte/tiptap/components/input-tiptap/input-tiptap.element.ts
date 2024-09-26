@@ -83,8 +83,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		const maxWidth = this.configuration?.getValueByAlias<number>('maxWidth');
 		const maxHeight = this.configuration?.getValueByAlias<number>('maxHeight');
-		this.setAttribute('style', `max-width: ${maxWidth}px;`);
-		element.setAttribute('style', `max-height: ${maxHeight}px;`);
+		if (maxWidth) this.setAttribute('style', `max-width: ${maxWidth}px;`);
+		if (maxHeight) element.setAttribute('style', `max-height: ${maxHeight}px;`);
 
 		const extensions = this._extensions
 			.map((ext) => ext.getTiptapExtensions({ configuration: this.configuration }))
@@ -176,8 +176,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				h1,
 				h2,
-				h3,
-				p {
+				h3 {
 					margin-top: 0;
 					margin-bottom: 0.5em;
 				}
