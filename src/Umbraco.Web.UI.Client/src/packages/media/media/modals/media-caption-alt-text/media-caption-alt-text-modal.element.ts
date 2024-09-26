@@ -27,7 +27,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		const { data } = await this.#mediaDetailRepository.requestByUnique(this.#mediaUnique);
 		if (!data) return;
 
-		this.value = { altText: data.variants[0].name, caption: undefined, url: data.urls[0]?.url ?? '' };
+		this.value = { ...this.value, altText: this.value.altText ?? data.variants[0].name, url: data.urls[0]?.url ?? '' };
 	}
 
 	override render() {
@@ -46,11 +46,14 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 					<uui-input
 						id="caption"
 						label="caption"
+						.value=${this.value?.caption ?? ''}
 						@input=${(e: UUIInputEvent) =>
 							(this.value = { ...this.value, caption: e.target.value as string })}></uui-input>
 
-					<img src=${this.value?.url ?? ''} alt=${this.value?.altText ?? ''} />
-					${this.value?.caption ?? ''}
+					<figure id="mainobject">
+						<img src=${this.value?.url ?? ''} alt=${this.value?.altText ?? ''} />
+						<figcaption>${this.value?.caption ?? ''}</figcaption>
+					</figure>
 				</div>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
@@ -64,7 +67,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			uui-input {
 				margin-bottom: var(--uui-size-layout-1);
@@ -73,6 +76,17 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 			#wrapper {
 				display: flex;
 				flex-direction: column;
+			}
+
+			#mainobject {
+				display: flex;
+				flex-direction: column;
+				max-width: 100%;
+
+				img {
+					max-width: 100%;
+					height: auto;
+				}
 			}
 		`,
 	];
