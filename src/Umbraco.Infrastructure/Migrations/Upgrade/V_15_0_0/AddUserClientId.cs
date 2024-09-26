@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
@@ -11,5 +12,12 @@ public class AddUserClientId : MigrationBase
     }
 
     protected override void Migrate()
-        => Create.Table<User2ClientIdDto>().Do();
+    {
+        if (TableExists(Constants.DatabaseSchema.Tables.User2ClientId))
+        {
+            return;
+        }
+
+        Create.Table<User2ClientIdDto>().Do();
+    }
 }

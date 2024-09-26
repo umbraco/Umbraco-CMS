@@ -358,6 +358,93 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(expectedResult, result);
     }
 
+    [Test]
+    public async Task Can_Validate_For_All_Languages()
+    {
+        var contentType = await SetupLanguageTest();
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants = [
+                    new()
+                    {
+                        Name = "Test Document (EN)",
+                        Culture = "en-US",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in English",
+                            }
+                        ]
+                    },
+                    new()
+                    {
+                        Name = "Test Document (DA)",
+                        Culture = "da-DK",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in Danish",
+                            }
+                        ]
+                    }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(2, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Culture == "en-US" && r.JsonPath == string.Empty));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Culture == "da-DK" && r.JsonPath == string.Empty));
+    }
+
+    [TestCase("da-DK")]
+    [TestCase("en-US")]
+    public async Task Can_Validate_For_Specific_Language(string culture)
+    {
+        var contentType = await SetupLanguageTest();
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants = [
+                    new()
+                    {
+                        Name = "Test Document (EN)",
+                        Culture = "en-US",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in English",
+                            }
+                        ]
+                    },
+                    new()
+                    {
+                        Name = "Test Document (DA)",
+                        Culture = "da-DK",
+                        Properties = [
+                            new()
+                            {
+                                Alias = "title",
+                                Value = "Invalid value in Danish",
+                            }
+                        ]
+                    }
+                ]
+            },
+            contentType,
+            [culture]);
+
+        Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Culture == culture && r.JsonPath == string.Empty));
+    }
+
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()
     {
         var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();
@@ -440,6 +527,24 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         contentType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^Valid.*$";
         contentType.AllowedAsRoot = true;
         ContentTypeService.Save(contentType);
+
+        return contentType;
+    }
+
+    private async Task<IContentType> SetupLanguageTest()
+    {
+        var language = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type");
+        contentType.Variations = ContentVariation.Culture;
+        var titlePropertyType = contentType.PropertyTypes.First(pt => pt.Alias == "title");
+        titlePropertyType.Variations = ContentVariation.Culture;
+        titlePropertyType.ValidationRegExp = "^Valid.*$";
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return contentType;
     }
