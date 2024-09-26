@@ -20,6 +20,12 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
     protected override void Migrate()
     {
+        // If the new column already exists we'll do nothing.
+        if (ColumnExists(Constants.DatabaseSchema.Tables.UserGroup, NewColumnName))
+        {
+            return;
+        }
+
         // SQL server can simply add the column, but for SQLite this won't work,
         // so we'll have to create a new table and copy over data.
         if (DatabaseType != DatabaseType.SQLite)
@@ -36,11 +42,6 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
-
-        if (ColumnExists(Constants.DatabaseSchema.Tables.UserGroup, NewColumnName))
-        {
-            return;
-        }
 
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);
@@ -67,12 +68,6 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
-
-        // If the new column already exists we'll do nothing.
-        if (ColumnExists(Constants.DatabaseSchema.Tables.UserGroup, NewColumnName))
-        {
-            return;
-        }
 
         // This isn't pretty,
         // But since you cannot alter columns, we have to copy the data over and delete the old table.
