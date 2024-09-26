@@ -153,6 +153,11 @@ export class UmbTiptapToolbarGroupsConfiguration2Element extends UmbLitElement {
 
 	override render() {
 		return html`
+			<p>
+				<uui-badge color="warning">WIP Feature</uui-badge> Rows, groups and order of items have no effect yet. <br />
+				However adding and removing items from the toolbar is functional. Also hiding items from the toolbar by not
+				including them in the toolbar layout is functional.
+			</p>
 			${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
 			<uui-button look="secondary" @click=${() => this.#addRow(this._structuredData.length)}>+</uui-button>
 
