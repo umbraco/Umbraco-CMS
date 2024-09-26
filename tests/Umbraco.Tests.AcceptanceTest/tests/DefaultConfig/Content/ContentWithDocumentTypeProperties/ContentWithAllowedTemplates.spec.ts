@@ -19,7 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
-test('can create a content that set an allowed template', async ({umbracoApi, umbracoUi}) => {
+test('can create content with an allowed template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
   await umbracoUi.goToBackOffice();
@@ -39,7 +39,7 @@ test('can create a content that set an allowed template', async ({umbracoApi, um
   expect(contentData.template.id).toBe(templateId);
 });
 
-test('can create a content that set multiple allowed template', async ({umbracoApi, umbracoUi}) => {
+test('can create content with multiple allowed templates', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const defaultTemplateName = 'TestDefaultTemplate';
   await umbracoApi.template.ensureNameNotExists(defaultTemplateName);

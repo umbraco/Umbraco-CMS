@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists(secondLanguageName);
 });
 
-test('can create a content with allow vary by culture is enabled', async ({umbracoApi, umbracoUi}) => {
+test('can create content with allow vary by culture enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDocumentTypeWithAllowVaryByCulture(documentTypeName);
   await umbracoUi.goToBackOffice();
@@ -37,7 +37,7 @@ test('can create a content with allow vary by culture is enabled', async ({umbra
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 
-test('can create a language version with a different name of an empty content', async ({umbracoApi, umbracoUi}) => {
+test('can create content with names that vary by culture', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const danishContentName = 'Test indhold';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowVaryByCulture(documentTypeName);
@@ -62,7 +62,7 @@ test('can create a language version with a different name of an empty content', 
   expect(contentData.variants[1].name).toBe(danishContentName);
 });
 
-test('can create a language version with a different name and same content of an non-empty content', async ({umbracoApi, umbracoUi}) => {
+test('can create content with names that vary by culture and content that is invariant', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const danishContentName = 'Test indhold';
   const textContent = 'This is a test text';
@@ -94,7 +94,7 @@ test('can create a language version with a different name and same content of an
   expect(contentData.values[0].value).toBe(danishTextContent);
 });
 
-test('can create a language version with a different name and different content of an non-empty content', async ({umbracoApi, umbracoUi}) => {
+test('can create content with names and content that vary by culture', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const danishContentName = 'Test indhold';
   const textContent = 'This is a test text';

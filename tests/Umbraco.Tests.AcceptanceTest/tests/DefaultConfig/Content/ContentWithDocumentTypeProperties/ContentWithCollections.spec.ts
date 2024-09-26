@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create a content that configure it as a collection', async ({umbracoApi, umbracoUi}) => {
+test('can create content configured as a collection', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const noItemsToShowMessage = 'There are no items to show in the list.';
   await umbracoApi.documentType.createDocumentTypeWithCollectionId(documentTypeName, dataTypeData.id);
@@ -41,7 +41,7 @@ test('can create a content that configure it as a collection', async ({umbracoAp
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 
-test('can create a child content under a collection', async ({umbracoApi, umbracoUi}) => {
+test('can create child content in a collection', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedNames = [firstChildContentName];
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -75,7 +75,7 @@ test('can create a child content under a collection', async ({umbracoApi, umbrac
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
-test('can create multiple child contents under a collection', async ({umbracoApi, umbracoUi}) => {
+test('can create multiple child nodes in a collection', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedNames = [secondChildContentName, firstChildContentName];
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);

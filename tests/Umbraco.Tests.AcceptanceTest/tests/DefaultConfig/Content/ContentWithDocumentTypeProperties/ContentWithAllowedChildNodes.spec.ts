@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create a content with allowed child node is enabled', async ({umbracoApi, umbracoUi}) => {
+test('can create content with allowed child node enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeName = 'Test Child Document Type';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -38,7 +38,7 @@ test('can create a content with allowed child node is enabled', async ({umbracoA
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
-test('cannot create a child content if allowed child node is not enabled', async ({umbracoApi, umbracoUi}) => {
+test('cannot create child content if allowed child node is disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const noAllowedDocumentTypeAvailableMessage = 'There are no allowed Document Types available for creating content here';
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);

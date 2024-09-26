@@ -11,7 +11,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('cannot create any content if allow at root is not enabled', async ({umbracoApi, umbracoUi}) => {
+test('cannot create content if allow at root is disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const noAllowedDocumentTypeAvailableMessage = 'There are no allowed Document Types available for creating content here';
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
