@@ -5,7 +5,10 @@
     <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure</RootNamespace>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>$(DefineConstants);TRACE_SCOPES</DefineConstants>
   </PropertyGroup>
@@ -36,6 +39,9 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
+
+    <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <ItemGroup>

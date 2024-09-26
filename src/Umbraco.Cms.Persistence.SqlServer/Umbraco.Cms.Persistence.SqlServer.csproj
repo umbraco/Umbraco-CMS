@@ -3,7 +3,12 @@
     <Title>Umbraco CMS - Persistence - SQL Server</Title>
     <Description>Adds support for SQL Server to Umbraco CMS.</Description>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!--  TODO: [SA1405] Simplify null checks, [SA1121] resolve hiding inherited members, [SA1117] remove async or make method synchronous,
+    [IDE1006] fix naming rule violation, [CS0618] handle member obsolete appropriately, [IDE0270] simplify null check, [IDE0057] simplify substring,
+    [IDE0054] use compound assignment, [CSO618] use NVARCARMAX, [IDE0048] add parenthesis for clarity, [CS1574] resolve ML comment cref attribute and remove this override -->
+    <WarningsNotAsErrors>SA1405,SA1121,SA1117,SA1116,IDE1006,CS0618,IDE0270,IDE0057,IDE0054,CSO618,IDE0048,CS1574</WarningsNotAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <!-- Take top-level depedendency on Azure.Identity, because NPoco.SqlServer depends on a vulnerable version -->
     <PackageReference Include="Azure.Identity" />
@@ -11,6 +16,12 @@
 
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
+
+    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
+    <PackageReference Include="System.Text.Encodings.Web"/>
+
+    <!-- NPoco.SqlServer bring in vulnerable version of Microsoft.Data.SqlClient  -->
+    <PackageReference Include="Microsoft.Data.SqlClient" />
   </ItemGroup>
 
   <ItemGroup>

@@ -174,16 +174,13 @@ public class TestHelper : TestHelperBase
 
     private static void AssertListsAreEqual(PropertyInfo property, IEnumerable expected, IEnumerable actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
     {
-        if (sorter == null)
+        // this is pretty hackerific but saves us some code to write
+        sorter ??= enumerable =>
         {
-            // this is pretty hackerific but saves us some code to write
-            sorter = enumerable =>
-            {
-                // semi-generic way of ensuring any collection of IEntity are sorted by Ids for comparison
-                var entities = enumerable.OfType<IEntity>().ToList();
-                return entities.Count > 0 ? entities.OrderBy(x => x.Id) : entities;
-            };
-        }
+            // semi-generic way of ensuring any collection of IEntity are sorted by Ids for comparison
+            var entities = enumerable.OfType<IEntity>().ToList();
+            return entities.Count > 0 ? entities.OrderBy(x => x.Id) : entities;
+        };
 
         var expectedListEx = sorter(expected).Cast<object>().ToList();
         var actualListEx = sorter(actual).Cast<object>().ToList();

@@ -5,7 +5,10 @@
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <!-- TODO: Fix all warnings and remove this override -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -23,6 +26,8 @@
     <PackageReference Include="System.Text.RegularExpressions" />
     <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
+    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web  -->
+    <PackageReference Include="System.Text.Encodings.Web"/>
   </ItemGroup>
 
   <ItemGroup>
