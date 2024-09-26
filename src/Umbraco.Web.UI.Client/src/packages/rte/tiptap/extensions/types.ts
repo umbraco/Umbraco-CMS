@@ -5,12 +5,38 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export interface UmbTiptapExtensionApi extends UmbApi {
+	/**
+	 * Sets the editor instance to the extension.
+	 */
+	setEditor(editor: Editor): void;
+
+	/**
+	 * Gets the Tiptap extensions for the editor.
+	 */
 	getTiptapExtensions(args?: UmbTiptapExtensionArgs): Array<Extension | Mark | Node>;
 }
 
 export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implements UmbTiptapExtensionApi {
-	public manifest?: ManifestTiptapExtension;
+	/**
+	 * The manifest for the extension.
+	 */
+	protected _manifest?: ManifestTiptapExtension;
 
+	/**
+	 * The editor instance.
+	 */
+	protected _editor?: Editor;
+
+	/**
+	 * @inheritdoc
+	 */
+	setEditor(editor: Editor): void {
+		this._editor = editor;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	abstract getTiptapExtensions(args?: UmbTiptapExtensionArgs): Array<Extension | Mark | Node>;
 }
 
@@ -24,18 +50,31 @@ export interface UmbTiptapExtensionArgs {
 }
 
 export interface UmbTiptapToolbarElementApi extends UmbTiptapExtensionApi {
-	execute(editor?: Editor): void;
-	isActive(editor?: Editor): boolean;
+	/**
+	 * Executes the toolbar element action.
+	 */
+	execute(editor: Editor): void;
+
+	/**
+	 * Checks if the toolbar element is active.
+	 */
+	isActive(editor: Editor): boolean;
 }
 
 export abstract class UmbTiptapToolbarElementApiBase
 	extends UmbTiptapExtensionApiBase
 	implements UmbTiptapToolbarElementApi
 {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	public execute(editor?: Editor) {}
+	/**
+	 * A method to execute the toolbar element action.
+	 */
+	public abstract execute(editor: Editor): void;
 
+	/**
+	 * Informs the toolbar element if it is active or not. It uses the manifest meta alias to check if the toolbar element is active.
+	 * @see {ManifestTiptapExtension}
+	 */
 	public isActive(editor?: Editor) {
-		return editor && this.manifest?.meta.alias ? editor?.isActive(this.manifest.meta.alias) : false;
+		return editor && this._manifest?.meta.alias ? editor?.isActive(this._manifest.meta.alias) : false;
 	}
 }

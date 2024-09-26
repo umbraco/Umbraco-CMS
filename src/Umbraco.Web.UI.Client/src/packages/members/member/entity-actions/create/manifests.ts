@@ -13,6 +13,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_create',
+			additionalOptions: true,
 		},
 	},
 ];

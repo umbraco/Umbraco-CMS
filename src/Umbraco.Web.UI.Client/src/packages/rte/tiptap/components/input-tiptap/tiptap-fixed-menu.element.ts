@@ -3,6 +3,8 @@ import { css, customElement, html, property } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
+import '../toolbar/tiptap-toolbar-dropdown-base.element.js';
+
 const elementName = 'umb-tiptap-fixed-menu';
 
 @customElement(elementName)
@@ -51,12 +53,14 @@ export class UmbTiptapFixedMenuElement extends UmbLitElement {
 			color: var(--color-text);
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
-			gap: 4px;
+			gap: var(--uui-size-space-1);
 			position: sticky;
 			top: -25px;
 			left: 0px;
 			right: 0px;
-			padding: 4px;
+			padding: var(--uui-size-space-3);
+			align-items: center;
+			z-index: 100;
 		}
 
 		:host([readonly]) {

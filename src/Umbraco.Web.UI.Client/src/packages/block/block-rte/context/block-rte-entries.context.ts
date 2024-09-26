@@ -50,15 +50,9 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						value.create.contentElementTypeKey,
 						// We can parse an empty object, cause the rest will be filled in by others.
 						{} as any,
-						data.originData as UmbBlockRteWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
-							created.layout,
-							created.content,
-							created.settings,
-							data.originData as UmbBlockRteWorkspaceOriginData,
-						);
+						this.insert(created.layout, created.content, created.settings);
 					} else {
 						throw new Error('Failed to create block');
 					}
@@ -131,25 +125,16 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		this._manager?.setLayouts(layouts);
 	}
 
-	async create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentUdi'>,
-		originData?: UmbBlockRteWorkspaceOriginData,
-	) {
+	async create(contentElementTypeKey: string, partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentUdi'>) {
 		await this._retrieveManager;
-		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, originData);
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry);
 	}
 
 	// insert Block?
 
-	async insert(
-		layoutEntry: UmbBlockRteLayoutModel,
-		content: UmbBlockDataType,
-		settings: UmbBlockDataType | undefined,
-		originData: UmbBlockRteWorkspaceOriginData,
-	) {
+	async insert(layoutEntry: UmbBlockRteLayoutModel, content: UmbBlockDataType, settings: UmbBlockDataType | undefined) {
 		await this._retrieveManager;
-		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
+		return this._manager?.insert(layoutEntry, content, settings) ?? false;
 	}
 
 	// create Block?

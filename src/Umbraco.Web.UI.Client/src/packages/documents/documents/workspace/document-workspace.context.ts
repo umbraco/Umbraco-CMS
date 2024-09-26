@@ -31,7 +31,6 @@ import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	type UmbCollectionWorkspaceContext,
 	type UmbPublishableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
@@ -64,7 +63,7 @@ import {
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import type { UmbContentCollectionWorkspaceContext, UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
@@ -75,7 +74,7 @@ export class UmbDocumentWorkspaceContext
 	implements
 		UmbContentWorkspaceContext<UmbDocumentTypeDetailModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext,
-		UmbCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
+		UmbContentCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -171,7 +170,7 @@ export class UmbDocumentWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
-		this.addValidationContext(new UmbValidationContext(this).provide());
+		this.addValidationContext(new UmbValidationContext(this));
 
 		new UmbVariantValuesValidationPathTranslator(this);
 		new UmbVariantsValidationPathTranslator(this);
@@ -415,6 +414,7 @@ export class UmbDocumentWorkspaceContext
 	}
 	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		variantId ??= UmbVariantId.CreateInvariant();
+		//const property = await this.structure.getPropertyStructureByAlias(alias);
 
 		const entry = { ...variantId.toObject(), alias, value } as UmbDocumentValueModel<ValueType>;
 		const currentData = this.getData();

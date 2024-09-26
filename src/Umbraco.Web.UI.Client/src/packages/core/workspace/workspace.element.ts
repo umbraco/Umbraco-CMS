@@ -16,7 +16,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 		if (!this.entityType) return nothing;
 		return html`<umb-extension-with-api-slot
 			type="workspace"
-			.defaultApi=${() => import('./contexts/default-workspace.context.js')}
+			.defaultApi=${() => import('./kinds/default/default-workspace.context.js')}
 			.apiArgs=${apiArgsCreator}
 			.filter=${(manifest: ManifestWorkspace) =>
 				manifest.meta.entityType === this.entityType}></umb-extension-with-api-slot>`;

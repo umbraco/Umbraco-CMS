@@ -1,6 +1,7 @@
 export * from './debounce/debounce.function.js';
 export * from './direction/index.js';
 export * from './download/blob-download.function.js';
+export * from './get-guid-from-udi.function.js';
 export * from './get-processed-image-url.function.js';
 export * from './math/math.js';
 export * from './media/image-size.function.js';

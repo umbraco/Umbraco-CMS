@@ -3,7 +3,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbCollectionBulkActionPermissions,
@@ -31,7 +31,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._collectionAlias = workspaceContext.getCollectionAlias();
 
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {

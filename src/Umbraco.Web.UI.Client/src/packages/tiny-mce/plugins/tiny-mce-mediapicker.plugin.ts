@@ -1,11 +1,15 @@
-import { getGuid } from '../utils.js';
-import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL } from '../modals/media-caption-alt-text/media-caption-alt-text-modal.token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
+import { getGuidFromUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { sizeImageInEditor, uploadBlobImages, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
+import {
+	sizeImageInEditor,
+	uploadBlobImages,
+	UMB_MEDIA_PICKER_MODAL,
+	UMB_MEDIA_CAPTION_ALT_TEXT_MODAL,
+} from '@umbraco-cms/backoffice/media';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 interface MediaPickerTargetData {
@@ -143,7 +147,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 				//startNodeIsVirtual,
 			},
 			value: {
-				selection: currentTarget.udi ? [getGuid(currentTarget.udi)] : [],
+				selection: currentTarget.udi ? [getGuidFromUdi(currentTarget.udi)] : [],
 			},
 		});
 

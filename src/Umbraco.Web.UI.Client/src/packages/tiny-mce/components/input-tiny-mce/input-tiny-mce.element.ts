@@ -380,7 +380,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return html`<div class="editor"></div>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			.tox-tinymce {
 				position: relative;

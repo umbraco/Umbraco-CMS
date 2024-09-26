@@ -1,6 +1,7 @@
 import { UmbTiptapToolbarElementApiBase } from '../types.js';
+import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
-import { UMB_CODE_EDITOR_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTiptapCodeEditorExtensionApi extends UmbTiptapToolbarElementApiBase {
 	getTiptapExtensions = () => [];

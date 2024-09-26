@@ -17,6 +17,7 @@ export const manifest: UmbExtensionManifestKind = {
 		meta: {
 			icon: 'icon-add',
 			label: '#actions_folderCreate',
+			additionalOptions: true,
 		},
 	},
 };

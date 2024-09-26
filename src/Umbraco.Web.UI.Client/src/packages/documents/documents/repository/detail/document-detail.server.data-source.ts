@@ -92,6 +92,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			unique: data.id,
 			values: data.values.map((value) => {
 				return {
+					editorAlias: value.editorAlias,
 					alias: value.alias,
 					culture: value.culture || null,
 					segment: value.segment || null,

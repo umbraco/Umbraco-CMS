@@ -32,8 +32,8 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 		);
 	}
 
-	#manager = new UmbTemporaryFileManager(this);
-	#localize = new UmbLocalizationController(this);
+	readonly #manager = new UmbTemporaryFileManager(this);
+	readonly #localize = new UmbLocalizationController(this);
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
@@ -99,13 +99,7 @@ export default class UmbTiptapMediaUploadExtension extends UmbTiptapExtensionApi
 				return;
 			}
 
-			let { width, height } = await imageSize(URL.createObjectURL(upload.file));
-
-			if (maxImageSize > 0 && width > maxImageSize) {
-				const ratio = maxImageSize / width;
-				width = maxImageSize;
-				height = Math.round(height * ratio);
-			}
+			const { width, height } = await imageSize(URL.createObjectURL(upload.file), { maxWidth: maxImageSize });
 
 			editor
 				.chain()

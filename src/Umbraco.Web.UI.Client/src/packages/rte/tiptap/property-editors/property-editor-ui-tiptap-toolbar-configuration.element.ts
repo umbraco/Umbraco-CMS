@@ -165,7 +165,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-icon {

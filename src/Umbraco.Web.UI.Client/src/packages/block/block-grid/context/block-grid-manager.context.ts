@@ -171,7 +171,7 @@ export class UmbBlockGridManagerContext<
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
 		this.setOneLayout(layoutEntry, originData);
-		this.insertBlockData(layoutEntry, content, settings, originData);
+		this.insertBlockData(layoutEntry, content, settings);
 
 		return true;
 	}

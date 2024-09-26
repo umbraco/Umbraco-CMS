@@ -1792,13 +1792,7 @@ This is to test the default configuration of the TinyMCE editor.
 
 Search for **dt-richTextEditorTinyMce** in the codebase to find the configuration and add configuration values.
 
-**NB!** If this throws an error in console, go to \`input-tiny-mce.defaults.ts\` and comment out the script append on line 126:
-
-\`\`\`js
-script.text = \`import "@umbraco-cms/backoffice/extension-registry";\`;
-script.text = \`import "\${UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH}";\`;
-//editor.dom.doc.head.appendChild(script);
-\`\`\``,
+**NB!** If this throws an error in console, make sure that \`@umbraco-cms/backoffice/block-rte\` is available in the importmap.`,
 				dataType: { id: 'dt-richTextEditorTinyMce' },
 				variesByCulture: false,
 				variesBySegment: false,

@@ -8,5 +8,12 @@ const dist = '../../../dist-cms/packages/rte';
 rmSync(dist, { recursive: true, force: true });
 
 export default defineConfig({
-	...getDefaultConfig({ dist }),
+	...getDefaultConfig({
+		dist,
+		entry: {
+			'tiptap/index': 'tiptap/index.ts',
+			manifests: 'manifests.ts',
+			'umbraco-package': 'umbraco-package.ts',
+		},
+	}),
 });

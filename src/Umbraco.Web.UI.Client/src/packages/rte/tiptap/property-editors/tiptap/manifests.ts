@@ -69,10 +69,9 @@ export const manifests: Array<ManifestTypes> = [
 						// 			{ alias: 'subscript', label: 'Subscript', icon: 'subscript', category: 'text-transformation' },
 						// 			{ alias: 'superscript', label: 'Superscript', icon: 'superscript', category: 'text-transformation' },
 
-						// 			// Styling and Font Group
-						// 			{ alias: 'styles', label: 'Style select', icon: 'permanent-pen', category: 'styling' },
-						// 			{ alias: 'fontname', label: 'Font select', icon: 'text-color', category: 'styling' },
-						// 			{ alias: 'fontsize', label: 'Font size', icon: 'text-color', category: 'styling' },
+						//			// Styling and Font Group
+						//			{ alias: 'fontname', label: 'Font select', icon: 'text-color', category: 'styling' },
+						//			{ alias: 'fontsize', label: 'Font size', icon: 'text-color', category: 'styling' },
 
 						// 			// Block Element Group
 						// 			{ alias: 'blockquote', label: 'Blockquote', icon: 'quote', category: 'block-elements' },

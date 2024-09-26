@@ -3,7 +3,8 @@ import { UmbCurrentUserRepository } from '../repository/index.js';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/user-change-password';
 export class UmbChangePasswordCurrentUserAction<ArgsMetaType = never>
 	extends UmbActionBase<UmbCurrentUserActionArgs<ArgsMetaType>>
 	implements UmbCurrentUserAction<ArgsMetaType>

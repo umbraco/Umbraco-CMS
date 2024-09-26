@@ -1,41 +1,40 @@
-import { UmbLanguageDetailRepository } from '../../repository/index.js';
+import { UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS, UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
+import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
 import { UMB_LANGUAGE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	type UmbSubmittableWorkspaceContext,
-	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
+	UmbEntityDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbSubmittableWorkspaceContextBase<UmbLanguageDetailModel>
+	extends UmbEntityDetailWorkspaceContextBase<UmbLanguageDetailModel, UmbLanguageDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 
-	#data = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
-	readonly data = this.#data.asObservable();
+	readonly data = this._data.current;
 
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	readonly name = this.#data.asObservablePart((data) => data?.name);
-
-	// TODO: this is a temp solution to bubble validation errors to the UI
-	#validationErrors = new UmbObjectState<any | undefined>(undefined);
-	readonly validationErrors = this.#validationErrors.asObservable();
+	readonly unique = this._data.createObservablePartOfCurrent((data) => data?.unique);
+	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_LANGUAGE_WORKSPACE_ALIAS);
+		super(host, {
+			workspaceAlias: UMB_LANGUAGE_WORKSPACE_ALIAS,
+			entityType: UMB_LANGUAGE_ENTITY_TYPE,
+			detailRepositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
+		});
 
 		this.routes.setRoutes([
 			{
 				path: 'create',
 				component: UmbLanguageWorkspaceEditorElement,
 				setup: async () => {
-					this.create();
+					this.createScaffold({ parent: { entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE, unique: null } });
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -55,85 +54,24 @@ export class UmbLanguageWorkspaceContext
 		]);
 	}
 
-	protected override resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	async load(unique: string) {
-		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.#data.update(data);
-		}
-	}
-
-	async create() {
-		this.resetState();
-		const { data } = await this.repository.createScaffold();
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.update(data);
-		return { data };
-	}
-
-	getData() {
-		return this.#data.getValue();
-	}
-
-	getEntityType() {
-		return 'language';
-	}
-
-	// TODO: Convert to uniques:
-	getUnique() {
-		return this.#data.getValue()?.unique;
-	}
-
 	setName(name: string) {
-		this.#data.update({ name });
+		this._data.updateCurrent({ name });
 	}
 
 	setCulture(unique: string) {
-		this.#data.update({ unique });
+		this._data.updateCurrent({ unique });
 	}
 
 	setMandatory(isMandatory: boolean) {
-		this.#data.update({ isMandatory });
+		this._data.updateCurrent({ isMandatory });
 	}
 
 	setDefault(isDefault: boolean) {
-		this.#data.update({ isDefault });
+		this._data.updateCurrent({ isDefault });
 	}
 
 	setFallbackCulture(unique: string) {
-		this.#data.update({ fallbackIsoCode: unique });
-	}
-
-	async submit() {
-		const newData = this.getData();
-		if (!newData) {
-			throw new Error('No data to submit');
-		}
-
-		if (this.getIsNew()) {
-			const { error } = await this.repository.create(newData);
-			if (error) {
-				throw new Error(error.message);
-			}
-			this.setIsNew(false);
-		} else {
-			const { error } = await this.repository.save(newData);
-			if (error) {
-				throw new Error(error.message);
-			}
-		}
-	}
-
-	override destroy(): void {
-		this.#data.destroy();
-		super.destroy();
+		this._data.updateCurrent({ fallbackIsoCode: unique });
 	}
 }
 

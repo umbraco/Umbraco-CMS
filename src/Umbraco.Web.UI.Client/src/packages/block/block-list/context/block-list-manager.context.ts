@@ -39,7 +39,7 @@ export class UmbBlockListManagerContext<
 	) {
 		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);
 
-		this.insertBlockData(layoutEntry, content, settings, originData);
+		this.insertBlockData(layoutEntry, content, settings);
 
 		return true;
 	}

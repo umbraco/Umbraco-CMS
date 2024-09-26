@@ -18,6 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			sortChildrenOfRepositoryAlias: UMB_SORT_CHILDREN_OF_DOCUMENT_REPOSITORY_ALIAS,
 			treeRepositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
+			additionalOptions: true,
 		},
 		conditions: [
 			{
