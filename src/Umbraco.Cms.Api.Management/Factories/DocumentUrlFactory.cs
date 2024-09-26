@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,7 +24,10 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     private readonly ILoggerFactory _loggerFactory;
     private readonly UriUtility _uriUtility;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IPublishedContentCache _contentCache;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
 
+    [Obsolete("Use the constructor that takes all parameters. Scheduled for removal in V17.")]
     public DocumentUrlFactory(
         IPublishedRouter publishedRouter,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -32,6 +38,33 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         ILoggerFactory loggerFactory,
         UriUtility uriUtility,
         IPublishedUrlProvider publishedUrlProvider)
+        : this(
+            publishedRouter,
+            umbracoContextAccessor,
+            languageService,
+            localizedTextService,
+            contentService,
+            variationContextAccessor,
+            loggerFactory,
+            uriUtility,
+            publishedUrlProvider,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+    {
+    }
+
+    public DocumentUrlFactory(
+        IPublishedRouter publishedRouter,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ILanguageService languageService,
+        ILocalizedTextService localizedTextService,
+        IContentService contentService,
+        IVariationContextAccessor variationContextAccessor,
+        ILoggerFactory loggerFactory,
+        UriUtility uriUtility,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
     {
         _publishedRouter = publishedRouter;
         _umbracoContextAccessor = umbracoContextAccessor;
@@ -42,6 +75,8 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         _loggerFactory = loggerFactory;
         _uriUtility = uriUtility;
         _publishedUrlProvider = publishedUrlProvider;
+        _contentCache = contentCache;
+        _navigationQueryService = navigationQueryService;
     }
 
     public async Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content)
@@ -57,7 +92,9 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             _variationContextAccessor,
             _loggerFactory.CreateLogger<IContent>(),
             _uriUtility,
-            _publishedUrlProvider);
+            _publishedUrlProvider,
+            _contentCache,
+            _navigationQueryService);
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)
