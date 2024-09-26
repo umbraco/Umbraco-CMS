@@ -18,10 +18,10 @@ type TestServerValue = Array<{
 export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	@property({ attribute: false })
 	set value(value: TestServerValue) {
-		// if (this.#originalFormat === value) return;
+		if (this.#originalFormat === value) return;
 		// TODO: also check if the added values have positions, if not, there's no need to update the structured data.
 		this.#originalFormat = value;
-		this._structuredData = this.toStructuredData(value);
+		this._structuredData = this.#toStructuredData(value);
 	}
 
 	get value(): TestServerValue {
@@ -30,8 +30,6 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	extensionConfigs: Extension[] = [];
-
-	//TODO: Use the context again so that we can remove items from the extensions list from here.
 
 	@state()
 	_structuredData: string[][][] = [[[]]];
@@ -56,7 +54,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 			const fromPos = this.#originalFormat.find((item) => item.alias === this.#currentDragAlias)?.position;
 			if (!fromPos) return;
 
-			this.removeItem(fromPos);
+			this.#moveItemToHiddenExtensions(fromPos);
 		}
 	};
 
@@ -65,13 +63,13 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		const fromPos = this.#originalFormat.find((item) => item.alias === this.#currentDragAlias)?.position;
 
 		if (fromPos) {
-			this.moveItem(fromPos, toPos);
+			this.#moveItem(fromPos, toPos);
 		} else if (this.#currentDragAlias) {
-			this.insertItem(this.#currentDragAlias, toPos);
+			this.#insertItem(this.#currentDragAlias, toPos);
 		}
 	};
 
-	private moveItem = (from: [number, number, number], to: [number, number, number]) => {
+	#moveItem = (from: [number, number, number], to: [number, number, number]) => {
 		const [rowIndex, groupIndex, itemIndex] = from;
 
 		// Get the item to move from the 'from' position
@@ -80,10 +78,10 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		// Remove the item from the original position
 		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 1);
 
-		this.insertItem(itemToMove, to);
+		this.#insertItem(itemToMove, to);
 	};
 
-	private insertItem = (alias: string, toPos: [number, number, number]) => {
+	#insertItem = (alias: string, toPos: [number, number, number]) => {
 		const [rowIndex, groupIndex, itemIndex] = toPos;
 		// Insert the item into the new position
 		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 0, alias);
@@ -93,7 +91,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	};
 
-	private removeItem(from: [number, number, number]) {
+	#moveItemToHiddenExtensions(from: [number, number, number]) {
 		const [rowIndex, groupIndex, itemIndex] = from;
 		this._structuredData[rowIndex][groupIndex].splice(itemIndex, 1);
 
@@ -136,11 +134,11 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 	};
 
 	#updateOriginalFormat() {
-		this.#originalFormat = this.toOriginalFormat(this._structuredData);
+		this.#originalFormat = this.#toOriginalFormat(this._structuredData);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	private renderItem(alias: string) {
+	#renderItem(alias: string) {
 		const extension = this.extensionConfigs.find((ext) => ext.alias === alias);
 		if (!extension) return nothing;
 		return html`<div
@@ -152,14 +150,14 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		</div>`;
 	}
 
-	private renderGroup(group: string[], rowIndex: number, groupIndex: number) {
+	#renderGroup(group: string[], rowIndex: number, groupIndex: number) {
 		return html`
 			<div
 				class="group"
 				dropzone="move"
 				@dragover=${this.#onDragOver}
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.length])}>
-				${group.map((alias) => this.renderItem(alias))}
+				${group.map((alias) => this.#renderItem(alias))}
 				<uui-button
 					look="primary"
 					color="danger"
@@ -172,10 +170,10 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		`;
 	}
 
-	private renderRow(row: string[][], rowIndex: number) {
+	#renderRow(row: string[][], rowIndex: number) {
 		return html`
 			<div class="row">
-				${repeat(row, (group, groupIndex) => this.renderGroup(group, rowIndex, groupIndex))}
+				${repeat(row, (group, groupIndex) => this.#renderGroup(group, rowIndex, groupIndex))}
 				<uui-button look="secondary" @click=${() => this.#addGroup(rowIndex, row.length)}>+</uui-button>
 				<uui-button
 					look="primary"
@@ -196,7 +194,7 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				However, adding and removing items from the toolbar is functional. Additionally, hiding items from the toolbar
 				while retaining their functionality by excluding them from the toolbar layout is also functional.
 			</p>
-			${repeat(this._structuredData, (row, rowIndex) => this.renderRow(row, rowIndex))}
+			${repeat(this._structuredData, (row, rowIndex) => this.#renderRow(row, rowIndex))}
 			<uui-button look="secondary" @click=${() => this.#addRow(this._structuredData.length)}>+</uui-button>
 			${this.#renderHiddenExtensions()}
 		`;
@@ -212,11 +210,11 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				Extensions hidden from the toolbar<br />Drag and drop buttons into the toolbar to add them
 			</p>
 
-			<div class="hidden-extensions">${hiddenExtensions.map((item) => this.renderItem(item.alias))}</div>
+			<div class="hidden-extensions">${hiddenExtensions.map((item) => this.#renderItem(item.alias))}</div>
 		`;
 	}
 
-	toStructuredData = (data: TestServerValue) => {
+	#toStructuredData(data: TestServerValue) {
 		if (!data?.length) return [[[]]];
 
 		const structuredData: string[][][] = [[[]]];
@@ -241,9 +239,9 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 		});
 
 		return structuredData;
-	};
+	}
 
-	toOriginalFormat = (structuredData: string[][][]) => {
+	#toOriginalFormat = (structuredData: string[][][]) => {
 		const originalData: TestServerValue = [];
 
 		structuredData.forEach((row, rowIndex) => {
@@ -267,16 +265,6 @@ export class UmbTiptapToolbarGroupsConfigurationElement extends UmbLitElement {
 				});
 			}
 		});
-
-		// TODO: this code removes the items completely, while the one above just puts them back into the hidden extensions list. Which one do we prefer?
-		// this.#originalFormat.forEach((item) => {
-		// 	if (!item.position) {
-		// 		const exists = originalData.find((i) => i.alias === item.alias);
-		// 		if (!exists) {
-		// 			originalData.push(item);
-		// 		}
-		// 	}
-		// });
 
 		return originalData;
 	};

@@ -15,7 +15,7 @@ export const manifests: Array<ManifestTypes> = [
 				properties: [
 					{
 						alias: 'toolbar',
-						label: 'Toolbar - NOT IMPLEMENTED',
+						label: 'Toolbar',
 						description: 'Pick the toolbar options that should be available when editing',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tiptap.ToolbarConfiguration',
 						weight: 10,
