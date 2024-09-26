@@ -1,66 +1,60 @@
-﻿using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+﻿using Umbraco.Cms.Core.Models.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeContainerBuilder<TParent>(TParent parentBuilder)
-    : ChildBuilderBase<TParent, ContentTypePropertyContainerModel>(parentBuilder),
-        IBuildPropertyTypes, IWithKeyBuilder, IWithParentKeyBuilder, IWithNameBuilder, IWithTypeBuilder,
-        IWithSortOrderBuilder
+public class PropertyTypeContainerBuilder<TParent, TModel>(TParent parentBuilder)
+    : ChildBuilderBase<TParent, TModel>(parentBuilder)
+    where TModel : PropertyTypeContainerModelBase, new()
 {
+    private readonly TModel _model = new();
     private Guid? _key;
     private Guid? _parentKey;
     private string _name;
     private string _type;
     private int? _sortOrder;
 
-    Guid? IWithKeyBuilder.Key
+    public PropertyTypeContainerBuilder<TParent, TModel> WithKey(Guid key)
     {
-        get => _key;
-        set => _key = value;
+        _key = key;
+        return this;
     }
 
-    Guid? IWithParentKeyBuilder.ParentKey
+    public PropertyTypeContainerBuilder<TParent, TModel> WithParentKey(Guid parentKey)
     {
-        get => _parentKey;
-        set => _parentKey = value;
+        _parentKey = parentKey;
+        return this;
     }
 
-    string IWithNameBuilder.Name
+    public PropertyTypeContainerBuilder<TParent, TModel> WithName(string name)
     {
-        get => _name;
-        set => _name = value;
+        _name = name;
+        return this;
     }
 
-    string IWithTypeBuilder.Type
+    public PropertyTypeContainerBuilder<TParent, TModel> WithType(string type)
     {
-        get => _type;
-        set => _type = value;
+        _type = type;
+        return this;
     }
 
-    int? IWithSortOrderBuilder.SortOrder
+    public PropertyTypeContainerBuilder<TParent, TModel> WithSortOrder(int sortOrder)
     {
-        get => _sortOrder;
-        set => _sortOrder = value;
+        _model.SortOrder = sortOrder;
+        return this;
     }
 
-    public override ContentTypePropertyContainerModel Build()
+    public override TModel Build()
     {
-        var key = _key ?? Guid.NewGuid();
-        var parentKey = _parentKey;
-        var name = _name ?? "Container";
-        var type = _type ?? "Group";
-        var sortOrder = _sortOrder ?? 0;
+        _model.Key = _key ?? Guid.NewGuid();
 
-
-        return new ContentTypePropertyContainerModel
+        if (_parentKey is not null)
         {
-            Key = key,
-            ParentKey = parentKey,
-            Name = name,
-            Type = type,
-            SortOrder = sortOrder,
-        };
+            _model.ParentKey = _parentKey;
+        }
+
+        _model.Name = _name ?? "Container";
+        _model.Type = _type ?? "Group";
+        _model.SortOrder = _sortOrder ?? 0;
+        return _model;
     }
 }

@@ -3,20 +3,21 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeValidationEditingBuilder<TParent>
-    : ChildBuilderBase<PropertyTypeEditingBuilder<TParent>, PropertyTypeValidation>,
+public class PropertyTypeValidationEditingBuilder<TParent, TModel>
+    : ChildBuilderBase<PropertyTypeModelBuilder<TParent, TModel>, PropertyTypeValidation>,
         IBuildPropertyTypes,
         IWithMandatoryBuilder,
         IWithMandatoryMessageBuilder,
         IWithRegularExpressionBuilder,
         IWithRegularExpressionMessage
+    where TModel : PropertyTypeModelBase, new()
 {
     private bool? _mandatory;
     private string? _mandatoryMessage;
     private string? _regularExpression;
     private string? _regularExpressionMessage;
 
-    public PropertyTypeValidationEditingBuilder(PropertyTypeEditingBuilder<TParent> parentBuilder)
+    public PropertyTypeValidationEditingBuilder(PropertyTypeModelBuilder<TParent, TModel> parentBuilder)
         : base(parentBuilder)
     {
     }

@@ -11,6 +11,8 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
 {
     protected IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
     protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+    protected IMediaService MediaService => GetRequiredService<IMediaService>();
+    protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     protected IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
@@ -39,7 +41,18 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
     {
         var tester = MediaTypeEditingBuilder.CreateBasicMediaType();
 
-        await MediaTypeEditingService.CreateAsync(tester, Constants.Security.SuperUserKey);
+        var testerrr = await MediaTypeEditingService.CreateAsync(tester, Constants.Security.SuperUserKey);
+
+
+        var skipper = MediaEditingBuilder.CreateBasicMedia(tester.Key.Value, null);
+
+        var fwjqpwfm = await MediaTypeService.GetAsync(tester.Key.Value);
+        var fdwjqpwfm = await ContentTypeService.GetAsync(tester.Key.Value);
+
+        var jdjdjd = await MediaEditingService.CreateAsync(skipper, Constants.Security.SuperUserKey);
+
+
+
         // RootFolder =  MediaEditingBuilder.CreateBasicContent()
     }
 }

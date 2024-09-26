@@ -7,14 +7,18 @@ namespace Umbraco.Cms.Tests.Common.Builders;
 public class MediaEditingBuilder : ContentEditingBaseBuilder<MediaCreateModel>
 {
 
+    public static MediaCreateModel CreateBasicMedia(Guid mediaTypeKey, Guid? key) =>
+        new MediaEditingBuilder()
+            .WithKey(key)
+            .WithContentTypeKey(mediaTypeKey)
+            .WithInvariantName("Media")
+            .Build();
 
-
-
-    // public static MediaCreateModel CreateMediaFolder(Guid contentTypeKey, Guid? key) =>
-    //     new MediaEditingBuilder()
-    //         .WithKey(key)
-    //         .WithContentTypeKey(Constants.Conventions.MediaTypes.)
-    //         .WithInvariantName("Home")
-    //         .Build();
+    public static MediaCreateModel CreateSimpleMedia(Guid mediaTypeKey, string name, Guid? parentKey) =>
+        new MediaEditingBuilder()
+            .WithContentTypeKey(mediaTypeKey)
+            .WithInvariantName(name)
+            .WithParentKey(parentKey)
+            .Build();
 
 }

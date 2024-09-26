@@ -23,7 +23,6 @@ public class ContentTypeSortBuilder<TBuilder>
     {
     }
 
-
     string IWithAliasBuilder.Alias
     {
         get => _alias;

@@ -4,7 +4,7 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces.ContentCreateModel;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCreateModel>,
+public abstract class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCreateModel>,
     IWithInvariantNameBuilder,
     IWithInvariantPropertiesBuilder,
     IWithVariantsBuilder,
@@ -14,7 +14,7 @@ public class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCreateModel>
     IBuildContentTypes
     where TCreateModel : ContentCreationModelBase, new()
 {
-    protected TCreateModel _model = new TCreateModel();
+    protected TCreateModel _model = new();
     private IEnumerable<PropertyValueModel> _invariantProperties = [];
     private IEnumerable<VariantModel> _variants = [];
     private Guid _contentTypeKey;
@@ -71,8 +71,7 @@ public class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCreateModel>
         return this;
     }
 
-    public ContentEditingBaseBuilder<TCreateModel> AddVariant(string culture, string segment, string name,
-        IEnumerable<PropertyValueModel> properties)
+    public ContentEditingBaseBuilder<TCreateModel> AddVariant(string culture, string segment, string name, IEnumerable<PropertyValueModel> properties)
     {
         var variant = new VariantModel { Culture = culture, Segment = segment, Name = name, Properties = properties };
         _variants = _variants.Concat(new[] { variant });
@@ -85,25 +84,30 @@ public class ContentEditingBaseBuilder<TCreateModel> : BuilderBase<TCreateModel>
         return this;
     }
 
+    public ContentEditingBaseBuilder<TCreateModel> WithContentTypeKey(Guid contentTypeKey)
+    {
+        _contentTypeKey = contentTypeKey;
+        return this;
+    }
+
+    public ContentEditingBaseBuilder<TCreateModel> WithKey(Guid key)
+    {
+        _key = key;
+        return this;
+    }
+
     public override TCreateModel Build()
     {
-        var key = _key ?? Guid.NewGuid();
-        var parentKey = _parentKey;
-        var invariantName = _invariantName ?? Guid.NewGuid().ToString();
-        var invariantProperties = _invariantProperties;
-        var variants = _variants;
-        var contentTypeKey = _contentTypeKey;
-
-        if (parentKey is not null)
+        if (_parentKey is not null)
         {
-            _model.ParentKey = parentKey;
+            _model.ParentKey = _parentKey;
         }
 
-        _model.InvariantName = invariantName;
-        _model.ContentTypeKey = contentTypeKey;
-        _model.Key = key;
-        _model.InvariantProperties = invariantProperties;
-        _model.Variants = variants;
+        _model.InvariantName = _invariantName ?? Guid.NewGuid().ToString();
+        _model.ContentTypeKey = _contentTypeKey;
+        _model.Key = _key ?? Guid.NewGuid();
+        _model.InvariantProperties = _invariantProperties;
+        _model.Variants = _variants;
 
         return _model;
     }

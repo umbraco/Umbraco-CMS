@@ -3,12 +3,14 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class PropertyTypeAppearanceBuilder<TParent>
-    : ChildBuilderBase<PropertyTypeEditingBuilder<TParent>, PropertyTypeAppearance>, IBuildPropertyTypes, IWithLabelOnTop
+public class PropertyTypeAppearanceBuilder<TParent, TModel>
+    : ChildBuilderBase<PropertyTypeModelBuilder<TParent, TModel>, PropertyTypeAppearance>, IBuildPropertyTypes, IWithLabelOnTop
+    where TModel : PropertyTypeModelBase, new()
 {
     private bool? _labelOnTop;
 
-    public PropertyTypeAppearanceBuilder(PropertyTypeEditingBuilder<TParent> parentBuilder) : base(parentBuilder)
+    public PropertyTypeAppearanceBuilder(PropertyTypeModelBuilder<TParent, TModel> parentBuilder)
+        : base(parentBuilder)
     {
     }
 
