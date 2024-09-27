@@ -141,10 +141,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			// TODO: Ideally we move this into the Block Manager [NL] To avoid binding the Block Manager to a Property...
 			// If the current property is readonly all inner block content should also be readonly.
 			this.observe(
-				context.isReadOnly,
-				(isReadOnly) => {
+				observeMultiple([context.isReadOnly, this.variantId]),
+				([isReadOnly, variantId]) => {
 					const unique = 'UMB_PROPERTY_CONTEXT';
-					const variantId = this.#variantId.getValue();
+					console.log('make states', variantId);
 					if (variantId === undefined) return;
 
 					if (isReadOnly) {

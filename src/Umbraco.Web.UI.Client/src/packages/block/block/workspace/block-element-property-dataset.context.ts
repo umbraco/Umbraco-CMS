@@ -7,13 +7,14 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase implements UmbPropertyDatasetContext {
 	#elementManager: UmbBlockElementManager;
 	public getVariantId() {
 		return this.#elementManager.getVariantId();
 	}
+	#variantId: UmbVariantId;
 
 	#readOnly = new UmbBooleanState(false);
 	public readOnly = this.#readOnly.asObservable();
@@ -32,31 +33,18 @@ export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase imp
 	}
 	readonly name: Observable<string | undefined> = 'TODO: get label observable' as any;
 
-	constructor(host: UmbControllerHost, elementManager: UmbBlockElementManager) {
+	constructor(host: UmbControllerHost, elementManager: UmbBlockElementManager, variantId?: UmbVariantId) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, UMB_PROPERTY_DATASET_CONTEXT.toString());
 		this.#elementManager = elementManager;
-
-		// Niels: I think this should be implemented in the Block Element Manager...
-		/*
-		this.observe(
-			this.#elementManager.readOnlyState.states,
-			(states) => {
-				const isReadOnly = states.some(
-					(state) => state.unique.startsWith('UMB_CULTURE_') && state.variantId.equal(this.#variantId),
-				);
-
-				this.#currentVariantCultureIsReadOnly.setValue(isReadOnly);
-			},
-			'umbObserveReadOnlyStates',
-		);
-		*/
+		this.#variantId = variantId ?? UmbVariantId.CreateInvariant();
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspace) => {
 			this.observe(
-				workspace.readOnlyState.isOn,
-				(value) => {
-					this.#readOnly.setValue(value);
+				workspace.readOnlyState.states,
+				(states) => {
+					const isReadOnly = states.some((state) => state.variantId.equal(this.#variantId));
+					this.#readOnly.setValue(isReadOnly);
 				},
 				'umbObserveReadOnlyStates',
 			);

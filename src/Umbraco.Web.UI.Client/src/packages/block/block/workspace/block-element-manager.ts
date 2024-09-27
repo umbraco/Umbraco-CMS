@@ -192,7 +192,7 @@ export class UmbBlockElementManager extends UmbControllerBase {
 	}
 
 	public createPropertyDatasetContext(host: UmbControllerHost) {
-		return new UmbBlockElementPropertyDatasetContext(host, this);
+		return new UmbBlockElementPropertyDatasetContext(host, this, this.getVariantId());
 	}
 
 	public setup(host: UmbClassInterface) {
