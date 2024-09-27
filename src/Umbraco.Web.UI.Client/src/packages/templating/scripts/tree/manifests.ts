@@ -35,6 +35,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Script Tree Item',
 		forEntityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.Script.Root',
+		name: 'Script Root Workspace',
+		meta: {
+			entityType: UMB_SCRIPT_ROOT_ENTITY_TYPE,
+			headline: '#treeHeaders_scripts',
+		},
+	},
 	...folderManifests,
 	...reloadTreeItemChildrenManifest,
 ];

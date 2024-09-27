@@ -37,7 +37,11 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 
 			this.observe(
 				this.#userWorkspaceContext.unique,
-				async (unique) => this.#onUserUniqueChange(unique),
+				async (unique) => {
+					if (unique) {
+						this.#onUserUniqueChange(unique);
+					}
+				},
 				'umbUserUniqueObserver',
 			);
 		});

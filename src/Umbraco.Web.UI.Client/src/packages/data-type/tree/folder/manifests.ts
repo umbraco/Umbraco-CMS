@@ -1,13 +1,9 @@
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-export const UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Folder';
+import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from './repository/index.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
+import { manifests as repositoryManifests } from './repository/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
-	{
-		type: 'repository',
-		alias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
-		name: 'Data Type Folder Repository',
-		api: () => import('./data-type-folder.repository.js'),
-	},
 	{
 		type: 'entityAction',
 		kind: 'folderUpdate',
@@ -28,4 +24,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
+	...repositoryManifests,
+	...workspaceManifests,
 ];

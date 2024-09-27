@@ -73,7 +73,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#observeUserGroup() {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.isNew, (value) => (this._isNew = value), '_observeIsNew');
-		this.observe(this.#workspaceContext.unique, (value) => (this._unique = value), '_observeUnique');
+		this.observe(this.#workspaceContext.unique, (value) => (this._unique = value ?? undefined), '_observeUnique');
 		this.observe(this.#workspaceContext.name, (value) => (this._name = value), '_observeName');
 		this.observe(this.#workspaceContext.alias, (value) => (this._alias = value), '_observeAlias');
 		this.observe(
