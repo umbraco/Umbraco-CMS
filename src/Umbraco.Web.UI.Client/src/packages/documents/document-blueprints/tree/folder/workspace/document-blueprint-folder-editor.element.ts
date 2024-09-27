@@ -4,7 +4,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-data-type-folder-workspace-editor';
+const elementName = 'umb-document-blueprint-folder-workspace-editor';
 @customElement(elementName)
 export class UmbDocumentBlueprintFolderWorkspaceEditorElement extends UmbLitElement {
 	@state()
