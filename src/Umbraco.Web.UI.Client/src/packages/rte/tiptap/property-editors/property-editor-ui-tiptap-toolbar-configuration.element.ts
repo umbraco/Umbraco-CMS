@@ -12,7 +12,6 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry, type UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
-import './input-tiptap-toolbar-layout.element.js';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
 type Extension = {
