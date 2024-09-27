@@ -86,7 +86,6 @@ public class PublishedRouterTests
         pc.Setup(content => content.CreateDate).Returns(DateTime.Now);
         pc.Setup(content => content.UpdateDate).Returns(DateTime.Now);
         pc.Setup(content => content.Path).Returns("-1,1");
-        pc.Setup(content => content.Parent).Returns(() => null);
         pc.Setup(content => content.Properties).Returns(new Collection<IPublishedProperty>());
         pc.Setup(content => content.ContentType)
             .Returns(new PublishedContentType(
