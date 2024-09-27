@@ -1,10 +1,11 @@
 import { css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbFolderModel, UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 export abstract class UmbFolderModalElementBase<
 	FolderModalDataType extends { folderRepositoryAlias: string },
@@ -13,7 +14,7 @@ export abstract class UmbFolderModalElementBase<
 	@state()
 	_isNew = false;
 
-	folderRepository?: UmbFolderRepository;
+	folderRepository?: UmbDetailRepository<UmbFolderModel>;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -29,7 +30,7 @@ export abstract class UmbFolderModalElementBase<
 			this.data.folderRepositoryAlias,
 			[this],
 			(permitted, ctrl) => {
-				this.folderRepository = permitted ? (ctrl.api as UmbFolderRepository) : undefined;
+				this.folderRepository = permitted ? (ctrl.api as UmbDetailRepository<UmbFolderModel>) : undefined;
 				if (this.folderRepository) {
 					this.init();
 				}

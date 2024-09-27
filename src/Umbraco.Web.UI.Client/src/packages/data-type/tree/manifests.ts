@@ -1,3 +1,4 @@
+import { UMB_DATA_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
 import {
@@ -34,6 +35,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.TreeItem.DataType',
 		name: 'Data Type Tree Item',
 		forEntityTypes: ['data-type-root', 'data-type', 'data-type-folder'],
+	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.DataType.Root',
+		name: 'Data Type Root Workspace',
+		meta: {
+			entityType: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+			headline: '#treeHeaders_dataTypes',
+		},
 	},
 	...folderManifests,
 	...reloadManifests,

@@ -35,5 +35,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Recycle Bin Tree Item',
 		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
 	},
+	{
+		type: 'workspace',
+		kind: 'default',
+		alias: 'Umb.Workspace.Document.RecycleBin.Root',
+		name: 'Document Recycle Bin Root Workspace',
+		meta: {
+			entityType: UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
+			headline: '#general_recycleBin',
+		},
+	},
 	...reloadTreeItemChildrenManifests,
 ];

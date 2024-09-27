@@ -1,8 +1,4 @@
-import {
-	UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
-	UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
-	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
-} from '../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentBlueprint';
@@ -16,24 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./document-blueprint-workspace.context.js'),
 		meta: {
 			entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
-		},
-	},
-	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.DocumentBlueprint.Root',
-		name: 'Document Blueprint Root Workspace',
-		element: () => import('./document-blueprint-root-workspace.element.js'),
-		meta: {
-			entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
-		},
-	},
-	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.DocumentBlueprint.Folder',
-		name: 'Document Blueprint Folder Workspace',
-		element: () => import('./document-blueprint-root-workspace.element.js'),
-		meta: {
-			entityType: UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 		},
 	},
 	{
