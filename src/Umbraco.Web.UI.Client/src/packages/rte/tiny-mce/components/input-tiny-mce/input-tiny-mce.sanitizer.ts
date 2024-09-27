@@ -1,4 +1,3 @@
-// TODO: clean up this file
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
@@ -47,21 +46,4 @@ export const uriAttributeSanitizer = (editor: Editor) => {
 			return uri;
 		};
 	})();
-
-	// TODO: sanitizeTinyMce is not defined in the global scope, so this will not work. Instead we need to get this setting from somewhere else:
-	/*
-	if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
-		uriAttributesToSanitize.forEach((attribute) => {
-			editor.serializer.addAttributeFilter(attribute, (nodes: AstNode[]) => {
-				nodes.forEach((node: AstNode) => {
-					node.attributes?.forEach((attr) => {
-						if (uriAttributesToSanitize.includes(attr.name.toLowerCase())) {
-							attr.value = parseUri(attr.value, node.name) ?? '';
-						}
-					});
-				});
-			});
-		});
-	}
-	*/
 };

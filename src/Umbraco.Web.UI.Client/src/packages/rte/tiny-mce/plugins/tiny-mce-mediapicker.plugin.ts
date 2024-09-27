@@ -43,13 +43,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			this.#modalManager = instance;
 		});
 
-		// TODO => this breaks tests. disabling for now
-		// will ignore user media start nodes
-		// this.host.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-		// 	this.#currentUserContext = instance;
-		// 	this.#observeCurrentUser();
-		// });
-
 		this.editor.ui.registry.addToggleButton('umbmediapicker', {
 			icon: 'image',
 			tooltip: localize.term('general_mediaPicker'),
@@ -124,7 +117,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 	async #showMediaPicker(currentTarget: MediaPickerTargetData) {
 		/*
-		// TODO: I dont think we should parse this one... it should be up to the modal to get this information, and then we could parse some configs on to affect this.
 		let startNodeId;
 		let startNodeIsVirtual;
 
@@ -138,8 +130,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			}
 		}
 		*/
-
-		// TODO => startNodeId and startNodeIsVirtual do not exist on ContentTreeItemResponseModel
 
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
@@ -241,7 +231,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		});
 	}
 
-	#uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
+	readonly #uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
 		return new Promise((resolve, reject) => {
 			// Fetch does not support progress, so we need to fake it.
 			progress(0);

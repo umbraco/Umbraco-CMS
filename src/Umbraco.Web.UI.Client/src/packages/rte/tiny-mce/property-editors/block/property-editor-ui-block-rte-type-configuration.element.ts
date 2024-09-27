@@ -18,7 +18,7 @@ export class UmbPropertyEditorUIBlockRteBlockConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
+	readonly #blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
 		typeof UMB_WORKSPACE_MODAL.DATA,
 		typeof UMB_WORKSPACE_MODAL.VALUE
 	>;

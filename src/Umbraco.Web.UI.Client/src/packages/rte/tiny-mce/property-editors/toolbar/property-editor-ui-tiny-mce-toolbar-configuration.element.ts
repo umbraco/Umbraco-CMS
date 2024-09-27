@@ -59,7 +59,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _toolbarConfig: ToolbarConfig[] = [];
+	private readonly _toolbarConfig: ToolbarConfig[] = [];
 
 	#selectedValues: string[] = [];
 

@@ -38,7 +38,7 @@ export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends Um
 			pixels`;
 	}
 
-	static override styles = [UmbTextStyles];
+	static override readonly styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITinyMceDimensionsConfigurationElement;

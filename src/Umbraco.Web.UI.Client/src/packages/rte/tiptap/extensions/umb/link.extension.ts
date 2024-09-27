@@ -60,7 +60,7 @@ export default class UmbTiptapLinkExtensionApi extends UmbTiptapToolbarElementAp
 		// The href might be an external url, so check the value for an anchor/querystring;
 		// `href` has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
 		if (!queryString) {
-			const urlParts = url?.split(/(#|\?)/);
+			const urlParts = url?.split(/([#?])/);
 			if (urlParts?.length === 3) {
 				url = urlParts[0];
 				queryString = urlParts[1] + urlParts[2];

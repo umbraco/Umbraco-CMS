@@ -14,7 +14,7 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+	readonly #serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	@property({ type: Array })
 	public set value(value: Array<string>) {
