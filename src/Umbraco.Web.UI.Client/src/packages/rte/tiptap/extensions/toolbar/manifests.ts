@@ -77,6 +77,20 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Redo',
+		name: 'Redo Tiptap Extension',
+		api: () => import('./redo.extension.js'),
+		element: () => import('../../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
+		weight: 994,
+		meta: {
+			alias: 'redo',
+			icon: 'icon-redo',
+			label: 'Redo',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Strike',
 		name: 'Strike Tiptap Extension',
 		api: () => import('./strike.extension.js'),
@@ -237,6 +251,20 @@ export const manifests: Array<ManifestTiptapToolbarExtension | ManifestTiptapToo
 			icon: 'icon-underline',
 			label: 'Underline',
 			isDefault: true,
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Undo',
+		name: 'Undo Tiptap Extension',
+		api: () => import('./undo.extension.js'),
+		element: () => import('../../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
+		weight: 994,
+		meta: {
+			alias: 'undo',
+			icon: 'icon-undo',
+			label: 'Undo',
 		},
 	},
 	{
