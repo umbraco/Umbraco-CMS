@@ -15,7 +15,6 @@ export class UmbBlockEntryIsExposedCondition
 			this.observe(
 				context.exposed,
 				(exposed) => {
-					console.log('exposed', exposed);
 					if (exposed !== undefined) {
 						// Check if equal to match, if match not set it defaults to true.
 						this.permitted = exposed === (this.config.match !== undefined ? this.config.match : true);
