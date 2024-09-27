@@ -1148,7 +1148,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             Assert.AreEqual("foo", entity.Name);
 
             var e = ContentService.GetById(entity.Id);
-            Assert.AreEqual("Home", e.Name);
+            Assert.AreEqual("Textpage", e.Name);
 
             savingWasCalled = true;
         };
@@ -1165,7 +1165,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         try
         {
             var content = ContentService.GetById(Textpage.Id);
-            Assert.AreEqual("Home", content.Name);
+            Assert.AreEqual("Textpage", content.Name);
 
             content.Name = "foo";
             ContentService.Save(content);
@@ -2186,7 +2186,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act
@@ -2211,7 +2211,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Home", temp.Name);
+        Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act

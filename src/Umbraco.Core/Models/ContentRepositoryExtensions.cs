@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 
@@ -298,7 +299,12 @@ public static class ContentRepositoryExtensions
     ///     A value indicating whether it was possible to publish the names and values for the specified
     ///     culture(s). The method may fail if required names are not set, but it does NOT validate property data
     /// </returns>
-    public static bool PublishCulture(this IContent content, CultureImpact? impact, PropertyEditorCollection propertyEditorCollection)
+    [Obsolete("TODO: KJA")]
+    public static bool PublishCulture(this IContent content, CultureImpact? impact)
+    {
+        return PublishCulture(content, impact, DateTime.Now, StaticServiceProvider.Instance.GetService<PropertyEditorCollection>());
+    }
+    public static bool PublishCulture(this IContent content, CultureImpact? impact, DateTime publishTime, PropertyEditorCollection propertyEditorCollection)
     {
         if (impact == null)
         {
@@ -325,7 +331,7 @@ public static class ContentRepositoryExtensions
                     return false;
                 }
 
-                content.SetPublishInfo(culture, name, DateTime.Now);
+                content.SetPublishInfo(culture, name, publishTime);
             }
         }
         else if (impact.ImpactsOnlyInvariantCulture)
@@ -344,7 +350,7 @@ public static class ContentRepositoryExtensions
                 return false;
             }
 
-            content.SetPublishInfo(impact.Culture, name, DateTime.Now);
+            content.SetPublishInfo(impact.Culture, name, publishTime);
         }
 
         // set values
