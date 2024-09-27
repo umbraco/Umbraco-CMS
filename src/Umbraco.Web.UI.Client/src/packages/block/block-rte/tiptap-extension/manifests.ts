@@ -9,6 +9,7 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExt
 		meta: {
 			icon: 'icon-block',
 			label: 'Block',
+			group: 'Interactive Elements',
 		},
 	},
 	{
