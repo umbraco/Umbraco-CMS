@@ -7,8 +7,9 @@ import {
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
+import { getGuidFromUdi, getProcessedImageUrl, imageSize } from '@umbraco-cms/backoffice/utils';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapToolbarElementApiBase {
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
@@ -103,10 +104,11 @@ export default class UmbTiptapMediaPickerExtensionApi extends UmbTiptapToolbarEl
 		if (!media?.url) return;
 
 		const { width, height } = await imageSize(media.url, { maxWidth: this.maxWidth });
+		const src = await getProcessedImageUrl(media.url, { width, height, mode: ImageCropModeModel.MAX });
 
 		const img = {
 			alt: media.altText,
-			src: media.url ? media.url : 'nothing.jpg',
+			src,
 			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
 			width: width.toString(),
 			height: height.toString(),
