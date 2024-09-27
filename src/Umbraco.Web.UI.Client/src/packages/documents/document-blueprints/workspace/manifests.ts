@@ -19,15 +19,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.DocumentBlueprint.Root',
-		name: 'Document Blueprint Root Workspace',
-		element: () => import('./document-blueprint-root-workspace.element.js'),
-		meta: {
-			entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
-		},
-	},
-	{
 		type: 'workspaceView',
 		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.DocumentBlueprint.Edit',
